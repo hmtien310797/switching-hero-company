@@ -1,0 +1,2098 @@
+{
+"skeleton": {
+	"hash": "67xxWTNK7Is",
+	"spine": "4.2.33",
+	"x": -540,
+	"y": -636,
+	"width": 1080,
+	"height": 1920,
+	"images": "./images2/",
+	"audio": "./audio"
+},
+"bones": [
+	{ "name": "root" },
+	{ "name": "VFX", "parent": "root" },
+	{ "name": "Beam", "parent": "VFX", "x": 18, "y": -222, "scaleX": 1.611, "scaleY": 1.611 },
+	{ "name": "beam_baoquan01", "parent": "Beam", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_baoquan02", "parent": "Beam", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu03", "parent": "Beam", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_gaungzhu3", "parent": "beam_guangzhu03", "rotation": -90 },
+	{ "name": "beam_guangxian01", "parent": "Beam", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu01", "parent": "Beam", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu02", "parent": "Beam", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_yumao01", "parent": "Beam", "length": 80.73, "rotation": 90 },
+	{ "name": "Beam2", "parent": "VFX", "x": 210, "y": 390, "scaleX": 1.611, "scaleY": 1.611 },
+	{ "name": "beam_baoquan03", "parent": "Beam2", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_baoquan04", "parent": "Beam2", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu04", "parent": "Beam2", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_gaungzhu4", "parent": "beam_guangzhu04", "rotation": -90 },
+	{ "name": "beam_guangxian02", "parent": "Beam2", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu05", "parent": "Beam2", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu06", "parent": "Beam2", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_yumao02", "parent": "Beam2", "length": 80.73, "rotation": 90 },
+	{ "name": "Beam3", "parent": "VFX", "x": -240, "y": 306, "scaleX": 1.611, "scaleY": 1.611 },
+	{ "name": "beam_baoquan05", "parent": "Beam3", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_baoquan06", "parent": "Beam3", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu07", "parent": "Beam3", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_gaungzhu5", "parent": "beam_guangzhu07", "rotation": -90 },
+	{ "name": "beam_guangxian03", "parent": "Beam3", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu08", "parent": "Beam3", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu09", "parent": "Beam3", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_yumao03", "parent": "Beam3", "length": 80.73, "rotation": 90 },
+	{ "name": "Beam4", "parent": "VFX", "x": 150, "y": 786, "scaleX": 1.611, "scaleY": 1.611 },
+	{ "name": "beam_baoquan07", "parent": "Beam4", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_baoquan08", "parent": "Beam4", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu010", "parent": "Beam4", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_gaungzhu6", "parent": "beam_guangzhu010", "rotation": -90 },
+	{ "name": "beam_guangxian04", "parent": "Beam4", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu011", "parent": "Beam4", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu012", "parent": "Beam4", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_yumao04", "parent": "Beam4", "length": 80.73, "rotation": 90 },
+	{ "name": "Beam5", "parent": "VFX", "x": -294, "y": -288, "scaleX": 0.7356, "scaleY": 0.7356 },
+	{ "name": "beam_baoquan09", "parent": "Beam5", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_baoquan010", "parent": "Beam5", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu013", "parent": "Beam5", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_gaungzhu7", "parent": "beam_guangzhu013", "rotation": -90 },
+	{ "name": "beam_guangxian05", "parent": "Beam5", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu014", "parent": "Beam5", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu015", "parent": "Beam5", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_yumao05", "parent": "Beam5", "length": 80.73, "rotation": 90 },
+	{ "name": "Beam6", "parent": "VFX", "x": -306, "y": 660, "scaleX": 0.7356, "scaleY": 0.7356 },
+	{ "name": "beam_baoquan011", "parent": "Beam6", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_baoquan012", "parent": "Beam6", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu016", "parent": "Beam6", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_gaungzhu8", "parent": "beam_guangzhu016", "rotation": -90 },
+	{ "name": "beam_guangxian06", "parent": "Beam6", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu017", "parent": "Beam6", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu018", "parent": "Beam6", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_yumao06", "parent": "Beam6", "length": 80.73, "rotation": 90 },
+	{ "name": "Beam7", "parent": "VFX", "x": 390, "y": 210, "scaleX": 0.7356, "scaleY": 0.7356 },
+	{ "name": "beam_baoquan013", "parent": "Beam7", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_baoquan014", "parent": "Beam7", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu019", "parent": "Beam7", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_gaungzhu9", "parent": "beam_guangzhu019", "rotation": -90 },
+	{ "name": "beam_guangxian07", "parent": "Beam7", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu020", "parent": "Beam7", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu021", "parent": "Beam7", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_yumao07", "parent": "Beam7", "length": 80.73, "rotation": 90 },
+	{ "name": "Beam8", "parent": "VFX", "x": 288, "y": -480, "scaleX": 1.2291, "scaleY": 1.2291 },
+	{ "name": "beam_baoquan015", "parent": "Beam8", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_baoquan016", "parent": "Beam8", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu022", "parent": "Beam8", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_gaungzhu10", "parent": "beam_guangzhu022", "rotation": -90 },
+	{ "name": "beam_guangxian08", "parent": "Beam8", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu023", "parent": "Beam8", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_guangzhu024", "parent": "Beam8", "length": 80.73, "rotation": 90 },
+	{ "name": "beam_yumao08", "parent": "Beam8", "length": 80.73, "rotation": 90 }
+],
+"slots": [
+	{ "name": "frame1920x1080", "bone": "root" },
+	{ "name": "beam_changguangzhu", "bone": "beam_guangzhu01" },
+	{ "name": "beam_changguangzhu5", "bone": "beam_guangzhu05" },
+	{ "name": "beam_changguangzhu8", "bone": "beam_guangzhu08" },
+	{ "name": "beam_changguangzhu11", "bone": "beam_guangzhu011" },
+	{ "name": "beam_changguangzhu14", "bone": "beam_guangzhu014" },
+	{ "name": "beam_changguangzhu17", "bone": "beam_guangzhu017" },
+	{ "name": "beam_changguangzhu20", "bone": "beam_guangzhu020" },
+	{ "name": "beam_changguangzhu23", "bone": "beam_guangzhu023" },
+	{ "name": "beam_changguangzhu2", "bone": "beam_guangzhu02" },
+	{ "name": "beam_changguangzhu6", "bone": "beam_guangzhu06" },
+	{ "name": "beam_changguangzhu9", "bone": "beam_guangzhu09" },
+	{ "name": "beam_changguangzhu12", "bone": "beam_guangzhu012" },
+	{ "name": "beam_changguangzhu15", "bone": "beam_guangzhu015" },
+	{ "name": "beam_changguangzhu18", "bone": "beam_guangzhu018" },
+	{ "name": "beam_changguangzhu21", "bone": "beam_guangzhu021" },
+	{ "name": "beam_changguangzhu24", "bone": "beam_guangzhu024" },
+	{ "name": "beam_changguangzhu3", "bone": "beam_gaungzhu3", "color": "ffffff76", "blend": "additive" },
+	{ "name": "beam_changguangzhu4", "bone": "beam_gaungzhu4", "color": "ffffff76", "blend": "additive" },
+	{ "name": "beam_changguangzhu7", "bone": "beam_gaungzhu5", "color": "ffffff76", "blend": "additive" },
+	{ "name": "beam_changguangzhu10", "bone": "beam_gaungzhu6", "color": "ffffff76", "blend": "additive" },
+	{ "name": "beam_changguangzhu13", "bone": "beam_gaungzhu7", "color": "ffffff76", "blend": "additive" },
+	{ "name": "beam_changguangzhu16", "bone": "beam_gaungzhu8", "color": "ffffff76", "blend": "additive" },
+	{ "name": "beam_changguangzhu19", "bone": "beam_gaungzhu9", "color": "ffffff76", "blend": "additive" },
+	{ "name": "beam_changguangzhu22", "bone": "beam_gaungzhu10", "color": "ffffff76", "blend": "additive" },
+	{ "name": "beam_guangxian", "bone": "beam_guangxian01", "blend": "additive" },
+	{ "name": "beam_guangxian2", "bone": "beam_guangxian02", "blend": "additive" },
+	{ "name": "beam_guangxian3", "bone": "beam_guangxian03", "blend": "additive" },
+	{ "name": "beam_guangxian4", "bone": "beam_guangxian04", "blend": "additive" },
+	{ "name": "beam_guangxian5", "bone": "beam_guangxian05", "blend": "additive" },
+	{ "name": "beam_guangxian6", "bone": "beam_guangxian06", "blend": "additive" },
+	{ "name": "beam_guangxian7", "bone": "beam_guangxian07", "blend": "additive" },
+	{ "name": "beam_guangxian8", "bone": "beam_guangxian08", "blend": "additive" },
+	{ "name": "beam_baoquan2", "bone": "beam_baoquan02", "blend": "additive" },
+	{ "name": "beam_baoquan4", "bone": "beam_baoquan04", "blend": "additive" },
+	{ "name": "beam_baoquan6", "bone": "beam_baoquan06", "blend": "additive" },
+	{ "name": "beam_baoquan8", "bone": "beam_baoquan08", "blend": "additive" },
+	{ "name": "beam_baoquan10", "bone": "beam_baoquan010", "blend": "additive" },
+	{ "name": "beam_baoquan12", "bone": "beam_baoquan012", "blend": "additive" },
+	{ "name": "beam_baoquan14", "bone": "beam_baoquan014", "blend": "additive" },
+	{ "name": "beam_baoquan16", "bone": "beam_baoquan016", "blend": "additive" },
+	{ "name": "beam_baoquan", "bone": "beam_baoquan01", "blend": "additive" },
+	{ "name": "beam_baoquan3", "bone": "beam_baoquan03", "blend": "additive" },
+	{ "name": "beam_baoquan5", "bone": "beam_baoquan05", "blend": "additive" },
+	{ "name": "beam_baoquan7", "bone": "beam_baoquan07", "blend": "additive" },
+	{ "name": "beam_baoquan9", "bone": "beam_baoquan09", "blend": "additive" },
+	{ "name": "beam_baoquan11", "bone": "beam_baoquan011", "blend": "additive" },
+	{ "name": "beam_baoquan13", "bone": "beam_baoquan013", "blend": "additive" },
+	{ "name": "beam_baoquan15", "bone": "beam_baoquan015", "blend": "additive" },
+	{ "name": "beam_yumao", "bone": "beam_yumao01", "blend": "additive" },
+	{ "name": "beam_yumao2", "bone": "beam_yumao02", "blend": "additive" },
+	{ "name": "beam_yumao3", "bone": "beam_yumao03", "blend": "additive" },
+	{ "name": "beam_yumao4", "bone": "beam_yumao04", "blend": "additive" },
+	{ "name": "beam_yumao5", "bone": "beam_yumao05", "blend": "additive" },
+	{ "name": "beam_yumao6", "bone": "beam_yumao06", "blend": "additive" },
+	{ "name": "beam_yumao7", "bone": "beam_yumao07", "blend": "additive" },
+	{ "name": "beam_yumao8", "bone": "beam_yumao08", "blend": "additive" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"beam_baoquan": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan2": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan3": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan4": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan5": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan6": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan7": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan8": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan9": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan10": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan11": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan12": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan13": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan14": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan15": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_baoquan16": {
+				"VFX/baoquan_0019": { "rotation": -90, "width": 159, "height": 97 },
+				"VFX/baoquan_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 },
+				"VFX/baoquan_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 318, "height": 194 }
+			},
+			"beam_changguangzhu": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu2": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu3": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu4": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu5": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu6": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu7": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu8": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu9": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu10": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu11": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu12": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu13": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu14": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu15": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu16": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu17": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu18": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu19": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu20": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu21": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu22": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu23": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_changguangzhu24": {
+				"VFX/changguangzhu_0000": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0001": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0002": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0003": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0004": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0005": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0006": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 },
+				"VFX/changguangzhu_0008": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 243, "height": 388 }
+			},
+			"beam_guangxian": {
+				"VFX/guangxian_0000": { "rotation": -90, "width": 186, "height": 37 }
+			},
+			"beam_guangxian2": {
+				"VFX/guangxian_0000": { "rotation": -90, "width": 186, "height": 37 }
+			},
+			"beam_guangxian3": {
+				"VFX/guangxian_0000": { "rotation": -90, "width": 186, "height": 37 }
+			},
+			"beam_guangxian4": {
+				"VFX/guangxian_0000": { "rotation": -90, "width": 186, "height": 37 }
+			},
+			"beam_guangxian5": {
+				"VFX/guangxian_0000": { "rotation": -90, "width": 186, "height": 37 }
+			},
+			"beam_guangxian6": {
+				"VFX/guangxian_0000": { "rotation": -90, "width": 186, "height": 37 }
+			},
+			"beam_guangxian7": {
+				"VFX/guangxian_0000": { "rotation": -90, "width": 186, "height": 37 }
+			},
+			"beam_guangxian8": {
+				"VFX/guangxian_0000": { "rotation": -90, "width": 186, "height": 37 }
+			},
+			"beam_yumao": {
+				"VFX/yumao_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0028": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0029": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0030": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 }
+			},
+			"beam_yumao2": {
+				"VFX/yumao_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0028": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0029": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0030": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 }
+			},
+			"beam_yumao3": {
+				"VFX/yumao_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0028": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0029": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0030": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 }
+			},
+			"beam_yumao4": {
+				"VFX/yumao_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0028": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0029": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0030": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 }
+			},
+			"beam_yumao5": {
+				"VFX/yumao_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0028": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0029": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0030": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 }
+			},
+			"beam_yumao6": {
+				"VFX/yumao_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0028": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0029": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0030": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 }
+			},
+			"beam_yumao7": {
+				"VFX/yumao_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0028": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0029": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0030": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 }
+			},
+			"beam_yumao8": {
+				"VFX/yumao_0020": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0021": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0022": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0023": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0024": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0025": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0026": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0027": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0028": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0029": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 },
+				"VFX/yumao_0030": { "scaleX": 0.5, "scaleY": 0.5, "rotation": -90, "width": 362, "height": 370 }
+			}
+		}
+	}
+],
+"animations": {
+	"animation": {
+		"slots": {
+			"beam_baoquan": {
+				"rgba": [
+					{ "time": 0.4333, "color": "ffffffff" },
+					{ "time": 0.5, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.0333, "name": "VFX/baoquan_0019" },
+					{ "time": 0.0667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.1, "name": "VFX/baoquan_0021" },
+					{ "time": 0.1333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.1667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.2, "name": "VFX/baoquan_0024" },
+					{ "time": 0.2667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.3333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.4, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan2": {
+				"rgba": [
+					{ "color": "ffffff00" },
+					{ "time": 0.1, "color": "7a5022ff" },
+					{ "time": 0.5, "color": "ffffffff" },
+					{ "time": 0.6333, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.0667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.1, "name": "VFX/baoquan_0021" },
+					{ "time": 0.1333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.1667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.2, "name": "VFX/baoquan_0024" },
+					{ "time": 0.2667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.3333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.4, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan3": {
+				"rgba": [
+					{ "time": 0.5333, "color": "ffffffff" },
+					{ "time": 0.6, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.1333, "name": "VFX/baoquan_0019" },
+					{ "time": 0.1667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.2, "name": "VFX/baoquan_0021" },
+					{ "time": 0.2333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.2667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.3, "name": "VFX/baoquan_0024" },
+					{ "time": 0.3667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.4333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.5, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan4": {
+				"rgba": [
+					{ "time": 0.1, "color": "ffffff00" },
+					{ "time": 0.2, "color": "7a5022ff" },
+					{ "time": 0.6, "color": "ffffffff" },
+					{ "time": 0.7333, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.1667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.2, "name": "VFX/baoquan_0021" },
+					{ "time": 0.2333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.2667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.3, "name": "VFX/baoquan_0024" },
+					{ "time": 0.3667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.4333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.5, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan5": {
+				"rgba": [
+					{ "time": 0.6333, "color": "ffffffff" },
+					{ "time": 0.7, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.2333, "name": "VFX/baoquan_0019" },
+					{ "time": 0.2667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.3, "name": "VFX/baoquan_0021" },
+					{ "time": 0.3333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.3667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.4, "name": "VFX/baoquan_0024" },
+					{ "time": 0.4667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.5333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.6, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan6": {
+				"rgba": [
+					{ "time": 0.2, "color": "ffffff00" },
+					{ "time": 0.3, "color": "7a5022ff" },
+					{ "time": 0.7, "color": "ffffffff" },
+					{ "time": 0.8333, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.2667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.3, "name": "VFX/baoquan_0021" },
+					{ "time": 0.3333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.3667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.4, "name": "VFX/baoquan_0024" },
+					{ "time": 0.4667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.5333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.6, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan7": {
+				"rgba": [
+					{ "time": 0.7333, "color": "ffffffff" },
+					{ "time": 0.8, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.3333, "name": "VFX/baoquan_0019" },
+					{ "time": 0.3667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.4, "name": "VFX/baoquan_0021" },
+					{ "time": 0.4333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.4667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.5, "name": "VFX/baoquan_0024" },
+					{ "time": 0.5667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.6333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.7, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan8": {
+				"rgba": [
+					{ "time": 0.3, "color": "ffffff00" },
+					{ "time": 0.4, "color": "7a5022ff" },
+					{ "time": 0.8, "color": "ffffffff" },
+					{ "time": 0.9333, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.3667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.4, "name": "VFX/baoquan_0021" },
+					{ "time": 0.4333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.4667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.5, "name": "VFX/baoquan_0024" },
+					{ "time": 0.5667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.6333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.7, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan9": {
+				"rgba": [
+					{ "time": 0.8333, "color": "ffffffff" },
+					{ "time": 0.9, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.4333, "name": "VFX/baoquan_0019" },
+					{ "time": 0.4667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.5, "name": "VFX/baoquan_0021" },
+					{ "time": 0.5333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.5667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.6, "name": "VFX/baoquan_0024" },
+					{ "time": 0.6667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.7333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.8, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan10": {
+				"rgba": [
+					{ "time": 0.4, "color": "ffffff00" },
+					{ "time": 0.5, "color": "7a5022ff" },
+					{ "time": 0.9, "color": "ffffffff" },
+					{ "time": 1.0333, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.4667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.5, "name": "VFX/baoquan_0021" },
+					{ "time": 0.5333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.5667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.6, "name": "VFX/baoquan_0024" },
+					{ "time": 0.6667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.7333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.8, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan11": {
+				"rgba": [
+					{ "time": 0.9333, "color": "ffffffff" },
+					{ "time": 1, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.5333, "name": "VFX/baoquan_0019" },
+					{ "time": 0.5667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.6, "name": "VFX/baoquan_0021" },
+					{ "time": 0.6333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.6667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.7, "name": "VFX/baoquan_0024" },
+					{ "time": 0.7667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.8333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.9, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan12": {
+				"rgba": [
+					{ "time": 0.5, "color": "ffffff00" },
+					{ "time": 0.6, "color": "7a5022ff" },
+					{ "time": 1, "color": "ffffffff" },
+					{ "time": 1.1333, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.5667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.6, "name": "VFX/baoquan_0021" },
+					{ "time": 0.6333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.6667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.7, "name": "VFX/baoquan_0024" },
+					{ "time": 0.7667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.8333, "name": "VFX/baoquan_0026" },
+					{ "time": 0.9, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan13": {
+				"rgba": [
+					{ "time": 1.0333, "color": "ffffffff" },
+					{ "time": 1.1, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.6333, "name": "VFX/baoquan_0019" },
+					{ "time": 0.6667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.7, "name": "VFX/baoquan_0021" },
+					{ "time": 0.7333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.7667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.8, "name": "VFX/baoquan_0024" },
+					{ "time": 0.8667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.9333, "name": "VFX/baoquan_0026" },
+					{ "time": 1, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan14": {
+				"rgba": [
+					{ "time": 0.6, "color": "ffffff00" },
+					{ "time": 0.7, "color": "7a5022ff" },
+					{ "time": 1.1, "color": "ffffffff" },
+					{ "time": 1.2333, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.6667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.7, "name": "VFX/baoquan_0021" },
+					{ "time": 0.7333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.7667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.8, "name": "VFX/baoquan_0024" },
+					{ "time": 0.8667, "name": "VFX/baoquan_0025" },
+					{ "time": 0.9333, "name": "VFX/baoquan_0026" },
+					{ "time": 1, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan15": {
+				"rgba": [
+					{ "time": 1.1333, "color": "ffffffff" },
+					{ "time": 1.2, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.7333, "name": "VFX/baoquan_0019" },
+					{ "time": 0.7667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.8, "name": "VFX/baoquan_0021" },
+					{ "time": 0.8333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.8667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.9, "name": "VFX/baoquan_0024" },
+					{ "time": 0.9667, "name": "VFX/baoquan_0025" },
+					{ "time": 1.0333, "name": "VFX/baoquan_0026" },
+					{ "time": 1.1, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_baoquan16": {
+				"rgba": [
+					{ "time": 0.7, "color": "ffffff00" },
+					{ "time": 0.8, "color": "7a5022ff" },
+					{ "time": 1.2, "color": "ffffffff" },
+					{ "time": 1.3333, "color": "ffffff00" }
+				],
+				"attachment": [
+					{ "time": 0.7667, "name": "VFX/baoquan_0020" },
+					{ "time": 0.8, "name": "VFX/baoquan_0021" },
+					{ "time": 0.8333, "name": "VFX/baoquan_0022" },
+					{ "time": 0.8667, "name": "VFX/baoquan_0023" },
+					{ "time": 0.9, "name": "VFX/baoquan_0024" },
+					{ "time": 0.9667, "name": "VFX/baoquan_0025" },
+					{ "time": 1.0333, "name": "VFX/baoquan_0026" },
+					{ "time": 1.1, "name": "VFX/baoquan_0027" }
+				]
+			},
+			"beam_changguangzhu": {
+				"rgba": [
+					{ "time": 0.5, "color": "ffffffff" },
+					{ "time": 0.6333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.0333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.1, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.1667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.2333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.3, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.3667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu2": {
+				"rgba": [
+					{ "time": 0.5333, "color": "ffffffff" },
+					{ "time": 0.6667, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.0333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.1, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.1667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.2333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.3, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.3667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu3": {
+				"rgba": [
+					{ "color": "ff9c976a" },
+					{ "time": 0.0333, "color": "ff948f69" },
+					{ "time": 0.6333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.0333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.1, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.1667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.2333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.3, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.3667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu4": {
+				"rgba": [
+					{ "time": 0.1, "color": "ff9c976a" },
+					{ "time": 0.1333, "color": "ff948f69" },
+					{ "time": 0.7333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.1333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.2, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.2667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.3333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.4, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.4667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu5": {
+				"rgba": [
+					{ "time": 0.6, "color": "ffffffff" },
+					{ "time": 0.7333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.1333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.2, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.2667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.3333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.4, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.4667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu6": {
+				"rgba": [
+					{ "time": 0.6333, "color": "ffffffff" },
+					{ "time": 0.7667, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.1333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.2, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.2667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.3333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.4, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.4667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu7": {
+				"rgba": [
+					{ "time": 0.2, "color": "ff9c976a" },
+					{ "time": 0.2333, "color": "ff948f69" },
+					{ "time": 0.8333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.2333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.3, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.3667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.5667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu8": {
+				"rgba": [
+					{ "time": 0.7, "color": "ffffffff" },
+					{ "time": 0.8333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.2333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.3, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.3667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.5667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu9": {
+				"rgba": [
+					{ "time": 0.7333, "color": "ffffffff" },
+					{ "time": 0.8667, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.2333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.3, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.3667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.5667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu10": {
+				"rgba": [
+					{ "time": 0.3, "color": "ff9c976a" },
+					{ "time": 0.3333, "color": "ff948f69" },
+					{ "time": 0.9333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.3333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.4, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.4667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.6667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu11": {
+				"rgba": [
+					{ "time": 0.8, "color": "ffffffff" },
+					{ "time": 0.9333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.3333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.4, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.4667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.6667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu12": {
+				"rgba": [
+					{ "time": 0.8333, "color": "ffffffff" },
+					{ "time": 0.9667, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.3333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.4, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.4667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.6667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu13": {
+				"rgba": [
+					{ "time": 0.4, "color": "ff9c976a" },
+					{ "time": 0.4333, "color": "ff948f69" },
+					{ "time": 1.0333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.5667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.7667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.8333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.9, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu14": {
+				"rgba": [
+					{ "time": 0.9, "color": "ffffffff" },
+					{ "time": 1.0333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.5667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.7667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.8333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.9, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu15": {
+				"rgba": [
+					{ "time": 0.9333, "color": "ffffffff" },
+					{ "time": 1.0667, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.4333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.5, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.5667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.7667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.8333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 0.9, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu16": {
+				"rgba": [
+					{ "time": 0.5, "color": "ff9c976a" },
+					{ "time": 0.5333, "color": "ff948f69" },
+					{ "time": 1.1333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.6667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.8667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.9333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu17": {
+				"rgba": [
+					{ "time": 1, "color": "ffffffff" },
+					{ "time": 1.1333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.6667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.8667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.9333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu18": {
+				"rgba": [
+					{ "time": 1.0333, "color": "ffffffff" },
+					{ "time": 1.1667, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.5333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.6, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.6667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.8667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 0.9333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu19": {
+				"rgba": [
+					{ "time": 0.6, "color": "ff9c976a" },
+					{ "time": 0.6333, "color": "ff948f69" },
+					{ "time": 1.2333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.7667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.8333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.9, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.9667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 1.0333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1.1, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu20": {
+				"rgba": [
+					{ "time": 1.1, "color": "ffffffff" },
+					{ "time": 1.2333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.7667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.8333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.9, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.9667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 1.0333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1.1, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu21": {
+				"rgba": [
+					{ "time": 1.1333, "color": "ffffffff" },
+					{ "time": 1.2667, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.6333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.7, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.7667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.8333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 0.9, "name": "VFX/changguangzhu_0004" },
+					{ "time": 0.9667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 1.0333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1.1, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu22": {
+				"rgba": [
+					{ "time": 0.7, "color": "ff9c976a" },
+					{ "time": 0.7333, "color": "ff948f69" },
+					{ "time": 1.3333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.8667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.9333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 1, "name": "VFX/changguangzhu_0004" },
+					{ "time": 1.0667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 1.1333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1.2, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu23": {
+				"rgba": [
+					{ "time": 1.2, "color": "ffffffff" },
+					{ "time": 1.3333, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.8667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.9333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 1, "name": "VFX/changguangzhu_0004" },
+					{ "time": 1.0667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 1.1333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1.2, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_changguangzhu24": {
+				"rgba": [
+					{ "time": 1.2333, "color": "ffffffff" },
+					{ "time": 1.3667, "color": "ffd09400" }
+				],
+				"attachment": [
+					{ "time": 0.7333, "name": "VFX/changguangzhu_0000" },
+					{ "time": 0.8, "name": "VFX/changguangzhu_0001" },
+					{ "time": 0.8667, "name": "VFX/changguangzhu_0002" },
+					{ "time": 0.9333, "name": "VFX/changguangzhu_0003" },
+					{ "time": 1, "name": "VFX/changguangzhu_0004" },
+					{ "time": 1.0667, "name": "VFX/changguangzhu_0005" },
+					{ "time": 1.1333, "name": "VFX/changguangzhu_0006" },
+					{ "time": 1.2, "name": "VFX/changguangzhu_0008" }
+				]
+			},
+			"beam_guangxian": {
+				"attachment": [
+					{ "time": 0.0333, "name": "VFX/guangxian_0000" }
+				]
+			},
+			"beam_guangxian2": {
+				"attachment": [
+					{ "time": 0.1333, "name": "VFX/guangxian_0000" }
+				]
+			},
+			"beam_guangxian3": {
+				"attachment": [
+					{ "time": 0.2333, "name": "VFX/guangxian_0000" }
+				]
+			},
+			"beam_guangxian4": {
+				"attachment": [
+					{ "time": 0.3333, "name": "VFX/guangxian_0000" }
+				]
+			},
+			"beam_guangxian5": {
+				"attachment": [
+					{ "time": 0.4333, "name": "VFX/guangxian_0000" }
+				]
+			},
+			"beam_guangxian6": {
+				"attachment": [
+					{ "time": 0.5333, "name": "VFX/guangxian_0000" }
+				]
+			},
+			"beam_guangxian7": {
+				"attachment": [
+					{ "time": 0.6333, "name": "VFX/guangxian_0000" }
+				]
+			},
+			"beam_guangxian8": {
+				"attachment": [
+					{ "time": 0.7333, "name": "VFX/guangxian_0000" }
+				]
+			},
+			"beam_yumao": {
+				"rgba": [
+					{ "time": 0.5333, "color": "ffffffff" },
+					{ "time": 0.6667, "color": "ffffff08" }
+				],
+				"attachment": [
+					{ "time": 0.0333, "name": "VFX/yumao_0020" },
+					{ "time": 0.0667, "name": "VFX/yumao_0021" },
+					{ "time": 0.1, "name": "VFX/yumao_0022" },
+					{ "time": 0.1333, "name": "VFX/yumao_0023" },
+					{ "time": 0.1667, "name": "VFX/yumao_0024" },
+					{ "time": 0.2, "name": "VFX/yumao_0025" },
+					{ "time": 0.2667, "name": "VFX/yumao_0026" },
+					{ "time": 0.3333, "name": "VFX/yumao_0027" },
+					{ "time": 0.4, "name": "VFX/yumao_0028" },
+					{ "time": 0.4667, "name": "VFX/yumao_0029" },
+					{ "time": 0.5333, "name": "VFX/yumao_0030" }
+				]
+			},
+			"beam_yumao2": {
+				"rgba": [
+					{ "time": 0.6333, "color": "ffffffff" },
+					{ "time": 0.7667, "color": "ffffff08" }
+				],
+				"attachment": [
+					{ "time": 0.1333, "name": "VFX/yumao_0020" },
+					{ "time": 0.1667, "name": "VFX/yumao_0021" },
+					{ "time": 0.2, "name": "VFX/yumao_0022" },
+					{ "time": 0.2333, "name": "VFX/yumao_0023" },
+					{ "time": 0.2667, "name": "VFX/yumao_0024" },
+					{ "time": 0.3, "name": "VFX/yumao_0025" },
+					{ "time": 0.3667, "name": "VFX/yumao_0026" },
+					{ "time": 0.4333, "name": "VFX/yumao_0027" },
+					{ "time": 0.5, "name": "VFX/yumao_0028" },
+					{ "time": 0.5667, "name": "VFX/yumao_0029" },
+					{ "time": 0.6333, "name": "VFX/yumao_0030" }
+				]
+			},
+			"beam_yumao3": {
+				"rgba": [
+					{ "time": 0.7333, "color": "ffffffff" },
+					{ "time": 0.8667, "color": "ffffff08" }
+				],
+				"attachment": [
+					{ "time": 0.2333, "name": "VFX/yumao_0020" },
+					{ "time": 0.2667, "name": "VFX/yumao_0021" },
+					{ "time": 0.3, "name": "VFX/yumao_0022" },
+					{ "time": 0.3333, "name": "VFX/yumao_0023" },
+					{ "time": 0.3667, "name": "VFX/yumao_0024" },
+					{ "time": 0.4, "name": "VFX/yumao_0025" },
+					{ "time": 0.4667, "name": "VFX/yumao_0026" },
+					{ "time": 0.5333, "name": "VFX/yumao_0027" },
+					{ "time": 0.6, "name": "VFX/yumao_0028" },
+					{ "time": 0.6667, "name": "VFX/yumao_0029" },
+					{ "time": 0.7333, "name": "VFX/yumao_0030" }
+				]
+			},
+			"beam_yumao4": {
+				"rgba": [
+					{ "time": 0.8333, "color": "ffffffff" },
+					{ "time": 0.9667, "color": "ffffff08" }
+				],
+				"attachment": [
+					{ "time": 0.3333, "name": "VFX/yumao_0020" },
+					{ "time": 0.3667, "name": "VFX/yumao_0021" },
+					{ "time": 0.4, "name": "VFX/yumao_0022" },
+					{ "time": 0.4333, "name": "VFX/yumao_0023" },
+					{ "time": 0.4667, "name": "VFX/yumao_0024" },
+					{ "time": 0.5, "name": "VFX/yumao_0025" },
+					{ "time": 0.5667, "name": "VFX/yumao_0026" },
+					{ "time": 0.6333, "name": "VFX/yumao_0027" },
+					{ "time": 0.7, "name": "VFX/yumao_0028" },
+					{ "time": 0.7667, "name": "VFX/yumao_0029" },
+					{ "time": 0.8333, "name": "VFX/yumao_0030" }
+				]
+			},
+			"beam_yumao5": {
+				"rgba": [
+					{ "time": 0.9333, "color": "ffffffff" },
+					{ "time": 1.0667, "color": "ffffff08" }
+				],
+				"attachment": [
+					{ "time": 0.4333, "name": "VFX/yumao_0020" },
+					{ "time": 0.4667, "name": "VFX/yumao_0021" },
+					{ "time": 0.5, "name": "VFX/yumao_0022" },
+					{ "time": 0.5333, "name": "VFX/yumao_0023" },
+					{ "time": 0.5667, "name": "VFX/yumao_0024" },
+					{ "time": 0.6, "name": "VFX/yumao_0025" },
+					{ "time": 0.6667, "name": "VFX/yumao_0026" },
+					{ "time": 0.7333, "name": "VFX/yumao_0027" },
+					{ "time": 0.8, "name": "VFX/yumao_0028" },
+					{ "time": 0.8667, "name": "VFX/yumao_0029" },
+					{ "time": 0.9333, "name": "VFX/yumao_0030" }
+				]
+			},
+			"beam_yumao6": {
+				"rgba": [
+					{ "time": 1.0333, "color": "ffffffff" },
+					{ "time": 1.1667, "color": "ffffff08" }
+				],
+				"attachment": [
+					{ "time": 0.5333, "name": "VFX/yumao_0020" },
+					{ "time": 0.5667, "name": "VFX/yumao_0021" },
+					{ "time": 0.6, "name": "VFX/yumao_0022" },
+					{ "time": 0.6333, "name": "VFX/yumao_0023" },
+					{ "time": 0.6667, "name": "VFX/yumao_0024" },
+					{ "time": 0.7, "name": "VFX/yumao_0025" },
+					{ "time": 0.7667, "name": "VFX/yumao_0026" },
+					{ "time": 0.8333, "name": "VFX/yumao_0027" },
+					{ "time": 0.9, "name": "VFX/yumao_0028" },
+					{ "time": 0.9667, "name": "VFX/yumao_0029" },
+					{ "time": 1.0333, "name": "VFX/yumao_0030" }
+				]
+			},
+			"beam_yumao7": {
+				"rgba": [
+					{ "time": 1.1333, "color": "ffffffff" },
+					{ "time": 1.2667, "color": "ffffff08" }
+				],
+				"attachment": [
+					{ "time": 0.6333, "name": "VFX/yumao_0020" },
+					{ "time": 0.6667, "name": "VFX/yumao_0021" },
+					{ "time": 0.7, "name": "VFX/yumao_0022" },
+					{ "time": 0.7333, "name": "VFX/yumao_0023" },
+					{ "time": 0.7667, "name": "VFX/yumao_0024" },
+					{ "time": 0.8, "name": "VFX/yumao_0025" },
+					{ "time": 0.8667, "name": "VFX/yumao_0026" },
+					{ "time": 0.9333, "name": "VFX/yumao_0027" },
+					{ "time": 1, "name": "VFX/yumao_0028" },
+					{ "time": 1.0667, "name": "VFX/yumao_0029" },
+					{ "time": 1.1333, "name": "VFX/yumao_0030" }
+				]
+			},
+			"beam_yumao8": {
+				"rgba": [
+					{ "time": 1.2333, "color": "ffffffff" },
+					{ "time": 1.3667, "color": "ffffff08" }
+				],
+				"attachment": [
+					{ "time": 0.7333, "name": "VFX/yumao_0020" },
+					{ "time": 0.7667, "name": "VFX/yumao_0021" },
+					{ "time": 0.8, "name": "VFX/yumao_0022" },
+					{ "time": 0.8333, "name": "VFX/yumao_0023" },
+					{ "time": 0.8667, "name": "VFX/yumao_0024" },
+					{ "time": 0.9, "name": "VFX/yumao_0025" },
+					{ "time": 0.9667, "name": "VFX/yumao_0026" },
+					{ "time": 1.0333, "name": "VFX/yumao_0027" },
+					{ "time": 1.1, "name": "VFX/yumao_0028" },
+					{ "time": 1.1667, "name": "VFX/yumao_0029" },
+					{ "time": 1.2333, "name": "VFX/yumao_0030" }
+				]
+			}
+		},
+		"bones": {
+			"Beam": {
+				"scale": [
+					{ "x": 5.446, "y": 5.446 }
+				]
+			},
+			"beam_baoquan01": {
+				"translate": [
+					{ "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "curve": "stepped" },
+					{ "time": 0.1, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_baoquan02": {
+				"translate": [
+					{ "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "curve": "stepped" },
+					{ "time": 0.1, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_guangzhu01": {
+				"translate": [
+					{ "x": 10.57, "y": 74.6 },
+					{ "time": 0.0333, "x": 11.38, "y": 80.34 }
+				]
+			},
+			"beam_guangxian01": {
+				"translate": [
+					{ "x": 7.69, "y": 1.99 },
+					{ "time": 0.0333, "x": 8.28, "y": 2.14 }
+				],
+				"scale": [
+					{ "x": 1.464 },
+					{ "time": 0.0333, "x": 1.5 },
+					{ "time": 0.2, "x": 0, "y": 0 }
+				]
+			},
+			"beam_yumao01": {
+				"translate": [
+					{ "x": 2.5, "y": 29.33 },
+					{ "time": 0.0333, "x": 2.69, "y": 31.58 },
+					{ "time": 0.1, "x": 2.69, "y": 44.35 }
+				]
+			},
+			"beam_guangzhu02": {
+				"translate": [
+					{ "x": 11.81, "y": 217.59 },
+					{ "time": 0.0333, "x": 12.72, "y": 234.32 }
+				]
+			},
+			"beam_gaungzhu3": {
+				"translate": [
+					{ "x": 10.2, "y": 72.61 },
+					{ "time": 0.0333, "x": 10.99, "y": 78.19 },
+					{ "time": 0.0667, "x": 11.49, "y": 79.69 }
+				]
+			},
+			"beam_guangzhu03": {
+				"translate": [
+					{ "x": 83.54, "y": 72.61 },
+					{ "time": 0.0333, "x": 89.96, "y": 78.19 }
+				]
+			},
+			"beam_baoquan03": {
+				"translate": [
+					{ "time": 0.1, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.1, "curve": "stepped" },
+					{ "time": 0.2, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_baoquan04": {
+				"translate": [
+					{ "time": 0.1, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.1, "curve": "stepped" },
+					{ "time": 0.2, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_gaungzhu4": {
+				"translate": [
+					{ "time": 0.1, "x": 10.2, "y": 72.61 },
+					{ "time": 0.1333, "x": 10.99, "y": 78.19 },
+					{ "time": 0.1667, "x": 11.49, "y": 79.69 }
+				]
+			},
+			"beam_guangzhu04": {
+				"translate": [
+					{ "time": 0.1, "x": 83.54, "y": 72.61 },
+					{ "time": 0.1333, "x": 89.96, "y": 78.19 }
+				]
+			},
+			"beam_guangxian02": {
+				"translate": [
+					{ "time": 0.1, "x": 7.69, "y": 1.99 },
+					{ "time": 0.1333, "x": 8.28, "y": 2.14 }
+				],
+				"scale": [
+					{ "time": 0.1, "x": 1.464 },
+					{ "time": 0.1333, "x": 1.5 },
+					{ "time": 0.3, "x": 0, "y": 0 }
+				]
+			},
+			"beam_guangzhu05": {
+				"translate": [
+					{ "time": 0.1, "x": 10.57, "y": 74.6 },
+					{ "time": 0.1333, "x": 11.38, "y": 80.34 }
+				]
+			},
+			"beam_guangzhu06": {
+				"translate": [
+					{ "time": 0.1, "x": 11.81, "y": 217.59 },
+					{ "time": 0.1333, "x": 12.72, "y": 234.32 }
+				]
+			},
+			"beam_yumao02": {
+				"translate": [
+					{ "time": 0.1, "x": 2.5, "y": 29.33 },
+					{ "time": 0.1333, "x": 2.69, "y": 31.58 },
+					{ "time": 0.2, "x": 2.69, "y": 44.35 }
+				]
+			},
+			"Beam2": {
+				"scale": [
+					{ "time": 0.1, "x": 5.446, "y": 5.446 }
+				]
+			},
+			"beam_baoquan05": {
+				"translate": [
+					{ "time": 0.2, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.2, "curve": "stepped" },
+					{ "time": 0.3, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_baoquan06": {
+				"translate": [
+					{ "time": 0.2, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.2, "curve": "stepped" },
+					{ "time": 0.3, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_gaungzhu5": {
+				"translate": [
+					{ "time": 0.2, "x": 10.2, "y": 72.61 },
+					{ "time": 0.2333, "x": 10.99, "y": 78.19 },
+					{ "time": 0.2667, "x": 11.49, "y": 79.69 }
+				]
+			},
+			"beam_guangzhu07": {
+				"translate": [
+					{ "time": 0.2, "x": 83.54, "y": 72.61 },
+					{ "time": 0.2333, "x": 89.96, "y": 78.19 }
+				]
+			},
+			"beam_guangxian03": {
+				"translate": [
+					{ "time": 0.2, "x": 7.69, "y": 1.99 },
+					{ "time": 0.2333, "x": 8.28, "y": 2.14 }
+				],
+				"scale": [
+					{ "time": 0.2, "x": 1.464 },
+					{ "time": 0.2333, "x": 1.5 },
+					{ "time": 0.4, "x": 0, "y": 0 }
+				]
+			},
+			"beam_guangzhu08": {
+				"translate": [
+					{ "time": 0.2, "x": 10.57, "y": 74.6 },
+					{ "time": 0.2333, "x": 11.38, "y": 80.34 }
+				]
+			},
+			"beam_guangzhu09": {
+				"translate": [
+					{ "time": 0.2, "x": 11.81, "y": 217.59 },
+					{ "time": 0.2333, "x": 12.72, "y": 234.32 }
+				]
+			},
+			"beam_yumao03": {
+				"translate": [
+					{ "time": 0.2, "x": 2.5, "y": 29.33 },
+					{ "time": 0.2333, "x": 2.69, "y": 31.58 },
+					{ "time": 0.3, "x": 2.69, "y": 44.35 }
+				]
+			},
+			"Beam3": {
+				"scale": [
+					{ "time": 0.2, "x": 5.446, "y": 5.446 }
+				]
+			},
+			"beam_baoquan07": {
+				"translate": [
+					{ "time": 0.3, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.3, "curve": "stepped" },
+					{ "time": 0.4, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_baoquan08": {
+				"translate": [
+					{ "time": 0.3, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.3, "curve": "stepped" },
+					{ "time": 0.4, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_gaungzhu6": {
+				"translate": [
+					{ "time": 0.3, "x": 10.2, "y": 72.61 },
+					{ "time": 0.3333, "x": 10.99, "y": 78.19 },
+					{ "time": 0.3667, "x": 11.49, "y": 79.69 }
+				]
+			},
+			"beam_guangzhu010": {
+				"translate": [
+					{ "time": 0.3, "x": 83.54, "y": 72.61 },
+					{ "time": 0.3333, "x": 89.96, "y": 78.19 }
+				]
+			},
+			"beam_guangxian04": {
+				"translate": [
+					{ "time": 0.3, "x": 7.69, "y": 1.99 },
+					{ "time": 0.3333, "x": 8.28, "y": 2.14 }
+				],
+				"scale": [
+					{ "time": 0.3, "x": 1.464 },
+					{ "time": 0.3333, "x": 1.5 },
+					{ "time": 0.5, "x": 0, "y": 0 }
+				]
+			},
+			"beam_guangzhu011": {
+				"translate": [
+					{ "time": 0.3, "x": 10.57, "y": 74.6 },
+					{ "time": 0.3333, "x": 11.38, "y": 80.34 }
+				]
+			},
+			"beam_guangzhu012": {
+				"translate": [
+					{ "time": 0.3, "x": 11.81, "y": 217.59 },
+					{ "time": 0.3333, "x": 12.72, "y": 234.32 }
+				]
+			},
+			"beam_yumao04": {
+				"translate": [
+					{ "time": 0.3, "x": 2.5, "y": 29.33 },
+					{ "time": 0.3333, "x": 2.69, "y": 31.58 },
+					{ "time": 0.4, "x": 2.69, "y": 44.35 }
+				]
+			},
+			"Beam4": {
+				"scale": [
+					{ "time": 0.3, "x": 5.446, "y": 5.446 }
+				]
+			},
+			"beam_baoquan09": {
+				"translate": [
+					{ "time": 0.4, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.4, "curve": "stepped" },
+					{ "time": 0.5, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_baoquan010": {
+				"translate": [
+					{ "time": 0.4, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.4, "curve": "stepped" },
+					{ "time": 0.5, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_gaungzhu7": {
+				"translate": [
+					{ "time": 0.4, "x": 10.2, "y": 72.61 },
+					{ "time": 0.4333, "x": 10.99, "y": 78.19 },
+					{ "time": 0.4667, "x": 11.49, "y": 79.69 }
+				]
+			},
+			"beam_guangzhu013": {
+				"translate": [
+					{ "time": 0.4, "x": 83.54, "y": 72.61 },
+					{ "time": 0.4333, "x": 89.96, "y": 78.19 }
+				]
+			},
+			"beam_guangxian05": {
+				"translate": [
+					{ "time": 0.4, "x": 7.69, "y": 1.99 },
+					{ "time": 0.4333, "x": 8.28, "y": 2.14 }
+				],
+				"scale": [
+					{ "time": 0.4, "x": 1.464 },
+					{ "time": 0.4333, "x": 1.5 },
+					{ "time": 0.6, "x": 0, "y": 0 }
+				]
+			},
+			"beam_guangzhu014": {
+				"translate": [
+					{ "time": 0.4, "x": 10.57, "y": 74.6 },
+					{ "time": 0.4333, "x": 11.38, "y": 80.34 }
+				]
+			},
+			"beam_guangzhu015": {
+				"translate": [
+					{ "time": 0.4, "x": 11.81, "y": 217.59 },
+					{ "time": 0.4333, "x": 12.72, "y": 234.32 }
+				]
+			},
+			"beam_yumao05": {
+				"translate": [
+					{ "time": 0.4, "x": 2.5, "y": 29.33 },
+					{ "time": 0.4333, "x": 2.69, "y": 31.58 },
+					{ "time": 0.5, "x": 2.69, "y": 44.35 }
+				]
+			},
+			"Beam5": {
+				"scale": [
+					{ "time": 0.4, "x": 5.446, "y": 5.446 }
+				]
+			},
+			"beam_baoquan011": {
+				"translate": [
+					{ "time": 0.5, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.5, "curve": "stepped" },
+					{ "time": 0.6, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_baoquan012": {
+				"translate": [
+					{ "time": 0.5, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.5, "curve": "stepped" },
+					{ "time": 0.6, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_gaungzhu8": {
+				"translate": [
+					{ "time": 0.5, "x": 10.2, "y": 72.61 },
+					{ "time": 0.5333, "x": 10.99, "y": 78.19 },
+					{ "time": 0.5667, "x": 11.49, "y": 79.69 }
+				]
+			},
+			"beam_guangzhu016": {
+				"translate": [
+					{ "time": 0.5, "x": 83.54, "y": 72.61 },
+					{ "time": 0.5333, "x": 89.96, "y": 78.19 }
+				]
+			},
+			"beam_guangxian06": {
+				"translate": [
+					{ "time": 0.5, "x": 7.69, "y": 1.99 },
+					{ "time": 0.5333, "x": 8.28, "y": 2.14 }
+				],
+				"scale": [
+					{ "time": 0.5, "x": 1.464 },
+					{ "time": 0.5333, "x": 1.5 },
+					{ "time": 0.7, "x": 0, "y": 0 }
+				]
+			},
+			"beam_guangzhu017": {
+				"translate": [
+					{ "time": 0.5, "x": 10.57, "y": 74.6 },
+					{ "time": 0.5333, "x": 11.38, "y": 80.34 }
+				]
+			},
+			"beam_guangzhu018": {
+				"translate": [
+					{ "time": 0.5, "x": 11.81, "y": 217.59 },
+					{ "time": 0.5333, "x": 12.72, "y": 234.32 }
+				]
+			},
+			"beam_yumao06": {
+				"translate": [
+					{ "time": 0.5, "x": 2.5, "y": 29.33 },
+					{ "time": 0.5333, "x": 2.69, "y": 31.58 },
+					{ "time": 0.6, "x": 2.69, "y": 44.35 }
+				]
+			},
+			"Beam6": {
+				"scale": [
+					{ "time": 0.5, "x": 5.446, "y": 5.446 }
+				]
+			},
+			"beam_baoquan013": {
+				"translate": [
+					{ "time": 0.6, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.6, "curve": "stepped" },
+					{ "time": 0.7, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_baoquan014": {
+				"translate": [
+					{ "time": 0.6, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.6, "curve": "stepped" },
+					{ "time": 0.7, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_gaungzhu9": {
+				"translate": [
+					{ "time": 0.6, "x": 10.2, "y": 72.61 },
+					{ "time": 0.6333, "x": 10.99, "y": 78.19 },
+					{ "time": 0.6667, "x": 11.49, "y": 79.69 }
+				]
+			},
+			"beam_guangzhu019": {
+				"translate": [
+					{ "time": 0.6, "x": 83.54, "y": 72.61 },
+					{ "time": 0.6333, "x": 89.96, "y": 78.19 }
+				]
+			},
+			"beam_guangxian07": {
+				"translate": [
+					{ "time": 0.6, "x": 7.69, "y": 1.99 },
+					{ "time": 0.6333, "x": 8.28, "y": 2.14 }
+				],
+				"scale": [
+					{ "time": 0.6, "x": 1.464 },
+					{ "time": 0.6333, "x": 1.5 },
+					{ "time": 0.8, "x": 0, "y": 0 }
+				]
+			},
+			"beam_guangzhu020": {
+				"translate": [
+					{ "time": 0.6, "x": 10.57, "y": 74.6 },
+					{ "time": 0.6333, "x": 11.38, "y": 80.34 }
+				]
+			},
+			"beam_guangzhu021": {
+				"translate": [
+					{ "time": 0.6, "x": 11.81, "y": 217.59 },
+					{ "time": 0.6333, "x": 12.72, "y": 234.32 }
+				]
+			},
+			"beam_yumao07": {
+				"translate": [
+					{ "time": 0.6, "x": 2.5, "y": 29.33 },
+					{ "time": 0.6333, "x": 2.69, "y": 31.58 },
+					{ "time": 0.7, "x": 2.69, "y": 44.35 }
+				]
+			},
+			"Beam7": {
+				"scale": [
+					{ "time": 0.6, "x": 5.446, "y": 5.446 }
+				]
+			},
+			"beam_baoquan015": {
+				"translate": [
+					{ "time": 0.7, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.7, "curve": "stepped" },
+					{ "time": 0.8, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_baoquan016": {
+				"translate": [
+					{ "time": 0.7, "x": 5.96, "y": 38.99 }
+				],
+				"scale": [
+					{ "time": 0.7, "curve": "stepped" },
+					{ "time": 0.8, "x": 1.2, "y": 1.2 }
+				]
+			},
+			"beam_gaungzhu10": {
+				"translate": [
+					{ "time": 0.7, "x": 10.2, "y": 72.61 },
+					{ "time": 0.7333, "x": 10.99, "y": 78.19 },
+					{ "time": 0.7667, "x": 11.49, "y": 79.69 }
+				]
+			},
+			"beam_guangzhu022": {
+				"translate": [
+					{ "time": 0.7, "x": 83.54, "y": 72.61 },
+					{ "time": 0.7333, "x": 89.96, "y": 78.19 }
+				]
+			},
+			"beam_guangxian08": {
+				"translate": [
+					{ "time": 0.7, "x": 7.69, "y": 1.99 },
+					{ "time": 0.7333, "x": 8.28, "y": 2.14 }
+				],
+				"scale": [
+					{ "time": 0.7, "x": 1.464 },
+					{ "time": 0.7333, "x": 1.5 },
+					{ "time": 0.9, "x": 0, "y": 0 }
+				]
+			},
+			"beam_guangzhu023": {
+				"translate": [
+					{ "time": 0.7, "x": 10.57, "y": 74.6 },
+					{ "time": 0.7333, "x": 11.38, "y": 80.34 }
+				]
+			},
+			"beam_guangzhu024": {
+				"translate": [
+					{ "time": 0.7, "x": 11.81, "y": 217.59 },
+					{ "time": 0.7333, "x": 12.72, "y": 234.32 }
+				]
+			},
+			"beam_yumao08": {
+				"translate": [
+					{ "time": 0.7, "x": 2.5, "y": 29.33 },
+					{ "time": 0.7333, "x": 2.69, "y": 31.58 },
+					{ "time": 0.8, "x": 2.69, "y": 44.35 }
+				]
+			},
+			"Beam8": {
+				"scale": [
+					{ "time": 0.7, "x": 5.446, "y": 5.446 }
+				]
+			}
+		}
+	}
+}
+}
