@@ -33,4 +33,14 @@ public class GroupFlashController : MonoBehaviour
 
         return flashTrans[idx].position;
     }
+
+    public Vector3 GetNearestPoint()
+    {
+        return GetPosByIdx(0); 
+    }
+
+    public Vector3 GetFarestPoint()
+    {
+        return GetPosByIdx(flashCount - 1); 
+    }
 }

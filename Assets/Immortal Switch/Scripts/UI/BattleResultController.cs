@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +10,13 @@ namespace Scripts.UI
     {
         [SerializeField] Button confirmBtn;
 
-        private Action confirmAct = null;
+        private List<Action> confirmActs = new();
+
+        private void Awake()
+        {
+            GameEventManager.Subscribe(GameEvents.OnStageCleared, ()=>SetBattleResultState(true));
+        }
+
 
         void Start()
         {
@@ -18,12 +26,17 @@ namespace Scripts.UI
 
         public void RegisterConfirmAction(Action endAct)
         {
-            confirmAct = endAct;
+            confirmActs.Add(endAct);
         }
 
         private void OnConfirmBtnClick()
         {
-            confirmAct?.Invoke();
+            foreach (var action in confirmActs)
+            {
+                action?.Invoke();
+            }
+
+            confirmActs.Clear();
             SetBattleResultState(false);
             //confirmAct = null;
         }

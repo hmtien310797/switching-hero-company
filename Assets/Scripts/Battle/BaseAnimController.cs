@@ -22,6 +22,11 @@ namespace Scripts.Battle
             InitAnimDict();
         }
 
+        public SkeletonAnimation GetBaseSka()
+        {
+            return ska; 
+        }
+
         public void RegisterAnimEvent(string animName, string eventName, Action eventAct)
         {
             ska.AnimationState.Event += (entry, e) =>
@@ -36,7 +41,12 @@ namespace Scripts.Battle
 
         private void InitAnimDict()
         {
-            if(animDict.Count > 0) animDict.Clear();
+            if (ska && !ska.valid)
+            {
+                ska.Initialize(false);
+            }
+
+            if (animDict.Count > 0) animDict.Clear();
 
             var animations = ska.Skeleton.Data.Animations;
             foreach (var anim in animations)
@@ -55,9 +65,18 @@ namespace Scripts.Battle
 
         public float GetDurByAnimName(string name)
         {
-            if(animDict.ContainsKey(name)) return animDict[name];
+            if (animDict.ContainsKey(name))
+            {
+                if (animDict[name] == 0)
+                {
+                    animDict[name] = ska.Skeleton.Data.FindAnimation(name).Duration;
+                }
 
-            return 0f;
+                return animDict[name];
+            }
+
+            animDict[name] = ska.Skeleton.Data.FindAnimation(name).Duration;
+            return animDict[name];
         }
 
     }

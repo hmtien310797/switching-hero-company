@@ -142,6 +142,7 @@ GameObject:
   - component: {fileID: 1225117025982657443}
   - component: {fileID: 7654298978766293683}
   - component: {fileID: 6899932718952636657}
+  - component: {fileID: 8909548691691332534}
   m_Layer: 6
   m_Name: Monster01
   m_TagString: Untagged
@@ -181,7 +182,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseSkillController: {fileID: 6899932718952636657}
   heroType: 1
+  statsController: {fileID: 8909548691691332534}
   healthBarController: {fileID: 5700245179803430304}
+  baseStatData:
+    Health: 0
+    RemainHealth: 0
+    IdleStateTime: 0
+    IdleIntervalTime: 0
+    AttackRange: 0
+    Defense: 0
+    Attack: 0
+    AttackSpeed: 0
+    CritChance: 0
+    CritDamage: 0
+    Accuracy: 0
+    MoveSpeed: 0
+    Element: 0
   isBoss: 0
 --- !u!114 &7654298978766293683
 MonoBehaviour:
@@ -212,6 +228,18 @@ MonoBehaviour:
   baseAnimController: {fileID: 7654298978766293683}
   skaFx: {fileID: 7127945535885355771}
   monsterScrep: {fileID: 1225117025982657443}
+--- !u!114 &8909548691691332534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4320152038019175889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a8cc74f972449caae4ff8a2f8624856, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6657366355764210877
 GameObject:
   m_ObjectHideFlags: 0

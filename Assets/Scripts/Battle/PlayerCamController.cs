@@ -1,33 +1,72 @@
+﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace Scripts.Battle
 {
+    public enum ShakeType
+    {
+        Shake,
+        Punch
+    }
+
     public class PlayerCamController : MonoBehaviour
     {
         [SerializeField] float moveSpeed = 2f;
+        [SerializeField] Vector3 offset = new Vector3(0, 7, 26);
 
-        private Transform playerTrans;
+        private Camera cam;
+        private Transform[] playerTrans = new Transform[2];
 
         private Vector3 camPos;
         private Vector3 playerPos;
         private bool isShaked = false;
+        
+        private float _lastAspectRatio;
+        private float landscapeFov = 35f;
+        private float portraitFov = 55f;
+        private float zPortraitCam = 20;
+        private float zLandscapeCam = 24;
+        private float zCam = 26;
+        
 
-        public void InitCam(Transform player)
+        public void InitCam(Transform player, bool isMain)
         {
-            playerTrans = player;
+            if(isMain)
+                playerTrans[0] = player;
+            else 
+                playerTrans[1] = player;
+        }
+
+        private void Awake()
+        {
+            cam = GetComponent<Camera>();
         }
 
         private void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Space))
+            float currentAspect = (float)Screen.width / Screen.height;
+
+            if (Mathf.Abs(currentAspect - _lastAspectRatio) > 0.01f)
             {
-                ShakeCamera();
+                _lastAspectRatio = currentAspect;
+                UpdateFov(currentAspect);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                ShakeCamera(.5f);
 
                 return;
             }
+        }
 
-            if (playerTrans == null || isShaked)
+        private void LateUpdate()
+        {
+            if (playerTrans[0] == null || playerTrans[1] == null)
             {
                 return;
             }
@@ -38,24 +77,75 @@ namespace Scripts.Battle
         private void Domove()
         {
             camPos = transform.position;
-            playerPos = playerTrans.position + new Vector3(0,7,-28);
-            if (Vector3.Distance(camPos, playerPos) < 0.1f)
+            var pos = GetTargetPos(playerTrans[0].position, playerTrans[1].position);
+            playerPos = pos;
+            if ((camPos - playerPos).sqrMagnitude < 0.1f)
             {
+                camPos = playerPos;
                 return;
             }
 
-            transform.position = Vector3.Lerp(camPos,playerPos, Time.deltaTime * moveSpeed);
+            transform.position = Vector3.Lerp(camPos, playerPos, Time.deltaTime * moveSpeed);
         }
 
-        public void ShakeCamera()
+        private Vector3 GetTargetPos(Vector3 a, Vector3 b)
+        {
+            float minZ = Mathf.Min(a.z, b.z);
+            float zC = minZ - offset.z;
+
+            float hA = a.z - zC;
+            float hB = b.z - zC;
+
+            float xC = (b.x * hA + a.x * hB) / (hA + hB);
+
+            float yC = offset.y;
+
+            return new Vector3(xC, yC, zC);
+        }
+
+        public void ShakeCamera(float dur, int viration = 50, ShakeType shakeType = ShakeType.Shake)
         {
             if (isShaked) return;
 
+            StartCoroutine(DoShakeCamAsync(dur,viration,shakeType));
+        }
+
+        private IEnumerator DoShakeCamAsync(float dur, int viration = 50, ShakeType shakeType = ShakeType.Shake)
+        {
             isShaked = true;
-            transform.DOShakePosition(0.5f, new Vector3(0.2f, 0.2f, 0f), 20, 90f).OnComplete(() =>
+            switch (shakeType)
             {
-                isShaked = false;
-            });
+                case ShakeType.Shake:
+                    transform.DOShakePosition(dur, new Vector3(0.2f, 0.2f, 0f), viration, 0f, false, true).SetEase(Ease.Linear).OnComplete(() =>
+                    {
+                        isShaked = false;
+                    });
+                    break;
+
+                case ShakeType.Punch:
+                    transform.DOPunchPosition(new Vector3(0.2f, 0.2f, 0f), dur, viration, .75f, false).SetEase(Ease.Linear).OnComplete(() =>
+                    {
+                        isShaked = false;
+                    });
+                    break;
+            }
+            yield return null;
+        }
+
+        private void UpdateFov(float aspect)
+        {
+            if (aspect >= 1f)
+            {
+                cam.fieldOfView = landscapeFov;
+                zCam = zLandscapeCam;
+            }
+            else
+            {
+                cam.fieldOfView = portraitFov;
+                zCam = zPortraitCam;
+            }
+
+            offset.z = zCam;
         }
     }
 }

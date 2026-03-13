@@ -36,7 +36,7 @@ namespace Scripts.Battle
             var dur = BaseAnimController.GetDurByAnimName(StandAnimName.Attack1);
             yield return new WaitForSeconds(dur / 2);
             DoAttackFx();
-            monsterBoss?.Target.OnReceiveDamage(2, null);
+            monsterBoss?.Target.OnReceiveDamage(2, null, null);
             yield return new WaitForSeconds(dur / 2);
             endAct?.Invoke();
             SkaFx.gameObject.SetActive(false);

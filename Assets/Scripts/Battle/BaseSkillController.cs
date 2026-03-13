@@ -20,6 +20,7 @@ namespace Scripts.Battle
         Win,
         Switch,
         Spawn,
+        Flash
     }
 
     public class BaseSkillController : MonoBehaviour, ICharacterSkillController
@@ -37,6 +38,15 @@ namespace Scripts.Battle
             {
                 skaFx.Initialize(false);
             }
+        }
+        public virtual void InitSkill(List<BaseExternalSkillController> bEscs, Transform soTrans)
+        {
+
+        }
+
+        public void HideFxAttack()
+        {
+            skaFx?.gameObject.SetActive(false);
         }
 
         public virtual void DoAttack(Action endAct)
@@ -99,7 +109,13 @@ namespace Scripts.Battle
 
         public virtual void DoSpawn(Action endAct)
         {
+            HideFxAttack();
             baseAnimController?.PlayAmin(StandAnimName.Spawn, 1, false);
+        }
+
+        public virtual void DoFlash(Action endAct)
+        {
+
         }
 
         public virtual void DoSkillByIdx(HeroSkills skillIdx, Action endAct)
@@ -141,6 +157,9 @@ namespace Scripts.Battle
                     break;
                 case HeroSkills.Spawn:
                     DoSpawn(endAct);
+                    break;
+                case HeroSkills.Flash:
+                    DoFlash(endAct);
                     break;
             }
         }

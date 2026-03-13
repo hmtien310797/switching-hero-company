@@ -15,7 +15,7 @@ public class HealthPoolController : MonoBehaviour
     {
         Instance = this;
 
-        InitHealthTxt();
+        //InitHealthTxt();
     }
 
     private void InitHealthTxt()

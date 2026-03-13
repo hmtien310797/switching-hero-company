@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Scripts.Battle

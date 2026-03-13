@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Scripts.Common;
 using TMPro;
 using UnityEngine;
 
@@ -6,8 +7,8 @@ public class HealthTxtController : MonoBehaviour
 {
     [SerializeField] TMP_Text dameTxt;
 
-    private float offsetY = .3f;
-    private float moveTime = .2f;
+    private float offsetY = .75f;
+    private float moveTime = .35f;
     private bool isPlayingDameTxtAnim = false;
 
     private void Start()
@@ -34,19 +35,12 @@ public class HealthTxtController : MonoBehaviour
     }
 
     private void DoAnimDameTxt()
-    {
-        //if(isPlayingDameTxtAnim)
-        /*{
-            DOTween.Kill("dameMoving");
-        }*/
-
-        isPlayingDameTxtAnim = true;
+    { 
         SetDameTxtState(true);
         var nY = dameTxt.transform.position.y + offsetY;
-        dameTxt.transform.DOMoveY(nY, moveTime).SetEase(Ease.InCirc).OnComplete(() =>
+        dameTxt.transform.DOMoveY(nY, moveTime).SetEase(Ease.OutCirc).OnComplete(() =>
         {
-            isPlayingDameTxtAnim = false;
-            SetDameTxtState(false);
+            PoolController.Instance.ReturnToPool(gameObject);
         }).SetId("dameMoving");
     }
 }

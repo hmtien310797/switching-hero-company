@@ -15,7 +15,7 @@
             else Destroy(gameObject);
         }
 
-        public T Get<T>(T prefab, Vector3 pos) where T : Component
+        public (T,bool) Get<T>(T prefab, Vector3 pos) where T : Component
         {
             string key = prefab.name;
 
@@ -26,11 +26,13 @@
 
             GameObject obj = _poolDict[key].Find(x => !x.activeInHierarchy);
 
+            bool isNew = false;
             if (obj == null)
             {
                 obj = Instantiate(prefab.gameObject, pos, Quaternion.identity);
                 obj.name = key;
                 _poolDict[key].Add(obj);
+                isNew = true;
             }
             else
             {
@@ -38,7 +40,7 @@
                 obj.gameObject.SetActive(true);
             }
 
-            return obj.GetComponent<T>();
+            return (obj.GetComponent<T>(), isNew);
         }
 
         public void ReturnToPool(GameObject obj)

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6284699621128745569}
   - component: {fileID: 1767980063621421128}
   - component: {fileID: 6260098013902319187}
-  - component: {fileID: 7629190708592832171}
+  - component: {fileID: -607966872467342200}
   m_Layer: 10
   m_Name: FxSkill4
   m_TagString: Untagged
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c1d340ab35f9d3c41ab77712191bd926, type: 2}
+  - {fileID: 2100000, guid: b39c6db60d517fc41a02b53f5b84b40e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: 2f1e8883c36d522408df3fc0fa74930c, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: 91d03b8f79f130544bb197cf02a69558, type: 2}
   initialSkinName: 
   fixPrefabOverrideViaMeshFilter: 2
   initialFlipX: 0
@@ -131,7 +131,7 @@ MonoBehaviour:
   _animationName: animation
   loop: 1
   timeScale: 1
---- !u!114 &7629190708592832171
+--- !u!114 &-607966872467342200
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,8 +140,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7002611873313139584}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3113e4792a2f9f04c8fc6d8d98a2a4ca, type: 3}
+  m_Script: {fileID: 11500000, guid: a5295973bae4b8042ae932b60f786c07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isFollow: 0
   skaFx: {fileID: 6260098013902319187}
+  tierSkill: 2
+  rangeSkill: 4
+  dameSkillFactor: 2.5

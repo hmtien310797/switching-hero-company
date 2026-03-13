@@ -1,266 +1,241 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using Immortal_Switch.Scripts;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor
+public class HeroCsvToSoTool : EditorWindow
 {
-    public class HeroDataCsvImporterWindow : EditorWindow
+    private TextAsset csvFile;
+    private DefaultAsset outputFolder;
+
+    [MenuItem("Tools/CSV/Hero CSV To ScriptableObject")]
+    public static void ShowWindow()
     {
-        [Header("Input")] [SerializeField] private TextAsset csvFile;
+        GetWindow<HeroCsvToSoTool>("Hero CSV Parser");
+    }
 
-        [Header("Output Folder (must be under Assets/)")] [SerializeField]
-        private string outputFolder = "Assets/Immortal Switch/GameData/Heroes";
+    private void OnGUI()
+    {
+        GUILayout.Label("Hero CSV -> HeroDataSO", EditorStyles.boldLabel);
 
-        [Header("Options")] [SerializeField] private bool overwriteExisting = true;
-        [SerializeField] private bool logEachHero = false;
+        csvFile = (TextAsset)EditorGUILayout.ObjectField("CSV File", csvFile, typeof(TextAsset), false);
+        outputFolder = (DefaultAsset)EditorGUILayout.ObjectField("Output Folder", outputFolder, typeof(DefaultAsset), false);
 
-        [MenuItem("Tools/Immortal Switch/Import HeroData (CSV)")]
-        public static void Open()
+        EditorGUILayout.Space();
+
+        if (GUILayout.Button("Parse CSV And Create SO"))
         {
-            var w = GetWindow<HeroDataCsvImporterWindow>("HeroData CSV Importer");
-            w.minSize = new Vector2(520, 260);
+            CreateHeroSOs();
+        }
+    }
+
+    private void CreateHeroSOs()
+    {
+        if (csvFile == null)
+        {
+            EditorUtility.DisplayDialog("Error", "Vui lòng chọn file CSV.", "OK");
+            return;
         }
 
-        private void OnGUI()
+        if (outputFolder == null)
         {
-            EditorGUILayout.LabelField("HeroData CSV Importer", EditorStyles.boldLabel);
-            EditorGUILayout.Space(8);
+            EditorUtility.DisplayDialog("Error", "Vui lòng chọn folder output.", "OK");
+            return;
+        }
 
-            csvFile = (TextAsset)EditorGUILayout.ObjectField("CSV File", csvFile, typeof(TextAsset), false);
-            outputFolder = EditorGUILayout.TextField("Output Folder", outputFolder);
+        string folderPath = AssetDatabase.GetAssetPath(outputFolder);
+        if (!AssetDatabase.IsValidFolder(folderPath))
+        {
+            EditorUtility.DisplayDialog("Error", "Output Folder không hợp lệ.", "OK");
+            return;
+        }
 
-            EditorGUILayout.Space(6);
-            overwriteExisting = EditorGUILayout.Toggle("Overwrite Existing", overwriteExisting);
-            logEachHero = EditorGUILayout.Toggle("Log Each Hero", logEachHero);
+        string[] lines = csvFile.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length <= 1)
+        {
+            EditorUtility.DisplayDialog("Error", "CSV không có dữ liệu.", "OK");
+            return;
+        }
 
-            EditorGUILayout.Space(12);
+        int createdCount = 0;
+        int updatedCount = 0;
 
-            using (new EditorGUI.DisabledScope(csvFile == null))
+        // Bỏ dòng header
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+            if (string.IsNullOrEmpty(line))
+                continue;
+
+            List<string> columns = ParseCsvLine(line);
+
+            // CSV của bạn có 12 cột
+            if (columns.Count < 12)
             {
-                if (GUILayout.Button("Import / Update HeroDataSO", GUILayout.Height(36)))
+                Debug.LogWarning($"[HeroCsvToSoTool] Dòng {i + 1} không đủ cột: {line}");
+                continue;
+            }
+
+            try
+            {
+                HeroRow row = ConvertRow(columns);
+
+                string assetName = $"{row.Id}_{row.HeroName}.asset";
+                string assetPath = Path.Combine(folderPath, assetName).Replace("\\", "/");
+
+                HeroDataSO heroData = AssetDatabase.LoadAssetAtPath<HeroDataSO>(assetPath);
+
+                if (heroData == null)
                 {
-                    try
-                    {
-                        Import();
-                        EditorUtility.DisplayDialog("Import done", "HeroDataSO imported/updated successfully.", "OK");
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError(e);
-                        EditorUtility.DisplayDialog("Import failed", e.Message, "OK");
-                    }
+                    heroData = ScriptableObject.CreateInstance<HeroDataSO>();
+                    FillHeroData(heroData, row);
+                    AssetDatabase.CreateAsset(heroData, assetPath);
+                    createdCount++;
+                }
+                else
+                {
+                    FillHeroData(heroData, row);
+                    EditorUtility.SetDirty(heroData);
+                    updatedCount++;
                 }
             }
-
-            EditorGUILayout.HelpBox(
-                "CSV needs headers like:\n" +
-                "hero_Id,class,rarity,Hp,ATK,Def,Critchange,Critdamage,ATKSPD,(optional)AttackRange\n\n" +
-                "Note: tool handles decimal comma (0,05) and decimal dot (0.05).",
-                MessageType.Info);
-        }
-
-        private void Import()
-        {
-            if (csvFile == null) throw new InvalidOperationException("CSV file is null.");
-            if (!outputFolder.StartsWith("Assets/", StringComparison.Ordinal))
-                throw new InvalidOperationException("Output folder must start with 'Assets/'.");
-
-            if (!AssetDatabase.IsValidFolder(outputFolder))
+            catch (Exception ex)
             {
-                CreateFoldersRecursively(outputFolder);
-            }
-
-            var lines = ReadAllLines(csvFile.text);
-            if (lines.Length < 2) throw new InvalidOperationException("CSV has no data rows.");
-
-            // Parse header
-            // Parse header
-            var header = SplitCsvLine(lines[0]);
-            int colName = FindCol(header, "heroID", "hero_Id", "HeroId", "Name");
-            int colClass  = FindCol(header, "class", "HeroClass");
-            int colRarity = FindCol(header, "rarity", "Rarity");
-            int colHp     = FindCol(header, "Hp", "HP", "HitPoint");
-            int colAtk    = FindCol(header, "ATK", "Attack");
-            int colDef    = FindCol(header, "Def", "DEF", "Defense");
-            int colCritChance = FindCol(header, "Critchange", "CritChance", "Critchance");
-            int colCritDmg    = FindCol(header, "Critdamage", "CritDamage");
-            int colAtkSpd     = FindCol(header, "ATKSPD", "AttackSpeed", "AtkSpd");
-            int colRange      = FindColOptional(header, "AttackRange", "Range", "ATKRANGE");
-
-            for (int i = 1; i < lines.Length; i++)
-            {
-                if (string.IsNullOrWhiteSpace(lines[i])) continue;
-                var row = SplitCsvLine(lines[i]);
-
-                string heroName = GetCell(row, colName).Trim();
-                if (string.IsNullOrEmpty(heroName)) continue;
-
-                // dùng heroName làm key + tên asset
-                string assetPath = $"{outputFolder}/{MakeSafeFileName(heroName)}.asset";
-
-                HeroDataSO so = AssetDatabase.LoadAssetAtPath<HeroDataSO>(assetPath);
-                bool isNew = so == null;
-                if (isNew) so = ScriptableObject.CreateInstance<HeroDataSO>();
-
-                so.Name = heroName;
-
-                so.HeroClass = ParseEnum<HeroClass>(GetCell(row, colClass), "HeroClass", heroName);
-                so.Rarity    = ParseEnum<Rarity>(GetCell(row, colRarity), "Rarity", heroName);
-
-                so.HitPoint    = ParseFloat(GetCell(row, colHp));
-                so.Attack      = ParseFloat(GetCell(row, colAtk));
-                so.Defense     = ParseFloat(GetCell(row, colDef));
-                so.CritChance  = ParseFloat(GetCell(row, colCritChance));
-                so.CritDamage  = ParseFloat(GetCell(row, colCritDmg));
-                so.AttackSpeed = ParseFloat(GetCell(row, colAtkSpd));
-                so.AttackRange = colRange >= 0 ? ParseFloat(GetCell(row, colRange)) : 1f;
-
-                if (isNew) AssetDatabase.CreateAsset(so, assetPath);
-                else EditorUtility.SetDirty(so);
-            }
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-
-            //Debug.Log($"HeroData Import finished. Created={created}, Updated={updated}, Skipped={skipped}");
-        }
-
-        // ---------- Helpers ----------
-
-        private static void CreateFoldersRecursively(string assetsPath)
-        {
-            // assetsPath like: Assets/A/B/C
-            var parts = assetsPath.Split('/');
-            if (parts.Length < 2 || parts[0] != "Assets") return;
-
-            string current = "Assets";
-            for (int i = 1; i < parts.Length; i++)
-            {
-                string next = $"{current}/{parts[i]}";
-                if (!AssetDatabase.IsValidFolder(next))
-                {
-                    AssetDatabase.CreateFolder(current, parts[i]);
-                }
-
-                current = next;
+                Debug.LogError($"[HeroCsvToSoTool] Lỗi parse dòng {i + 1}: {line}\n{ex}");
             }
         }
 
-        private static string[] ReadAllLines(string text)
-        {
-            // Normalize line endings
-            text = text.Replace("\r\n", "\n").Replace('\r', '\n');
-            return text.Split('\n');
-        }
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
 
-        private static int FindCol(string[] header, params string[] names)
-        {
-            int idx = FindColOptional(header, names);
-            if (idx < 0)
-                throw new InvalidOperationException($"Missing required column: {string.Join(" / ", names)}");
-            return idx;
-        }
+        EditorUtility.DisplayDialog(
+            "Done",
+            $"Parse hoàn tất.\nCreated: {createdCount}\nUpdated: {updatedCount}",
+            "OK"
+        );
+    }
 
-        private static int FindColOptional(string[] header, params string[] names)
+    private static void FillHeroData(HeroDataSO heroData, HeroRow row)
+    {
+        heroData.Id = row.Id;
+        heroData.Name = row.HeroName;
+        heroData.HeroClass = row.HeroClass;
+        heroData.Rarity = row.Rarity;
+        heroData.Element = row.Element;
+        heroData.Health = row.HitPoint;
+        heroData.Attack = row.Attack;
+        heroData.Defense = row.Defense;
+        heroData.CritChance = row.CritChance;
+        heroData.CritDamage = row.CritDamage;
+        heroData.AttackSpeed = row.AttackSpeed;
+        heroData.AttackRange = row.AttackRange;
+    }
+
+    private static HeroRow ConvertRow(List<string> cols)
+    {
+        HeroRow row = new HeroRow
         {
-            for (int i = 0; i < header.Length; i++)
+            Id = ParseInt(cols[0]),
+            HeroName = cols[1],
+            HeroClass = ParseEnum<HeroClass>(cols[2]),
+            Rarity = ParseEnum<Rarity>(cols[3]),
+            Element = ParseEnum<Element>(cols[4]),
+            HitPoint = ParseFloat(cols[5]),
+            Attack = ParseFloat(cols[6]),
+            Defense = ParseFloat(cols[7]),
+            CritChance = ParseFloat(cols[8]),
+            CritDamage = ParseFloat(cols[9]),
+            AttackSpeed = ParseFloat(cols[10]),
+            AttackRange = ParseFloat(cols[11])
+        };
+
+        return row;
+    }
+
+    private static int ParseInt(string value)
+    {
+        value = value.Trim();
+        return int.Parse(value, CultureInfo.InvariantCulture);
+    }
+
+    private static float ParseFloat(string value)
+    {
+        value = value.Trim();
+
+        // xử lý trường hợp như 01.05
+        // và kiểu số dùng dấu phẩy thập phân như 0,05 hoặc 1,5
+        value = value.Replace(",", ".");
+
+        return float.Parse(value, CultureInfo.InvariantCulture);
+    }
+
+    private static T ParseEnum<T>(string value) where T : struct
+    {
+        value = value.Trim();
+
+        if (Enum.TryParse(value, true, out T result))
+            return result;
+
+        throw new Exception($"Không parse được enum {typeof(T).Name} từ value: {value}");
+    }
+
+    /// <summary>
+    /// Parser đơn giản cho 1 dòng CSV.
+    /// Hỗ trợ field có dấu nháy kép.
+    /// </summary>
+    private static List<string> ParseCsvLine(string line)
+    {
+        List<string> result = new List<string>();
+        bool inQuotes = false;
+        string current = "";
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+
+            if (c == '"')
             {
-                var h = header[i].Trim().Trim('"');
-                foreach (var n in names)
-                {
-                    if (string.Equals(h, n, StringComparison.OrdinalIgnoreCase))
-                        return i;
-                }
+                inQuotes = !inQuotes;
+                continue;
             }
 
-            return -1;
-        }
-
-        private static string GetCell(string[] row, int index)
-        {
-            if (index < 0) return "";
-            if (row == null) return "";
-            if (index >= row.Length) return "";
-            return row[index]?.Trim().Trim('"') ?? "";
-        }
-
-        private static T ParseEnum<T>(string raw, string fieldName, string heroId) where T : struct
-        {
-            raw = (raw ?? "").Trim().Trim('"');
-
-            // allow things like "Warrior " or "warrior"
-            if (Enum.TryParse<T>(raw, true, out var result))
-                return result;
-
-            throw new InvalidOperationException($"Invalid {fieldName} '{raw}' for hero '{heroId}'.");
-        }
-
-        private static float ParseFloat(string raw)
-        {
-            raw = (raw ?? "").Trim().Trim('"');
-            if (string.IsNullOrEmpty(raw)) return 0f;
-
-            // Handle decimal comma: "0,05" -> "0.05"
-            raw = raw.Replace(" ", "");
-            raw = raw.Replace(',', '.');
-
-            if (float.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out float v))
-                return v;
-
-            return 0f;
-        }
-
-        private static string MakeSafeFileName(string name)
-        {
-            foreach (var c in Path.GetInvalidFileNameChars())
-                name = name.Replace(c, '_');
-
-            return name.Trim();
-        }
-
-        // Minimal CSV splitter that handles quoted commas
-        private static string[] SplitCsvLine(string line)
-        {
-            var result = new System.Collections.Generic.List<string>();
-            var sb = new StringBuilder();
-            bool inQuotes = false;
-
-            for (int i = 0; i < line.Length; i++)
+            if (c == '\t' && !inQuotes)
             {
-                char ch = line[i];
-
-                if (ch == '"')
-                {
-                    // double quotes inside quoted string -> escaped quote
-                    if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
-                    {
-                        sb.Append('"');
-                        i++;
-                    }
-                    else
-                    {
-                        inQuotes = !inQuotes;
-                    }
-
-                    continue;
-                }
-
-                if (ch == ',' && !inQuotes)
-                {
-                    result.Add(sb.ToString());
-                    sb.Clear();
-                    continue;
-                }
-
-                sb.Append(ch);
+                result.Add(current.Trim());
+                current = "";
             }
-
-            result.Add(sb.ToString());
-            return result.ToArray();
+            else if (c == ',' && !inQuotes)
+            {
+                // CSV của bạn nhìn giống tab-separated hơn là comma-separated
+                // nên chỗ này chỉ dùng nếu file thực sự ngăn bằng dấu phẩy.
+                current += c;
+            }
+            else
+            {
+                current += c;
+            }
         }
+
+        result.Add(current.Trim());
+        return result;
+    }
+
+    private class HeroRow
+    {
+        public int Id;
+        public string HeroName;
+        public HeroClass HeroClass;
+        public Rarity Rarity;
+        public Element Element;
+        public float HitPoint;
+        public float Attack;
+        public float Defense;
+        public float CritChance;
+        public float CritDamage;
+        public float AttackSpeed;
+        public float AttackRange;
     }
 }

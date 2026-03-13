@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using Immortal_Switch.Scripts.StatSystem;
+using NaughtyAttributes;
 using UnityEngine;
 
 namespace Scripts.Battle
@@ -10,17 +13,35 @@ namespace Scripts.Battle
         Boss,
     }
 
-    public class BaseCharacterController<T> : MonoBehaviour where T : BaseCharacterController<T>
+    public class BaseCharacterController<T> : MonoBehaviour where T : BaseCharacterController<T>, ICombatUnit
     {
         [SerializeField] BaseSkillController baseSkillController;
         [SerializeField] HeroType heroType;
+        [SerializeField] StatsController statsController;
         public HealthBarController healthBarController;
+        [ReadOnly]
+        public BaseStat baseStatData = new BaseStat();
 
         private ICharacterSkillController characterSkillController;
         public ICharacterState<T> currentState = null;
+        public StatsController Stats => statsController;
+        
+        #region Properties
+        public float CurrentHp => statsController.HealthModule?.CurrentHP ?? 0f;
+        public float MaxHp => statsController.HealthModule?.MaxHP ?? 0f;
+        public bool IsDead => statsController == null || statsController.HealthModule == null ||
+                              statsController.HealthModule.IsDead;
+        public float CurrentMoveSpeed => statsController.StatModule.GetFinalStat(StatType.MoveSpeed);
+        public float CurrentDefense => statsController.StatModule.GetFinalStat(StatType.DEF);
+        public float CurrentAttackSpeed => statsController.StatModule.GetFinalStat(StatType.ATK);
+        #endregion
 
+        public void InitSkill(List<BaseExternalSkillController> skills, Transform obTrans)
+        {
+            baseSkillController.InitSkill(skills, obTrans);
+        }
 
-        private void Awake()
+        protected virtual void Awake()
         {
             SetCharacterSkill();
         }
@@ -80,15 +101,21 @@ namespace Scripts.Battle
         public virtual void DoIntoMove()
         {
             characterSkillController.DoSkillByIdx(HeroSkills.Run, null);
-        }        
+        }
+
+        public virtual void DoIntoFlash(Action endAct)
+        {
+            characterSkillController.DoSkillByIdx(HeroSkills.Flash, endAct);
+        }
 
         public void DoMoveToTarget(Transform target, float speed = 3f, float offsetX = 0)
         {
             var isRight = transform.position.x < target.position.x;
             DoRotate(isRight);
             
-            var newPos = target.position - (isRight ? Vector3.right : Vector3.left) * offsetX;
-            transform.position = Vector3.MoveTowards(transform.position, newPos, Time.deltaTime * speed);
+            //var newPos = target.position - (isRight ? Vector3.right : Vector3.left) * offsetX;
+            //transform.position = Vector3.MoveTowards(transform.position, newPos, Time.deltaTime * speed);
+            transform.position = Vector3.MoveTowards(transform.position, target.position, Time.deltaTime * speed);
         }
 
         public virtual void DoIntoInjured()
@@ -106,7 +133,7 @@ namespace Scripts.Battle
             baseSkillController?.DoSkillByIdx(HeroSkills.Win, endAct);
         }
 
-        public virtual void OnReceiveDamage(float damage, Action endAct)
+        public virtual void OnReceiveDamage(float damage, Action endAct, PlayerHeroController target)
         {
             
         }
@@ -125,12 +152,9 @@ namespace Scripts.Battle
                 transform.eulerAngles = Vector3.up*180;
         }
 
-        public bool IsInAttackRange(float rangeAttack, Vector3 target, float offsetX = .25f, float offsetZ = .5f)
+        public virtual bool IsInAttackRange(float rangeAttack, Vector3 target)
         {
-            bool isInRangeX = Mathf.Abs(transform.position.x - target.x) < rangeAttack - offsetX;
-            bool isInRangeZ = Mathf.Abs(transform.position.z - target.z) < offsetZ;
-
-            return isInRangeX && isInRangeZ;
+            return (transform.position - target).sqrMagnitude <= rangeAttack*rangeAttack;
         }
     }
 }

@@ -1,73 +1,108 @@
 using System;
+using System.Collections.Generic;
+using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
 namespace Scripts.Battle
 {
-    public class ScrepData
+    [Serializable]
+    public class BaseStat
     {
-        public int Hid;
         public float Health;
-        public float RemainHealth;
         public float IdleStateTime;
         public float IdleIntervalTime;
-        public float RangeAttack;
+        public float AttackRange;
+        public float Defense;
+        public float Attack;
+        public float AttackSpeed;
+        public float CritChance;
+        public float CritDamage;
+        public float Accuracy;
+        public float MoveSpeed;
+        public Element Element;
     }
 
-    public class MonsterScrepController : BaseCharacterController<MonsterScrepController>
+    public class MonsterScrepController : BaseCharacterController<MonsterScrepController>, ICombatUnit
     {
         [SerializeField] bool isBoss = false;
 
-        private PlayerHeroController target;
-        private PvEBattleController pvEBattleController = null;
-        private int hId;
-
-        public ScrepData MonsterData = new ScrepData();
+        private List<PlayerHeroController> targets;
+        private PlayerHeroController etarget;
+        protected PvEBattleController pvEBattleController = null;
 
         public ScrepSpanwState SpawnState = new ScrepSpanwState();
         public ScrepIdleState IdleState = new ScrepIdleState();
         public ScrepMoveState MoveState = new ScrepMoveState();
         public ScrepAttackState AttackState = new ScrepAttackState();
         public ScrepDeathState DeathState = new ScrepDeathState();
-        public WinState WinState = new WinState();
+        private Transform targetTrans = null;
+        public int hId { get; private set; }
 
-        public PlayerHeroController Target { get => target; set => target = value; }
+        public PlayerHeroController Target
+        {
+            get => etarget;
+            set => etarget = value;
+        }
 
-        public virtual void InitMonster(int hid, PlayerHeroController etarget, PvEBattleController pBc, bool isBoss = false)
+        public virtual void InitMonster(int hid, PlayerHeroController etarget, PvEBattleController pBc,
+            BaseStat monsterData, bool isBoss = false)
         {
             hId = hid;
-            target = etarget;
             pvEBattleController = pBc;
             healthBarController?.PreSetHealth();
-            DoRotate(transform.position.x < target.transform.position.x);
-            if(!isBoss) InitMonsterData();
+            SetTargetTrans(etarget);
+            DoRotate(transform.position.x < etarget.transform.position.x);
+            Stats.Initialize(monsterData);
+            InitMonsterData();
+
             SwitchState(SpawnState);
+        }
+
+        private void SetTargetTrans(PlayerHeroController pHc)
+        {
+            etarget = pHc;
+            targetTrans = etarget.FollowHeroController.GetNextPoint();
+        }
+
+        private void SetTarget()
+        {
+            if (targets == null || targets.Count == 0) return;
+
+            var nearDist = float.MaxValue;
+            PlayerHeroController target = null;
+            foreach (var tg in targets)
+            {
+                var dist = (transform.position - tg.transform.position).sqrMagnitude;
+                if (dist < nearDist)
+                {
+                    nearDist = dist;
+                    target = tg;
+                }
+            }
+
+            SetTargetTrans(target);
         }
 
         private void InitMonsterData()
         {
-            MonsterData.Health = 100;
-            MonsterData.RemainHealth = MonsterData.Health;
-            MonsterData.RangeAttack = 2f;
-            MonsterData.IdleIntervalTime = 3f;
-            MonsterData.IdleStateTime = MonsterData.IdleIntervalTime/2;
-        }
-
-        public override void Update()
-        {
-            base.Update();
+            baseStatData.IdleIntervalTime = 3f;
+            baseStatData.IdleStateTime = baseStatData.IdleIntervalTime / 2;
+            baseStatData.AttackRange = isBoss ? 4f : 2f;
         }
 
         public void DoIdleCallback()
         {
-            if (MonsterData.IdleStateTime > 0)
+            if (baseStatData.IdleStateTime > 0)
             {
-                MonsterData.IdleStateTime -= Time.deltaTime;
+                baseStatData.IdleStateTime -= Time.deltaTime;
                 return;
             }
 
             if (IsConditionValid())
             {
-                if(IsInAttackRange(MonsterData.RangeAttack, target.transform.position))
+                if (IsInAttackRange(Stats.StatModule.GetBaseStat(StatType.AttackRange),
+                        etarget.transform.position))
                 {
                     SwitchState(AttackState);
                 }
@@ -75,14 +110,14 @@ namespace Scripts.Battle
                     SwitchState(MoveState);
             }
             else
-                MonsterData.IdleStateTime = MonsterData.IdleIntervalTime;
+                baseStatData.IdleStateTime = baseStatData.IdleIntervalTime;
         }
 
         public void DoMoveCallback()
         {
-            DoMoveToTarget(target.transform, offsetX:1f);
+            DoMoveToTarget(targetTrans, 1.5f, offsetX: 1f);
 
-            if(IsInAttackRange(MonsterData.RangeAttack, target.transform.position))
+            if (IsInAttackRange(Stats.StatModule.GetBaseStat(StatType.AttackRange), etarget.transform.position))
             {
                 SwitchState(AttackState);
             }
@@ -90,17 +125,17 @@ namespace Scripts.Battle
 
         private void ResetIdleTime()
         {
-            MonsterData.IdleStateTime = MonsterData.IdleIntervalTime;
+            baseStatData.IdleStateTime = baseStatData.IdleIntervalTime;
         }
 
         private void IdleTimeToZero()
         {
-            MonsterData.IdleStateTime = 0;
+            baseStatData.IdleStateTime = 0;
         }
 
         public bool IsConditionValid()
         {
-            return target != null;
+            return etarget != null;
         }
 
         public bool isLookRight()
@@ -111,49 +146,51 @@ namespace Scripts.Battle
         public void DoChangeState()
         {
             ResetIdleTime();
-            
-            if(MonsterData.RemainHealth <= 0)
+
+            if (IsDead)
             {
                 SwitchState(DeathState);
                 return;
             }
+
             SwitchState(IdleState);
         }
 
         public void DoEndSpawn()
         {
             IdleTimeToZero();
-            if (MonsterData.RemainHealth <= 0)
-            {
-                SwitchState(DeathState);
-                return;
-            }
-            SwitchState(IdleState);
-        }
-        
-        public override void OnReceiveDamage(float damage, Action endAct)
-        {
-            if (MonsterData.RemainHealth <= 0)
+            if (IsDead)
             {
                 SwitchState(DeathState);
                 return;
             }
 
+            SwitchState(IdleState);
+        }
+
+        public override void OnReceiveDamage(float damage, Action endAct, PlayerHeroController target)
+        {
+            if (CurrentHp <= 0)
+            {
+                SwitchState(DeathState);
+                return;
+            }
+
+            if (!isBoss) etarget = target;
+
             healthBarController?.ShowHealthTxt(damage, transform.position + Vector3.up);
-            MonsterData.RemainHealth = Mathf.Max(0, MonsterData.RemainHealth - damage);
-            healthBarController?.SetHealth((float)MonsterData.RemainHealth / MonsterData.Health);
-            if (MonsterData.RemainHealth <= 0)
+            Stats.HealthModule.ApplyDamage(damage);
+            healthBarController?.SetHealth(CurrentHp / MaxHp);
+            if (CurrentHp <= 0)
             {
                 endAct?.Invoke();
                 SwitchState(DeathState);
-
-                return;
             }
         }
 
         public override void AttackBySpecific()
         {
-            target?.OnReceiveDamage(10, null);
+            etarget?.OnReceiveDamage(baseStatData.Attack, null, this);
         }
 
         public void ResolveDeath()
@@ -163,7 +200,7 @@ namespace Scripts.Battle
 
         public void CheckDead(Action endAct)
         {
-            if(MonsterData.RemainHealth <= 0)
+            if (IsDead)
             {
                 SwitchState(DeathState);
             }
@@ -173,11 +210,6 @@ namespace Scripts.Battle
             }
         }
 
-        public bool IsDead()
-        {
-            return MonsterData.RemainHealth <= 0;
-        }
-
         public bool IsBoss()
         {
             return isBoss;
@@ -185,8 +217,26 @@ namespace Scripts.Battle
 
         public void IsLookRight()
         {
-            DoRotate(transform.position.x < target.transform.position.x);
-        }    
+            DoRotate(transform.position.x < etarget.transform.position.x);
+        }
+
+        public void TakeDamage(float amount, DamageType damageType = DamageType.Normal)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Heal(float amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsInAttackRange(float rangeAttack, Vector3 target)
+        {
+            var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack * rangeAttack;
+            var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack;
+
+            return isValidX && isValidZ;
+        }
     }
 
     public class ScrepSpanwState : ICharacterState<MonsterScrepController>
@@ -202,7 +252,6 @@ namespace Scripts.Battle
 
         public void UpdateState(MonsterScrepController state)
         {
-            
         }
     }
 
@@ -214,8 +263,7 @@ namespace Scripts.Battle
 
         public void StartState(MonsterScrepController state)
         {
-            state.CheckDead(()=>state.DoIntoIdle());
-            //state.DoIntoIdle();
+            state.CheckDead(() => state.DoIntoIdle());
         }
 
         public void UpdateState(MonsterScrepController state)

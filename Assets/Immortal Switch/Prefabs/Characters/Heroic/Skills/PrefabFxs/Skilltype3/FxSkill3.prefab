@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4300755362429337218}
   - component: {fileID: 3157570941729172741}
   - component: {fileID: 2664466493559742682}
-  - component: {fileID: 1298183006759145006}
+  - component: {fileID: 659613842275125512}
   m_Layer: 10
   m_Name: FxSkill3
   m_TagString: Untagged
@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: 604f101d620aa4445bf49c520907250b, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: a59a44b72dfa1784988fd7cb5928c5ac, type: 2}
   initialSkinName: 
   fixPrefabOverrideViaMeshFilter: 2
   initialFlipX: 0
@@ -130,7 +130,7 @@ MonoBehaviour:
   _animationName: 
   loop: 1
   timeScale: 1
---- !u!114 &1298183006759145006
+--- !u!114 &659613842275125512
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -139,8 +139,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7710482370080699668}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3113e4792a2f9f04c8fc6d8d98a2a4ca, type: 3}
+  m_Script: {fileID: 11500000, guid: 0397c594d0562a442b968a589aa1a716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isFollow: 0
   skaFx: {fileID: 2664466493559742682}
+  tierSkill: 3
+  rangeSkill: 3
+  dameSkillFactor: 2.5

@@ -1,6 +1,7 @@
 using Scripts.Battle;
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,9 +20,28 @@ namespace Scripts.UI
         None,
     }
 
+    public class CoolingData
+    {
+        public int Hid;
+        public bool isMain;
+        public Dictionary<HeroNameAction, Action> callbackActs;
+        public Dictionary <HeroNameAction, float> intervalCoolings;
+        public Dictionary <HeroNameAction, float> timerCoolings;
+
+        public CoolingData(bool isMain =  false)
+        {
+            this.isMain = isMain;
+            callbackActs = new Dictionary<HeroNameAction, Action>();
+            intervalCoolings = new Dictionary<HeroNameAction, float>();
+            timerCoolings = new Dictionary<HeroNameAction, float>();
+        }
+    }
+
     public class UIHeroBattleController : MonoBehaviour
     {
         public static UIHeroBattleController Instance;
+
+        [SerializeField] UISwitchHeroController uISwitchHeroController;
 
         [SerializeField] Button autoSwitchBtn;
         [SerializeField] Button autoSkillBtn;
@@ -39,39 +59,24 @@ namespace Scripts.UI
         [SerializeField] Image coverAutoSwitch;
         [SerializeField] Image coverAutoSkill;
         [SerializeField] Image coverSwitch;
+        [SerializeField] Transform autoSkillRotate;
+        [SerializeField] Transform autoSwitchRotate;
+        [SerializeField] List<Sprite> firstSprites;
+        [SerializeField] List<Sprite> secondSprites;
+        [SerializeField] List<Image> skillIcons;
 
-        private Dictionary<HeroNameAction, Action> actions = new Dictionary<HeroNameAction, Action>();
-        private Dictionary<HeroNameAction, float> intervalCoolings = new Dictionary<HeroNameAction, float>();
-        private Dictionary<HeroNameAction, float> coolingsTime = new Dictionary<HeroNameAction, float>();
+        private CoolingData firstHeroData = new CoolingData(true);
+        private CoolingData secondHeroData = new CoolingData(false);
+        private CoolingData mainHeroData = null;
+
         private Dictionary<HeroNameAction,Image> covers = null;
+        private Dictionary<HeroNameAction,Image> icons = null;
         private bool isAutoSwitching = false;
         private bool isAutoSkilling = false;
         private PlayerHeroController playerHeroController;
-
-        public void SetStateAllCover(bool isEnable = false)
-        {
-            InitCovers();
-
-            foreach (var cover in covers)
-            {
-                cover.Value.gameObject.SetActive(isEnable);
-            }
-        }
-
-        private void InitCovers()
-        {
-            covers = new Dictionary<HeroNameAction, Image>()
-            {
-                {HeroNameAction.AutoSwitchBtn, coverAutoSwitch },
-                {HeroNameAction.AutoSkillBtn, coverAutoSkill },
-                {HeroNameAction.Skill1Btn, coverSkill1 },
-                {HeroNameAction.Skill2Btn, coverSkill2 },
-                {HeroNameAction.Skill3Btn, coverSkill3 },
-                {HeroNameAction.Skill4Btn, coverSkill4 },
-                {HeroNameAction.Skill5Btn, coverSkill5 },
-                {HeroNameAction.SwithBtn, coverSwitch },
-            };
-        }
+        
+        private Tween autoSkillTween;
+        private Tween autoSwitchTween;
 
         private void Awake()
         {
@@ -85,15 +90,38 @@ namespace Scripts.UI
             autoSwitchBtn?.onClick.AddListener(() =>
             {
                 isAutoSwitching = !isAutoSwitching;
-                SetShowCover(HeroNameAction.AutoSwitchBtn);
-                actions[HeroNameAction.AutoSwitchBtn]?.Invoke();
+                if (isAutoSwitching)
+                {
+                    autoSwitchTween?.Kill();
+                    autoSwitchTween = autoSwitchRotate
+                        .DOLocalRotate(new Vector3(0, 0, 360), 0.5f, RotateMode.FastBeyond360)
+                        .SetEase(Ease.Linear)
+                        .SetLoops(-1, LoopType.Incremental);
+                }
+                else
+                {
+                    autoSwitchTween?.Kill();
+                    autoSwitchRotate.localRotation = Quaternion.identity;
+                }
+                
             });
 
             autoSkillBtn?.onClick.AddListener(() =>
             {
                 isAutoSkilling = !isAutoSkilling;
-                SetShowCover(HeroNameAction.AutoSkillBtn);
-                actions[HeroNameAction.AutoSkillBtn]?.Invoke();
+                if (isAutoSkilling)
+                {
+                    autoSkillTween?.Kill();
+                    autoSkillTween = autoSkillRotate
+                        .DOLocalRotate(new Vector3(0, 0, 360), 0.5f, RotateMode.FastBeyond360)
+                        .SetEase(Ease.Linear)
+                        .SetLoops(-1, LoopType.Incremental);
+                }
+                else
+                {
+                    autoSkillTween?.Kill();
+                    autoSkillRotate.localRotation = Quaternion.identity;
+                }
             });
 
             skill1Btn?.onClick.AddListener(() =>
@@ -124,7 +152,7 @@ namespace Scripts.UI
             switchBtn?.onClick.AddListener(() =>
             {
                 SetShowCover(HeroNameAction.SwithBtn);
-                actions[HeroNameAction.SwithBtn]?.Invoke();
+                mainHeroData.callbackActs[HeroNameAction.SwithBtn]?.Invoke();
             });
         }
 
@@ -133,94 +161,220 @@ namespace Scripts.UI
             DoCoolingdownSkill();
         }
 
+        public void RegisterHeroSwitch(Action<int> heroAct)
+        {
+            uISwitchHeroController?.RegisterActionHeroByIdx(heroAct);
+        }
+
+        private void InitUIHeros(bool ismain, int hid)
+        {
+            if (ismain)
+            {
+                firstHeroData.Hid = hid;
+                mainHeroData = firstHeroData;
+                AppLySpriteSkillByIdx(true);
+            }
+            else
+            {
+                secondHeroData.Hid = hid;
+            }
+        }
+
+        private void AppLySpriteSkillByIdx(bool isFirst)
+        {
+            var idx = 0;
+            foreach (var img in skillIcons)
+            {
+                if (isFirst)
+                {
+                    img.sprite = firstSprites[idx];
+                }
+                else
+                {
+                    img.sprite = secondSprites[idx];
+                }
+                idx++;
+            }
+        }
+
+        public void SetStateAllCover(bool isEnable = false)
+        {
+            InitCovers();
+
+            foreach (var cover in covers)
+            {
+                cover.Value.gameObject.SetActive(isEnable);
+            }
+
+            InitIcon();
+        }
+
+        private void InitCovers()
+        {
+            covers = new Dictionary<HeroNameAction, Image>()
+            {
+                {HeroNameAction.Skill1Btn, coverSkill1 },
+                {HeroNameAction.Skill2Btn, coverSkill2 },
+                {HeroNameAction.Skill3Btn, coverSkill3 },
+                {HeroNameAction.Skill4Btn, coverSkill4 },
+                {HeroNameAction.Skill5Btn, coverSkill5 },
+                {HeroNameAction.SwithBtn, coverSwitch },
+            };
+        }
+
+        private void InitIcon()
+        {
+            if (icons != null && icons.Count > 0) icons.Clear();
+            if (icons == null) icons = new Dictionary<HeroNameAction, Image>();
+            icons = new Dictionary<HeroNameAction, Image>()
+            {
+                {HeroNameAction.Skill1Btn, skillIcons[0] },
+                {HeroNameAction.Skill2Btn, skillIcons[1] },
+                {HeroNameAction.Skill3Btn, skillIcons[2] },
+                {HeroNameAction.Skill4Btn, skillIcons[3] },
+                {HeroNameAction.Skill5Btn, skillIcons[4] },
+                {HeroNameAction.SwithBtn, skillIcons[5] },
+            };
+        }
+
         private void DoSkillAction(HeroNameAction hak)
         {
             if (isAutoSkilling || playerHeroController.IsInAction()) return;
 
             SetShowCover(hak);
-            actions[hak]?.Invoke();
+            mainHeroData.callbackActs[hak]?.Invoke();
         }
 
-        public void SetPlayerHeroInstance(PlayerHeroController phc)
+        public void SetPlayerHeroInstance(PlayerHeroController phc, bool isMain, int hid)
         {
             playerHeroController = phc;
+            InitUIHeros(isMain, hid);
+            uISwitchHeroController?.RegisterActionByIdx(ChangeMainHeroByIdx);
         }
 
-        public void RegisterActionByIdx(HeroNameAction idx, Action fAct, float interval)
+        private void ChangeMainHeroByIdx(int hid)
         {
-            if (!actions.ContainsKey(idx))
+            if(hid == 0)
             {
-                actions[idx] = fAct;
+                mainHeroData = firstHeroData;
+                firstHeroData.isMain = true;
+                secondHeroData.isMain = false;
+                AppLySpriteSkillByIdx(true);
             }
-
-            if (!intervalCoolings.ContainsKey(idx))
+            else
             {
-                intervalCoolings.Add(idx, interval);
+                mainHeroData = secondHeroData;
+                firstHeroData.isMain = false;
+                secondHeroData.isMain = true;
+                AppLySpriteSkillByIdx(false);
             }
+        }
 
-            if(!coolingsTime.ContainsKey(idx))
+        public void RegisterActionByIdx(HeroNameAction idx, Action fAct, float interval, bool hasCoolDown = true , bool isFirst = true)
+        {
+            if(isFirst)
             {
-                coolingsTime.Add(idx, interval);
+                if (!firstHeroData.callbackActs.ContainsKey(idx))
+                {
+                    firstHeroData.callbackActs[idx] = fAct;
+                }
+
+                if (!firstHeroData.intervalCoolings.ContainsKey(idx))
+                {
+                    firstHeroData.intervalCoolings.Add(idx, interval);
+                }
+
+                if (!firstHeroData.timerCoolings.ContainsKey(idx) && hasCoolDown)
+                {
+                    firstHeroData.timerCoolings.Add(idx, interval);
+                }
+            }
+            else
+            {
+                if (!secondHeroData.callbackActs.ContainsKey(idx))
+                {
+                    secondHeroData.callbackActs[idx] = fAct;
+                }
+
+                if (!secondHeroData.intervalCoolings.ContainsKey(idx))
+                {
+                    secondHeroData.intervalCoolings.Add(idx, interval);
+                }
+
+                if (!secondHeroData.timerCoolings.ContainsKey(idx) && hasCoolDown)
+                {
+                    secondHeroData.timerCoolings.Add(idx, interval);
+                }
             }
         }
 
         private void DoSkillCallback(HeroNameAction nameAction)
         {
             SetShowCover(nameAction);
-            actions[nameAction]?.Invoke();
+            mainHeroData.callbackActs[nameAction]?.Invoke();
         }
 
         private void DoCoolingdownSkill()
         {
-            if(coolingsTime == null || coolingsTime.Count == 0) return;
+            DoCoolingdownSkill(firstHeroData, firstHeroData.isMain);
+            DoCoolingdownSkill(secondHeroData, secondHeroData.isMain);
+        }
 
-            var keys = new List<HeroNameAction>(coolingsTime.Keys);
+        private void DoCoolingdownSkill(CoolingData data, bool isMain)
+        {
+            if (data == null) return;
+
+            var keys = new List<HeroNameAction>(data.timerCoolings.Keys);
 
             foreach (var key in keys)
             {
-                if (coolingsTime[key] > 0)
+                if (data.timerCoolings[key] > 0)
                 {
-                    coolingsTime[key] -= Time.deltaTime;
-
-                    //if (key == HeroNameAction.SwithBtn) continue;
-
-                    covers[key].fillAmount = coolingsTime[key] / intervalCoolings[key];
+                    data.timerCoolings[key] -= Time.deltaTime;
+                    if(isMain)
+                        covers[key].fillAmount = data.timerCoolings[key] / data.intervalCoolings[key];
                 }
                 else
                 {
-                    covers[key].gameObject.SetActive(false);
+                    if(isMain)
+                        covers[key].gameObject.SetActive(false);
                 }
             }
         }
 
         private void SetShowCover(HeroNameAction name)
         {
-            /*if(name != HeroNameAction.SwithBtn)
-            {
-                coolingsTime[name] = intervalCoolings[name];
-                covers[name].fillAmount = 1;
-            }
-            else
-            {
-                coolingsTime[name] = intervalCoolings[name];
-            }*/
-            coolingsTime[name] = intervalCoolings[name];
+            mainHeroData.timerCoolings[name] = mainHeroData.intervalCoolings[name];
             covers[name].fillAmount = 1;
             covers[name].gameObject.SetActive(true);
         }
 
-        public void AutoActiveSkill(Func<HeroNameAction, int> endFucn = null)
+        private void ResetTimer(CoolingData data, HeroNameAction name)
+        {
+            data.timerCoolings[name] = data.intervalCoolings[name];
+        }
+
+        public void AutoActiveSkill(Func<HeroNameAction, int> endFucn = null, bool isMain = true)
         {
             HeroNameAction selectedAction = HeroNameAction.None;
             if (isAutoSkilling)
             {
-                foreach (var cl in coolingsTime)
+                var data = isMain ? mainHeroData : firstHeroData.isMain ? secondHeroData : firstHeroData;
+                foreach (var cl in data.timerCoolings)
                 {
                     if(cl.Key == HeroNameAction.SwithBtn || cl.Key == HeroNameAction.AutoSwitchBtn || cl.Key == HeroNameAction.AutoSkillBtn) continue;
 
                     if (cl.Value <= 0)
                     {
-                        DoSkillCallback(cl.Key);
+                        if (isMain)
+                        {
+                            DoSkillCallback(cl.Key);
+                        }
+                        else
+                        {
+                            ResetTimer(data, cl.Key);
+                            data.callbackActs[cl.Key]?.Invoke();
+                        }
                         selectedAction = cl.Key;
                         break;
                     }
@@ -229,16 +383,45 @@ namespace Scripts.UI
             endFucn?.Invoke(selectedAction);
         }
 
-        public void AutoActiveSwitch(Action<HeroNameAction> endFucn = null)
+        public void AutoActiveSwitch(Action<HeroNameAction> endFucn = null, bool isMain = true)
         {
             if(isAutoSwitching)
             {
-                if (coolingsTime[HeroNameAction.SwithBtn] <= 0)
+                if (isMain)
                 {
-                    DoSkillCallback(HeroNameAction.SwithBtn);
+                    if (mainHeroData.timerCoolings[HeroNameAction.SwithBtn] <= 0)
+                    {
+                        DoSkillCallback(HeroNameAction.SwithBtn);
 
-                    endFucn?.Invoke(HeroNameAction.SwithBtn);
+                        endFucn?.Invoke(HeroNameAction.SwithBtn);
+                    }
                 }
+                else
+                {
+                    var sub = (mainHeroData.Hid == firstHeroData.Hid) ? secondHeroData : firstHeroData;
+                    if (sub.timerCoolings[HeroNameAction.SwithBtn] <= 0)
+                    {
+                        ResetTimer(sub, HeroNameAction.SwithBtn);
+                        sub.callbackActs[HeroNameAction.SwithBtn]?.Invoke();
+                        endFucn?.Invoke(HeroNameAction.SwithBtn);
+                    }
+                }
+            }
+        }
+
+        public void SwapMainHero(int hid)
+        {
+            if(firstHeroData.isMain)
+            {
+                firstHeroData.isMain = false;
+                secondHeroData.isMain = true;
+                mainHeroData = secondHeroData;
+            }
+            else
+            {
+                secondHeroData.isMain = false;
+                firstHeroData.isMain = true;
+                mainHeroData = firstHeroData;
             }
         }
     }

@@ -1,8 +1,10 @@
+using Scripts.Common;
 using UnityEngine;
 
 public class HealthBarController : MonoBehaviour
 {
     [SerializeField] SpriteRenderer spriteRenderer;
+    [SerializeField] HealthTxtController healthTxtPrefab;
 
     public void SetHealth(float health)
     {
@@ -20,7 +22,7 @@ public class HealthBarController : MonoBehaviour
 
     public void ShowHealthTxt(float dame, Vector3 pos)
     {
-        var ht = HealthPoolController.Instance.GetHealthTxt(dame);
+        var (ht,_) = PoolController.Instance.Get(healthTxtPrefab, pos);
         ht.DoShowHealthTxt(dame, pos);
     }
 }
