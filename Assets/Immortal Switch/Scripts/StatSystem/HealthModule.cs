@@ -87,7 +87,10 @@ namespace Immortal_Switch.Scripts.StatSystem
 
         public void Dispose()
         {
-            statModule.OnStatChanged -= OnStatChanged;
+            if (statModule != null)
+            {
+                statModule.OnStatChanged -= OnStatChanged;
+            }
         }
     }
 }

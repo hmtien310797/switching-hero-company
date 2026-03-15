@@ -516,7 +516,7 @@ namespace Scripts.Battle
 
         private void OnGameLose()
         {
-            SwitchState(IdleState);
+            SwitchState(DeathState);
             GameStatView.Instance?.battleTimerController.HideTimer();
         }
 
@@ -679,7 +679,7 @@ namespace Scripts.Battle
 
         public void StartState(PlayerHeroController state)
         {
-            
+            state.DoIntoSkill(HeroSkills.Die, null);
         }
 
         public void UpdateState(PlayerHeroController state)

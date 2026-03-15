@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 
 namespace Scripts.Battle
@@ -19,6 +20,11 @@ namespace Scripts.Battle
 
         private int attackIdx = 0;
         private const string eventAttack = "hit";
+
+        private void Awake()
+        {
+            GameEventManager.Subscribe(GameEvents.OnStageLost, StopAllCoroutines);
+        }
 
         public override void InitSkill(List<BaseExternalSkillController> bEscs, Transform soTrans)
         {
@@ -393,6 +399,9 @@ namespace Scripts.Battle
                     break;
                 case HeroSkills.Flash:
                     DoFlash(endAct);
+                    break;
+                case HeroSkills.Die:
+                    DoDeath(endAct);
                     break;
             }
         }

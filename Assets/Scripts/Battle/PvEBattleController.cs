@@ -328,7 +328,7 @@ namespace Scripts.Battle
                         Defense = creepData.BaseDef * Mathf.Pow(1.06f, currentStage - 1f),
                         MoveSpeed = creepData.BaseMoveSpeed,
                     };
-                    var target = UnityEngine.Random.Range(0, 2);
+                    var target = Random.Range(0, 2);
                     creep.InitMonster(hid, target == 0 ? firstPlayerHeroController:secondPlayerHeroController, this, monsterStat);
 
                     creeps.Add(creep);
