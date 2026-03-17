@@ -1,12 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Immortal_Switch.Scripts.Core;
 using Scripts.Common;
 using Spine.Unity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using Immortal_Switch.Scripts.Core;
+using TMPro;
 using UnityEngine;
 
 namespace Scripts.Battle
@@ -17,21 +18,52 @@ namespace Scripts.Battle
         [SerializeField] List<BaseExternalSkillController> fxSkills;
         [SerializeField] SkeletonAnimation winFx;
         [SerializeField] Transform skillTrans;
+        [SerializeField] BaseExternalSkillController externalSkillController;
+        [SerializeField] Transform arrowTrans;
+        [SerializeField] Transform oArrowTrans;
 
         private int attackIdx = 0;
         private const string eventAttack = "hit";
+        private Dictionary<int, SkillDataSO> skillDataSOs;
+        public string boneArraw = "L_hand";
+        private Spine.Bone handBone;
 
         private void Awake()
         {
+            if(arrowTrans != null) 
+                arrowTrans.gameObject.SetActive(false);
             GameEventManager.Subscribe(GameEvents.OnStageLost, StopAllCoroutines);
         }
 
-        public override void InitSkill(List<BaseExternalSkillController> bEscs, Transform soTrans)
+        private void Start()
         {
+            handBone = BaseAnimController.GetBaseSka().Skeleton.FindBone(boneArraw);
+        }
+
+        public void InitSkillData(List<int>skillIds)
+        {
+            if (skillDataSOs == null) skillDataSOs = new Dictionary<int, SkillDataSO>();
+            skillDataSOs.Clear();
+
+            for (int i = 0; i < skillIds.Count; i++)
+            {
+                var skillId = skillIds[i];
+                skillDataSOs[i] = MasterDataCache.Instance?.GetSkillDataById(skillId);
+                /*skillDataSOs[1] = MasterDataCache.Instance?.GetSkillDataById(3);
+                skillDataSOs[2] = MasterDataCache.Instance?.GetSkillDataById(4);
+                skillDataSOs[3] = MasterDataCache.Instance?.GetSkillDataById(5);
+                skillDataSOs[4] = MasterDataCache.Instance?.GetSkillDataById(6);*/
+            }
+        }
+        
+        public override void InitSkill(List<int> skillIds, Transform soTrans)
+        {
+            InitSkillData(skillIds);
             //fxSkills = bEscs;
             skillTrans = soTrans;
 
             ResgisterHitSwitchEvent();
+            RegisterHitAttactEvent();
         }
 
         private void DoShakeCam(float dur, int viration, ShakeType shakeType = ShakeType.Shake)
@@ -42,6 +74,13 @@ namespace Scripts.Battle
         private void ResgisterHitSwitchEvent()
         {
             BaseAnimController.RegisterAnimEvent(StandAnimName.Switch, eventAttack, DoHitSwitchEventAction);
+        }
+
+        private void RegisterHitAttactEvent()
+        {
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack1, eventAttack, DoAttackByArrowEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack2, eventAttack, DoAttackByArrowEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack3, eventAttack, DoAttackByArrowEvent);
         }
                 
         private string GetAttackAnimNameByIdx(int idx)
@@ -72,11 +111,52 @@ namespace Scripts.Battle
         public IEnumerator CoDoAttack(Action endAct, string animName)
         {
             var dur = BaseAnimController.GetDurByAnimName(animName);
-            yield return new WaitForSeconds(dur / 2);
+            if (playerHeroController.HeroAttackType == HeroAttackType.Knight)
+            {
+                yield return new WaitForSeconds(dur / 2);
+                DoAttackFx();
+                playerHeroController?.AttackBySpecific();
+                yield return new WaitForSeconds(dur / 2);
+                endAct?.Invoke();
+                SkaFx.gameObject.SetActive(false);
+            }
+            else if(playerHeroController.HeroAttackType == HeroAttackType.Archer)
+            {
+                yield return new WaitForSeconds(dur);
+                endAct?.Invoke();
+            }
+        }
+
+        private void DoAttackByArrowEvent()
+        {
+            if(playerHeroController.HeroAttackType != HeroAttackType.Archer) return;
+            var (arrow, b) = PoolController.Instance.Get(arrowTrans, oArrowTrans.position);
+            var targetPos = playerHeroController.GetMonsterPos() + Vector3.up;
+            Vector3 direction = (targetPos - oArrowTrans.position).normalized;
+            if (arrow != null)
+            {
+                if (handBone == null) handBone = BaseAnimController.GetBaseSka().skeleton.FindBone(boneArraw);
+                Debug.Log("hand bone" + handBone == null);
+                arrow.position = handBone != null ? handBone.GetWorldPosition(BaseAnimController.GetBaseSka().transform) : oArrowTrans.position;
+                arrow.rotation = Quaternion.FromToRotation(Vector3.right, direction);
+            }
+            StartCoroutine(DoFlyAsync(arrow, targetPos));
+        }
+
+        private IEnumerator DoFlyAsync(Transform arrow,Vector3 target)
+        {
+            arrow.position = Vector3.MoveTowards(arrow.position, target, 20 * Time.deltaTime);
+            while ((arrow.position - target).sqrMagnitude > 0.1f)
+            {
+                yield return null;
+                arrow.position = Vector3.MoveTowards(arrow.position, target, 20 * Time.deltaTime);
+                arrow.Rotate(Vector3.right, 30, Space.Self);
+            }
+
             DoAttackFx();
             playerHeroController?.AttackBySpecific();
-            yield return new WaitForSeconds(dur / 2);
-            endAct?.Invoke();
+            PoolController.Instance.ReturnToPool(arrow.gameObject);
+            yield return new WaitForSeconds(.2f);
             SkaFx.gameObject.SetActive(false);
         }
 
@@ -104,7 +184,7 @@ namespace Scripts.Battle
             ska.AnimationState.SetAnimation(0, name, isLooped);
         }
 
-        private void DoSkillAnim()
+        private void DoUISkillAnim()
         {
             var pos = new Vector3(2,.6f,6);
             skillTrans.localPosition = pos;
@@ -123,14 +203,16 @@ namespace Scripts.Battle
 
         public override void DoSkill01(Action endAct)
         {
-            DoSkillAnim();
-            var pos = transform.position;
+            DoUISkillAnim();
+
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[0], endAct, (dur)=>DoShakeCam(dur, 40, ShakeType.Punch));
+            /*var pos = transform.position;
             var (fx, b) = PoolController.Instance.Get(fxSkills[0], pos);
             if(b)
             {
                 fx.InitSkill((r, d) => playerHeroController?.AttackByArea(pos, r, d));
             }
-            fx.DoSkill(ActiveKill1Callback, endAct, transform, this.GetCancellationTokenOnDestroy()).Forget();
+            fx.DoSkill(ActiveKill1Callback, endAct, transform, this.GetCancellationTokenOnDestroy()).Forget();*/
         }
 
         public async UniTask ActiveKill1Callback(float dur, CancellationToken token)
@@ -141,14 +223,15 @@ namespace Scripts.Battle
 
         public override void DoSkill02(Action endAct)
         {
-            DoSkillAnim();
-            var pos = playerHeroController.GetNearestMonster();
+            DoUISkillAnim();
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[1], endAct, (dur)=> DoShakeCam(dur, 40, ShakeType.Shake));
+            /*var pos = playerHeroController.GetNearestMonster();
             var (fx, b) = PoolController.Instance.Get(fxSkills[1], pos);
             if (b)
             {
                 fx.InitSkill();
             }
-            fx.DoSkill(ActiveKill2Callback, endAct, transform, this.GetCancellationTokenOnDestroy()).Forget();
+            fx.DoSkill(ActiveKill2Callback, endAct, transform, this.GetCancellationTokenOnDestroy()).Forget();*/
         }
 
         private async UniTask ActiveKill2Callback(float dur, CancellationToken token)
@@ -166,7 +249,9 @@ namespace Scripts.Battle
 
         public override async void DoSkill03(Action endAct)
         {
-            DoSkillAnim();
+            DoUISkillAnim();
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[2], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
+            /*DoUISkillAnim();
             var pos = playerHeroController.GetNearestMonster();
             var numAtk = 6;
             for (int i = 0; i < numAtk; i++)
@@ -179,7 +264,7 @@ namespace Scripts.Battle
                 }
                 await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: this.GetCancellationTokenOnDestroy());
                 fx.DoSkill(nPos, ActiveKill3Callback, i < numAtk - 1 ? null : endAct, this.GetCancellationTokenOnDestroy()).Forget();
-            }           
+            }      */
         }
 
         private async UniTask ActiveKill3Callback(Vector3 targetPos, float dur, CancellationToken token, Action<Vector3> callAct)
@@ -192,14 +277,16 @@ namespace Scripts.Battle
 
         public override void DoSkill04(Action endAct)
         {
-            DoSkillAnim();
+            DoUISkillAnim();
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[3], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
+            /*DoUISkillAnim();
             var pos = playerHeroController.GetNearestMonster();
             var (fx, b) = PoolController.Instance.Get(fxSkills[3], pos);
             if (b)
             {
                 fx.InitSkill((r, d) => playerHeroController?.AttackByArea(pos, r, d));
             }
-            fx.DoSkill(ActiveKill4Callback, endAct, pos, this.GetCancellationTokenOnDestroy()).Forget();
+            fx.DoSkill(ActiveKill4Callback, endAct, pos, this.GetCancellationTokenOnDestroy()).Forget();*/
         }
 
         private async UniTask ActiveKill4Callback(Vector3 targetPos, float dur, CancellationToken token)
@@ -216,7 +303,9 @@ namespace Scripts.Battle
 
         public override async void DoSkill05(Action endAct)
         {
-            DoSkillAnim();
+            DoUISkillAnim();
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[4], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
+            /*DoUISkillAnim();
             var pos = playerHeroController.GetNearestMonster();
             var numAtk = 10;
             for (int i = 0; i < numAtk; i++)
@@ -233,7 +322,7 @@ namespace Scripts.Battle
                 }    
                 await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: this.GetCancellationTokenOnDestroy());
                 fx.DoSkill(nPos, ActiveKill5Callback, i < numAtk - 1 ? null : endAct, this.GetCancellationTokenOnDestroy()).Forget();
-            }
+            }*/
         }
 
         private async UniTask ActiveKill5Callback(Vector3 targetPos, float dur, CancellationToken token, Action<Vector3> callAct)

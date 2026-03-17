@@ -12,14 +12,14 @@ GameObject:
   - component: {fileID: 6284699621128745569}
   - component: {fileID: 1767980063621421128}
   - component: {fileID: 6260098013902319187}
-  - component: {fileID: -607966872467342200}
+  - component: {fileID: 4941236797972096919}
   m_Layer: 10
   m_Name: FxSkill4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2273205972946941458
 Transform:
   m_ObjectHideFlags: 0
@@ -131,7 +131,7 @@ MonoBehaviour:
   _animationName: animation
   loop: 1
   timeScale: 1
---- !u!114 &-607966872467342200
+--- !u!114 &4941236797972096919
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,11 +140,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7002611873313139584}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5295973bae4b8042ae932b60f786c07, type: 3}
+  m_Script: {fileID: 11500000, guid: 0397c594d0562a442b968a589aa1a716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isFollow: 0
-  skaFx: {fileID: 6260098013902319187}
   tierSkill: 2
   rangeSkill: 4
   dameSkillFactor: 2.5
+  skaFx: {fileID: 6260098013902319187}

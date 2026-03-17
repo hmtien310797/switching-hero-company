@@ -156,7 +156,7 @@ namespace Scripts.Battle
                 var target = targets[i];
                 if (target == null || target.IsDead) continue;
 
-                target.TakeDamage(damage);
+                target.TakeDamage(this);
             }
 
             Debug.Log($"boss deals {damage} AOE damage ({percentAtk}% ATK) to {targets.Count} targets");
@@ -170,7 +170,7 @@ namespace Scripts.Battle
             float atk = Stats.StatModule.GetFinalStat(StatType.ATK);
             float damage = atk * percentAtk / 100f;
 
-            target.TakeDamage(damage);
+            target.TakeDamage(this);
 
             Debug.Log($"boss deals {damage} damage ({percentAtk}% ATK) to target");
         }

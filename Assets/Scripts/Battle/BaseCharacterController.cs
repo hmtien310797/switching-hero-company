@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.StatSystem;
 using NaughtyAttributes;
 using UnityEngine;
@@ -36,7 +37,7 @@ namespace Scripts.Battle
         public float CurrentAttackSpeed => statsController.StatModule.GetFinalStat(StatType.ATK);
         #endregion
 
-        public void InitSkill(List<BaseExternalSkillController> skills, Transform obTrans)
+        public void InitSkill(List<int> skills, Transform obTrans)
         {
             baseSkillController.InitSkill(skills, obTrans);
         }
@@ -143,7 +144,6 @@ namespace Scripts.Battle
 
         }
 
-
         public void DoRotate(bool isRight)
         {
             if(isRight) 
@@ -155,6 +155,19 @@ namespace Scripts.Battle
         public virtual bool IsInAttackRange(float rangeAttack, Vector3 target)
         {
             return (transform.position - target).sqrMagnitude <= rangeAttack*rangeAttack;
+        }
+
+        public void TakeDamage(ICombatUnit attacker, float amount = 1)
+        {
+            DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, (ICombatUnit)this, amount);
+            healthBarController?.ShowHealthTxt((int)damageResult.Damage, transform.position + Vector3.up);
+            statsController.HealthModule.TakeDamage(damageResult.Damage, damageResult.DamageTextType);
+            healthBarController?.SetHealth(CurrentHp / MaxHp);
+        }
+
+        public void Heal(float amount)
+        {
+            statsController.HealthModule.ApplyHeal(amount);
         }
     }
 }

@@ -6,8 +6,8 @@
         bool IsDead { get; }
         float CurrentHp { get; }
         float MaxHp { get; }
-
-        void TakeDamage(float amount, DamageType damageType = DamageType.Normal);
+        void TakeDamage(ICombatUnit attacker, float amount = 1);
         void Heal(float amount);
     }
+    
 }

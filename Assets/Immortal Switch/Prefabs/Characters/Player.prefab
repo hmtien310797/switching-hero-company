@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1066281164950148047
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7982249090960025673}
+  m_Layer: 0
+  m_Name: OArrowTrasn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7982249090960025673
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1066281164950148047}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.27, y: 1.55, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5137324121463227497}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3433791974974161003
 GameObject:
   m_ObjectHideFlags: 0
@@ -13,6 +44,7 @@ GameObject:
   - component: {fileID: 4374813364255653229}
   - component: {fileID: 8686406742812245777}
   - component: {fileID: 3541416523792417231}
+  - component: {fileID: -6887672660385192121}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -36,6 +68,7 @@ Transform:
   - {fileID: 4624543974518113124}
   - {fileID: 6850086287229038633}
   - {fileID: 4289035825999891994}
+  - {fileID: 7982249090960025673}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &491192442546481272
@@ -108,6 +141,9 @@ MonoBehaviour:
   - {fileID: 7590146775286044908, guid: db2084fa7e891f64caf04d20723e7cc8, type: 3}
   winFx: {fileID: 3621413825147627468}
   skillTrans: {fileID: 0}
+  externalSkillController: {fileID: -6887672660385192121}
+  arrowTrans: {fileID: 6208129103282587161, guid: 16dd6b4ec3dd23945a763dd4de579691, type: 3}
+  oArrowTrans: {fileID: 7982249090960025673}
 --- !u!114 &3541416523792417231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,6 +156,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a8cc74f972449caae4ff8a2f8624856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-6887672660385192121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3113e4792a2f9f04c8fc6d8d98a2a4ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isFollow: 0
+  tierSkill: 0
+  rangeSkill: 4
+  dameSkillFactor: 2.5
 --- !u!1 &6117754734744368223
 GameObject:
   m_ObjectHideFlags: 0
@@ -185,7 +237,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b19e81b13a37a804bb4cf30a31f53327, type: 2}
+  - {fileID: 2100000, guid: 652508f41a76cb043ba3e7f9d044ebf0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -219,7 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: 97bc5814e8664914cadeba16427050b3, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: ac1ddc6fa3e2be54bbc99420c0695d5b, type: 2}
   initialSkinName: 
   fixPrefabOverrideViaMeshFilter: 2
   initialFlipX: 0

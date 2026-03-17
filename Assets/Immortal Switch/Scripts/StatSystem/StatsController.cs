@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Combat;
 using Scripts.Battle;
 using UnityEngine;
 
@@ -11,10 +12,12 @@ namespace Immortal_Switch.Scripts.StatSystem
         public HealthModule HealthModule { get; private set; }
         public StatusEffectModule StatusEffectModule { get; private set; }
         public BuffModule BuffModule { get; private set; }
+        public DotModule DotModule { get; private set; }
 
         public void Initialize(BaseStat baseStat)
         {
             StatModule = new StatModule();
+            DotModule = new DotModule();
             StatModule.Init(new Dictionary<StatType, float>
             {
                 { StatType.MaxHP, baseStat.Health },
@@ -46,6 +49,7 @@ namespace Immortal_Switch.Scripts.StatSystem
         private void Update()
         {
             BuffModule?.Update(Time.deltaTime);
+            DotModule?.Update(Time.deltaTime);
         }
 
         private void OnDestroy()

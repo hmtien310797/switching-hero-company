@@ -1,17 +1,18 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-using System.Collections.Generic;
+using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.StatSystem;
 
 [CustomEditor(typeof(StatsController))]
 public class CharacterStatsControllerEditor : UnityEditor.Editor
 {
-    private bool showRuntimeDebug = true;
     private bool showHealth = true;
     private bool showStats = true;
     private bool showBuffs = true;
+    private bool showDots = true;
     private bool showStatus = true;
-    private bool showDebugActions = true;
+    private bool showActions = true;
 
     private readonly Dictionary<StatType, bool> expandedStatModifiers = new();
 
@@ -26,7 +27,7 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
 
         if (!Application.isPlaying)
         {
-            EditorGUILayout.HelpBox("Các thông tin runtime chỉ hiện khi đang Play Mode.", MessageType.Info);
+            EditorGUILayout.HelpBox("Runtime debug chỉ hiển thị khi đang Play Mode.", MessageType.Info);
             return;
         }
 
@@ -36,15 +37,12 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
             return;
         }
 
-        showRuntimeDebug = EditorGUILayout.Foldout(showRuntimeDebug, "Character Runtime Debug", true);
-        if (!showRuntimeDebug)
-            return;
-
         DrawHealthSection(controller);
         DrawStatsSection(controller);
         DrawBuffSection(controller);
+        DrawDotSection(controller);
         DrawStatusSection(controller);
-        DrawDebugActions(controller);
+        DrawActionSection(controller);
 
         Repaint();
     }
@@ -56,31 +54,29 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
 
         using (new EditorGUI.IndentLevelScope())
         {
-            float currentHp = controller.HealthModule != null ? controller.HealthModule.CurrentHP : 0f;
-            float maxHp = controller.HealthModule != null ? controller.HealthModule.MaxHP : 0f;
+            float current = controller.HealthModule != null ? controller.HealthModule.CurrentHP : 0f;
+            float max = controller.HealthModule != null ? controller.HealthModule.MaxHP : 0f;
 
-            EditorGUILayout.LabelField("Current HP", currentHp.ToString("0.##"));
-            EditorGUILayout.LabelField("Max HP", maxHp.ToString("0.##"));
+            EditorGUILayout.LabelField("Current HP", current.ToString("0.##"));
+            EditorGUILayout.LabelField("Max HP", max.ToString("0.##"));
 
-            float ratio = maxHp > 0f ? currentHp / maxHp : 0f;
+            float ratio = max > 0f ? current / max : 0f;
             Rect rect = GUILayoutUtility.GetRect(18, 18);
-            EditorGUI.ProgressBar(rect, ratio, $"{currentHp:0.##} / {maxHp:0.##}");
+            EditorGUI.ProgressBar(rect, ratio, $"{current:0.##} / {max:0.##}");
             EditorGUILayout.Space(4);
         }
     }
 
     private void DrawStatsSection(StatsController controller)
     {
-        showStats = EditorGUILayout.Foldout(showStats, "Base Stat / Current Stat / Modifiers", true);
+        showStats = EditorGUILayout.Foldout(showStats, "Base Stats / Current Stats", true);
         if (!showStats) return;
 
         var allStats = controller.StatModule.GetAllStats();
         if (allStats == null || allStats.Count == 0)
         {
             using (new EditorGUI.IndentLevelScope())
-            {
-                EditorGUILayout.LabelField("No stat data.");
-            }
+                EditorGUILayout.LabelField("No stats.");
             return;
         }
 
@@ -130,12 +126,10 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
                                 if (mod == null) continue;
 
                                 EditorGUILayout.BeginHorizontal();
-                                EditorGUILayout.LabelField(mod.SourceId, GUILayout.Width(150));
+                                EditorGUILayout.LabelField(string.IsNullOrEmpty(mod.SourceId) ? "NoSource" : mod.SourceId, GUILayout.Width(150));
                                 EditorGUILayout.LabelField(mod.Operation.ToString(), GUILayout.Width(70));
                                 EditorGUILayout.LabelField(FormatModifierValue(mod), GUILayout.Width(80));
                                 EditorGUILayout.EndHorizontal();
-
-                                EditorGUILayout.LabelField($"Target: {mod.StatType}", EditorStyles.miniLabel);
                             }
                         }
                     }
@@ -173,30 +167,26 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
                 if (buff == null || buff.Data == null) continue;
 
                 EditorGUILayout.BeginVertical("box");
-
                 EditorGUILayout.LabelField(buff.Data.Name, EditorStyles.boldLabel);
                 EditorGUILayout.LabelField("Id", buff.Data.Id);
                 EditorGUILayout.LabelField("Kind", buff.Data.Kind.ToString());
                 EditorGUILayout.LabelField("Stack", buff.StackCount.ToString());
-                EditorGUILayout.LabelField("Remaining Time", $"{buff.RemainingTime:0.00}s");
+                EditorGUILayout.LabelField("Remaining", $"{buff.RemainingTime:0.00}s");
 
                 if (buff.Data.StatusEffects != StatusEffectType.None)
-                {
-                    EditorGUILayout.LabelField("Status Effect", buff.Data.StatusEffects.ToString());
-                }
+                    EditorGUILayout.LabelField("Status", buff.Data.StatusEffects.ToString());
 
                 if (buff.Data.PeriodicEffectType != PeriodicEffectType.None)
                 {
-                    EditorGUILayout.LabelField("Periodic Type", buff.Data.PeriodicEffectType.ToString());
+                    EditorGUILayout.LabelField("Periodic", buff.Data.PeriodicEffectType.ToString());
                     EditorGUILayout.LabelField("Tick Interval", $"{buff.Data.TickInterval:0.##}s");
-                    EditorGUILayout.LabelField("Tick Value", buff.Data.PeriodicValue.ToString("0.##"));
+                    EditorGUILayout.LabelField("Periodic Value", buff.Data.PeriodicValue.ToString("0.##"));
                     EditorGUILayout.LabelField("Damage Type", buff.Data.PeriodicDamageType.ToString());
                 }
 
                 if (buff.Data.Modifiers != null && buff.Data.Modifiers.Count > 0)
                 {
-                    EditorGUILayout.Space(2);
-                    EditorGUILayout.LabelField("Buff Modifiers", EditorStyles.miniBoldLabel);
+                    EditorGUILayout.LabelField("Modifiers", EditorStyles.miniBoldLabel);
 
                     using (new EditorGUI.IndentLevelScope())
                     {
@@ -204,14 +194,49 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
                         {
                             var mod = buff.Data.Modifiers[j];
                             if (mod == null) continue;
-
-                            EditorGUILayout.LabelField(
-                                $"{mod.StatType} | {mod.Operation} | {FormatModifierValue(mod)}"
-                            );
+                            EditorGUILayout.LabelField($"{mod.StatType} | {mod.Operation} | {FormatModifierValue(mod)}");
                         }
                     }
                 }
 
+                EditorGUILayout.EndVertical();
+            }
+        }
+    }
+
+    private void DrawDotSection(StatsController controller)
+    {
+        showDots = EditorGUILayout.Foldout(showDots, "Active DOT", true);
+        if (!showDots) return;
+
+        using (new EditorGUI.IndentLevelScope())
+        {
+            var dots = controller.DotModule != null ? controller.DotModule.ActiveDots : null;
+
+            if (dots == null || dots.Count == 0)
+            {
+                EditorGUILayout.LabelField("No active DOT.");
+                return;
+            }
+
+            for (int i = 0; i < dots.Count; i++)
+            {
+                var dot = dots[i];
+                if (dot == null) continue;
+
+                EditorGUILayout.BeginVertical("box");
+                EditorGUILayout.LabelField(dot.EffectId, EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Damage Type", dot.DamageType.ToString());
+                EditorGUILayout.LabelField("Stack Rule", dot.StackRule.ToString());
+                EditorGUILayout.LabelField("Tick Damage", dot.TickDamage.ToString("0.##"));
+                EditorGUILayout.LabelField("Tick Interval", $"{dot.TickInterval:0.##}s");
+                EditorGUILayout.LabelField("Remaining", $"{dot.RemainingDuration:0.00}s");
+
+                string sourceName = dot.Source != null ? dot.Source.Stats.gameObject.name : "None";
+                string targetName = dot.Target != null ? dot.Target.Stats.gameObject.name : "None";
+
+                EditorGUILayout.LabelField("Source", sourceName);
+                EditorGUILayout.LabelField("Target", targetName);
                 EditorGUILayout.EndVertical();
             }
         }
@@ -224,85 +249,64 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
 
         using (new EditorGUI.IndentLevelScope())
         {
-            var currentStatus = controller.StatusEffectModule != null
+            var current = controller.StatusEffectModule != null
                 ? controller.StatusEffectModule.CurrentStatus
                 : StatusEffectType.None;
 
-            EditorGUILayout.LabelField("Current Status", currentStatus.ToString());
+            EditorGUILayout.LabelField("Current Status", current.ToString());
 
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.Toggle("Stun", (currentStatus & StatusEffectType.Stun) != 0);
-                EditorGUILayout.Toggle("Silence", (currentStatus & StatusEffectType.Silence) != 0);
-                EditorGUILayout.Toggle("Freeze", (currentStatus & StatusEffectType.Freeze) != 0);
+                EditorGUILayout.Toggle("Stun", (current & StatusEffectType.Stun) != 0);
+                EditorGUILayout.Toggle("Silence", (current & StatusEffectType.Silence) != 0);
+                EditorGUILayout.Toggle("Freeze", (current & StatusEffectType.Freeze) != 0);
             }
         }
     }
 
-    private void DrawDebugActions(StatsController controller)
+    private void DrawActionSection(StatsController controller)
     {
-        showDebugActions = EditorGUILayout.Foldout(showDebugActions, "Debug Actions", true);
-        if (!showDebugActions) return;
+        showActions = EditorGUILayout.Foldout(showActions, "Debug Actions", true);
+        if (!showActions) return;
 
         using (new EditorGUI.IndentLevelScope())
         {
             EditorGUILayout.BeginVertical("box");
 
-            if (GUILayout.Button("Apply Poison"))
-            {
-                controller.BuffModule.ApplyBuff(BuffFactory.CreatePoison());
-            }
-
-            if (GUILayout.Button("Apply Burn"))
-            {
-                controller.BuffModule.ApplyBuff(BuffFactory.CreateBurn());
-            }
-
-            if (GUILayout.Button("Apply Regen"))
-            {
-                controller.BuffModule.ApplyBuff(BuffFactory.CreateRegen());
-            }
-
-            if (GUILayout.Button("Apply Stun"))
-            {
-                controller.BuffModule.ApplyBuff(BuffFactory.CreateStun());
-            }
-
-            if (GUILayout.Button("Apply Silence"))
-            {
-                controller.BuffModule.ApplyBuff(BuffFactory.CreateSilence());
-            }
-
-            if (GUILayout.Button("Apply Freeze"))
-            {
-                controller.BuffModule.ApplyBuff(BuffFactory.CreateFreeze());
-            }
-
-            EditorGUILayout.Space(5);
-
             if (GUILayout.Button("Damage 100"))
-            {
-                controller.HealthModule.ApplyDamage(100f);
-            }
+                controller.HealthModule.TakeDamage(100f, DamageType.Normal);
 
             if (GUILayout.Button("Heal 100"))
-            {
                 controller.HealthModule.ApplyHeal(100f);
+
+            if (GUILayout.Button("Add DEF +30"))
+            {
+                controller.StatModule.AddModifier(
+                    new StatModifier(StatType.DEF, ModifierOp.Add, 30f, "debug_def_30")
+                );
             }
 
-            if (GUILayout.Button("Add DEF +30 Manual"))
+            if (GUILayout.Button("Remove DEF +30"))
             {
-                controller.StatModule.AddModifier(new StatModifier(
-                    StatType.DEF,
-                    ModifierOp.Add,
-                    30f,
-                    "debug_manual_def_30"
-                ));
+                controller.StatModule.RemoveModifiersBySource("debug_def_30");
             }
 
-            if (GUILayout.Button("Remove DEF +30 Manual"))
+            if (GUILayout.Button("Apply Burn DOT Snapshot"))
             {
-                controller.StatModule.RemoveModifiersBySource("debug_manual_def_30");
+                // ví dụ snapshot hệ số 0.4
+                var attacker = controller.gameObject.GetComponent<ICombatUnit>();
+                DamageResult result = DamageCalculator.CalculateDamage(attacker, attacker, 0.4f);
+
+                controller.DotModule.ApplyDotSnapshot(
+                    effectId: "burn",
+                    source: attacker,
+                    target: attacker,
+                    tickDamage: result.Damage,
+                    tickInterval: 1f,
+                    duration: 4f,
+                    damageType: DamageType.Burn,
+                    stackRule: DotStackRule.StackIndependent
+                );
             }
 
             EditorGUILayout.EndVertical();

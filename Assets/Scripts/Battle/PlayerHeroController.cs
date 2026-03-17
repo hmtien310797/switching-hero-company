@@ -6,8 +6,8 @@ using System;
 using System.Collections;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
-using Unity.VisualScripting;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Scripts.Battle
 {
@@ -32,6 +32,13 @@ namespace Scripts.Battle
         { 
             intervalSkill1 = timer1; intervalSkill2 = timer2; intervalSkill3 = timer3; intervalSkill4 = timer4; intervalSkill5 = timer5;intervalSwitch = timerS;
         }
+    }
+
+    public enum HeroAttackType
+    {
+        Knight,
+        Archer,
+        Mage
     }
 
     public class PlayerHeroController : BaseCharacterController<PlayerHeroController>, ICombatUnit
@@ -69,9 +76,11 @@ namespace Scripts.Battle
         private bool isPriorityNearTarget = false;
         private Vector3 targetPos = Vector3.zero;
         private FollowHeroController followHeroController;
+        private HeroAttackType heroAttackType;
 
         public MonsterScrepController MonsterTarget { get => _monsterTarget; set => _monsterTarget = value; }
         public FollowHeroController FollowHeroController { get => followHeroController; set => followHeroController = value; }
+        public HeroAttackType HeroAttackType { get => heroAttackType; set => heroAttackType = value; }
 
         protected override void Awake()
         {
@@ -81,7 +90,7 @@ namespace Scripts.Battle
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnGameLose);
         }
 
-        public void InitHero(HeroDataSO data, PvEBattleController pbc, PlayerCamController pcc, Transform soTrans, Transform partnerTrans, FollowHeroController fHc, bool isSwitch = false, bool isMainHero = false)
+        public void InitHero(HeroDataSO data, PvEBattleController pbc, PlayerCamController pcc, Transform soTrans, Transform partnerTrans, FollowHeroController fHc, HeroAttackType hAT, bool isSwitch = false, bool isMainHero = false)
         {
             isMain = isMainHero;
             isPriorityNearTarget = isMain;
@@ -92,10 +101,12 @@ namespace Scripts.Battle
             isInSwitchAction = isSwitch;
             baseHeroData = data;
             followHeroController = fHc;
+            heroAttackType = hAT;
+
             SetPartner(partnerTrans);
             SetIntervalSkills();
             playerCamController?.InitCam(transform, isMain);
-            InitSkill(null, soTrans);
+            InitSkill(!isMain ? new List<int>() { 1,3,5,6,6} : new List<int>() {9, 2,4,7,7}, soTrans);
             SetTargetPos();
             InitHeroData();
             SwitchState(SpawnState);
@@ -239,6 +250,7 @@ namespace Scripts.Battle
 
         public void ResetHeroData()
         {
+            gameObject.SetActive(true);
             InitHeroData();
             SwitchState(SpawnState);
             MonsterTarget = null;
@@ -303,7 +315,7 @@ namespace Scripts.Battle
                 return;
             }
 
-            if (_monsterTarget == null || _monsterTarget.IsDead)
+            //if (_monsterTarget == null || _monsterTarget.IsDead)
             {
                 SetTarget(pvEBattleController?.GetNearestMonster(targetPos));
             }
@@ -332,18 +344,27 @@ namespace Scripts.Battle
 
         private bool IsBossInAttackRange(float rangeAttack, Vector3 target)
         {
-            var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack * rangeAttack;
-            var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack && transform.position.z <= target.z;
+            if (heroAttackType == HeroAttackType.Knight)
+            {
+                var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack * rangeAttack;
+                var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack && transform.position.z <= target.z;
 
-            return isValidX && isValidZ;
+                return isValidX && isValidZ;
+            }
+
+            return (transform.position - target).sqrMagnitude <= baseHeroData.AttackRange * baseHeroData.AttackRange;
         }
 
         private bool IsCreepInAttackRange(float rangeAttack, Vector3 target)
         {
-            var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack*rangeAttack;
-            var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack;
+            if (heroAttackType == HeroAttackType.Knight)
+            {
+                var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack * rangeAttack;
+                var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack;
+                return isValidX && isValidZ;
+            }
 
-            return isValidX && isValidZ;
+            return (transform.position - target).sqrMagnitude <= baseHeroData.AttackRange * baseHeroData.AttackRange;
         }
 
         public override bool IsInAttackRange(float rangeAttack, Vector3 target)
@@ -488,17 +509,28 @@ namespace Scripts.Battle
         private void SetIsInActionState(bool isActive)
         {
             isInSkillAction = isActive;
+            Debug.Log($"active skill is: {isActive}");
         }
 
         public bool IsInAction()
         {
-            return isInSkillAction;
+            return isInSkillAction || isInSwitchAction;
         }
-
+        
         public override void AttackBySpecific()
         {
             _monsterTarget?.OnReceiveDamage(baseStatData.Attack, ResetTarget, this);
         }
+
+        public Vector3 GetMonsterPos()
+        {
+            if(_monsterTarget == null)
+            {
+                SetTarget(pvEBattleController.GetNearestMonster(transform.position));
+            }
+
+            return _monsterTarget?.transform.position?? transform.position;
+        }    
 
         public Vector3 GetFlashPos()
         {
@@ -506,7 +538,10 @@ namespace Scripts.Battle
 
             var pos = _monsterTarget.transform.position;
             pos.y = transform.position.y;
-            return pos + new Vector3( - baseStatData.AttackRange * .9f * (isMain ? 1 : -1), 0, - baseStatData.AttackRange * .5f);
+            if(heroAttackType == HeroAttackType.Knight)
+                return pos + new Vector3( - baseStatData.AttackRange * .9f * (isMain ? 1 : -1), 0, - baseStatData.AttackRange * .5f);
+            else
+                return pos + new Vector3(-baseStatData.AttackRange * .2f * (isMain ? 1 : -1), 0, -baseStatData.AttackRange * .9f);
         }
 
         private void ResetTarget()
@@ -537,16 +572,6 @@ namespace Scripts.Battle
         {
             if(isMain)
                 pvEBattleController.NextStageCallback().Forget();
-        }
-
-        public void TakeDamage(float amount, DamageType damageType = DamageType.Normal)
-        {
-            
-        }
-
-        public void Heal(float amount)
-        {
-            
         }
     }
 
@@ -679,7 +704,7 @@ namespace Scripts.Battle
 
         public void StartState(PlayerHeroController state)
         {
-            state.DoIntoSkill(HeroSkills.Die, null);
+            state.DoIntoSkill(HeroSkills.Die, null);            
         }
 
         public void UpdateState(PlayerHeroController state)

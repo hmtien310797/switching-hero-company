@@ -32,7 +32,7 @@ namespace Scripts.Battle
         Defeat
     }
     
-    public class PvEBattleController : MonoBehaviour
+    public class PvEBattleController : Singleton<PvEBattleController>
     {
         [Header("Refs")]
         [SerializeField] PlayerCamController playerCamController;
@@ -52,9 +52,9 @@ namespace Scripts.Battle
         [SerializeField] private BossDataSO[] bossData;
 
         [Header("Stage")]
-        [SerializeField] 
-        private int currentStage = 1;
+        [SerializeField] private int currentStage = 1;
         [SerializeField] private int stagesPerPattern = 10;
+        [SerializeField] private int battleTime = 45;
         [SerializeField] private ChapterStageSO[] chapterStages;
 
         private BattleResult result = BattleResult.None;
@@ -77,12 +77,13 @@ namespace Scripts.Battle
         private PlayerHeroController secondPlayerHeroController;
         private PlayerHeroController mainPlayerHeroController;
         private bool isReadyBattle = false;
+        private bool losingStage = false;
         
         public BattleState State { get; private set; } = BattleState.None;
 
         public bool IsReadyBattle { get => isReadyBattle; set => isReadyBattle = value; }
 
-        private void Awake()
+        protected override void Awake()
         {
             BuildCreepDataLookup();
             BuildSpawnPositions();
@@ -140,14 +141,14 @@ namespace Scripts.Battle
             if (isMain)
             {
                 firstPlayerHeroController = hero;
-                firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, secondPlayerHeroController?.transform ?? null, mainFollow, false, true);
+                firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, secondPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, true);
                 mainPlayerHeroController = firstPlayerHeroController;
                 mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
             }
             else
             {
                 secondPlayerHeroController = hero;
-                secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, firstPlayerHeroController.transform ,subFollow , false, false);
+                secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, firstPlayerHeroController.transform ,subFollow , HeroAttackType.Knight, false, false);
                 firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
                 subFollow.SetFollowTarget(secondPlayerHeroController.transform);
             }
@@ -209,7 +210,7 @@ namespace Scripts.Battle
         {
             aliveCreepCount = 0;
             totalCreepsSpawnedThisStage = 0;
-            deadCreepCount = 0;
+            deadCreepCount = losingStage ? gameData.maxCreepsPerStage : 0;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
             GameEventManager.Trigger(GameEvents.OnWaveStart);
             
@@ -294,9 +295,9 @@ namespace Scripts.Battle
             if (enemyIds == null || rates == null) return;
 
             int remaining = gameData.maxCreepsPerStage - totalCreepsSpawnedThisStage;
-            if (remaining <= 0) return;
+            if (remaining <= 0 && !losingStage) return;
 
-            int spawnNow = Mathf.Min(gameData.creepBatchSize, remaining);
+            int spawnNow = Mathf.Min(gameData.creepBatchSize, losingStage ? gameData.creepBatchSize : remaining);
             
             int[] counts = AllocateCounts(spawnNow, rates);
             if (counts == null) return;
@@ -328,7 +329,7 @@ namespace Scripts.Battle
                         Defense = creepData.BaseDef * Mathf.Pow(1.06f, currentStage - 1f),
                         MoveSpeed = creepData.BaseMoveSpeed,
                     };
-                    var target = Random.Range(0, 2);
+                    var target = UnityEngine.Random.Range(0, 2);
                     creep.InitMonster(hid, target == 0 ? firstPlayerHeroController:secondPlayerHeroController, this, monsterStat);
 
                     creeps.Add(creep);
@@ -375,7 +376,7 @@ namespace Scripts.Battle
             firstPlayerHeroController.SetTarget(currentBoss);
             secondPlayerHeroController.SetTarget(currentBoss);
 
-            GameStatView.Instance.InitTimer(5, () =>
+            GameStatView.Instance.InitTimer(battleTime, () =>
             {
                 if (State == BattleState.Ended)
                 {
@@ -392,13 +393,16 @@ namespace Scripts.Battle
         {
             result = BattleResult.Victory;
             SetState(BattleState.Ended);
+            losingStage = false;
         }
 
         private void OnStageFailed()
         {
             result = BattleResult.Defeat;
+            currentBoss = null;
             SetState(BattleState.Ended);
             PlayCurrentStage().Forget();
+            losingStage = true;
         }
 
         private void SetState(BattleState newState)
@@ -415,19 +419,19 @@ namespace Scripts.Battle
             PoolController.Instance.ReturnToPool(creep.gameObject);
             creeps.Remove(creep);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
-            deadCreepCount++;
+            deadCreepCount = losingStage ? GameData.Instance.maxCreepsPerStage : creep.IsBoss() ? deadCreepCount : deadCreepCount + 1;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
             if (State != BattleState.FightingCreeps) return;
             if (aliveCreepCount != 0) return;
             
-            if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage)
+            if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage)
             {
                 isReadyBattle = false;
                 SpawnNextCreepBatch();
                 isReadyBattle = true;
                 return;
             }
-            
+
             SpawnBoss();
         }
         
@@ -479,6 +483,17 @@ namespace Scripts.Battle
             }
 
             return target;
+        }
+
+        public void SpawnBossDirectly()
+        {
+            SpawnBoss();
+            aliveCreepCount = 0;
+            for (int i = 0; i < creeps.Count; i++)
+            {
+                PoolController.Instance.ReturnToPool(creeps[i].gameObject);
+                creeps.RemoveAt(i);
+            }
         }
 
         public List<MonsterScrepController> GetNearestMonstesInRange(Vector3 pos, float range)
@@ -623,9 +638,7 @@ namespace Scripts.Battle
 
             if (creepDataDict == null || creepDataDict.Count == 0) return false;
             if (!creepDataDict.TryGetValue(enemyId, out var data) || data == null) return false;
-
-            // IMPORTANT:
-            // Change this line if your CreepDataSo uses a different field/property name for prefab.
+            
             creepData = data;
 
             return creepData != null;
@@ -653,15 +666,17 @@ namespace Scripts.Battle
         private async UniTask PlayCurrentStage()
         {
             Debug.Log("[PvE] Play Current Stage");
-            await UniTask.Delay(TimeSpan.FromSeconds(1f)); 
+            await UniTask.Delay(TimeSpan.FromSeconds(1.2f)); 
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
-            firstPlayerHeroController.ResetHeroData();
-            secondPlayerHeroController.ResetHeroData();
+            firstPlayerHeroController.gameObject.SetActive(false);
+            secondPlayerHeroController.gameObject.SetActive(false);
 
             HandleCurrentStage();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
+            firstPlayerHeroController.ResetHeroData();
+            secondPlayerHeroController.ResetHeroData();
         }
 
     }

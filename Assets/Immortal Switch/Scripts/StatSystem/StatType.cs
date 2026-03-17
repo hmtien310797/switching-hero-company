@@ -18,7 +18,9 @@ namespace Immortal_Switch.Scripts.StatSystem
         DamageReduction,
         ClassSkillDamage,
         ExclusiveSkillDamage,
-        SwitchSkillDamage
+        SwitchSkillDamage,
+        FlatATKBonus,
+        ATKPercentBonus
     }
 
     public enum ModifierOp
@@ -62,6 +64,7 @@ namespace Immortal_Switch.Scripts.StatSystem
         Normal,
         Poison,
         Burn,
-        True
+        True,
+        Crit
     }
 }

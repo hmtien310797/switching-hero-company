@@ -566,6 +566,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3194692378588952452, guid: 43d5b6cec50891248ac1f42a39181303, type: 3}
   m_PrefabInstance: {fileID: 483675457}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &591659922
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 591659923}
+  m_Layer: 0
+  m_Name: UserDataCache
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &591659923
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591659922}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &659182058
 GameObject:
   m_ObjectHideFlags: 0
@@ -598,6 +629,17 @@ MonoBehaviour:
   heroDatas:
   - {fileID: 11400000, guid: b695e4375a235d04b9f291059abb223e, type: 2}
   - {fileID: 11400000, guid: f72145f5f142a4941b53ed5f4499ce15, type: 2}
+  skillDatas:
+  - {fileID: 11400000, guid: 37d18d747bf2b0a4faaa4f28601bcddc, type: 2}
+  - {fileID: 11400000, guid: 13e9baba27087ac41a27698eeba3d14d, type: 2}
+  - {fileID: 11400000, guid: cb0c0c81900eb7448a63c4513c3c31a0, type: 2}
+  - {fileID: 11400000, guid: f6aeb791c0b7b7340aec98fb172968c9, type: 2}
+  - {fileID: 11400000, guid: 57092fd4afdffce44b5d688606aa4b5d, type: 2}
+  - {fileID: 11400000, guid: 6ff73a0cffe91f54bb5c7fd4ee0a273e, type: 2}
+  - {fileID: 11400000, guid: 1cbf3d119314a9e4cbdceb3104d7db1b, type: 2}
+  - {fileID: 11400000, guid: 61b8247379e89a44999714f6a64463bc, type: 2}
+  - {fileID: 11400000, guid: 17febab3d510b4f4fbb239c8650c5f7f, type: 2}
+  - {fileID: 11400000, guid: f2734c568f975a34aafe11200cdf97ed, type: 2}
 --- !u!4 &659182060
 Transform:
   m_ObjectHideFlags: 0
@@ -1759,3 +1801,4 @@ SceneRoots:
   - {fileID: 659182060}
   - {fileID: 2823857699897121107}
   - {fileID: 34594837}
+  - {fileID: 591659923}

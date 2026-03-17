@@ -115,7 +115,7 @@ namespace Scripts.Battle
 
         public void DoMoveCallback()
         {
-            DoMoveToTarget(targetTrans, 1.5f, offsetX: 1f);
+            DoMoveToTarget(targetTrans, 0.25f, offsetX: 1f);
 
             if (IsInAttackRange(Stats.StatModule.GetBaseStat(StatType.AttackRange), etarget.transform.position))
             {
@@ -177,10 +177,7 @@ namespace Scripts.Battle
             }
 
             if (!isBoss) etarget = target;
-
-            healthBarController?.ShowHealthTxt(damage, transform.position + Vector3.up);
-            Stats.HealthModule.ApplyDamage(damage);
-            healthBarController?.SetHealth(CurrentHp / MaxHp);
+            TakeDamage(etarget);
             if (CurrentHp <= 0)
             {
                 endAct?.Invoke();
@@ -218,16 +215,6 @@ namespace Scripts.Battle
         public void IsLookRight()
         {
             DoRotate(transform.position.x < etarget.transform.position.x);
-        }
-
-        public void TakeDamage(float amount, DamageType damageType = DamageType.Normal)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Heal(float amount)
-        {
-            throw new NotImplementedException();
         }
 
         public override bool IsInAttackRange(float rangeAttack, Vector3 target)

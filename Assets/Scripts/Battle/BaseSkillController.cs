@@ -39,7 +39,7 @@ namespace Scripts.Battle
                 skaFx.Initialize(false);
             }
         }
-        public virtual void InitSkill(List<BaseExternalSkillController> bEscs, Transform soTrans)
+        public virtual void InitSkill(List<int> bEscs, Transform soTrans)
         {
 
         }

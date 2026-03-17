@@ -36,7 +36,7 @@ namespace Immortal_Switch.Scripts.StatSystem
             OnHPChanged?.Invoke(CurrentHP, MaxHP);
         }
 
-        public void ApplyDamage(float amount, DamageType damageType = DamageType.Normal)
+        public void TakeDamage(float amount, DamageType damageType = DamageType.Normal)
         {
             if (amount <= 0f || IsDead)
                 return;

@@ -27,6 +27,7 @@ namespace Scripts.UI
         public Dictionary<HeroNameAction, Action> callbackActs;
         public Dictionary <HeroNameAction, float> intervalCoolings;
         public Dictionary <HeroNameAction, float> timerCoolings;
+        public PlayerHeroController playerHeroController;
 
         public CoolingData(bool isMain =  false)
         {
@@ -73,7 +74,6 @@ namespace Scripts.UI
         private Dictionary<HeroNameAction,Image> icons = null;
         private bool isAutoSwitching = false;
         private bool isAutoSkilling = false;
-        private PlayerHeroController playerHeroController;
         
         private Tween autoSkillTween;
         private Tween autoSwitchTween;
@@ -239,7 +239,7 @@ namespace Scripts.UI
 
         private void DoSkillAction(HeroNameAction hak)
         {
-            if (isAutoSkilling || playerHeroController.IsInAction()) return;
+            if (isAutoSkilling || mainHeroData.playerHeroController.IsInAction()) return;
 
             SetShowCover(hak);
             mainHeroData.callbackActs[hak]?.Invoke();
@@ -247,8 +247,13 @@ namespace Scripts.UI
 
         public void SetPlayerHeroInstance(PlayerHeroController phc, bool isMain, int hid)
         {
-            playerHeroController = phc;
             InitUIHeros(isMain, hid);
+
+            if (isMain) 
+                firstHeroData.playerHeroController = phc;
+            else 
+                secondHeroData.playerHeroController = phc;
+
             uISwitchHeroController?.RegisterActionByIdx(ChangeMainHeroByIdx);
         }
 

@@ -187,7 +187,7 @@ namespace Immortal_Switch.Scripts.StatSystem
             switch (instance.Data.PeriodicEffectType)
             {
                 case PeriodicEffectType.DamageOverTime:
-                    healthModule.ApplyDamage(value, instance.Data.PeriodicDamageType);
+                    healthModule.TakeDamage(value, instance.Data.PeriodicDamageType);
                     break;
 
                 case PeriodicEffectType.HealOverTime:

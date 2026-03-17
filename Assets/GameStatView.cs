@@ -1,5 +1,6 @@
 using System;
 using Immortal_Switch.Scripts.Core;
+using Scripts.Battle;
 using Scripts.UI;
 using TMPro;
 using Unity.VisualScripting;
@@ -26,8 +27,13 @@ public class GameStatView : MonoBehaviour
         Instance = this;
         GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         GameEventManager.Subscribe(GameEvents.OnWaveStart, OnInitNewStage);
-        GameEventManager.Subscribe(GameEvents.OnStageCleared, OnInitNewStage);
-        GameEventManager.Subscribe(GameEvents.OnStageLost, () => battleTimerController.HideTimer());
+        GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
+        GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
+        
+        buttonBoss.onClick.AddListener(PvEBattleController.Instance.SpawnBossDirectly);
+        buttonBoss.interactable = false;
+        //not available yet, so disactive
+        buttonGiveUp.interactable = false;
     }
 
     private void OnEnemyDead(int deadCount)
@@ -45,6 +51,18 @@ public class GameStatView : MonoBehaviour
         battleTimerController.HideTimer();
         buttonGiveUp.gameObject.SetActive(false);
         buttonBoss.gameObject.SetActive(true);
+    }
+
+    private void OnStageCleared()
+    {
+        buttonBoss.interactable = false;
+        battleTimerController.HideTimer();
+    }
+
+    private void OnStageLost()
+    {
+        buttonBoss.interactable = true;
+        battleTimerController.HideTimer();
     }
 
     public void InitTimer(float dur, Action Act)
