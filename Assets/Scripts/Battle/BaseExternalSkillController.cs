@@ -13,6 +13,7 @@ namespace Scripts.Battle
         AA,
         S,
         SS,
+        SSR,
         B,
         BB,
     }
@@ -30,6 +31,7 @@ namespace Scripts.Battle
         [SerializeField] TierSkill tierSkill;
         [SerializeField] float rangeSkill = 4;
         [SerializeField] float dameSkillFactor = 2.5f;
+        [SerializeField] bool isAtkEvent = true;
 
         private const string animSkill = "animation";
         private const string enventHit = "hit";
@@ -51,6 +53,8 @@ namespace Scripts.Battle
         public Action<float, float> AtkAct { get => atkAct; set => atkAct = value; }
         public bool IsFollow { get => isFollow; set => isFollow = value; }
         public PlayerHeroController PlayerHeroController { get => playerHeroController; set => playerHeroController = value; }
+        public bool IsAtkEvent { get => isAtkEvent; set => isAtkEvent = value; }
+        public SkillDataSO SkillData { get => skillData; set => skillData = value; }
 
         public virtual void InitInnerSkill(bool isInit, Action<float> camAct)
         {
@@ -66,7 +70,7 @@ namespace Scripts.Battle
                 {
                     isFollow = fxObj.isFollow;
                     fxObj.SetHeroPlayerController(pHc);
-                    this.skillData = skillData;
+                    fxObj.skillData = skillData;
                     fxObj.endAct = endAct;
                 }
 
@@ -79,7 +83,7 @@ namespace Scripts.Battle
                 {
                     isFollow = fxObj.isFollow;
                     fxObj.SetHeroPlayerController(pHc);
-                    this.skillData = skillData;
+                    fxObj.skillData = skillData;
                     fxObj.endAct = endAct;
                 }
 
@@ -94,17 +98,36 @@ namespace Scripts.Battle
         public async void DoS2SkillWithMultiSpawn(Action endAct, SkillDataSO skillData, PlayerHeroController pHc, Action<float>camAct)
         {
             var pos = pHc.GetNearestMonster();
-            for (int i = 0; i < skillData.NumSpawn; i++)
+            if (skillData.Tier == TierSkill.SS)
             {
-                var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f));
-                var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, nPos);
-                isFollow = fxObj.isFollow;
-                fxObj.SetHeroPlayerController(pHc);
-                this.skillData = skillData;
-                fxObj.endAct = i == skillData.NumSpawn - 1 ? endAct : null;
-                fxObj.InitInnerSkillMultiSpawn(i == skillData.NumSpawn - 1, i==0?camAct:null);
+                for (int i = 0; i < skillData.NumSpawn; i++)
+                {
+                    var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f));
+                    var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, nPos);
+                    isFollow = fxObj.isFollow;
+                    fxObj.SetHeroPlayerController(pHc);
+                    fxObj.skillData = skillData;
+                    fxObj.endAct = i == skillData.NumSpawn - 1 ? endAct : null;
+                    fxObj.InitInnerSkillMultiSpawn(i == skillData.NumSpawn - 1, i == 0 ? camAct : null);
 
-                await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: this.GetCancellationTokenOnDestroy());
+                    await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: this.GetCancellationTokenOnDestroy());
+                }
+            }
+            else if (skillData.Tier == TierSkill.SSR)
+            {
+                for (int i = 0; i < skillData.NumSpawn; i++)
+                {
+                    var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f)) + Vector3.up * 8;
+                    var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, nPos);
+                    fxObj.transform.rotation = Quaternion.FromToRotation(Vector3.right, Vector3.down);
+                    isFollow = fxObj.isFollow;
+                    fxObj.SetHeroPlayerController(pHc);
+                    this.skillData = skillData;
+                    fxObj.endAct = i == skillData.NumSpawn - 1 ? endAct : null;
+                    fxObj.InitInnerSkillMultiSpawn(i == skillData.NumSpawn - 1, i == 0 ? camAct : null);
+
+                    await UniTask.Delay(TimeSpan.FromSeconds(0.075f), cancellationToken: this.GetCancellationTokenOnDestroy());
+                }
             }
         }
 
@@ -130,7 +153,7 @@ namespace Scripts.Battle
             
         }
 
-        public void PlayAnim(SkeletonAnimation skaFx, float speed = 1)
+        public void PlayAnim(SkeletonAnimation skaFx, float speed = 1, bool isLoop = false)
         {
             skaFx.AnimationState.TimeScale = speed;
             skaFx.AnimationState.SetAnimation(0, animSkill, false);

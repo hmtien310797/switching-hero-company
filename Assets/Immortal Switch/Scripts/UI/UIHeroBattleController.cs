@@ -74,6 +74,8 @@ namespace Scripts.UI
         private Dictionary<HeroNameAction,Image> icons = null;
         private bool isAutoSwitching = false;
         private bool isAutoSkilling = false;
+        private Sprite firstIconHead;
+        private Sprite secondIconHead;
         
         private Tween autoSkillTween;
         private Tween autoSwitchTween;
@@ -173,10 +175,12 @@ namespace Scripts.UI
                 firstHeroData.Hid = hid;
                 mainHeroData = firstHeroData;
                 AppLySpriteSkillByIdx(true);
+                uISwitchHeroController?.ChangeIconByIdx(0, firstIconHead);
             }
             else
             {
                 secondHeroData.Hid = hid;
+                uISwitchHeroController?.ChangeIconByIdx(1, secondIconHead);
             }
         }
 
@@ -245,16 +249,49 @@ namespace Scripts.UI
             mainHeroData.callbackActs[hak]?.Invoke();
         }
 
-        public void SetPlayerHeroInstance(PlayerHeroController phc, bool isMain, int hid)
+        public void SetPlayerHeroInstance(PlayerHeroController phc, bool isMain, int hid, Dictionary<SkillSlot,int> skillIds)
         {
             InitUIHeros(isMain, hid);
 
-            if (isMain) 
+            if (isMain)
+            {
                 firstHeroData.playerHeroController = phc;
-            else 
+                firstIconHead = firstHeroData.playerHeroController.UISprite.GetHeadIcon;
+                uISwitchHeroController?.ChangeIconByIdx(0, firstIconHead);
+                firstSprites.Clear();
+                firstSprites = new List<Sprite>()
+                {
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
+                    firstHeroData.playerHeroController.UISprite.SwithSkillIcon
+                };
+            }
+            else
+            {
                 secondHeroData.playerHeroController = phc;
-
+                secondIconHead = secondHeroData.playerHeroController.UISprite.GetHeadIcon;
+                uISwitchHeroController?.ChangeIconByIdx(1, secondIconHead);
+                secondSprites.Clear();
+                secondSprites = new List<Sprite>()
+                {
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
+                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
+                    secondHeroData.playerHeroController.UISprite.SwithSkillIcon
+                };
+            }
+            
             uISwitchHeroController?.RegisterActionByIdx(ChangeMainHeroByIdx);
+        }
+
+        private void SetHeadIconById(int hid)
+        {
+
         }
 
         private void ChangeMainHeroByIdx(int hid)
@@ -273,6 +310,25 @@ namespace Scripts.UI
                 secondHeroData.isMain = true;
                 AppLySpriteSkillByIdx(false);
             }
+        }
+
+        public void ChangeSkillByIdx(HeroNameAction idx, float interval, int hid)
+        {
+            if(firstHeroData.Hid == hid)
+            {
+                firstHeroData.intervalCoolings[idx] = interval;
+                ChangeIconSkillBySlot((int)idx, firstSprites);
+            }
+            else
+            {
+                secondHeroData.intervalCoolings[idx] = interval;
+                ChangeIconSkillBySlot((int)idx, secondSprites);
+            }
+        }
+
+        private void ChangeIconSkillBySlot(int slot, List<Sprite> sprites)
+        {
+            sprites[slot] = null;
         }
 
         public void RegisterActionByIdx(HeroNameAction idx, Action fAct, float interval, bool hasCoolDown = true , bool isFirst = true)

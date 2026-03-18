@@ -1,8 +1,9 @@
-using System;
-using System.Collections.Generic;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.StatSystem;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace Scripts.Battle
 {
@@ -45,17 +46,17 @@ namespace Scripts.Battle
             set => etarget = value;
         }
 
-        public virtual void InitMonster(int hid, PlayerHeroController etarget, PvEBattleController pBc,
-            BaseStat monsterData, bool isBoss = false)
+        public virtual void InitMonster(int hid, PlayerHeroController etarget, PvEBattleController pBc, BaseStat monsterData, bool isBoss = false, List<PlayerHeroController> eEargets = null)
         {
             hId = hid;
             pvEBattleController = pBc;
             healthBarController?.PreSetHealth();
+            targets = eEargets;
             SetTargetTrans(etarget);
             DoRotate(transform.position.x < etarget.transform.position.x);
             Stats.Initialize(monsterData);
             InitMonsterData();
-
+            SetAnimMoveSpeed(UnityEngine.Random.Range(0.9f,1.1f));
             SwitchState(SpawnState);
         }
 
@@ -115,12 +116,52 @@ namespace Scripts.Battle
 
         public void DoMoveCallback()
         {
-            DoMoveToTarget(targetTrans, 0.25f, offsetX: 1f);
+            SetTarget();
+
+            MoveToTarget();
 
             if (IsInAttackRange(Stats.StatModule.GetBaseStat(StatType.AttackRange), etarget.transform.position))
             {
                 SwitchState(AttackState);
             }
+        }
+
+        private void MoveToTarget()
+        {
+            var isRight = transform.position.x < targetTrans.position.x;
+            DoRotate(isRight);
+            if (!IsBoss())
+                transform.position = GetNextPos();
+            else
+                DoMoveToTarget(targetTrans, 3);
+        }
+
+        private Vector3 GetNextPos()
+        {
+            Vector3 targetPos = Vector3.MoveTowards(transform.position, targetTrans.position, Time.deltaTime * 0.25f);
+            var monsterArounds = pvEBattleController.GetNearestMonstesInRange(targetPos, 1f);
+            if (monsterArounds == null || monsterArounds.Count <= 1) return targetPos;
+
+            Vector3 avoidanceDir = Vector3.zero;
+            int count = 0;
+
+            foreach (var monster in monsterArounds)
+            {
+                if (monster.gameObject == this.gameObject) continue;
+                Vector3 pushDir = targetPos - monster.transform.position;
+                float distance = pushDir.magnitude;
+                if (distance < 0.001f) continue;
+
+                avoidanceDir += pushDir.normalized / distance;
+                count++;
+            }
+
+            if (count > 0)
+            {
+                targetPos += (avoidanceDir / count) * Time.deltaTime * 0.5f;
+            }
+
+            return targetPos;
         }
 
         private void ResetIdleTime()
@@ -168,7 +209,7 @@ namespace Scripts.Battle
             SwitchState(IdleState);
         }
 
-        public override void OnReceiveDamage(float damage, Action endAct, PlayerHeroController target)
+        public override void OnReceiveDamage(float factorSkillDamage, Action endAct, PlayerHeroController target)
         {
             if (CurrentHp <= 0)
             {
@@ -177,7 +218,7 @@ namespace Scripts.Battle
             }
 
             if (!isBoss) etarget = target;
-            TakeDamage(etarget);
+            TakeDamage(etarget, factorSkillDamage);
             if (CurrentHp <= 0)
             {
                 endAct?.Invoke();

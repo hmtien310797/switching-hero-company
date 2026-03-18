@@ -17,7 +17,7 @@ namespace Immortal_Switch.Scripts.Boss
                 StackRule = BuffStackRule.Refresh,
                 Modifiers = new List<StatModifier>
                 {
-                    new (StatType.DEF, ModifierOp.Multiply, -0.2f)
+                    new (StatType.Def, ModifierOp.Multiply, -0.2f)
                 }
             };
         }
@@ -34,7 +34,7 @@ namespace Immortal_Switch.Scripts.Boss
                 StackRule = BuffStackRule.Refresh,
                 Modifiers = new List<StatModifier>
                 {
-                    new StatModifier(StatType.ATK, ModifierOp.Multiply, -0.25f)
+                    new StatModifier(StatType.Atk, ModifierOp.Multiply, -0.25f)
                 }
             };
         }
@@ -85,7 +85,7 @@ namespace Immortal_Switch.Scripts.Boss
                 StackRule = BuffStackRule.Refresh,
                 Modifiers = new List<StatModifier>
                 {
-                    new StatModifier(StatType.ATK, ModifierOp.Multiply, 0.25f)
+                    new StatModifier(StatType.Atk, ModifierOp.Multiply, 0.25f)
                 }
             };
         }

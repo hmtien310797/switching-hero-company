@@ -7,11 +7,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using TMPro;
 using UnityEngine;
 
 namespace Scripts.Battle
 {
+    public enum SkillSlot
+    {
+        Slot1 = 0, Slot2 = 1, Slot3 = 2, Slot4 = 3, Slot5 = 4,
+    }
+
     public class Player01SkillScontroller : BaseSkillController
     {
         [SerializeField] PlayerHeroController playerHeroController;
@@ -24,7 +28,7 @@ namespace Scripts.Battle
 
         private int attackIdx = 0;
         private const string eventAttack = "hit";
-        private Dictionary<int, SkillDataSO> skillDataSOs;
+        private Dictionary<SkillSlot, SkillDataSO> skillDataSOs = new Dictionary<SkillSlot, SkillDataSO>();
         public string boneArraw = "L_hand";
         private Spine.Bone handBone;
 
@@ -42,26 +46,30 @@ namespace Scripts.Battle
 
         public void InitSkillData(List<int>skillIds)
         {
-            if (skillDataSOs == null) skillDataSOs = new Dictionary<int, SkillDataSO>();
             skillDataSOs.Clear();
 
             for (int i = 0; i < skillIds.Count; i++)
             {
+                if (i >= 5) break;
+
                 var skillId = skillIds[i];
-                skillDataSOs[i] = MasterDataCache.Instance?.GetSkillDataById(skillId);
-                /*skillDataSOs[1] = MasterDataCache.Instance?.GetSkillDataById(3);
-                skillDataSOs[2] = MasterDataCache.Instance?.GetSkillDataById(4);
-                skillDataSOs[3] = MasterDataCache.Instance?.GetSkillDataById(5);
-                skillDataSOs[4] = MasterDataCache.Instance?.GetSkillDataById(6);*/
+                skillDataSOs[(SkillSlot)i] = MasterDataCache.Instance?.GetSkillDataById(skillId);
+            }
+        }
+
+        public override void ChangeSkillBySlot(int slotId, int skillId)
+        {
+            if(skillDataSOs.ContainsKey((SkillSlot)slotId))
+            {
+                skillDataSOs[(SkillSlot)slotId] = MasterDataCache.Instance?.GetSkillDataById(skillId);
             }
         }
         
         public override void InitSkill(List<int> skillIds, Transform soTrans)
         {
-            InitSkillData(skillIds);
-            //fxSkills = bEscs;
             skillTrans = soTrans;
 
+            InitSkillData(skillIds);
             ResgisterHitSwitchEvent();
             RegisterHitAttactEvent();
         }
@@ -131,7 +139,7 @@ namespace Scripts.Battle
         {
             if(playerHeroController.HeroAttackType != HeroAttackType.Archer) return;
             var (arrow, b) = PoolController.Instance.Get(arrowTrans, oArrowTrans.position);
-            var targetPos = playerHeroController.GetMonsterPos() + Vector3.up;
+            var targetPos = playerHeroController.GetMonsterPos() + Vector3.up*1.5f;
             Vector3 direction = (targetPos - oArrowTrans.position).normalized;
             if (arrow != null)
             {
@@ -145,11 +153,11 @@ namespace Scripts.Battle
 
         private IEnumerator DoFlyAsync(Transform arrow,Vector3 target)
         {
-            arrow.position = Vector3.MoveTowards(arrow.position, target, 20 * Time.deltaTime);
+            arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
             while ((arrow.position - target).sqrMagnitude > 0.1f)
             {
                 yield return null;
-                arrow.position = Vector3.MoveTowards(arrow.position, target, 20 * Time.deltaTime);
+                arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
                 arrow.Rotate(Vector3.right, 30, Space.Self);
             }
 
@@ -163,7 +171,7 @@ namespace Scripts.Battle
         private void DoAttackFx()
         {
             var pos = playerHeroController?.MonsterTarget?.transform.position ?? transform.position;
-            SkaFx.transform.position = new Vector3(pos.x, .6f, pos.z);
+            SkaFx.transform.position = new Vector3(pos.x, 1f, pos.z);
             SkaFx.gameObject.SetActive(true);
             PlayAmin(StandAnimName.Attack1);
         }
@@ -205,7 +213,7 @@ namespace Scripts.Battle
         {
             DoUISkillAnim();
 
-            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[0], endAct, (dur)=>DoShakeCam(dur, 40, ShakeType.Punch));
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot1], endAct, (dur)=>DoShakeCam(dur, 40, ShakeType.Punch));
             /*var pos = transform.position;
             var (fx, b) = PoolController.Instance.Get(fxSkills[0], pos);
             if(b)
@@ -224,7 +232,7 @@ namespace Scripts.Battle
         public override void DoSkill02(Action endAct)
         {
             DoUISkillAnim();
-            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[1], endAct, (dur)=> DoShakeCam(dur, 40, ShakeType.Shake));
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot2], endAct, (dur)=> DoShakeCam(dur, 40, ShakeType.Shake));
             /*var pos = playerHeroController.GetNearestMonster();
             var (fx, b) = PoolController.Instance.Get(fxSkills[1], pos);
             if (b)
@@ -250,7 +258,7 @@ namespace Scripts.Battle
         public override async void DoSkill03(Action endAct)
         {
             DoUISkillAnim();
-            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[2], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot3], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
             /*DoUISkillAnim();
             var pos = playerHeroController.GetNearestMonster();
             var numAtk = 6;
@@ -278,7 +286,7 @@ namespace Scripts.Battle
         public override void DoSkill04(Action endAct)
         {
             DoUISkillAnim();
-            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[3], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot4], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
             /*DoUISkillAnim();
             var pos = playerHeroController.GetNearestMonster();
             var (fx, b) = PoolController.Instance.Get(fxSkills[3], pos);
@@ -304,7 +312,7 @@ namespace Scripts.Battle
         public override async void DoSkill05(Action endAct)
         {
             DoUISkillAnim();
-            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[4], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
+            externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot5], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
             /*DoUISkillAnim();
             var pos = playerHeroController.GetNearestMonster();
             var numAtk = 10;
@@ -376,7 +384,7 @@ namespace Scripts.Battle
 
         private void DoHitSwitchEventAction()
         {
-            playerHeroController?.AttackByArea(transform.position, 2f, 1);
+            playerHeroController?.AttackByArea(transform.position, 5f, 1);
         }
 
         public override void DoWin(Action endAct)

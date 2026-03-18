@@ -11,11 +11,11 @@ namespace Immortal_Switch.Scripts.Combat
         {
             DamageResult result = new DamageResult();
 
-            float baseAtk = attacker.Stats.StatModule.GetFinalStat(StatType.ATK);
-            float flatAtkBonus = attacker.Stats.StatModule.GetFinalStat(StatType.FlatATKBonus);
-            float atkPercentBonus = attacker.Stats.StatModule.GetFinalStat(StatType.ATKPercentBonus);
+            float baseAtk = attacker.Stats.StatModule.GetFinalStat(StatType.Atk);
+            float flatAtkBonus = attacker.Stats.StatModule.GetFinalStat(StatType.FlatAtkBonus);
+            float atkPercentBonus = attacker.Stats.StatModule.GetFinalStat(StatType.AtkPercentBonus);
 
-            float enemyDef = defender.Stats.StatModule.GetFinalStat(StatType.DEF);
+            float enemyDef = defender.Stats.StatModule.GetFinalStat(StatType.Def);
 
             float critChance = attacker.Stats.StatModule.GetFinalStat(StatType.CritChance);
             float critDamage = attacker.Stats.StatModule.GetFinalStat(StatType.CritDamage);
@@ -24,10 +24,11 @@ namespace Immortal_Switch.Scripts.Combat
             float critMultiplier = isCrit ? critDamage : 1f;
 
             float defenseMultiplier = 100f / (100f + enemyDef);
+            float calculatedSkillCo = skillCoefficient == 1f ? 1f : skillCoefficient/100;
 
             float atk1 =
                 baseAtk *
-                skillCoefficient *
+                calculatedSkillCo *
                 defenseMultiplier *
                 critMultiplier;
 

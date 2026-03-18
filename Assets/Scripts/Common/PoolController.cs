@@ -33,6 +33,7 @@
                 obj.name = key;
                 _poolDict[key].Add(obj);
                 isNew = true;
+                obj.gameObject.SetActive(true);
             }
             else
             {

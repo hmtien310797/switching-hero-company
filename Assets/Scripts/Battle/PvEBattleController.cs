@@ -8,6 +8,8 @@ using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 using Scripts.Common;
 using Random = UnityEngine.Random;
+using NUnit.Framework.Constraints;
+
 
 
 #if UNITY_EDITOR
@@ -54,7 +56,7 @@ namespace Scripts.Battle
         [Header("Stage")]
         [SerializeField] private int currentStage = 1;
         [SerializeField] private int stagesPerPattern = 10;
-        [SerializeField] private int battleTime = 45;
+        [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
 
         private BattleResult result = BattleResult.None;
@@ -94,6 +96,7 @@ namespace Scripts.Battle
         {
             GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
+            GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int,int>)OnChangeHero);
             gameData = GameData.Instance;
             StartAsync().Forget();
         }
@@ -113,6 +116,32 @@ namespace Scripts.Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+        }
+
+        private void OnChangeHero(int sId, int tId)
+        {
+            if(firstPlayerHeroController.GetHeroId() == sId)
+            {
+                switchHeroIds[0] = tId;
+                var heroDt = MasterDataCache.Instance.GetHeroDataById(tId);
+                var (hero, b) = PoolController.Instance.Get(heroDt.PlayerHeroController, firstPlayerHeroController.transform.position);
+                firstPlayerHeroController = hero;
+                var isMain = mainPlayerHeroController.GetHeroId() == sId;
+                if (b) firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, secondPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, isMain);
+                if(isMain) mainPlayerHeroController = firstPlayerHeroController;
+                mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
+            }
+            else
+            {
+                switchHeroIds[1] = tId;
+                var heroDt = MasterDataCache.Instance.GetHeroDataById(tId);
+                var (hero, b) = PoolController.Instance.Get(heroDt.PlayerHeroController, secondPlayerHeroController.transform.position);
+                secondPlayerHeroController = hero;
+                var isMain = mainPlayerHeroController.GetHeroId() == sId;
+                secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, firstPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, isMain);
+                if (isMain) mainPlayerHeroController = secondPlayerHeroController;
+                subFollow.SetFollowTarget(secondPlayerHeroController.transform);
+            }
         }
         
         public void InitSwitchableHeroIds()
@@ -319,6 +348,14 @@ namespace Scripts.Battle
                     var nPos = basePos + new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
 
                     var (creep,_) = PoolController.Instance.Get(creepData.CreepPrefab, nPos);
+                    if(k%5 == 0)
+                    {
+                        creep.transform.localScale = Vector3.one * 1.5f;
+                    }
+                    else
+                    {
+                        creep.transform.localScale = Vector3.one;
+                    }
                     int hid = creep.GetInstanceID();
                     BaseStat monsterStat = new BaseStat
                     {
@@ -330,7 +367,7 @@ namespace Scripts.Battle
                         MoveSpeed = creepData.BaseMoveSpeed,
                     };
                     var target = UnityEngine.Random.Range(0, 2);
-                    creep.InitMonster(hid, target == 0 ? firstPlayerHeroController:secondPlayerHeroController, this, monsterStat);
+                    creep.InitMonster(hid, target == 0 ? firstPlayerHeroController:secondPlayerHeroController, this, monsterStat, false,new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });
 
                     creeps.Add(creep);
                     aliveCreepCount++;
@@ -371,7 +408,7 @@ namespace Scripts.Battle
                 AttackRange = bossSo.AttackRange
             };
 
-            currentBoss.InitMonster(bossSo.Id, mainPlayerHeroController, this, bossStat);
+            currentBoss.InitMonster(bossSo.Id, mainPlayerHeroController, this, bossStat, true, new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });
 
             firstPlayerHeroController.SetTarget(currentBoss);
             secondPlayerHeroController.SetTarget(currentBoss);
@@ -396,7 +433,7 @@ namespace Scripts.Battle
             losingStage = false;
         }
 
-        private void OnStageFailed()
+        public void OnStageFailed()
         {
             result = BattleResult.Defeat;
             currentBoss = null;

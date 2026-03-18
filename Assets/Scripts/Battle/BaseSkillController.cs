@@ -28,6 +28,7 @@ namespace Scripts.Battle
         [SerializeField] List<bool> IsMissingSkills = new List<bool>(5);
         [SerializeField] BaseAnimController baseAnimController;
         [SerializeField] SkeletonAnimation skaFx;
+        [SerializeField] float moveAnimSpeed = 1f;
 
         public BaseAnimController BaseAnimController { get => baseAnimController; set => baseAnimController = value; }
         public SkeletonAnimation SkaFx { get => skaFx; set => skaFx = value; }
@@ -39,7 +40,18 @@ namespace Scripts.Battle
                 skaFx.Initialize(false);
             }
         }
+
+        public void SetAnimMoveSpeed(float speed)
+        {
+            moveAnimSpeed = speed;
+        }
+
         public virtual void InitSkill(List<int> bEscs, Transform soTrans)
+        {
+
+        }
+
+        public virtual void ChangeSkillBySlot(int slotId, int skillId)
         {
 
         }
@@ -81,7 +93,7 @@ namespace Scripts.Battle
 
         public void DoRun(Action endAct)
         {
-            baseAnimController?.PlayAmin(StandAnimName.Run);
+            baseAnimController?.PlayAmin(StandAnimName.Run, moveAnimSpeed);
             endAct?.Invoke();
         }
 

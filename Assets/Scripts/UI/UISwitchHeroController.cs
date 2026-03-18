@@ -59,19 +59,12 @@ namespace Scripts.UI
                 heroAction?.Invoke(idx);
         }
 
-        private void ChangeIconByIdx(int idx, Sprite sprite)
+        public void ChangeIconByIdx(int idx, Sprite sprite)
         {
             if (idx >= icons.Count) return;
 
             var oldSprite = icons[idx].sprite;
             icons[idx].sprite = sprite;
-
-            if(oldSprite != null && oldSprite.texture != null)
-            {
-                Destroy(oldSprite.texture);
-                Destroy(oldSprite);
-            }
         }
-
     }
 }

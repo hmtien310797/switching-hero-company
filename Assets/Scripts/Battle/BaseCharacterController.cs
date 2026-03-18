@@ -33,13 +33,23 @@ namespace Scripts.Battle
         public bool IsDead => statsController == null || statsController.HealthModule == null ||
                               statsController.HealthModule.IsDead;
         public float CurrentMoveSpeed => statsController.StatModule.GetFinalStat(StatType.MoveSpeed);
-        public float CurrentDefense => statsController.StatModule.GetFinalStat(StatType.DEF);
-        public float CurrentAttackSpeed => statsController.StatModule.GetFinalStat(StatType.ATK);
+        public float CurrentDefense => statsController.StatModule.GetFinalStat(StatType.Def);
+        public float CurrentAttackSpeed => statsController.StatModule.GetFinalStat(StatType.Atk);
         #endregion
 
         public void InitSkill(List<int> skills, Transform obTrans)
         {
             baseSkillController.InitSkill(skills, obTrans);
+        }
+
+        public void ChangeSkillBySlot(int slotId, int skillID)
+        {
+            baseSkillController.ChangeSkillBySlot(slotId, skillID);
+        }
+
+        public void SetAnimMoveSpeed(float speed)
+        {
+            baseSkillController?.SetAnimMoveSpeed(speed);
         }
 
         protected virtual void Awake()
@@ -113,10 +123,11 @@ namespace Scripts.Battle
         {
             var isRight = transform.position.x < target.position.x;
             DoRotate(isRight);
-            
+
             //var newPos = target.position - (isRight ? Vector3.right : Vector3.left) * offsetX;
             //transform.position = Vector3.MoveTowards(transform.position, newPos, Time.deltaTime * speed);
-            transform.position = Vector3.MoveTowards(transform.position, target.position, Time.deltaTime * speed);
+            var nPos = Vector3.MoveTowards(transform.position, target.position, Time.deltaTime * speed);
+            transform.position = nPos;
         }
 
         public virtual void DoIntoInjured()
@@ -134,7 +145,7 @@ namespace Scripts.Battle
             baseSkillController?.DoSkillByIdx(HeroSkills.Win, endAct);
         }
 
-        public virtual void OnReceiveDamage(float damage, Action endAct, PlayerHeroController target)
+        public virtual void OnReceiveDamage(float factorSkillDamage, Action endAct, PlayerHeroController target)
         {
             
         }

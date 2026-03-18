@@ -15,7 +15,7 @@ namespace Immortal_Switch.Scripts.StatSystem
 
         [field: SerializeField]
         public float CurrentHP { get; private set; }
-        public float MaxHP => statModule.GetFinalStat(StatType.MaxHP);
+        public float MaxHP => statModule.GetFinalStat(StatType.MaxHp);
         public bool IsDead => CurrentHP <= 0f;
 
         public HealthModule(StatModule statModule)
@@ -73,7 +73,7 @@ namespace Immortal_Switch.Scripts.StatSystem
 
         private void OnStatChanged(StatType statType, float oldValue, float newValue)
         {
-            if (statType != StatType.MaxHP)
+            if (statType != StatType.MaxHp)
                 return;
 
             float ratio = oldValue > 0f ? CurrentHP / oldValue : 1f;

@@ -20,9 +20,9 @@ namespace Immortal_Switch.Scripts.StatSystem
             DotModule = new DotModule();
             StatModule.Init(new Dictionary<StatType, float>
             {
-                { StatType.MaxHP, baseStat.Health },
-                { StatType.ATK, baseStat.Attack },
-                { StatType.DEF, baseStat.Defense },
+                { StatType.MaxHp, baseStat.Health },
+                { StatType.Atk, baseStat.Attack },
+                { StatType.Def, baseStat.Defense },
                 { StatType.AttackSpeed, baseStat.AttackSpeed },
                 { StatType.AttackRange, baseStat.AttackRange },
                 { StatType.CritChance, baseStat.CritChance },

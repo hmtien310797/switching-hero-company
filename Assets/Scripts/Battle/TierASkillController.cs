@@ -20,6 +20,22 @@ namespace Scripts.Battle
             PoolController.Instance?.ReturnToPool(gameObject);
         }
 
+        private async UniTaskVoid DoActSkillByNum(Action<float> camAct, int numAtk)
+        {
+            numAtk = numAtk < 1 ? 1 : numAtk;
+            PlayAnim(skaFx);
+            var dur = GetAnimDur(skaFx)/ numAtk;
+            camAct?.Invoke(dur);
+            await UniTask.Delay(TimeSpan.FromSeconds(dur));
+            for (int i = 0; i < numAtk; i++)
+            {
+                PlayerHeroController.AttackByArea(transform.position, RangeSkill, i == numAtk - 1? SkillData.FinalDame : SkillData.NomalDame);
+                await UniTask.Delay(TimeSpan.FromSeconds(dur));
+            }
+            base.DoEndSkill().Forget();
+            PoolController.Instance?.ReturnToPool(gameObject);
+        }
+
         public override void InitInnerSkill(bool isInit = true, Action<float> camAct = null)
         {
             InitSka();
@@ -32,9 +48,14 @@ namespace Scripts.Battle
                 transform.position = PlayerHeroController.transform.position;
             }
 
-            if (isInit)
+            if (IsAtkEvent)
             {
                 RegisterAnimEvent(AttackCallback);
+            }
+            else
+            {
+                DoActSkillByNum(camAct, 10).Forget();
+                return;
             }
 
             DoActSkill(camAct).Forget();
@@ -62,7 +83,7 @@ namespace Scripts.Battle
                 if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
                 {
                     Debug.Log($"Anim event {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, DameSkillFactor);
+                    eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
                 }
             };
         }

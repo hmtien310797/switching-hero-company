@@ -37,7 +37,7 @@ namespace Immortal_Switch.Scripts.StatSystem
                 PeriodicDamageType = DamageType.Burn,
                 Modifiers = new List<StatModifier>
                 {
-                    new StatModifier(StatType.DEF, ModifierOp.Add, -10f)
+                    new StatModifier(StatType.Def, ModifierOp.Add, -10f)
                 }
             };
         }

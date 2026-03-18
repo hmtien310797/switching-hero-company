@@ -4,9 +4,9 @@ namespace Immortal_Switch.Scripts.StatSystem
 {
     public enum StatType
     {
-        MaxHP,
-        ATK,
-        DEF,
+        MaxHp,
+        Atk,
+        Def,
         Accuracy,
         AttackSpeed,
         AttackRange,
@@ -19,8 +19,8 @@ namespace Immortal_Switch.Scripts.StatSystem
         ClassSkillDamage,
         ExclusiveSkillDamage,
         SwitchSkillDamage,
-        FlatATKBonus,
-        ATKPercentBonus
+        FlatAtkBonus,
+        AtkPercentBonus
     }
 
     public enum ModifierOp

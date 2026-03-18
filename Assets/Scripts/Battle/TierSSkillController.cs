@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Scripts.Common;
 using Spine.Unity;
 using System;
 using UnityEngine;
@@ -9,28 +10,62 @@ namespace Scripts.Battle
     {
         [SerializeField] SkeletonAnimation skaFx;
 
-        public async UniTaskVoid DoSkill()
+        private Vector3 targetPos;
+
+        private async UniTaskVoid DoActSkill(Action<float> camAct = null)
         {
-            AtkAct?.Invoke(RangeSkill, DameSkillFactor);
+            PlayAnim(skaFx);
+            var dur = GetAnimDur(skaFx);
+            camAct?.Invoke(dur);
+            await UniTask.Delay(TimeSpan.FromSeconds(dur));
+            if (!IsAtkEvent) PlayerHeroController.AttackByArea(transform.position, RangeSkill, DameSkillFactor);
+            base.DoEndSkill().Forget();
+            PoolController.Instance?.ReturnToPool(gameObject);
         }
 
-        public override void InitInnerSkill(bool isInit, Action<float> camAct)
+        public void InitSka()
         {
-            /*base.InitSkill(pHc, skillData, endAct);
-            base.InitSkill();
-            RegisterAnimEvent(hitAct);*/
+            if (skaFx && !skaFx.valid)
+            {
+                skaFx.Initialize(false);
+            }
+
+            GetAnimDur(skaFx);
+        }
+
+        public override void SetHeroPlayerController(PlayerHeroController phC)
+        {
+            base.SetHeroPlayerController(phC);
+        }
+
+        public override void InitInnerSkill(bool isFinal, Action<float> camAct)
+        {
+            InitSka();
+            targetPos = PlayerHeroController.GetNearestMonster();
+            transform.position = targetPos;
+            if (IsAtkEvent)
+            {
+                RegisterAnimEvent(AttackCallback);
+            }
+            
+            DoActSkill(camAct).Forget();
+        }
+                
+        private void AttackCallback(float rangeAtk, float dameAtk)
+        {
+            PlayerHeroController.AttackByArea(targetPos, rangeAtk, dameAtk);
         }
 
         public override void RegisterAnimEvent(Action<float, float> eventAct)
         {
-            /*SkaFx.AnimationState.Event += (entry, e) =>
+            skaFx.AnimationState.Event += (entry, e) =>
             {
                 if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
                 {
                     Debug.Log($"Anim event {EnventHit} triggered.");
                     eventAct?.Invoke(RangeSkill, DameSkillFactor);
                 }
-            };*/
+            };
         }
     }
 }

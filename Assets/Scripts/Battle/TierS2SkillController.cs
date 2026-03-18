@@ -18,7 +18,25 @@ namespace Scripts.Battle
             var dur = GetAnimDur(skaFx);
             camAct?.Invoke(dur);
             await UniTask.Delay(TimeSpan.FromSeconds(dur));
+            if(!IsAtkEvent) PlayerHeroController.AttackByArea(transform.position, RangeSkill, SkillData.FinalDame);
             base.DoEndSkill().Forget();
+            PoolController.Instance?.ReturnToPool(gameObject);
+        }
+
+        private async UniTaskVoid DoActSkillSSR(Action<float> camAct = null, bool isFinal = false)
+        {
+            PlayAnim(skaFx, isLoop:true);
+            camAct?.Invoke(.25f);
+
+            var targetPos  = new Vector3(transform.position.x, 0, transform.position.z);
+            while(transform.position.y > 0)
+            {
+                await UniTask.DelayFrame(1);
+                transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 50);
+            }
+            
+            PlayerHeroController.AttackByArea(targetPos, RangeSkill, isFinal ? SkillData.FinalDame : SkillData.NomalDame);
+            if(isFinal) base.DoEndSkill().Forget();
             PoolController.Instance?.ReturnToPool(gameObject);
         }
 
@@ -28,6 +46,7 @@ namespace Scripts.Battle
             var dur = GetAnimDur(skaFx);
             camAct?.Invoke(dur);
             await UniTask.Delay(TimeSpan.FromSeconds(dur));
+            if (!IsAtkEvent) PlayerHeroController.AttackByArea(transform.position, RangeSkill, SkillData.NomalDame);
             PoolController.Instance?.ReturnToPool(gameObject);
         }
 
@@ -41,7 +60,7 @@ namespace Scripts.Battle
             InitSka();
             targetPos = PlayerHeroController.GetNearestMonster();
             transform.position = targetPos;
-            if (isInit)
+            if (IsAtkEvent)
             {
                 RegisterAnimEvent(AttackCallback);
             }
@@ -52,12 +71,32 @@ namespace Scripts.Battle
         public override void InitInnerSkillMultiSpawn(bool isFinal, Action<float> camAct)
         {
             InitSka();
-            if (isFinal)
+            targetPos = transform.position;
+            if (TierBaseSkill == TierSkill.SS)
             {
-                DoActSkill().Forget();
+                if (!IsAtkEvent)
+                {
+                    if (isFinal)
+                        DoActSkill().Forget();
+                    else
+                        DoActSkillWithoutEndAct(camAct).Forget();
+                }
+                else
+                {
+                    RegisterAnimEvent(AttackCallback);
+                    DoActSkill(camAct).Forget();
+                }
             }
-            else
-                DoActSkillWithoutEndAct(camAct).Forget();
+            else if(TierBaseSkill == TierSkill.SSR)
+            {
+                if (IsAtkEvent)
+                {
+                    RegisterAnimEvent(AttackCallback);
+                    DoActSkill(camAct).Forget();
+                }
+                else
+                    DoActSkillSSR(camAct, isFinal).Forget();
+            }
         }
 
         public void InitSka()
@@ -75,6 +114,11 @@ namespace Scripts.Battle
             PlayerHeroController.AttackByArea(targetPos,rangeAtk, dameAtk);
         }
 
+        private void SingleAttackCallback(float rangeAtk, float dameAtk)
+        {
+            PlayerHeroController.AttackBySpecific();
+        }
+
         public override void RegisterAnimEvent(Action<float, float> eventAct)
         {
             skaFx.AnimationState.Event += (entry, e) =>
@@ -82,7 +126,7 @@ namespace Scripts.Battle
                 if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
                 {
                     Debug.Log($"Anim event {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, DameSkillFactor);
+                    eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
                 }
             };
         }

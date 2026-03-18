@@ -19,10 +19,9 @@ namespace Scripts.Battle
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnDead);
         }
 
-        public override void InitMonster(int hid, PlayerHeroController etargets, PvEBattleController pBc,
-            BaseStat BossData, bool isBoss = true)
+        public override void InitMonster(int hid, PlayerHeroController etarget, PvEBattleController pBc, BaseStat BossData, bool isBoss = true, List<PlayerHeroController> eTargets = null)
         {
-            base.InitMonster(hid, etargets, pBc, BossData, isBoss);
+            base.InitMonster(hid, etarget, pBc, BossData, isBoss, eTargets);
             normalAttackCount = 0;
             skillLogic = BossSkillLogicFactory.Create(hid);
             skillLogic?.Initialize(this);
@@ -53,9 +52,9 @@ namespace Scripts.Battle
             skillLogic?.OnSkillCast();
         }
 
-        public override void OnReceiveDamage(float damage, Action endAct, PlayerHeroController target)
+        public override void OnReceiveDamage(float factorSkillDamage, Action endAct, PlayerHeroController target)
         { ;
-            base.OnReceiveDamage(damage, endAct, target);
+            base.OnReceiveDamage(factorSkillDamage, endAct, target);
             if (CurrentHp <= 0)
             {
                 if (pvEBattleController.State == BattleState.Ended)
@@ -65,7 +64,7 @@ namespace Scripts.Battle
                 GameEventManager.Trigger(GameEvents.OnStageCleared);
                 return;
             }
-            skillLogic?.OnHitTaken(damage);
+            skillLogic?.OnHitTaken(factorSkillDamage);
             skillLogic?.OnHpChanged();
         }
 
@@ -148,7 +147,7 @@ namespace Scripts.Battle
         {
             if (targets == null || targets.Count == 0) return;
 
-            float atk = Stats.StatModule.GetFinalStat(StatType.ATK);
+            float atk = Stats.StatModule.GetFinalStat(StatType.Atk);
             float damage = atk * percentAtk / 100f;
 
             for (int i = 0; i < targets.Count; i++)
@@ -167,7 +166,7 @@ namespace Scripts.Battle
             if (target == null) return;
             if (target.IsDead) return;
 
-            float atk = Stats.StatModule.GetFinalStat(StatType.ATK);
+            float atk = Stats.StatModule.GetFinalStat(StatType.Atk);
             float damage = atk * percentAtk / 100f;
 
             target.TakeDamage(this);

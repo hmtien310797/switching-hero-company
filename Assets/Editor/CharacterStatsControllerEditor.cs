@@ -282,7 +282,7 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
             if (GUILayout.Button("Add DEF +30"))
             {
                 controller.StatModule.AddModifier(
-                    new StatModifier(StatType.DEF, ModifierOp.Add, 30f, "debug_def_30")
+                    new StatModifier(StatType.Def, ModifierOp.Add, 30f, "debug_def_30")
                 );
             }
 

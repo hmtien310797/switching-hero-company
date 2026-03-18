@@ -18,14 +18,4 @@ namespace Immortal_Switch.Scripts.Skill
         public float MoveSpeed;
         public MonsterBossController bossPrefab;
     }
-
-    public enum StatType
-    {
-        HP,
-        ATK,
-        DEF,
-        AtkSpeed,
-        MoveSpeed,
-        Evade
-    }
 }
