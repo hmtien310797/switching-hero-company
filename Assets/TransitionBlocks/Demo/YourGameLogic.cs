@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class YourGameLogic : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class YourGameLogic : MonoBehaviour
         }
         else if(Input.GetKeyDown(_transitionOutNoSceneSwitchKey))
         {
-            Transitioner.Instance.TransitionOutWithoutChangingScene();
+            Transitioner.Instance.TransitionOutWithoutChangingScene().Forget();
         }
         else if (Input.GetKeyDown(_transitionInNoSceneSwitchKey))
         {

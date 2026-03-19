@@ -10,10 +10,13 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         private readonly List<GrowthTierSegment> segments = new();
         private readonly Dictionary<StatType, List<GrowthTierSegment>> segmentsByStat = new();
+        private readonly Dictionary<int, GrowthDataSO> tierDataMap = new();
 
         private readonly GrowthSaveData saveData;
+        private int maxTier;
 
         public int CurrentUnlockedTier => saveData.CurrentUnlockedTier;
+        public int MaxTier => maxTier;
 
         public GrowthSystemService(GrowthDatabaseSO database, GrowthSaveData saveData)
         {
@@ -28,6 +31,8 @@ namespace Immortal_Switch.Scripts.GrowthSystem
         {
             segments.Clear();
             segmentsByStat.Clear();
+            tierDataMap.Clear();
+            maxTier = 0;
 
             if (database.Tiers == null || database.Tiers.Length == 0)
                 return;
@@ -41,6 +46,10 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             {
                 var tierData = sortedTiers[i];
                 if (tierData == null) continue;
+
+                tierDataMap[tierData.Tier] = tierData;
+                if (tierData.Tier > maxTier)
+                    maxTier = tierData.Tier;
 
                 int segmentStartStackInclusive = previousTierMaxStack + 1;
                 int segmentEndStackInclusive = tierData.MaxStack;
@@ -84,6 +93,11 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             }
         }
 
+        public bool HasTier(int tier)
+        {
+            return tierDataMap.ContainsKey(tier);
+        }
+
         public bool IsStatUnlocked(StatType stat)
         {
             if (!segmentsByStat.TryGetValue(stat, out var statSegments))
@@ -96,6 +110,69 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             }
 
             return false;
+        }
+        
+        public GrowthDataSO GetTierData(int tier)
+        {
+            tierDataMap.TryGetValue(tier, out var data);
+            return data;
+        }
+
+        public List<StatType> GetAllUnlockedStatsUpToCurrentTier()
+        {
+            var result = new List<StatType>();
+
+            foreach (var pair in segmentsByStat)
+            {
+                var stat = pair.Key;
+                var list = pair.Value;
+
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i].Tier <= CurrentUnlockedTier)
+                    {
+                        result.Add(stat);
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public List<StatType> GetStatsUnlockedExactlyAtTier(int tier)
+        {
+            var result = new List<StatType>();
+
+            foreach (var pair in segmentsByStat)
+            {
+                var stat = pair.Key;
+                var list = pair.Value;
+
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i].Tier == tier)
+                    {
+                        result.Add(stat);
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public List<StatType> GetAllUnlockedStats()
+        {
+            var result = new List<StatType>();
+
+            foreach (var pair in segmentsByStat)
+            {
+                if (IsStatUnlocked(pair.Key))
+                    result.Add(pair.Key);
+            }
+
+            return result;
         }
 
         public int GetCurrentStack(StatType stat)
@@ -172,40 +249,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             }
 
             return totalCost;
-        }
-        public List<StatType> GetStatsUnlockedExactlyAtTier(int tier)
-        {
-            var result = new List<StatType>();
-
-            foreach (var pair in segmentsByStat)
-            {
-                var stat = pair.Key;
-                var list = pair.Value;
-
-                for (int i = 0; i < list.Count; i++)
-                {
-                    if (list[i].Tier == tier)
-                    {
-                        result.Add(stat);
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        public List<StatType> GetAllUnlockedStats()
-        {
-            var result = new List<StatType>();
-
-            foreach (var pair in segmentsByStat)
-            {
-                if (IsStatUnlocked(pair.Key))
-                    result.Add(pair.Key);
-            }
-
-            return result;
         }
 
         public int GetAffordableUpgradeAmount(StatType stat, int desiredAmount, int currentGold)
@@ -338,10 +381,66 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return lastTier;
         }
 
+        public bool IsTierFullyMaxed(int tier)
+        {
+            var stats = GetStatsUnlockedExactlyAtTier(tier);
+            if (stats.Count == 0)
+                return false;
+
+            for (int i = 0; i < stats.Count; i++)
+            {
+                if (!IsMaxed(stats[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool TryGetStatGrowthAtTier(int tier, StatType stat, out StatGrowthData growth)
+        {
+            growth = default;
+
+            if (!tierDataMap.TryGetValue(tier, out var tierData) || tierData == null || tierData.StatGrowths == null)
+                return false;
+
+            for (int i = 0; i < tierData.StatGrowths.Length; i++)
+            {
+                if (tierData.StatGrowths[i].Stat == stat)
+                {
+                    growth = tierData.StatGrowths[i];
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool TryGetPreviousKnownStatGrowthBeforeTier(int tierExclusive, StatType stat, out int sourceTier, out StatGrowthData growth)
+        {
+            sourceTier = 0;
+            growth = default;
+
+            for (int tier = tierExclusive - 1; tier >= 1; tier--)
+            {
+                if (TryGetStatGrowthAtTier(tier, stat, out growth))
+                {
+                    sourceTier = tier;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void UnlockTier(int tier)
         {
-            if (tier > saveData.CurrentUnlockedTier)
-                saveData.CurrentUnlockedTier = tier;
+            if (tier <= saveData.CurrentUnlockedTier)
+                return;
+
+            if (!HasTier(tier))
+                return;
+
+            saveData.CurrentUnlockedTier = tier;
         }
 
         public void ApplyGrowthToStatModule(StatModule statModule)
@@ -463,6 +562,5 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             ValuePerLevel = valuePerLevel;
             GoldCostPerLevel = goldCostPerLevel;
         }
-        
     }
 }

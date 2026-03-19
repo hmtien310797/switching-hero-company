@@ -5,53 +5,54 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 {
     public class GrowthUpgradePanelBinder
     {
-        private readonly GrowthSystemService growthService;
-        private readonly GrowthStatUIViewDatabaseSO statUiDatabase;
+        private readonly GrowthSystemService service;
+        private readonly GrowthStatUIViewDatabaseSO uiDb;
 
         public GrowthUpgradePanelBinder(
-            GrowthSystemService growthService,
-            GrowthStatUIViewDatabaseSO statUiDatabase)
+            GrowthSystemService service,
+            GrowthStatUIViewDatabaseSO uiDb)
         {
-            this.growthService = growthService;
-            this.statUiDatabase = statUiDatabase;
+            this.service = service;
+            this.uiDb = uiDb;
         }
 
-        public List<StatTierViewData> Build(int playerGold, int selectedUpgradeAmount)
+        public List<StatTierViewData> Build(int gold, int amount)
         {
             var result = new List<StatTierViewData>();
 
-            int currentTier = growthService.CurrentUnlockedTier;
-            var stats = growthService.GetStatsUnlockedExactlyAtTier(currentTier);
+            var stats = service.GetStatsUnlockedExactlyAtTier(service.CurrentUnlockedTier);
 
-            for (int i = 0; i < stats.Count; i++)
+            foreach (var stat in stats)
             {
-                var stat = stats[i];
-                result.Add(BuildOne(stat, playerGold, selectedUpgradeAmount));
+                result.Add(BuildOne(stat, gold, amount));
             }
 
             return result;
         }
 
-        private StatTierViewData BuildOne(StatType stat, int playerGold, int selectedUpgradeAmount)
+        private StatTierViewData BuildOne(StatType stat, int gold, int amount)
         {
-            var uiData = statUiDatabase != null ? statUiDatabase.Get(stat) : default;
+            var ui = uiDb.Get(stat);
 
-            int currentStack = growthService.GetCurrentStack(stat);
-            int maxStack = growthService.GetMaxAvailableStack(stat);
-            int affordableAmount = growthService.GetAffordableUpgradeAmount(stat, selectedUpgradeAmount, playerGold);
-            int upgradeCost = growthService.GetUpgradeCost(stat, affordableAmount);
-            bool isMax = growthService.IsMaxed(stat);
+            int cur = service.GetCurrentStack(stat);
+            int max = service.GetMaxAvailableStack(stat);
+            int afford = service.GetAffordableUpgradeAmount(stat, amount, gold);
+            int cost = service.GetUpgradeCost(stat, afford);
+
+            bool isMax = service.IsMaxed(stat);
+            bool can = afford > 0 && !isMax;
 
             return new StatTierViewData
             {
                 Stat = stat,
-                Icon = uiData.Icon,
-                Name = string.IsNullOrEmpty(uiData.DisplayName) ? stat.ToString() : uiData.DisplayName,
-                StatProgressPercent = maxStack > 0 ? (float)currentStack / maxStack : 0f,
-                StatCurrentStack = currentStack,
-                StatMaxStack = maxStack,
-                ValuePay = isMax ? "MAX" : upgradeCost.ToString("N0"),
-                IsMax = isMax
+                Icon = ui.Icon,
+                Name = ui.DisplayName,
+                StatProgressPercent = max > 0 ? (float)cur / max : 0,
+                StatCurrentStack = cur,
+                StatMaxStack = max,
+                ValuePay = isMax ? "MAX" : cost.ToString("N0"),
+                IsMax = isMax,
+                CanUpgrade = can
             };
         }
     }

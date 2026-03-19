@@ -60,7 +60,7 @@ public class Transitioner : MonoBehaviour
         {
             if (instance == null)
             {
-                instance = GameObject.FindObjectOfType<Transitioner>();
+                instance = FindObjectOfType<Transitioner>();
                 if (instance == null)
                 {
                     Debug.LogError("No Transitioner was found in this scene. Make sure you place one in the scene.");

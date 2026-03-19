@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.UI;

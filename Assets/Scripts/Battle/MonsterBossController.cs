@@ -68,17 +68,6 @@ namespace Scripts.Battle
             skillLogic?.OnHpChanged();
         }
 
-        public void Heal(float value)
-        {
-            if (value <= 0) return;
-
-            float oldHp = CurrentHp;
-
-            Stats.HealthModule.ApplyHeal(value);
-
-            Debug.Log($"boss heals {value}. HP: {oldHp} -> {CurrentHp}");
-        }
-
         public void ResetNormalAttackCount()
         {
             normalAttackCount = 0;

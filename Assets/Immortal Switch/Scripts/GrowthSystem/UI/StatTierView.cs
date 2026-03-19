@@ -2,7 +2,6 @@ using System;
 using Immortal_Switch.Scripts.StatSystem;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GrowthSystem.UI
@@ -64,5 +63,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         public int StatMaxStack;
         public string ValuePay;
         public bool IsMax;
+        public bool CanUpgrade;
     }
 }

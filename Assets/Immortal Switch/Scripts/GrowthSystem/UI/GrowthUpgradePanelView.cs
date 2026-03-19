@@ -9,52 +9,43 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 {
     public class GrowthUpgradePanelView : MonoBehaviour
     {
-        [Header("Top Info")]
         [SerializeField] private TMP_Text goldText;
         [SerializeField] private GrowthUpgradeAmountSelector amountSelector;
 
-        [Header("Stat List")]
         [SerializeField] private Transform contentRoot;
-        [SerializeField] private StatTierView statTierViewPrefab;
+        [SerializeField] private StatTierView prefab;
 
-        private readonly List<StatTierView> spawnedViews = new();
+        private readonly List<StatTierView> views = new();
 
         public void Bind(
             List<StatTierViewData> datas,
-            int playerGold,
-            int selectedUpgradeAmount,
-            Action<StatType> onUpgradeClicked,
-            Action<int> onUpgradeAmountChanged)
+            int gold,
+            int selectedAmount,
+            Action<StatType> onUpgrade,
+            Action<int> onAmountChanged)
         {
-            if (goldText != null)
-                goldText.text = playerGold.ToString("N0");
+            goldText.text = gold.ToString("N0");
 
-            if (amountSelector != null)
-                amountSelector.Initialize(selectedUpgradeAmount, onUpgradeAmountChanged);
+            amountSelector.Initialize(selectedAmount, onAmountChanged);
 
-            EnsureViewCount(datas.Count);
+            Ensure(datas.Count);
 
-            for (int i = 0; i < spawnedViews.Count; i++)
+            for (int i = 0; i < views.Count; i++)
             {
                 bool active = i < datas.Count;
-                spawnedViews[i].gameObject.SetActive(active);
+                views[i].gameObject.SetActive(active);
 
                 if (active)
-                {
-                    spawnedViews[i].Initialize(datas[i], onUpgradeClicked);
-                }
+                    views[i].Initialize(datas[i], onUpgrade);
             }
         }
 
-        private void EnsureViewCount(int targetCount)
+        private void Ensure(int count)
         {
-            if (contentRoot == null || statTierViewPrefab == null)
-                return;
-
-            while (spawnedViews.Count < targetCount)
+            while (views.Count < count)
             {
-                var view = Instantiate(statTierViewPrefab, contentRoot);
-                spawnedViews.Add(view);
+                var v = Instantiate(prefab, contentRoot);
+                views.Add(v);
             }
         }
     }
