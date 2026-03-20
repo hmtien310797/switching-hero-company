@@ -1,3 +1,4 @@
+using Immortal_Switch.Scripts.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace Scripts.UI
         [SerializeField] Button heroBtnB;
         [SerializeField] List<GameObject> covers;
         [SerializeField] List<Image> icons;
+        [SerializeField] TutorialController tutorialController;
 
         private int selectedBtnIdx = -1;
         private Action<int> selectedAct = null;
@@ -20,12 +22,28 @@ namespace Scripts.UI
         {
             heroBtnA?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    if (!tutorialController.IsAbleActionCallback(heroBtnA))
+                    {
+                        return;
+                    }
+                }
+
                 if (selectedBtnIdx == 0) return;
                 ActiveHeroBtn(0);
             });
 
             heroBtnB?.onClick.AddListener(() => 
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    if (!tutorialController.IsAbleActionCallback(heroBtnB))
+                    {
+                        return;
+                    }
+                }
+
                 if (selectedBtnIdx == 1) return;
                 ActiveHeroBtn(1);
             });

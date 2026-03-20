@@ -128,6 +128,11 @@ namespace Scripts.Battle
                     Debug.Log($"Anim event {EnventHit} triggered.");
                     eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
                 }
+                if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventFinalHit)
+                {
+                    Debug.Log($"Anim event final {EnventHit} triggered.");
+                    eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
+                }
             };
         }
     }

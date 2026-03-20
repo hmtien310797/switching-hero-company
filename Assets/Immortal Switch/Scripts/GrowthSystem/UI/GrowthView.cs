@@ -1,4 +1,4 @@
-﻿using Immortal_Switch.Scripts.StatSystem;
+﻿﻿using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
@@ -40,6 +40,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             growthManager.OnGrowthChanged += RefreshUI;
             growthManager.OnTierReadyToUpgradePopup += HandleTierReadyPopup;
             RefreshUI();
+            growthManager.CheckAndNotifyTierReady();
         }
 
         private void OnDisable()
@@ -50,13 +51,13 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         public void RefreshUI()
         {
-            var datas = binder.Build(
+            var panelData = binder.Build(
                 growthManager.PlayerGold,
                 selectedUpgradeAmount
             );
 
             panelView.Bind(
-                datas,
+                panelData,
                 growthManager.PlayerGold,
                 selectedUpgradeAmount,
                 OnClickUpgradeStat,
@@ -75,9 +76,12 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             growthManager.TryUpgrade(stat, selectedUpgradeAmount);
         }
 
-        private void HandleTierReadyPopup(int currentTier, int nextTier)
+        private void HandleTierReadyPopup(int currentTier, int nextTier, bool isActive = true)
         {
             if (tierUpgradePopupView == null)
+                return;
+            
+            if (!isActive)
                 return;
 
             var currentIcon = GetIconForTier(currentTier);

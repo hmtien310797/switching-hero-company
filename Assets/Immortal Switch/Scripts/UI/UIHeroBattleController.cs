@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using Immortal_Switch.Scripts.UI;
 
 namespace Scripts.UI
 {
@@ -43,6 +44,7 @@ namespace Scripts.UI
         public static UIHeroBattleController Instance;
 
         [SerializeField] UISwitchHeroController uISwitchHeroController;
+        [SerializeField] TutorialController tutorialController;
 
         [SerializeField] Button autoSwitchBtn;
         [SerializeField] Button autoSkillBtn;
@@ -91,6 +93,14 @@ namespace Scripts.UI
 
             autoSwitchBtn?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    if (!tutorialController.IsAbleActionCallback(autoSwitchBtn))
+                    {
+                        return;
+                    }
+                }
+
                 isAutoSwitching = !isAutoSwitching;
                 if (isAutoSwitching)
                 {
@@ -110,6 +120,14 @@ namespace Scripts.UI
 
             autoSkillBtn?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    if (!tutorialController.IsAbleActionCallback(autoSkillBtn))
+                    {
+                        return;
+                    }
+                }
+
                 isAutoSkilling = !isAutoSkilling;
                 if (isAutoSkilling)
                 {
@@ -128,31 +146,65 @@ namespace Scripts.UI
 
             skill1Btn?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    if (!tutorialController.IsAbleActionCallback(skill1Btn))
+                        return;
+                }
+
                 DoSkillAction(HeroNameAction.Skill1Btn);
             });
 
             skill2Btn?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    return;
+                }
+
                 DoSkillAction(HeroNameAction.Skill2Btn);
             });
 
             skill3Btn?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    return;
+                }
+
                 DoSkillAction(HeroNameAction.Skill3Btn);
             });
 
             skill4Btn?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    return;
+                }
+
                 DoSkillAction(HeroNameAction.Skill4Btn);
             });
 
             skill5Btn?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    return;
+                }
+                
                 DoSkillAction(HeroNameAction.Skill5Btn);
             });
 
             switchBtn?.onClick.AddListener(() =>
             {
+                if (tutorialController.IsIntutorial)
+                {
+                    if (!tutorialController.IsAbleActionCallback(switchBtn))
+                    {
+                        return;
+                    }
+                }
+
                 SetShowCover(HeroNameAction.SwithBtn);
                 mainHeroData.callbackActs[HeroNameAction.SwithBtn]?.Invoke();
             });
@@ -247,6 +299,7 @@ namespace Scripts.UI
 
             SetShowCover(hak);
             mainHeroData.callbackActs[hak]?.Invoke();
+            
         }
 
         public void SetPlayerHeroInstance(PlayerHeroController phc, bool isMain, int hid, Dictionary<SkillSlot,int> skillIds)
@@ -392,8 +445,10 @@ namespace Scripts.UI
                 if (data.timerCoolings[key] > 0)
                 {
                     data.timerCoolings[key] -= Time.deltaTime;
-                    if(isMain)
+                    if (isMain)
+                    {
                         covers[key].fillAmount = data.timerCoolings[key] / data.intervalCoolings[key];
+                    }
                 }
                 else
                 {
@@ -401,6 +456,11 @@ namespace Scripts.UI
                         covers[key].gameObject.SetActive(false);
                 }
             }
+        }
+
+        public bool IsSkillAvailable(HeroNameAction nameAction)
+        {
+            return mainHeroData.timerCoolings[nameAction] <= 0;
         }
 
         private void SetShowCover(HeroNameAction name)

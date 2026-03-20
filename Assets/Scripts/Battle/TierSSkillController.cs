@@ -63,7 +63,13 @@ namespace Scripts.Battle
                 if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
                 {
                     Debug.Log($"Anim event {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, DameSkillFactor);
+                    eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
+                }
+
+                if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventFinalHit)
+                {
+                    Debug.Log($"Anim event {EnventHit} triggered.");
+                    eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
                 }
             };
         }

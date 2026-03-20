@@ -214,13 +214,6 @@ namespace Scripts.Battle
             DoUISkillAnim();
 
             externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot1], endAct, (dur)=>DoShakeCam(dur, 40, ShakeType.Punch));
-            /*var pos = transform.position;
-            var (fx, b) = PoolController.Instance.Get(fxSkills[0], pos);
-            if(b)
-            {
-                fx.InitSkill((r, d) => playerHeroController?.AttackByArea(pos, r, d));
-            }
-            fx.DoSkill(ActiveKill1Callback, endAct, transform, this.GetCancellationTokenOnDestroy()).Forget();*/
         }
 
         public async UniTask ActiveKill1Callback(float dur, CancellationToken token)
@@ -233,13 +226,6 @@ namespace Scripts.Battle
         {
             DoUISkillAnim();
             externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot2], endAct, (dur)=> DoShakeCam(dur, 40, ShakeType.Shake));
-            /*var pos = playerHeroController.GetNearestMonster();
-            var (fx, b) = PoolController.Instance.Get(fxSkills[1], pos);
-            if (b)
-            {
-                fx.InitSkill();
-            }
-            fx.DoSkill(ActiveKill2Callback, endAct, transform, this.GetCancellationTokenOnDestroy()).Forget();*/
         }
 
         private async UniTask ActiveKill2Callback(float dur, CancellationToken token)
@@ -259,20 +245,6 @@ namespace Scripts.Battle
         {
             DoUISkillAnim();
             externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot3], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
-            /*DoUISkillAnim();
-            var pos = playerHeroController.GetNearestMonster();
-            var numAtk = 6;
-            for (int i = 0; i < numAtk; i++)
-            {
-                var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f));
-                var (fx, b) = PoolController.Instance.Get(fxSkills[2], pos);
-                if (b)
-                {
-                    fx.InitSkill((r, d) => playerHeroController?.AttackByArea(nPos, r, d));
-                }
-                await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: this.GetCancellationTokenOnDestroy());
-                fx.DoSkill(nPos, ActiveKill3Callback, i < numAtk - 1 ? null : endAct, this.GetCancellationTokenOnDestroy()).Forget();
-            }      */
         }
 
         private async UniTask ActiveKill3Callback(Vector3 targetPos, float dur, CancellationToken token, Action<Vector3> callAct)
@@ -280,57 +252,24 @@ namespace Scripts.Battle
             DoShakeCam(dur, 100);
             callAct?.Invoke(targetPos);
             await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: token);
-            //playerHeroController?.AttackByArea(targetPos, 1.5f);
         }
 
         public override void DoSkill04(Action endAct)
         {
             DoUISkillAnim();
             externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot4], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
-            /*DoUISkillAnim();
-            var pos = playerHeroController.GetNearestMonster();
-            var (fx, b) = PoolController.Instance.Get(fxSkills[3], pos);
-            if (b)
-            {
-                fx.InitSkill((r, d) => playerHeroController?.AttackByArea(pos, r, d));
-            }
-            fx.DoSkill(ActiveKill4Callback, endAct, pos, this.GetCancellationTokenOnDestroy()).Forget();*/
         }
 
         private async UniTask ActiveKill4Callback(Vector3 targetPos, float dur, CancellationToken token)
         {
             DoShakeCam(dur, 50);
             await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: token);
-            /*var hitCount = 6;
-            for (int i = 0; i < hitCount; i++)
-            {
-                await UniTask.Delay(TimeSpan.FromSeconds(dur / hitCount), cancellationToken: token);
-                playerHeroController?.AttackByArea(targetPos, 2f, factorDam: 1);
-            }*/
         }
 
         public override async void DoSkill05(Action endAct)
         {
             DoUISkillAnim();
             externalSkillController?.InitSkill(playerHeroController, skillDataSOs[SkillSlot.Slot5], endAct, (dur) => DoShakeCam(dur, 40, ShakeType.Shake));
-            /*DoUISkillAnim();
-            var pos = playerHeroController.GetNearestMonster();
-            var numAtk = 10;
-            for (int i = 0; i < numAtk; i++)
-            {
-                var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f));
-                var (fx, b) = PoolController.Instance.Get(fxSkills[4], pos);
-                if (b)
-                {
-                    fx.InitSkill((r,d) => playerHeroController?.AttackByArea(nPos, r, d));
-                }
-                else
-                {
-                    fx.SetFxState(false);
-                }    
-                await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: this.GetCancellationTokenOnDestroy());
-                fx.DoSkill(nPos, ActiveKill5Callback, i < numAtk - 1 ? null : endAct, this.GetCancellationTokenOnDestroy()).Forget();
-            }*/
         }
 
         private async UniTask ActiveKill5Callback(Vector3 targetPos, float dur, CancellationToken token, Action<Vector3> callAct)
@@ -405,7 +344,7 @@ namespace Scripts.Battle
                 transform.position - Vector3.forward * 35 + Vector3.up *5,
                 transform.position - Vector3.forward * 20 + Vector3.right * 10,
                 transform.position + Vector3.forward * 0 + Vector3.right * 15,
-                Vector3.forward * 45,
+                PvEBattleController.Instance.GetMapEndPoint(),
             };
 
             transform.DOPath(path, 3f, PathType.CatmullRom).SetEase(Ease.InQuart).OnComplete(() =>

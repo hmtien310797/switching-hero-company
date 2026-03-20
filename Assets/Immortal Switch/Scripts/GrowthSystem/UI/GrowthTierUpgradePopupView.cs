@@ -39,8 +39,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                 closeButton.onClick.RemoveAllListeners();
                 closeButton.onClick.AddListener(Hide);
             }
-
-            gameObject.SetActive(false);
         }
 
         public void Show(GrowthTierUpgradePopupData data, Action onConfirmCallback)

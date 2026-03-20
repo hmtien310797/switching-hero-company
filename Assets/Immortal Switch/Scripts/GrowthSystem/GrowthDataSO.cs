@@ -10,13 +10,19 @@ namespace Immortal_Switch.Scripts.GrowthSystem
         public int Tier;
         public int MaxStack;
         public StatGrowthData[] StatGrowths;
-        
+    }
+
+    public enum GrowthValueType
+    {
+        Percent = 0, 
+        Flat = 1   
     }
 
     [Serializable]
     public struct StatGrowthData
     {
         public StatType Stat;
+        public GrowthValueType ValueType;
         public float ValuePerLevel;
         public int GoldCostPerLevel;
     }

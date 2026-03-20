@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.GrowthSystem
 {
-    public class GrowthSystemService
+    public class GrowthSystemService : IPowerUpSource
     {
-        private const string GrowthSourceId = "GROWTH_SYSTEM";
+        public string SourceId => "GROWTH_SYSTEM";
 
         private readonly List<GrowthTierSegment> segments = new();
         private readonly Dictionary<StatType, List<GrowthTierSegment>> segmentsByStat = new();
@@ -67,6 +68,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                     var segment = new GrowthTierSegment(
                         tierData.Tier,
                         statGrowth.Stat,
+                        statGrowth.ValueType,
                         segmentStartStackInclusive,
                         segmentEndStackInclusive,
                         statGrowth.ValuePerLevel,
@@ -98,6 +100,12 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return tierDataMap.ContainsKey(tier);
         }
 
+        public GrowthDataSO GetTierData(int tier)
+        {
+            tierDataMap.TryGetValue(tier, out var data);
+            return data;
+        }
+
         public bool IsStatUnlocked(StatType stat)
         {
             if (!segmentsByStat.TryGetValue(stat, out var statSegments))
@@ -111,11 +119,18 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             return false;
         }
-        
-        public GrowthDataSO GetTierData(int tier)
+
+        public List<StatType> GetAllUnlockedStats()
         {
-            tierDataMap.TryGetValue(tier, out var data);
-            return data;
+            var result = new List<StatType>();
+
+            foreach (var pair in segmentsByStat)
+            {
+                if (IsStatUnlocked(pair.Key))
+                    result.Add(pair.Key);
+            }
+
+            return result;
         }
 
         public List<StatType> GetAllUnlockedStatsUpToCurrentTier()
@@ -162,19 +177,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return result;
         }
 
-        public List<StatType> GetAllUnlockedStats()
-        {
-            var result = new List<StatType>();
-
-            foreach (var pair in segmentsByStat)
-            {
-                if (IsStatUnlocked(pair.Key))
-                    result.Add(pair.Key);
-            }
-
-            return result;
-        }
-
         public int GetCurrentStack(StatType stat)
         {
             return saveData.GetStack(stat);
@@ -202,6 +204,56 @@ namespace Immortal_Switch.Scripts.GrowthSystem
         public bool IsMaxed(StatType stat)
         {
             return GetCurrentStack(stat) >= GetMaxAvailableStack(stat);
+        }
+
+        public bool IsTierFullyMaxed(int tier)
+        {
+            var stats = GetStatsUnlockedExactlyAtTier(tier);
+            if (stats == null || stats.Count == 0)
+                return false;
+
+            for (int i = 0; i < stats.Count; i++)
+            {
+                if (!IsMaxed(stats[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        // NEW
+        public int GetTierTotalStatCount(int tier)
+        {
+            var stats = GetStatsUnlockedExactlyAtTier(tier);
+            return stats?.Count ?? 0;
+        }
+
+        // NEW
+        public int GetTierCompletedStatCount(int tier)
+        {
+            var stats = GetStatsUnlockedExactlyAtTier(tier);
+            if (stats == null || stats.Count == 0)
+                return 0;
+
+            int completed = 0;
+            for (int i = 0; i < stats.Count; i++)
+            {
+                if (IsMaxed(stats[i]))
+                    completed++;
+            }
+
+            return completed;
+        }
+
+        // NEW
+        public float GetTierCompletionPercent(int tier)
+        {
+            int total = GetTierTotalStatCount(tier);
+            if (total <= 0)
+                return 0f;
+
+            int completed = GetTierCompletedStatCount(tier);
+            return (float)completed / total;
         }
 
         public int GetRemainingUpgradableStacks(StatType stat)
@@ -324,7 +376,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 if (contributedStacks <= 0)
                     continue;
 
-                totalValue += contributedStacks * seg.ValuePerLevel;
+                totalValue += contributedStacks * seg.RuntimeValuePerLevel;
             }
 
             return totalValue;
@@ -381,21 +433,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return lastTier;
         }
 
-        public bool IsTierFullyMaxed(int tier)
-        {
-            var stats = GetStatsUnlockedExactlyAtTier(tier);
-            if (stats.Count == 0)
-                return false;
-
-            for (int i = 0; i < stats.Count; i++)
-            {
-                if (!IsMaxed(stats[i]))
-                    return false;
-            }
-
-            return true;
-        }
-
         public bool TryGetStatGrowthAtTier(int tier, StatType stat, out StatGrowthData growth)
         {
             growth = default;
@@ -432,6 +469,38 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return false;
         }
 
+        public GrowthValueType GetValueType(StatType stat)
+        {
+            if (!segmentsByStat.TryGetValue(stat, out var statSegments) || statSegments.Count == 0)
+                return GrowthValueType.Flat;
+
+            return statSegments[0].ValueType;
+        }
+
+        public bool IsPercentValue(StatType stat)
+        {
+            return GetValueType(stat) == GrowthValueType.Percent;
+        }
+
+        public float ConvertRawValueToRuntime(StatType stat, float rawValue)
+        {
+            return IsPercentValue(stat) ? rawValue / 100f : rawValue;
+        }
+
+        public string FormatForDisplay(StatType stat, float runtimeValue)
+        {
+            return IsPercentValue(stat)
+                ? $"{runtimeValue * 100f:0.##}%"
+                : $"{runtimeValue:0.##}";
+        }
+
+        public string FormatRawPerLevelForDisplay(StatType stat, float rawPerLevelValue)
+        {
+            return IsPercentValue(stat)
+                ? $"{rawPerLevelValue:0.###}%"
+                : $"{rawPerLevelValue:0.###}";
+        }
+
         public void UnlockTier(int tier)
         {
             if (tier <= saveData.CurrentUnlockedTier)
@@ -442,13 +511,11 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             saveData.CurrentUnlockedTier = tier;
         }
-
-        public void ApplyGrowthToStatModule(StatModule statModule)
+        
+        public void CollectPowerUps(List<PowerUpModifierData> output)
         {
-            if (statModule == null)
+            if (output == null)
                 return;
-
-            statModule.RemoveModifiersBySource(GrowthSourceId);
 
             foreach (var pair in segmentsByStat)
             {
@@ -458,9 +525,49 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 if (Math.Abs(totalValue) <= 0.0001f)
                     continue;
 
-                var modifier = CreateGrowthModifier(stat, totalValue);
-                modifier.SourceId = GrowthSourceId;
-                statModule.AddModifier(modifier);
+                output.Add(CreatePowerUpModifier(stat, totalValue));
+            }
+        }
+
+        private PowerUpModifierData CreatePowerUpModifier(StatType stat, float value)
+        {
+            bool isPercentValue = IsPercentValue(stat);
+
+            switch (stat)
+            {
+                // nhóm stat scale theo base stat của player
+                case StatType.Atk:
+                case StatType.MaxHp:
+                case StatType.Def:
+                    return new PowerUpModifierData(
+                        SourceId,
+                        stat,
+                        isPercentValue ? PowerUpValueKind.PercentOfBase : PowerUpValueKind.FlatAdd,
+                        value
+                    );
+
+                // nhóm cộng trực tiếp
+                case StatType.CritChance:
+                case StatType.CritDamage:
+                case StatType.Accuracy:
+                case StatType.AttackSpeed:
+                case StatType.AttackRange:
+                case StatType.MoveSpeed:
+                case StatType.DamageToNormalMonster:
+                case StatType.DamageToHeroMonster:
+                case StatType.DamageReduction:
+                case StatType.ClassSkillDamage:
+                case StatType.ExclusiveSkillDamage:
+                case StatType.SwitchSkillDamage:
+                case StatType.FlatAtkBonus:
+                case StatType.AtkPercentBonus:
+                default:
+                    return new PowerUpModifierData(
+                        SourceId,
+                        stat,
+                        PowerUpValueKind.FlatAdd,
+                        value
+                    );
             }
         }
 
@@ -487,7 +594,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 if (contributedStacks <= 0)
                     continue;
 
-                totalValue += contributedStacks * seg.ValuePerLevel;
+                totalValue += contributedStacks * seg.RuntimeValuePerLevel;
             }
 
             return totalValue;
@@ -521,8 +628,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 case StatType.ExclusiveSkillDamage:
                 case StatType.SwitchSkillDamage:
                 case StatType.AtkPercentBonus:
-                    return new StatModifier(stat, ModifierOp.Multiply, value);
-
                 case StatType.Accuracy:
                 case StatType.AttackSpeed:
                 case StatType.AttackRange:
@@ -542,24 +647,31 @@ namespace Immortal_Switch.Scripts.GrowthSystem
     {
         public int Tier { get; }
         public StatType Stat { get; }
+        public GrowthValueType ValueType { get; }
         public int StartStackInclusive { get; }
         public int EndStackInclusive { get; }
-        public float ValuePerLevel { get; }
+        public float RawValuePerLevel { get; }
+        public float RuntimeValuePerLevel { get; }
         public int GoldCostPerLevel { get; }
 
         public GrowthTierSegment(
             int tier,
             StatType stat,
+            GrowthValueType valueType,
             int startStackInclusive,
             int endStackInclusive,
-            float valuePerLevel,
+            float rawValuePerLevel,
             int goldCostPerLevel)
         {
             Tier = tier;
             Stat = stat;
+            ValueType = valueType;
             StartStackInclusive = startStackInclusive;
             EndStackInclusive = endStackInclusive;
-            ValuePerLevel = valuePerLevel;
+            RawValuePerLevel = rawValuePerLevel;
+            RuntimeValuePerLevel = valueType == GrowthValueType.Percent
+                ? rawValuePerLevel / 100f
+                : rawValuePerLevel;
             GoldCostPerLevel = goldCostPerLevel;
         }
     }

@@ -1,6 +1,6 @@
 {
 "skeleton": {
-	"hash": "BAh8PdNwrso",
+	"hash": "KEUuVLMnkG8",
 	"spine": "4.2.33",
 	"x": -1056,
 	"y": -1177.2,
@@ -107,6 +107,9 @@
 		}
 	}
 ],
+"events": {
+	"hit": {}
+},
 "animations": {
 	"animation": {
 		"slots": {
@@ -286,7 +289,10 @@
 					{ "time": 0.0333, "x": 89.96, "y": 78.19 }
 				]
 			}
-		}
+		},
+		"events": [
+			{ "time": 0.0333, "name": "hit" }
+		]
 	}
 }
 }

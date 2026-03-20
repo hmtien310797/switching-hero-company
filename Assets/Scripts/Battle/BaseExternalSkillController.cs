@@ -35,6 +35,7 @@ namespace Scripts.Battle
 
         private const string animSkill = "animation";
         private const string enventHit = "hit";
+        private const string enventFinalHit = "finalhit";
         private float skillDuration;
         
         private Action<float, float> atkAct;
@@ -55,6 +56,8 @@ namespace Scripts.Battle
         public PlayerHeroController PlayerHeroController { get => playerHeroController; set => playerHeroController = value; }
         public bool IsAtkEvent { get => isAtkEvent; set => isAtkEvent = value; }
         public SkillDataSO SkillData { get => skillData; set => skillData = value; }
+
+        public static string EnventFinalHit => enventFinalHit;
 
         public virtual void InitInnerSkill(bool isInit, Action<float> camAct)
         {

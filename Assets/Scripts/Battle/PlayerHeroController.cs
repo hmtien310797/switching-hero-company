@@ -515,7 +515,6 @@ namespace Scripts.Battle
         {
             if(isInSwitchAction) return; 
 
-            //if(currentState == WinState) return;
             ResetIdleStateTime();
             SwitchState(IdleState);
         }
@@ -558,7 +557,7 @@ namespace Scripts.Battle
         
         public override void AttackBySpecific()
         {
-            _monsterTarget?.OnReceiveDamage(baseStatData.Attack, ResetTarget, this);
+            _monsterTarget?.OnReceiveDamage(1, ResetTarget, this);
         }
 
         public Vector3 GetMonsterPos()

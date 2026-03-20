@@ -1,6 +1,7 @@
-﻿using System;
+﻿﻿using System;
 using UnityEngine;
 using Immortal_Switch.Scripts.StatSystem;
+using Immortal_Switch.Scripts.PowerUpSystem;
 
 namespace Immortal_Switch.Scripts.GrowthSystem
 {
@@ -23,7 +24,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         public event Action OnGrowthChanged;
         public event Action<int> OnGoldChanged;
-        public event Action<int, int> OnTierReadyToUpgradePopup; // currentTier, nextTier
+        public event Action<int, int, bool> OnTierReadyToUpgradePopup;
 
         private void Awake()
         {
@@ -38,8 +39,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             Load();
         }
-
-        #region SAVE / LOAD
 
         public void Save()
         {
@@ -64,11 +63,13 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             OnGoldChanged?.Invoke(playerGold);
             OnGrowthChanged?.Invoke();
+
+            if (PowerUpManager.Instance != null)
+            {
+                PowerUpManager.Instance.TryInitializeSources();
+                PowerUpManager.Instance.RebuildAndApply();
+            }
         }
-
-        #endregion
-
-        #region API
 
         public bool TryUpgrade(StatType stat, int amount)
         {
@@ -83,7 +84,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 return false;
 
             playerGold = gold;
-
             Save();
 
             bool isCurrentTierFullyMaxedNow = Service.IsTierFullyMaxed(currentTier);
@@ -94,7 +94,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             if (!wasCurrentTierFullyMaxed && isCurrentTierFullyMaxedNow && canOpenNextTierPopup)
             {
-                OnTierReadyToUpgradePopup?.Invoke(currentTier, nextTier);
+                OnTierReadyToUpgradePopup?.Invoke(currentTier, nextTier, true);
             }
 
             return true;
@@ -102,11 +102,11 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         public void UnlockTier(int tier)
         {
-            int old = SaveData.CurrentUnlockedTier;
+            int oldTier = SaveData.CurrentUnlockedTier;
 
             Service.UnlockTier(tier);
 
-            if (SaveData.CurrentUnlockedTier != old)
+            if (SaveData.CurrentUnlockedTier != oldTier)
             {
                 Save();
                 OnGrowthChanged?.Invoke();
@@ -122,6 +122,20 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             OnGrowthChanged?.Invoke();
         }
 
+        public void CheckAndNotifyTierReady()
+        {
+            if (SaveData == null || Service == null)
+                return;
+
+            int currentTier = SaveData.CurrentUnlockedTier;
+            int nextTier = currentTier + 1;
+
+            bool isCurrentTierFullyMaxed = Service.IsTierFullyMaxed(currentTier);
+            bool canOpenNextTierPopup = Service.HasTier(nextTier);
+
+            OnTierReadyToUpgradePopup?.Invoke(currentTier, nextTier, isCurrentTierFullyMaxed && canOpenNextTierPopup);
+        }
+
         public void ClearData()
         {
             if (ES3.KeyExists(SAVE_KEY))
@@ -132,7 +146,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             SaveData = new GrowthSaveData();
             playerGold = defaultGold;
-
             Service = new GrowthSystemService(growthDatabase, SaveData);
 
             Debug.Log("[Growth] DATA CLEARED");
@@ -140,10 +153,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             OnGoldChanged?.Invoke(playerGold);
             OnGrowthChanged?.Invoke();
         }
-
-        #endregion
-
-        #region DEBUG BUTTONS
 
         [ContextMenu("DEBUG / Add 10000 Gold")]
         public void DebugAddGold()
@@ -178,7 +187,5 @@ namespace Immortal_Switch.Scripts.GrowthSystem
         {
             ClearData();
         }
-
-        #endregion
     }
 }

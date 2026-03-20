@@ -1,4 +1,4 @@
-using Spine.Unity;
+﻿using Spine.Unity;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -60,7 +60,23 @@ namespace Scripts.Battle
             if (ska == null) return;
 
             ska.timeScale = speed;
-            ska.AnimationState.SetAnimation(0, name, isLooped);
+            /*if(name == StandAnimName.Attack1 || name == StandAnimName.Attack2 || name == StandAnimName.Attack3)
+            {
+                var percent = (name) switch
+                {
+                    StandAnimName.Attack1 => 0.5f,
+                    StandAnimName.Attack2 => 0.5f,
+                    StandAnimName.Attack3 => 0.95f,
+                    _ => 1
+                };
+
+                //ska.AnimationState.SetAnimation(0, StandAnimName.Idle, false);
+                var attackTrack = ska.AnimationState.SetAnimation(1, name, false);
+                ska.AnimationState.AddAnimation(0, StandAnimName.Injured, false,0);
+                attackTrack.Alpha = percent;
+            }
+            else*/
+                ska.AnimationState.SetAnimation(0, name, isLooped);
         }
 
         public float GetDurByAnimName(string name)

@@ -34,7 +34,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             if (levelUpButton != null)
             {
                 levelUpButton.onClick.RemoveListener(OnClickLevelUp);
-                levelUpButton.interactable = !viewData.IsMax;
+                levelUpButton.interactable = viewData.CanUpgrade;
                 levelUpButton.onClick.AddListener(OnClickLevelUp);
             }
         }

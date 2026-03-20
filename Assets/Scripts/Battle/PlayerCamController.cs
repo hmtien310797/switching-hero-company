@@ -1,8 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
-using DG.Tweening;
+﻿using DG.Tweening;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 namespace Scripts.Battle
@@ -16,7 +13,7 @@ namespace Scripts.Battle
     public class PlayerCamController : MonoBehaviour
     {
         [SerializeField] float moveSpeed = 2f;
-        [SerializeField] Vector3 offset = new Vector3(0, 7, 26);
+        [SerializeField] Vector3 offset = new Vector3(0, 7, 25);
 
         private Camera cam;
         private Transform[] playerTrans = new Transform[2];
@@ -26,10 +23,10 @@ namespace Scripts.Battle
         private bool isShaked = false;
         
         private float _lastAspectRatio;
-        private float landscapeFov = 35f;
-        private float portraitFov = 55f;
+        private float landscapeFov = 30f;
+        private float portraitFov = 60f;
         private float zPortraitCam = 20;
-        private float zLandscapeCam = 24;
+        private float zLandscapeCam = 28;
         private float zCam = 26;
         
 

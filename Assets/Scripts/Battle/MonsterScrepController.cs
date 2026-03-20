@@ -3,7 +3,6 @@ using Immortal_Switch.Scripts.StatSystem;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 namespace Scripts.Battle
 {
@@ -128,17 +127,21 @@ namespace Scripts.Battle
 
         private void MoveToTarget()
         {
-            var isRight = transform.position.x < targetTrans.position.x;
-            DoRotate(isRight);
+            var isRight = transform.position.x < etarget.transform.position.x;
             if (!IsBoss())
-                transform.position = GetNextPos();
+            {
+                var nPos = GetNextPos();
+                //isRight = transform.position.x < nPos.x;
+                DoRotate(isRight);
+                transform.position = nPos;
+            }
             else
-                DoMoveToTarget(targetTrans, 3);
+                DoMoveToTarget(etarget.transform, 3);
         }
 
         private Vector3 GetNextPos()
         {
-            Vector3 targetPos = Vector3.MoveTowards(transform.position, targetTrans.position, Time.deltaTime * 0.25f);
+            Vector3 targetPos = Vector3.MoveTowards(transform.position, etarget.transform.position, Time.deltaTime * 0.25f);
             var monsterArounds = pvEBattleController.GetNearestMonstesInRange(targetPos, 1f);
             if (monsterArounds == null || monsterArounds.Count <= 1) return targetPos;
 
@@ -150,7 +153,7 @@ namespace Scripts.Battle
                 if (monster.gameObject == this.gameObject) continue;
                 Vector3 pushDir = targetPos - monster.transform.position;
                 float distance = pushDir.magnitude;
-                if (distance < 0.001f) continue;
+                if (distance < 0.5f) continue;
 
                 avoidanceDir += pushDir.normalized / distance;
                 count++;
@@ -158,7 +161,7 @@ namespace Scripts.Battle
 
             if (count > 0)
             {
-                targetPos += (avoidanceDir / count) * Time.deltaTime * 0.5f;
+                targetPos += (avoidanceDir / count) * Time.deltaTime * 0.25f;
             }
 
             return targetPos;

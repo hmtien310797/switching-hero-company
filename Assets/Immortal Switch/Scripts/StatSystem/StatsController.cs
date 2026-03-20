@@ -1,6 +1,7 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.PowerUpSystem;
 using Scripts.Battle;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ namespace Immortal_Switch.Scripts.StatSystem
         {
             StatModule = new StatModule();
             DotModule = new DotModule();
+
             StatModule.Init(new Dictionary<StatType, float>
             {
                 { StatType.MaxHp, baseStat.Health },
@@ -40,10 +42,14 @@ namespace Immortal_Switch.Scripts.StatSystem
             HealthModule.Init();
 
             StatusEffectModule = new StatusEffectModule();
-
             BuffModule = new BuffModule(StatModule, HealthModule, StatusEffectModule);
 
             BindDebug();
+
+            if (PowerUpManager.Instance != null)
+            {
+                PowerUpManager.Instance.BindPlayer(this);
+            }
         }
 
         private void Update()
@@ -54,6 +60,11 @@ namespace Immortal_Switch.Scripts.StatSystem
 
         private void OnDestroy()
         {
+            if (PowerUpManager.Instance != null)
+            {
+                PowerUpManager.Instance.UnbindPlayer(this);
+            }
+
             HealthModule?.Dispose();
         }
 
@@ -93,20 +104,20 @@ namespace Immortal_Switch.Scripts.StatSystem
         public bool CanMove()
         {
             return !StatusEffectModule.HasStatus(StatusEffectType.Stun)
-                && !StatusEffectModule.HasStatus(StatusEffectType.Freeze);
+                   && !StatusEffectModule.HasStatus(StatusEffectType.Freeze);
         }
 
         public bool CanCastSkill()
         {
             return !StatusEffectModule.HasStatus(StatusEffectType.Stun)
-                && !StatusEffectModule.HasStatus(StatusEffectType.Silence)
-                && !StatusEffectModule.HasStatus(StatusEffectType.Freeze);
+                   && !StatusEffectModule.HasStatus(StatusEffectType.Silence)
+                   && !StatusEffectModule.HasStatus(StatusEffectType.Freeze);
         }
 
         public bool CanAttack()
         {
             return !StatusEffectModule.HasStatus(StatusEffectType.Stun)
-                && !StatusEffectModule.HasStatus(StatusEffectType.Freeze);
+                   && !StatusEffectModule.HasStatus(StatusEffectType.Freeze);
         }
     }
 }

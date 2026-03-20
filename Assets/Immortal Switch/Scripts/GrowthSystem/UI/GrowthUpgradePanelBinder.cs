@@ -16,16 +16,25 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             this.uiDb = uiDb;
         }
 
-        public List<StatTierViewData> Build(int gold, int amount)
+        public GrowthUpgradePanelData Build(int gold, int amount)
         {
-            var result = new List<StatTierViewData>();
+            var result = new GrowthUpgradePanelData
+            {
+                Rows = new List<StatTierViewData>()
+            };
 
-            var stats = service.GetStatsUnlockedExactlyAtTier(service.CurrentUnlockedTier);
+            int tier = service.CurrentUnlockedTier;
+            var stats = service.GetStatsUnlockedExactlyAtTier(tier);
 
             foreach (var stat in stats)
             {
-                result.Add(BuildOne(stat, gold, amount));
+                result.Rows.Add(BuildOne(stat, gold, amount));
             }
+
+            result.CurrentTier = tier;
+            result.CompletedStatCount = service.GetTierCompletedStatCount(tier);
+            result.TotalStatCount = service.GetTierTotalStatCount(tier);
+            result.TierProgressPercent = service.GetTierCompletionPercent(tier);
 
             return result;
         }
@@ -47,7 +56,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                 Stat = stat,
                 Icon = ui.Icon,
                 Name = ui.DisplayName,
-                StatProgressPercent = max > 0 ? (float)cur / max : 0,
+                StatProgressPercent = max > 0 ? (float)cur / max : 0f,
                 StatCurrentStack = cur,
                 StatMaxStack = max,
                 ValuePay = isMax ? "MAX" : cost.ToString("N0"),
@@ -55,5 +64,14 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                 CanUpgrade = can
             };
         }
+    }
+
+    public struct GrowthUpgradePanelData
+    {
+        public int CurrentTier;
+        public int CompletedStatCount;
+        public int TotalStatCount;
+        public float TierProgressPercent;
+        public List<StatTierViewData> Rows;
     }
 }

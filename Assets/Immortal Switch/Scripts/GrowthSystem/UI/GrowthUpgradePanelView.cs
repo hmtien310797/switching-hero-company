@@ -4,39 +4,50 @@ using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GrowthSystem.UI
 {
     public class GrowthUpgradePanelView : MonoBehaviour
     {
+        [Header("Top")]
         [SerializeField] private TMP_Text goldText;
         [SerializeField] private GrowthUpgradeAmountSelector amountSelector;
 
+        [Header("Tier Progress")]
+        [SerializeField] private Image tierProgressBar;
+
+        [Header("Stats")]
         [SerializeField] private Transform contentRoot;
         [SerializeField] private StatTierView prefab;
 
         private readonly List<StatTierView> views = new();
 
         public void Bind(
-            List<StatTierViewData> datas,
+            GrowthUpgradePanelData panelData,
             int gold,
             int selectedAmount,
             Action<StatType> onUpgrade,
             Action<int> onAmountChanged)
         {
-            goldText.text = gold.ToString("N0");
+            if (goldText != null)
+                goldText.text = gold.ToString("N0");
 
-            amountSelector.Initialize(selectedAmount, onAmountChanged);
+            if (amountSelector != null)
+                amountSelector.Initialize(selectedAmount, onAmountChanged);
 
-            Ensure(datas.Count);
+            if (tierProgressBar != null)
+                tierProgressBar.fillAmount = panelData.TierProgressPercent;
+
+            Ensure(panelData.Rows.Count);
 
             for (int i = 0; i < views.Count; i++)
             {
-                bool active = i < datas.Count;
+                bool active = i < panelData.Rows.Count;
                 views[i].gameObject.SetActive(active);
 
                 if (active)
-                    views[i].Initialize(datas[i], onUpgrade);
+                    views[i].Initialize(panelData.Rows[i], onUpgrade);
             }
         }
 

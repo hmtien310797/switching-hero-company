@@ -8,9 +8,6 @@ using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 using Scripts.Common;
 using Random = UnityEngine.Random;
-using NUnit.Framework.Constraints;
-
-
 
 #if UNITY_EDITOR
 using NaughtyAttributes;
@@ -41,6 +38,7 @@ namespace Scripts.Battle
         [SerializeField] Transform skillObjTrans;
         [SerializeField] FollowHeroController mainFollow;
         [SerializeField] FollowHeroController subFollow;
+        [SerializeField] PvEMapController pvEMapController;
 
         [Header("Spawn Positions")]
         [SerializeField] private List<Transform> spawnPoss;
@@ -107,7 +105,7 @@ namespace Scripts.Battle
 
             currentStage = Mathf.Max(1, currentStage);
             await UIManager.Instance.InitMainScene();
-
+            pvEMapController.InitMapByChapter(GetChapterIdByStage(currentStage));
             InitSwitchableHeroIds();
             await InitPlayerHeroById();
 
@@ -116,6 +114,11 @@ namespace Scripts.Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+        }
+
+        public Vector3 GetMapEndPoint()
+        {
+            return pvEMapController.EndMapPoint;
         }
 
         private void OnChangeHero(int sId, int tId)
@@ -213,6 +216,7 @@ namespace Scripts.Battle
             result = BattleResult.None;
             SetState(BattleState.Initializing);
             currentStage++;
+            pvEMapController.InitMapByChapter(GetChapterIdByStage(currentStage));
             InitStage(currentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
@@ -306,6 +310,32 @@ namespace Scripts.Battle
             return false;
         }
 
+        private int GetChapterIdByStage(int stage)
+        {
+            if (chapterStages == null || chapterStages.Length == 0 || stage <= 0)
+                return 0;
+
+            int accumulatedStage = 0;
+
+            for (int i = 0; i < chapterStages.Length; i++)
+            {
+                var data = chapterStages[i];
+                if (data == null || data.TotalStage <= 0) continue;
+
+                int startStage = accumulatedStage;
+                int endStage = accumulatedStage + data.TotalStage;
+
+                if (stage > startStage && stage <= endStage)
+                {
+                    return i;
+                }
+
+                accumulatedStage = endStage;
+            }
+
+            return 0;
+        }
+
         private bool TryGetBossDataByStage(int stage, out BossDataSO bossSo)
         {
             bossSo = null;
@@ -345,7 +375,7 @@ namespace Scripts.Battle
                 for (int k = 0; k < amount; k++)
                 {
                     var basePos = spawnPoss[Random.Range(0, spawnPoss.Count)].position;
-                    var nPos = basePos + new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
+                    var nPos = basePos + new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f));
 
                     var (creep,_) = PoolController.Instance.Get(creepData.CreepPrefab, nPos);
                     if(k%5 == 0)

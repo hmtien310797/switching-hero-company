@@ -1,18 +1,17 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.UI
 {
     public class ResponsivePanel : MonoBehaviour
     {
         [SerializeField] private RectTransform panelRoot;
-
-        [Header("Portrait")]
-        [SerializeField] private Vector2 portraitSize = new Vector2(700f, 1500f);
-
-        [Header("Landscape")]
-        [SerializeField] private Vector2 landscapeSize = new Vector2(1200f, 700f);
         
-        [SerializeField] private Vector2 startPosition = new Vector2(0, 0);
+        [Header("Portrait")]
+        [SerializeField] private float scalePortrait = 1f;
+        
+        [Header("Landscape")]
+        [SerializeField] private float scaleLandscape = 0.6f;
 
         private Vector2Int lastScreenSize;
 
@@ -32,17 +31,7 @@ namespace Immortal_Switch.Scripts.UI
         private void Apply()
         {
             bool isPortrait = Screen.height >= Screen.width;
-
-            panelRoot.anchorMin = new Vector2(0.5f, 0.5f);
-            panelRoot.anchorMax = new Vector2(0.5f, 0.5f);
-            panelRoot.pivot = new Vector2(0.5f, 0.5f);
-            panelRoot.anchoredPosition = startPosition;
-
-            Vector2 size = isPortrait ? portraitSize : landscapeSize;
-            panelRoot.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size.x);
-            panelRoot.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size.y);
-
-            lastScreenSize = new Vector2Int(Screen.width, Screen.height);
+            panelRoot.localScale = isPortrait ? scalePortrait * Vector3.one : scaleLandscape * Vector3.one;
         }
     }
 }
