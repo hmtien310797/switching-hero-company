@@ -8,6 +8,7 @@ using Spine.Unity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.PowerUpSystem;
 using UnityEngine;
 
 namespace Scripts.Battle
@@ -210,6 +211,10 @@ namespace Scripts.Battle
             };
              
             Stats.Initialize(baseStatData);
+            if (PowerUpManager.Instance != null)
+            {
+                PowerUpManager.Instance.BindPlayer(Stats);
+            }
         }
 
         private void Start()

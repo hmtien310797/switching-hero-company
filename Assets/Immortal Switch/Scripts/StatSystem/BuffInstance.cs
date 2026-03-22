@@ -11,7 +11,7 @@ namespace Immortal_Switch.Scripts.StatSystem
         private float tickTimer;
         private readonly List<StatModifier> appliedModifiers = new();
 
-        public string RuntimeSourceId => $"{Data.Id}_Runtime";
+        public string RuntimeSourceId => StatSourceIds.Buff(Data.Id);
 
         public BuffInstance(BuffData data)
         {

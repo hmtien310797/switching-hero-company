@@ -7,7 +7,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 {
     public class GrowthSystemService : IPowerUpSource
     {
-        public string SourceId => "GROWTH_SYSTEM";
+        public string SourceId => StatSourceIds.GrowthSystem;
 
         private readonly List<GrowthTierSegment> segments = new();
         private readonly Dictionary<StatType, List<GrowthTierSegment>> segmentsByStat = new();
@@ -41,7 +41,8 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             var sortedTiers = new List<GrowthDataSO>(database.Tiers);
             sortedTiers.Sort((a, b) => a.Tier.CompareTo(b.Tier));
 
-            int previousTierMaxStack = 0;
+            // Theo dõi end stack cuối cùng của từng stat riêng biệt
+            var lastEndStackByStat = new Dictionary<StatType, int>();
 
             for (int i = 0; i < sortedTiers.Count; i++)
             {
@@ -52,18 +53,22 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 if (tierData.Tier > maxTier)
                     maxTier = tierData.Tier;
 
-                int segmentStartStackInclusive = previousTierMaxStack + 1;
-                int segmentEndStackInclusive = tierData.MaxStack;
-
                 if (tierData.StatGrowths == null || tierData.StatGrowths.Length == 0)
-                {
-                    previousTierMaxStack = tierData.MaxStack;
                     continue;
-                }
 
                 for (int j = 0; j < tierData.StatGrowths.Length; j++)
                 {
                     var statGrowth = tierData.StatGrowths[j];
+
+                    int previousEnd = lastEndStackByStat.TryGetValue(statGrowth.Stat, out var endStack)
+                        ? endStack
+                        : 0;
+
+                    int segmentStartStackInclusive = previousEnd + 1;
+                    int segmentEndStackInclusive = tierData.MaxStack;
+
+                    if (segmentEndStackInclusive < segmentStartStackInclusive)
+                        continue;
 
                     var segment = new GrowthTierSegment(
                         tierData.Tier,
@@ -84,9 +89,9 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                     }
 
                     list.Add(segment);
-                }
 
-                previousTierMaxStack = tierData.MaxStack;
+                    lastEndStackByStat[statGrowth.Stat] = segmentEndStackInclusive;
+                }
             }
 
             foreach (var pair in segmentsByStat)
@@ -452,7 +457,8 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return false;
         }
 
-        public bool TryGetPreviousKnownStatGrowthBeforeTier(int tierExclusive, StatType stat, out int sourceTier, out StatGrowthData growth)
+        public bool TryGetPreviousKnownStatGrowthBeforeTier(int tierExclusive, StatType stat, out int sourceTier,
+            out StatGrowthData growth)
         {
             sourceTier = 0;
             growth = default;
@@ -511,7 +517,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             saveData.CurrentUnlockedTier = tier;
         }
-        
+
         public void CollectPowerUps(List<PowerUpModifierData> output)
         {
             if (output == null)

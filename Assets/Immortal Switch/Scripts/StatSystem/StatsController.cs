@@ -45,11 +45,6 @@ namespace Immortal_Switch.Scripts.StatSystem
             BuffModule = new BuffModule(StatModule, HealthModule, StatusEffectModule);
 
             BindDebug();
-
-            if (PowerUpManager.Instance != null)
-            {
-                PowerUpManager.Instance.BindPlayer(this);
-            }
         }
 
         private void Update()

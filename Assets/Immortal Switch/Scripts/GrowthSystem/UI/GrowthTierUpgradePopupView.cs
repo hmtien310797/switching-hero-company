@@ -67,7 +67,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         public void Hide()
         {
-            gameObject.SetActive(false);
+            UIManager.Instance.Close<GrowthTierUpgradePopupView>();
             onConfirm = null;
         }
 

@@ -35,7 +35,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         private void RefreshData()
         {
-            manager = GrowthManager.Instance;
+            manager = PowerUpManager.Instance.GrowthManager;
             service = manager != null ? manager.Service : null;
 
             statsCache.Clear();

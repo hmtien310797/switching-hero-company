@@ -7,8 +7,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 {
     public class GrowthManager : MonoBehaviour
     {
-        public static GrowthManager Instance { get; private set; }
-
         [Header("Config")]
         [SerializeField] private GrowthDatabaseSO growthDatabase;
         [SerializeField] private int defaultGold = 100000;
@@ -28,15 +26,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         private void Awake()
         {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
             Load();
         }
 

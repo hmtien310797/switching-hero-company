@@ -597,7 +597,7 @@ public sealed class UIManager : Singleton<UIManager>
 
         var parent = GetLayerRoot(entry.layer);
         entry.backdropInstance = Instantiate(backdropPrefab, parent, false);
-
+        entry.backdropInstance.transform.SetAsFirstSibling();
         var btn = entry.backdropInstance.GetComponent<Button>();
         if (btn != null)
         {

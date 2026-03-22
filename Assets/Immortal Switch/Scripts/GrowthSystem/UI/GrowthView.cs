@@ -1,4 +1,6 @@
-﻿﻿using Immortal_Switch.Scripts.StatSystem;
+﻿using Cysharp.Threading.Tasks;
+ using Immortal_Switch.Scripts.PowerUpSystem;
+ using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
@@ -10,7 +12,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         [SerializeField] private GrowthStatUIViewDatabaseSO statUiDatabase;
 
         [Header("Tier Popup")]
-        [SerializeField] private GrowthTierUpgradePopupView tierUpgradePopupView;
         [SerializeField] private Sprite[] tierIcons; 
 
         [Header("UI State")]
@@ -22,7 +23,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         private void Awake()
         {
-            growthManager = GrowthManager.Instance;
+            growthManager = PowerUpManager.Instance.GrowthManager;
 
             binder = new GrowthUpgradePanelBinder(
                 growthManager.Service,
@@ -76,13 +77,17 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             growthManager.TryUpgrade(stat, selectedUpgradeAmount);
         }
 
-        private void HandleTierReadyPopup(int currentTier, int nextTier, bool isActive = true)
+        private void HandleTierReadyPopup(int currentTier, int newTier, bool isActive = true)
         {
-            if (tierUpgradePopupView == null)
-                return;
-            
+            HandleTierReadyPopupAsync(currentTier, newTier, isActive).Forget();
+        }
+
+        private async UniTask HandleTierReadyPopupAsync(int currentTier, int nextTier, bool isActive = true)
+        {
             if (!isActive)
                 return;
+            
+            var tierUpgradePopupView = await UIManager.Instance.OpenPopupAsync<GrowthTierUpgradePopupView>(withBackdrop: false);
 
             var currentIcon = GetIconForTier(currentTier);
             var nextIcon = GetIconForTier(nextTier);
