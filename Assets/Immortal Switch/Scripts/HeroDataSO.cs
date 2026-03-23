@@ -30,6 +30,6 @@ namespace Immortal_Switch.Scripts
     
     public enum Rarity
     {
-        Common, Rare, Epic, Legendary
+        Common, Rare, Epic, Legendary, Legendary1, Legendary2
     }
 }

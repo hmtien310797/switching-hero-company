@@ -29,19 +29,18 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             };
 
             var nextTierStats = service.GetStatsUnlockedExactlyAtTier(nextTier);
-            var currentTierStats = service.GetStatsUnlockedExactlyAtTier(currentTier);
 
             for (int i = 0; i < nextTierStats.Count; i++)
             {
                 var stat = nextTierStats[i];
 
-                if (!service.TryGetStatGrowthAtTier(nextTier, stat, out var nextGrowth))
+                if (!service.TryGetStatGrowthAtTier(nextTier, stat, out _))
                     continue;
 
                 var ui = uiDb.Get(stat);
 
-                bool hasCurrentTierVersion = service.TryGetStatGrowthAtTier(currentTier, stat, out var currentTierGrowth);
-                bool hasAnyPreviousVersion = service.TryGetPreviousKnownStatGrowthBeforeTier(nextTier, stat, out int previousTier, out var previousGrowth);
+                bool hasCurrentTierVersion = service.TryGetStatGrowthAtTier(currentTier, stat, out _);
+                bool hasAnyPreviousVersion = service.TryGetPreviousKnownStatGrowthBeforeTier(nextTier, stat, out int previousTier, out _);
 
                 var row = new GrowthTierUpgradeRowData
                 {
@@ -53,63 +52,74 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                     RightValueText = string.Empty
                 };
 
-                // Rule 1
                 if (hasCurrentTierVersion)
                 {
                     row.ShowArrow = true;
 
-                    float left = GetTotalValueOfTier(currentTier, stat);
-                    float right = GetTotalValueOfTier(nextTier, stat);
+                    float left = GetTotalValueUpToTier(currentTier, stat);
+                    float right = GetTotalValueUpToTier(nextTier, stat);
 
-                    row.LeftValueText = FormatValue(left);
-                    row.RightValueText = FormatValue(right);
+                    row.LeftValueText = FormatValue(stat, left);
+                    row.RightValueText = FormatValue(stat, right);
                 }
-// Rule 4
                 else if (hasAnyPreviousVersion)
                 {
                     row.ShowArrow = true;
 
-                    float left = GetTotalValueOfTier(previousTier, stat);
-                    float right = GetTotalValueOfTier(nextTier, stat);
+                    float left = GetTotalValueUpToTier(previousTier, stat);
+                    float right = GetTotalValueUpToTier(nextTier, stat);
 
-                    row.LeftValueText = FormatValue(left);
-                    row.RightValueText = FormatValue(right);
+                    row.LeftValueText = FormatValue(stat, left);
+                    row.RightValueText = FormatValue(stat, right);
                 }
-// Rule 2
                 else
                 {
                     row.ShowArrow = false;
 
-                    float value = GetTotalValueOfTier(nextTier, stat);
-                    row.LeftValueText = FormatValue(value);
+                    float value = GetTotalValueUpToTier(nextTier, stat);
+                    row.LeftValueText = FormatValue(stat, value);
                     row.RightValueText = string.Empty;
                 }
 
                 data.Rows.Add(row);
             }
 
-            // Rule 3 tự nhiên được xử lý:
-            // stat chỉ có ở tier cũ mà không có ở tier mới sẽ không loop vào nextTierStats nên không hiện.
-
             return data;
         }
 
-        private static string FormatValue(float value)
+        private string FormatValue(StatType stat, float rawValue)
         {
-            return $"{value:0.##}%";
+            float runtimeValue = service.ConvertRawValueToRuntime(stat, rawValue);
+            return service.FormatForDisplay(stat, runtimeValue);
         }
-        
-        private float GetTotalValueOfTier(int tier, StatType stat)
+
+        private float GetTotalValueUpToTier(int targetTier, StatType stat)
         {
-            if (!service.TryGetStatGrowthAtTier(tier, stat, out var growth))
-                return 0f;
+            float totalRawValue = 0f;
+            int previousEndStack = 0;
 
-            // Lấy max stack của tier
-            var tierData = service.GetTierData(tier);
-            if (tierData == null)
-                return 0f;
+            for (int tier = 1; tier <= targetTier; tier++)
+            {
+                if (!service.TryGetStatGrowthAtTier(tier, stat, out var growth))
+                    continue;
 
-            return growth.ValuePerLevel * tierData.MaxStack;
+                var tierData = service.GetTierData(tier);
+                if (tierData == null)
+                    continue;
+
+                int segmentStart = previousEndStack + 1;
+                int segmentEnd = tierData.MaxStack;
+
+                if (segmentEnd < segmentStart)
+                    continue;
+
+                int stackCountThisSegment = segmentEnd - segmentStart + 1;
+                totalRawValue += stackCountThisSegment * growth.ValuePerLevel;
+
+                previousEndStack = segmentEnd;
+            }
+
+            return totalRawValue;
         }
     }
 

@@ -41,7 +41,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             var sortedTiers = new List<GrowthDataSO>(database.Tiers);
             sortedTiers.Sort((a, b) => a.Tier.CompareTo(b.Tier));
 
-            // Theo dõi end stack cuối cùng của từng stat riêng biệt
+
             var lastEndStackByStat = new Dictionary<StatType, int>();
 
             for (int i = 0; i < sortedTiers.Count; i++)
