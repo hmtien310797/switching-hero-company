@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5390162923460574460}
   - component: {fileID: 5991103040437487263}
   - component: {fileID: 8935599472112453296}
+  - component: {fileID: -3713057558822808144}
   m_Layer: 7
   m_Name: KnightMetalPlayer
   m_TagString: Untagged
@@ -86,6 +87,7 @@ MonoBehaviour:
   hero: {fileID: 7056940943283354692}
   heroUIView: {fileID: 8935599472112453296}
   hideMat: {fileID: 2100000, guid: ecf734acdd466ab47b0f063dc046c5be, type: 2}
+  progressionBridge: {fileID: 0}
   distFlashConst: 7
   distSkillRange: 5
   intervalSwitch: 20
@@ -161,6 +163,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headIcon: {fileID: 21300000, guid: 4f554405f8f06164db0773d689da243c, type: 3}
   swithSkillIcon: {fileID: 2053586910, guid: 7832bd6534fba854d99d160a3ca6a389, type: 3}
+--- !u!114 &-3713057558822808144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1143ac4471e40e0a33aa71913ce4137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  heroData: {fileID: 0}
+  playerHeroController: {fileID: 0}
+  statsController: {fileID: 0}
 --- !u!1 &6894580092140334920
 GameObject:
   m_ObjectHideFlags: 0

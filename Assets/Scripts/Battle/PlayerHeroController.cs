@@ -8,6 +8,7 @@ using Spine.Unity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using UnityEngine;
 
@@ -51,6 +52,7 @@ namespace Scripts.Battle
         [SerializeField] SkeletonAnimation hero;
         [SerializeField] HeroUIView heroUIView;
         [SerializeField] Material hideMat;
+        [SerializeField] private HeroProgressionRuntimeBridge progressionBridge;
         [SerializeField] float distFlashConst = 5;
         [SerializeField] float distSkillRange = 5;
         [SerializeField] float intervalSwitch = 20;
@@ -214,6 +216,15 @@ namespace Scripts.Battle
             if (PowerUpManager.Instance != null)
             {
                 PowerUpManager.Instance.BindPlayer(Stats);
+            }
+            
+            if (progressionBridge == null)
+                progressionBridge = GetComponent<HeroProgressionRuntimeBridge>();
+
+            if (progressionBridge != null)
+            {
+                progressionBridge.Setup(baseHeroData, this);
+                progressionBridge.RefreshFromProgression();
             }
         }
 

@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 3541416523792417231}
   - component: {fileID: -6887672660385192121}
   - component: {fileID: 8550740779067930300}
+  - component: {fileID: -2321336621784235455}
   m_Layer: 7
   m_Name: ArcherWaterPlayer
   m_TagString: Untagged
@@ -118,6 +119,7 @@ MonoBehaviour:
   hero: {fileID: 7753249893286820407}
   heroUIView: {fileID: 8550740779067930300}
   hideMat: {fileID: 2100000, guid: ecf734acdd466ab47b0f063dc046c5be, type: 2}
+  progressionBridge: {fileID: 0}
   distFlashConst: 7
   distSkillRange: 10
   intervalSwitch: 20
@@ -193,6 +195,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headIcon: {fileID: 21300000, guid: 32997c96a91b5904aa064f961fa62937, type: 3}
   swithSkillIcon: {fileID: 244264321, guid: f3b5ac43f402abb4eae98942241d1b71, type: 3}
+--- !u!114 &-2321336621784235455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1143ac4471e40e0a33aa71913ce4137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  heroData: {fileID: 0}
+  playerHeroController: {fileID: 0}
+  statsController: {fileID: 0}
 --- !u!1 &6117754734744368223
 GameObject:
   m_ObjectHideFlags: 0

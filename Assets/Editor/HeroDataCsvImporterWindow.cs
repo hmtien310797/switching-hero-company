@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts;
 using UnityEditor;
 using UnityEngine;
@@ -123,7 +124,7 @@ public class HeroCsvToSoTool : EditorWindow
         heroData.Id = row.Id;
         heroData.Name = row.HeroName;
         heroData.HeroClass = row.HeroClass;
-        heroData.Rarity = row.Rarity;
+        heroData.SummonRarity = row.Rarity;
         heroData.Element = row.Element;
         heroData.Health = row.HitPoint;
         heroData.Attack = row.Attack;
@@ -141,7 +142,7 @@ public class HeroCsvToSoTool : EditorWindow
             Id = ParseInt(cols[0]),
             HeroName = cols[1],
             HeroClass = ParseEnum<HeroClass>(cols[2]),
-            Rarity = ParseEnum<Rarity>(cols[3]),
+            Rarity = ParseEnum<SummonRarity>(cols[3]),
             Element = ParseEnum<Element>(cols[4]),
             HitPoint = ParseFloat(cols[5]),
             Attack = ParseFloat(cols[6]),
@@ -228,7 +229,7 @@ public class HeroCsvToSoTool : EditorWindow
         public int Id;
         public string HeroName;
         public HeroClass HeroClass;
-        public Rarity Rarity;
+        public SummonRarity Rarity;
         public Element Element;
         public float HitPoint;
         public float Attack;
