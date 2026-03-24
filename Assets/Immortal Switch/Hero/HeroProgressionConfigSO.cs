@@ -53,14 +53,14 @@ namespace Immortal_Switch.Hero
         [Min(0)] public int NextStarInTier = 0;
 
         [Header("Stat Multipliers At This Node")]
-        [Min(0.01f)] public float HealthMultiplier = 1f;
-        [Min(0.01f)] public float AttackMultiplier = 1f;
-        [Min(0.01f)] public float DefenseMultiplier = 1f;
-        [Min(0.01f)] public float AccuracyMultiplier = 1f;
-        [Min(0.01f)] public float AttackSpeedMultiplier = 1f;
-        [Min(0.01f)] public float AttackRangeMultiplier = 1f;
-        [Min(0.01f)] public float MoveSpeedMultiplier = 1f;
-        [Min(0.01f)] public float CritChanceMultiplier = 1f;
-        [Min(0.01f)] public float CritDamageMultiplier = 1f;
+        [Min(0f)] public float HealthMultiplier = 0f;
+        [Min(0f)] public float AttackMultiplier = 0f;
+        [Min(0f)] public float DefenseMultiplier = 0f;
+        [Min(0f)] public float AccuracyMultiplier = 0f;
+        [Min(0f)] public float AttackSpeedMultiplier = 0f;
+        [Min(0f)] public float AttackRangeMultiplier = 0f;
+        [Min(0f)] public float MoveSpeedMultiplier = 0f;
+        [Min(0f)] public float CritChanceMultiplier = 0f;
+        [Min(0f)] public float CritDamageMultiplier = 0f;
     }
 }

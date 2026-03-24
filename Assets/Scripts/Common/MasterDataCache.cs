@@ -1,5 +1,6 @@
 using Immortal_Switch.Scripts;
 using System.Collections.Generic;
+using Immortal_Switch.Hero;
 using UnityEngine;
 
 public class MasterDataCache : MonoBehaviour

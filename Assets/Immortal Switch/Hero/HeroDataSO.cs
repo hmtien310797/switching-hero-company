@@ -8,18 +8,24 @@ namespace Immortal_Switch.Hero
     [CreateAssetMenu(fileName = "HeroData", menuName = "ScriptableObjects/HeroData", order = 1)]
     public class HeroDataSO : ScriptableObject
     {
-        [Header("Identity")] public int Id;
+        [Header("Identity")] 
+        public int Id;
         public string Name;
         public HeroClass HeroClass;
         public Element Element;
+        
+        [Header("UI")]
+        public Sprite PortraitIcon;
+        public Sprite ShardIcon;
 
-        [Header("Summon")] public SummonRarity SummonRarity;
+        [Header("Summon")] 
+        public SummonRarity SummonRarity;
         public bool IsAvailableInSummon = true;
-        [Min(1)] public int SummonWeight = 1;
+        [Min(1)] 
+        public int SummonWeight = 1;
 
-        [Header("Base Stats")] [FormerlySerializedAs("HitPoint")]
+        [Header("Base Stats")] 
         public float Health;
-
         public float IdleStateTime;
         public float IdleIntervalTime;
         public float AttackRange;
@@ -31,34 +37,35 @@ namespace Immortal_Switch.Hero
         public float Accuracy;
         public float MoveSpeed;
 
-        [Header("Prefab")] public PlayerHeroController PlayerHeroController;
+        [Header("Prefab")] 
+        public PlayerHeroController PlayerHeroController;
     }
 
     public enum HeroClass
     {
         Warrior,
         Assassin,
-        Tank,
+        Archer,
         Mage
     }
 
     public enum SummonRarity
     {
         Common,
+        UnCommon,
         Rare,
         Epic,
         Legendary,
-        Legendary1,
-        Legendary2
+        Mythic
     }
     
     public enum HeroProgressTier
     {
         Common,
+        UnCommon,
         Rare,
         Epic,
         Legendary,
-        Legendary1,
-        Legendary2
+        Mythic
     }
 }

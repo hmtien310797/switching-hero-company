@@ -18,10 +18,25 @@ MonoBehaviour:
   Nodes:
   - Tier: 0
     StarInTier: 0
-    ShardCostToNext: 5
+    ShardCostToNext: 2
     IsMaxNode: 0
     NextTier: 0
     NextStarInTier: 1
+    HealthMultiplier: 0
+    AttackMultiplier: 0
+    DefenseMultiplier: 0
+    AccuracyMultiplier: 0
+    AttackSpeedMultiplier: 0
+    AttackRangeMultiplier: 0
+    MoveSpeedMultiplier: 0
+    CritChanceMultiplier: 0
+    CritDamageMultiplier: 0
+  - Tier: 0
+    StarInTier: 1
+    ShardCostToNext: 5
+    IsMaxNode: 0
+    NextTier: 0
+    NextStarInTier: 2
     HealthMultiplier: 1500
     AttackMultiplier: 800
     DefenseMultiplier: 90
@@ -32,11 +47,11 @@ MonoBehaviour:
     CritChanceMultiplier: 0
     CritDamageMultiplier: 0
   - Tier: 0
-    StarInTier: 1
+    StarInTier: 2
     ShardCostToNext: 10
     IsMaxNode: 0
-    NextTier: 0
-    NextStarInTier: 2
+    NextTier: 1
+    NextStarInTier: 0
     HealthMultiplier: 1700
     AttackMultiplier: 1000
     DefenseMultiplier: 0.01
@@ -46,14 +61,44 @@ MonoBehaviour:
     MoveSpeedMultiplier: 1
     CritChanceMultiplier: 0
     CritDamageMultiplier: 0
-  - Tier: 0
-    StarInTier: 2
+  - Tier: 1
+    StarInTier: 0
     ShardCostToNext: 20
-    IsMaxNode: 1
+    IsMaxNode: 0
     NextTier: 1
-    NextStarInTier: 0
+    NextStarInTier: 1
     HealthMultiplier: 2000
     AttackMultiplier: 2000
+    DefenseMultiplier: 0.01
+    AccuracyMultiplier: 1
+    AttackSpeedMultiplier: 0
+    AttackRangeMultiplier: 0
+    MoveSpeedMultiplier: 1
+    CritChanceMultiplier: 0
+    CritDamageMultiplier: 0
+  - Tier: 1
+    StarInTier: 1
+    ShardCostToNext: 30
+    IsMaxNode: 0
+    NextTier: 1
+    NextStarInTier: 2
+    HealthMultiplier: 3000
+    AttackMultiplier: 3000
+    DefenseMultiplier: 0.01
+    AccuracyMultiplier: 1
+    AttackSpeedMultiplier: 0
+    AttackRangeMultiplier: 0
+    MoveSpeedMultiplier: 1
+    CritChanceMultiplier: 0
+    CritDamageMultiplier: 0
+  - Tier: 1
+    StarInTier: 2
+    ShardCostToNext: 30
+    IsMaxNode: 1
+    NextTier: 1
+    NextStarInTier: 3
+    HealthMultiplier: 4000
+    AttackMultiplier: 4000
     DefenseMultiplier: 0.01
     AccuracyMultiplier: 1
     AttackSpeedMultiplier: 0
