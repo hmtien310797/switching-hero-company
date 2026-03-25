@@ -165,7 +165,8 @@ namespace Immortal_Switch.Scripts.GachaSystem
                     HeroName = hero.Name,
                     IsNewHero = !alreadyOwned,
                     ShardGained = alreadyOwned ? 1 : 0,
-                    IsPityHit = pityHit
+                    IsPityHit = pityHit,
+                    Rarity = rolledRarity
                 });
             }
 

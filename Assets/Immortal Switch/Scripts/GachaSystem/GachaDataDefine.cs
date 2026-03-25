@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Hero;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.GachaSystem
@@ -44,6 +45,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
         public bool IsNewHero;
         public int ShardGained;
         public bool IsPityHit;
+        public SummonRarity Rarity;
     }
 
     [Serializable]

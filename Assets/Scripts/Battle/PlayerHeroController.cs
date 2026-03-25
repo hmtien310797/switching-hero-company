@@ -56,6 +56,7 @@ namespace Scripts.Battle
         [SerializeField] float distFlashConst = 5;
         [SerializeField] float distSkillRange = 5;
         [SerializeField] float intervalSwitch = 20;
+        [SerializeField] float switchArea = 5;
 
         private Material originalMaterial;
 
@@ -126,6 +127,8 @@ namespace Scripts.Battle
         }
 
         public HeroUIView UISprite => heroUIView;
+
+        public float GetSwitchArea => switchArea;
 
         private void SetTargetPos()
         {

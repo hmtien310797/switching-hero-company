@@ -1,31 +1,28 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonView : MonoBehaviour
+    public class HeroSummonView : AnimatedUIView
     {
         [Header("Buttons")]
-        [SerializeField] private Button summonButtonA;
-        [SerializeField] private Button summonButtonB;
+        [SerializeField] private HeroSummonButtonUI summonButtonA;
+        [SerializeField] private HeroSummonButtonUI summonButtonB;
 
         [Header("Texts")]
         [SerializeField] private TMP_Text summonLevelText;
-        [SerializeField] private TMP_Text progressText;
-        [SerializeField] private TMP_Text ticketText;
-        [SerializeField] private TMP_Text gemText;
-        [SerializeField] private TMP_Text rewardBadgeText;
 
         [Header("Progress")]
         [SerializeField] private Image summonLevelProgressFill;
 
         [Header("Popup")]
         [SerializeField] private HeroSummonConfirmPopup confirmPopup;
-        [SerializeField] private HeroSummonResultPopup resultPopup;
         [SerializeField] private HeroSummonRewardClaimView rewardClaimView;
+        [SerializeField] private HeroSummonSequencePopup sequencePopup;
 
         [Header("Option Id")]
         [SerializeField] private string optionAId = "summon_30";
@@ -50,21 +47,18 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (CurrencyManager.Instance != null)
                 CurrencyManager.Instance.OnAnyCurrencyChanged -= RefreshView;
+            
+            confirmPopup.Hide();
+            sequencePopup.Hide();
         }
 
         private void BindButtons()
         {
             if (summonButtonA != null)
-            {
-                summonButtonA.onClick.RemoveAllListeners();
-                summonButtonA.onClick.AddListener(() => TrySummon(optionAId));
-            }
+                summonButtonA.Init(optionAId, TrySummon);
 
             if (summonButtonB != null)
-            {
-                summonButtonB.onClick.RemoveAllListeners();
-                summonButtonB.onClick.AddListener(() => TrySummon(optionBId));
-            }
+                summonButtonB.Init(optionBId, TrySummon);
         }
 
         public void RefreshView()
@@ -73,8 +67,13 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 return;
 
             RefreshSummonLevel();
-            RefreshCurrency();
             RefreshClaimableRewards();
+
+            if (summonButtonA != null)
+                summonButtonA.Refresh();
+
+            if (summonButtonB != null)
+                summonButtonB.Refresh();
         }
 
         private void RefreshSummonLevel()
@@ -107,9 +106,6 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (nextRequired <= currentRequired)
             {
-                if (progressText != null)
-                    progressText.text = "MAX";
-
                 if (summonLevelProgressFill != null)
                     summonLevelProgressFill.fillAmount = 1f;
 
@@ -119,39 +115,14 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             int currentProgress = totalRoll - currentRequired;
             int needed = nextRequired - currentRequired;
 
-            if (progressText != null)
-                progressText.text = $"{currentProgress}/{needed}";
-
             if (summonLevelProgressFill != null)
                 summonLevelProgressFill.fillAmount = needed <= 0 ? 0f : Mathf.Clamp01((float)currentProgress / needed);
-        }
-
-        private void RefreshCurrency()
-        {
-            if (CurrencyManager.Instance == null) return;
-
-            if (ticketText != null)
-                ticketText.text = CurrencyManager.Instance.Get(CurrencyType.HeroTicket).ToString();
-
-            if (gemText != null)
-                gemText.text = CurrencyManager.Instance.Get(CurrencyType.Diamond).ToString();
         }
 
         private void RefreshClaimableRewards()
         {
             if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
                 return;
-
-            List<int> claimable = HeroSummonManager.Instance.Service.GetClaimableRewardLevels();
-
-            if (rewardBadgeText != null)
-            {
-                bool hasReward = claimable.Count > 0;
-                rewardBadgeText.gameObject.SetActive(hasReward);
-
-                if (hasReward)
-                    rewardBadgeText.text = claimable.Count.ToString();
-            }
 
             if (rewardClaimView != null)
                 rewardClaimView.Refresh();
@@ -196,10 +167,30 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             if (result == null)
                 return;
 
-            if (resultPopup != null)
-                resultPopup.Show(result);
+            if (sequencePopup != null)
+            {
+                sequencePopup.Show(result, () =>
+                {
+                    if (HeroSummonManager.Instance.CanSummon(optionId, out var nextPaymentType, out _))
+                    {
+                        if (nextPaymentType == SummonPaymentType.Gem)
+                        {
+                            ShowGemConfirm(optionId, HeroSummonManager.Instance.Service.GetOption(optionId).GemCost);
+                            return;
+                        }
+
+                        ExecuteSummon(optionId, nextPaymentType);
+                    }
+                    else
+                    {
+                        // TODO: Show Not Enough Resource Popup
+                        Debug.Log("Not enough resource for auto summon");
+                    }
+                });
+            }
 
             RefreshView();
         }
+
     }
 }

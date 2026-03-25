@@ -26,5 +26,11 @@ namespace Immortal_Switch.Scripts.UI
                 vh.SetUIVertex(vertex, i);
             }
         }
+
+        public void Refresh()
+        {
+            if (graphic != null)
+                graphic.SetVerticesDirty();
+        }
     }
 }

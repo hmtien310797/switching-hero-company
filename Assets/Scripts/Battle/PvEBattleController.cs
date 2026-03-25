@@ -24,36 +24,35 @@ namespace Scripts.Battle
         FightingBoss,
         Ended
     }
-    
+
     public enum BattleResult
     {
         None,
         Victory,
         Defeat
     }
-    
+
     public class PvEBattleController : Singleton<PvEBattleController>
     {
-        [Header("Refs")]
-        [SerializeField] PlayerCamController playerCamController;
+        [Header("Refs")] [SerializeField] PlayerCamController playerCamController;
         [SerializeField] Transform skillObjTrans;
         [SerializeField] FollowHeroController mainFollow;
         [SerializeField] FollowHeroController subFollow;
         [SerializeField] PvEMapController pvEMapController;
 
-        [Header("Spawn Positions")]
-        [SerializeField] private List<Transform> spawnPoss;
+        [Header("Spawn Positions")] [SerializeField]
+        private List<Transform> spawnPoss;
 
-        [Header("Data (Creeps)")]
-        [SerializeField] private CreepDataSo[] creepDataSo;
-        [SerializeField] private CreepSpawnPatternCollectionSO creepSpawnPatternCollection; 
-        [SerializeField] private SpawnRatePatternSO spawnRatePattern; 
-        
-        [Header("Data (Boss)")]
-        [SerializeField] private BossDataSO[] bossData;
+        [Header("Data (Creeps)")] [SerializeField]
+        private CreepDataSo[] creepDataSo;
 
-        [Header("Stage")]
-        [SerializeField] private int currentStage = 1;
+        [SerializeField] private CreepSpawnPatternCollectionSO creepSpawnPatternCollection;
+        [SerializeField] private SpawnRatePatternSO spawnRatePattern;
+
+        [Header("Data (Boss)")] [SerializeField]
+        private BossDataSO[] bossData;
+
+        [Header("Stage")] [SerializeField] private int currentStage = 1;
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
@@ -67,7 +66,7 @@ namespace Scripts.Battle
         private int patternId;
         private int[] enemyIds;
         private float[] rates;
-        
+
         private Dictionary<int, CreepDataSo> creepDataDict;
         private Dictionary<int, BossDataSO> bossDataDict;
         private Dictionary<int, PlayerHeroController> switchablePlayers = new();
@@ -79,10 +78,14 @@ namespace Scripts.Battle
         private PlayerHeroController mainPlayerHeroController;
         private bool isReadyBattle = false;
         private bool losingStage = false;
-        
+
         public BattleState State { get; private set; } = BattleState.None;
 
-        public bool IsReadyBattle { get => isReadyBattle; set => isReadyBattle = value; }
+        public bool IsReadyBattle
+        {
+            get => isReadyBattle;
+            set => isReadyBattle = value;
+        }
 
         protected override void Awake()
         {
@@ -95,7 +98,7 @@ namespace Scripts.Battle
         {
             GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
-            GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int,int>)OnChangeHero);
+            GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
             gameData = GameData.Instance;
             StartAsync().Forget();
         }
@@ -124,71 +127,139 @@ namespace Scripts.Battle
 
         private void OnChangeHero(int sId, int tId)
         {
-            if(firstPlayerHeroController.GetHeroId() == sId)
-            {
+            if (!CanSwitchHero(sId, tId))
+                return;
+
+            bool replaceFirst = firstPlayerHeroController != null && firstPlayerHeroController.GetHeroId() == sId;
+            bool replaceSecond = secondPlayerHeroController != null && secondPlayerHeroController.GetHeroId() == sId;
+
+            if (!replaceFirst && !replaceSecond)
+                return;
+
+            var oldHero = replaceFirst ? firstPlayerHeroController : secondPlayerHeroController;
+            if (oldHero == null)
+                return;
+
+            bool isMain = mainPlayerHeroController != null && mainPlayerHeroController.GetHeroId() == sId;
+            Vector3 spawnPos = oldHero.transform.position;
+
+            var heroDt = MasterDataCache.Instance.GetHeroDataById(tId);
+            if (heroDt == null)
+                return;
+
+            if (replaceFirst)
                 switchHeroIds[0] = tId;
-                var heroDt = MasterDataCache.Instance.GetHeroDataById(tId);
-                var (hero, b) = PoolController.Instance.Get(heroDt.PlayerHeroController, firstPlayerHeroController.transform.position);
-                firstPlayerHeroController = hero;
-                var isMain = mainPlayerHeroController.GetHeroId() == sId;
-                if (b) firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, secondPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, isMain);
-                if(isMain) mainPlayerHeroController = firstPlayerHeroController;
-                mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
+            else
+                switchHeroIds[1] = tId;
+
+            if (switchablePlayers.ContainsKey(sId))
+                switchablePlayers.Remove(sId);
+
+            // Tắt hero cũ, chỗ này tùy PoolController project của bạn
+            oldHero.gameObject.SetActive(false);
+
+            var (newHero, isNewInstance) = PoolController.Instance.Get(heroDt.PlayerHeroController, spawnPos);
+            if (newHero == null)
+                return;
+
+            switchablePlayers[tId] = newHero;
+
+            if (replaceFirst)
+            {
+                firstPlayerHeroController = newHero;
+
+                firstPlayerHeroController.InitHero(
+                    heroDt,
+                    this,
+                    playerCamController,
+                    skillObjTrans,
+                    secondPlayerHeroController != null ? secondPlayerHeroController.transform : null,
+                    mainFollow,
+                    HeroAttackType.Archer,
+                    false,
+                    isMain);
+
+                if (isMain)
+                {
+                    mainPlayerHeroController = firstPlayerHeroController;
+                    mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
+                }
             }
             else
             {
-                switchHeroIds[1] = tId;
-                var heroDt = MasterDataCache.Instance.GetHeroDataById(tId);
-                var (hero, b) = PoolController.Instance.Get(heroDt.PlayerHeroController, secondPlayerHeroController.transform.position);
-                secondPlayerHeroController = hero;
-                var isMain = mainPlayerHeroController.GetHeroId() == sId;
-                secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, firstPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, isMain);
-                if (isMain) mainPlayerHeroController = secondPlayerHeroController;
+                secondPlayerHeroController = newHero;
+
+                secondPlayerHeroController.InitHero(
+                    heroDt,
+                    this,
+                    playerCamController,
+                    skillObjTrans,
+                    firstPlayerHeroController != null ? firstPlayerHeroController.transform : null,
+                    subFollow,
+                    HeroAttackType.Knight,
+                    false,
+                    isMain);
+
+                if (isMain)
+                {
+                    mainPlayerHeroController = secondPlayerHeroController;
+                    mainFollow.SetFollowTarget(secondPlayerHeroController.transform);
+                }
+
                 subFollow.SetFollowTarget(secondPlayerHeroController.transform);
             }
+
+            if (firstPlayerHeroController != null && secondPlayerHeroController != null)
+            {
+                firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
+                secondPlayerHeroController.SetPartner(firstPlayerHeroController.transform);
+            }
         }
-        
+
         public void InitSwitchableHeroIds()
         {
             // asign to 1 and 2
             switchHeroIds.Clear();
-            switchHeroIds = new List<int>() { 1, 2 };
+            switchHeroIds = new List<int>() { 1, 3 };
         }
 
         private async UniTask InitPlayerHeroById(bool isSwitch = false)
         {
-            for(int i = 0; i < switchHeroIds.Count; i++)
+            for (int i = 0; i < switchHeroIds.Count; i++)
             {
                 var id = switchHeroIds[i];
                 var heroDt = MasterDataCache.Instance.GetHeroDataById(id);
                 await SpawnHero(heroDt, i == 0);
-            }          
-            
+            }
+
             await UniTask.Delay(1000);
         }
 
         private async UniTask SpawnHero(HeroDataSO heroDt, bool isMain = true)
         {
-            var (hero, b) = PoolController.Instance.Get<PlayerHeroController>(heroDt.PlayerHeroController, isMain ? Vector3.forward * 12 + Vector3.left * 1.5f : Vector3.forward * 12 + Vector3.right * 1.5f);
+            var (hero, b) = PoolController.Instance.Get<PlayerHeroController>(heroDt.PlayerHeroController,
+                isMain ? Vector3.forward * 12 + Vector3.left * 1.5f : Vector3.forward * 12 + Vector3.right * 1.5f);
             switchablePlayers[heroDt.Id] = hero;
             if (isMain)
             {
                 firstPlayerHeroController = hero;
-                firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, secondPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, true);
+                firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans,
+                    secondPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, true);
                 mainPlayerHeroController = firstPlayerHeroController;
                 mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
             }
             else
             {
                 secondPlayerHeroController = hero;
-                secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans, firstPlayerHeroController.transform ,subFollow , HeroAttackType.Knight, false, false);
+                secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans,
+                    firstPlayerHeroController.transform, subFollow, HeroAttackType.Knight, false, false);
                 firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
                 subFollow.SetFollowTarget(secondPlayerHeroController.transform);
             }
 
             await UniTask.Delay(1000);
         }
-        
+
         private void BuildBossDataLookup()
         {
             bossDataDict = new Dictionary<int, BossDataSO>();
@@ -208,8 +279,45 @@ namespace Scripts.Battle
         {
             if (mainPlayerHeroController.GetHeroId() == hId) return;
 
-            var hero = firstPlayerHeroController.GetHeroId() == hId ? firstPlayerHeroController : secondPlayerHeroController;
+            var hero = firstPlayerHeroController.GetHeroId() == hId
+                ? firstPlayerHeroController
+                : secondPlayerHeroController;
             mainPlayerHeroController = hero;
+        }
+
+        public List<int> GetCurrentSwitchHeroIds()
+        {
+            return new List<int>(switchHeroIds);
+        }
+
+        public bool IsHeroCurrentlyActive(int heroId)
+        {
+            return switchHeroIds.Contains(heroId);
+        }
+
+        public bool CanSwitchHero(int sourceHeroId, int targetHeroId)
+        {
+            if (sourceHeroId <= 0 || targetHeroId <= 0)
+                return false;
+
+            if (sourceHeroId == targetHeroId)
+                return false;
+
+            if (!switchHeroIds.Contains(sourceHeroId))
+                return false;
+
+            if (switchHeroIds.Contains(targetHeroId))
+                return false;
+
+            return true;
+        }
+
+        public void RequestSwitchHero(int sourceHeroId, int targetHeroId)
+        {
+            if (!CanSwitchHero(sourceHeroId, targetHeroId))
+                return;
+
+            OnChangeHero(sourceHeroId, targetHeroId);
         }
 
         private void HandleNextStage()
@@ -224,11 +332,12 @@ namespace Scripts.Battle
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
         }
-        
+
         private void HandleCurrentStage()
         {
             result = BattleResult.None;
-            SetState(BattleState.Initializing); ;
+            SetState(BattleState.Initializing);
+            ;
             InitStage(currentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
@@ -247,7 +356,7 @@ namespace Scripts.Battle
             deadCreepCount = losingStage ? gameData.maxCreepsPerStage : 0;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
             GameEventManager.Trigger(GameEvents.OnWaveStart);
-            
+
             isBossAlive = false;
             if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
             {
@@ -277,8 +386,9 @@ namespace Scripts.Battle
                 Debug.LogError($"[PvE] No rates found. patternId={patternId}, len={enemyIds.Length}");
             }
         }
-        
-        private bool TryGetChapterDataByStage(int stage, out ChapterStageSO chapterData, out int chapterIndex, out int localStage)
+
+        private bool TryGetChapterDataByStage(int stage, out ChapterStageSO chapterData, out int chapterIndex,
+            out int localStage)
         {
             chapterData = null;
             chapterIndex = -1;
@@ -358,7 +468,7 @@ namespace Scripts.Battle
             if (remaining <= 0 && !losingStage) return;
 
             int spawnNow = Mathf.Min(gameData.creepBatchSize, losingStage ? gameData.creepBatchSize : remaining);
-            
+
             int[] counts = AllocateCounts(spawnNow, rates);
             if (counts == null) return;
 
@@ -378,8 +488,8 @@ namespace Scripts.Battle
                     var basePos = spawnPoss[Random.Range(0, spawnPoss.Count)].position;
                     var nPos = basePos + new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f));
 
-                    var (creep,_) = PoolController.Instance.Get(creepData.CreepPrefab, nPos);
-                    if(k%5 == 0)
+                    var (creep, _) = PoolController.Instance.Get(creepData.CreepPrefab, nPos);
+                    if (k % 5 == 0)
                     {
                         creep.transform.localScale = Vector3.one * 1.5f;
                     }
@@ -387,6 +497,7 @@ namespace Scripts.Battle
                     {
                         creep.transform.localScale = Vector3.one;
                     }
+
                     int hid = creep.GetInstanceID();
                     BaseStat monsterStat = new BaseStat
                     {
@@ -398,7 +509,9 @@ namespace Scripts.Battle
                         MoveSpeed = creepData.BaseMoveSpeed,
                     };
                     var target = UnityEngine.Random.Range(0, 2);
-                    creep.InitMonster(hid, target == 0 ? firstPlayerHeroController:secondPlayerHeroController, this, monsterStat, false,new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });
+                    creep.InitMonster(hid, target == 0 ? firstPlayerHeroController : secondPlayerHeroController, this,
+                        monsterStat, false,
+                        new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });
 
                     creeps.Add(creep);
                     aliveCreepCount++;
@@ -439,7 +552,8 @@ namespace Scripts.Battle
                 AttackRange = bossSo.AttackRange
             };
 
-            currentBoss.InitMonster(bossSo.Id, mainPlayerHeroController, this, bossStat, true, new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });
+            currentBoss.InitMonster(bossSo.Id, mainPlayerHeroController, this, bossStat, true,
+                new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });
 
             firstPlayerHeroController.SetTarget(currentBoss);
             secondPlayerHeroController.SetTarget(currentBoss);
@@ -450,6 +564,7 @@ namespace Scripts.Battle
                 {
                     return;
                 }
+
                 GameEventManager.Trigger(GameEvents.OnStageLost);
             });
 
@@ -478,20 +593,21 @@ namespace Scripts.Battle
             if (State == newState) return;
             State = newState;
         }
-        
+
         public void NotifyMonsterDeath(MonsterScrepController creep)
         {
             if (creep == null) return;
             if (!creep.gameObject.activeInHierarchy) return;
-            
+
             PoolController.Instance.ReturnToPool(creep.gameObject);
             creeps.Remove(creep);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
-            deadCreepCount = losingStage ? GameData.Instance.maxCreepsPerStage : creep.IsBoss() ? deadCreepCount : deadCreepCount + 1;
+            deadCreepCount = losingStage ? GameData.Instance.maxCreepsPerStage :
+                creep.IsBoss() ? deadCreepCount : deadCreepCount + 1;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
             if (State != BattleState.FightingCreeps) return;
             if (aliveCreepCount != 0) return;
-            
+
             if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage)
             {
                 isReadyBattle = false;
@@ -502,11 +618,11 @@ namespace Scripts.Battle
 
             SpawnBoss();
         }
-        
+
         public MonsterScrepController GetNearestMonster(Vector3 pos)
         {
-            if(!isReadyBattle) return null;
-            
+            if (!isReadyBattle) return null;
+
             float nearest = float.MaxValue;
             MonsterScrepController target = null;
 
@@ -520,7 +636,9 @@ namespace Scripts.Battle
                     target = c;
                 }
             }
-            if (target == null && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy && !currentBoss.IsDead)
+
+            if (target == null && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy &&
+                !currentBoss.IsDead)
             {
                 target = currentBoss;
             }
@@ -530,7 +648,7 @@ namespace Scripts.Battle
 
         public MonsterScrepController GetFarestMonster(Vector3 pos)
         {
-            if(!isReadyBattle) return null;
+            if (!isReadyBattle) return null;
             float farest = 0;
             MonsterScrepController target = null;
 
@@ -545,7 +663,8 @@ namespace Scripts.Battle
                 }
             }
 
-            if (target == null && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy && !currentBoss.IsDead)
+            if (target == null && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy &&
+                !currentBoss.IsDead)
             {
                 target = currentBoss;
             }
@@ -632,7 +751,7 @@ namespace Scripts.Battle
 
             return null;
         }
-        
+
         private int[] AllocateCounts(int total, float[] weights)
         {
             int n = weights.Length;
@@ -643,6 +762,7 @@ namespace Scripts.Battle
                 if (weights[i] < 0) weights[i] = 0;
                 sum += weights[i];
             }
+
             if (sum <= 0f) return null;
 
             int[] counts = new int[n];
@@ -682,7 +802,7 @@ namespace Scripts.Battle
             else
                 spawnPoss = spawnPoss.OrderBy(_ => Random.value).ToList(); // shuffle
         }
-        
+
 
         private void BuildCreepDataLookup()
         {
@@ -706,7 +826,7 @@ namespace Scripts.Battle
 
             if (creepDataDict == null || creepDataDict.Count == 0) return false;
             if (!creepDataDict.TryGetValue(enemyId, out var data) || data == null) return false;
-            
+
             creepData = data;
 
             return creepData != null;
@@ -717,7 +837,7 @@ namespace Scripts.Battle
             var monster = creeps.Find(c => c.gameObject.activeInHierarchy);
             NotifyMonsterDeath(monster);
         }
-        
+
         public async UniTask NextStageCallback()
         {
             Debug.Log("[PvE] Next Stage");
@@ -734,7 +854,7 @@ namespace Scripts.Battle
         private async UniTask PlayCurrentStage()
         {
             Debug.Log("[PvE] Play Current Stage");
-            await UniTask.Delay(TimeSpan.FromSeconds(1.2f)); 
+            await UniTask.Delay(TimeSpan.FromSeconds(1.2f));
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
             firstPlayerHeroController.gameObject.SetActive(false);
             secondPlayerHeroController.gameObject.SetActive(false);
@@ -746,6 +866,5 @@ namespace Scripts.Battle
             firstPlayerHeroController.ResetHeroData();
             secondPlayerHeroController.ResetHeroData();
         }
-
     }
 }

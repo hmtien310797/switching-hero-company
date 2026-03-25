@@ -3,6 +3,7 @@ using System.Linq;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.HeroUIView
 {
@@ -15,6 +16,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private HeroUIIconConfigSO heroUIIconConfig;
         [SerializeField] private Transform contentRoot;
         [SerializeField] private HeroCollectionItemUI itemPrefab;
+        [SerializeField] private Button combatFormationButton;
 
         [Header("Element Filters")] [SerializeField]
         private HeroCollectionFilterButton allElementButton;
@@ -28,8 +30,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         [Header("Optional")] [SerializeField] private bool showOnlyAcquired = false;
 
-        private readonly List<HeroCollectionItemUI> spawnedItems = new();
-        private readonly List<HeroCollectionItemViewData> allItemsData = new();
+        public List<HeroCollectionItemUI> spawnedItems = new();
+        public List<HeroCollectionItemViewData> allItemsData = new();
 
         private ElementFilterMode currentElementFilter = ElementFilterMode.All;
         private HeroClassFilterMode currentHeroClassFilter = HeroClassFilterMode.All;
@@ -40,6 +42,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             InitFilters();
             RefreshAll();
+            combatFormationButton.onClick.AddListener(() => UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>());
         }
 
         public void RefreshAll()
@@ -52,6 +55,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             if (HeroProgressionManager.Instance != null)
                 HeroProgressionManager.Instance.OnHeroCollectionChanged += HandleHeroCollectionChanged;
+
+            RefreshAll();
         }
 
         private void OnDisable()
@@ -163,97 +168,18 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 var hero = heroDatabase.Heroes[i];
                 if (hero == null) continue;
 
-                var data = BuildItemData(hero, service);
-                allItemsData.Add(data);
+                var data = HeroCollectionItemViewDataFactory.Build(
+                    hero,
+                    heroDatabase,
+                    service,
+                    heroRarityVisualConfig,
+                    heroUIIconConfig);
+
+                if (data != null)
+                    allItemsData.Add(data);
             }
 
-            allItemsData.Sort(SortHeroData);
-        }
-
-        private HeroCollectionItemViewData BuildItemData(HeroDataSO hero, HeroProgressionService service)
-        {
-            var progressionConfig = heroDatabase.GetProgressionConfig(hero.Id);
-            bool isAcquired = service.HasHero(hero.Id);
-
-            HeroProgressTier displayTier = HeroProgressTier.Common;
-
-            if (isAcquired)
-            {
-                var owned = service.GetOrCreateOwnedHero(hero.Id);
-                displayTier = owned.CurrentTier;
-            }
-            else if (progressionConfig != null)
-            {
-                displayTier = progressionConfig.StartingTier;
-            }
-
-            var viewData = new HeroCollectionItemViewData
-            {
-                HeroId = hero.Id,
-                HeroName = hero.Name,
-                PortraitIcon = hero.PortraitIcon,
-                ShardIcon = hero.ShardIcon,
-                RarityIcon = heroRarityVisualConfig != null ? heroRarityVisualConfig.GetIcon(displayTier) : null,
-                ElementIcon = heroUIIconConfig != null ? heroUIIconConfig.GetElementIcon(hero.Element) : null,
-                HeroClassIcon = heroUIIconConfig != null ? heroUIIconConfig.GetHeroClassIcon(hero.HeroClass) : null,
-                IsAcquired = isAcquired,
-                SummonRarity = hero.SummonRarity,
-                Element = hero.Element,
-                HeroClass = hero.HeroClass,
-                DisplayTier = displayTier
-            };
-
-            if (!viewData.IsAcquired)
-            {
-                int maxStarAtStartingTier = progressionConfig != null
-                    ? progressionConfig.GetMaxStarInTier(displayTier)
-                    : 0;
-
-                viewData.CurrentStarInTier = 0;
-                viewData.MaxStarInTier = maxStarAtStartingTier;
-                viewData.CurrentShard = 0;
-                viewData.RequiredShardToNext = 0;
-                viewData.ProgressNormalized = 0f;
-                viewData.IsMaxNode = false;
-
-                return viewData;
-            }
-
-            var ownedData = service.GetOrCreateOwnedHero(hero.Id);
-            var currentNode = service.GetCurrentNode(hero.Id);
-            int maxStar = service.GetMaxStarInCurrentTier(hero.Id);
-
-            viewData.CurrentStarInTier = ownedData.CurrentStarInTier;
-            viewData.MaxStarInTier = maxStar;
-            viewData.CurrentShard = ownedData.CurrentShard;
-            viewData.IsMaxNode = currentNode == null || currentNode.IsMaxNode;
-
-            if (currentNode == null || currentNode.IsMaxNode)
-            {
-                viewData.RequiredShardToNext = 0;
-                viewData.ProgressNormalized = 1f;
-            }
-            else
-            {
-                viewData.RequiredShardToNext = currentNode.ShardCostToNext;
-                viewData.ProgressNormalized = currentNode.ShardCostToNext <= 0
-                    ? 0f
-                    : Mathf.Clamp01((float)ownedData.CurrentShard / currentNode.ShardCostToNext);
-            }
-
-            return viewData;
-        }
-
-        private int SortHeroData(HeroCollectionItemViewData a, HeroCollectionItemViewData b)
-        {
-            if (a.IsAcquired != b.IsAcquired)
-                return a.IsAcquired ? -1 : 1;
-
-            int tierCompare = b.DisplayTier.CompareTo(a.DisplayTier);
-            if (tierCompare != 0)
-                return tierCompare;
-
-            return a.HeroId.CompareTo(b.HeroId);
+            allItemsData.Sort(HeroCollectionItemViewDataFactory.Sort);
         }
 
         private void ApplyFiltersAndRebuild()
@@ -262,10 +188,16 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             var filtered = allItemsData.Where(PassFilter).ToList();
 
-            for (int i = 0; i < filtered.Count; i++)
+            foreach (var data in filtered)
             {
                 var item = Instantiate(itemPrefab, contentRoot);
-                item.Bind(filtered[i]);
+                item.Bind(data);
+                item.SetClickCallback(OnClickHeroItem);
+                item.SetButtonInteractable(true);
+                item.SetDimmed(false);
+                item.SetSelected(false);
+                item.SetReadyHighlight(false);
+
                 spawnedItems.Add(item);
             }
         }
@@ -288,6 +220,30 @@ namespace Immortal_Switch.Scripts.HeroUIView
             }
 
             return true;
+        }
+        
+        private void OnClickHeroItem(HeroCollectionItemUI item)
+        {
+            if (item == null || item.Data == null)
+                return;
+
+            if (currentSelectedItem != null && currentSelectedItem != item)
+            {
+                currentSelectedItem.SetSelected(false);
+                currentSelectedItem.SetReadyHighlight(false);
+            }
+
+            currentSelectedItem = item;
+            currentSelectedItem.SetSelected(true);
+            currentSelectedItem.SetReadyHighlight(false);
+
+            OpenHeroInfo(item.Data.HeroId);
+        }
+
+        private void OpenHeroInfo(int heroId)
+        {
+            Debug.Log($"Open hero info: {heroId}");
+            
         }
 
         private bool MatchElement(Element element, ElementFilterMode filter)

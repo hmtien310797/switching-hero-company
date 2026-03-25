@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.GachaSystem.HeroSummonView;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.UI;
@@ -32,8 +33,8 @@ public class BottomMainView : UIView
         // if (ButtonDungeon != null)
         //     ButtonDungeon.onClick.AddListener(() => OnToggleMain<DungeonView>().Forget());
 
-        // Add other buttons similarly:
-        // ButtonShop.onClick.AddListener(() => OnToggleMain<ShopView>().Forget());
+
+         ButtonShop.onClick.AddListener(() => OnToggleMain<HeroSummonView>().Forget());
          ButtonHero.onClick.AddListener(() => OnToggleMain<HeroCollectionView>().Forget());
 
         if (ButtonClose != null)

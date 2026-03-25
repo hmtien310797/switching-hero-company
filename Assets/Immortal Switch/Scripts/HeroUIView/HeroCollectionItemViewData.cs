@@ -1,8 +1,10 @@
-﻿using Immortal_Switch.Hero;
+﻿using System;
+using Immortal_Switch.Hero;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.HeroUIView
 {
+    [Serializable]
     public class HeroCollectionItemViewData
     {
         public int HeroId;

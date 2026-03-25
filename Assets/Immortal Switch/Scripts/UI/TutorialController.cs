@@ -25,6 +25,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private Coroutine coMoveAndFlash = null;
         private bool isWaitingForAction = false;
+        private bool isWaitingForChangeAction = false;
 
         public bool IsIntutorial => isIntutorial;
         public float moveSpeed = 500f;
@@ -42,7 +43,7 @@ namespace Immortal_Switch.Scripts.UI
             while(IsIntutorial)
             {
                 await UniTask.Delay(2000);
-                if (isWaitingForAction) continue;
+                if (isWaitingForAction || isWaitingForChangeAction) continue;
 
                 switch(currentIdx)
                 {
@@ -139,7 +140,7 @@ namespace Immortal_Switch.Scripts.UI
         public bool IsAbleActionCallback(Button inputBtn)
         {
             var inputRectTrans = inputBtn.GetComponent<RectTransform>();
-            if (!isWaitingForAction || inputRectTrans != curButtonSeleted) return false;
+            if (!isWaitingForAction || isWaitingForChangeAction || inputRectTrans != curButtonSeleted) return false;
 
             if(coMoveAndFlash != null)
             {
@@ -160,8 +161,10 @@ namespace Immortal_Switch.Scripts.UI
 
         private IEnumerator NextTutorial(float dur)
         {
-            yield return new WaitForSeconds(dur);
             isWaitingForAction = false;
+            isWaitingForChangeAction = true;
+            yield return new WaitForSeconds(dur);
+            isWaitingForChangeAction = false;
         }
     }
 }

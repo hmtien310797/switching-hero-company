@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.UI;
+﻿using System;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,8 +25,17 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private GameObject acquiredGroup;
         [SerializeField] private GameObject notAcquiredGroup;
         [SerializeField] private GameObject grayscaleOverlay;
+
+        [Tooltip("Viền chọn tĩnh")]
         [SerializeField] private GameObject selectedObject;
-        
+
+        [Tooltip("Glow sáng nhẹ / pulse khi đã chọn đủ source + target")]
+        [SerializeField] private GameObject readyHighlightObject;
+
+        [Header("Interaction")]
+        [SerializeField] private Button button;
+        [SerializeField] private CanvasGroup canvasGroup;
+
         [Header("Tier Background")]
         [SerializeField] private Image backgroundImage;
         [SerializeField] private UIGradient gradient;
@@ -37,6 +47,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private GameObject emptyStarPrefab;
 
         private HeroCollectionItemViewData currentData;
+        private Action<HeroCollectionItemUI> onClick;
 
         public HeroCollectionItemViewData Data => currentData;
 
@@ -74,7 +85,9 @@ namespace Immortal_Switch.Scripts.HeroUIView
                     if (progressFill != null)
                         progressFill.fillAmount = data.ProgressNormalized;
                 }
+
                 RefreshStars(data.CurrentStarInTier, data.MaxStarInTier);
+                ApplyTierVisual(data);
             }
             else
             {
@@ -83,20 +96,47 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
                 if (progressFill != null)
                     progressFill.fillAmount = 0f;
-                
+
                 RefreshStars(0, 0);
+
+                if (gradient != null)
+                    gradient.enabled = false;
+
+                if (backgroundImage != null)
+                {
+                    backgroundImage.sprite = null;
+                    backgroundImage.color = new Color(0.3f, 0.3f, 0.3f);
+                }
             }
 
             SetSelected(false);
-            if (data.IsAcquired)
+            SetReadyHighlight(false);
+            SetDimmed(false);
+            SetButtonInteractable(true);
+        }
+
+        public void SetClickCallback(Action<HeroCollectionItemUI> clickCallback)
+        {
+            onClick = clickCallback;
+
+            if (button != null)
             {
-                ApplyTierVisual(data);
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(HandleClick);
             }
-            else
-            {
-                if (gradient != null) gradient.enabled = false;
-                backgroundImage.color = new Color(0.3f, 0.3f, 0.3f);
-            }
+        }
+
+        public void ClearClickCallback()
+        {
+            onClick = null;
+
+            if (button != null)
+                button.onClick.RemoveAllListeners();
+        }
+
+        private void HandleClick()
+        {
+            onClick?.Invoke(this);
         }
 
         public void SetSelected(bool isSelected)
@@ -104,7 +144,31 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (selectedObject != null)
                 selectedObject.SetActive(isSelected);
         }
-        
+
+        public void SetReadyHighlight(bool isReady)
+        {
+            if (readyHighlightObject != null)
+                readyHighlightObject.SetActive(isReady);
+        }
+
+        public void SetButtonInteractable(bool interactable)
+        {
+            if (button != null)
+                button.interactable = interactable;
+
+            if (canvasGroup != null)
+            {
+                canvasGroup.interactable = interactable;
+                canvasGroup.blocksRaycasts = interactable;
+            }
+        }
+
+        public void SetDimmed(bool dimmed)
+        {
+            if (canvasGroup != null)
+                canvasGroup.alpha = dimmed ? 0.45f : 1f;
+        }
+
         private void ApplyTierVisual(HeroCollectionItemViewData data)
         {
             if (tierVisualConfig == null || backgroundImage == null)
@@ -134,7 +198,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 backgroundImage.color = Color.white;
             }
         }
-        
+
         private void RefreshStars(int current, int max)
         {
             if (starRoot == null) return;
@@ -145,7 +209,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
             for (int i = 0; i < max; i++)
             {
                 var prefab = i < current ? starPrefab : emptyStarPrefab;
-                Instantiate(prefab, starRoot);
+                if (prefab != null)
+                    Instantiate(prefab, starRoot);
             }
         }
     }

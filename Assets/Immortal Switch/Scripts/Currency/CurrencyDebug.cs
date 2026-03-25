@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Currency
@@ -7,21 +8,21 @@ namespace Immortal_Switch.Scripts.Currency
         [SerializeField] private CurrencyType currencyType = CurrencyType.Gold;
         [SerializeField] private int amount = 100;
 
-        [ContextMenu("Add Currency")]
+        [Button]
         public void AddCurrency()
         {
             CurrencyManager.Instance.Add(currencyType, amount);
             Debug.Log($"Added {amount} {currencyType}. Current = {CurrencyManager.Instance.Get(currencyType)}");
         }
 
-        [ContextMenu("Spend Currency")]
+        [Button]
         public void SpendCurrency()
         {
             bool result = CurrencyManager.Instance.Spend(currencyType, amount);
             Debug.Log($"Spend {amount} {currencyType} => {result}. Current = {CurrencyManager.Instance.Get(currencyType)}");
         }
 
-        [ContextMenu("Set Currency")]
+        [Button]
         public void SetCurrency()
         {
             CurrencyManager.Instance.Set(currencyType, amount);

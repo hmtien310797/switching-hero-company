@@ -304,17 +304,15 @@ namespace Scripts.Battle
         {
             var dur = BaseAnimController.GetDurByAnimName(animName);
             yield return new WaitForSeconds(dur);
-            yield return DoActivePassive(endAct);
+            DoActivePassive(endAct);
         }
 
-        private IEnumerator DoActivePassive(Action endAct)
+        private void DoActivePassive(Action endAct)
         {
             var isShow = UnityEngine.Random.Range(0, 3) == 0;
             if (isShow)
             {
-                var dur = BaseAnimController.GetDurByAnimName(StandAnimName.PassiveSwitch);
-                BaseAnimController?.PlayAmin(StandAnimName.PassiveSwitch, 1, false);
-                yield return new WaitForSeconds(dur);
+                BaseAnimController.AddPassiveAnim(5f);
                 endAct?.Invoke();
             }
             else
@@ -323,7 +321,7 @@ namespace Scripts.Battle
 
         private void DoHitSwitchEventAction()
         {
-            playerHeroController?.AttackByArea(transform.position, 5f, 1);
+            playerHeroController?.AttackByArea(transform.position, playerHeroController.GetSwitchArea, 1);
         }
 
         public override void DoWin(Action endAct)

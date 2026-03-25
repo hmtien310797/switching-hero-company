@@ -31,7 +31,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             confirmAction = onConfirm;
 
             if (messageText != null)
-                messageText.text = $"Không đủ Hero Ticket.\nLần quay này sẽ dùng {gemCost} Diamond.\nXác nhận?";
+                messageText.text = $"Not enough Hero Tickets.\nThis summon will cost {gemCost} Diamonds.\nConfirm?";
 
             if (skipToggle != null)
                 skipToggle.isOn = HeroSummonManager.Instance != null &&
