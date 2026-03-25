@@ -116,11 +116,6 @@ namespace Editor
 
             GUILayout.Space(8);
 
-            if (GUILayout.Button("Refresh All Bridges In Scene"))
-            {
-                HeroProgressionManager.Instance.RefreshAllHeroBridgesInScene();
-            }
-
             GUI.backgroundColor = Color.red;
             if (GUILayout.Button("CLEAR ALL HERO DATA"))
             {

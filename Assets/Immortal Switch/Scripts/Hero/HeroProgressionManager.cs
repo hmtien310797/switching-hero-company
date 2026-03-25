@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Immortal_Switch.Hero
@@ -16,6 +17,7 @@ namespace Immortal_Switch.Hero
         public HeroProgressionService Service => service;
         public HeroProgressionDatabaseSO Database => database;
         public event Action<HeroCollectionChangedArgs> OnHeroCollectionChanged;
+        private readonly Dictionary<int, List<HeroProgressionRuntimeBridge>> heroBridges = new();
 
         private void Awake()
         {
@@ -69,14 +71,16 @@ namespace Immortal_Switch.Hero
 
         public bool UpgradeHero(int heroId)
         {
-            bool result = service.UpgradeHero(heroId);
-            if (result)
-            {
-                Save();
-                NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroUpgraded);
-            }
+            if (service == null) return false;
 
-            return result;
+            bool result = service.UpgradeHero(heroId);
+            if (!result) return false;
+
+            Save();
+            NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroUpgraded);
+            RefreshHeroRuntime(heroId);
+
+            return true;
         }
         
         public void ResetHero(int heroId)
@@ -99,6 +103,7 @@ namespace Immortal_Switch.Hero
 
             Save();
             NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroReset);
+            RefreshHeroRuntime(heroId);
         }
         
         public void ResetHeroProgress(int heroId)
@@ -121,6 +126,7 @@ namespace Immortal_Switch.Hero
 
             Save();
             NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroReset);
+            RefreshHeroRuntime(heroId);
         }
         
         public void ClearAllHeroData()
@@ -131,9 +137,18 @@ namespace Immortal_Switch.Hero
             if (ES3.KeyExists(saveKey))
                 ES3.DeleteKey(saveKey);
 
-            Debug.Log("All hero progression data cleared.");
-
             NotifyHeroCollectionChanged(-1, HeroCollectionChangeType.AllReset);
+
+            var allLists = new List<List<HeroProgressionRuntimeBridge>>(heroBridges.Values);
+            for (int i = 0; i < allLists.Count; i++)
+            {
+                var list = allLists[i];
+                for (int j = 0; j < list.Count; j++)
+                {
+                    if (list[j] != null)
+                        list[j].RefreshFromProgression();
+                }
+            }
         }
         
         private void NotifyHeroCollectionChanged(int heroId, HeroCollectionChangeType changeType)
@@ -145,21 +160,66 @@ namespace Immortal_Switch.Hero
             });
         }
         
+        public void RegisterBridge(int heroId, HeroProgressionRuntimeBridge bridge)
+        {
+            if (bridge == null) return;
+
+            if (!heroBridges.TryGetValue(heroId, out var list))
+            {
+                list = new List<HeroProgressionRuntimeBridge>();
+                heroBridges[heroId] = list;
+            }
+
+            if (!list.Contains(bridge))
+                list.Add(bridge);
+        }
+
+        public void UnregisterBridge(int heroId, HeroProgressionRuntimeBridge bridge)
+        {
+            if (bridge == null) return;
+            if (!heroBridges.TryGetValue(heroId, out var list)) return;
+
+            list.Remove(bridge);
+
+            if (list.Count == 0)
+                heroBridges.Remove(heroId);
+        }
+        
+        private void RefreshHeroRuntime(int heroId)
+        {
+            if (!heroBridges.TryGetValue(heroId, out var list)) return;
+
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                var bridge = list[i];
+                if (bridge == null)
+                {
+                    list.RemoveAt(i);
+                    continue;
+                }
+
+                bridge.RefreshFromProgression();
+            }
+
+            if (list.Count == 0)
+                heroBridges.Remove(heroId);
+        }
+        
         public void AcquireHeroIfNeeded(HeroDataSO hero)
         {
-            if (hero == null) return;
+            if (hero == null || service == null) return;
 
             bool unlocked = service.UnlockHero(hero);
-            if (unlocked)
-            {
-                Save();
-                NotifyHeroCollectionChanged(hero.Id, HeroCollectionChangeType.HeroUnlocked);
-            }
+            if (!unlocked) return;
+
+            Save();
+            NotifyHeroCollectionChanged(hero.Id, HeroCollectionChangeType.HeroUnlocked);
+            RefreshHeroRuntime(hero.Id);
         }
 
         public void AddShardToHero(HeroDataSO hero, int amount, bool acquireIfMissing = true)
         {
-            if (hero == null || amount <= 0) return;
+            if (hero == null || amount <= 0 || service == null) return;
 
             bool justUnlocked = false;
 
@@ -175,7 +235,9 @@ namespace Immortal_Switch.Hero
                 NotifyHeroCollectionChanged(hero.Id, HeroCollectionChangeType.HeroUnlocked);
 
             NotifyHeroCollectionChanged(hero.Id, HeroCollectionChangeType.ShardAdded);
+            RefreshHeroRuntime(hero.Id);
         }
+        
     }
     
     public enum HeroCollectionChangeType

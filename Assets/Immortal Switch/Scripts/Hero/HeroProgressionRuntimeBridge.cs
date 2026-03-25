@@ -11,6 +11,8 @@ namespace Immortal_Switch.Hero
         [SerializeField] private PlayerHeroController playerHeroController;
         [SerializeField] private StatsController statsController;
 
+        private int registeredHeroId = -1;
+
         public HeroDataSO HeroData => heroData;
         public PlayerHeroController PlayerHeroController => playerHeroController;
         public StatsController StatsController => statsController;
@@ -29,8 +31,20 @@ namespace Immortal_Switch.Hero
             }
         }
 
+        private void OnEnable()
+        {
+            TryRegister();
+        }
+
+        private void OnDisable()
+        {
+            TryUnregister();
+        }
+
         public void Setup(HeroDataSO data, PlayerHeroController controller = null)
         {
+            TryUnregister();
+
             heroData = data;
 
             if (controller != null)
@@ -38,16 +52,26 @@ namespace Immortal_Switch.Hero
 
             if (playerHeroController != null && statsController == null)
                 statsController = playerHeroController.Stats;
+
+            TryRegister();
         }
 
-        public void EnsureUnlocked()
+        private void TryRegister()
         {
-            if (heroData == null || HeroProgressionManager.Instance == null) return;
+            if (heroData == null) return;
+            if (HeroProgressionManager.Instance == null) return;
 
-            if (!HeroProgressionManager.Instance.Service.HasHero(heroData.Id))
-            {
-                HeroProgressionManager.Instance.UnlockHero(heroData);
-            }
+            registeredHeroId = heroData.Id;
+            HeroProgressionManager.Instance.RegisterBridge(registeredHeroId, this);
+        }
+
+        private void TryUnregister()
+        {
+            if (registeredHeroId < 0) return;
+            if (HeroProgressionManager.Instance == null) return;
+
+            HeroProgressionManager.Instance.UnregisterBridge(registeredHeroId, this);
+            registeredHeroId = -1;
         }
 
         public void RefreshFromProgression()
@@ -69,8 +93,6 @@ namespace Immortal_Switch.Hero
                 Debug.LogWarning("HeroProgressionRuntimeBridge: HeroProgressionManager not found");
                 return;
             }
-
-            EnsureUnlocked();
 
             var stat = HeroProgressionManager.Instance.Service.GetCurrentStats(heroData.Id);
             if (stat == null)
@@ -100,46 +122,6 @@ namespace Immortal_Switch.Hero
             module.SetBaseStat(StatType.MoveSpeed, stat.MoveSpeed);
             module.SetBaseStat(StatType.CritChance, stat.CritChance);
             module.SetBaseStat(StatType.CritDamage, stat.CritDamage);
-        }
-
-        // ===== Debug helpers =====
-
-        public void AddShardDebug(int amount)
-        {
-            if (heroData == null || HeroProgressionManager.Instance == null) return;
-
-            EnsureUnlocked();
-            HeroProgressionManager.Instance.AddShard(heroData.Id, amount);
-        }
-
-        public void TryUpgradeDebug()
-        {
-            if (heroData == null || HeroProgressionManager.Instance == null) return;
-
-            EnsureUnlocked();
-
-            if (HeroProgressionManager.Instance.UpgradeHero(heroData.Id))
-            {
-                RefreshFromProgression();
-            }
-        }
-
-        public string GetDebugInfo()
-        {
-            if (heroData == null || HeroProgressionManager.Instance == null || HeroProgressionManager.Instance.Service == null)
-                return "Missing HeroData or HeroProgressionManager";
-
-            EnsureUnlocked();
-
-            var service = HeroProgressionManager.Instance.Service;
-            var owned = service.GetOrCreateOwnedHero(heroData.Id);
-            var currentNode = service.GetCurrentNode(heroData.Id);
-            int maxStar = service.GetMaxStarInCurrentTier(heroData.Id);
-
-            if (owned == null || currentNode == null)
-                return "Owned data or current node is null";
-
-            return $"Hero: {heroData.Name} ({heroData.Id}) | Tier: {owned.CurrentTier} | Star: {owned.CurrentStarInTier}/{maxStar} | Shard: {owned.CurrentShard} | CostToNext: {(currentNode.IsMaxNode ? 0 : currentNode.ShardCostToNext)}";
         }
     }
 }

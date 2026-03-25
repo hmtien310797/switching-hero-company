@@ -123,7 +123,7 @@ namespace Immortal_Switch.Hero
             owned.CurrentShard -= currentNode.ShardCostToNext;
             owned.CurrentTier = currentNode.NextTier;
             owned.CurrentStarInTier = currentNode.NextStarInTier;
-
+            
             return true;
         }
 
