@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 using Scripts.Common;
+using Scripts.UI;
 using Random = UnityEngine.Random;
 
 #if UNITY_EDITOR
@@ -140,9 +141,9 @@ namespace Scripts.Battle
             if (oldHero == null)
                 return;
 
-            bool isMain = mainPlayerHeroController != null && mainPlayerHeroController.GetHeroId() == sId;
+            bool wasMain = mainPlayerHeroController != null &&
+                           mainPlayerHeroController.GetHeroId() == sId;
             Vector3 spawnPos = oldHero.transform.position;
-
             var heroDt = MasterDataCache.Instance.GetHeroDataById(tId);
             if (heroDt == null)
                 return;
@@ -155,7 +156,6 @@ namespace Scripts.Battle
             if (switchablePlayers.ContainsKey(sId))
                 switchablePlayers.Remove(sId);
 
-            // Tắt hero cũ, chỗ này tùy PoolController project của bạn
             oldHero.gameObject.SetActive(false);
 
             var (newHero, isNewInstance) = PoolController.Instance.Get(heroDt.PlayerHeroController, spawnPos);
@@ -167,6 +167,10 @@ namespace Scripts.Battle
             if (replaceFirst)
             {
                 firstPlayerHeroController = newHero;
+                if (wasMain)
+                {
+                    mainPlayerHeroController = firstPlayerHeroController;
+                }
 
                 firstPlayerHeroController.InitHero(
                     heroDt,
@@ -177,17 +181,18 @@ namespace Scripts.Battle
                     mainFollow,
                     HeroAttackType.Archer,
                     false,
-                    isMain);
+                    wasMain
+                );
 
-                if (isMain)
-                {
-                    mainPlayerHeroController = firstPlayerHeroController;
-                    mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
-                }
+                RefreshBattleUISlot(firstPlayerHeroController, true, tId);
             }
             else
             {
                 secondPlayerHeroController = newHero;
+                if (wasMain)
+                {
+                    mainPlayerHeroController = secondPlayerHeroController;
+                }
 
                 secondPlayerHeroController.InitHero(
                     heroDt,
@@ -198,15 +203,10 @@ namespace Scripts.Battle
                     subFollow,
                     HeroAttackType.Knight,
                     false,
-                    isMain);
+                    wasMain
+                );
 
-                if (isMain)
-                {
-                    mainPlayerHeroController = secondPlayerHeroController;
-                    mainFollow.SetFollowTarget(secondPlayerHeroController.transform);
-                }
-
-                subFollow.SetFollowTarget(secondPlayerHeroController.transform);
+                RefreshBattleUISlot(secondPlayerHeroController, false, tId);
             }
 
             if (firstPlayerHeroController != null && secondPlayerHeroController != null)
@@ -214,6 +214,22 @@ namespace Scripts.Battle
                 firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
                 secondPlayerHeroController.SetPartner(firstPlayerHeroController.transform);
             }
+        }
+        
+
+        private void RefreshBattleUISlot(PlayerHeroController heroController, bool isFirstSlot, int heroId)
+        {
+            if (heroController == null) return;
+
+            var heroData = MasterDataCache.Instance.GetHeroDataById(heroId);
+            if (heroData == null) return;
+
+            UIHeroBattleController.Instance?.ReplaceHeroSlot(
+                heroController,
+                isFirstSlot,
+                heroId,
+                heroController.SkillIdDict
+            );
         }
 
         public void InitSwitchableHeroIds()

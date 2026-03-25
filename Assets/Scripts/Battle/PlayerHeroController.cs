@@ -79,6 +79,7 @@ namespace Scripts.Battle
         private bool isInSwitchAction = false;
         private readonly Vector3 heroSpawnPosition = new Vector3(0f, 0f, 12f);
         private bool isValid = false;
+        [SerializeField]
         private bool isMain = false;
         private Transform partnerTrans = null;
         private HeroDataSO baseHeroData;
@@ -88,7 +89,8 @@ namespace Scripts.Battle
         private FollowHeroController followHeroController;
         private HeroAttackType heroAttackType;
         private Dictionary<SkillSlot, int> skillIdDict = new Dictionary<SkillSlot, int>();
-
+        
+        public Dictionary<SkillSlot, int> SkillIdDict => skillIdDict;
         public MonsterScrepController MonsterTarget { get => _monsterTarget; set => _monsterTarget = value; }
         public FollowHeroController FollowHeroController { get => followHeroController; set => followHeroController = value; }
         public HeroAttackType HeroAttackType { get => heroAttackType; set => heroAttackType = value; }

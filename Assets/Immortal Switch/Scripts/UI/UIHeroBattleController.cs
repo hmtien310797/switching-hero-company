@@ -295,7 +295,11 @@ namespace Scripts.UI
 
         private void DoSkillAction(HeroNameAction hak)
         {
-            if (isAutoSkilling || mainHeroData.playerHeroController.IsInAction()) return;
+            if (isAutoSkilling) return;
+            if (mainHeroData == null) return;
+            if (mainHeroData.playerHeroController == null) return;
+            if (mainHeroData.playerHeroController.IsInAction()) return;
+            if (!mainHeroData.callbackActs.ContainsKey(hak)) return;
 
             SetShowCover(hak);
             mainHeroData.callbackActs[hak]?.Invoke();
@@ -384,40 +388,77 @@ namespace Scripts.UI
             sprites[slot] = null;
         }
 
-        public void RegisterActionByIdx(HeroNameAction idx, Action fAct, float interval, bool hasCoolDown = true , bool isFirst = true)
+        public void RegisterActionByIdx(HeroNameAction idx, Action fAct, float interval, bool hasCoolDown = true, bool isFirst = true)
         {
-            if(isFirst)
+            var data = isFirst ? firstHeroData : secondHeroData;
+
+            data.callbackActs[idx] = fAct;
+            data.intervalCoolings[idx] = interval;
+
+            if (hasCoolDown)
             {
-                if (!firstHeroData.callbackActs.ContainsKey(idx))
-                {
-                    firstHeroData.callbackActs[idx] = fAct;
-                }
+                if (!data.timerCoolings.ContainsKey(idx))
+                    data.timerCoolings[idx] = interval;
+            }
+            else
+            {
+                if (data.timerCoolings.ContainsKey(idx))
+                    data.timerCoolings.Remove(idx);
+            }
+        }
+        
+        private void ResetHeroSlotData(CoolingData data)
+        {
+            bool keepIsMain = data.isMain;
 
-                if (!firstHeroData.intervalCoolings.ContainsKey(idx))
-                {
-                    firstHeroData.intervalCoolings.Add(idx, interval);
-                }
+            data.callbackActs.Clear();
+            data.intervalCoolings.Clear();
+            data.timerCoolings.Clear();
+            data.playerHeroController = null;
+            data.Hid = 0;
+            data.isMain = keepIsMain;
+        }
+        
+        public void ReplaceHeroSlot(PlayerHeroController phc, bool isFirstSlot, int hid, Dictionary<SkillSlot, int> skillIds)
+        {
+            var data = isFirstSlot ? firstHeroData : secondHeroData;
+            //ResetHeroSlotData(data);
 
-                if (!firstHeroData.timerCoolings.ContainsKey(idx) && hasCoolDown)
+            data.Hid = hid;
+            data.playerHeroController = phc;
+
+            var newSprites = new List<Sprite>()
+            {
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
+                phc.UISprite.SwithSkillIcon
+            };
+
+            if (isFirstSlot)
+            {
+                firstIconHead = phc.UISprite.GetHeadIcon;
+                firstSprites = newSprites;
+                uISwitchHeroController?.ChangeIconByIdx(0, firstIconHead);
+
+                if (firstHeroData.isMain)
                 {
-                    firstHeroData.timerCoolings.Add(idx, interval);
+                    mainHeroData = firstHeroData;
+                    AppLySpriteSkillByIdx(true);
                 }
             }
             else
             {
-                if (!secondHeroData.callbackActs.ContainsKey(idx))
-                {
-                    secondHeroData.callbackActs[idx] = fAct;
-                }
+                secondIconHead = phc.UISprite.GetHeadIcon;
+                secondSprites = newSprites;
+                uISwitchHeroController?.ChangeIconByIdx(1, secondIconHead);
 
-                if (!secondHeroData.intervalCoolings.ContainsKey(idx))
+                if (secondHeroData.isMain)
                 {
-                    secondHeroData.intervalCoolings.Add(idx, interval);
-                }
-
-                if (!secondHeroData.timerCoolings.ContainsKey(idx) && hasCoolDown)
-                {
-                    secondHeroData.timerCoolings.Add(idx, interval);
+                    mainHeroData = secondHeroData;
+                    AppLySpriteSkillByIdx(false);
                 }
             }
         }
