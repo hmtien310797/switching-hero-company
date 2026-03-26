@@ -44,7 +44,7 @@ namespace Immortal_Switch.Hero
     public enum HeroClass
     {
         Warrior,
-        Assassin,
+        Knight,
         Archer,
         Mage
     }

@@ -308,12 +308,10 @@ namespace Scripts.UI
 
         public void SetPlayerHeroInstance(PlayerHeroController phc, bool isMain, int hid, Dictionary<SkillSlot,int> skillIds)
         {
-            InitUIHeros(isMain, hid);
-
             if (isMain)
             {
                 firstHeroData.playerHeroController = phc;
-                firstIconHead = firstHeroData.playerHeroController.UISprite.GetHeadIcon;
+                firstIconHead = firstHeroData.playerHeroController.HeroIcon;
                 uISwitchHeroController?.ChangeIconByIdx(0, firstIconHead);
                 firstSprites.Clear();
                 firstSprites = new List<Sprite>()
@@ -329,7 +327,7 @@ namespace Scripts.UI
             else
             {
                 secondHeroData.playerHeroController = phc;
-                secondIconHead = secondHeroData.playerHeroController.UISprite.GetHeadIcon;
+                secondIconHead = secondHeroData.playerHeroController.HeroIcon;
                 uISwitchHeroController?.ChangeIconByIdx(1, secondIconHead);
                 secondSprites.Clear();
                 secondSprites = new List<Sprite>()
@@ -342,7 +340,7 @@ namespace Scripts.UI
                     secondHeroData.playerHeroController.UISprite.SwithSkillIcon
                 };
             }
-            
+            InitUIHeros(isMain, hid);
             uISwitchHeroController?.RegisterActionByIdx(ChangeMainHeroByIdx);
         }
 
@@ -439,7 +437,7 @@ namespace Scripts.UI
 
             if (isFirstSlot)
             {
-                firstIconHead = phc.UISprite.GetHeadIcon;
+                firstIconHead = phc.HeroIcon;
                 firstSprites = newSprites;
                 uISwitchHeroController?.ChangeIconByIdx(0, firstIconHead);
 
@@ -451,7 +449,7 @@ namespace Scripts.UI
             }
             else
             {
-                secondIconHead = phc.UISprite.GetHeadIcon;
+                secondIconHead = phc.HeroIcon;
                 secondSprites = newSprites;
                 uISwitchHeroController?.ChangeIconByIdx(1, secondIconHead);
 

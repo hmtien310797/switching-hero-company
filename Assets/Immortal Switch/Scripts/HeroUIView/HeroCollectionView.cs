@@ -264,7 +264,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             switch (filter)
             {
                 case HeroClassFilterMode.Warrior: return heroClass == HeroClass.Warrior;
-                case HeroClassFilterMode.Assassin: return heroClass == HeroClass.Assassin;
+                case HeroClassFilterMode.Assassin: return heroClass == HeroClass.Knight;
                 case HeroClassFilterMode.Tank: return heroClass == HeroClass.Archer;
                 case HeroClassFilterMode.Mage: return heroClass == HeroClass.Mage;
                 default: return true;

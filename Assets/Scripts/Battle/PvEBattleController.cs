@@ -306,11 +306,6 @@ namespace Scripts.Battle
             return new List<int>(switchHeroIds);
         }
 
-        public bool IsHeroCurrentlyActive(int heroId)
-        {
-            return switchHeroIds.Contains(heroId);
-        }
-
         public bool CanSwitchHero(int sourceHeroId, int targetHeroId)
         {
             if (sourceHeroId <= 0 || targetHeroId <= 0)
@@ -881,6 +876,28 @@ namespace Scripts.Battle
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             firstPlayerHeroController.ResetHeroData();
             secondPlayerHeroController.ResetHeroData();
+        }
+
+        public bool IsHeroCurrentlyActive(int heroId)
+        {
+            if (heroId <= 0) return false;
+            return switchHeroIds.Contains(heroId);
+        }
+
+        public int GetFirstActiveHeroId()
+        {
+            if (switchHeroIds == null || switchHeroIds.Count <= 0)
+                return -1;
+
+            return switchHeroIds[0];
+        }
+
+        public int GetSecondActiveHeroId()
+        {
+            if (switchHeroIds == null || switchHeroIds.Count <= 1)
+                return -1;
+
+            return switchHeroIds[1];
         }
     }
 }

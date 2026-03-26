@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.UI;
 using Scripts.Battle;
@@ -32,54 +34,64 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private CanvasGroup confirmCanvasGroup;
         [SerializeField] private GameObject confirmReadyObject;
         [SerializeField] private GameObject confirmDisabledObject;
+        
+        [Header("Source Select Hint")]
+        [SerializeField] private RectTransform slot1Arrow;
+        [SerializeField] private RectTransform slot2Arrow;
+        [SerializeField] private float arrowMoveDistance = 18f;
+        [SerializeField] private float arrowMoveDuration = 0.55f;
 
         private readonly List<HeroCollectionItemUI> spawnedItems = new();
+        private PvEBattleController battleController;
 
         private int selectedSourceHeroId = -1;
         private int selectedTargetHeroId = -1;
-        private HeroCollectionItemUI selectedTargetItem;
-        private PvEBattleController battleController;
+        
+        private Tween slot1ArrowTween;
+        private Tween slot2ArrowTween;
 
-        private void Awake()
-        {
-            battleController = PvEBattleController.Instance;
-        }
+        private Vector2 slot1ArrowAnchoredPos;
+        private Vector2 slot2ArrowAnchoredPos;
 
         private void OnEnable()
         {
             RefreshView();
         }
 
+        private void OnDisable()
+        {
+            StopSourceArrowHint();
+        }
+
+        private void OnDestroy()
+        {
+            StopSourceArrowHint();
+        }
+
+        private void Awake()
+        {
+            battleController = PvEBattleController.Instance;
+            if (slot1Arrow != null)
+                slot1ArrowAnchoredPos = slot1Arrow.anchoredPosition;
+
+            if (slot2Arrow != null)
+                slot2ArrowAnchoredPos = slot2Arrow.anchoredPosition;
+        }
+
         public void RefreshView()
         {
-            if (battleController == null)
-            {
-                Debug.LogWarning("HeroSwitchPopupView missing battleController.");
+            if (battleController == null || heroDatabase == null)
                 return;
-            }
-
-            if (heroDatabase == null)
-            {
-                Debug.LogWarning("HeroSwitchPopupView missing heroDatabase.");
-                return;
-            }
 
             if (HeroProgressionManager.Instance == null || HeroProgressionManager.Instance.Service == null)
-            {
-                Debug.LogWarning("HeroSwitchPopupView missing HeroProgressionManager.");
                 return;
-            }
 
             var activeIds = battleController.GetCurrentSwitchHeroIds();
             if (activeIds == null || activeIds.Count < 2)
-            {
-                Debug.LogWarning("HeroSwitchPopupView active hero ids invalid.");
                 return;
-            }
 
             selectedSourceHeroId = -1;
             selectedTargetHeroId = -1;
-            selectedTargetItem = null;
 
             BindTopSlots(activeIds);
             RebuildCandidateList(activeIds);
@@ -99,11 +111,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
             var data2 = HeroCollectionItemViewDataFactory.Build(
                 hero2, heroDatabase, service, heroRarityVisualConfig, heroUIIconConfig);
 
-            if (slot1UI != null)
-                slot1UI.Bind(1, data1, OnClickSourceSlot);
-
-            if (slot2UI != null)
-                slot2UI.Bind(2, data2, OnClickSourceSlot);
+            slot1UI?.Bind(1, data1, OnClickSourceSlot);
+            slot2UI?.Bind(2, data2, OnClickSourceSlot);
         }
 
         private void RebuildCandidateList(List<int> activeIds)
@@ -128,19 +137,21 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 if (data == null) continue;
                 if (!data.IsAcquired) continue;
 
+                // QUAN TRỌNG: hero đang ở sân thì không được xuất hiện trong list
+                if (activeIds.Contains(data.HeroId)) continue;
+
                 allData.Add(data);
             }
 
             allData.Sort(HeroCollectionItemViewDataFactory.Sort);
 
-            for (int i = 0; i < allData.Count; i++)
+            foreach (var data in allData)
             {
-                var data = allData[i];
-                bool canSelect = !activeIds.Contains(data.HeroId);
-
                 var item = Instantiate(itemPrefab, contentRoot);
                 item.Bind(data);
                 item.SetClickCallback(OnClickCandidateItem);
+                item.SetButtonInteractable(true);
+                item.SetDimmed(false);
                 item.SetSelected(false);
                 item.SetReadyHighlight(false);
 
@@ -150,8 +161,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void OnClickSourceSlot(int heroId)
         {
-            if (heroId <= 0)
-                return;
+            if (heroId <= 0) return;
 
             selectedSourceHeroId = heroId;
             RefreshSelectionVisualState();
@@ -162,30 +172,20 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (item == null || item.Data == null)
                 return;
 
-            if (battleController == null)
-                return;
-
-            if (!battleController.CanSwitchHero(selectedSourceHeroId, item.Data.HeroId))
-            {
-                // Trường hợp chưa chọn source hoặc target không hợp lệ
-                if (selectedSourceHeroId <= 0)
-                    return;
-
-                // Nếu target không hợp lệ vì đang active thì cũng bỏ qua
-                if (battleController.IsHeroCurrentlyActive(item.Data.HeroId))
-                    return;
-            }
-
-            selectedTargetItem = item;
             selectedTargetHeroId = item.Data.HeroId;
-
             RefreshSelectionVisualState();
         }
 
         private bool HasValidSelection()
         {
-            return battleController != null &&
-                   battleController.CanSwitchHero(selectedSourceHeroId, selectedTargetHeroId);
+            if (battleController == null) return false;
+            if (selectedSourceHeroId <= 0) return false;
+            if (selectedTargetHeroId <= 0) return false;
+            if (selectedSourceHeroId == selectedTargetHeroId) return false;
+            if (!battleController.IsHeroCurrentlyActive(selectedSourceHeroId)) return false;
+            if (battleController.IsHeroCurrentlyActive(selectedTargetHeroId)) return false;
+
+            return true;
         }
 
         private void RefreshSelectionVisualState()
@@ -194,26 +194,33 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             if (instructionText != null)
             {
-                if (selectedSourceHeroId <= 0)
-                    instructionText.text = "Please select the hero to switch";
+                if (selectedSourceHeroId <= 0 && selectedTargetHeroId <= 0)
+                    instructionText.text = "Please select heroes";
+                else if (selectedSourceHeroId <= 0)
+                    instructionText.text = "Please select the hero to switch out";
                 else if (selectedTargetHeroId <= 0)
-                    instructionText.text = "Please select the hero to replace";
+                    instructionText.text = "Please select the hero to switch in";
                 else
                     instructionText.text = "Ready to switch";
             }
+            
+            if (selectedSourceHeroId <= 0)
+                PlaySourceArrowHint();
+            else
+                StopSourceArrowHint();
 
             if (slot1UI != null)
             {
-                bool isSelectedSource = slot1UI.HeroId == selectedSourceHeroId;
-                slot1UI.SetSelected(isSelectedSource);
-                slot1UI.SetReadyHighlight(ready && isSelectedSource);
+                bool selected = slot1UI.HeroId == selectedSourceHeroId;
+                slot1UI.SetSelected(selected);
+                slot1UI.SetReadyHighlight(ready && selected);
             }
 
             if (slot2UI != null)
             {
-                bool isSelectedSource = slot2UI.HeroId == selectedSourceHeroId;
-                slot2UI.SetSelected(isSelectedSource);
-                slot2UI.SetReadyHighlight(ready && isSelectedSource);
+                bool selected = slot2UI.HeroId == selectedSourceHeroId;
+                slot2UI.SetSelected(selected);
+                slot2UI.SetReadyHighlight(ready && selected);
             }
 
             for (int i = 0; i < spawnedItems.Count; i++)
@@ -221,9 +228,9 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 var item = spawnedItems[i];
                 if (item == null || item.Data == null) continue;
 
-                bool isSelectedTarget = item.Data.HeroId == selectedTargetHeroId;
-                item.SetSelected(isSelectedTarget);
-                item.SetReadyHighlight(ready && isSelectedTarget);
+                bool selected = item.Data.HeroId == selectedTargetHeroId;
+                item.SetSelected(selected);
+                item.SetReadyHighlight(ready && selected);
             }
 
             RefreshConfirmVisual(ready);
@@ -247,6 +254,56 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (confirmDisabledObject != null)
                 confirmDisabledObject.SetActive(!ready);
         }
+        
+        private void PlaySourceArrowHint()
+        {
+            StopSourceArrowHint();
+
+            if (slot1Arrow != null)
+            {
+                slot1Arrow.gameObject.SetActive(true);
+                slot1Arrow.anchoredPosition = slot1ArrowAnchoredPos;
+
+                slot1ArrowTween = slot1Arrow.DOAnchorPosY(
+                        slot1ArrowAnchoredPos.y - arrowMoveDistance,
+                        arrowMoveDuration)
+                    .SetEase(Ease.InOutSine)
+                    .SetLoops(-1, LoopType.Yoyo);
+            }
+
+            if (slot2Arrow != null)
+            {
+                slot2Arrow.gameObject.SetActive(true);
+                slot2Arrow.anchoredPosition = slot2ArrowAnchoredPos;
+
+                slot2ArrowTween = slot2Arrow.DOAnchorPosY(
+                        slot2ArrowAnchoredPos.y - arrowMoveDistance,
+                        arrowMoveDuration)
+                    .SetEase(Ease.InOutSine)
+                    .SetLoops(-1, LoopType.Yoyo);
+            }
+        }
+
+        private void StopSourceArrowHint()
+        {
+            slot1ArrowTween?.Kill();
+            slot2ArrowTween?.Kill();
+
+            slot1ArrowTween = null;
+            slot2ArrowTween = null;
+
+            if (slot1Arrow != null)
+            {
+                slot1Arrow.anchoredPosition = slot1ArrowAnchoredPos;
+                slot1Arrow.gameObject.SetActive(false);
+            }
+
+            if (slot2Arrow != null)
+            {
+                slot2Arrow.anchoredPosition = slot2ArrowAnchoredPos;
+                slot2Arrow.gameObject.SetActive(false);
+            }
+        }
 
         private void ConfirmSwitch()
         {
@@ -254,7 +311,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 return;
 
             battleController.RequestSwitchHero(selectedSourceHeroId, selectedTargetHeroId);
-            gameObject.SetActive(false);
+            UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
         }
 
         private void ClearItems()

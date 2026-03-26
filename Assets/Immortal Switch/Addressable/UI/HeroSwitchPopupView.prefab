@@ -40,7 +40,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 340, y: -270}
+  m_AnchoredPosition: {x: 340, y: -195}
   m_SizeDelta: {x: 250, y: 340}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &5745466351006442794
@@ -253,7 +253,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -340, y: -270}
+  m_AnchoredPosition: {x: -340, y: -195}
   m_SizeDelta: {x: 250, y: 340}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &8391878568016486516
@@ -352,7 +352,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -2067}
+  m_AnchoredPosition: {x: 0, y: -1974}
   m_SizeDelta: {x: 500, y: 150}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &5066400166974824043
@@ -522,7 +522,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -849}
+  m_AnchoredPosition: {x: 0, y: -774}
   m_SizeDelta: {x: -200, y: 1164.8}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &8757977550084060311
@@ -911,7 +911,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -696}
+  m_AnchoredPosition: {x: 0, y: -621}
   m_SizeDelta: {x: 886.9, y: 100}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &5355505431007469259
@@ -961,6 +961,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 435221962733355344}
+  - component: {fileID: 4378822777072440811}
   m_Layer: 5
   m_Name: RootView
   m_TagString: Untagged
@@ -989,11 +990,29 @@ RectTransform:
   - {fileID: 5302434746604854352}
   m_Father: {fileID: 5686556437470971574}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1350, y: 2331.89}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 270}
+  m_SizeDelta: {x: 1350, y: 2200}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &4378822777072440811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4740895288889125660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df38ebce50a9aee4ea257ee941d79c42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panelRoot: {fileID: 435221962733355344}
+  scalePortrait: 1
+  yPosPortrait: 1
+  scaleLandscape: 0.5
+  yPosLandscape: 1
+  changePosY: 0
 --- !u!1 &5368397312690151188
 GameObject:
   m_ObjectHideFlags: 0
@@ -1448,7 +1467,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 268}
+  m_AnchoredPosition: {x: 0, y: 237}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3554036054451442252
@@ -1479,7 +1498,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -1845802277, guid: 1e34d9ec17bd6b44f8caad10d0544423, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1660,7 +1679,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 268}
+  m_AnchoredPosition: {x: 0, y: 237}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7187868624300785425
@@ -1691,7 +1710,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -1845802277, guid: 1e34d9ec17bd6b44f8caad10d0544423, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1798,6 +1817,10 @@ MonoBehaviour:
   confirmCanvasGroup: {fileID: 1994582320340943284}
   confirmReadyObject: {fileID: 2056184962845392097}
   confirmDisabledObject: {fileID: 5368397312690151188}
+  slot1Arrow: {fileID: 654482696074345997}
+  slot2Arrow: {fileID: 2450169067840699748}
+  arrowMoveDistance: 18
+  arrowMoveDuration: 0.55
 --- !u!1 &8592321014374809777
 GameObject:
   m_ObjectHideFlags: 0

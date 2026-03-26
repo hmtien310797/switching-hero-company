@@ -87,13 +87,13 @@ namespace Scripts.Battle
         private bool isPriorityNearTarget = false;
         private Vector3 targetPos = Vector3.zero;
         private FollowHeroController followHeroController;
-        private HeroAttackType heroAttackType;
         private Dictionary<SkillSlot, int> skillIdDict = new Dictionary<SkillSlot, int>();
         
         public Dictionary<SkillSlot, int> SkillIdDict => skillIdDict;
         public MonsterScrepController MonsterTarget { get => _monsterTarget; set => _monsterTarget = value; }
         public FollowHeroController FollowHeroController { get => followHeroController; set => followHeroController = value; }
-        public HeroAttackType HeroAttackType { get => heroAttackType; set => heroAttackType = value; }
+        public HeroClass HeroClass { get; private set; }
+        public Sprite HeroIcon { get; private set; }
 
         protected override void Awake()
         {
@@ -115,7 +115,8 @@ namespace Scripts.Battle
             isInSwitchAction = isSwitch;
             baseHeroData = data;
             followHeroController = fHc;
-            heroAttackType = hAT;
+            HeroClass = data.HeroClass;
+            HeroIcon = data.PortraitIcon;
 
             SetPartner(partnerTrans);
             var skillIds = !isMain ? new List<int>() { 101, 102, 111, 121, 122 } : new List<int>() { 201, 211, 212, 221, 222 };
@@ -404,7 +405,7 @@ namespace Scripts.Battle
 
         private bool IsBossInAttackRange(float rangeAttack, Vector3 target)
         {
-            if (heroAttackType == HeroAttackType.Knight)
+            if (HeroClass == HeroClass.Knight || HeroClass == HeroClass.Warrior)
             {
                 var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack * rangeAttack;
                 var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack && transform.position.z <= target.z;
@@ -417,7 +418,7 @@ namespace Scripts.Battle
 
         private bool IsCreepInAttackRange(float rangeAttack, Vector3 target)
         {
-            if (heroAttackType == HeroAttackType.Knight)
+            if (HeroClass == HeroClass.Knight || HeroClass == HeroClass.Warrior)
             {
                 var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack * rangeAttack;
                 var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack;
@@ -598,7 +599,7 @@ namespace Scripts.Battle
             var pos = _monsterTarget.transform.position;
             pos.y = transform.position.y;
             var isLeft = transform.position.x < pos.x;
-            if(heroAttackType == HeroAttackType.Knight)
+            if(HeroClass is HeroClass.Knight or HeroClass.Warrior)
                 return pos + new Vector3( - baseStatData.AttackRange * .9f * (isMain ? 1 : -1), 0, - baseStatData.AttackRange * .5f);
             else
                 return pos + new Vector3(baseStatData.AttackRange * .35f * (isLeft ? -1 : 1), 0, -baseStatData.AttackRange * .9f);

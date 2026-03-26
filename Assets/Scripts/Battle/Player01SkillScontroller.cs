@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Immortal_Switch.Hero;
 using UnityEngine;
 
 namespace Scripts.Battle
@@ -119,7 +120,7 @@ namespace Scripts.Battle
         public IEnumerator CoDoAttack(Action endAct, string animName)
         {
             var dur = BaseAnimController.GetDurByAnimName(animName);
-            if (playerHeroController.HeroAttackType == HeroAttackType.Knight)
+            if (playerHeroController.HeroClass == HeroClass.Knight || playerHeroController.HeroClass == HeroClass.Warrior)
             {
                 yield return new WaitForSeconds(dur / 2);
                 DoAttackFx();
@@ -128,7 +129,7 @@ namespace Scripts.Battle
                 endAct?.Invoke();
                 SkaFx.gameObject.SetActive(false);
             }
-            else if(playerHeroController.HeroAttackType == HeroAttackType.Archer)
+            else
             {
                 yield return new WaitForSeconds(dur);
                 endAct?.Invoke();
@@ -137,7 +138,8 @@ namespace Scripts.Battle
 
         private void DoAttackByArrowEvent()
         {
-            if(playerHeroController.HeroAttackType != HeroAttackType.Archer) return;
+            if(playerHeroController.HeroClass != HeroClass.Archer) return;
+            if(playerHeroController.HeroClass != HeroClass.Mage) return;
             var (arrow, b) = PoolController.Instance.Get(arrowTrans, oArrowTrans.position);
             var targetPos = playerHeroController.GetMonsterPos() + Vector3.up*1.5f;
             Vector3 direction = (targetPos - oArrowTrans.position).normalized;
