@@ -181,7 +181,7 @@ namespace Scripts.Battle
                     mainFollow,
                     HeroAttackType.Archer,
                     false,
-                    wasMain
+                    wasMain ? 0 : 1
                 );
 
                 RefreshBattleUISlot(firstPlayerHeroController, true, tId);
@@ -203,7 +203,7 @@ namespace Scripts.Battle
                     subFollow,
                     HeroAttackType.Knight,
                     false,
-                    wasMain
+                    wasMain ? 0 : 1
                 );
 
                 RefreshBattleUISlot(secondPlayerHeroController, false, tId);
@@ -260,7 +260,7 @@ namespace Scripts.Battle
             {
                 firstPlayerHeroController = hero;
                 firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans,
-                    secondPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, true);
+                    secondPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, 0);
                 mainPlayerHeroController = firstPlayerHeroController;
                 mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
             }
@@ -268,7 +268,7 @@ namespace Scripts.Battle
             {
                 secondPlayerHeroController = hero;
                 secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans,
-                    firstPlayerHeroController.transform, subFollow, HeroAttackType.Knight, false, false);
+                    firstPlayerHeroController.transform, subFollow, HeroAttackType.Knight, false, 1);
                 firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
                 subFollow.SetFollowTarget(secondPlayerHeroController.transform);
             }

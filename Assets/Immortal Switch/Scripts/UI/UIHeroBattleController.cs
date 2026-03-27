@@ -81,6 +81,8 @@ namespace Scripts.UI
         
         private Tween autoSkillTween;
         private Tween autoSwitchTween;
+        private int displayedHeroSlotIndex = 0;
+        private bool IsDisplayingFirstHero => displayedHeroSlotIndex == 0;
 
         private void Awake()
         {
@@ -225,8 +227,6 @@ namespace Scripts.UI
             if (ismain)
             {
                 firstHeroData.Hid = hid;
-                mainHeroData = firstHeroData;
-                AppLySpriteSkillByIdx(true);
                 uISwitchHeroController?.ChangeIconByIdx(0, firstIconHead);
             }
             else
@@ -234,6 +234,8 @@ namespace Scripts.UI
                 secondHeroData.Hid = hid;
                 uISwitchHeroController?.ChangeIconByIdx(1, secondIconHead);
             }
+            mainHeroData = IsDisplayingFirstHero ? firstHeroData : secondHeroData;
+            AppLySpriteSkillByIdx(IsDisplayingFirstHero);
         }
 
         private void AppLySpriteSkillByIdx(bool isFirst)
@@ -306,9 +308,11 @@ namespace Scripts.UI
             
         }
 
-        public void SetPlayerHeroInstance(PlayerHeroController phc, bool isMain, int hid, Dictionary<SkillSlot,int> skillIds)
+        public void SetPlayerHeroInstance(PlayerHeroController phc, int heroSlotIndex, int hid, Dictionary<SkillSlot,int> skillIds)
         {
-            if (isMain)
+            bool isFirstHeroSlot = heroSlotIndex == 0;
+
+            if (isFirstHeroSlot)
             {
                 firstHeroData.playerHeroController = phc;
                 firstIconHead = firstHeroData.playerHeroController.HeroIcon;
@@ -340,8 +344,8 @@ namespace Scripts.UI
                     secondHeroData.playerHeroController.UISprite.SwithSkillIcon
                 };
             }
-            InitUIHeros(isMain, hid);
-            uISwitchHeroController?.RegisterActionByIdx(ChangeMainHeroByIdx);
+
+            InitUIHeros(isFirstHeroSlot, hid);
         }
 
         private void SetHeadIconById(int hid)
@@ -351,20 +355,30 @@ namespace Scripts.UI
 
         private void ChangeMainHeroByIdx(int hid)
         {
-            if(hid == 0)
+            displayedHeroSlotIndex = hid;
+            mainHeroData = IsDisplayingFirstHero ? firstHeroData : secondHeroData;
+            AppLySpriteSkillByIdx(IsDisplayingFirstHero);
+        }
+        
+        public void ToggleDisplayedHero()
+        {
+            displayedHeroSlotIndex = 1 - displayedHeroSlotIndex;
+
+            RefreshDisplayedHeroUI();
+        }
+        
+        private void RefreshDisplayedHeroUI()
+        {
+            mainHeroData = IsDisplayingFirstHero ? firstHeroData : secondHeroData;
+
+            var sprites = IsDisplayingFirstHero ? firstSprites : secondSprites;
+
+            for (int i = 0; i < skillIcons.Count; i++)
             {
-                mainHeroData = firstHeroData;
-                firstHeroData.isMain = true;
-                secondHeroData.isMain = false;
-                AppLySpriteSkillByIdx(true);
+                skillIcons[i].sprite = sprites[i];
             }
-            else
-            {
-                mainHeroData = secondHeroData;
-                firstHeroData.isMain = false;
-                secondHeroData.isMain = true;
-                AppLySpriteSkillByIdx(false);
-            }
+
+            // nếu có cooldown UI thì update lại luôn ở đây
         }
 
         public void ChangeSkillByIdx(HeroNameAction idx, float interval, int hid)
@@ -441,7 +455,7 @@ namespace Scripts.UI
                 firstSprites = newSprites;
                 uISwitchHeroController?.ChangeIconByIdx(0, firstIconHead);
 
-                if (firstHeroData.isMain)
+                if (IsDisplayingFirstHero)
                 {
                     mainHeroData = firstHeroData;
                     AppLySpriteSkillByIdx(true);
@@ -453,7 +467,7 @@ namespace Scripts.UI
                 secondSprites = newSprites;
                 uISwitchHeroController?.ChangeIconByIdx(1, secondIconHead);
 
-                if (secondHeroData.isMain)
+                if (!IsDisplayingFirstHero)
                 {
                     mainHeroData = secondHeroData;
                     AppLySpriteSkillByIdx(false);
@@ -469,8 +483,8 @@ namespace Scripts.UI
 
         private void DoCoolingdownSkill()
         {
-            DoCoolingdownSkill(firstHeroData, firstHeroData.isMain);
-            DoCoolingdownSkill(secondHeroData, secondHeroData.isMain);
+            DoCoolingdownSkill(firstHeroData, IsDisplayingFirstHero);
+            DoCoolingdownSkill(secondHeroData, !IsDisplayingFirstHero);
         }
 
         private void DoCoolingdownSkill(CoolingData data, bool isMain)
@@ -571,18 +585,9 @@ namespace Scripts.UI
 
         public void SwapMainHero(int hid)
         {
-            if(firstHeroData.isMain)
-            {
-                firstHeroData.isMain = false;
-                secondHeroData.isMain = true;
-                mainHeroData = secondHeroData;
-            }
-            else
-            {
-                secondHeroData.isMain = false;
-                firstHeroData.isMain = true;
-                mainHeroData = firstHeroData;
-            }
+            displayedHeroSlotIndex = hid;
+            mainHeroData = IsDisplayingFirstHero ? firstHeroData : secondHeroData;
+            AppLySpriteSkillByIdx(IsDisplayingFirstHero);
         }
     }
 }
