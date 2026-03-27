@@ -10,16 +10,6 @@ namespace Scripts.Battle
     {
         [SerializeField] SkeletonAnimation skaFx;
 
-        private async UniTaskVoid DoActSkill(Action<float> camAct)
-        {
-            PlayAnim(skaFx);
-            var dur = GetAnimDur(skaFx);
-            camAct?.Invoke(dur);
-            await UniTask.Delay(TimeSpan.FromSeconds(dur));
-            base.DoEndSkill().Forget();
-            PoolController.Instance?.ReturnToPool(gameObject);
-        }
-
         private async UniTaskVoid DoActSkillByNum(Action<float> camAct, int numAtk)
         {
             numAtk = numAtk < 1 ? 1 : numAtk;
@@ -38,7 +28,7 @@ namespace Scripts.Battle
 
         public override void InitInnerSkill(bool isInit = true, Action<float> camAct = null)
         {
-            InitSka();
+            InitSkeletonAnimation();
             if (IsFollow)
             {
                 transform.SetParent(PlayerHeroController.transform);
@@ -60,16 +50,16 @@ namespace Scripts.Battle
 
             DoActSkill(camAct).Forget();
         }
-
-        public void InitSka()
+        
+        private async UniTaskVoid DoActSkill(Action<float> camAct)
         {
-            if (skaFx && !skaFx.valid)
-            {
-                skaFx.Initialize(false);
-            }
-
-            GetAnimDur(skaFx);
-        }        
+            PlayAnim(skaFx);
+            var dur = GetAnimDur(skaFx);
+            camAct?.Invoke(dur);
+            await UniTask.Delay(TimeSpan.FromSeconds(dur));
+            base.DoEndSkill().Forget();
+            PoolController.Instance?.ReturnToPool(gameObject);
+        }
 
         private void AttackCallback(float rangeAtk, float dameAtk)
         {

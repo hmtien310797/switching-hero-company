@@ -1,4 +1,3 @@
-using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.GachaSystem.HeroSummonView;
 using Immortal_Switch.Scripts.GrowthSystem.UI;

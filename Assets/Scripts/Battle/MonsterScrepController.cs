@@ -62,6 +62,8 @@ namespace Scripts.Battle
         private void SetTargetTrans(PlayerHeroController pHc)
         {
             etarget = pHc;
+            if (etarget == null) return;
+
             targetTrans = etarget.FollowHeroController.GetNextPoint();
         }
 
@@ -73,6 +75,8 @@ namespace Scripts.Battle
             PlayerHeroController target = null;
             foreach (var tg in targets)
             {
+                if (!tg.IsValid()) continue;
+
                 var dist = (transform.position - tg.transform.position).sqrMagnitude;
                 if (dist < nearDist)
                 {
@@ -119,6 +123,8 @@ namespace Scripts.Battle
 
             MoveToTarget();
 
+            if (etarget == null) return;
+
             if (IsInAttackRange(Stats.StatModule.GetBaseStat(StatType.AttackRange), etarget.transform.position))
             {
                 SwitchState(AttackState);
@@ -127,6 +133,8 @@ namespace Scripts.Battle
 
         private void MoveToTarget()
         {
+            if(etarget == null) return;
+
             var isRight = transform.position.x < etarget.transform.position.x;
             if (!IsBoss())
             {

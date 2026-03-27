@@ -58,6 +58,7 @@ namespace Scripts.UI
 
         public void RegisterActionHeroByIdx(Action<int> fAct)
         {
+            heroAction-=fAct;
             heroAction += fAct;
         }
 
@@ -83,6 +84,11 @@ namespace Scripts.UI
 
             var oldSprite = icons[idx].sprite;
             icons[idx].sprite = sprite;
+        }
+
+        public bool IsSelectedMain()
+        {
+            return selectedBtnIdx == 0;
         }
     }
 }

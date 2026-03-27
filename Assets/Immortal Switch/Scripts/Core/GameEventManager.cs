@@ -91,7 +91,8 @@ public static class GameEventManager
                 }
                 catch (Exception e)
                 {
-                    UnityEngine.Debug.LogError($"Event {eventName} lỗi thực thi: {e.Message}");
+                    var realException = e.InnerException != null ? e.InnerException : e;
+                    UnityEngine.Debug.LogError($"Event {eventName} lỗi thực thi: {realException.Message}\n{realException.StackTrace}");
                 }
             };
             wrapperMapMulti[listener] = wrapper;

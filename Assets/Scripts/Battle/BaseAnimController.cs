@@ -1,6 +1,6 @@
-﻿using Spine.Unity;
+﻿using Cysharp.Threading.Tasks;
+using Spine.Unity;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,14 +28,14 @@ namespace Scripts.Battle
             return ska; 
         }
 
-        public void RegisterAnimEvent(string animName, string eventName, Action eventAct)
+        public void RegisterAnimEvent(string animName, string eventName, Action<bool> eventAct)
         {
             ska.AnimationState.Event += (entry, e) =>
             {
                 if(animName == entry.Animation.Name && e.Data.Name == eventName)
                 {
                     Debug.Log($"Anim event {eventName} triggered.");
-                    eventAct?.Invoke();
+                    eventAct?.Invoke(eventName == Player01SkillScontroller.eventFinalAttack);
                 }
             };
         }
@@ -68,12 +68,12 @@ namespace Scripts.Battle
         {
             var passiveTrack = ska.AnimationState.SetAnimation(1, StandAnimName.PassiveSwitch, true);
             passiveTrack.Alpha = 1;
-            StartCoroutine(StopPassiveAnimAsync(delayTime));
+            StopPassiveAnimAsync(delayTime).Forget();
         }
 
-        public IEnumerator StopPassiveAnimAsync(float dur)
+        public async UniTaskVoid StopPassiveAnimAsync(float dur)
         {
-            yield return new WaitForSeconds(dur);
+            await UniTask.Delay(TimeSpan.FromSeconds(dur));
             ska.AnimationState.SetEmptyAnimation(1, 0.2f);
         }
 

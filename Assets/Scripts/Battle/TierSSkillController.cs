@@ -23,16 +23,6 @@ namespace Scripts.Battle
             PoolController.Instance?.ReturnToPool(gameObject);
         }
 
-        public void InitSka()
-        {
-            if (skaFx && !skaFx.valid)
-            {
-                skaFx.Initialize(false);
-            }
-
-            GetAnimDur(skaFx);
-        }
-
         public override void SetHeroPlayerController(PlayerHeroController phC)
         {
             base.SetHeroPlayerController(phC);
@@ -40,7 +30,7 @@ namespace Scripts.Battle
 
         public override void InitInnerSkill(bool isFinal, Action<float> camAct)
         {
-            InitSka();
+            InitSkeletonAnimation();
             targetPos = PlayerHeroController.GetNearestMonster();
             transform.position = targetPos;
             if (IsAtkEvent)

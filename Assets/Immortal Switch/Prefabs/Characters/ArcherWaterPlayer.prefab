@@ -124,6 +124,7 @@ MonoBehaviour:
   distSkillRange: 10
   intervalSwitch: 20
   switchArea: 10
+  heroAttackType: 1
 --- !u!114 &8686406742812245777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,16 +144,16 @@ MonoBehaviour:
   playerHeroController: {fileID: 4374813364255653229}
   fxSkills:
   - {fileID: 4956581297548654311, guid: 6459d4b5305608548b7a442db80b6249, type: 3}
-  - {fileID: 4848209512770238035, guid: 43ac0b5e30de6a146a9e330d80070b2c, type: 3}
+  - {fileID: 0}
   - {fileID: 659613842275125512, guid: e3f74662b51936143947dbfde4301a59, type: 3}
-  - {fileID: -607966872467342200, guid: 19034042a43474c478c8fe0ceb8f3cd7, type: 3}
+  - {fileID: 0}
   - {fileID: 7590146775286044908, guid: db2084fa7e891f64caf04d20723e7cc8, type: 3}
   winFx: {fileID: 3621413825147627468}
   skillTrans: {fileID: 0}
   externalSkillController: {fileID: -6887672660385192121}
   arrowTrans: {fileID: 6208129103282587161, guid: 16dd6b4ec3dd23945a763dd4de579691, type: 3}
   oArrowTrans: {fileID: 7982249090960025673}
-  boneArraw: L_hand
+  boneArraw: BOW_ARROW
 --- !u!114 &3541416523792417231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,7 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8e7c8669bda7cd45b466915d0939c3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  headIcon: {fileID: 21300000, guid: 32997c96a91b5904aa064f961fa62937, type: 3}
+  headIcon: {fileID: -583231673, guid: f3b5ac43f402abb4eae98942241d1b71, type: 3}
   swithSkillIcon: {fileID: 244264321, guid: f3b5ac43f402abb4eae98942241d1b71, type: 3}
 --- !u!114 &-2321336621784235455
 MonoBehaviour:
@@ -276,6 +277,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
+  - {fileID: 2100000, guid: d564ad182b967ab4aa6f650489179bcb, type: 2}
   - {fileID: 2100000, guid: 652508f41a76cb043ba3e7f9d044ebf0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -338,7 +340,7 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
-  _animationName: spawn
+  _animationName: idle
   loop: 1
   timeScale: 1
 --- !u!1 &6894580092140334920

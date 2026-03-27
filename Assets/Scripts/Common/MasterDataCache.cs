@@ -1,6 +1,7 @@
 using Immortal_Switch.Scripts;
 using System.Collections.Generic;
 using Immortal_Switch.Hero;
+using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 
 public class MasterDataCache : MonoBehaviour
@@ -13,7 +14,7 @@ public class MasterDataCache : MonoBehaviour
     private Dictionary<int,HeroDataSO> heroDataDicts = new Dictionary<int, HeroDataSO> ();
     private Dictionary<int,SkillDataSO> skillDataDicts = new Dictionary<int, SkillDataSO> ();
 
-    void Start()
+    private void Awake()
     {
         Instance = this;
         DontDestroyOnLoad(gameObject);
@@ -52,6 +53,11 @@ public class MasterDataCache : MonoBehaviour
         if (!skillDataDicts.ContainsKey(id)) return null;
 
         return skillDataDicts[id];
+    }
+
+    public Dictionary<int,SkillDataSO> GetAllSkills()
+    {
+        return skillDataDicts;
     }
 
 }

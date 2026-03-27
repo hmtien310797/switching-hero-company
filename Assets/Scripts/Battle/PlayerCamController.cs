@@ -12,6 +12,7 @@ namespace Scripts.Battle
 
     public class PlayerCamController : MonoBehaviour
     {
+        [SerializeField] Transform camHolder;
         [SerializeField] float moveSpeed = 2f;
         [SerializeField] Vector3 offset = new Vector3(0, 7, 25);
 
@@ -73,7 +74,7 @@ namespace Scripts.Battle
 
         private void Domove()
         {
-            camPos = transform.position;
+            camPos = camHolder.position;
             var pos = GetTargetPos(playerTrans[0].position, playerTrans[1].position);
             playerPos = pos;
             if ((camPos - playerPos).sqrMagnitude < 0.1f)
@@ -82,7 +83,7 @@ namespace Scripts.Battle
                 return;
             }
 
-            transform.position = Vector3.Lerp(camPos, playerPos, Time.deltaTime * moveSpeed);
+            camHolder.position = Vector3.Lerp(camPos, playerPos, Time.deltaTime * moveSpeed);
         }
 
         private Vector3 GetTargetPos(Vector3 a, Vector3 b)
@@ -116,14 +117,14 @@ namespace Scripts.Battle
                     transform.DOShakePosition(dur, new Vector3(0.2f, 0.2f, 0f), viration, 0f, false, true).SetEase(Ease.Linear).OnComplete(() =>
                     {
                         isShaked = false;
-                    });
+                    }).SetRelative(true);
                     break;
 
                 case ShakeType.Punch:
                     transform.DOPunchPosition(new Vector3(0.2f, 0.2f, 0f), dur, viration, .75f, false).SetEase(Ease.Linear).OnComplete(() =>
                     {
                         isShaked = false;
-                    });
+                    }).SetRelative(true);
                     break;
             }
             yield return null;

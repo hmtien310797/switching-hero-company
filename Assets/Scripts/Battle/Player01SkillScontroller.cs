@@ -4,10 +4,10 @@ using Immortal_Switch.Scripts.Core;
 using Scripts.Common;
 using Spine.Unity;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Immortal_Switch.Hero;
+using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 
 namespace Scripts.Battle
@@ -26,12 +26,18 @@ namespace Scripts.Battle
         [SerializeField] BaseExternalSkillController externalSkillController;
         [SerializeField] Transform arrowTrans;
         [SerializeField] Transform oArrowTrans;
+        public string boneArraw = "BOW_ARROW";
+        public string boneAiming = "AIMING";
 
         private int attackIdx = 0;
-        private const string eventAttack = "hit";
+        public const string eventAttack = "hit";
+        public const string eventFinalAttack = "finalhit";
         private Dictionary<SkillSlot, SkillDataSO> skillDataSOs = new Dictionary<SkillSlot, SkillDataSO>();
-        public string boneArraw = "L_hand";
+        
         private Spine.Bone handBone;
+        private Spine.Bone aimBone;
+
+        private CancellationTokenSource _disableCts;
 
         private void Awake()
         {
@@ -43,6 +49,7 @@ namespace Scripts.Battle
         private void Start()
         {
             handBone = BaseAnimController.GetBaseSka().Skeleton.FindBone(boneArraw);
+            aimBone = BaseAnimController.GetBaseSka().Skeleton.FindBone(boneAiming);
         }
 
         public void InitSkillData(List<int>skillIds)
@@ -87,18 +94,23 @@ namespace Scripts.Battle
 
         private void RegisterHitAttactEvent()
         {
-            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack1, eventAttack, DoAttackByArrowEvent);
-            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack2, eventAttack, DoAttackByArrowEvent);
-            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack3, eventAttack, DoAttackByArrowEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack1, eventAttack, DoAttackByEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack1Back, eventAttack, DoAttackByEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack2, eventAttack, DoAttackByEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack2Back, eventAttack, DoAttackByEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack3, eventAttack, DoAttackByEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack3Back, eventAttack, DoAttackByEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack3, eventFinalAttack, DoAttackByEvent);
+            BaseAnimController.RegisterAnimEvent(StandAnimName.Attack3Back, eventFinalAttack, DoAttackByEvent);
         }
                 
-        private string GetAttackAnimNameByIdx(int idx)
+        private string GetAttackAnimNameByIdx(int idx, bool isAfter = true)
         {
             var anim = (idx) switch
             {
-                0 => StandAnimName.Attack1,
-                1 => StandAnimName.Attack2,
-                2 => StandAnimName.Attack3,
+                0 => isAfter ? StandAnimName.Attack1 : StandAnimName.Attack1Back,
+                1 => isAfter ? StandAnimName.Attack2 : StandAnimName.Attack2Back,
+                2 => isAfter ? StandAnimName.Attack3 : StandAnimName.Attack3Back,
                 _ => StandAnimName.Attack1,
             };
                 
@@ -112,61 +124,93 @@ namespace Scripts.Battle
         {
             var isRight = playerHeroController?.IsLookRight()?? false;
             playerHeroController?.DoRotate(isRight);
-            var animName = GetAttackAnimNameByIdx(attackIdx);
-            BaseAnimController?.PlayAmin(animName);
-            StartCoroutine(CoDoAttack(endAct, animName));
+            var isAfterTarger = playerHeroController.IsAfterTarget();
+            var animName = GetAttackAnimNameByIdx(attackIdx, isAfterTarger);
+            if (playerHeroController.HeroClass == HeroClass.Archer)
+            { 
+                animName = isAfterTarger ? StandAnimName.Attack1 : StandAnimName.Attack1Back;
+                BaseAnimController?.PlayAmin(animName);
+            }
+            else
+                BaseAnimController?.PlayAmin(animName);
+            CoDoAttack(endAct, animName).Forget();
         }
 
-        public IEnumerator CoDoAttack(Action endAct, string animName)
+        public async UniTaskVoid CoDoAttack(Action endAct, string animName)
         {
             var dur = BaseAnimController.GetDurByAnimName(animName);
             if (playerHeroController.HeroClass == HeroClass.Knight || playerHeroController.HeroClass == HeroClass.Warrior)
             {
-                yield return new WaitForSeconds(dur / 2);
-                DoAttackFx();
-                playerHeroController?.AttackBySpecific();
-                yield return new WaitForSeconds(dur / 2);
+                await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: _disableCts.Token);
                 endAct?.Invoke();
                 SkaFx.gameObject.SetActive(false);
             }
-            else
+            else if (playerHeroController.HeroClass == HeroClass.Archer)
             {
-                yield return new WaitForSeconds(dur);
+                var targetPos = playerHeroController.GetMonsterPos() + Vector3.up * 1.5f;
+                if (aimBone == null) aimBone = BaseAnimController.GetBaseSka().skeleton.FindBone(boneAiming);
+
+                var isAfterTarger = transform.position.z > targetPos.z;
+                var camPos = Camera.main.transform.position;
+                camPos.z *= (isAfterTarger ? -1 : 1);
+                camPos.y -= (isAfterTarger ? 9 : 0);
+                var dir = (targetPos - camPos).normalized;
+                Ray ray = new Ray(camPos, dir);
+                Plane planeZ = new Plane(Vector3.forward, transform.position);
+                var point = transform.position;
+                if (planeZ.Raycast(ray, out var distance))
+                {
+                    point = ray.GetPoint(distance);
+                    point = transform.InverseTransformPoint(point);
+                }
+
+                aimBone.X = point.x;
+                aimBone.Y = point.y;
+
+                await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: _disableCts.Token);
                 endAct?.Invoke();
             }
         }
 
-        private void DoAttackByArrowEvent()
+        private void DoAttackByEvent(bool isFinal = false)
         {
-            if(playerHeroController.HeroClass != HeroClass.Archer) return;
-            if(playerHeroController.HeroClass != HeroClass.Mage) return;
+            if (playerHeroController.HeroClass != HeroClass.Archer)
+            {
+                DoAttackFx();
+                playerHeroController?.AttackBySpecific();
+                return;
+            }
+
+            if (oArrowTrans == null) return;
             var (arrow, b) = PoolController.Instance.Get(arrowTrans, oArrowTrans.position);
-            var targetPos = playerHeroController.GetMonsterPos() + Vector3.up*1.5f;
-            Vector3 direction = (targetPos - oArrowTrans.position).normalized;
+            var targetPos = playerHeroController.GetMonsterPos() + Vector3.up * 1.5f;
             if (arrow != null)
             {
                 if (handBone == null) handBone = BaseAnimController.GetBaseSka().skeleton.FindBone(boneArraw);
-                Debug.Log("hand bone" + handBone == null);
                 arrow.position = handBone != null ? handBone.GetWorldPosition(BaseAnimController.GetBaseSka().transform) : oArrowTrans.position;
+                Vector3 direction = (targetPos - arrow.position).normalized;
                 arrow.rotation = Quaternion.FromToRotation(Vector3.right, direction);
             }
-            StartCoroutine(DoFlyAsync(arrow, targetPos));
+
+            DoFlyAsync(arrow, targetPos).Forget();
         }
 
-        private IEnumerator DoFlyAsync(Transform arrow,Vector3 target)
+        private async UniTaskVoid DoFlyAsync(Transform arrow,Vector3 target)
         {
+            if (arrow == null) return;
+            Debug.Log($"do flying now {target}");
             arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
             while ((arrow.position - target).sqrMagnitude > 0.1f)
             {
-                yield return null;
                 arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
                 arrow.Rotate(Vector3.right, 30, Space.Self);
+                await UniTask.Yield(PlayerLoopTiming.Update, _disableCts.Token);
             }
 
             DoAttackFx();
             playerHeroController?.AttackBySpecific();
             PoolController.Instance.ReturnToPool(arrow.gameObject);
-            yield return new WaitForSeconds(.2f);
+            await UniTask.Delay(TimeSpan.FromSeconds(.2f), cancellationToken: _disableCts.Token);
             SkaFx.gameObject.SetActive(false);
         }
 
@@ -281,7 +325,7 @@ namespace Scripts.Battle
             await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: token);
         }
 
-        private IEnumerator CoDoFlash(Action endAct)
+        private async UniTaskVoid CoDoFlash(Action endAct)
         {
             var pos = GroupFlashController.Instance.GetRandPos();
 
@@ -290,7 +334,7 @@ namespace Scripts.Battle
             while (Vector3.Distance(transform.position, pos) > 0.1f)
             {
                 transform.position = Vector3.MoveTowards(transform.position, pos, 20 * Time.deltaTime);
-                yield return null;
+                await UniTask.DelayFrame(1);
             }
 
             endAct?.Invoke();
@@ -299,13 +343,13 @@ namespace Scripts.Battle
         public override void DoSwitch(Action endAct)
         {
             BaseAnimController?.PlayAmin(StandAnimName.Switch, 1, false);
-            StartCoroutine(CoDoSwitch(endAct, StandAnimName.Switch));
+            CoDoSwitch(endAct, StandAnimName.Switch).Forget();
         }
 
-        private IEnumerator CoDoSwitch(Action endAct, string animName)
+        private async UniTaskVoid CoDoSwitch(Action endAct, string animName)
         {
             var dur = BaseAnimController.GetDurByAnimName(animName);
-            yield return new WaitForSeconds(dur);
+            await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: _disableCts.Token);
             DoActivePassive(endAct);
         }
 
@@ -321,22 +365,22 @@ namespace Scripts.Battle
                 endAct?.Invoke();
         }
 
-        private void DoHitSwitchEventAction()
+        private void DoHitSwitchEventAction(bool isFanal = false)
         {
             playerHeroController?.AttackByArea(transform.position, playerHeroController.GetSwitchArea, 1);
         }
 
         public override void DoWin(Action endAct)
         {
-            StartCoroutine(CoDoWin(endAct, StandAnimName.Win));
+            CoDoWin(endAct, StandAnimName.Win).Forget();
         }
 
-        private IEnumerator CoDoWin(Action endAct, string animName)
+        private async UniTaskVoid CoDoWin(Action endAct, string animName)
         {
-            yield return new WaitForSeconds(.25f);
+            await UniTask.Delay(TimeSpan.FromSeconds(.25f), cancellationToken: _disableCts.Token);
             BaseAnimController?.PlayAmin(animName, 1, false);
             var dur = BaseAnimController.GetDurByAnimName(animName);
-            yield return new WaitForSeconds(dur);
+            await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: _disableCts.Token);
             PlayAmin(winFx, "win", 1, true);
             Vector3[] path = new Vector3[] 
             {
@@ -353,7 +397,7 @@ namespace Scripts.Battle
                 endAct?.Invoke();
             });
 
-            yield return new WaitForSeconds(.5f);
+            await UniTask.Delay(TimeSpan.FromSeconds(.5f), cancellationToken: _disableCts.Token);
             winFx.gameObject.SetActive(true);
         }
 
@@ -439,6 +483,21 @@ namespace Scripts.Battle
                 case HeroSkills.Die:
                     DoDeath(endAct);
                     break;
+            }
+        }
+
+        private void OnEnable()
+        {
+            _disableCts = new CancellationTokenSource();
+        }
+
+        private void OnDisable()
+        {
+            if (_disableCts != null)
+            {
+                _disableCts.Cancel();
+                _disableCts.Dispose();
+                _disableCts = null;
             }
         }
     }

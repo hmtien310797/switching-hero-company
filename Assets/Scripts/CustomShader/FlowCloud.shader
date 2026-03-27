@@ -5,10 +5,8 @@
         _MainTex ("Cloud Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
 
-        _MoveRangeX ("Move Range X", Range(0, 2)) = 0.5
-        _MoveRangeY ("Move Range Y", Range(0, 1)) = 0.2
-
-        _Speed ("Speed", Range(0, 5)) = 1
+        _SpeedX ("Speed X", Float) = 0.05
+        _SpeedY ("Speed Y", Float) = 0.01
 
         _Offset ("Random Offset", Float) = 0
     }
@@ -47,29 +45,17 @@
             SAMPLER(sampler_MainTex);
 
             float4 _Color;
-            float _MoveRangeX;
-            float _MoveRangeY;
-            float _Speed;
+            float _SpeedX;
+            float _SpeedY;
             float _Offset;
 
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
 
-                float t = _Time.y * _Speed + _Offset;
+                // ❌ KHÔNG di chuyển vertex nữa
+                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
 
-                float3 pos = IN.positionOS.xyz;
-
-                // Di chuyển qua lại theo sin (loop vô hạn)
-                float moveX = sin(t) * _MoveRangeX;
-
-                // Lên xuống nhẹ (lệch phase để tự nhiên)
-                float moveY = cos(t * 0.7) * _MoveRangeY;
-
-                pos.x += moveX;
-                pos.y += moveY;
-
-                OUT.positionHCS = TransformObjectToHClip(pos);
                 OUT.uv = IN.uv;
                 OUT.color = IN.color * _Color;
 
@@ -78,7 +64,16 @@
 
             half4 frag(Varyings IN) : SV_Target
             {
-                half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+                float t = _Time.y + _Offset;
+
+                // 👉 UV scroll + wrap
+                float2 uv = IN.uv + float2(_SpeedX, _SpeedY) * t;
+
+                // 👉 loop lại khi vượt UV
+                uv = frac(uv);
+
+                half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+
                 return col * IN.color;
             }
 

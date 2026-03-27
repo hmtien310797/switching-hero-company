@@ -81,6 +81,7 @@ namespace Scripts.Battle
         private bool losingStage = false;
 
         public BattleState State { get; private set; } = BattleState.None;
+        public List<MonsterScrepController> MonsterList => creeps;
 
         public bool IsReadyBattle
         {
@@ -179,9 +180,9 @@ namespace Scripts.Battle
                     skillObjTrans,
                     secondPlayerHeroController != null ? secondPlayerHeroController.transform : null,
                     mainFollow,
-                    HeroAttackType.Archer,
+                    heroDt.HeroClass,
                     false,
-                    wasMain ? 0 : 1
+                    wasMain
                 );
 
                 RefreshBattleUISlot(firstPlayerHeroController, true, tId);
@@ -201,9 +202,9 @@ namespace Scripts.Battle
                     skillObjTrans,
                     firstPlayerHeroController != null ? firstPlayerHeroController.transform : null,
                     subFollow,
-                    HeroAttackType.Knight,
+                    heroDt.HeroClass,
                     false,
-                    wasMain ? 0 : 1
+                    wasMain
                 );
 
                 RefreshBattleUISlot(secondPlayerHeroController, false, tId);
@@ -260,7 +261,7 @@ namespace Scripts.Battle
             {
                 firstPlayerHeroController = hero;
                 firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans,
-                    secondPlayerHeroController?.transform ?? null, mainFollow, HeroAttackType.Archer, false, 0);
+                    secondPlayerHeroController?.transform ?? null, mainFollow, heroDt.HeroClass, false, true);
                 mainPlayerHeroController = firstPlayerHeroController;
                 mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
             }
@@ -268,7 +269,7 @@ namespace Scripts.Battle
             {
                 secondPlayerHeroController = hero;
                 secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans,
-                    firstPlayerHeroController.transform, subFollow, HeroAttackType.Knight, false, 1);
+                    firstPlayerHeroController.transform, subFollow, heroDt.HeroClass, false, false);
                 firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
                 subFollow.SetFollowTarget(secondPlayerHeroController.transform);
             }

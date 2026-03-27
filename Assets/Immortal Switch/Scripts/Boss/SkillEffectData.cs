@@ -29,6 +29,12 @@ namespace Immortal_Switch.Scripts.Skill
         [Header("Chance")]
         [Range(0, 100)]
         public float ChancePercent = 100f;
+        
+        [Header("Scaling")]
+        public SkillScalingStat ScalingStat = SkillScalingStat.Attack;
+
+        [Header("Target")]
+        public SkillTargetType TargetTypeOverride = SkillTargetType.CurrentTarget;
     }
     
     public enum StatusEffectType

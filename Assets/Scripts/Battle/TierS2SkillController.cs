@@ -8,8 +8,6 @@ namespace Scripts.Battle
 {
     public class TierS2SkillController : BaseExternalSkillController
     {
-        [SerializeField] SkeletonAnimation skaFx;
-
         private Vector3 targetPos;
 
         private async UniTaskVoid DoActSkill(Action<float> camAct = null)
@@ -57,7 +55,7 @@ namespace Scripts.Battle
 
         public override void InitInnerSkill(bool isInit, Action<float> camAct)
         {
-            InitSka();
+            InitSkeletonAnimation();
             targetPos = PlayerHeroController.GetNearestMonster();
             transform.position = targetPos;
             if (IsAtkEvent)
@@ -68,9 +66,9 @@ namespace Scripts.Battle
             DoActSkill(camAct).Forget();
         }
 
-        public override void InitInnerSkillMultiSpawn(bool isFinal, Action<float> camAct)
+        protected override void InitInnerSkillMultiSpawn(bool isFinal, Action<float> camAct)
         {
-            InitSka();
+            InitSkeletonAnimation();
             targetPos = transform.position;
             if (TierBaseSkill == TierSkill.SS)
             {
@@ -97,16 +95,6 @@ namespace Scripts.Battle
                 else
                     DoActSkillSSR(camAct, isFinal).Forget();
             }
-        }
-
-        public void InitSka()
-        {
-            if (skaFx && !skaFx.valid)
-            {
-                skaFx.Initialize(false);
-            }
-
-            GetAnimDur(skaFx);
         }
 
         private void AttackCallback(float rangeAtk, float dameAtk)
