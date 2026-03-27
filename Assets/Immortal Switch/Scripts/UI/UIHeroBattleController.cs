@@ -207,8 +207,7 @@ namespace Scripts.UI
                     }
                 }
 
-                SetShowCover(HeroNameAction.SwithBtn);
-                mainHeroData.callbackActs[HeroNameAction.SwithBtn]?.Invoke();
+                DoSkillAction(HeroNameAction.SwithBtn);
             });
         }
 
@@ -235,7 +234,7 @@ namespace Scripts.UI
                 uISwitchHeroController?.ChangeIconByIdx(1, secondIconHead);
             }
             mainHeroData = IsDisplayingFirstHero ? firstHeroData : secondHeroData;
-            AppLySpriteSkillByIdx(IsDisplayingFirstHero);
+            RefreshDisplayedHeroUI();
         }
 
         private void AppLySpriteSkillByIdx(bool isFirst)
@@ -301,11 +300,10 @@ namespace Scripts.UI
             if (mainHeroData == null) return;
             if (mainHeroData.playerHeroController == null) return;
             if (mainHeroData.playerHeroController.IsInAction()) return;
-            if (!mainHeroData.callbackActs.ContainsKey(hak)) return;
+            if (!mainHeroData.intervalCoolings.ContainsKey(hak)) return;
 
             SetShowCover(hak);
-            mainHeroData.callbackActs[hak]?.Invoke();
-            
+            mainHeroData.playerHeroController.ExecuteSkill(hak);
         }
 
         public void SetPlayerHeroInstance(PlayerHeroController phc, int heroSlotIndex, int hid, Dictionary<SkillSlot,int> skillIds)
@@ -346,18 +344,15 @@ namespace Scripts.UI
             }
 
             InitUIHeros(isFirstHeroSlot, hid);
+            uISwitchHeroController?.RegisterActionHeroByIdx(ChangeMainHeroByIdx);
         }
-
-        private void SetHeadIconById(int hid)
-        {
-
-        }
+        
 
         private void ChangeMainHeroByIdx(int hid)
         {
             displayedHeroSlotIndex = hid;
             mainHeroData = IsDisplayingFirstHero ? firstHeroData : secondHeroData;
-            AppLySpriteSkillByIdx(IsDisplayingFirstHero);
+            RefreshDisplayedHeroUI();
         }
         
         public void ToggleDisplayedHero()
@@ -378,7 +373,32 @@ namespace Scripts.UI
                 skillIcons[i].sprite = sprites[i];
             }
 
-            // nếu có cooldown UI thì update lại luôn ở đây
+            foreach (var kvp in covers)
+            {
+                var action = kvp.Key;
+                var cover = kvp.Value;
+
+                if (mainHeroData == null ||
+                    !mainHeroData.timerCoolings.ContainsKey(action) ||
+                    !mainHeroData.intervalCoolings.ContainsKey(action))
+                {
+                    cover.gameObject.SetActive(false);
+                    continue;
+                }
+
+                float timer = mainHeroData.timerCoolings[action];
+                float interval = mainHeroData.intervalCoolings[action];
+
+                if (timer > 0f && interval > 0f)
+                {
+                    cover.gameObject.SetActive(true);
+                    cover.fillAmount = timer / interval;
+                }
+                else
+                {
+                    cover.gameObject.SetActive(false);
+                }
+            }
         }
 
         public void ChangeSkillByIdx(HeroNameAction idx, float interval, int hid)
@@ -404,13 +424,16 @@ namespace Scripts.UI
         {
             var data = isFirst ? firstHeroData : secondHeroData;
 
-            data.callbackActs[idx] = fAct;
+            if (fAct != null)
+                data.callbackActs[idx] = fAct;
+            else if (data.callbackActs.ContainsKey(idx))
+                data.callbackActs.Remove(idx);
+
             data.intervalCoolings[idx] = interval;
 
             if (hasCoolDown)
             {
-                if (!data.timerCoolings.ContainsKey(idx))
-                    data.timerCoolings[idx] = interval;
+                data.timerCoolings.TryAdd(idx, 0f);
             }
             else
             {
@@ -458,7 +481,7 @@ namespace Scripts.UI
                 if (IsDisplayingFirstHero)
                 {
                     mainHeroData = firstHeroData;
-                    AppLySpriteSkillByIdx(true);
+                    RefreshDisplayedHeroUI();
                 }
             }
             else
@@ -470,15 +493,20 @@ namespace Scripts.UI
                 if (!IsDisplayingFirstHero)
                 {
                     mainHeroData = secondHeroData;
-                    AppLySpriteSkillByIdx(false);
+                    RefreshDisplayedHeroUI();
                 }
             }
         }
 
         private void DoSkillCallback(HeroNameAction nameAction)
         {
+            if (mainHeroData == null) return;
+            if (mainHeroData.playerHeroController == null) return;
+            if (mainHeroData.playerHeroController.IsInAction()) return;
+            if (!mainHeroData.intervalCoolings.ContainsKey(nameAction)) return;
+
             SetShowCover(nameAction);
-            mainHeroData.callbackActs[nameAction]?.Invoke();
+            mainHeroData.playerHeroController.ExecuteSkill(nameAction);
         }
 
         private void DoCoolingdownSkill()
@@ -495,6 +523,9 @@ namespace Scripts.UI
 
             foreach (var key in keys)
             {
+                if (!data.intervalCoolings.ContainsKey(key)) continue;
+                if (!covers.ContainsKey(key)) continue;
+
                 if (data.timerCoolings[key] > 0)
                 {
                     data.timerCoolings[key] -= Time.deltaTime;
@@ -505,7 +536,7 @@ namespace Scripts.UI
                 }
                 else
                 {
-                    if(isMain)
+                    if (isMain)
                         covers[key].gameObject.SetActive(false);
                 }
             }
@@ -513,11 +544,19 @@ namespace Scripts.UI
 
         public bool IsSkillAvailable(HeroNameAction nameAction)
         {
+            if (mainHeroData == null) return false;
+            if (!mainHeroData.timerCoolings.ContainsKey(nameAction)) return false;
+
             return mainHeroData.timerCoolings[nameAction] <= 0;
         }
 
         private void SetShowCover(HeroNameAction name)
         {
+            if (mainHeroData == null) return;
+            if (!mainHeroData.intervalCoolings.ContainsKey(name)) return;
+            if (!mainHeroData.timerCoolings.ContainsKey(name)) return;
+            if (!covers.ContainsKey(name)) return;
+
             mainHeroData.timerCoolings[name] = mainHeroData.intervalCoolings[name];
             covers[name].fillAmount = 1;
             covers[name].gameObject.SetActive(true);
@@ -525,6 +564,10 @@ namespace Scripts.UI
 
         private void ResetTimer(CoolingData data, HeroNameAction name)
         {
+            if (data == null) return;
+            if (!data.intervalCoolings.ContainsKey(name)) return;
+            if (!data.timerCoolings.ContainsKey(name)) return;
+
             data.timerCoolings[name] = data.intervalCoolings[name];
         }
 
@@ -533,10 +576,20 @@ namespace Scripts.UI
             HeroNameAction selectedAction = HeroNameAction.None;
             if (isAutoSkilling)
             {
-                var data = isMain ? mainHeroData : firstHeroData.isMain ? secondHeroData : firstHeroData;
+                var data = isMain
+                    ? mainHeroData
+                    : (mainHeroData == firstHeroData ? secondHeroData : firstHeroData);
+
+                if (data == null || data.playerHeroController == null)
+                {
+                    endFucn?.Invoke(selectedAction);
+                    return;
+                }
+
                 foreach (var cl in data.timerCoolings)
                 {
-                    if(cl.Key == HeroNameAction.SwithBtn || cl.Key == HeroNameAction.AutoSwitchBtn || cl.Key == HeroNameAction.AutoSkillBtn) continue;
+                    if (cl.Key == HeroNameAction.SwithBtn || cl.Key == HeroNameAction.AutoSwitchBtn || cl.Key == HeroNameAction.AutoSkillBtn)
+                        continue;
 
                     if (cl.Value <= 0)
                     {
@@ -547,38 +600,44 @@ namespace Scripts.UI
                         else
                         {
                             ResetTimer(data, cl.Key);
-                            data.callbackActs[cl.Key]?.Invoke();
+                            data.playerHeroController.ExecuteSkill(cl.Key);
                         }
+
                         selectedAction = cl.Key;
                         break;
                     }
                 }
             }
+
             endFucn?.Invoke(selectedAction);
         }
 
         public void AutoActiveSwitch(Action<HeroNameAction> endFucn = null, bool isMain = true)
         {
-            if(isAutoSwitching)
-            {
-                if (isMain)
-                {
-                    if (mainHeroData.timerCoolings[HeroNameAction.SwithBtn] <= 0)
-                    {
-                        DoSkillCallback(HeroNameAction.SwithBtn);
+            if (!isAutoSwitching) return;
 
-                        endFucn?.Invoke(HeroNameAction.SwithBtn);
-                    }
-                }
-                else
+            if (isMain)
+            {
+                if (mainHeroData == null || mainHeroData.playerHeroController == null) return;
+                if (!mainHeroData.timerCoolings.ContainsKey(HeroNameAction.SwithBtn)) return;
+
+                if (mainHeroData.timerCoolings[HeroNameAction.SwithBtn] <= 0)
                 {
-                    var sub = (mainHeroData.Hid == firstHeroData.Hid) ? secondHeroData : firstHeroData;
-                    if (sub.timerCoolings[HeroNameAction.SwithBtn] <= 0)
-                    {
-                        ResetTimer(sub, HeroNameAction.SwithBtn);
-                        sub.callbackActs[HeroNameAction.SwithBtn]?.Invoke();
-                        endFucn?.Invoke(HeroNameAction.SwithBtn);
-                    }
+                    DoSkillCallback(HeroNameAction.SwithBtn);
+                    endFucn?.Invoke(HeroNameAction.SwithBtn);
+                }
+            }
+            else
+            {
+                var sub = (mainHeroData == firstHeroData) ? secondHeroData : firstHeroData;
+                if (sub == null || sub.playerHeroController == null) return;
+                if (!sub.timerCoolings.ContainsKey(HeroNameAction.SwithBtn)) return;
+
+                if (sub.timerCoolings[HeroNameAction.SwithBtn] <= 0)
+                {
+                    ResetTimer(sub, HeroNameAction.SwithBtn);
+                    sub.playerHeroController.ExecuteSkill(HeroNameAction.SwithBtn);
+                    endFucn?.Invoke(HeroNameAction.SwithBtn);
                 }
             }
         }
@@ -587,7 +646,7 @@ namespace Scripts.UI
         {
             displayedHeroSlotIndex = hid;
             mainHeroData = IsDisplayingFirstHero ? firstHeroData : secondHeroData;
-            AppLySpriteSkillByIdx(IsDisplayingFirstHero);
+            RefreshDisplayedHeroUI();
         }
     }
 }

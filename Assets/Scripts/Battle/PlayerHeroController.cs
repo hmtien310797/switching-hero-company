@@ -336,8 +336,17 @@ namespace Scripts.Battle
         {
             UIHeroBattleController.Instance?.SetPlayerHeroInstance(this, heroSlotIndex, heroId, skillIdDict);
             UIHeroBattleController.Instance?.RegisterHeroSwitch(ChangeToMain);
+            
             UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.AutoSwitchBtn, null, 5, false, IsFirstHeroSlot);
             UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.AutoSkillBtn, null, 5, false, IsFirstHeroSlot);
+            
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill1Btn, null, intervalSkill.intervalSkill1, true, IsFirstHeroSlot);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill2Btn, null, intervalSkill.intervalSkill2, true, IsFirstHeroSlot);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill3Btn, null, intervalSkill.intervalSkill3, true, IsFirstHeroSlot);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill4Btn, null, intervalSkill.intervalSkill4, true, IsFirstHeroSlot);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill5Btn, null, intervalSkill.intervalSkill5, true, IsFirstHeroSlot);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.SwithBtn, null, intervalSkill.intervalSwitch, true, IsFirstHeroSlot);
+            
             RegisterSkillAction(HeroNameAction.Skill1Btn, () => DoIntoSkill(HeroSkills.Skill1, EndAction));
             RegisterSkillAction(HeroNameAction.Skill2Btn, () => DoIntoSkill(HeroSkills.Skill2, EndAction));
             RegisterSkillAction(HeroNameAction.Skill3Btn, () => DoIntoSkill(HeroSkills.Skill3, EndAction));
@@ -351,6 +360,7 @@ namespace Scripts.Battle
             heroSlotIndex = index;
             isPriorityNearTarget = (index == 0);
         }
+        
         private void ChangeToMain(int hid)
         {
             isPriorityNearTarget = !isPriorityNearTarget;
