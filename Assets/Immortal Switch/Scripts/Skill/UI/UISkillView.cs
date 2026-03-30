@@ -1,273 +1,598 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Immortal_Switch.Hero;
-using Scripts.Battle;
+using Immortal_Switch.Scripts.UI;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Skill.UI
 {
-    public class UISkillView : MonoBehaviour
+    public class UISkillView : AnimatedUIView
     {
-        [Header("Class Buttons")]
-        [SerializeField] private SkillClassButtonView[] classButtons;
+        private SkillViewDataProvider dataProvider;
 
-        [Header("Hero Tabs")]
-        [SerializeField] private SkillHeroTabView[] heroTabs;
+        [Header("Class Buttons")] [SerializeField]
+        private SkillClassButtonView[] classButtons;
 
-        [Header("Equipped Slots")]
-        [SerializeField] private SkillEquippedSlotView[] equippedSlots;
+        [Header("Roots")] [SerializeField] private GameObject assignedContentRoot;
+        [SerializeField] private GameObject unassignedContentRoot;
+        [SerializeField] private GameObject heroTabsRoot;
+        [SerializeField] private GameObject equippedSlotsRoot;
 
-        [Header("Skill Grid")]
-        [SerializeField] private Transform gridRoot;
+        [Header("Hero Tabs")] [SerializeField] private SkillHeroTabView[] heroTabs;
+
+        [Header("Equipped Slots")] [SerializeField]
+        private SkillEquippedSlotView[] equippedSlots;
+
+        [Header("Grid")] [SerializeField] private Transform gridRoot;
         [SerializeField] private SkillItemView skillItemPrefab;
 
-        [Header("Replace Popup")]
-        [SerializeField] private GameObject replacePopup;
-        [SerializeField] private SkillReplaceSlotView[] replaceSlots;
+        [Header("Detail")] [SerializeField] private Image detailIcon;
+        [SerializeField] private TMP_Text detailLevelText;
+        [SerializeField] private TMP_Text detailNameText;
+        [SerializeField] private TMP_Text detailTypeText;
+        [SerializeField] private TMP_Text detailDescText;
+        [SerializeField] private TMP_Text detailShardText;
+        [SerializeField] private Image detailShardFill;
+
+        [Header("Warning")] [SerializeField] private TMP_Text warningText;
+
+        [Header("Buttons")] [SerializeField] private Button equipButton;
+        [SerializeField] private TMP_Text equipButtonText;
+        [SerializeField] private Button optionButton;
+        [SerializeField] private Button glyphButton;
+
+        [Header("Replace Popup")] [SerializeField]
+        private GameObject replacePopupRoot;
+
+        [SerializeField] private SkillHeroTabView replaceHeroPreview;
+        [SerializeField] private Image replacePendingSkillIcon;
+        [SerializeField] private TMP_Text replaceInstructionText;
+        [SerializeField] private SkillReplaceSlotView[] replaceSlotViews;
+        [SerializeField] private Button replaceCloseButton;
+
+        private readonly List<SkillItemView> spawnedGridItems = new();
 
         private HeroClass selectedClass;
-        private int selectedHeroId;
-        private int selectedSkillId;
+        private SkillViewHeroContext selectedHero;
+        private SkillDataSO selectedSkill;
+        private SkillDataSO pendingReplaceSkill;
+        private bool isReplaceMode;
+        [SerializeField] private bool enableDebugLog = true;
 
-        private List<SkillItemView> currentItems = new();
-
-        // =========================
-        // INIT
-        // =========================
-        private void Start()
+        private void LogView(string message)
         {
-            BindClassButtons();
+            if (!enableDebugLog) return;
+            Debug.Log($"[UISkillView] {message}", this);
         }
 
-        private void BindClassButtons()
+        private void LogWarningView(string message)
         {
-            for (int i = 0; i < classButtons.Length; i++)
+            if (!enableDebugLog) return;
+            Debug.LogWarning($"[UISkillView] {message}", this);
+        }
+
+        private void LogErrorView(string message)
+        {
+            Debug.LogError($"[UISkillView] {message}", this);
+        }
+
+        private void Awake()
+        {
+            dataProvider = SkillViewDataProvider.Instance;
+            BindStaticEvents();
+        }
+
+        private void OnEnable()
+        {
+            if (dataProvider != null)
+                dataProvider.OnDataChanged += RefreshCurrentContext;
+
+            OpenDefaultClass();
+        }
+
+        private void OnDisable()
+        {
+            if (dataProvider != null)
+                dataProvider.OnDataChanged -= RefreshCurrentContext;
+        }
+
+        private void BindStaticEvents()
+        {
+            foreach (var button in classButtons)
             {
-                int idx = i;
-                classButtons[i].Button.onClick.AddListener(() =>
+                if (button == null) continue;
+
+                var captured = button;
+                captured.Button.onClick.AddListener(() => OnClickClass(captured.HeroClass));
+            }
+
+            for (int i = 0; i < heroTabs.Length; i++)
+            {
+                int index = i;
+                heroTabs[i].Button.onClick.AddListener(() => OnClickHeroTab(index));
+            }
+
+            for (int i = 0; i < equippedSlots.Length; i++)
+            {
+                int index = i;
+                equippedSlots[i].Button.onClick.AddListener(() => OnClickEquippedSlot(index));
+            }
+
+            if (equipButton != null)
+                equipButton.onClick.AddListener(OnClickEquipOrUnequip);
+
+            if (replaceCloseButton != null)
+                replaceCloseButton.onClick.AddListener(CloseReplacePopup);
+        }
+
+        private void OpenDefaultClass()
+        {
+            if (classButtons == null || classButtons.Length == 0)
+            {
+                LogErrorView("ClassButtons is null or empty.");
+                return;
+            }
+
+            var firstAssigned = classButtons.FirstOrDefault(x =>
+                x != null && dataProvider != null && dataProvider.HasAssignedHero(x.HeroClass));
+            selectedClass = firstAssigned != null ? firstAssigned.HeroClass : classButtons[0].HeroClass;
+
+            selectedHero = null;
+            selectedSkill = null;
+
+            LogView($"OpenDefaultClass -> selectedClass={selectedClass}");
+            RefreshCurrentContext();
+        }
+
+        private void OnClickClass(HeroClass heroClass)
+        {
+            if (isReplaceMode)
+            {
+                LogView($"Closing replace popup before switching class to {heroClass}");
+                CloseReplacePopup();
+            }
+
+            selectedClass = heroClass;
+            selectedHero = dataProvider != null ? dataProvider.GetAssignedHeroByClass(heroClass) : null;
+            selectedSkill = null;
+
+            LogView(
+                $"OnClickClass -> selectedClass={selectedClass}, hero={(selectedHero != null ? selectedHero.HeroId.ToString() : "null")}");
+            RefreshCurrentContext();
+        }
+
+        private void OnClickHeroTab(int heroIndex)
+        {
+            if (isReplaceMode)
+            {
+                LogWarningView("Ignored hero tab click because replace mode is active.");
+                return;
+            }
+
+            var activeHeroes = dataProvider.GetAssignedHeroes();
+            if (heroIndex < 0 || heroIndex >= activeHeroes.Count)
+            {
+                LogErrorView($"OnClickHeroTab invalid index={heroIndex}, activeHeroesCount={activeHeroes.Count}");
+                return;
+            }
+
+            selectedHero = activeHeroes[heroIndex];
+            selectedClass = selectedHero.HeroClass;
+            selectedSkill = null;
+
+            LogView($"OnClickHeroTab -> heroId={selectedHero.HeroId}, class={selectedClass}");
+            RefreshCurrentContext();
+        }
+
+        private void OnClickEquippedSlot(int slotIndex)
+        {
+            if (isReplaceMode || selectedHero == null)
+                return;
+
+            if (selectedHero.EquippedSkillIds == null || slotIndex < 0 ||
+                slotIndex >= selectedHero.EquippedSkillIds.Count)
+                return;
+
+            int skillId = selectedHero.EquippedSkillIds[slotIndex];
+            selectedSkill = dataProvider.GetClassPool(selectedHero.HeroClass)
+                .FirstOrDefault(x => x != null && x.SkillId == skillId);
+
+            RefreshCurrentContext();
+        }
+
+        private void OnClickGridSkill(SkillDataSO skillData)
+        {
+            if (isReplaceMode)
+            {
+                LogWarningView("Ignored grid skill click because replace mode is active.");
+                return;
+            }
+
+            if (skillData == null)
+            {
+                LogErrorView("OnClickGridSkill received null skillData.");
+                return;
+            }
+
+            selectedSkill = skillData;
+            LogView($"OnClickGridSkill -> skillId={skillData.SkillId}, skillName={skillData.SkillName}");
+            RefreshCurrentContext();
+        }
+
+        private void RefreshCurrentContext()
+        {
+            if (dataProvider == null)
+            {
+                LogErrorView("DataProvider is null.");
+                return;
+            }
+
+            RefreshClassButtons();
+
+            bool hasAssignedHero = dataProvider.HasAssignedHero(selectedClass);
+
+            LogView(
+                $"RefreshCurrentContext -> selectedClass={selectedClass}, hasAssignedHero={hasAssignedHero}, isReplaceMode={isReplaceMode}");
+
+            if (assignedContentRoot != null)
+                assignedContentRoot.SetActive(hasAssignedHero);
+
+            if (unassignedContentRoot != null)
+                unassignedContentRoot.SetActive(!hasAssignedHero);
+
+            if (!hasAssignedHero)
+            {
+                selectedHero = null;
+
+                if (warningText != null)
+                    warningText.text = "Cannot equip skill because this Hero's class is not assigned";
+
+                BindHeroTabs();
+                BindEquippedSlots();
+                RebuildGridByClass(selectedClass, null);
+                BindDetail(null, null);
+                CloseReplacePopup();
+
+                LogWarningView($"Class {selectedClass} has no assigned hero. Showing warning mode.");
+                return;
+            }
+
+            selectedHero = ResolveSelectedHero();
+
+            if (selectedHero == null)
+            {
+                LogErrorView($"ResolveSelectedHero returned null while class {selectedClass} is assigned.");
+                return;
+            }
+
+            LogView(
+                $"ResolvedHero -> heroId={selectedHero.HeroId}, class={selectedHero.HeroClass}, equippedCount={selectedHero.EquippedSkillIds?.Count ?? 0}");
+
+            BindHeroTabs();
+            BindEquippedSlots();
+
+            var pool = dataProvider.GetSortedPoolForHero(selectedHero);
+            selectedSkill = ValidateSelectedSkill(pool, selectedHero);
+
+            LogView(
+                $"SelectedSkill -> {(selectedSkill != null ? $"{selectedSkill.SkillId}-{selectedSkill.SkillName}" : "null")}");
+
+            RebuildGridByClass(selectedClass, selectedHero);
+            BindDetail(selectedHero, selectedSkill);
+
+            if (isReplaceMode)
+            {
+                if (selectedHero == null || pendingReplaceSkill == null)
                 {
-                    OnClickClass((HeroClass)idx);
-                });
+                    LogWarningView("ReplaceMode invalid state. Auto closing popup.");
+                    CloseReplacePopup();
+                }
+                else
+                {
+                    OpenReplacePopupInternal();
+                }
             }
         }
 
-        // =========================
-        // CLASS CLICK
-        // =========================
-        private void OnClickClass(HeroClass heroClass)
+        private SkillViewHeroContext ResolveSelectedHero()
         {
-            selectedClass = heroClass;
+            var activeHeroes = dataProvider.GetAssignedHeroes();
+            LogView($"ResolveSelectedHero -> activeHeroesCount={activeHeroes.Count}");
 
-            RefreshClassButtons();
-            RefreshContent();
+            if (selectedHero != null)
+            {
+                var matched = activeHeroes.FirstOrDefault(x => x != null && x.HeroId == selectedHero.HeroId);
+                if (matched != null)
+                {
+                    LogView($"ResolveSelectedHero -> keep current heroId={matched.HeroId}");
+                    return matched;
+                }
+
+                LogWarningView($"Previously selected heroId={selectedHero.HeroId} is no longer active.");
+            }
+
+            var heroByClass = dataProvider.GetAssignedHeroByClass(selectedClass);
+            if (heroByClass != null)
+            {
+                LogView($"ResolveSelectedHero -> fallback by class heroId={heroByClass.HeroId}");
+                return heroByClass;
+            }
+
+            var first = activeHeroes.FirstOrDefault();
+            if (first != null)
+                LogWarningView($"ResolveSelectedHero -> fallback to first active heroId={first.HeroId}");
+
+            return first;
+        }
+
+        private SkillDataSO ValidateSelectedSkill(List<SkillDataSO> pool, SkillViewHeroContext hero)
+        {
+            if (pool == null || pool.Count == 0)
+                return null;
+
+            if (selectedSkill != null && pool.Any(x => x != null && x.SkillId == selectedSkill.SkillId))
+                return selectedSkill;
+
+            if (hero != null && hero.EquippedSkillIds != null)
+            {
+                foreach (var skillId in hero.EquippedSkillIds)
+                {
+                    var equippedSkill = pool.FirstOrDefault(x => x != null && x.SkillId == skillId);
+                    if (equippedSkill != null)
+                        return equippedSkill;
+                }
+            }
+
+            return pool[0];
         }
 
         private void RefreshClassButtons()
         {
-            foreach (var btn in classButtons)
+            foreach (var button in classButtons)
             {
-                bool isSelected = (HeroClass)System.Array.IndexOf(classButtons, btn) == selectedClass;
-                btn.SetSelected(isSelected);
+                if (button == null) continue;
 
-                bool isEquipped = IsClassActive(selectedClass);
-                btn.SetEquipped(isEquipped);
+                bool isAssigned = dataProvider != null && dataProvider.HasAssignedHero(button.HeroClass);
+                bool isSelected = button.HeroClass == selectedClass;
+                button.SetAssigned(isAssigned);
+                button.SetSelected(isSelected);
             }
         }
 
-        // =========================
-        // MAIN CONTENT
-        // =========================
-        private void RefreshContent()
+        private void BindHeroTabs()
         {
-            var heroes = GetActiveHeroesByClass(selectedClass);
+            var activeHeroes = dataProvider.GetAssignedHeroes();
 
-            if (heroes.Count == 0)
-            {
-                ShowUnassignedMode();
-                return;
-            }
-
-            ShowAssignedMode();
-
-            selectedHeroId = heroes[0];
-            RefreshHeroTabs(heroes);
-            RefreshEquipped();
-            RefreshGrid();
-        }
-
-        // =========================
-        // HERO
-        // =========================
-        private void RefreshHeroTabs(List<int> heroIds)
-        {
             for (int i = 0; i < heroTabs.Length; i++)
             {
-                if (i >= heroIds.Count)
+                if (i >= activeHeroes.Count)
                 {
-                    heroTabs[i].gameObject.SetActive(false);
+                    heroTabs[i].Hide();
                     continue;
                 }
 
-                heroTabs[i].gameObject.SetActive(true);
-
-                int heroId = heroIds[i];
-                var hero = GetHeroController(heroId);
-
-                heroTabs[i].Setup(heroId, hero.HeroIcon, heroId == selectedHeroId);
-
-                heroTabs[i].Button.onClick.RemoveAllListeners();
-                heroTabs[i].Button.onClick.AddListener(() =>
-                {
-                    selectedHeroId = heroId;
-                    RefreshEquipped();
-                    RefreshGrid();
-                });
+                var hero = activeHeroes[i];
+                bool isSelected = selectedHero != null && hero.HeroId == selectedHero.HeroId;
+                heroTabs[i].Setup(hero.HeroId, hero.HeroIcon, isSelected);
             }
         }
 
-        // =========================
-        // EQUIPPED
-        // =========================
-        private void RefreshEquipped()
+        private void BindEquippedSlots()
         {
-            var hero = GetHeroController(selectedHeroId);
-            var dict = hero.SkillIdDict;
-
-            int i = 0;
-            foreach (var kvp in dict)
+            for (int i = 0; i < equippedSlots.Length; i++)
             {
-                int skillId = kvp.Value;
-
-                var data = MasterDataCache.Instance.GetSkillDataById(skillId);
-
-                equippedSlots[i].Setup(i, skillId, data.skillIcon, skillId == selectedSkillId);
-
-                int captured = skillId;
-
-                equippedSlots[i].Button.onClick.RemoveAllListeners();
-                equippedSlots[i].Button.onClick.AddListener(() =>
+                if (selectedHero == null || selectedHero.EquippedSkillIds == null ||
+                    i >= selectedHero.EquippedSkillIds.Count)
                 {
-                    selectedSkillId = captured;
-                    RefreshEquipped();
-                    RefreshGrid();
-                });
+                    equippedSlots[i].Setup(i, -1, null, false);
+                    continue;
+                }
 
-                i++;
+                int skillId = selectedHero.EquippedSkillIds[i];
+                var skillData = dataProvider.GetClassPool(selectedHero.HeroClass)
+                    .FirstOrDefault(x => x != null && x.SkillId == skillId);
+
+                bool isSelected = selectedSkill != null && skillData != null &&
+                                  selectedSkill.SkillId == skillData.SkillId;
+                equippedSlots[i].Setup(i, skillId, skillData != null ? skillData.skillIcon : null, isSelected);
             }
         }
 
-        // =========================
-        // GRID
-        // =========================
-        private void RefreshGrid()
+        private void RebuildGridByClass(HeroClass heroClass, SkillViewHeroContext hero)
         {
-            foreach (var item in currentItems)
-                Destroy(item.gameObject);
-
-            currentItems.Clear();
-
-            var skills = GetSkillsByClass(selectedClass);
-
-            foreach (var skill in skills)
+            foreach (var item in spawnedGridItems)
             {
+                if (item != null)
+                    Destroy(item.gameObject);
+            }
+
+            spawnedGridItems.Clear();
+
+            var pool = hero != null ? dataProvider.GetSortedPoolForHero(hero) : dataProvider.GetClassPool(heroClass);
+
+            foreach (var skillData in pool)
+            {
+                var state = dataProvider.BuildSkillState(hero, skillData);
+                if (state == null) continue;
+
                 var item = Instantiate(skillItemPrefab, gridRoot);
+                bool isSelected = selectedSkill != null && skillData != null &&
+                                  selectedSkill.SkillId == skillData.SkillId;
+                item.Setup(state, isSelected, OnClickGridSkill);
+                spawnedGridItems.Add(item);
+            }
+        }
 
-                bool isEquipped = IsSkillEquipped(selectedHeroId, skill.SkillId);
-                bool isOwned = true; // TODO
+        private void BindDetail(SkillViewHeroContext hero, SkillDataSO skillData)
+        {
+            if (skillData == null)
+            {
+                if (detailIcon != null) detailIcon.sprite = null;
+                if (detailLevelText != null) detailLevelText.text = string.Empty;
+                if (detailNameText != null) detailNameText.text = string.Empty;
+                if (detailTypeText != null) detailTypeText.text = string.Empty;
+                if (detailDescText != null) detailDescText.text = string.Empty;
+                if (detailShardText != null) detailShardText.text = string.Empty;
+                if (detailShardFill != null) detailShardFill.fillAmount = 0f;
 
-                item.Setup(
-                    skill.SkillId,
-                    skill.skillIcon,
-                    isEquipped,
-                    isOwned,
-                    20,
-                    22,
-                    skill.SkillId == selectedSkillId
-                );
+                if (equipButton != null) equipButton.interactable = false;
+                if (equipButtonText != null) equipButtonText.text = "Equip";
+                return;
+            }
 
-                item.Button.onClick.AddListener(() =>
+            var state = dataProvider.BuildSkillState(hero, skillData);
+
+            if (detailIcon != null) detailIcon.sprite = skillData.skillIcon;
+            if (detailLevelText != null) detailLevelText.text = $"Lv.{state.Level}";
+            if (detailNameText != null) detailNameText.text = skillData.SkillName;
+            if (detailTypeText != null) detailTypeText.text = $"{skillData.CastType} Skill";
+            if (detailDescText != null) detailDescText.text = skillData.BuildDescription(state.Level);
+            if (detailShardText != null) detailShardText.text = $"{state.CurrentShard}/{state.RequiredShard}";
+            if (detailShardFill != null)
+                detailShardFill.fillAmount =
+                    state.RequiredShard > 0 ? (float)state.CurrentShard / state.RequiredShard : 0f;
+
+            if (!state.IsOwned)
+            {
+                if (equipButton != null) equipButton.interactable = false;
+                if (equipButtonText != null) equipButtonText.text = "Equip";
+                return;
+            }
+
+            if (equipButton != null) equipButton.interactable = hero != null;
+            if (equipButtonText != null) equipButtonText.text = state.IsEquipped ? "Unequip" : "Equip";
+        }
+
+        private void OnClickEquipOrUnequip()
+        {
+            if (selectedHero == null)
+            {
+                LogErrorView("OnClickEquipOrUnequip failed because selectedHero is null.");
+                return;
+            }
+
+            if (selectedSkill == null)
+            {
+                LogErrorView("OnClickEquipOrUnequip failed because selectedSkill is null.");
+                return;
+            }
+
+            var state = dataProvider.BuildSkillState(selectedHero, selectedSkill);
+            if (state == null)
+            {
+                LogErrorView($"BuildSkillState returned null for heroId={selectedHero.HeroId}, skillId={selectedSkill.SkillId}");
+                return;
+            }
+
+            LogView($"OnClickEquipOrUnequip -> heroId={selectedHero.HeroId}, skillId={selectedSkill.SkillId}, isOwned={state.IsOwned}, isEquipped={state.IsEquipped}");
+
+            if (!state.IsOwned)
+            {
+                LogWarningView($"Skill {selectedSkill.SkillId} is not owned. Equip ignored.");
+                return;
+            }
+
+            if (state.IsEquipped)
+            {
+                bool success = dataProvider.TryUnequipSkillFromHero(selectedHero, selectedSkill.SkillId);
+                LogView($"Unequip result -> success={success}");
+                return;
+            }
+
+            int equippedCount = selectedHero.EquippedSkillIds != null ? selectedHero.EquippedSkillIds.Count : 0;
+            if (equippedCount < 5)
+            {
+                bool success = dataProvider.TryEquipSkillToHero(selectedHero, selectedSkill.SkillId);
+                LogView($"Equip to empty result -> success={success}, equippedCountBefore={equippedCount}");
+                return;
+            }
+
+            pendingReplaceSkill = selectedSkill;
+            isReplaceMode = true;
+            LogView($"Open replace mode -> heroId={selectedHero.HeroId}, pendingSkillId={pendingReplaceSkill.SkillId}");
+            OpenReplacePopupInternal();
+        }
+
+        private void OpenReplacePopupInternal()
+        {
+            if (replacePopupRoot != null)
+                replacePopupRoot.SetActive(true);
+
+            if (replaceHeroPreview != null && selectedHero != null)
+                replaceHeroPreview.Setup(selectedHero.HeroId, selectedHero.HeroIcon, true);
+
+            if (replacePendingSkillIcon != null)
+                replacePendingSkillIcon.sprite = pendingReplaceSkill != null ? pendingReplaceSkill.skillIcon : null;
+
+            if (replaceInstructionText != null)
+                replaceInstructionText.text = "Please select the slot to equip";
+
+            for (int i = 0; i < replaceSlotViews.Length; i++)
+            {
+                if (selectedHero == null || selectedHero.EquippedSkillIds == null ||
+                    i >= selectedHero.EquippedSkillIds.Count)
                 {
-                    selectedSkillId = skill.SkillId;
-                    OnClickSkill(skill.SkillId);
-                    RefreshGrid();
-                    RefreshEquipped();
-                });
+                    replaceSlotViews[i].gameObject.SetActive(false);
+                    continue;
+                }
 
-                currentItems.Add(item);
+                int slotIndex = i;
+                int skillId = selectedHero.EquippedSkillIds[i];
+
+                var skillData = dataProvider.GetClassPool(selectedHero.HeroClass)
+                    .FirstOrDefault(x => x != null && x.SkillId == skillId);
+
+                replaceSlotViews[i].Setup(slotIndex, skillData != null ? skillData.skillIcon : null);
+                replaceSlotViews[i].Button.onClick.RemoveAllListeners();
+                replaceSlotViews[i].Button.onClick.AddListener(() => OnClickReplaceSlot(slotIndex));
             }
         }
 
-        // =========================
-        // SKILL ACTION
-        // =========================
-        private void OnClickSkill(int skillId)
+        private void OnClickReplaceSlot(int slotIndex)
         {
-            if (IsSkillEquipped(selectedHeroId, skillId))
+            if (!isReplaceMode)
             {
-                Unequip(skillId);
+                LogWarningView("OnClickReplaceSlot ignored because not in replace mode.");
+                return;
             }
-            else
+
+            if (selectedHero == null)
             {
-                TryEquip(skillId);
+                LogErrorView("OnClickReplaceSlot failed because selectedHero is null.");
+                return;
             }
+
+            if (pendingReplaceSkill == null)
+            {
+                LogErrorView("OnClickReplaceSlot failed because pendingReplaceSkill is null.");
+                return;
+            }
+
+            LogView($"OnClickReplaceSlot -> heroId={selectedHero.HeroId}, slotIndex={slotIndex}, newSkillId={pendingReplaceSkill.SkillId}");
+
+            bool success = dataProvider.TryReplaceSkillOnHero(selectedHero, slotIndex, pendingReplaceSkill.SkillId);
+            if (!success)
+            {
+                LogWarningView($"Replace failed -> heroId={selectedHero.HeroId}, slotIndex={slotIndex}, skillId={pendingReplaceSkill.SkillId}");
+                return;
+            }
+
+            selectedSkill = pendingReplaceSkill;
+            LogView($"Replace success -> selectedSkillId={selectedSkill.SkillId}");
+
+            CloseReplacePopup();
+            RefreshCurrentContext();
         }
 
-        private void TryEquip(int skillId)
+        private void CloseReplacePopup()
         {
-            if (HasEmptySlot(selectedHeroId))
-            {
-                EquipToEmpty(skillId);
-            }
-            else
-            {
-                OpenReplacePopup(skillId);
-            }
+            isReplaceMode = false;
+            pendingReplaceSkill = null;
+
+            if (replacePopupRoot != null)
+                replacePopupRoot.SetActive(false);
         }
-
-        private void OpenReplacePopup(int newSkillId)
-        {
-            replacePopup.SetActive(true);
-
-            var hero = GetHeroController(selectedHeroId);
-
-            int i = 0;
-            foreach (var kvp in hero.SkillIdDict)
-            {
-                int skillId = kvp.Value;
-
-                var data = MasterDataCache.Instance.GetSkillDataById(skillId);
-
-                replaceSlots[i].Setup(i, data.skillIcon);
-
-                int capturedSlot = i;
-
-                replaceSlots[i].Button.onClick.RemoveAllListeners();
-                replaceSlots[i].Button.onClick.AddListener(() =>
-                {
-                    ReplaceSkill(capturedSlot, newSkillId);
-                    replacePopup.SetActive(false);
-                    RefreshEquipped();
-                    RefreshGrid();
-                });
-
-                i++;
-            }
-        }
-
-        // =========================
-        // MOCK / TODO
-        // =========================
-        private bool IsClassActive(HeroClass cls) => true;
-        private List<int> GetActiveHeroesByClass(HeroClass cls) => new() { 1 };
-        private PlayerHeroController GetHeroController(int id) => null;
-        private List<SkillDataSO> GetSkillsByClass(HeroClass cls) => new();
-        private bool IsSkillEquipped(int heroId, int skillId) => false;
-        private bool HasEmptySlot(int heroId) => false;
-
-        private void EquipToEmpty(int skillId) { }
-        private void Unequip(int skillId) { }
-        private void ReplaceSkill(int slot, int newSkillId) { }
-
-        private void ShowUnassignedMode() { }
-        private void ShowAssignedMode() { }
     }
 }

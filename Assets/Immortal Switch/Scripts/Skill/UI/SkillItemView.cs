@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,41 +9,47 @@ namespace Immortal_Switch.Scripts.Skill.UI
     {
         [SerializeField] private Button button;
         [SerializeField] private Image icon;
-        [SerializeField] private GameObject selected;
-        [SerializeField] private GameObject equippedTag;
-        [SerializeField] private GameObject lockedOverlay;
+        [SerializeField] private GameObject selectedObject;
+        [SerializeField] private GameObject equippedTagObject;
+        [SerializeField] private GameObject darkenObject;
+        [SerializeField] private TMP_Text levelText;
         [SerializeField] private TMP_Text shardText;
-        [SerializeField] private Image progress;
+        [SerializeField] private Image shardProgress;
 
-        private int skillId;
+        private SkillDataSO skillData;
+        private Action<SkillDataSO> clickCallback;
 
         public Button Button => button;
-        public int SkillId => skillId;
+        public int SkillId => skillData != null ? skillData.SkillId : -1;
 
-        public void Setup(
-            int skillId,
-            Sprite iconSprite,
-            bool isEquipped,
-            bool isOwned,
-            int shard,
-            int shardMax,
-            bool isSelected)
+        public void Setup(SkillViewSkillState state, bool isSelected, Action<SkillDataSO> onClick)
         {
-            this.skillId = skillId;
+            skillData = state.SkillData;
+            clickCallback = onClick;
 
-            icon.sprite = iconSprite;
-            equippedTag.SetActive(isEquipped);
-            lockedOverlay.SetActive(!isOwned);
+            if (icon != null)
+                icon.sprite = state.SkillData != null ? state.SkillData.skillIcon : null;
 
-            shardText.text = $"{shard}/{shardMax}";
-            progress.fillAmount = shardMax > 0 ? (float)shard / shardMax : 0;
+            if (levelText != null)
+                levelText.text = $"Lv.{state.Level}";
 
-            selected.SetActive(isSelected);
-        }
+            if (shardText != null)
+                shardText.text = $"{state.CurrentShard}/{state.RequiredShard}";
 
-        public void SetSelected(bool value)
-        {
-            selected.SetActive(value);
+            if (shardProgress != null)
+                shardProgress.fillAmount = state.RequiredShard > 0 ? (float)state.CurrentShard / state.RequiredShard : 0f;
+
+            if (equippedTagObject != null)
+                equippedTagObject.SetActive(state.IsEquipped);
+
+            if (darkenObject != null)
+                darkenObject.SetActive(!state.IsOwned);
+
+            if (selectedObject != null)
+                selectedObject.SetActive(isSelected);
+
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => clickCallback?.Invoke(skillData));
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         [SerializeField] private Button button;
         [SerializeField] private Image icon;
 
-        private int slotIndex;
+        private int slotIndex = -1;
 
         public Button Button => button;
         public int SlotIndex => slotIndex;
@@ -16,7 +16,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public void Setup(int slotIndex, Sprite iconSprite)
         {
             this.slotIndex = slotIndex;
-            icon.sprite = iconSprite;
+
+            if (icon != null)
+                icon.sprite = iconSprite;
+
+            gameObject.SetActive(true);
         }
     }
 }

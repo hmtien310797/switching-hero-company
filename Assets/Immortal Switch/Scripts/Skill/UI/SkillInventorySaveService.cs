@@ -54,6 +54,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                     CurrentShard = 0,
                     RequiredShard = 2
                 };
+
                 cache[skillId] = data;
                 SaveAll();
             }
@@ -103,6 +104,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public static void ClearAll()
         {
             cache = new Dictionary<int, SkillProgressSaveData>();
+
             if (ES3.KeyExists(AllProgressKey, SaveFile))
                 ES3.DeleteKey(AllProgressKey, SaveFile);
         }

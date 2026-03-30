@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.GachaSystem.HeroSummonView;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
+using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,14 +24,11 @@ public class BottomMainView : UIView
         // Ensure persistent layer (recommended)
         Layer = UILayer.SubMain;
 
-        if (ButtonEquip != null)
-            ButtonEquip.onClick.AddListener(() => OnToggleMain<EquipView>().Forget());
-
         if (ButtonGrowth != null)
             ButtonGrowth.onClick.AddListener(() => OnToggleMain<GrowthView>().Forget());
 
-        // if (ButtonDungeon != null)
-        //     ButtonDungeon.onClick.AddListener(() => OnToggleMain<DungeonView>().Forget());
+        if (ButtonEquip != null)
+            ButtonEquip.onClick.AddListener(() => OnToggleMain<UISkillView>().Forget());
 
 
          ButtonShop.onClick.AddListener(() => OnToggleMain<HeroSummonView>().Forget());

@@ -448,7 +448,7 @@ namespace Scripts.Battle
 
         private bool IsBossInAttackRange(float rangeAttack, Vector3 target)
         {
-            if (HeroClass == HeroClass.Knight || HeroClass == HeroClass.Warrior)
+            if (HeroClass == HeroClass.Assassin || HeroClass == HeroClass.Warrior)
             {
                 var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack * rangeAttack;
                 var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack && transform.position.z <= target.z;
@@ -461,7 +461,7 @@ namespace Scripts.Battle
 
         private bool IsCreepInAttackRange(float rangeAttack, Vector3 target)
         {
-            if (HeroClass == HeroClass.Knight || HeroClass == HeroClass.Warrior)
+            if (HeroClass == HeroClass.Assassin || HeroClass == HeroClass.Warrior)
             {
                 var isValidX = Mathf.Pow(transform.position.x - target.x, 2) <= rangeAttack * rangeAttack;
                 var isValidZ = Mathf.Pow(transform.position.z - target.z, 2) <= rangeAttack;
@@ -648,7 +648,7 @@ namespace Scripts.Battle
             var pos = _monsterTarget.transform.position;
             pos.y = transform.position.y;
             var isLeft = transform.position.x < pos.x;
-            if(HeroClass is HeroClass.Knight or HeroClass.Warrior)
+            if(HeroClass is HeroClass.Assassin or HeroClass.Warrior)
                 return pos + new Vector3( - baseStatData.AttackRange * .9f * (isMain ? 1 : -1), 0, - baseStatData.AttackRange * .5f);
             else
             {

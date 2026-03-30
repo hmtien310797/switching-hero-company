@@ -7,15 +7,15 @@ namespace Immortal_Switch.Scripts.Skill.UI
     {
         [SerializeField] private Button button;
         [SerializeField] private Image icon;
-        [SerializeField] private GameObject emptyObj;
-        [SerializeField] private GameObject selected;
+        [SerializeField] private GameObject emptyObject;
+        [SerializeField] private GameObject selectedObject;
 
-        private int skillId = -1;
         private int slotIndex;
+        private int skillId = -1;
 
         public Button Button => button;
-        public int SkillId => skillId;
         public int SlotIndex => slotIndex;
+        public int SkillId => skillId;
 
         public void Setup(int slotIndex, int skillId, Sprite iconSprite, bool isSelected)
         {
@@ -24,18 +24,24 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             bool hasSkill = skillId > 0;
 
-            emptyObj.SetActive(!hasSkill);
-            icon.gameObject.SetActive(hasSkill);
+            if (icon != null)
+            {
+                icon.gameObject.SetActive(hasSkill);
+                if (hasSkill)
+                    icon.sprite = iconSprite;
+            }
 
-            if (hasSkill)
-                icon.sprite = iconSprite;
+            if (emptyObject != null)
+                emptyObject.SetActive(!hasSkill);
 
-            selected.SetActive(isSelected);
+            SetSelected(isSelected);
+            gameObject.SetActive(true);
         }
 
         public void SetSelected(bool value)
         {
-            selected.SetActive(value);
+            if (selectedObject != null)
+                selectedObject.SetActive(value && skillId > 0);
         }
     }
 }

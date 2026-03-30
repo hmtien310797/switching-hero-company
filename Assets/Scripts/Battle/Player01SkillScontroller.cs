@@ -139,7 +139,7 @@ namespace Scripts.Battle
         public async UniTaskVoid CoDoAttack(Action endAct, string animName)
         {
             var dur = BaseAnimController.GetDurByAnimName(animName);
-            if (playerHeroController.HeroClass == HeroClass.Knight || playerHeroController.HeroClass == HeroClass.Warrior)
+            if (playerHeroController.HeroClass == HeroClass.Assassin || playerHeroController.HeroClass == HeroClass.Warrior)
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: _disableCts.Token);
                 endAct?.Invoke();

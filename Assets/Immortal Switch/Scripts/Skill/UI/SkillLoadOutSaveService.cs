@@ -20,7 +20,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 return new List<int>();
 
             var list = ES3.Load(key, SaveFile, new List<int>());
-            return list?.Where(x => x > 0).Take(5).ToList() ?? new List<int>();
+            return list?.Where(x => x > 0).Distinct().Take(5).ToList() ?? new List<int>();
         }
 
         public static void SaveSelectedSkillIdsByHeroId(int heroId, List<int> skillIds)
