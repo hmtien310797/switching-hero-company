@@ -87,6 +87,8 @@ namespace Scripts.Battle
         public FollowHeroController FollowHeroController { get => followHeroController; set => followHeroController = value; }
         public HeroClass HeroClass { get; private set; }
         public Sprite HeroIcon { get; private set; }
+        private Transform skillRootTrans;
+        public bool IsMainHero => isMain;
 
         protected override void Awake()
         {
@@ -94,11 +96,12 @@ namespace Scripts.Battle
             
             GameEventManager.Subscribe(GameEvents.OnStageCleared, RegisterBattleResult);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnGameLose);
-            GameEventManager.Subscribe(GameEvents.OnChangeSkill, (Action<int,int>)OnChageSkillEvent);
         }
 
-        public void InitHero(HeroDataSO data, PvEBattleController pbc, PlayerCamController pcc, Transform soTrans, Transform partnerTrans, FollowHeroController fHc, HeroClass heroClass, bool isSwitch = false, bool isMainHero = false)
+        public void InitHero(HeroDataSO data, PvEBattleController pbc, PlayerCamController pcc, Transform soTrans,
+            Transform partnerTrans, FollowHeroController fHc, HeroClass heroClass, bool isSwitch = false, bool isMainHero = false)
         {
+            skillRootTrans = soTrans;
             isMain = isMainHero;
             isPriorityNearTarget = isMain;
             isValid = true;
@@ -143,21 +146,42 @@ namespace Scripts.Battle
             Debug.Log($"target pos is: {isMain} and pos is: {targetPos}");
         }
 
-        private void SetIntervalSkills(List<int>skillIds)
+        private void SetIntervalSkills(List<int> skillIds)
         {
-            for (int i = 0; i < skillIds.Count; i++)
+            skillIdDict.Clear();
+
+            if (skillIds == null || skillIds.Count == 0)
+            {
+                intervalSkill ??= new HeroCoolingTimeDefine();
+                intervalSkill.intervalSkill1 = 10f;
+                intervalSkill.intervalSkill2 = 10f;
+                intervalSkill.intervalSkill3 = 10f;
+                intervalSkill.intervalSkill4 = 10f;
+                intervalSkill.intervalSkill5 = 10f;
+                intervalSkill.intervalSwitch = intervalSwitch;
+                return;
+            }
+
+            for (int i = 0; i < skillIds.Count && i < 5; i++)
             {
                 skillIdDict[(SkillSlot)i] = skillIds[i];
             }
 
-            if(skillIds == null || skillIds.Count == 0) return;
             intervalSkill ??= new HeroCoolingTimeDefine();
-            intervalSkill.intervalSkill1 = MasterDataCache.Instance.GetSkillDataById(skillIdDict[SkillSlot.Slot1])?.CooldownTime??10f;
-            intervalSkill.intervalSkill2 = MasterDataCache.Instance.GetSkillDataById(skillIdDict[SkillSlot.Slot2])?.CooldownTime??10f;
-            intervalSkill.intervalSkill3 = MasterDataCache.Instance.GetSkillDataById(skillIdDict[SkillSlot.Slot3])?.CooldownTime??10f;
-            intervalSkill.intervalSkill4 = MasterDataCache.Instance.GetSkillDataById(skillIdDict[SkillSlot.Slot4])?.CooldownTime??10f;
-            intervalSkill.intervalSkill5 = MasterDataCache.Instance.GetSkillDataById(skillIdDict[SkillSlot.Slot5])?.CooldownTime??10f;
+            intervalSkill.intervalSkill1 = GetCooldownBySlot(SkillSlot.Slot1);
+            intervalSkill.intervalSkill2 = GetCooldownBySlot(SkillSlot.Slot2);
+            intervalSkill.intervalSkill3 = GetCooldownBySlot(SkillSlot.Slot3);
+            intervalSkill.intervalSkill4 = GetCooldownBySlot(SkillSlot.Slot4);
+            intervalSkill.intervalSkill5 = GetCooldownBySlot(SkillSlot.Slot5);
             intervalSkill.intervalSwitch = intervalSwitch;
+        }
+
+        private float GetCooldownBySlot(SkillSlot slot)
+        {
+            if (!skillIdDict.TryGetValue(slot, out var skillId))
+                return 10f;
+
+            return MasterDataCache.Instance.GetSkillDataById(skillId)?.CooldownTime ?? 10f;
         }
 
         private void OnChageSkillEvent(int slotId, int skillId)
@@ -667,8 +691,35 @@ namespace Scripts.Battle
         public void DoLoseCallback()
         {
             return;
-            if (isMain)
-                pvEBattleController?.OnStageFailed();
+        }
+        
+        public IReadOnlyDictionary<SkillSlot, int> GetRuntimeSkillMap()
+        {
+            return skillIdDict;
+        }
+
+        public List<int> GetOrderedEquippedSkillIds()
+        {
+            var result = new List<int>(5);
+
+            for (int i = 0; i < 5; i++)
+            {
+                if (skillIdDict.TryGetValue((SkillSlot)i, out var skillId) && skillId > 0)
+                    result.Add(skillId);
+            }
+
+            return result;
+        }
+
+        public void RefreshSelectedSkillsRuntime()
+        {
+            if (heroId <= 0)
+                return;
+
+            var selectedSkillIds = UserDataCache.Instance.GetSelectedSkillIdsByHeroId(heroId);
+            SetIntervalSkills(selectedSkillIds);
+            InitSkill(selectedSkillIds, skillRootTrans);
+            InitUIHeroBattle();
         }
     }
 

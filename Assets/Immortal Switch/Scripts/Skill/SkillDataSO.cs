@@ -82,7 +82,8 @@ namespace Immortal_Switch.Scripts.Skill
         [Header("New Skill Metadata")]
         public string SkillKey;
         public string SkillName;
-        [TextArea(3, 8)] public string DescriptionTemplate;
+        [TextArea(3, 8)]
+        public string DescriptionTemplate;
         public SkillCastType CastType = SkillCastType.Active;
         public SkillTargetType DefaultTargetType = SkillTargetType.CurrentTarget;
         public int MaxLevel = 1;
@@ -90,14 +91,21 @@ namespace Immortal_Switch.Scripts.Skill
         [Header("New Skill Levels")]
         public List<SkillLevelData> Levels = new();
 
+        public int GetSafeLevel(int level)
+        {
+            return Mathf.Clamp(level, 1, Mathf.Max(1, MaxLevel));
+        }
+
         public SkillLevelData GetLevelData(int level)
         {
+            int safeLevel = GetSafeLevel(level);
+
             if (Levels == null || Levels.Count == 0)
                 return null;
 
             for (int i = 0; i < Levels.Count; i++)
             {
-                if (Levels[i] != null && Levels[i].Level == level)
+                if (Levels[i] != null && Levels[i].Level == safeLevel)
                     return Levels[i];
             }
 
@@ -123,6 +131,11 @@ namespace Immortal_Switch.Scripts.Skill
             }
 
             return null;
+        }
+
+        public string BuildDescription(int level)
+        {
+            return SkillDescriptionBuilder.BuildDescription(this, level);
         }
     }
 }

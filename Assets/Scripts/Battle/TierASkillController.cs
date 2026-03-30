@@ -10,6 +10,16 @@ namespace Scripts.Battle
     {
         [SerializeField] SkeletonAnimation skaFx;
 
+        private async UniTaskVoid DoActSkill(Action<float> camAct)
+        {
+            PlayAnim(skaFx);
+            var dur = GetAnimDur(skaFx);
+            camAct?.Invoke(dur);
+            await UniTask.Delay(TimeSpan.FromSeconds(dur));
+            base.DoEndSkill().Forget();
+            PoolController.Instance?.ReturnToPool(gameObject);
+        }
+
         private async UniTaskVoid DoActSkillByNum(Action<float> camAct, int numAtk)
         {
             numAtk = numAtk < 1 ? 1 : numAtk;
@@ -28,7 +38,7 @@ namespace Scripts.Battle
 
         public override void InitInnerSkill(bool isInit = true, Action<float> camAct = null)
         {
-            InitSkeletonAnimation();
+            InitSka();
             if (IsFollow)
             {
                 transform.SetParent(PlayerHeroController.transform);
@@ -50,16 +60,16 @@ namespace Scripts.Battle
 
             DoActSkill(camAct).Forget();
         }
-        
-        private async UniTaskVoid DoActSkill(Action<float> camAct)
+
+        public void InitSka()
         {
-            PlayAnim(skaFx);
-            var dur = GetAnimDur(skaFx);
-            camAct?.Invoke(dur);
-            await UniTask.Delay(TimeSpan.FromSeconds(dur));
-            base.DoEndSkill().Forget();
-            PoolController.Instance?.ReturnToPool(gameObject);
-        }
+            if (skaFx && !skaFx.valid)
+            {
+                skaFx.Initialize(false);
+            }
+
+            GetAnimDur(skaFx);
+        }        
 
         private void AttackCallback(float rangeAtk, float dameAtk)
         {
@@ -81,6 +91,18 @@ namespace Scripts.Battle
                     eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
                 }
             };
+        }
+        
+        protected virtual bool TryExecuteNewSkillPhase(string eventName, Vector3 Pos)
+        {
+            if (PlayerHeroController == null) return false;
+            if (SkillData == null) return false;
+
+            var phase = SkillData.GetPhaseByEvent(defaultSkillLevel, eventName);
+            if (phase == null) return false;
+
+            SkillExecutor.ExecutePhase(PlayerHeroController, phase, Pos, RangeSkill);
+            return true;
         }
     }
 }

@@ -29,14 +29,14 @@ namespace Immortal_Switch.Scripts.Skill
         [Header("Chance")]
         [Range(0, 100)]
         public float ChancePercent = 100f;
-        
+
         [Header("Scaling")]
         public SkillScalingStat ScalingStat = SkillScalingStat.Attack;
 
         [Header("Target")]
         public SkillTargetType TargetTypeOverride = SkillTargetType.CurrentTarget;
     }
-    
+
     public enum StatusEffectType
     {
         Curse,
@@ -45,7 +45,7 @@ namespace Immortal_Switch.Scripts.Skill
         Mark,
         CustomDebuff
     }
-    
+
     public enum SkillEffectType
     {
         Damage,
@@ -57,5 +57,18 @@ namespace Immortal_Switch.Scripts.Skill
         DamageReductionPercent,
         AddMark,
         TeleportToTarget
+    }
+
+    public enum SkillTargetType
+    {
+        CurrentTarget,
+        Self,
+        AllEnemies,
+        AllAllies,
+        RandomEnemy,
+        LowestHpEnemy,
+        HighestHpEnemy,
+        AreaAroundTarget,
+        AreaAroundSelf
     }
 }

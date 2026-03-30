@@ -132,24 +132,6 @@ namespace Scripts.Battle
             target.Stats.BuffModule.ApplyBuff(buffData);
         }
         
-        public void DealDamageToAllTargets(List<ICombatUnit> targets, float percentAtk)
-        {
-            if (targets == null || targets.Count == 0) return;
-
-            float atk = Stats.StatModule.GetFinalStat(StatType.Atk);
-            float damage = atk * percentAtk / 100f;
-
-            for (int i = 0; i < targets.Count; i++)
-            {
-                var target = targets[i];
-                if (target == null || target.IsDead) continue;
-
-                target.TakeDamage(this);
-            }
-
-            Debug.Log($"boss deals {damage} AOE damage ({percentAtk}% ATK) to {targets.Count} targets");
-        }
-        
         public void DealDamageToTarget(ICombatUnit target, float percentAtk)
         {
             if (target == null) return;

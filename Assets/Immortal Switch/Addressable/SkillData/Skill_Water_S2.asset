@@ -26,5 +26,158 @@ MonoBehaviour:
   DescriptionTemplate: 
   CastType: 0
   DefaultTargetType: 0
-  MaxLevel: 1
-  Levels: []
+  MaxLevel: 3
+  Levels:
+  - Level: 1
+    Phases:
+    - PhaseId: 1
+      SpineEventName: hit
+      TargetTypeOverride: 0
+      Effects:
+      - EffectType: 0
+        Value: 0
+        Duration: 0
+        StackCount: 1
+        DamageMultiplier: 200
+        DamageMultiplierPerLevel: 0
+        ValuePerLevel: 0
+        DurationPerLevel: 0
+        StatType: 0
+        StatModifierPercent: 0
+        StatModifierPercentPerLevel: 0
+        StatusType: 0
+        ChancePercent: 100
+        ChancePercentPerLevel: 0
+        ScalingStat: 0
+        TargetTypeOverride: 0
+    - PhaseId: 2
+      SpineEventName: finalhit
+      TargetTypeOverride: 0
+      Effects:
+      - EffectType: 0
+        Value: 0
+        Duration: 0
+        StackCount: 1
+        DamageMultiplier: 60
+        DamageMultiplierPerLevel: 0
+        ValuePerLevel: 0
+        DurationPerLevel: 0
+        StatType: 0
+        StatModifierPercent: 0
+        StatModifierPercentPerLevel: 0
+        StatusType: 0
+        ChancePercent: 100
+        ChancePercentPerLevel: 0
+        ScalingStat: 0
+        TargetTypeOverride: 0
+    DescriptionParams:
+    - Key: damage1
+      Value: 200
+      IsPercent: 0
+      DecimalPlaces: 0
+    - Key: damage2
+      Value: 60
+      IsPercent: 0
+      DecimalPlaces: 0
+  - Level: 2
+    Phases:
+    - PhaseId: 1
+      SpineEventName: hit
+      TargetTypeOverride: 0
+      Effects:
+      - EffectType: 0
+        Value: 0
+        Duration: 0
+        StackCount: 1
+        DamageMultiplier: 200
+        DamageMultiplierPerLevel: 0
+        ValuePerLevel: 0
+        DurationPerLevel: 0
+        StatType: 0
+        StatModifierPercent: 0
+        StatModifierPercentPerLevel: 0
+        StatusType: 0
+        ChancePercent: 100
+        ChancePercentPerLevel: 0
+        ScalingStat: 0
+        TargetTypeOverride: 0
+    - PhaseId: 2
+      SpineEventName: finalhit
+      TargetTypeOverride: 0
+      Effects:
+      - EffectType: 0
+        Value: 0
+        Duration: 0
+        StackCount: 1
+        DamageMultiplier: 60
+        DamageMultiplierPerLevel: 0
+        ValuePerLevel: 0
+        DurationPerLevel: 0
+        StatType: 0
+        StatModifierPercent: 0
+        StatModifierPercentPerLevel: 0
+        StatusType: 0
+        ChancePercent: 100
+        ChancePercentPerLevel: 0
+        ScalingStat: 0
+        TargetTypeOverride: 0
+    DescriptionParams:
+    - Key: damage1
+      Value: 200
+      IsPercent: 0
+      DecimalPlaces: 0
+    - Key: damage2
+      Value: 60
+      IsPercent: 0
+      DecimalPlaces: 0
+  - Level: 3
+    Phases:
+    - PhaseId: 1
+      SpineEventName: hit
+      TargetTypeOverride: 0
+      Effects:
+      - EffectType: 0
+        Value: 0
+        Duration: 0
+        StackCount: 1
+        DamageMultiplier: 200
+        DamageMultiplierPerLevel: 0
+        ValuePerLevel: 0
+        DurationPerLevel: 0
+        StatType: 0
+        StatModifierPercent: 0
+        StatModifierPercentPerLevel: 0
+        StatusType: 0
+        ChancePercent: 100
+        ChancePercentPerLevel: 0
+        ScalingStat: 0
+        TargetTypeOverride: 0
+    - PhaseId: 2
+      SpineEventName: finalhit
+      TargetTypeOverride: 0
+      Effects:
+      - EffectType: 0
+        Value: 0
+        Duration: 0
+        StackCount: 1
+        DamageMultiplier: 60
+        DamageMultiplierPerLevel: 0
+        ValuePerLevel: 0
+        DurationPerLevel: 0
+        StatType: 0
+        StatModifierPercent: 0
+        StatModifierPercentPerLevel: 0
+        StatusType: 0
+        ChancePercent: 100
+        ChancePercentPerLevel: 0
+        ScalingStat: 0
+        TargetTypeOverride: 0
+    DescriptionParams:
+    - Key: damage1
+      Value: 200
+      IsPercent: 0
+      DecimalPlaces: 0
+    - Key: damage2
+      Value: 60
+      IsPercent: 0
+      DecimalPlaces: 0

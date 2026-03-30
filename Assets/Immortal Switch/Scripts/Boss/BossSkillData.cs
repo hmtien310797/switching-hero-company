@@ -27,16 +27,4 @@ namespace Immortal_Switch.Scripts.Skill
         Active
     }
     
-    public enum SkillTargetType
-    {
-        CurrentTarget,
-        Self,
-        AllEnemies,
-        AllAllies,
-        RandomEnemy,
-        LowestHpEnemy,
-        HighestHpEnemy,
-        AreaAroundTarget,
-        AreaAroundSelf
-    }
 }

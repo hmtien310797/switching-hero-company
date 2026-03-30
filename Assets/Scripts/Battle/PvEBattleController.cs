@@ -33,7 +33,7 @@ namespace Scripts.Battle
         Defeat
     }
 
-    public class PvEBattleController : Singleton<PvEBattleController>
+    public partial class PvEBattleController : Singleton<PvEBattleController>
     {
         [Header("Refs")] [SerializeField] PlayerCamController playerCamController;
         [SerializeField] Transform skillObjTrans;
@@ -114,7 +114,7 @@ namespace Scripts.Battle
             pvEMapController.InitMapByChapter(GetChapterIdByStage(currentStage));
             InitSwitchableHeroIds();
             await InitPlayerHeroById();
-
+            NotifyActiveLineupChanged();
             InitStage(currentStage);
 
             SpawnNextCreepBatch();
@@ -215,6 +215,7 @@ namespace Scripts.Battle
                 firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
                 secondPlayerHeroController.SetPartner(firstPlayerHeroController.transform);
             }
+            NotifyActiveLineupChanged();
         }
         
 
@@ -273,8 +274,9 @@ namespace Scripts.Battle
                 firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
                 subFollow.SetFollowTarget(secondPlayerHeroController.transform);
             }
-
+            
             await UniTask.Delay(1000);
+            NotifyActiveLineupChanged();
         }
 
         private void BuildBossDataLookup()
