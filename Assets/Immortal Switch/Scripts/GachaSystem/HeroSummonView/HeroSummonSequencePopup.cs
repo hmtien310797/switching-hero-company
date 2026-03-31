@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.HeroUIView;
@@ -9,27 +10,50 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
     public class HeroSummonSequencePopup : MonoBehaviour
     {
+        [Header("Root")]
         [SerializeField] private GameObject root;
         [SerializeField] private Transform cardRoot;
         [SerializeField] private HeroSummonSequenceCardUI cardPrefab;
+
+        [Header("Top / Utility")]
         [SerializeField] private Button closeButton;
         [SerializeField] private Button skipRevealButton;
+
+        [Header("Bottom Summon Buttons")]
+        [SerializeField] private HeroSummonButtonUI summonButtonA;
+        [SerializeField] private HeroSummonButtonUI summonButtonB;
+        [SerializeField] private string optionAId = "summon_10";
+        [SerializeField] private string optionBId = "summon_50";
+
+        [Header("Auto / Skip")]
+        [SerializeField] private HeroSummonAutoSummonController autoSummonController;
+        [SerializeField] private float autoSummonDelay = 0.35f;
+
+        [Header("Reveal")]
+        [SerializeField] private float initialDelay = 0.12f;
+        [SerializeField] private float minRevealInterval = 0.05f;
+        [SerializeField] private float maxRevealInterval = 0.18f;
+        [SerializeField] private float highRarityExtraPause = 0.18f;
+        [SerializeField] private float lastCardExtraPause = 0.12f;
+
+        [Header("Rarity Visual")]
         [SerializeField] private HeroSummonRarityVisualConfigSO rarityVisualConfig;
 
-        [Header("Auto Summon")] [SerializeField]
-        private HeroSummonAutoSummonController autoSummonController;
-
-        [SerializeField] private float autoSummonDelay = 0.4f;
-
-        [Header("Reveal")] [SerializeField] private float initialDelay = 0.15f;
-        [SerializeField] private float revealInterval = 0.2f;
-
         private readonly List<HeroSummonSequenceCardUI> spawnedCards = new();
+        private readonly List<HeroSummonSequenceCardUI> cardPool = new();
+        private readonly List<HeroSummonGroupedResultEntry> currentGroupedEntries = new();
+
         private Coroutine revealCoroutine;
         private Coroutine autoSummonCoroutine;
 
-        private HeroSummonResult currentResult;
-        private System.Action autoSummonAction;
+        private Action<string> summonAction;
+        private string lastSelectedOptionId;
+        private bool revealCompletedInvoked;
+        private bool isBusyReplacing;
+
+        public bool IsShowing => root != null ? root.activeSelf : gameObject.activeSelf;
+
+        public event Action OnRevealCompleted;
 
         private void Awake()
         {
@@ -39,82 +63,186 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             if (skipRevealButton != null)
                 skipRevealButton.onClick.AddListener(SkipReveal);
 
+            BindSummonButtons();
             Hide();
         }
 
-        public void Show(HeroSummonResult result, System.Action onAutoSummon = null)
+        public void ShowFirstResult(HeroSummonResult result, Action<string> onSummonAction, string currentOptionId)
+        {
+            summonAction = onSummonAction;
+            lastSelectedOptionId = currentOptionId;
+
+            SetPopupVisible(true);
+            RefreshSummonButtons();
+            ReplaceResult(result);
+        }
+
+        public void ReplaceResult(HeroSummonResult result)
         {
             if (result == null) return;
+            StartCoroutine(CoReplaceResult(result));
+        }
 
-            currentResult = result;
-            autoSummonAction = onAutoSummon;
+        private IEnumerator CoReplaceResult(HeroSummonResult result)
+        {
+            isBusyReplacing = true;
+            UpdateButtonInteractable();
+
+            StopRevealOnly();
+            ResetRevealState();
+
+            yield return StartCoroutine(CoFadeOutOldCards());
 
             ClearCards();
+            BuildCards(result);
 
-            var groupedEntries = HeroSummonResultGrouper.Group(result);
+            var rootRect = cardRoot as RectTransform;
+            if (rootRect != null)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
 
-            for (int i = 0; i < groupedEntries.Count; i++)
-            {
-                var entry = groupedEntries[i];
-                var visual = rarityVisualConfig != null ? rarityVisualConfig.Get(entry.Rarity) : null;
-
-                var card = Instantiate(cardPrefab, cardRoot);
-                card.Bind(
-                    entry,
-                    visual != null ? visual.Icon : null,
-                    visual != null ? visual.TopColor : Color.white,
-                    visual != null ? visual.BottomColor : Color.white);
-
-                spawnedCards.Add(card);
-            }
-
-            if (root != null)
-                root.SetActive(true);
-            else
-                gameObject.SetActive(true);
-
-            if (revealCoroutine != null)
-                StopCoroutine(revealCoroutine);
-
-            if (autoSummonCoroutine != null)
-                StopCoroutine(autoSummonCoroutine);
+            yield return null;
 
             bool skipAnim = autoSummonController != null && autoSummonController.IsSkipAnimationOn;
+
             if (skipAnim)
             {
-                SkipReveal();
-
-                if (autoSummonController != null && autoSummonController.IsAutoSummonOn)
-                    autoSummonCoroutine = StartCoroutine(CoAutoSummon());
+                ShowAllCardsImmediate();
+                InvokeRevealCompletedOnce();
+                StartAutoSummonIfNeeded();
             }
             else
             {
                 revealCoroutine = StartCoroutine(CoRevealCards());
             }
+
+            isBusyReplacing = false;
+            UpdateButtonInteractable();
+        }
+
+        private IEnumerator CoFadeOutOldCards()
+        {
+            float duration = 0.16f;
+            float time = 0f;
+
+            while (time < duration)
+            {
+                time += Time.deltaTime;
+                float t = 1f - Mathf.Clamp01(time / duration);
+
+                for (int i = 0; i < spawnedCards.Count; i++)
+                {
+                    if (spawnedCards[i] != null && spawnedCards[i].CanvasGroup != null)
+                        spawnedCards[i].CanvasGroup.alpha = t;
+                }
+
+                yield return null;
+            }
+
+            for (int i = 0; i < spawnedCards.Count; i++)
+            {
+                if (spawnedCards[i] != null && spawnedCards[i].CanvasGroup != null)
+                    spawnedCards[i].CanvasGroup.alpha = 0f;
+            }
         }
 
         public void Hide()
         {
-            if (revealCoroutine != null)
-            {
-                StopCoroutine(revealCoroutine);
-                revealCoroutine = null;
-            }
-
-            if (autoSummonCoroutine != null)
-            {
-                StopCoroutine(autoSummonCoroutine);
-                autoSummonCoroutine = null;
-            }
-
-            if (root != null)
-                root.SetActive(false);
-            else
-                gameObject.SetActive(false);
-
+            StopAllCoroutinesInternal();
             ClearCards();
-            currentResult = null;
-            autoSummonAction = null;
+            SetPopupVisible(false);
+
+            revealCompletedInvoked = false;
+            isBusyReplacing = false;
+        }
+
+        private void BindSummonButtons()
+        {
+            if (summonButtonA != null)
+                summonButtonA.Init(optionAId, HandleSummonButtonClick);
+
+            if (summonButtonB != null)
+                summonButtonB.Init(optionBId, HandleSummonButtonClick);
+        }
+
+        private void RefreshSummonButtons()
+        {
+            if (summonButtonA != null)
+                summonButtonA.Refresh();
+
+            if (summonButtonB != null)
+                summonButtonB.Refresh();
+        }
+
+        private void HandleSummonButtonClick(string optionId)
+        {
+            if (isBusyReplacing)
+                return;
+
+            lastSelectedOptionId = optionId;
+            StopAutoSummonOnly();
+            summonAction?.Invoke(optionId);
+        }
+
+        private void BuildCards(HeroSummonResult result)
+        {
+            currentGroupedEntries.Clear();
+            currentGroupedEntries.AddRange(HeroSummonResultGrouper.Group(result));
+
+            for (int i = 0; i < currentGroupedEntries.Count; i++)
+            {
+                var entry = currentGroupedEntries[i];
+                var visual = rarityVisualConfig != null ? rarityVisualConfig.Get(entry.Rarity) : null;
+
+                var card = GetCardFromPool();
+                card.Bind(
+                    entry,
+                    visual != null ? visual.Icon : null,
+                    visual != null ? visual.TopColor : Color.white,
+                    visual != null ? visual.BottomColor : Color.white,
+                    i == currentGroupedEntries.Count - 1
+                );
+
+                spawnedCards.Add(card);
+            }
+        }
+
+        private HeroSummonSequenceCardUI GetCardFromPool()
+        {
+            HeroSummonSequenceCardUI card = null;
+
+            int lastIndex = cardPool.Count - 1;
+            if (lastIndex >= 0)
+            {
+                card = cardPool[lastIndex];
+                cardPool.RemoveAt(lastIndex);
+            }
+            else
+            {
+                card = Instantiate(cardPrefab, cardRoot);
+            }
+
+            card.transform.SetParent(cardRoot, false);
+            card.transform.SetAsLastSibling();
+            card.PrepareForReuse();
+            card.SetVisible(true);
+
+            return card;
+        }
+
+        private void ReleaseAllSpawnedCardsToPool()
+        {
+            for (int i = 0; i < spawnedCards.Count; i++)
+            {
+                var card = spawnedCards[i];
+                if (card == null) continue;
+
+                card.PrepareForReuse();
+                card.SetVisible(false);
+                cardPool.Add(card);
+            }
+
+            spawnedCards.Clear();
+            currentGroupedEntries.Clear();
         }
 
         private IEnumerator CoRevealCards()
@@ -123,26 +251,29 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             for (int i = 0; i < spawnedCards.Count; i++)
             {
-                if (spawnedCards[i] != null)
-                    spawnedCards[i].Reveal();
+                if (spawnedCards[i] == null)
+                    continue;
 
-                yield return new WaitForSeconds(revealInterval);
+                var entry = i < currentGroupedEntries.Count ? currentGroupedEntries[i] : null;
+                bool isHighRarity = entry != null && entry.Rarity >= SummonRarity.Epic;
+                bool isLastCard = i == spawnedCards.Count - 1;
+
+                if (isHighRarity)
+                    yield return new WaitForSeconds(highRarityExtraPause);
+
+                spawnedCards[i].Reveal();
+
+                float delay = Mathf.Lerp(maxRevealInterval, minRevealInterval, spawnedCards.Count <= 1 ? 1f : (float)i / (spawnedCards.Count - 1));
+
+                if (isLastCard)
+                    delay += lastCardExtraPause;
+
+                yield return new WaitForSeconds(delay);
             }
 
             revealCoroutine = null;
-
-            if (autoSummonController != null && autoSummonController.IsAutoSummonOn)
-                autoSummonCoroutine = StartCoroutine(CoAutoSummon());
-        }
-
-        private IEnumerator CoAutoSummon()
-        {
-            yield return new WaitForSeconds(autoSummonDelay);
-
-            Hide();
-            autoSummonAction?.Invoke();
-
-            autoSummonCoroutine = null;
+            InvokeRevealCompletedOnce();
+            StartAutoSummonIfNeeded();
         }
 
         private void SkipReveal()
@@ -153,6 +284,13 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 revealCoroutine = null;
             }
 
+            ShowAllCardsImmediate();
+            InvokeRevealCompletedOnce();
+            StartAutoSummonIfNeeded();
+        }
+
+        private void ShowAllCardsImmediate()
+        {
             for (int i = 0; i < spawnedCards.Count; i++)
             {
                 if (spawnedCards[i] != null)
@@ -160,15 +298,95 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             }
         }
 
-        private void ClearCards()
+        private void StartAutoSummonIfNeeded()
         {
-            for (int i = 0; i < spawnedCards.Count; i++)
+            if (autoSummonController == null || !autoSummonController.IsAutoSummonOn)
+                return;
+
+            StopAutoSummonOnly();
+            autoSummonCoroutine = StartCoroutine(CoAutoSummon());
+        }
+
+        private IEnumerator CoAutoSummon()
+        {
+            yield return new WaitForSeconds(autoSummonDelay);
+
+            if (autoSummonController == null || !autoSummonController.IsAutoSummonOn)
             {
-                if (spawnedCards[i] != null)
-                    Destroy(spawnedCards[i].gameObject);
+                autoSummonCoroutine = null;
+                yield break;
             }
 
-            spawnedCards.Clear();
+            string optionId = string.IsNullOrEmpty(lastSelectedOptionId) ? optionAId : lastSelectedOptionId;
+            summonAction?.Invoke(optionId);
+            autoSummonCoroutine = null;
+        }
+
+        private void InvokeRevealCompletedOnce()
+        {
+            if (revealCompletedInvoked) return;
+
+            revealCompletedInvoked = true;
+            OnRevealCompleted?.Invoke();
+        }
+
+        private void ResetRevealState()
+        {
+            revealCompletedInvoked = false;
+        }
+
+        public void SetBusyReplacing(bool value)
+        {
+            isBusyReplacing = value;
+            UpdateButtonInteractable();
+        }
+
+        private void UpdateButtonInteractable()
+        {
+            bool canClick = !isBusyReplacing;
+
+            if (summonButtonA != null)
+                summonButtonA.SetInteractable(canClick);
+
+            if (summonButtonB != null)
+                summonButtonB.SetInteractable(canClick);
+        }
+
+        private void StopRevealOnly()
+        {
+            if (revealCoroutine != null)
+            {
+                StopCoroutine(revealCoroutine);
+                revealCoroutine = null;
+            }
+        }
+
+        private void StopAutoSummonOnly()
+        {
+            if (autoSummonCoroutine != null)
+            {
+                StopCoroutine(autoSummonCoroutine);
+                autoSummonCoroutine = null;
+            }
+        }
+
+        private void StopAllCoroutinesInternal()
+        {
+            StopRevealOnly();
+            StopAutoSummonOnly();
+        }
+
+        private void SetPopupVisible(bool visible)
+        {
+            if (root != null)
+                root.SetActive(visible);
+            else
+                gameObject.SetActive(visible);
+        }
+
+        private void ClearCards()
+        {
+            ReleaseAllSpawnedCardsToPool();
         }
     }
 }

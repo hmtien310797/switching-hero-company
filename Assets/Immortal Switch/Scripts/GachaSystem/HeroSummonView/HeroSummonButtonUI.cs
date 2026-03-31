@@ -20,6 +20,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private GameObject redDot;
         [SerializeField] private Color normalColor = Color.white;
         [SerializeField] private Color notEnoughColor = Color.red;
+        [SerializeField] private CanvasGroup canvasGroup;
 
         private string optionId;
         private System.Action<string> clickAction;
@@ -85,6 +86,19 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                     showRedDot: false,
                     color: notEnoughColor
                 );
+            }
+        }
+        
+        public void SetInteractable(bool value)
+        {
+            if (button != null)
+                button.interactable = value;
+
+            if (canvasGroup != null)
+            {
+                canvasGroup.interactable = value;
+                canvasGroup.blocksRaycasts = value;
+                canvasGroup.alpha = value ? 1f : 0.5f;
             }
         }
 

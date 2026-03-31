@@ -135,12 +135,20 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (!HeroSummonManager.Instance.CanSummon(optionId, out var paymentType, out var paidAmount))
             {
-                Debug.Log("Not enough currency to summon");
+                // TODO: Show Not Enough Resource Popup
+                Debug.Log("Not enough resource");
                 return;
             }
 
             if (paymentType == SummonPaymentType.Gem)
             {
+                bool skipConfirm = HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
+                if (skipConfirm)
+                {
+                    ExecuteSummon(optionId, paymentType);
+                    return;
+                }
+
                 ShowGemConfirm(optionId, paidAmount);
                 return;
             }
@@ -158,38 +166,41 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             confirmPopup.Show(
                 gemCost,
-                () => ExecuteSummon(optionId, SummonPaymentType.Gem));
+                () => ExecuteSummon(optionId, SummonPaymentType.Gem)
+            );
         }
 
         private void ExecuteSummon(string optionId, SummonPaymentType paymentType)
         {
+            if (sequencePopup != null)
+                sequencePopup.SetBusyReplacing(true);
+
             var result = HeroSummonManager.Instance.ExecuteSummon(optionId, paymentType);
+
+            if (sequencePopup != null)
+                sequencePopup.SetBusyReplacing(false);
+
             if (result == null)
+            {
+                // TODO: Show Not Enough Resource Popup
+                Debug.Log("Summon failed or not enough resource");
                 return;
+            }
 
             if (sequencePopup != null)
             {
-                sequencePopup.Show(result, () =>
-                {
-                    if (HeroSummonManager.Instance.CanSummon(optionId, out var nextPaymentType, out _))
-                    {
-                        if (nextPaymentType == SummonPaymentType.Gem)
-                        {
-                            ShowGemConfirm(optionId, HeroSummonManager.Instance.Service.GetOption(optionId).GemCost);
-                            return;
-                        }
-
-                        ExecuteSummon(optionId, nextPaymentType);
-                    }
-                    else
-                    {
-                        // TODO: Show Not Enough Resource Popup
-                        Debug.Log("Not enough resource for auto summon");
-                    }
-                });
+                if (sequencePopup.IsShowing)
+                    sequencePopup.ReplaceResult(result);
+                else
+                    sequencePopup.ShowFirstResult(result, TrySummonFromPopup, optionId);
             }
 
             RefreshView();
+        }
+
+        private void TrySummonFromPopup(string optionId)
+        {
+            TrySummon(optionId);
         }
 
     }
