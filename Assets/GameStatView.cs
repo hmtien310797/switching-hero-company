@@ -1,7 +1,7 @@
-using System;
-using Immortal_Switch.Scripts.Core;
+﻿using Immortal_Switch.Scripts.Core;
 using Scripts.Battle;
 using Scripts.UI;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -71,5 +71,10 @@ public class GameStatView : MonoBehaviour
         monsterKill.SetActive(false);
         buttonGiveUp.gameObject.SetActive(true);
         buttonBoss.gameObject.SetActive(false);
+    }
+
+    public void SetCoin(int value)
+    {
+        currentDeadMonsterQuantityText.text = value.ToString();
     }
 }

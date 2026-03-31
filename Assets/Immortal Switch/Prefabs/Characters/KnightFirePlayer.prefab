@@ -92,7 +92,7 @@ MonoBehaviour:
   distSkillRange: 5
   intervalSwitch: 20
   switchArea: 5
-  heroAttackType: 0
+  isMain: 0
 --- !u!114 &8686406742812245777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,6 +122,7 @@ MonoBehaviour:
   arrowTrans: {fileID: 0}
   oArrowTrans: {fileID: 0}
   boneArraw: L_hand
+  boneAiming: AIMING
 --- !u!114 &5390162923460574460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,7 +246,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: e0e5f451396e138498704be3ef51c69c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

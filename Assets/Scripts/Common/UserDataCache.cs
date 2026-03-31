@@ -1,108 +1,225 @@
-using Immortal_Switch.Scripts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Hero;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 
-
 namespace Scripts.Common
 {
+    [Serializable]
     public class HeroDataOwn
     {
-        public List<HeroDataSO> OwnedHeros;
+        public List<int> OwnedHeroIds = new();
     }
 
-    public class SkillDataOwn
-    {
-        public Dictionary<int, SkillDataSO> OwnedSkills;
-    }
-
+    [Serializable]
     public class SelectedHero
     {
         public int MainHeroId;
         public int SubHeroId;
     }
 
-    public class SelectedHeroSkill
+    [Serializable]
+    public class ClassSkillUnlockData
     {
-        public Dictionary<int, List<SkillDataSO>> SelectedSkillData;
+        public Dictionary<HeroClass, List<int>> UnlockedSkillIdsByClass = new();
     }
 
-    public class UserDataCache : MonoBehaviour
+    [Serializable]
+    public class HeroSkillLoadoutData
     {
-        public static UserDataCache Instance;
+        public Dictionary<int, List<int>> EquippedSkillIdsByHero = new();
+    }
 
-        public HeroDataOwn OwnedHeroData;
-        public SelectedHero SelectedHeros;
-        public SkillDataOwn OwnedSkillData;
-        public SelectedHeroSkill SelectedHeroSkills;
+    public class UserDataCache : Singleton<UserDataCache>
+    {
+        [Header("Init Config")]
+        [SerializeField] private ClassSkillUnlockInitSO classSkillUnlockInitSO;
+        [SerializeField] private HeroSkillLoadoutInitSO heroSkillLoadoutInitSO;
 
-        private void Awake()
+        [Header("Debug")]
+        [SerializeField] private bool enableLog = true;
+
+        public HeroDataOwn OwnedHeroData = new();
+        public SelectedHero SelectedHeros = new();
+        public ClassSkillUnlockData ClassSkillUnlock = new();
+        public HeroSkillLoadoutData HeroSkillLoadout = new();
+
+        public int initialGold = 1000;
+        public int initialDiamond = 1000;
+        public int initialHeroTicket = 1000;
+
+        public event Action<int> OnHeroSkillChanged;
+
+        public override UniTask InitializeAsync()
         {
-            Instance = this;
+            EnsureInitialized();
+            return UniTask.CompletedTask;
         }
 
-        private void Start()
+        #region LOG
+
+        void Log(string msg)
         {
-            SetSelectedHeros(1, 3);
-            SetOwnedHeros(new List<int>(){ 1,2,3});
-            SetOwnedSkills(MasterDataCache.Instance.GetAllSkills());
-            SetSelectedSkillByHeroId(1, new List<SkillDataSO>() 
-            { 
-                OwnedSkillData.OwnedSkills[201], OwnedSkillData.OwnedSkills[211], OwnedSkillData.OwnedSkills[212], OwnedSkillData.OwnedSkills[221], OwnedSkillData.OwnedSkills[222] 
-            });
-            SetSelectedSkillByHeroId(2, new List<SkillDataSO>()
-            {
-                OwnedSkillData.OwnedSkills[101], OwnedSkillData.OwnedSkills[111], OwnedSkillData.OwnedSkills[121], OwnedSkillData.OwnedSkills[122], OwnedSkillData.OwnedSkills[102]
-            });
-            SetSelectedSkillByHeroId(3, new List<SkillDataSO>()
-            {
-                OwnedSkillData.OwnedSkills[102], OwnedSkillData.OwnedSkills[122], OwnedSkillData.OwnedSkills[111], OwnedSkillData.OwnedSkills[121], OwnedSkillData.OwnedSkills[101]
-            });
+            if (enableLog) Debug.Log($"[UserData] {msg}", this);
         }
 
-        private void SetOwnedHeros(List<int> hids)
+        void LogError(string msg)
         {
-            OwnedHeroData = new HeroDataOwn();
-            if (OwnedHeroData.OwnedHeros == null)
-                OwnedHeroData.OwnedHeros = new List<HeroDataSO>();
+            Debug.LogError($"[UserData] {msg}", this);
+        }
 
-            foreach (int hid in hids)
+        #endregion
+
+        #region INIT
+
+        void EnsureInitialized()
+        {
+            if (SelectedHeros.MainHeroId <= 0) SelectedHeros.MainHeroId = 1;
+            if (SelectedHeros.SubHeroId <= 0) SelectedHeros.SubHeroId = 3;
+
+            AddOwnedHero(SelectedHeros.MainHeroId);
+            AddOwnedHero(SelectedHeros.SubHeroId);
+
+            // Class unlock
+            foreach (var e in classSkillUnlockInitSO.ClassEntries)
             {
-                OwnedHeroData.OwnedHeros.Add(MasterDataCache.Instance.GetHeroDataById(hid));
+                SetUnlockedSkillsForClass(e.HeroClass, e.UnlockedSkillIds);
+            }
+
+            // Hero loadout
+            foreach (var e in heroSkillLoadoutInitSO.HeroEntries)
+            {
+                AddOwnedHero(e.HeroId);
+                SetEquippedSkillsForHero(e.HeroId, e.EquippedSkillIds, false);
+            }
+
+        }
+
+        #endregion
+
+        #region HERO
+
+        public void AddOwnedHero(int heroId)
+        {
+            if (!OwnedHeroData.OwnedHeroIds.Contains(heroId))
+                OwnedHeroData.OwnedHeroIds.Add(heroId);
+        }
+
+        public List<int> GetEquippedSkills(int heroId)
+        {
+            if (!HeroSkillLoadout.EquippedSkillIdsByHero.TryGetValue(heroId, out var list))
+                return new List<int>();
+
+            return new List<int>(list);
+        }
+
+        #endregion
+
+        #region CLASS UNLOCK
+
+        public void SetUnlockedSkillsForClass(HeroClass heroClass, List<int> ids)
+        {
+            ClassSkillUnlock.UnlockedSkillIdsByClass[heroClass] = Normalize(ids);
+        }
+
+        public List<int> GetUnlockedSkills(HeroClass heroClass)
+        {
+            if (!ClassSkillUnlock.UnlockedSkillIdsByClass.TryGetValue(heroClass, out var list))
+                return new List<int>();
+
+            return list;
+        }
+
+        public bool IsUnlocked(HeroClass heroClass, int skillId)
+        {
+            return GetUnlockedSkills(heroClass).Contains(skillId);
+        }
+
+        #endregion
+
+        #region HERO LOADOUT
+
+        public void SetEquippedSkillsForHero(int heroId, List<int> ids, bool notify = true)
+        {
+            var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
+            if (hero == null)
+            {
+                LogError($"Hero null {heroId}");
+                return;
+            }
+
+            var unlocked = GetUnlockedSkills(hero.HeroClass);
+
+            var valid = Normalize(ids)
+                .Where(unlocked.Contains)
+                .Take(5)
+                .ToList();
+
+            HeroSkillLoadout.EquippedSkillIdsByHero[heroId] = valid;
+
+            if (notify)
+            {
+                OnHeroSkillChanged?.Invoke(heroId);
             }
         }
 
-        public void SetSelectedHeros(int mhid, int shid)
+        public bool Equip(int heroId, int skillId)
         {
-            SelectedHeros = new SelectedHero();
-            SelectedHeros.MainHeroId = mhid;
-            SelectedHeros.SubHeroId = shid;
+            var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
+            if (!IsUnlocked(hero.HeroClass, skillId))
+                return false;
+
+            var list = GetEquippedSkills(heroId);
+
+            if (list.Count >= 5) return false;
+            if (list.Contains(skillId)) return true;
+
+            list.Add(skillId);
+            SetEquippedSkillsForHero(heroId, list);
+            return true;
         }
 
-        public void SetOwnedSkills(Dictionary<int,SkillDataSO> skills)
+        public bool Unequip(int heroId, int skillId)
         {
-            OwnedSkillData = new SkillDataOwn();
-            OwnedSkillData.OwnedSkills = skills;
+            var list = GetEquippedSkills(heroId);
+            if (!list.Remove(skillId)) return false;
+
+            SetEquippedSkillsForHero(heroId, list);
+            return true;
         }
 
-        public void SetSelectedSkillByHeroId(int hid, List<SkillDataSO> skills)
+        public bool Replace(int heroId, int slot, int skillId)
         {
-            if(SelectedHeroSkills == null) SelectedHeroSkills = new ();
-            if (SelectedHeroSkills.SelectedSkillData == null) SelectedHeroSkills.SelectedSkillData = new();
+            var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
+            if (!IsUnlocked(hero.HeroClass, skillId)) return false;
 
-            SelectedHeroSkills.SelectedSkillData[hid] = skills;
+            var list = GetEquippedSkills(heroId);
+
+            while (list.Count < 5)
+                list.Add(0);
+
+            list[slot] = skillId;
+
+            list = list.Where(x => x > 0).Distinct().ToList();
+
+            SetEquippedSkillsForHero(heroId, list);
+            return true;
         }
 
-        public List<SkillDataSO> GetSelectedSkillByHeroId(int hid)
+        #endregion
+
+        #region UTIL
+
+        List<int> Normalize(List<int> ids)
         {
-            return SelectedHeroSkills.SelectedSkillData[hid];
+            return ids?.Where(x => x > 0).Distinct().ToList() ?? new List<int>();
         }
 
-        public List<int> GetSelectedSkillIdsByHeroId(int hid)
-        {
-            return SelectedHeroSkills.SelectedSkillData[hid].Select(x => x.SkillId).ToList();
-        }
+        #endregion
     }
 }

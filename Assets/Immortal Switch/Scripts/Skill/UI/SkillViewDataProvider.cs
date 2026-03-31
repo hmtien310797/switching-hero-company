@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.Core;
 using Scripts.Battle;
+using Scripts.Common;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill.UI
@@ -40,53 +42,68 @@ namespace Immortal_Switch.Scripts.Skill.UI
     public class SkillViewDataProvider : Singleton<SkillViewDataProvider>
     {
         private PvEBattleController battleController;
+
+        [Header("Skill Pools By Class")]
         [SerializeField] private List<HeroClassSkillPoolEntry> classPools = new();
+
+        [Header("Debug")]
+        [SerializeField] private bool enableDebugLog = true;
 
         public event Action OnDataChanged;
 
         private Dictionary<HeroClass, List<SkillDataSO>> poolLookup;
-        
-        [SerializeField] private bool enableDebugLog = true;
 
-        private void LogProvider(string message)
+        public override UniTask InitializeAsync()
         {
-            if (!enableDebugLog) return;
-            Debug.Log($"[SkillViewDataProvider] {message}", this);
-        }
-
-        private void LogWarningProvider(string message)
-        {
-            if (!enableDebugLog) return;
-            Debug.LogWarning($"[SkillViewDataProvider] {message}", this);
-        }
-
-        private void LogErrorProvider(string message)
-        {
-            Debug.LogError($"[SkillViewDataProvider] {message}", this);
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
             battleController = PvEBattleController.Instance;
             BuildLookup();
+            return UniTask.CompletedTask;
         }
 
         private void OnEnable()
         {
             if (battleController != null)
                 battleController.OnActiveLineupChanged += HandleBattleLineupChanged;
+
+            if (UserDataCache.Instance != null)
+                UserDataCache.Instance.OnHeroSkillChanged += HandleHeroSkillChanged;
         }
 
         private void OnDisable()
         {
             if (battleController != null)
                 battleController.OnActiveLineupChanged -= HandleBattleLineupChanged;
+
+            if (UserDataCache.Instance != null)
+                UserDataCache.Instance.OnHeroSkillChanged -= HandleHeroSkillChanged;
+        }
+
+        private void Log(string message)
+        {
+            if (!enableDebugLog) return;
+            Debug.Log($"[SkillViewDataProvider] {message}", this);
+        }
+
+        private void LogWarning(string message)
+        {
+            if (!enableDebugLog) return;
+            Debug.LogWarning($"[SkillViewDataProvider] {message}", this);
+        }
+
+        private void LogError(string message)
+        {
+            Debug.LogError($"[SkillViewDataProvider] {message}", this);
         }
 
         private void HandleBattleLineupChanged()
         {
-            LogProvider("Battle lineup changed. Notify UI refresh.");
+            Log("Battle lineup changed -> refresh UI");
+            OnDataChanged?.Invoke();
+        }
+
+        private void HandleHeroSkillChanged(int heroId)
+        {
+            Log($"Hero skill loadout changed -> heroId={heroId}");
             OnDataChanged?.Invoke();
         }
 
@@ -94,51 +111,78 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             poolLookup = new Dictionary<HeroClass, List<SkillDataSO>>();
 
+            if (classPools == null)
+            {
+                LogError("classPools is null.");
+                return;
+            }
+
             foreach (var entry in classPools)
             {
                 if (entry == null) continue;
 
-                poolLookup[entry.HeroClass] = entry.Skills?
+                var list = entry.Skills?
                     .Where(x => x != null)
+                    .Distinct()
                     .OrderBy(x => x.SkillId)
                     .ToList() ?? new List<SkillDataSO>();
+
+                poolLookup[entry.HeroClass] = list;
+
+                Log($"BuildLookup -> class={entry.HeroClass}, count={list.Count}");
             }
         }
 
         public bool HasAssignedHero(HeroClass heroClass)
         {
-            return battleController != null && battleController.HasActiveHeroOfClass(heroClass);
+            if (battleController == null)
+            {
+                LogError("HasAssignedHero failed because battleController is null.");
+                return false;
+            }
+
+            bool result = battleController.HasActiveHeroOfClass(heroClass);
+            Log($"HasAssignedHero -> class={heroClass}, result={result}");
+            return result;
         }
 
         public List<SkillViewHeroContext> GetAssignedHeroes()
         {
             var result = new List<SkillViewHeroContext>();
+
             if (battleController == null)
             {
-                LogErrorProvider("battleController is null.");
+                LogError("GetAssignedHeroes failed because battleController is null.");
                 return result;
             }
 
             var activeHeroes = battleController.GetActiveHeroControllers();
-            LogProvider($"GetAssignedHeroes -> activeHeroesCount={activeHeroes.Count}");
+            Log($"GetAssignedHeroes -> active count={activeHeroes.Count}");
 
             foreach (var hero in activeHeroes)
             {
                 if (hero == null)
                 {
-                    LogWarningProvider("GetAssignedHeroes found null hero in active list.");
+                    LogWarning("GetAssignedHeroes found null hero.");
                     continue;
                 }
 
+                int heroId = hero.GetHeroId();
+                var equipped = UserDataCache.Instance != null
+                    ? UserDataCache.Instance.GetEquippedSkills(heroId)
+                    : new List<int>();
+
                 result.Add(new SkillViewHeroContext
                 {
-                    HeroId = hero.GetHeroId(),
+                    HeroId = heroId,
                     HeroClass = hero.HeroClass,
                     HeroIcon = hero.HeroIcon,
                     IsMain = hero.IsMainHero,
-                    EquippedSkillIds = hero.GetOrderedEquippedSkillIds(),
+                    EquippedSkillIds = equipped,
                     RuntimeController = hero
                 });
+
+                Log($"GetAssignedHeroes -> heroId={heroId}, class={hero.HeroClass}, equipped=[{string.Join(",", equipped)}]");
             }
 
             return result;
@@ -146,17 +190,32 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         public SkillViewHeroContext GetAssignedHeroByClass(HeroClass heroClass)
         {
-            if (battleController == null) return null;
-            if (!battleController.TryGetActiveHeroByClass(heroClass, out var hero) || hero == null)
+            if (battleController == null)
+            {
+                LogError("GetAssignedHeroByClass failed because battleController is null.");
                 return null;
+            }
+
+            if (!battleController.TryGetActiveHeroByClass(heroClass, out var hero) || hero == null)
+            {
+                LogWarning($"GetAssignedHeroByClass -> no active hero for class={heroClass}");
+                return null;
+            }
+
+            int heroId = hero.GetHeroId();
+            var equipped = UserDataCache.Instance != null
+                ? UserDataCache.Instance.GetEquippedSkills(heroId)
+                : new List<int>();
+
+            Log($"GetAssignedHeroByClass -> class={heroClass}, heroId={heroId}, equipped=[{string.Join(",", equipped)}]");
 
             return new SkillViewHeroContext
             {
-                HeroId = hero.GetHeroId(),
+                HeroId = heroId,
                 HeroClass = hero.HeroClass,
                 HeroIcon = hero.HeroIcon,
                 IsMain = hero.IsMainHero,
-                EquippedSkillIds = hero.GetOrderedEquippedSkillIds(),
+                EquippedSkillIds = equipped,
                 RuntimeController = hero
             };
         }
@@ -165,156 +224,183 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (poolLookup == null)
                 BuildLookup();
-            List<SkillDataSO> pool;
-            if(poolLookup != null && poolLookup.TryGetValue(heroClass, out var list))
+
+            if (poolLookup == null)
             {
-                pool = list;
+                LogError("GetClassPool failed because poolLookup is null.");
+                return new List<SkillDataSO>();
             }
-            else
+
+            if (!poolLookup.TryGetValue(heroClass, out var list) || list == null)
             {
-                pool = new List<SkillDataSO>();
+                LogWarning($"GetClassPool -> no pool found for class={heroClass}");
+                return new List<SkillDataSO>();
             }
-            return pool;
+
+            return list;
+        }
+
+        public SkillDataSO GetSkillData(int skillId)
+        {
+            if (skillId <= 0)
+                return null;
+
+            return MasterDataCache.Instance.GetSkillDataById(skillId);
         }
 
         public SkillViewSkillState BuildSkillState(SkillViewHeroContext heroContext, SkillDataSO skillData)
         {
             if (skillData == null)
+            {
+                LogWarning("BuildSkillState received null skillData.");
                 return null;
+            }
+
+            var equippedIds = heroContext != null ? heroContext.EquippedSkillIds : new List<int>();
+            HeroClass heroClass = heroContext != null ? heroContext.HeroClass : default;
+
+            bool isUnlocked = false;
+            if (heroContext != null && UserDataCache.Instance != null)
+                isUnlocked = UserDataCache.Instance.IsUnlocked(heroClass, skillData.SkillId);
 
             var state = new SkillViewSkillState
             {
                 SkillData = skillData,
                 SkillId = skillData.SkillId,
-                Level = SkillInventorySaveService.GetLevel(skillData.SkillId),
-                CurrentShard = SkillInventorySaveService.GetCurrentShard(skillData.SkillId),
-                RequiredShard = SkillInventorySaveService.GetRequiredShard(skillData.SkillId),
-                IsOwned = SkillInventorySaveService.IsOwned(skillData.SkillId)
+
+                // Chỗ này hiện đang để tạm.
+                // Nếu sau này bạn có progression skill thật thì chỉ cần thay source ở đây.
+                Level = 1,
+                CurrentShard = 0,
+                RequiredShard = 2,
+
+                // UI hiện tại coi unlocked theo class là "được dùng / owned"
+                IsOwned = isUnlocked
             };
 
-            if (heroContext != null && heroContext.EquippedSkillIds != null)
-            {
-                state.EquippedSlotIndex = heroContext.EquippedSkillIds.FindIndex(x => x == state.SkillId);
-                state.IsEquipped = state.EquippedSlotIndex >= 0;
-            }
+            state.EquippedSlotIndex = equippedIds.FindIndex(x => x == state.SkillId);
+            state.IsEquipped = state.EquippedSlotIndex >= 0;
 
             return state;
         }
 
         public List<SkillDataSO> GetSortedPoolForHero(SkillViewHeroContext heroContext)
         {
-            var pool = heroContext != null ? GetClassPool(heroContext.HeroClass) : new List<SkillDataSO>();
+            if (heroContext == null)
+                return new List<SkillDataSO>();
 
-            return pool
-                .OrderByDescending(x => BuildSkillState(heroContext, x).IsEquipped)
-                .ThenByDescending(x => BuildSkillState(heroContext, x).IsOwned)
+            var pool = GetClassPool(heroContext.HeroClass);
+
+            // Sort:
+            // 1. skill đang equip
+            // 2. skill đã unlock
+            // 3. theo id
+            var sorted = pool
+                .OrderByDescending(x =>
+                {
+                    var state = BuildSkillState(heroContext, x);
+                    return state != null && state.IsEquipped;
+                })
+                .ThenByDescending(x =>
+                {
+                    var state = BuildSkillState(heroContext, x);
+                    return state != null && state.IsOwned;
+                })
                 .ThenBy(x => x.SkillId)
                 .ToList();
+
+            Log($"GetSortedPoolForHero -> heroId={heroContext.HeroId}, class={heroContext.HeroClass}, count={sorted.Count}");
+            return sorted;
         }
 
         public bool TryEquipSkillToHero(SkillViewHeroContext heroContext, int skillId)
         {
-            if (heroContext == null || skillId <= 0)
+            if (heroContext == null)
             {
-                LogErrorProvider($"TryEquipSkillToHero invalid input heroContext={(heroContext == null ? "null" : heroContext.HeroId.ToString())}, skillId={skillId}");
+                LogError("TryEquipSkillToHero failed because heroContext is null.");
                 return false;
             }
 
-            if (!SkillInventorySaveService.IsOwned(skillId))
+            if (UserDataCache.Instance == null)
             {
-                LogWarningProvider($"TryEquipSkillToHero skill not owned -> heroId={heroContext.HeroId}, skillId={skillId}");
+                LogError("TryEquipSkillToHero failed because UserDataCache.Instance is null.");
                 return false;
             }
 
-            var current = SkillLoadoutSaveService.GetSelectedSkillIdsByHeroId(heroContext.HeroId);
-            LogProvider($"TryEquipSkillToHero before -> heroId={heroContext.HeroId}, current=[{string.Join(",", current)}], newSkillId={skillId}");
+            Log($"TryEquipSkillToHero -> heroId={heroContext.HeroId}, skillId={skillId}");
 
-            if (current.Contains(skillId))
+            bool success = UserDataCache.Instance.Equip(heroContext.HeroId, skillId);
+            if (!success)
             {
-                LogWarningProvider($"TryEquipSkillToHero ignored because skill already equipped. heroId={heroContext.HeroId}, skillId={skillId}");
-                return true;
-            }
-
-            if (current.Count >= 5)
-            {
-                LogWarningProvider($"TryEquipSkillToHero failed because hero already has 5 skills. heroId={heroContext.HeroId}");
+                LogWarning($"TryEquipSkillToHero failed -> heroId={heroContext.HeroId}, skillId={skillId}");
                 return false;
             }
 
-            current.Add(skillId);
-            SkillLoadoutSaveService.SaveSelectedSkillIdsByHeroId(heroContext.HeroId, current);
-            RefreshHeroRuntime(heroContext);
-
-            LogProvider($"TryEquipSkillToHero success -> heroId={heroContext.HeroId}, after=[{string.Join(",", current)}]");
+            heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
+
+            Log($"TryEquipSkillToHero success -> heroId={heroContext.HeroId}, skillId={skillId}");
             return true;
         }
 
         public bool TryUnequipSkillFromHero(SkillViewHeroContext heroContext, int skillId)
         {
-            if (heroContext == null || skillId <= 0)
+            if (heroContext == null)
             {
-                LogErrorProvider($"TryUnequipSkillFromHero invalid input heroContext={(heroContext == null ? "null" : heroContext.HeroId.ToString())}, skillId={skillId}");
+                LogError("TryUnequipSkillFromHero failed because heroContext is null.");
                 return false;
             }
 
-            var current = SkillLoadoutSaveService.GetSelectedSkillIdsByHeroId(heroContext.HeroId);
-            LogProvider($"TryUnequipSkillFromHero before -> heroId={heroContext.HeroId}, current=[{string.Join(",", current)}], skillId={skillId}");
-
-            if (!current.Remove(skillId))
+            if (UserDataCache.Instance == null)
             {
-                LogWarningProvider($"TryUnequipSkillFromHero failed because skill not found. heroId={heroContext.HeroId}, skillId={skillId}");
+                LogError("TryUnequipSkillFromHero failed because UserDataCache.Instance is null.");
                 return false;
             }
 
-            SkillLoadoutSaveService.SaveSelectedSkillIdsByHeroId(heroContext.HeroId, current);
-            RefreshHeroRuntime(heroContext);
+            Log($"TryUnequipSkillFromHero -> heroId={heroContext.HeroId}, skillId={skillId}");
 
-            LogProvider($"TryUnequipSkillFromHero success -> heroId={heroContext.HeroId}, after=[{string.Join(",", current)}]");
+            bool success = UserDataCache.Instance.Unequip(heroContext.HeroId, skillId);
+            if (!success)
+            {
+                LogWarning($"TryUnequipSkillFromHero failed -> heroId={heroContext.HeroId}, skillId={skillId}");
+                return false;
+            }
+
+            heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
+
+            Log($"TryUnequipSkillFromHero success -> heroId={heroContext.HeroId}, skillId={skillId}");
             return true;
         }
 
         public bool TryReplaceSkillOnHero(SkillViewHeroContext heroContext, int slotIndex, int newSkillId)
         {
-            if (heroContext == null || newSkillId <= 0)
+            if (heroContext == null)
             {
-                LogErrorProvider($"TryReplaceSkillOnHero invalid input heroContext={(heroContext == null ? "null" : heroContext.HeroId.ToString())}, newSkillId={newSkillId}");
+                LogError("TryReplaceSkillOnHero failed because heroContext is null.");
                 return false;
             }
 
-            if (!SkillInventorySaveService.IsOwned(newSkillId))
+            if (UserDataCache.Instance == null)
             {
-                LogWarningProvider($"TryReplaceSkillOnHero skill not owned -> heroId={heroContext.HeroId}, newSkillId={newSkillId}");
+                LogError("TryReplaceSkillOnHero failed because UserDataCache.Instance is null.");
                 return false;
             }
 
-            if (slotIndex < 0 || slotIndex >= 5)
+            Log($"TryReplaceSkillOnHero -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
+
+            bool success = UserDataCache.Instance.Replace(heroContext.HeroId, slotIndex, newSkillId);
+            if (!success)
             {
-                LogErrorProvider($"TryReplaceSkillOnHero invalid slotIndex={slotIndex}");
+                LogWarning($"TryReplaceSkillOnHero failed -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
                 return false;
             }
 
-            var current = SkillLoadoutSaveService.GetSelectedSkillIdsByHeroId(heroContext.HeroId);
-            while (current.Count < 5)
-                current.Add(0);
-
-            LogProvider($"TryReplaceSkillOnHero before -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}, current=[{string.Join(",", current)}]");
-
-            current[slotIndex] = newSkillId;
-            current = current.Where(x => x > 0).Distinct().Take(5).ToList();
-
-            SkillLoadoutSaveService.SaveSelectedSkillIdsByHeroId(heroContext.HeroId, current);
-            RefreshHeroRuntime(heroContext);
-
-            LogProvider($"TryReplaceSkillOnHero success -> heroId={heroContext.HeroId}, after=[{string.Join(",", current)}]");
+            heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
-            return true;
-        }
 
-        private void RefreshHeroRuntime(SkillViewHeroContext heroContext)
-        {
-            heroContext?.RuntimeController?.RefreshSelectedSkillsRuntime();
+            Log($"TryReplaceSkillOnHero success -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
+            return true;
         }
     }
 }

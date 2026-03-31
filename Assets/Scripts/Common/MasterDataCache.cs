@@ -1,26 +1,24 @@
 using Immortal_Switch.Scripts;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Hero;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 
-public class MasterDataCache : MonoBehaviour
+public class MasterDataCache : Singleton<MasterDataCache>
 {
-    public static MasterDataCache Instance;
-
     [SerializeField] List<HeroDataSO> heroDatas;
     [SerializeField] List<SkillDataSO> skillDatas;
 
     private Dictionary<int,HeroDataSO> heroDataDicts = new Dictionary<int, HeroDataSO> ();
     private Dictionary<int,SkillDataSO> skillDataDicts = new Dictionary<int, SkillDataSO> ();
-
-    private void Awake()
+    
+    public override UniTask InitializeAsync()
     {
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
         InitHeroData();
         InitSkillData();
+        return UniTask.CompletedTask;
     }
 
     private void InitHeroData()

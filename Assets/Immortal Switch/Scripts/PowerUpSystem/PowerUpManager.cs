@@ -1,47 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.PowerUpSystem
 {
-    public class PowerUpManager : MonoBehaviour
+    public class PowerUpManager : Singleton<PowerUpManager>
     {
-        public static PowerUpManager Instance { get; private set; }
-
-        [Header("Optional Refs")]
-        [SerializeField] private GrowthManager growthManager;
+        private GrowthManager growthManager;
 
         private PowerUpSystemService service;
         private readonly List<StatsController> boundPlayerStats = new();
         private bool sourcesInitialized;
-        public GrowthManager GrowthManager => growthManager;
 
         public event Action<PowerUpSnapshot> OnPowerUpChanged;
 
         public PowerUpSystemService Service => service;
         public IReadOnlyList<StatsController> BoundPlayerStats => boundPlayerStats;
 
-        private void Awake()
+        public override UniTask InitializeAsync()
         {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
+            growthManager = GrowthManager.Instance;
             service = new PowerUpSystemService();
             service.OnPowerUpRebuilt += HandlePowerUpRebuilt;
-        }
-
-        private void Start()
-        {
             TryInitializeSources();
             RebuildAndApply();
+            return UniTask.CompletedTask;
         }
 
         private void OnDestroy()

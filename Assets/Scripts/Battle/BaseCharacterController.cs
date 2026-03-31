@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.StatSystem;
-using NaughtyAttributes;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Scripts.Battle

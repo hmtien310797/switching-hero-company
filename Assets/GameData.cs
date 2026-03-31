@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 
@@ -9,4 +10,9 @@ public class GameData : Singleton<GameData>
     
     [field: SerializeField] 
     public int creepBatchSize { get; private set; } = 40;
+
+    public override UniTask InitializeAsync()
+    {
+        throw new System.NotImplementedException();
+    }
 }

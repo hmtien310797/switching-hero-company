@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.StatSystem;
 
@@ -342,8 +343,9 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return bought;
         }
 
-        public int Upgrade(StatType stat, int desiredAmount, ref int currentGold)
+        public int Upgrade(StatType stat, int desiredAmount)
         {
+            int currentGold = CurrencyManager.Instance.Get(CurrencyType.Gold);
             int buyAmount = GetAffordableUpgradeAmount(stat, desiredAmount, currentGold);
             if (buyAmount <= 0)
                 return 0;
@@ -352,7 +354,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             if (totalCost <= 0 || currentGold < totalCost)
                 return 0;
 
-            currentGold -= totalCost;
+            CurrencyManager.Instance.Spend(CurrencyType.Gold, totalCost);
             saveData.AddStack(stat, buyAmount);
             return buyAmount;
         }

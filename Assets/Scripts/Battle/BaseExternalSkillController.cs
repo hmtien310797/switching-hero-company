@@ -127,7 +127,7 @@ namespace Scripts.Battle
                     fxObj.transform.rotation = Quaternion.FromToRotation(Vector3.right, Vector3.down);
                     isFollow = fxObj.isFollow;
                     fxObj.SetHeroPlayerController(pHc);
-                    this.skillData = skillData;
+                    fxObj.skillData = skillData;
                     fxObj.endAct = i == skillData.NumSpawn - 1 ? endAct : null;
                     fxObj.InitInnerSkillMultiSpawn(i == skillData.NumSpawn - 1, i == 0 ? camAct : null);
 

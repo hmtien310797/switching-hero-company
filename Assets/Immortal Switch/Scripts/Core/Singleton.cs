@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Core
 {
@@ -45,5 +46,7 @@ namespace Immortal_Switch.Scripts.Core
         {
             if (_instance == this) _instance = null;
         }
+
+        public abstract UniTask InitializeAsync();
     }
 }

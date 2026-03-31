@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Scripts.Common;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Currency
@@ -154,10 +155,31 @@ namespace Immortal_Switch.Scripts.Currency
 
         public void Load()
         {
+            
             if (ES3.KeyExists(saveKey))
                 saveData = ES3.Load<CurrencySaveData>(saveKey);
             else
-                saveData = new CurrencySaveData();
+                saveData = new CurrencySaveData
+                {
+                    Entries = new List<CurrencyEntry>
+                    {
+                        new CurrencyEntry
+                        {
+                            CurrencyType = CurrencyType.HeroTicket,
+                            Amount = UserDataCache.Instance.initialHeroTicket
+                        },
+                        new CurrencyEntry
+                        {
+                            CurrencyType = CurrencyType.Diamond,
+                            Amount = UserDataCache.Instance.initialDiamond
+                        },
+                        new CurrencyEntry
+                        {
+                            CurrencyType = CurrencyType.Gold,
+                            Amount = UserDataCache.Instance.initialGold
+                        }
+                    }
+                };
         }
 
         private CurrencyEntry GetEntry(CurrencyType currencyType)

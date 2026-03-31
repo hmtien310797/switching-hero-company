@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +10,6 @@ using UnityEngine;
 using Scripts.Common;
 using Scripts.UI;
 using Random = UnityEngine.Random;
-
-#if UNITY_EDITOR
-using NaughtyAttributes;
-#endif
 
 namespace Scripts.Battle
 {
@@ -40,6 +36,7 @@ namespace Scripts.Battle
         [SerializeField] FollowHeroController mainFollow;
         [SerializeField] FollowHeroController subFollow;
         [SerializeField] PvEMapController pvEMapController;
+        [SerializeField] BattleCoinView coinPrefab;
 
         [Header("Spawn Positions")] [SerializeField]
         private List<Transform> spawnPoss;
@@ -88,29 +85,28 @@ namespace Scripts.Battle
             get => isReadyBattle;
             set => isReadyBattle = value;
         }
+        
+        private void Start()
+        {
+            GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
+            //GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
+            GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
+        }
 
-        protected override void Awake()
+        public override async UniTask InitializeAsync()
         {
             BuildCreepDataLookup();
             BuildSpawnPositions();
             BuildBossDataLookup();
-        }
-
-        private void Start()
-        {
-            GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
-            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
-            GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
             gameData = GameData.Instance;
-            StartAsync().Forget();
+            await StartAsync();        
         }
 
-        private async UniTaskVoid StartAsync()
+        private async UniTask StartAsync()
         {
             SetState(BattleState.Initializing);
 
             currentStage = Mathf.Max(1, currentStage);
-            await UIManager.Instance.InitMainScene();
             pvEMapController.InitMapByChapter(GetChapterIdByStage(currentStage));
             InitSwitchableHeroIds();
             await InitPlayerHeroById();
@@ -613,6 +609,7 @@ namespace Scripts.Battle
             if (creep == null) return;
             if (!creep.gameObject.activeInHierarchy) return;
 
+            DropCoinAsync(creep.transform.position).Forget();
             PoolController.Instance.ReturnToPool(creep.gameObject);
             creeps.Remove(creep);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
@@ -633,6 +630,35 @@ namespace Scripts.Battle
             SpawnBoss();
         }
 
+        private async UniTaskVoid DropCoinAsync(Vector3 pos)
+        {
+            var numRand = Random.Range(2, 5);
+            for (int i = 0; i < numRand; i++)
+            {
+                var coin = PoolController.Instance.Get(coinPrefab, pos + Vector3.up * 0.25f);
+                var trans = FindHeroNearestFromPos(pos);
+                coin.Item1.DoDrop(0.1f + i * 0.1f, trans).Forget();
+            }
+        }
+
+        private Transform FindHeroNearestFromPos(Vector3 pos)
+        {
+            float dist = float.MaxValue;
+            if (firstPlayerHeroController)
+                dist = (firstPlayerHeroController.transform.position - pos).magnitude;
+
+            if(secondPlayerHeroController)
+            {
+                var dist2 = (secondPlayerHeroController.transform.position - pos).magnitude;
+                if(dist2 < dist) return secondPlayerHeroController.transform;
+            }
+
+            if(dist < float.MaxValue)
+                return firstPlayerHeroController.transform;
+
+            return null;
+        }
+        
         public MonsterScrepController GetNearestMonster(Vector3 pos)
         {
             if (!isReadyBattle) return null;

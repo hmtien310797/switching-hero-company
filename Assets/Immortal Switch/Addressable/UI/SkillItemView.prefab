@@ -110,9 +110,9 @@ RectTransform:
   - {fileID: 5700532475705170404}
   - {fileID: 1738723743818185479}
   - {fileID: 2856760317858062744}
-  - {fileID: 259938268555345143}
   - {fileID: 6279500823309542900}
   - {fileID: 5990747335939395410}
+  - {fileID: 259938268555345143}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -134,11 +134,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   button: {fileID: 933939131634264991}
   icon: {fileID: 9128028209819045955}
-  selected: {fileID: 8394771109841959703}
-  equippedTag: {fileID: 650552483669452627}
-  lockedOverlay: {fileID: 3324838418930674810}
-  shardText: {fileID: 268517467543166389}
-  progress: {fileID: 1458553500214287331}
+  selectedObject: {fileID: 8394771109841959703}
+  equippedTagObject: {fileID: 650552483669452627}
+  darkenObject: {fileID: 3324838418930674810}
+  levelText: {fileID: 5867831271144585626}
+  shardText: {fileID: 3705493760668808531}
+  shardProgress: {fileID: 1458553500214287331}
 --- !u!114 &933939131634264991
 MonoBehaviour:
   m_ObjectHideFlags: 0

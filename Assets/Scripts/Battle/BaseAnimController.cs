@@ -34,7 +34,6 @@ namespace Scripts.Battle
             {
                 if(animName == entry.Animation.Name && e.Data.Name == eventName)
                 {
-                    Debug.Log($"Anim event {eventName} triggered.");
                     eventAct?.Invoke(eventName == Player01SkillScontroller.eventFinalAttack);
                 }
             };

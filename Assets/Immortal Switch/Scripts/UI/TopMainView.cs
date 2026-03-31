@@ -1,3 +1,4 @@
+using Immortal_Switch.Scripts.UI;
 using Scripts.UI;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class TopMainView : UIView
 
     [SerializeField] BattleResultController battleResultController;
     [SerializeField] BattleTimerController battleTimerController;
+    [SerializeField] CurrencyView currencyView;
 
     private void Awake()
     {
@@ -22,4 +24,6 @@ public class TopMainView : UIView
     {
         return battleTimerController;
     }
+
+    public CurrencyView CurrencyView => currencyView;
 }

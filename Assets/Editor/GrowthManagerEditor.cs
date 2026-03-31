@@ -17,12 +17,6 @@ namespace Editor
 
             var manager = (GrowthManager)target;
 
-            if (GUILayout.Button("Add 10000 Gold"))
-            {
-                manager.DebugAddGold();
-                EditorUtility.SetDirty(manager);
-            }
-
             if (GUILayout.Button("Unlock Next Tier"))
             {
                 manager.DebugUnlockNextTier();

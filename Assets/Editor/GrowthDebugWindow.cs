@@ -35,7 +35,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         private void RefreshData()
         {
-            manager = PowerUpManager.Instance.GrowthManager;
+            manager = GrowthManager.Instance;
             service = manager != null ? manager.Service : null;
 
             statsCache.Clear();
@@ -101,12 +101,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             if (manager != null)
             {
-                if (GUILayout.Button("Add 10k Gold", EditorStyles.toolbarButton, GUILayout.Width(90)))
-                {
-                    manager.AddGold(10000);
-                    RefreshData();
-                }
-
                 if (GUILayout.Button("Unlock Next Tier", EditorStyles.toolbarButton, GUILayout.Width(110)))
                 {
                     manager.UnlockTier(manager.SaveData.CurrentUnlockedTier + 1);
@@ -148,7 +142,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             DrawInfoRow("Current Tier", manager.SaveData.CurrentUnlockedTier.ToString());
             DrawInfoRow("Max Tier", service.MaxTier.ToString());
-            DrawInfoRow("Gold", manager.PlayerGold.ToString("N0"));
             DrawInfoRow("Unlocked Stats", statsCache.Count.ToString());
             DrawInfoRow("Exported PowerUps", exportedPowerUps.Count.ToString());
 

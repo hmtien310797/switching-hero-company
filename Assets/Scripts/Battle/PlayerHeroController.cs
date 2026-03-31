@@ -1,16 +1,15 @@
 ﻿using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
 using Scripts.UI;
 using Spine.Unity;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using UnityEngine;
 using Scripts.Common;
+using Sirenix.OdinInspector;
 
 namespace Scripts.Battle
 {
@@ -81,7 +80,7 @@ namespace Scripts.Battle
         private Vector3 targetPos = Vector3.zero;
         private FollowHeroController followHeroController;
         private Dictionary<SkillSlot, int> skillIdDict = new Dictionary<SkillSlot, int>();
-        
+        [ShowInInspector]
         public Dictionary<SkillSlot, int> SkillIdDict => skillIdDict;
         public MonsterScrepController MonsterTarget { get => _monsterTarget; set => _monsterTarget = value; }
         public FollowHeroController FollowHeroController { get => followHeroController; set => followHeroController = value; }
@@ -116,7 +115,7 @@ namespace Scripts.Battle
             HeroIcon = data.PortraitIcon;
 
             SetPartner(partnerTrans);
-            var skillIds = UserDataCache.Instance.GetSelectedSkillIdsByHeroId(heroId);
+            var skillIds = UserDataCache.Instance.GetEquippedSkills(heroId);
             SetIntervalSkills(skillIds);
             playerCamController?.InitCam(transform, isMain);
             InitSkill(skillIds, soTrans);
@@ -143,7 +142,6 @@ namespace Scripts.Battle
         private void SetTargetPos()
         {
             targetPos = isPriorityNearTarget ? GroupFlashController.Instance?.GetNearestPoint()?? transform.position : GroupFlashController.Instance?.GetFarestPoint()??transform.position;
-            Debug.Log($"target pos is: {isMain} and pos is: {targetPos}");
         }
 
         private void SetIntervalSkills(List<int> skillIds)
@@ -542,7 +540,7 @@ namespace Scripts.Battle
         {
             if (_monsterTarget == null || HeroClass != HeroClass.Archer) return true;
 
-            return transform.position.z > _monsterTarget.transform.position.z;
+            return transform.position.z + 5f > _monsterTarget.transform.position.z;
         }
 
         public bool IsValidTarget()
@@ -565,6 +563,7 @@ namespace Scripts.Battle
         public override void DoIntoSkill(HeroSkills skillIdx, Action endAct)
         {
             if (!isValid || !gameObject.activeInHierarchy) return;
+            if(skillIdx == HeroSkills.Die) isValid = false;
 
             SetIsInActionState(skillIdx != HeroSkills.Switch);
             isInSwitchAction = skillIdx == HeroSkills.Switch;
@@ -584,7 +583,7 @@ namespace Scripts.Battle
 
         public void DoChangeState()
         {
-            if(isInSwitchAction) return; 
+            if(isInSwitchAction || !isValid) return; 
 
             ResetIdleStateTime();
             SwitchState(IdleState);
@@ -664,8 +663,8 @@ namespace Scripts.Battle
 
         private void OnGameLose()
         {
-            isValid = false;
             SwitchState(DeathState);
+            //isValid = false;
             GameStatView.Instance?.battleTimerController.HideTimer();
         }
 
@@ -690,7 +689,8 @@ namespace Scripts.Battle
 
         public void DoLoseCallback()
         {
-            return;
+            if (isMain)
+                pvEBattleController?.OnStageFailed();
         }
         
         public IReadOnlyDictionary<SkillSlot, int> GetRuntimeSkillMap()
@@ -710,15 +710,15 @@ namespace Scripts.Battle
 
             return result;
         }
-
+        
         public void RefreshSelectedSkillsRuntime()
         {
-            if (heroId <= 0)
-                return;
+            var ids = UserDataCache.Instance.GetEquippedSkills(heroId);
 
-            var selectedSkillIds = UserDataCache.Instance.GetSelectedSkillIdsByHeroId(heroId);
-            SetIntervalSkills(selectedSkillIds);
-            InitSkill(selectedSkillIds, skillRootTrans);
+            Debug.Log($"[HeroRuntime] Refresh skills hero={heroId} -> {string.Join(",", ids)}");
+
+            SetIntervalSkills(ids);
+            InitSkill(ids, skillRootTrans);
             InitUIHeroBattle();
         }
     }

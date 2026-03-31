@@ -12,23 +12,28 @@ namespace Immortal_Switch.Scripts.Skill.UI
     {
         private SkillViewDataProvider dataProvider;
 
-        [Header("Class Buttons")] [SerializeField]
+        [Header("Class Buttons")] 
+        [SerializeField]
         private SkillClassButtonView[] classButtons;
 
-        [Header("Roots")] [SerializeField] private GameObject assignedContentRoot;
+        [Header("Roots")] 
+        [SerializeField] private GameObject assignedContentRoot;
         [SerializeField] private GameObject unassignedContentRoot;
         [SerializeField] private GameObject heroTabsRoot;
         [SerializeField] private GameObject equippedSlotsRoot;
 
-        [Header("Hero Tabs")] [SerializeField] private SkillHeroTabView[] heroTabs;
+        [Header("Hero Tabs")] 
+        [SerializeField] private SkillHeroTabView[] heroTabs;
 
-        [Header("Equipped Slots")] [SerializeField]
-        private SkillEquippedSlotView[] equippedSlots;
+        [Header("Equipped Slots")] 
+        [SerializeField] private SkillEquippedSlotView[] equippedSlots;
 
-        [Header("Grid")] [SerializeField] private Transform gridRoot;
+        [Header("Grid")] 
+        [SerializeField] private Transform gridRoot;
         [SerializeField] private SkillItemView skillItemPrefab;
 
-        [Header("Detail")] [SerializeField] private Image detailIcon;
+        [Header("Detail")] 
+        [SerializeField] private Image detailIcon;
         [SerializeField] private TMP_Text detailLevelText;
         [SerializeField] private TMP_Text detailNameText;
         [SerializeField] private TMP_Text detailTypeText;
@@ -36,15 +41,17 @@ namespace Immortal_Switch.Scripts.Skill.UI
         [SerializeField] private TMP_Text detailShardText;
         [SerializeField] private Image detailShardFill;
 
-        [Header("Warning")] [SerializeField] private TMP_Text warningText;
+        [Header("Warning")] 
+        [SerializeField] private TMP_Text warningText;
 
-        [Header("Buttons")] [SerializeField] private Button equipButton;
+        [Header("Buttons")] 
+        [SerializeField] private Button equipButton;
         [SerializeField] private TMP_Text equipButtonText;
         [SerializeField] private Button optionButton;
         [SerializeField] private Button glyphButton;
 
-        [Header("Replace Popup")] [SerializeField]
-        private GameObject replacePopupRoot;
+        [Header("Replace Popup")] 
+        [SerializeField] private GameObject replacePopupRoot;
 
         [SerializeField] private SkillHeroTabView replaceHeroPreview;
         [SerializeField] private Image replacePendingSkillIcon;

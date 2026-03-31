@@ -24,7 +24,7 @@ namespace Immortal_Switch.Scripts.Combat
             float critMultiplier = isCrit ? critDamage : 1f;
 
             float defenseMultiplier = 100f / (100f + enemyDef);
-            float calculatedSkillCo = skillCoefficient == 1f ? 1f : skillCoefficient/100;
+            float calculatedSkillCo = skillCoefficient == 1f ? 1f : baseAtk + skillCoefficient/100;
 
             float atk1 =
                 baseAtk *

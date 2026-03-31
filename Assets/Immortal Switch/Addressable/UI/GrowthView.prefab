@@ -148,8 +148,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Standard Weapon
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 69e0ec4d526c5cf4e9fa2c42eed49173, type: 2}
-  m_sharedMaterial: {fileID: -112508593885672785, guid: 69e0ec4d526c5cf4e9fa2c42eed49173, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 02479d586e688df45842f13ac3faf2db, type: 2}
+  m_sharedMaterial: {fileID: -1389305967821746214, guid: 02479d586e688df45842f13ac3faf2db, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -179,7 +179,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -347,7 +347,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panelRoot: {fileID: 8637351277118781264}
   scalePortrait: 1
+  yPosPortrait: 1
   scaleLandscape: 0.6
+  yPosLandscape: 1
+  changePosY: 0
 --- !u!1 &1786135385608521957
 GameObject:
   m_ObjectHideFlags: 0
@@ -594,7 +597,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   panelView: {fileID: 5427790038406068870}
   statUiDatabase: {fileID: 11400000, guid: ff3cd31ec589a474bb84ffc741b340ad, type: 2}
-  tierUpgradePopupView: {fileID: 8207688595948317894}
   tierIcons:
   - {fileID: -1349698399, guid: 8df9652ddfc2e464abcb32086b4a3bb4, type: 3}
   - {fileID: -22456776, guid: f3b5ac43f402abb4eae98942241d1b71, type: 3}
@@ -811,6 +813,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8729979769144240164}
+  - component: {fileID: 2964954093224684184}
   m_Layer: 5
   m_Name: CurrencyPlaceHolder
   m_TagString: Untagged
@@ -839,6 +842,20 @@ RectTransform:
   m_AnchoredPosition: {x: -431, y: 250}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2964954093224684184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5840156070494662944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe9e3f9d26c48238d8ee8f9a35b8087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currencyType: 0
+  amountText: {fileID: 5038398303572378919}
 --- !u!1 &6382252377441056717
 GameObject:
   m_ObjectHideFlags: 0
@@ -856,7 +873,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8024966824567989191
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1276,8 +1293,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 69e0ec4d526c5cf4e9fa2c42eed49173, type: 2}
-  m_sharedMaterial: {fileID: -112508593885672785, guid: 69e0ec4d526c5cf4e9fa2c42eed49173, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 02479d586e688df45842f13ac3faf2db, type: 2}
+  m_sharedMaterial: {fileID: -1389305967821746214, guid: 02479d586e688df45842f13ac3faf2db, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1307,7 +1324,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1837,17 +1854,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3493298691908359949, guid: 43dadd2d107fc844b9376ff1a5476e88, type: 3}
   m_PrefabInstance: {fileID: 230888402530230595}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8207688595948317894 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8274192845432442245, guid: 43dadd2d107fc844b9376ff1a5476e88, type: 3}
-  m_PrefabInstance: {fileID: 230888402530230595}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc0d7e39222d4ca9adeb740d47dde632, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &831969321638494403
 PrefabInstance:
   m_ObjectHideFlags: 0

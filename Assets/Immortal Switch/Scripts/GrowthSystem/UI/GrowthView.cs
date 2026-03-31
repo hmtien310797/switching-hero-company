@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
- using Immortal_Switch.Scripts.PowerUpSystem;
+using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.PowerUpSystem;
  using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         private void Awake()
         {
-            growthManager = PowerUpManager.Instance.GrowthManager;
+            growthManager = GrowthManager.Instance;
 
             binder = new GrowthUpgradePanelBinder(
                 growthManager.Service,
@@ -52,14 +53,15 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         public void RefreshUI()
         {
+            int currentGold = CurrencyManager.Instance.Get(CurrencyType.Gold);
             var panelData = binder.Build(
-                growthManager.PlayerGold,
+                currentGold,
                 selectedUpgradeAmount
             );
 
             panelView.Bind(
                 panelData,
-                growthManager.PlayerGold,
+                currentGold,
                 selectedUpgradeAmount,
                 OnClickUpgradeStat,
                 OnChangeUpgradeAmount

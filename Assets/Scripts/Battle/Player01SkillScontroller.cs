@@ -126,12 +126,12 @@ namespace Scripts.Battle
             playerHeroController?.DoRotate(isRight);
             var isAfterTarger = playerHeroController.IsAfterTarget();
             var animName = GetAttackAnimNameByIdx(attackIdx, isAfterTarger);
-            if (playerHeroController.HeroClass == HeroClass.Archer)
+            /*if (playerHeroController.HeroClass == HeroClass.Archer)
             { 
                 animName = isAfterTarger ? StandAnimName.Attack1 : StandAnimName.Attack1Back;
                 BaseAnimController?.PlayAmin(animName);
             }
-            else
+            else*/
                 BaseAnimController?.PlayAmin(animName);
             CoDoAttack(endAct, animName).Forget();
         }
@@ -198,7 +198,6 @@ namespace Scripts.Battle
         private async UniTaskVoid DoFlyAsync(Transform arrow,Vector3 target)
         {
             if (arrow == null) return;
-            Debug.Log($"do flying now {target}");
             arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
             while ((arrow.position - target).sqrMagnitude > 0.1f)
             {
@@ -437,6 +436,19 @@ namespace Scripts.Battle
             }
 
             ske.A = 1f;
+            endAct?.Invoke();
+        }
+
+        public override void DoDeath(Action endAct)
+        {
+            base.DoDeath(endAct);
+            var dur = BaseAnimController.GetDurByAnimName(StandAnimName.Die);
+            DoDeathAsync(dur, endAct).Forget();
+        }
+
+        private async UniTaskVoid DoDeathAsync(float dur, Action endAct)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: _disableCts.Token);
             endAct?.Invoke();
         }
 

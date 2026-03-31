@@ -761,6 +761,7 @@ GameObject:
   - component: {fileID: 3332823986732656236}
   - component: {fileID: 7488789738090605463}
   - component: {fileID: 5750138118002498646}
+  - component: {fileID: 4206240332682867794}
   m_Layer: 5
   m_Name: TopMainView
   m_TagString: Untagged
@@ -818,6 +819,7 @@ MonoBehaviour:
   CacheOnClose: 0
   battleResultController: {fileID: 896038208632302443}
   battleTimerController: {fileID: 0}
+  currencyView: {fileID: 4206240332682867794}
 --- !u!114 &5750138118002498646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -871,6 +873,20 @@ MonoBehaviour:
   - {fileID: 5442691595675099956}
   - {fileID: 4029881184146071382}
   - {fileID: 7245453266946899112}
+--- !u!114 &4206240332682867794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288195215477195475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7477cd8f8a7488f458078f9fdb81ca16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goldText: {fileID: 5020206560783812391}
+  uiCoinRect: {fileID: 136601225526480129}
 --- !u!1 &1306975393399983633
 GameObject:
   m_ObjectHideFlags: 0
@@ -2791,8 +2807,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 162.54, y: 0}
+  m_AnchoredPosition: {x: 5.353, y: 0}
+  m_SizeDelta: {x: 158.8119, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &4185504567393740138
 CanvasRenderer:
@@ -2822,7 +2838,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 12231232
+  m_text: 10006
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 02479d586e688df45842f13ac3faf2db, type: 2}
   m_sharedMaterial: {fileID: -1389305967821746214, guid: 02479d586e688df45842f13ac3faf2db, type: 2}
@@ -2831,8 +2847,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281282376
-  m_fontColor: {r: 0.2830189, g: 0.18556428, b: 0.18556428, a: 1}
+    rgba: 4278200411
+  m_fontColor: {r: 0.3584906, g: 0.15646982, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2857,9 +2873,9 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
-  m_characterSpacing: -8.78
+  m_characterSpacing: -4.9
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -3751,7 +3767,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 162.54, y: 0}
+  m_SizeDelta: {x: 158.8119, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &6060404702319343325
 CanvasRenderer:
@@ -3781,7 +3797,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 12231232
+  m_text: 10006
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 02479d586e688df45842f13ac3faf2db, type: 2}
   m_sharedMaterial: {fileID: -1389305967821746214, guid: 02479d586e688df45842f13ac3faf2db, type: 2}
@@ -3790,8 +3806,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281282376
-  m_fontColor: {r: 0.2830189, g: 0.18556428, b: 0.18556428, a: 1}
+    rgba: 4278200411
+  m_fontColor: {r: 0.3584906, g: 0.15646982, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3816,9 +3832,9 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
-  m_characterSpacing: -8.78
+  m_characterSpacing: -4.9
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -4051,7 +4067,7 @@ GameObject:
   - component: {fileID: 1325066938128583624}
   - component: {fileID: 1120576515778011738}
   - component: {fileID: 6940138978091355880}
-  - component: {fileID: 1254536750352438225}
+  - component: {fileID: 723971697282041395}
   m_Layer: 5
   m_Name: DiamondPanel
   m_TagString: Untagged
@@ -4118,7 +4134,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 3.2
---- !u!114 &1254536750352438225
+--- !u!114 &723971697282041395
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4928,7 +4944,7 @@ GameObject:
   - component: {fileID: 7215221585300165627}
   - component: {fileID: 2408036505133416497}
   - component: {fileID: 432829201867697965}
-  - component: {fileID: 7738910214200224540}
+  - component: {fileID: 8404818155852439297}
   m_Layer: 5
   m_Name: GoldPanel
   m_TagString: Untagged
@@ -4995,7 +5011,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 3.2
---- !u!114 &7738910214200224540
+--- !u!114 &8404818155852439297
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

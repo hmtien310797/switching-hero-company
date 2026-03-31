@@ -111,11 +111,11 @@ public sealed class UIManager : Singleton<UIManager>
     private GameObject _mainSharedBackdrop; // shared backdrop for main
     private bool _suppressMainBackdropRefresh;
 
-    protected override void Awake()
+    public override async UniTask InitializeAsync()
     {
-        base.Awake();
         CreateLayerRootsFromEnum();
         InitLayerLists();
+        await InitMainScene();
     }
 
     #region Layer Roots

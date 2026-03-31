@@ -12,7 +12,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] private float yPosPortrait = 1f;
         
         [Header("Landscape")]
-        [SerializeField] private float scaleLandscape = 0.6f;
+        [SerializeField] private float scaleLandscape = 0.53f;
         [SerializeField] private float yPosLandscape = 1f;
         
         [SerializeField] private bool changePosY = false;
