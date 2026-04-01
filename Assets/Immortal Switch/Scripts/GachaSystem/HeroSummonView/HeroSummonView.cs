@@ -27,6 +27,10 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         
         [SerializeField] private Button probabilityInfoButton;
         [SerializeField] private HeroSummonProbabilityPopup probabilityPopup;
+        
+        [Header("Achievement")]
+        [SerializeField] private Button summonAchievementButton;
+        [SerializeField] private SummonAchievementRewardView summonAchievementRewardView;
 
         [Header("Option Id")]
         [SerializeField] private string optionAId = "summon_30";
@@ -57,6 +61,12 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (sequencePopup != null)
                 sequencePopup.Hide();
+            
+            if(probabilityInfoButton != null)
+                probabilityPopup.Hide();
+            
+            if(summonAchievementRewardView != null)
+                summonAchievementRewardView.Hide();
         }
 
         private void BindButtons()
@@ -72,6 +82,18 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 probabilityInfoButton.onClick.RemoveAllListeners();
                 probabilityInfoButton.onClick.AddListener(OpenProbabilityPopup);
             }
+            
+            if (summonAchievementButton != null)
+            {
+                summonAchievementButton.onClick.RemoveAllListeners();
+                summonAchievementButton.onClick.AddListener(OpenSummonAchievementPopup);
+            }
+        }
+        
+        private void OpenSummonAchievementPopup()
+        {
+            if (summonAchievementRewardView != null)
+                summonAchievementRewardView.Show();
         }
         
         private void OpenProbabilityPopup()

@@ -38,8 +38,10 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
         [LabelWidth(80)]
         public Color Tint = Color.white;
+        
+        public string DisplayName;
 
-        // ===== Filter =====
+        public string Description;
 
         [ShowIf(nameof(IsCurrency))]
         public CurrencyType CurrencyType;

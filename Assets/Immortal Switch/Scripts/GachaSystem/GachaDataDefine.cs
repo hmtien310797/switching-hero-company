@@ -61,6 +61,8 @@ namespace Immortal_Switch.Scripts.GachaSystem
         [LabelWidth(80)]
         public int Amount;
 
+        public string Description;
+
         // ===== Condition =====
         private bool IsCurrency() => RewardType == HeroSummonRewardType.Currency;
         private bool IsHero() => RewardType == HeroSummonRewardType.Hero;
