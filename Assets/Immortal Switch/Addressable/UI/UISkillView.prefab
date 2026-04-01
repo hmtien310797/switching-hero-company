@@ -4645,11 +4645,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panelRoot: {fileID: 8037861442086226697}
-  scalePortrait: 1
-  yPosPortrait: 1
-  scaleLandscape: 0.53
-  yPosLandscape: 1
+  fitMode: 2
+  useSafeArea: 1
+  portraitAlwaysScaleOne: 1
+  autoDetectDesignSize: 1
+  designSize: {x: 1300, y: 2200}
+  minScale: 0.35
+  maxScale: 1
   changePosY: 0
+  yPosPortrait: 1
+  yPosLandscape: 1
 --- !u!1 &4984979471255972560
 GameObject:
   m_ObjectHideFlags: 0

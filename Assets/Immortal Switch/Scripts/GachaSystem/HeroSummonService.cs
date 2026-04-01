@@ -29,27 +29,73 @@ namespace Immortal_Switch.Scripts.GachaSystem
             return config.GetOption(optionId);
         }
 
+        /// <summary>
+        /// Segment-based:
+        /// Level 1 cost = cost để lên level 2
+        /// Level 2 cost = cost để lên level 3
+        /// ...
+        /// </summary>
         public int GetCurrentSummonLevel()
         {
-            int level = 1;
+            int remainingRoll = Mathf.Max(0, saveData.TotalRoll);
+            int currentLevel = 1;
 
-            for (int i = 0; i < config.SummonLevels.Count; i++)
+            while (true)
             {
-                var entry = config.SummonLevels[i];
-                if (entry == null) continue;
+                int levelCost = GetLevelCost(currentLevel);
+                if (levelCost <= 0)
+                    break;
 
-                if (saveData.TotalRoll >= entry.TotalRollRequired && entry.SummonLevel > level)
-                    level = entry.SummonLevel;
+                if (remainingRoll < levelCost)
+                    break;
+
+                remainingRoll -= levelCost;
+                currentLevel++;
             }
 
-            return level;
+            return currentLevel;
         }
-        
+
+        /// <summary>
+        /// Số roll đã đi trong level hiện tại.
+        /// Ví dụ:
+        /// L1 cost=10, L2 cost=20
+        /// TotalRoll=20 => currentLevel=2, progressRoll=10
+        /// </summary>
+        public int GetCurrentLevelProgressRoll()
+        {
+            int remainingRoll = Mathf.Max(0, saveData.TotalRoll);
+            int currentLevel = 1;
+
+            while (true)
+            {
+                int levelCost = GetLevelCost(currentLevel);
+                if (levelCost <= 0)
+                    break;
+
+                if (remainingRoll < levelCost)
+                    return remainingRoll;
+
+                remainingRoll -= levelCost;
+                currentLevel++;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Cost của level hiện tại để lên level tiếp theo.
+        /// </summary>
+        public int GetCurrentLevelRequiredRoll()
+        {
+            return GetLevelCost(GetCurrentSummonLevel());
+        }
+
         public List<int> GetClaimableRewardLevels()
         {
             var result = new List<int>();
 
-            if (config == null)
+            if (config == null || config.LevelRewards == null)
                 return result;
 
             int currentLevel = GetCurrentSummonLevel();
@@ -58,18 +104,68 @@ namespace Immortal_Switch.Scripts.GachaSystem
             {
                 var reward = config.LevelRewards[i];
                 if (reward == null) continue;
-                
-                if (reward.SummonLevel > currentLevel)
-                    continue;
-                
+
                 if (saveData.ClaimedRewardLevels.Contains(reward.SummonLevel))
                     continue;
 
-                result.Add(reward.SummonLevel);
+                // Reward level X chỉ claim được khi đã vượt qua level X, tức currentLevel > X
+                if (currentLevel > reward.SummonLevel)
+                    result.Add(reward.SummonLevel);
             }
 
             result.Sort();
             return result;
+        }
+
+        public bool IsRewardClaimable(int summonLevel)
+        {
+            if (saveData.ClaimedRewardLevels.Contains(summonLevel))
+                return false;
+
+            return GetCurrentSummonLevel() > summonLevel;
+        }
+
+        public bool IsRewardClaimed(int summonLevel)
+        {
+            return saveData.ClaimedRewardLevels.Contains(summonLevel);
+        }
+
+        public HeroSummonLevelRewardEntry GetPreviewRewardEntry()
+        {
+            if (config == null || config.LevelRewards == null || config.LevelRewards.Count == 0)
+                return null;
+
+            var sortedRewards = config.LevelRewards
+                .Where(x => x != null)
+                .OrderBy(x => x.SummonLevel)
+                .ToList();
+
+            for (int i = 0; i < sortedRewards.Count; i++)
+            {
+                var entry = sortedRewards[i];
+
+                if (!saveData.ClaimedRewardLevels.Contains(entry.SummonLevel))
+                    return entry;
+            }
+
+            return sortedRewards.LastOrDefault();
+        }
+
+        public HeroSummonRewardPreviewData GetRewardPreviewData()
+        {
+            var entry = GetPreviewRewardEntry();
+            if (entry == null || entry.RewardItems == null || entry.RewardItems.Count == 0)
+                return null;
+
+            var rewardItem = entry.RewardItems[0];
+
+            return new HeroSummonRewardPreviewData
+            {
+                SummonLevel = entry.SummonLevel,
+                RewardItem = rewardItem,
+                IsClaimable = IsRewardClaimable(entry.SummonLevel),
+                IsClaimed = IsRewardClaimed(entry.SummonLevel)
+            };
         }
 
         public bool CanSummon(HeroSummonOptionEntry option, out SummonPaymentType paymentType, out int paidAmount)
@@ -181,7 +277,10 @@ namespace Immortal_Switch.Scripts.GachaSystem
         {
             if (rewardReceiver == null) return false;
             if (saveData.ClaimedRewardLevels.Contains(summonLevel)) return false;
-            if (summonLevel > GetCurrentSummonLevel()) return false;
+
+            // Reward level X chỉ claim được khi đã lên level > X
+            if (GetCurrentSummonLevel() <= summonLevel)
+                return false;
 
             var rewardEntry = config.LevelRewards.Find(x => x != null && x.SummonLevel == summonLevel);
             if (rewardEntry == null) return false;
@@ -192,7 +291,46 @@ namespace Immortal_Switch.Scripts.GachaSystem
             }
 
             saveData.ClaimedRewardLevels.Add(summonLevel);
+            saveData.ClaimedRewardLevels.Sort();
             return true;
+        }
+
+        public HeroDataSO GetRandomHeroByRarity(SummonRarity rarity)
+        {
+            var pool = config.HeroPool
+                .Where(x => x != null && x.IsAvailableInSummon && x.SummonRarity == rarity)
+                .ToList();
+
+            if (pool.Count == 0)
+                return null;
+
+            int totalWeight = 0;
+            for (int i = 0; i < pool.Count; i++)
+                totalWeight += Mathf.Max(1, pool[i].SummonWeight);
+
+            int roll = Random.Range(1, totalWeight + 1);
+            int cumulative = 0;
+
+            for (int i = 0; i < pool.Count; i++)
+            {
+                cumulative += Mathf.Max(1, pool[i].SummonWeight);
+                if (roll <= cumulative)
+                    return pool[i];
+            }
+
+            return pool[0];
+        }
+
+        private int GetLevelCost(int summonLevel)
+        {
+            if (config == null || config.SummonLevels == null)
+                return 0;
+
+            var exact = config.SummonLevels.Find(x => x != null && x.SummonLevel == summonLevel);
+            if (exact == null)
+                return 0;
+
+            return Mathf.Max(0, exact.TotalRollRequired);
         }
 
         private void Spend(HeroSummonOptionEntry option, SummonPaymentType paymentType)
@@ -305,9 +443,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
 
             int totalWeight = 0;
             for (int i = 0; i < pool.Count; i++)
-            {
                 totalWeight += Mathf.Max(1, pool[i].SummonWeight);
-            }
 
             int roll = Random.Range(1, totalWeight + 1);
             int cumulative = 0;
@@ -328,17 +464,16 @@ namespace Immortal_Switch.Scripts.GachaSystem
 
             if (newLevel <= oldLevel)
                 return result;
-
-            for (int i = 0; i < config.LevelRewards.Count; i++)
+            
+            for (int rewardLevel = oldLevel; rewardLevel < newLevel; rewardLevel++)
             {
-                var reward = config.LevelRewards[i];
-                if (reward == null) continue;
+                bool exists = config.LevelRewards != null &&
+                              config.LevelRewards.Any(x => x != null && x.SummonLevel == rewardLevel);
 
-                if (reward.SummonLevel > oldLevel && reward.SummonLevel <= newLevel)
-                    result.Add(reward.SummonLevel);
+                if (exists)
+                    result.Add(rewardLevel);
             }
 
-            result.Sort();
             return result;
         }
     }

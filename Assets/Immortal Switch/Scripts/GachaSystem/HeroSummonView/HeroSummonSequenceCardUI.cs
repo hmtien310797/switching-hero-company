@@ -20,6 +20,13 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [Header("Background")]
         [SerializeField] private UIGradient backgroundGradient;
 
+        [Header("Glow")]
+        [SerializeField] private GameObject glowRoot;
+        [SerializeField] private Image glowBack;
+        [SerializeField] private Image glowRing;
+        [SerializeField] private UISoftGlowPulse glowBackPulse;
+        [SerializeField] private UISoftGlowPulse glowRingPulse;
+
         [Header("Reveal Anim")]
         [SerializeField] private float revealDuration = 0.22f;
         [SerializeField] private Vector3 hiddenScale = new Vector3(0.72f, 0.72f, 1f);
@@ -28,6 +35,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [Header("Rare Feel")]
         [SerializeField] private float epicScaleMultiplier = 1.06f;
         [SerializeField] private float legendaryScaleMultiplier = 1.12f;
+        [SerializeField] private float mythicScaleMultiplier = 1.16f;
         [SerializeField] private float rarePulseDuration = 0.12f;
 
         private Coroutine revealCoroutine;
@@ -44,6 +52,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             bool lastCard = false)
         {
             var hero = entry.HeroAsset as HeroDataSO;
+
             boundRarity = entry.Rarity;
             isLastCard = lastCard;
 
@@ -64,11 +73,10 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (backgroundGradient != null)
             {
-                backgroundGradient.TopColor = topColor;
-                backgroundGradient.BottomColor = bottomColor;
-                backgroundGradient.Refresh();
+                backgroundGradient.Refresh(topColor, bottomColor);
             }
 
+            ApplyGlowByRarity(entry.Rarity, topColor, bottomColor);
             SetHiddenImmediate();
         }
 
@@ -109,6 +117,8 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             if (newTag != null)
                 newTag.SetActive(false);
 
+            ResetGlow();
+
             boundRarity = SummonRarity.Common;
             isLastCard = false;
         }
@@ -145,11 +155,79 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 rectTransform.localScale = GetFinalScale();
         }
 
+        private void ApplyGlowByRarity(SummonRarity rarity, Color topColor, Color bottomColor)
+        {
+            bool showGlow = rarity >= SummonRarity.Epic;
+
+            if (glowRoot != null)
+                glowRoot.SetActive(showGlow);
+
+            if (!showGlow)
+                return;
+
+            Color backColor = Color.Lerp(bottomColor, Color.white, 0.25f);
+            Color ringColor = Color.Lerp(topColor, Color.white, 0.15f);
+
+            backColor.a = 1f;
+            ringColor.a = 1f;
+
+            if (glowBack != null)
+                glowBack.color = backColor;
+
+            if (glowRing != null)
+                glowRing.color = ringColor;
+
+            if (rarity >= SummonRarity.Mythic)
+            {
+                if (glowBackPulse != null)
+                    glowBackPulse.SetProfile(0.45f, 0.90f, 2.8f, 0.98f, 1.10f, 2.0f, false, 0f);
+
+                if (glowRingPulse != null)
+                    glowRingPulse.SetProfile(0.55f, 1.00f, 3.2f, 0.98f, 1.12f, 2.2f, false, 22f);
+            }
+            else if (rarity >= SummonRarity.Legendary)
+            {
+                if (glowBackPulse != null)
+                    glowBackPulse.SetProfile(0.40f, 0.85f, 2.4f, 0.97f, 1.08f, 1.9f, false, 0f);
+
+                if (glowRingPulse != null)
+                    glowRingPulse.SetProfile(0.50f, 0.95f, 2.8f, 0.98f, 1.10f, 2.0f, false, 16f);
+            }
+            else
+            {
+                if (glowBackPulse != null)
+                    glowBackPulse.SetProfile(0.28f, 0.65f, 2.0f, 0.98f, 1.05f, 1.6f, false, 0f);
+
+                if (glowRingPulse != null)
+                    glowRingPulse.SetProfile(0.35f, 0.75f, 2.2f, 0.99f, 1.06f, 1.7f, false, 0f);
+            }
+
+            glowBackPulse?.ResetVisual();
+            glowRingPulse?.ResetVisual();
+        }
+
+        private void ResetGlow()
+        {
+            if (glowRoot != null)
+                glowRoot.SetActive(false);
+
+            if (glowBack != null)
+                glowBack.color = Color.clear;
+
+            if (glowRing != null)
+                glowRing.color = Color.clear;
+
+            glowBackPulse?.ResetVisual();
+            glowRingPulse?.ResetVisual();
+        }
+
         private Vector3 GetFinalScale()
         {
             float multiplier = 1f;
 
-            if (boundRarity >= SummonRarity.Legendary)
+            if (boundRarity >= SummonRarity.Mythic)
+                multiplier = mythicScaleMultiplier;
+            else if (boundRarity >= SummonRarity.Legendary)
                 multiplier = legendaryScaleMultiplier;
             else if (boundRarity >= SummonRarity.Epic)
                 multiplier = epicScaleMultiplier;
@@ -213,8 +291,10 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             {
                 time += Time.deltaTime;
                 float t = Mathf.Clamp01(time / rarePulseDuration);
+
                 if (rectTransform != null)
                     rectTransform.localScale = Vector3.Lerp(baseScale, pulseScale, t);
+
                 yield return null;
             }
 
@@ -223,8 +303,10 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             {
                 time += Time.deltaTime;
                 float t = Mathf.Clamp01(time / rarePulseDuration);
+
                 if (rectTransform != null)
                     rectTransform.localScale = Vector3.Lerp(pulseScale, baseScale, t);
+
                 yield return null;
             }
         }

@@ -168,7 +168,7 @@ namespace Scripts.Battle
             return (transform.position - target).sqrMagnitude <= rangeAttack*rangeAttack;
         }
 
-        public void TakeDamage(ICombatUnit attacker, float amount = 1)
+        public void TakeDamage(ICombatUnit attacker, float amount = 0)
         {
             DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, (ICombatUnit)this, amount);
             healthBarController?.ShowHealthTxt((int)damageResult.Damage, transform.position + Vector3.up);

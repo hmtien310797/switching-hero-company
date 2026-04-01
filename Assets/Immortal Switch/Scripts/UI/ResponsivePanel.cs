@@ -1,44 +1,141 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.UI
 {
     public class ResponsivePanel : MonoBehaviour
     {
+        public enum FitMode
+        {
+            FitInside,
+            FitWidth,
+            FitHeight
+        }
+
         [SerializeField] private RectTransform panelRoot;
-        
-        [Header("Portrait")]
-        [SerializeField] private float scalePortrait = 1f;
-        [SerializeField] private float yPosPortrait = 1f;
-        
-        [Header("Landscape")]
-        [SerializeField] private float scaleLandscape = 0.53f;
-        [SerializeField] private float yPosLandscape = 1f;
-        
+
+        [Header("Mode")]
+        [SerializeField] private FitMode fitMode = FitMode.FitInside;
+        [SerializeField] private bool useSafeArea = true;
+        [SerializeField] private bool portraitAlwaysScaleOne = true;
+
+        [Header("Auto Detect Design Size")]
+        [SerializeField] private bool autoDetectDesignSize = true;
+        [SerializeField] private Vector2 designSize = new Vector2(1300, 2200);
+
+        [Header("Clamp")]
+        [SerializeField] private float minScale = 0.35f;
+        [SerializeField] private float maxScale = 1f;
+
+        [Header("Optional Y Offset")]
         [SerializeField] private bool changePosY = false;
+        [SerializeField] private float yPosPortrait = 0f;
+        [SerializeField] private float yPosLandscape = 0f;
 
         private Vector2Int lastScreenSize;
+        private Rect lastSafeArea;
+        private bool cachedDesignSize;
 
-        private void Start()
+        private void OnEnable()
         {
+            CacheDesignSize();
             Apply();
         }
 
         private void Update()
         {
-            if (lastScreenSize.x != Screen.width || lastScreenSize.y != Screen.height)
+            if (NeedRefresh())
             {
                 Apply();
             }
         }
 
+        private bool NeedRefresh()
+        {
+            if (lastScreenSize.x != Screen.width || lastScreenSize.y != Screen.height)
+                return true;
+
+            if (useSafeArea && lastSafeArea != Screen.safeArea)
+                return true;
+
+            return false;
+        }
+
+        private void CacheDesignSize()
+        {
+            if (!autoDetectDesignSize || cachedDesignSize || panelRoot == null)
+                return;
+
+            // lấy size gốc (unscaled)
+            Vector2 size = panelRoot.rect.size;
+
+            // nếu bị scale rồi thì reverse lại
+            if (panelRoot.localScale != Vector3.one)
+            {
+                size = new Vector2(
+                    panelRoot.rect.width / panelRoot.localScale.x,
+                    panelRoot.rect.height / panelRoot.localScale.y
+                );
+            }
+
+            // fallback tránh lỗi
+            if (size.x > 0 && size.y > 0)
+            {
+                designSize = size;
+                cachedDesignSize = true;
+            }
+        }
+
         private void Apply()
         {
+            if (panelRoot == null) return;
+
             bool isPortrait = Screen.height >= Screen.width;
-            panelRoot.localScale = isPortrait ? scalePortrait * Vector3.one : scaleLandscape * Vector3.one;
-            if (!changePosY) return;
-            panelRoot.anchoredPosition = new Vector2(panelRoot.anchoredPosition.x, isPortrait ? yPosPortrait : yPosLandscape);
-            
+
+            float scale = CalculateScale(isPortrait);
+
+            panelRoot.localScale = Vector3.one * scale;
+
+            if (changePosY)
+            {
+                Vector2 pos = panelRoot.anchoredPosition;
+                pos.y = isPortrait ? yPosPortrait : yPosLandscape;
+                panelRoot.anchoredPosition = pos;
+            }
+
+            lastScreenSize = new Vector2Int(Screen.width, Screen.height);
+            lastSafeArea = Screen.safeArea;
+        }
+
+        private float CalculateScale(bool isPortrait)
+        {
+            if (portraitAlwaysScaleOne && isPortrait)
+                return 1f;
+
+            Rect area = useSafeArea
+                ? Screen.safeArea
+                : new Rect(0, 0, Screen.width, Screen.height);
+
+            float widthRatio = area.width / designSize.x;
+            float heightRatio = area.height / designSize.y;
+
+            float scale = 1f;
+
+            switch (fitMode)
+            {
+                case FitMode.FitInside:
+                    scale = Mathf.Min(widthRatio, heightRatio);
+                    break;
+
+                case FitMode.FitWidth:
+                    scale = widthRatio;
+                    break;
+
+                case FitMode.FitHeight:
+                    scale = heightRatio;
+                    break;
+            }
+
+            return Mathf.Clamp(scale, minScale, maxScale);
         }
     }
 }

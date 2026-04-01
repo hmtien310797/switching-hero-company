@@ -27,8 +27,10 @@ namespace Immortal_Switch.Scripts.UI
             }
         }
 
-        public void Refresh()
+        public void Refresh(Color top, Color bottom)
         {
+            TopColor = top;
+            BottomColor = bottom;
             if (graphic != null)
                 graphic.SetVerticesDirty();
         }

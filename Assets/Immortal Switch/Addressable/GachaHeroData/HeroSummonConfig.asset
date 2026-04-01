@@ -35,7 +35,7 @@ MonoBehaviour:
     LegendaryRate: 0
     MythicRate: 0
   - SummonLevel: 2
-    TotalRollRequired: 10
+    TotalRollRequired: 20
     CommonRate: 85
     UnCommonRate: 10
     RareRate: 5
@@ -43,7 +43,7 @@ MonoBehaviour:
     LegendaryRate: 0
     MythicRate: 0
   - SummonLevel: 3
-    TotalRollRequired: 10
+    TotalRollRequired: 50
     CommonRate: 81
     UnCommonRate: 11
     RareRate: 7
@@ -51,7 +51,7 @@ MonoBehaviour:
     LegendaryRate: 0
     MythicRate: 0
   - SummonLevel: 4
-    TotalRollRequired: 10
+    TotalRollRequired: 100
     CommonRate: 76.5
     UnCommonRate: 12
     RareRate: 9
@@ -59,39 +59,229 @@ MonoBehaviour:
     LegendaryRate: 0
     MythicRate: 0
   - SummonLevel: 5
-    TotalRollRequired: 10
+    TotalRollRequired: 200
     CommonRate: 71.8
     UnCommonRate: 13
     RareRate: 11
     EpicRate: 4
     LegendaryRate: 0.2
     MythicRate: 0
+  - SummonLevel: 6
+    TotalRollRequired: 350
+    CommonRate: 67.1
+    UnCommonRate: 14
+    RareRate: 13
+    EpicRate: 5.5
+    LegendaryRate: 0.3
+    MythicRate: 0.1
+  - SummonLevel: 7
+    TotalRollRequired: 500
+    CommonRate: 62.2
+    UnCommonRate: 15
+    RareRate: 15
+    EpicRate: 7
+    LegendaryRate: 0.6
+    MythicRate: 0.2
+  - SummonLevel: 8
+    TotalRollRequired: 750
+    CommonRate: 57.3
+    UnCommonRate: 16
+    RareRate: 16.5
+    EpicRate: 8.5
+    LegendaryRate: 1
+    MythicRate: 0.7
+  - SummonLevel: 9
+    TotalRollRequired: 1000
+    CommonRate: 52.4
+    UnCommonRate: 17
+    RareRate: 18
+    EpicRate: 10
+    LegendaryRate: 1.6
+    MythicRate: 1
+  - SummonLevel: 10
+    TotalRollRequired: 1500
+    CommonRate: 47
+    UnCommonRate: 18
+    RareRate: 20
+    EpicRate: 12
+    LegendaryRate: 2
+    MythicRate: 1
+  - SummonLevel: 11
+    TotalRollRequired: 2200
+    CommonRate: 43
+    UnCommonRate: 19
+    RareRate: 21
+    EpicRate: 13
+    LegendaryRate: 3
+    MythicRate: 1
+  - SummonLevel: 12
+    TotalRollRequired: 3000
+    CommonRate: 39
+    UnCommonRate: 20
+    RareRate: 22
+    EpicRate: 14
+    LegendaryRate: 3
+    MythicRate: 2
+  - SummonLevel: 13
+    TotalRollRequired: 4000
+    CommonRate: 34
+    UnCommonRate: 21
+    RareRate: 23
+    EpicRate: 16
+    LegendaryRate: 4
+    MythicRate: 2
+  - SummonLevel: 14
+    TotalRollRequired: 5500
+    CommonRate: 28
+    UnCommonRate: 22
+    RareRate: 23
+    EpicRate: 19
+    LegendaryRate: 5
+    MythicRate: 3
+  - SummonLevel: 15
+    TotalRollRequired: 8000
+    CommonRate: 22
+    UnCommonRate: 24
+    RareRate: 22
+    EpicRate: 23
+    LegendaryRate: 6
+    MythicRate: 3
   LevelRewards:
   - SummonLevel: 1
     RewardItems:
     - RewardType: 0
-      Amount: 50
-      Description: 
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 2
   - SummonLevel: 2
     RewardItems:
     - RewardType: 0
-      Amount: 50
-      Description: 
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 3
   - SummonLevel: 3
     RewardItems:
     - RewardType: 0
-      Amount: 50
-      Description: 
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 10
   - SummonLevel: 4
     RewardItems:
     - RewardType: 0
-      Amount: 50
-      Description: 
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 25
   - SummonLevel: 5
     RewardItems:
     - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 30
+  - SummonLevel: 6
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 40
+  - SummonLevel: 7
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
       Amount: 50
-      Description: 
+  - SummonLevel: 8
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 60
+  - SummonLevel: 9
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 80
+  - SummonLevel: 10
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 100
+  - SummonLevel: 11
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 100
+  - SummonLevel: 12
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 100
+  - SummonLevel: 13
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 100
+  - SummonLevel: 14
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      Amount: 100
+  - SummonLevel: 15
+    RewardItems:
+    - RewardType: 2
+      CurrencyType: 0
+      HeroId: 
+      HeroRarity: 0
+      RandomHeroRarity: 4
+      PoolId: 
+      Amount: 1
   EnablePity: 0
   PityMode: 3
   PityTargetRarity: 4

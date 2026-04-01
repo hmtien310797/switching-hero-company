@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -19,10 +18,15 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [Header("Progress")]
         [SerializeField] private Image summonLevelProgressFill;
 
+        [Header("Reward Preview")]
+        [SerializeField] private HeroSummonLevelRewardPreviewUI levelRewardPreviewUI;
+
         [Header("Popup")]
         [SerializeField] private HeroSummonConfirmPopup confirmPopup;
-        [SerializeField] private HeroSummonRewardClaimView rewardClaimView;
         [SerializeField] private HeroSummonSequencePopup sequencePopup;
+        
+        [SerializeField] private Button probabilityInfoButton;
+        [SerializeField] private HeroSummonProbabilityPopup probabilityPopup;
 
         [Header("Option Id")]
         [SerializeField] private string optionAId = "summon_30";
@@ -47,9 +51,12 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (CurrencyManager.Instance != null)
                 CurrencyManager.Instance.OnAnyCurrencyChanged -= RefreshView;
-            
-            confirmPopup.Hide();
-            sequencePopup.Hide();
+
+            if (confirmPopup != null)
+                confirmPopup.Hide();
+
+            if (sequencePopup != null)
+                sequencePopup.Hide();
         }
 
         private void BindButtons()
@@ -59,6 +66,21 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (summonButtonB != null)
                 summonButtonB.Init(optionBId, TrySummon);
+
+            if (probabilityInfoButton != null)
+            {
+                probabilityInfoButton.onClick.RemoveAllListeners();
+                probabilityInfoButton.onClick.AddListener(OpenProbabilityPopup);
+            }
+        }
+        
+        private void OpenProbabilityPopup()
+        {
+            if (probabilityPopup == null || HeroSummonManager.Instance == null)
+                return;
+
+            int currentLevel = HeroSummonManager.Instance.GetCurrentSummonLevel();
+            probabilityPopup.Show(currentLevel);
         }
 
         public void RefreshView()
@@ -67,7 +89,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 return;
 
             RefreshSummonLevel();
-            RefreshClaimableRewards();
+            RefreshRewardPreview();
 
             if (summonButtonA != null)
                 summonButtonA.Refresh();
@@ -84,48 +106,22 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             if (summonLevelText != null)
                 summonLevelText.text = $"Lv.{currentLevel}";
 
-            int totalRoll = manager.SaveData.TotalRoll;
-            int currentRequired = 0;
-            int nextRequired = currentRequired;
-
-            var levels = manager.Config.SummonLevels;
-            for (int i = 0; i < levels.Count; i++)
-            {
-                var entry = levels[i];
-                if (entry == null) continue;
-
-                if (entry.SummonLevel == currentLevel)
-                    currentRequired = entry.TotalRollRequired;
-
-                if (entry.SummonLevel == currentLevel + 1)
-                {
-                    nextRequired = entry.TotalRollRequired;
-                    break;
-                }
-            }
-
-            if (nextRequired <= currentRequired)
-            {
-                if (summonLevelProgressFill != null)
-                    summonLevelProgressFill.fillAmount = 1f;
-
-                return;
-            }
-
-            int currentProgress = totalRoll - currentRequired;
-            int needed = nextRequired - currentRequired;
+            int currentProgress = manager.Service.GetCurrentLevelProgressRoll();
+            int currentRequired = manager.Service.GetCurrentLevelRequiredRoll();
 
             if (summonLevelProgressFill != null)
-                summonLevelProgressFill.fillAmount = needed <= 0 ? 0f : Mathf.Clamp01((float)currentProgress / needed);
+            {
+                if (currentRequired <= 0)
+                    summonLevelProgressFill.fillAmount = 1f;
+                else
+                    summonLevelProgressFill.fillAmount = Mathf.Clamp01((float)currentProgress / currentRequired);
+            }
         }
 
-        private void RefreshClaimableRewards()
+        private void RefreshRewardPreview()
         {
-            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
-                return;
-
-            if (rewardClaimView != null)
-                rewardClaimView.Refresh();
+            if (levelRewardPreviewUI != null)
+                levelRewardPreviewUI.Refresh();
         }
 
         private void TrySummon(string optionId)
@@ -135,7 +131,6 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (!HeroSummonManager.Instance.CanSummon(optionId, out var paymentType, out var paidAmount))
             {
-                // TODO: Show Not Enough Resource Popup
                 Debug.Log("Not enough resource");
                 return;
             }
@@ -182,7 +177,6 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (result == null)
             {
-                // TODO: Show Not Enough Resource Popup
                 Debug.Log("Summon failed or not enough resource");
                 return;
             }
@@ -202,6 +196,5 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         {
             TrySummon(optionId);
         }
-
     }
 }

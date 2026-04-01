@@ -47,6 +47,20 @@ namespace Immortal_Switch.Scripts.GachaSystem
 
             return result;
         }
+
+        public HeroSummonLevelRewardEntry GetRewardEntry(int summonLevel)
+        {
+            for (int i = 0; i < LevelRewards.Count; i++)
+            {
+                var entry = LevelRewards[i];
+                if (entry == null) continue;
+
+                if (entry.SummonLevel == summonLevel)
+                    return entry;
+            }
+
+            return null;
+        }
     }
 
     [Serializable]

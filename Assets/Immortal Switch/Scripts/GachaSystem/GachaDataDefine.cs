@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Immortal_Switch.Hero;
+using Immortal_Switch.Scripts.Currency;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.GachaSystem
@@ -21,19 +23,48 @@ namespace Immortal_Switch.Scripts.GachaSystem
 
     public enum HeroSummonRewardType
     {
-        HeroTicket,
-        RandomEpicHero,
-        RandomLegendaryHero,
-        LegendaryShard,
-        SelectLegendaryHero
+        Currency,
+        Hero,
+        RandomHero
     }
 
-    [Serializable]
+    [System.Serializable]
     public class HeroSummonRewardItem
     {
+        [HorizontalGroup("Row", 60)]
+        [HideLabel]
         public HeroSummonRewardType RewardType;
-        [Min(0)] public int Amount;
-        public string Description;
+
+        // ===== Currency =====
+        [ShowIf(nameof(IsCurrency))]
+        [LabelWidth(80)]
+        public CurrencyType CurrencyType;
+
+        // ===== Hero =====
+        [ShowIf(nameof(IsHero))]
+        [LabelWidth(80)]
+        public string HeroId;
+
+        [ShowIf(nameof(IsHero))]
+        public SummonRarity HeroRarity;
+
+        // ===== Random Hero =====
+        [ShowIf(nameof(IsRandomHero))]
+        [LabelText("Pool Rarity")]
+        public SummonRarity RandomHeroRarity;
+
+        [ShowIf(nameof(IsRandomHero))]
+        [LabelText("Pool Id (optional)")]
+        public string PoolId;
+
+        // ===== Common =====
+        [LabelWidth(80)]
+        public int Amount;
+
+        // ===== Condition =====
+        private bool IsCurrency() => RewardType == HeroSummonRewardType.Currency;
+        private bool IsHero() => RewardType == HeroSummonRewardType.Hero;
+        private bool IsRandomHero() => RewardType == HeroSummonRewardType.RandomHero;
     }
 
     [Serializable]
@@ -61,5 +92,14 @@ namespace Immortal_Switch.Scripts.GachaSystem
 
         public List<int> NewlyUnlockedRewardLevels = new();
         public List<HeroSummonResultEntry> Entries = new();
+    }
+
+    [Serializable]
+    public class HeroSummonRewardPreviewData
+    {
+        public int SummonLevel;
+        public HeroSummonRewardItem RewardItem;
+        public bool IsClaimable;
+        public bool IsClaimed;
     }
 }
