@@ -33,6 +33,8 @@ namespace Immortal_Switch.Scripts.UI
         private Vector2Int lastScreenSize;
         private Rect lastSafeArea;
         private bool cachedDesignSize;
+        private const float defaultRatio = 2.05f;
+        private const float defaultPortraitHeight = 1440f;
 
         private void OnEnable()
         {
@@ -119,8 +121,27 @@ namespace Immortal_Switch.Scripts.UI
             if (panelRoot != null)
                 yOffset = Mathf.Max(0f, panelRoot.anchoredPosition.y);
 
+            float finalY = 1440;
+            
+            float currentRatio = Screen.width / Screen.height;
+            bool isSameRatio = Mathf.Abs(currentRatio - defaultRatio) < 0.1f;
+            
+            if(area.height <= 1080)
+            {
+                finalY = 1440;
+            }
+            else if (area.height <= 1220)
+            {
+                finalY = 1320;
+            }
+
             float widthRatio = area.width / designSize.x;
-            float heightRatio = (1440 - yOffset)  / designSize.y;
+            float heightRatio = (finalY - yOffset)  / designSize.y;
+            if (isSameRatio)
+            {
+                float newHeightRatio = defaultPortraitHeight / Screen.height;
+                heightRatio -= newHeightRatio / 100;
+            }
 
             float scale = 1f;
 

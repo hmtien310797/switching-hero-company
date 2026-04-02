@@ -12,6 +12,7 @@ namespace Immortal_Switch.Scripts.Core
     {
         private async void Start()
         {
+            Application.targetFrameRate = 60;
             await RunAsync();
         }
 
