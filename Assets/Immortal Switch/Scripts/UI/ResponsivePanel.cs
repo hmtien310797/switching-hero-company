@@ -16,7 +16,6 @@ namespace Immortal_Switch.Scripts.UI
         [Header("Mode")]
         [SerializeField] private FitMode fitMode = FitMode.FitInside;
         [SerializeField] private bool useSafeArea = true;
-        [SerializeField] private bool portraitAlwaysScaleOne = true;
 
         [Header("Auto Detect Design Size")]
         [SerializeField] private bool autoDetectDesignSize = true;
@@ -108,15 +107,20 @@ namespace Immortal_Switch.Scripts.UI
 
         private float CalculateScale(bool isPortrait)
         {
-            if (portraitAlwaysScaleOne && isPortrait)
+            if (isPortrait)
                 return 1f;
 
             Rect area = useSafeArea
                 ? Screen.safeArea
                 : new Rect(0, 0, Screen.width, Screen.height);
 
+            float yOffset = 0f;
+
+            if (panelRoot != null)
+                yOffset = Mathf.Max(0f, panelRoot.anchoredPosition.y);
+
             float widthRatio = area.width / designSize.x;
-            float heightRatio = area.height / designSize.y;
+            float heightRatio = (1440 - yOffset)  / designSize.y;
 
             float scale = 1f;
 

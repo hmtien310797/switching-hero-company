@@ -38,7 +38,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 200}
   m_SizeDelta: {x: 1216.8, y: 1531.9}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &4793571312021553475
@@ -54,11 +54,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panelRoot: {fileID: 5591901405614663904}
-  scalePortrait: 1
+  fitMode: 0
+  useSafeArea: 1
+  autoDetectDesignSize: 1
+  designSize: {x: 1300, y: 2200}
+  minScale: 0.35
+  maxScale: 1
+  changePosY: 0
   yPosPortrait: 300
-  scaleLandscape: 0.6
   yPosLandscape: 270
-  changePosY: 1
 --- !u!1 &1376627981171212292
 GameObject:
   m_ObjectHideFlags: 0
@@ -162,8 +166,8 @@ RectTransform:
   m_GameObject: {fileID: 2161752504789224176}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3493298691908359949}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
