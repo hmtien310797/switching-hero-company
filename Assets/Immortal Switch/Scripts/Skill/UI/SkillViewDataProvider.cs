@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.SkillSummon;
 using Scripts.Battle;
 using Scripts.Common;
 using UnityEngine;
@@ -248,34 +249,29 @@ namespace Immortal_Switch.Scripts.Skill.UI
             return MasterDataCache.Instance.GetSkillDataById(skillId);
         }
 
+        private readonly Immortal_Switch.Scripts.SkillSummon.SkillProgressionService progressionService
+            = new Immortal_Switch.Scripts.SkillSummon.SkillProgressionService();
+
         public SkillViewSkillState BuildSkillState(SkillViewHeroContext heroContext, SkillDataSO skillData)
         {
             if (skillData == null)
-            {
-                LogWarning("BuildSkillState received null skillData.");
                 return null;
-            }
 
             var equippedIds = heroContext != null ? heroContext.EquippedSkillIds : new List<int>();
-            HeroClass heroClass = heroContext != null ? heroContext.HeroClass : default;
 
-            bool isUnlocked = false;
-            if (heroContext != null && UserDataCache.Instance != null)
-                isUnlocked = UserDataCache.Instance.IsUnlocked(heroClass, skillData.SkillId);
+            int level = progressionService.GetLevel(skillData.SkillId);
+            int currentShard = progressionService.GetCurrentShard(skillData.SkillId);
+            int requiredShard = skillData.GetRequiredShardForLevel(level);
+            bool isOwned = progressionService.HasSkill(skillData.SkillId);
 
             var state = new SkillViewSkillState
             {
                 SkillData = skillData,
                 SkillId = skillData.SkillId,
-
-                // Chỗ này hiện đang để tạm.
-                // Nếu sau này bạn có progression skill thật thì chỉ cần thay source ở đây.
-                Level = 1,
-                CurrentShard = 0,
-                RequiredShard = 2,
-
-                // UI hiện tại coi unlocked theo class là "được dùng / owned"
-                IsOwned = isUnlocked
+                Level = level,
+                CurrentShard = currentShard,
+                RequiredShard = requiredShard,
+                IsOwned = isOwned
             };
 
             state.EquippedSlotIndex = equippedIds.FindIndex(x => x == state.SkillId);

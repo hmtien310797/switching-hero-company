@@ -8,7 +8,8 @@ namespace Immortal_Switch.Scripts.Currency
         Gold,
         Diamond,
         HeroTicket,
-        WeaponTicket
+        WeaponTicket,
+        SkillTicket
     }
     
     [Serializable]

@@ -11,6 +11,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public bool IsOwned;
         public int Level = 1;
         public int CurrentShard;
+
+        // Legacy field: giữ lại để không vỡ dữ liệu cũ.
         public int RequiredShard = 2;
     }
 
@@ -65,7 +67,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public static bool IsOwned(int skillId) => GetOrCreate(skillId).IsOwned;
         public static int GetLevel(int skillId) => Mathf.Max(1, GetOrCreate(skillId).Level);
         public static int GetCurrentShard(int skillId) => Mathf.Max(0, GetOrCreate(skillId).CurrentShard);
-        public static int GetRequiredShard(int skillId) => Mathf.Max(1, GetOrCreate(skillId).RequiredShard);
 
         public static void SetOwned(int skillId, bool isOwned)
         {
@@ -81,19 +82,20 @@ namespace Immortal_Switch.Scripts.Skill.UI
             SaveAll();
         }
 
-        public static void SetShard(int skillId, int currentShard, int requiredShard)
+        public static void SetCurrentShard(int skillId, int currentShard)
         {
             var data = GetOrCreate(skillId);
             data.CurrentShard = Mathf.Max(0, currentShard);
-            data.RequiredShard = Mathf.Max(1, requiredShard);
             SaveAll();
         }
 
-        public static void AddShard(int skillId, int amount, int requiredShard = 2)
+        public static void AddShard(int skillId, int amount)
         {
+            if (skillId <= 0 || amount <= 0)
+                return;
+
             var data = GetOrCreate(skillId);
             data.CurrentShard = Mathf.Max(0, data.CurrentShard + amount);
-            data.RequiredShard = Mathf.Max(1, requiredShard);
 
             if (data.CurrentShard > 0)
                 data.IsOwned = true;

@@ -65,6 +65,13 @@ namespace Immortal_Switch.Scripts.Skill
         public List<SkillDescriptionParam> DescriptionParams = new();
     }
 
+    [Serializable]
+    public class SkillUpgradeCostEntry
+    {
+        [Min(1)] public int Level = 1;              // level hiện tại
+        [Min(1)] public int RequiredShard = 2;      // shard cần để lên level tiếp theo
+    }
+
     [CreateAssetMenu(fileName = "Skill_", menuName = "ScriptableObjects/SkillDataSo")]
     public class SkillDataSO : ScriptableObject
     {
@@ -88,12 +95,40 @@ namespace Immortal_Switch.Scripts.Skill
         public SkillTargetType DefaultTargetType = SkillTargetType.CurrentTarget;
         public int MaxLevel = 1;
 
+        [Header("Upgrade")]
+        public List<SkillUpgradeCostEntry> UpgradeShardCosts = new();
+
         [Header("New Skill Levels")]
         public List<SkillLevelData> Levels = new();
 
         public int GetSafeLevel(int level)
         {
             return Mathf.Clamp(level, 1, Mathf.Max(1, MaxLevel));
+        }
+
+        public bool IsMaxLevel(int level)
+        {
+            return GetSafeLevel(level) >= Mathf.Max(1, MaxLevel);
+        }
+
+        public int GetRequiredShardForLevel(int currentLevel)
+        {
+            int safeLevel = GetSafeLevel(currentLevel);
+
+            if (IsMaxLevel(safeLevel))
+                return 0;
+
+            if (UpgradeShardCosts != null)
+            {
+                for (int i = 0; i < UpgradeShardCosts.Count; i++)
+                {
+                    var entry = UpgradeShardCosts[i];
+                    if (entry != null && entry.Level == safeLevel)
+                        return Mathf.Max(1, entry.RequiredShard);
+                }
+            }
+
+            return 2; // fallback an toàn
         }
 
         public SkillLevelData GetLevelData(int level)
