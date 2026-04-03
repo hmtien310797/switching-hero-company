@@ -1,21 +1,22 @@
-﻿using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.SkillSummon;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonButtonUI : BaseSummonButtonUI
+    public class SkillSummonButtonUI : BaseSummonButtonUI
     {
         public override void Refresh()
         {
-            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
+            if (SkillSummonManager.Instance == null || SkillSummonManager.Instance.Service == null)
                 return;
 
-            var option = HeroSummonManager.Instance.Service.GetOption(optionId);
+            var option = SkillSummonManager.Instance.Service.GetOption(optionId);
             if (option == null)
                 return;
 
             SetRollCountText(option.RollCount);
 
-            int ticket = CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
+            int ticket = CurrencyManager.Instance.Get(CurrencyType.SkillTicket);
             int gem = CurrencyManager.Instance.Get(CurrencyType.Diamond);
 
             bool hasEnoughTicket = ticket >= option.TicketCost;
