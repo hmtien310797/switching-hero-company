@@ -1,13 +1,22 @@
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonView : BaseSummonMainView<SummonPaymentType, HeroSummonResult>
+    public class HeroSummonView : AnimatedUIView
     {
-        public override SummonCategory Category => SummonCategory.Hero;
+        [Header("Buttons")]
+        [SerializeField] private HeroSummonButtonUI summonButtonA;
+        [SerializeField] private HeroSummonButtonUI summonButtonB;
+
+        [Header("Texts")]
+        [SerializeField] private TMP_Text summonLevelText;
+
+        [Header("Progress")]
+        [SerializeField] private Image summonLevelProgressFill;
 
         [Header("Reward Preview")]
         [SerializeField] private HeroSummonLevelRewardPreviewUI levelRewardPreviewUI;
@@ -15,111 +24,79 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [Header("Popup")]
         [SerializeField] private HeroSummonConfirmPopup confirmPopup;
         [SerializeField] private HeroSummonSequencePopup sequencePopup;
+        
+        [SerializeField] private Button probabilityInfoButton;
         [SerializeField] private HeroSummonProbabilityPopup probabilityPopup;
-
+        
         [Header("Achievement")]
+        [SerializeField] private Button summonAchievementButton;
         [SerializeField] private SummonAchievementRewardView summonAchievementRewardView;
 
-        public override bool HasNotification()
-        {
-            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
-                return false;
+        [Header("Option Id")]
+        [SerializeField] private string optionAId = "summon_30";
+        [SerializeField] private string optionBId = "summon_50";
 
-            var claimables = HeroSummonManager.Instance.Service.GetClaimableRewardLevels();
-            return claimables != null && claimables.Count > 0;
-        }
-
-        protected override void SubscribeEvents()
+        private void OnEnable()
         {
             if (HeroSummonManager.Instance != null)
                 HeroSummonManager.Instance.OnSummonDataChanged += RefreshView;
 
             if (CurrencyManager.Instance != null)
                 CurrencyManager.Instance.OnAnyCurrencyChanged += RefreshView;
+
+            BindButtons();
+            RefreshView();
         }
 
-        protected override void UnsubscribeEvents()
+        private void OnDisable()
         {
             if (HeroSummonManager.Instance != null)
                 HeroSummonManager.Instance.OnSummonDataChanged -= RefreshView;
 
             if (CurrencyManager.Instance != null)
                 CurrencyManager.Instance.OnAnyCurrencyChanged -= RefreshView;
+
+            if (confirmPopup != null)
+                confirmPopup.Hide();
+
+            if (sequencePopup != null)
+                sequencePopup.Hide();
+            
+            if(probabilityInfoButton != null)
+                probabilityPopup.Hide();
+            
+            if(summonAchievementRewardView != null)
+                summonAchievementRewardView.Hide();
         }
 
-        protected override bool CanRefresh()
+        private void BindButtons()
         {
-            return HeroSummonManager.Instance != null && HeroSummonManager.Instance.Service != null;
-        }
+            if (summonButtonA != null)
+                summonButtonA.Init(optionAId, TrySummon);
 
-        protected override int GetCurrentSummonLevel()
+            if (summonButtonB != null)
+                summonButtonB.Init(optionBId, TrySummon);
+
+            if (probabilityInfoButton != null)
+            {
+                probabilityInfoButton.onClick.RemoveAllListeners();
+                probabilityInfoButton.onClick.AddListener(OpenProbabilityPopup);
+            }
+            
+            if (summonAchievementButton != null)
+            {
+                summonAchievementButton.onClick.RemoveAllListeners();
+                summonAchievementButton.onClick.AddListener(OpenSummonAchievementPopup);
+            }
+        }
+        
+        private void OpenSummonAchievementPopup()
         {
-            return HeroSummonManager.Instance.GetCurrentSummonLevel();
+            if (summonAchievementRewardView != null)
+                summonAchievementRewardView.Show();
         }
-
-        protected override int GetCurrentLevelProgressRoll()
-        {
-            return HeroSummonManager.Instance.Service.GetCurrentLevelProgressRoll();
-        }
-
-        protected override int GetCurrentLevelRequiredRoll()
-        {
-            return HeroSummonManager.Instance.Service.GetCurrentLevelRequiredRoll();
-        }
-
-        protected override void RefreshRewardPreview()
-        {
-            levelRewardPreviewUI?.Refresh();
-        }
-
-        protected override bool CanSummon(string optionId, out SummonPaymentType paymentType, out int paidAmount)
-        {
-            paymentType = SummonPaymentType.Ticket;
-            paidAmount = 0;
-            return HeroSummonManager.Instance != null &&
-                   HeroSummonManager.Instance.CanSummon(optionId, out paymentType, out paidAmount);
-        }
-
-        protected override HeroSummonResult DoExecuteSummon(string optionId, SummonPaymentType paymentType)
-        {
-            return HeroSummonManager.Instance.ExecuteSummon(optionId, paymentType);
-        }
-
-        protected override bool IsGemPayment(SummonPaymentType paymentType)
-        {
-            return paymentType == SummonPaymentType.Gem;
-        }
-
-        protected override SummonPaymentType GetGemPaymentType()
-        {
-            return SummonPaymentType.Gem;
-        }
-
-        protected override bool ShouldSkipGemConfirm()
-        {
-            return HeroSummonManager.Instance != null &&
-                   HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
-        }
-
-        protected override bool HasConfirmPopup()
-        {
-            return confirmPopup != null;
-        }
-
-        protected override void ShowConfirmPopup(int gemCost, System.Action onConfirm)
-        {
-            confirmPopup.Show(gemCost, onConfirm);
-        }
-
-        protected override void HideAllPopups()
-        {
-            confirmPopup?.Hide();
-            sequencePopup?.Hide();
-            probabilityPopup?.Hide();
-            summonAchievementRewardView?.Hide();
-        }
-
-        protected override void OpenProbabilityPopup()
+        
+        private void OpenProbabilityPopup()
         {
             if (probabilityPopup == null || HeroSummonManager.Instance == null)
                 return;
@@ -128,29 +105,118 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             probabilityPopup.Show(currentLevel);
         }
 
-        protected override void OpenAchievementPopup()
+        public void RefreshView()
         {
-            summonAchievementRewardView?.Show();
+            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
+                return;
+
+            RefreshSummonLevel();
+            RefreshRewardPreview();
+
+            if (summonButtonA != null)
+                summonButtonA.Refresh();
+
+            if (summonButtonB != null)
+                summonButtonB.Refresh();
         }
 
-        protected override void SetSequenceBusy(bool value)
+        private void RefreshSummonLevel()
         {
-            sequencePopup?.SetBusyReplacing(value);
+            var manager = HeroSummonManager.Instance;
+            int currentLevel = manager.GetCurrentSummonLevel();
+
+            if (summonLevelText != null)
+                summonLevelText.text = $"Lv.{currentLevel}";
+
+            int currentProgress = manager.Service.GetCurrentLevelProgressRoll();
+            int currentRequired = manager.Service.GetCurrentLevelRequiredRoll();
+
+            if (summonLevelProgressFill != null)
+            {
+                if (currentRequired <= 0)
+                    summonLevelProgressFill.fillAmount = 1f;
+                else
+                    summonLevelProgressFill.fillAmount = Mathf.Clamp01((float)currentProgress / currentRequired);
+            }
         }
 
-        protected override bool IsSequenceShowing()
+        private void RefreshRewardPreview()
         {
-            return sequencePopup != null && sequencePopup.IsShowing;
+            if (levelRewardPreviewUI != null)
+                levelRewardPreviewUI.Refresh();
         }
 
-        protected override void ReplaceSequenceResult(HeroSummonResult result)
+        private void TrySummon(string optionId)
         {
-            sequencePopup?.ReplaceResult(result);
+            if (HeroSummonManager.Instance == null)
+                return;
+
+            if (!HeroSummonManager.Instance.CanSummon(optionId, out var paymentType, out var paidAmount))
+            {
+                Debug.Log("Not enough resource");
+                return;
+            }
+
+            if (paymentType == SummonPaymentType.Gem)
+            {
+                bool skipConfirm = HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
+                if (skipConfirm)
+                {
+                    ExecuteSummon(optionId, paymentType);
+                    return;
+                }
+
+                ShowGemConfirm(optionId, paidAmount);
+                return;
+            }
+
+            ExecuteSummon(optionId, paymentType);
         }
 
-        protected override void ShowSequenceFirstResult(HeroSummonResult result, System.Action<string> summonAction, string optionId)
+        private void ShowGemConfirm(string optionId, int gemCost)
         {
-            sequencePopup?.ShowFirstResult(result, summonAction, optionId);
+            if (confirmPopup == null)
+            {
+                ExecuteSummon(optionId, SummonPaymentType.Gem);
+                return;
+            }
+
+            confirmPopup.Show(
+                gemCost,
+                () => ExecuteSummon(optionId, SummonPaymentType.Gem)
+            );
+        }
+
+        private void ExecuteSummon(string optionId, SummonPaymentType paymentType)
+        {
+            if (sequencePopup != null)
+                sequencePopup.SetBusyReplacing(true);
+
+            var result = HeroSummonManager.Instance.ExecuteSummon(optionId, paymentType);
+
+            if (sequencePopup != null)
+                sequencePopup.SetBusyReplacing(false);
+
+            if (result == null)
+            {
+                Debug.Log("Summon failed or not enough resource");
+                return;
+            }
+
+            if (sequencePopup != null)
+            {
+                if (sequencePopup.IsShowing)
+                    sequencePopup.ReplaceResult(result);
+                else
+                    sequencePopup.ShowFirstResult(result, TrySummonFromPopup, optionId);
+            }
+
+            RefreshView();
+        }
+
+        private void TrySummonFromPopup(string optionId)
+        {
+            TrySummon(optionId);
         }
     }
 }
