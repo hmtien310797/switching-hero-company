@@ -1,11 +1,12 @@
-using System;
+﻿using System;
+using Immortal_Switch.Scripts.SkillSummon;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonConfirmPopup : MonoBehaviour
+    public class SkillSummonConfirmPopup : MonoBehaviour
     {
         [SerializeField] private GameObject root;
         [SerializeField] private TMP_Text messageText;
@@ -31,11 +32,11 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             confirmAction = onConfirm;
 
             if (messageText != null)
-                messageText.text = $"Not enough Hero Tickets.\nThis summon will cost {gemCost} Diamonds.\nConfirm?";
+                messageText.text = $"Not enough Skill Tickets.\nThis summon will cost {gemCost} Diamonds.\nConfirm?";
 
             if (skipToggle != null)
-                skipToggle.isOn = HeroSummonManager.Instance != null &&
-                                  HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
+                skipToggle.isOn = SkillSummonManager.Instance != null &&
+                                  SkillSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
 
             if (root != null)
                 root.SetActive(true);
@@ -53,10 +54,10 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
         private void HandleConfirm()
         {
-            if (HeroSummonManager.Instance != null && skipToggle != null)
+            if (SkillSummonManager.Instance != null && skipToggle != null)
             {
-                HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm = skipToggle.isOn;
-                HeroSummonManager.Instance.Save();
+                SkillSummonManager.Instance.SaveData.SkipGemFallbackConfirm = skipToggle.isOn;
+                SkillSummonManager.Instance.Save();
             }
 
             confirmAction?.Invoke();

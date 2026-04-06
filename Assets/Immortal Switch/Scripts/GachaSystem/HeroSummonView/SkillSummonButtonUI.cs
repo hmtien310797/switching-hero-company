@@ -1,11 +1,12 @@
 ﻿using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.SkillSummon;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonButtonUI : MonoBehaviour
+    public class SkillSummonButtonUI : MonoBehaviour
     {
         [SerializeField] private Button button;
         [SerializeField] private TMP_Text amountText;
@@ -13,7 +14,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private TMP_Text rollCountText;
 
         [Header("Icons")]
-        [SerializeField] private Sprite heroTicketIcon;
+        [SerializeField] private Sprite skillTicketIcon;
         [SerializeField] private Sprite diamondIcon;
 
         [Header("Visual")]
@@ -41,54 +42,36 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
         public void Refresh()
         {
-            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
+            if (SkillSummonManager.Instance == null || SkillSummonManager.Instance.Service == null)
                 return;
 
-            var option = HeroSummonManager.Instance.Service.GetOption(optionId);
+            var option = SkillSummonManager.Instance.Service.GetOption(optionId);
             if (option == null)
                 return;
 
             if (rollCountText != null)
                 rollCountText.text = option.RollCount.ToString();
 
-            int ticket = CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
+            int ticket = CurrencyManager.Instance.Get(CurrencyType.SkillTicket);
             int gem = CurrencyManager.Instance.Get(CurrencyType.Diamond);
 
             bool hasEnoughTicket = ticket >= option.TicketCost;
             bool hasEnoughGem = gem >= option.GemCost;
 
-        
             if (hasEnoughTicket)
             {
-                SetUI(
-                    amount: option.TicketCost,
-                    icon: heroTicketIcon,
-                    showRedDot: true,
-                    color: normalColor
-                );
+                SetUI(option.TicketCost, skillTicketIcon, true, normalColor);
             }
-     
             else if (hasEnoughGem)
             {
-                SetUI(
-                    amount: option.GemCost,
-                    icon: diamondIcon,
-                    showRedDot: false,
-                    color: normalColor
-                );
+                SetUI(option.GemCost, diamondIcon, false, normalColor);
             }
-  
             else
             {
-                SetUI(
-                    amount: option.GemCost,
-                    icon: diamondIcon,
-                    showRedDot: false,
-                    color: notEnoughColor
-                );
+                SetUI(option.GemCost, diamondIcon, false, notEnoughColor);
             }
         }
-        
+
         public void SetInteractable(bool value)
         {
             if (button != null)
@@ -119,9 +102,6 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
         private void HandleClick()
         {
-            // IMPORTANT: vẫn cho click kể cả không đủ resource
-            // Logic check sẽ nằm ở HeroSummonView
-
             clickAction?.Invoke(optionId);
         }
     }

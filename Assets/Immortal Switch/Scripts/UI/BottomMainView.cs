@@ -31,7 +31,7 @@ public class BottomMainView : UIView
             ButtonEquip.onClick.AddListener(() => OnToggleMain<UISkillView>().Forget());
 
 
-         ButtonShop.onClick.AddListener(() => OnToggleMain<HeroSummonView>().Forget());
+         ButtonShop.onClick.AddListener(() => OnToggleMain<SummonHubView>().Forget());
          ButtonHero.onClick.AddListener(() => OnToggleMain<HeroCollectionView>().Forget());
 
         if (ButtonClose != null)

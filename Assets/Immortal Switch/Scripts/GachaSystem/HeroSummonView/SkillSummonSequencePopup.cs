@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Immortal_Switch.Hero;
-using Immortal_Switch.Scripts.HeroUIView;
+using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonSequencePopup : MonoBehaviour
+    public class SkillSummonSequencePopup : MonoBehaviour
     {
         [Header("Root")]
         [SerializeField] private GameObject root;
         [SerializeField] private Transform cardRoot;
-        [SerializeField] private SummonSequenceCardUI cardPrefab;
+        [SerializeField] private SkillSummonSequenceCardUI cardPrefab;
 
         [Header("Top / Utility")]
         [SerializeField] private Button closeButton;
@@ -37,11 +36,11 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private float lastCardExtraPause = 0.12f;
 
         [Header("Rarity Visual")]
-        [SerializeField] private HeroSummonRarityVisualConfigSO rarityVisualConfig;
+        [SerializeField] private SkillSummonRarityVisualConfigSO rarityVisualConfig;
 
-        private readonly List<SummonSequenceCardUI> spawnedCards = new();
-        private readonly List<SummonSequenceCardUI> cardPool = new();
-        private readonly List<HeroSummonGroupedResultEntry> currentGroupedEntries = new();
+        private readonly List<SkillSummonSequenceCardUI> spawnedCards = new();
+        private readonly List<SkillSummonSequenceCardUI> cardPool = new();
+        private readonly List<SkillSummonGroupedResultEntry> currentGroupedEntries = new();
 
         private Coroutine revealCoroutine;
         private Coroutine autoSummonCoroutine;
@@ -67,7 +66,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             Hide();
         }
 
-        public void ShowFirstResult(HeroSummonResult result, Action<string> onSummonAction, string currentOptionId)
+        public void ShowFirstResult(SkillSummonResult result, Action<string> onSummonAction, string currentOptionId)
         {
             summonAction = onSummonAction;
             lastSelectedOptionId = currentOptionId;
@@ -77,13 +76,13 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             ReplaceResult(result);
         }
 
-        public void ReplaceResult(HeroSummonResult result)
+        public void ReplaceResult(SkillSummonResult result)
         {
             if (result == null) return;
             StartCoroutine(CoReplaceResult(result));
         }
 
-        private IEnumerator CoReplaceResult(HeroSummonResult result)
+        private IEnumerator CoReplaceResult(SkillSummonResult result)
         {
             isBusyReplacing = true;
             UpdateButtonInteractable();
@@ -183,22 +182,22 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             summonAction?.Invoke(optionId);
         }
 
-        private void BuildCards(HeroSummonResult result)
+        private void BuildCards(SkillSummonResult result)
         {
             currentGroupedEntries.Clear();
-            currentGroupedEntries.AddRange(HeroSummonResultGrouper.Group(result));
+            currentGroupedEntries.AddRange(SkillSummonResultGrouper.Group(result));
 
             for (int i = 0; i < currentGroupedEntries.Count; i++)
             {
                 var entry = currentGroupedEntries[i];
-                var visual = rarityVisualConfig != null ? rarityVisualConfig.Get(entry.Rarity) : null;
+                var visual = rarityVisualConfig != null ? rarityVisualConfig.Get(entry.Grade) : null;
 
                 var card = GetCardFromPool();
                 card.Bind(
                     entry,
-                    visual != null ? visual.Icon : null,
-                    visual != null ? visual.TopColor : Color.white,
-                    visual != null ? visual.BottomColor : Color.white,
+                    visual != null ? visual.icon : null,
+                    visual != null ? visual.topColor : Color.white,
+                    visual != null ? visual.bottomColor : Color.white,
                     i == currentGroupedEntries.Count - 1
                 );
 
@@ -206,9 +205,9 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             }
         }
 
-        private SummonSequenceCardUI GetCardFromPool()
+        private SkillSummonSequenceCardUI GetCardFromPool()
         {
-            SummonSequenceCardUI card = null;
+            SkillSummonSequenceCardUI card = null;
 
             int lastIndex = cardPool.Count - 1;
             if (lastIndex >= 0)
@@ -255,7 +254,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                     continue;
 
                 var entry = i < currentGroupedEntries.Count ? currentGroupedEntries[i] : null;
-                bool isHighRarity = entry != null && entry.Rarity >= SummonRarity.Epic;
+                bool isHighRarity = entry != null && entry.Grade >= SkillSummonGrade.S;
                 bool isLastCard = i == spawnedCards.Count - 1;
 
                 if (isHighRarity)

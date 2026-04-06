@@ -25,7 +25,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private SummonAchievementRewardItemUI itemPrefab;
 
         [Header("Reward Visual")]
-        [SerializeField] private HeroSummonRewardVisualConfigSO rewardVisualConfig;
+        [SerializeField] private SummonRewardVisualConfigSO rewardVisualConfig;
         
         [SerializeField] private Button closeButton;
 
@@ -127,6 +127,10 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         }
 
         public void Hide() => SetVisible(false);
-        public void Show() => SetVisible(true);
+        public void Show(SummonAchievementTab tab)
+        {
+            SelectTab(tab);
+            SetVisible(true);
+        }
     }
 }

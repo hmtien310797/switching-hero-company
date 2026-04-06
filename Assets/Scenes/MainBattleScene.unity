@@ -1619,6 +1619,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4867256792770744037, guid: d76312e609120d048acccc6888b73995, type: 3}
   m_PrefabInstance: {fileID: 4788671434723629498}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1961475118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1961475120}
+  - component: {fileID: 1961475119}
+  m_Layer: 0
+  m_Name: SkillSummonManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1961475119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961475118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 811bad9ca6b84283bf21315014cbe4e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  summonConfig: {fileID: 11400000, guid: 3b957d5b2d48b2f4988cb5ae56977445, type: 2}
+  saveKey: skill_summon_save
+--- !u!4 &1961475120
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961475118}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.8326945, y: -0.4048425, z: 177.925}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2093848896
 GameObject:
   m_ObjectHideFlags: 0
@@ -1932,3 +1978,4 @@ SceneRoots:
   - {fileID: 581921058}
   - {fileID: 268590027}
   - {fileID: 188864938}
+  - {fileID: 1961475120}

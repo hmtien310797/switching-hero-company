@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonSequenceCardUI : MonoBehaviour
+    public class SummonSequenceCardUI : MonoBehaviour
     {
         [SerializeField] private Image portraitImage;
         [SerializeField] private Image rarityIcon;

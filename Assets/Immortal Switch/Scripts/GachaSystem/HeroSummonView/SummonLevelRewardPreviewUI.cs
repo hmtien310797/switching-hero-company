@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonLevelRewardPreviewUI : MonoBehaviour
+    public class SummonLevelRewardPreviewUI : MonoBehaviour
     {
         [Header("Texts")]
         [SerializeField] private TMP_Text levelText;
@@ -23,7 +23,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private MonoBehaviour rewardReceiverBehaviour;
 
         [Header("Visual Config")]
-        [SerializeField] private HeroSummonRewardVisualConfigSO rewardVisualConfig;
+        [SerializeField] private SummonRewardVisualConfigSO rewardVisualConfig;
 
         [Header("Alpha")]
         [SerializeField] private float claimableAlpha = 1f;

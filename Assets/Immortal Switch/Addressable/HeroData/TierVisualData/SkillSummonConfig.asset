@@ -1,0 +1,172 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d7c3130fff14491be52ef52e493a222, type: 3}
+  m_Name: SkillSummonConfig
+  m_EditorClassIdentifier: 
+  SummonOptions:
+  - OptionId: summon_30
+    DisplayName: 10 times
+    RollCount: 10
+    TicketCost: 10
+    GemCost: 50
+    Enabled: 1
+  - OptionId: summon_50
+    DisplayName: 20 times
+    RollCount: 20
+    TicketCost: 20
+    GemCost: 100
+    Enabled: 1
+  SummonLevels:
+  - SummonLevel: 1
+    TotalRollRequired: 10
+    GradeBRate: 90
+    GradeARate: 10
+    GradeSRate: 0
+    GradeSSRate: 0
+  - SummonLevel: 2
+    TotalRollRequired: 20
+    GradeBRate: 85
+    GradeARate: 15
+    GradeSRate: 0
+    GradeSSRate: 0
+  - SummonLevel: 3
+    TotalRollRequired: 50
+    GradeBRate: 81
+    GradeARate: 18
+    GradeSRate: 1
+    GradeSSRate: 0
+  - SummonLevel: 4
+    TotalRollRequired: 100
+    GradeBRate: 76.5
+    GradeARate: 21
+    GradeSRate: 2.5
+    GradeSSRate: 0
+  - SummonLevel: 5
+    TotalRollRequired: 200
+    GradeBRate: 71.8
+    GradeARate: 24
+    GradeSRate: 4
+    GradeSSRate: 0
+  - SummonLevel: 6
+    TotalRollRequired: 350
+    GradeBRate: 67.1
+    GradeARate: 27
+    GradeSRate: 5.5
+    GradeSSRate: 0
+  - SummonLevel: 7
+    TotalRollRequired: 500
+    GradeBRate: 62.2
+    GradeARate: 30
+    GradeSRate: 7
+    GradeSSRate: 1
+  - SummonLevel: 8
+    TotalRollRequired: 750
+    GradeBRate: 57.3
+    GradeARate: 33
+    GradeSRate: 8.5
+    GradeSSRate: 1
+  - SummonLevel: 9
+    TotalRollRequired: 1000
+    GradeBRate: 52.4
+    GradeARate: 36
+    GradeSRate: 10
+    GradeSSRate: 2
+  - SummonLevel: 10
+    TotalRollRequired: 1500
+    GradeBRate: 47
+    GradeARate: 39
+    GradeSRate: 12
+    GradeSSRate: 2
+  LevelRewards:
+  - SummonLevel: 1
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 5
+      Description: 
+  - SummonLevel: 2
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 10
+      Description: 
+  - SummonLevel: 3
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 15
+      Description: 
+  - SummonLevel: 4
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 20
+      Description: 
+  - SummonLevel: 5
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 25
+      Description: 
+  - SummonLevel: 6
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 30
+      Description: 
+  - SummonLevel: 7
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 40
+      Description: 
+  - SummonLevel: 8
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 50
+      Description: 
+  - SummonLevel: 9
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 4
+      RandomSkillGrade: 0
+      Amount: 60
+      Description: 
+  - SummonLevel: 10
+    RewardItems:
+    - RewardType: 1
+      CurrencyType: 4
+      RandomSkillGrade: 3
+      Amount: 1
+      Description: 
+  SkillPool:
+  - {fileID: 11400000, guid: 37d18d747bf2b0a4faaa4f28601bcddc, type: 2}
+  - {fileID: 11400000, guid: 13e9baba27087ac41a27698eeba3d14d, type: 2}
+  - {fileID: 11400000, guid: 57092fd4afdffce44b5d688606aa4b5d, type: 2}
+  - {fileID: 11400000, guid: 1cbf3d119314a9e4cbdceb3104d7db1b, type: 2}
+  - {fileID: 11400000, guid: 61b8247379e89a44999714f6a64463bc, type: 2}
+  - {fileID: 11400000, guid: cb0c0c81900eb7448a63c4513c3c31a0, type: 2}
+  - {fileID: 11400000, guid: f6aeb791c0b7b7340aec98fb172968c9, type: 2}
+  - {fileID: 11400000, guid: 6ff73a0cffe91f54bb5c7fd4ee0a273e, type: 2}
+  - {fileID: 11400000, guid: db5b464cd56e695478500ac0bc3ddb5b, type: 2}
+  - {fileID: 11400000, guid: 3cf1dfa6974bb3d41801bae038936935, type: 2}
+  - {fileID: 11400000, guid: f2734c568f975a34aafe11200cdf97ed, type: 2}
+  - {fileID: 11400000, guid: 17febab3d510b4f4fbb239c8650c5f7f, type: 2}

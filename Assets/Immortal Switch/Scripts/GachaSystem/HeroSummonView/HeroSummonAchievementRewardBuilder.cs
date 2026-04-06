@@ -9,7 +9,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         public static SummonAchievementRewardListData BuildHeroic(
             HeroSummonConfigSO config,
             HeroSummonSaveData saveData,
-            HeroSummonRewardVisualConfigSO rewardVisualConfig)
+            SummonRewardVisualConfigSO rewardVisualConfig)
         {
             var result = new SummonAchievementRewardListData
             {

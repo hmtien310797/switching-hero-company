@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
     [CreateAssetMenu(fileName = "HeroSummonRewardVisualConfig", menuName = "Game/Hero Summon/Reward Visual Config")]
-    public class HeroSummonRewardVisualConfigSO : ScriptableObject
+    public class SummonRewardVisualConfigSO : ScriptableObject
     {
         [TableList(AlwaysExpanded = true)]
         public List<RewardVisualEntry> Entries = new();

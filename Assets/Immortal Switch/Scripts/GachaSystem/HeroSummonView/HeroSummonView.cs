@@ -1,16 +1,18 @@
 using Immortal_Switch.Scripts.Currency;
-using Immortal_Switch.Scripts.UI;
+using Immortal_Switch.Scripts.Summon;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    public class HeroSummonView : AnimatedUIView
+    public class HeroSummonView : BaseSummonPanelView
     {
+        public override SummonCategory Category => SummonCategory.Hero;
+
         [Header("Buttons")]
-        [SerializeField] private HeroSummonButtonUI summonButtonA;
-        [SerializeField] private HeroSummonButtonUI summonButtonB;
+        [SerializeField] private SummonButtonUI summonButtonA;
+        [SerializeField] private SummonButtonUI summonButtonB;
 
         [Header("Texts")]
         [SerializeField] private TMP_Text summonLevelText;
@@ -19,117 +21,119 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private Image summonLevelProgressFill;
 
         [Header("Reward Preview")]
-        [SerializeField] private HeroSummonLevelRewardPreviewUI levelRewardPreviewUI;
+        [SerializeField] private SummonLevelRewardPreviewUI levelRewardPreviewUI;
 
         [Header("Popup")]
-        [SerializeField] private HeroSummonConfirmPopup confirmPopup;
+        [SerializeField] private SummonConfirmPopup confirmPopup;
         [SerializeField] private HeroSummonSequencePopup sequencePopup;
-        
-        [SerializeField] private Button probabilityInfoButton;
         [SerializeField] private HeroSummonProbabilityPopup probabilityPopup;
-        
+
         [Header("Achievement")]
-        [SerializeField] private Button summonAchievementButton;
         [SerializeField] private SummonAchievementRewardView summonAchievementRewardView;
+        [SerializeField] private Button summonAchievementButton;
+
+        [Header("Probability")]
+        [SerializeField] private Button probabilityInfoButton;
 
         [Header("Option Id")]
-        [SerializeField] private string optionAId = "summon_30";
+        [SerializeField] private string optionAId = "summon_10";
         [SerializeField] private string optionBId = "summon_50";
 
+        private bool isBound;
+
         private void OnEnable()
+        {
+            SubscribeEvents();
+            BindButtonsIfNeeded();
+            RefreshView();
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeEvents();
+            HideAllPopups();
+        }
+
+        public override bool HasNotification()
+        {
+            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
+                return false;
+
+            var claimables = HeroSummonManager.Instance.Service.GetClaimableRewardLevels();
+            return claimables != null && claimables.Count > 0;
+        }
+
+        public override void RefreshView()
+        {
+            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
+                return;
+
+            RefreshSummonLevel();
+            levelRewardPreviewUI?.Refresh();
+            summonButtonA?.Refresh();
+            summonButtonB?.Refresh();
+        }
+
+        protected override void OnShowPanel()
+        {
+            RefreshView();
+        }
+
+        protected override void OnHidePanel()
+        {
+            HideAllPopups();
+        }
+
+        private void SubscribeEvents()
         {
             if (HeroSummonManager.Instance != null)
                 HeroSummonManager.Instance.OnSummonDataChanged += RefreshView;
 
             if (CurrencyManager.Instance != null)
                 CurrencyManager.Instance.OnAnyCurrencyChanged += RefreshView;
-
-            BindButtons();
-            RefreshView();
         }
 
-        private void OnDisable()
+        private void UnsubscribeEvents()
         {
             if (HeroSummonManager.Instance != null)
                 HeroSummonManager.Instance.OnSummonDataChanged -= RefreshView;
 
             if (CurrencyManager.Instance != null)
                 CurrencyManager.Instance.OnAnyCurrencyChanged -= RefreshView;
-
-            if (confirmPopup != null)
-                confirmPopup.Hide();
-
-            if (sequencePopup != null)
-                sequencePopup.Hide();
-            
-            if(probabilityInfoButton != null)
-                probabilityPopup.Hide();
-            
-            if(summonAchievementRewardView != null)
-                summonAchievementRewardView.Hide();
         }
 
-        private void BindButtons()
+        private void BindButtonsIfNeeded()
         {
-            if (summonButtonA != null)
-                summonButtonA.Init(optionAId, TrySummon);
+            if (isBound)
+                return;
 
-            if (summonButtonB != null)
-                summonButtonB.Init(optionBId, TrySummon);
+            summonButtonA?.Init(optionAId, TrySummon);
+            summonButtonB?.Init(optionBId, TrySummon);
 
             if (probabilityInfoButton != null)
             {
                 probabilityInfoButton.onClick.RemoveAllListeners();
                 probabilityInfoButton.onClick.AddListener(OpenProbabilityPopup);
             }
-            
+
             if (summonAchievementButton != null)
             {
                 summonAchievementButton.onClick.RemoveAllListeners();
-                summonAchievementButton.onClick.AddListener(OpenSummonAchievementPopup);
+                summonAchievementButton.onClick.AddListener(OpenAchievementPopup);
             }
-        }
-        
-        private void OpenSummonAchievementPopup()
-        {
-            if (summonAchievementRewardView != null)
-                summonAchievementRewardView.Show();
-        }
-        
-        private void OpenProbabilityPopup()
-        {
-            if (probabilityPopup == null || HeroSummonManager.Instance == null)
-                return;
 
-            int currentLevel = HeroSummonManager.Instance.GetCurrentSummonLevel();
-            probabilityPopup.Show(currentLevel);
-        }
-
-        public void RefreshView()
-        {
-            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
-                return;
-
-            RefreshSummonLevel();
-            RefreshRewardPreview();
-
-            if (summonButtonA != null)
-                summonButtonA.Refresh();
-
-            if (summonButtonB != null)
-                summonButtonB.Refresh();
+            isBound = true;
         }
 
         private void RefreshSummonLevel()
         {
-            var manager = HeroSummonManager.Instance;
-            int currentLevel = manager.GetCurrentSummonLevel();
+            int currentLevel = HeroSummonManager.Instance.GetCurrentSummonLevel();
 
             if (summonLevelText != null)
                 summonLevelText.text = $"Lv.{currentLevel}";
 
-            int currentProgress = manager.Service.GetCurrentLevelProgressRoll();
-            int currentRequired = manager.Service.GetCurrentLevelRequiredRoll();
+            int currentProgress = HeroSummonManager.Instance.Service.GetCurrentLevelProgressRoll();
+            int currentRequired = HeroSummonManager.Instance.Service.GetCurrentLevelRequiredRoll();
 
             if (summonLevelProgressFill != null)
             {
@@ -140,10 +144,22 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             }
         }
 
-        private void RefreshRewardPreview()
+        private void OpenProbabilityPopup()
         {
-            if (levelRewardPreviewUI != null)
-                levelRewardPreviewUI.Refresh();
+            if (probabilityPopup == null || HeroSummonManager.Instance == null)
+                return;
+
+            probabilityPopup.Show(HeroSummonManager.Instance.GetCurrentSummonLevel());
+        }
+
+        private void OpenAchievementPopup()
+        {
+            summonAchievementRewardView?.Show(SummonAchievementTab.Heroic);
+        }
+
+        private void HideAllPopups()
+        {
+
         }
 
         private void TrySummon(string optionId)
@@ -181,27 +197,19 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 return;
             }
 
-            confirmPopup.Show(
-                gemCost,
-                () => ExecuteSummon(optionId, SummonPaymentType.Gem)
-            );
+            confirmPopup.Show(gemCost, () => ExecuteSummon(optionId, SummonPaymentType.Gem));
         }
 
         private void ExecuteSummon(string optionId, SummonPaymentType paymentType)
         {
-            if (sequencePopup != null)
-                sequencePopup.SetBusyReplacing(true);
+            sequencePopup?.SetBusyReplacing(true);
 
             var result = HeroSummonManager.Instance.ExecuteSummon(optionId, paymentType);
 
-            if (sequencePopup != null)
-                sequencePopup.SetBusyReplacing(false);
+            sequencePopup?.SetBusyReplacing(false);
 
             if (result == null)
-            {
-                Debug.Log("Summon failed or not enough resource");
                 return;
-            }
 
             if (sequencePopup != null)
             {
