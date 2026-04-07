@@ -1456,8 +1456,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9100961578463491132}
-  - component: {fileID: 3769161108291389475}
-  - component: {fileID: 4784991168565915201}
+  - component: {fileID: 6362851428333439557}
+  - component: {fileID: 2151356465102959582}
   m_Layer: 5
   m_Name: SummonLevel
   m_TagString: Untagged
@@ -1489,7 +1489,7 @@ RectTransform:
   m_AnchoredPosition: {x: -36, y: -44}
   m_SizeDelta: {x: 300, y: 368.1}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &3769161108291389475
+--- !u!114 &6362851428333439557
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1498,32 +1498,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 785319427673213858}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 051ff4a2c5964a27b7cbe0addf2871b5, type: 3}
+  m_Script: {fileID: 11500000, guid: 6347ebc67f6f43f4ad0bc0700aea0161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelText: {fileID: 1413058418477427719}
+--- !u!114 &2151356465102959582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785319427673213858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bfb2162ce584513a8c543215eb8a100, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  category: 1
   amountText: {fileID: 6826875951255847842}
   rewardIcon: {fileID: 2975439287682543381}
   canvasGroup: {fileID: 2685888015923282653}
   claimableHighlight: {fileID: 2302259062862859156}
   redDot: {fileID: 3209398439369581342}
   claimButton: {fileID: 3091249931006577626}
-  rewardReceiverBehaviour: {fileID: 4784991168565915201}
+  rewardReceiverBehaviour: {fileID: 6362851428333439557}
   rewardVisualConfig: {fileID: 11400000, guid: 505d9390a8c24be47a3510e4b0aa8a8d, type: 2}
   claimableAlpha: 1
   claimedAlpha: 0.45
---- !u!114 &4784991168565915201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 785319427673213858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d780533f76424d718a66d256717afe15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &791288025083718909
 GameObject:
   m_ObjectHideFlags: 0
@@ -8217,7 +8217,7 @@ MonoBehaviour:
   summonButtonB: {fileID: 5407335012692810144}
   summonLevelText: {fileID: 1413058418477427719}
   summonLevelProgressFill: {fileID: 8637890030706972454}
-  levelRewardPreviewUI: {fileID: 3769161108291389475}
+  levelRewardPreviewUI: {fileID: 2151356465102959582}
   confirmPopup: {fileID: 4449459244334582990}
   sequencePopup: {fileID: 5141086497770191446}
   probabilityPopup: {fileID: 2016258975425652290}
@@ -22268,7 +22268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bfb2162ce584513a8c543215eb8a100, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelText: {fileID: 368789309821710782}
+  category: 0
   amountText: {fileID: 1207618727467572394}
   rewardIcon: {fileID: 3664457727471026293}
   canvasGroup: {fileID: 4351223143086599026}

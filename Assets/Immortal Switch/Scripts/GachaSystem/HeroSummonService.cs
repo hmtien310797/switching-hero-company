@@ -275,7 +275,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
             return result;
         }
 
-        public bool ClaimReward(int summonLevel, IHeroSummonRewardReceiver rewardReceiver)
+        public bool ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver)
         {
             if (rewardReceiver == null) return false;
             if (saveData.ClaimedRewardLevels.Contains(summonLevel)) return false;

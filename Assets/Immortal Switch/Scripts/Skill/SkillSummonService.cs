@@ -205,7 +205,7 @@ namespace Immortal_Switch.Scripts.SkillSummon
             return result;
         }
 
-        public bool ClaimReward(int summonLevel, ISkillSummonRewardReceiver rewardReceiver)
+        public bool ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver)
         {
             if (rewardReceiver == null)
                 return false;

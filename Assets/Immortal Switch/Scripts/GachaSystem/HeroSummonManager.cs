@@ -103,7 +103,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
             return service != null ? service.GetCurrentSummonLevel() : 1;
         }
 
-        public bool ClaimReward(int summonLevel, IHeroSummonRewardReceiver rewardReceiver)
+        public bool ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver)
         {
             if (service == null) return false;
 

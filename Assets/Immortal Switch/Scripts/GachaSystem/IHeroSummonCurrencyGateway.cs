@@ -1,3 +1,5 @@
+using Immortal_Switch.Scripts.GachaSystem.HeroSummonView;
+
 namespace Immortal_Switch.Scripts.GachaSystem
 {
     public interface IHeroSummonCurrencyGateway
@@ -12,8 +14,10 @@ namespace Immortal_Switch.Scripts.GachaSystem
         void SpendGem(int amount);
     }
     
-    public interface IHeroSummonRewardReceiver
+    public interface ISummonRewardReceiver
     {
         void GrantReward(SummonRewardItem rewardItem);
+        SummonRewardPreviewData GetRewardPreviewData(SummonCategory summonCategory);
+        bool ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver, SummonCategory summonCategory);
     }
 }

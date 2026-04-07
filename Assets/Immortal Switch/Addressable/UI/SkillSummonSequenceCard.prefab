@@ -82,9 +82,9 @@ MonoBehaviour:
   revealDuration: 0.22
   hiddenScale: {x: 0.72, y: 0.72, z: 1}
   shownScale: {x: 1, y: 1, z: 1}
-  epicScaleMultiplier: 1.06
-  legendaryScaleMultiplier: 1.12
-  mythicScaleMultiplier: 1.16
+  epicScaleMultiplier: 1
+  legendaryScaleMultiplier: 1
+  mythicScaleMultiplier: 1
   rarePulseDuration: 0.12
 --- !u!1 &635706237818411402
 GameObject:
@@ -594,7 +594,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -40, y: -40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1493644401163503621
 CanvasRenderer:
