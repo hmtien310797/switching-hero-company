@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.SkillSummon;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -21,32 +23,44 @@ namespace Immortal_Switch.Scripts.GachaSystem
         SoftHard
     }
 
-    public enum HeroSummonRewardType
+    public enum SummonRewardType
     {
         Currency,
         Hero,
-        RandomHero
+        Skill,
+        RandomHero,
+        RandomSkill
     }
 
-    [System.Serializable]
-    public class HeroSummonRewardItem
+    [Serializable]
+    public class SummonRewardItem
     {
         [HorizontalGroup("Row", 60)]
         [HideLabel]
-        public HeroSummonRewardType RewardType;
+        public SummonRewardType RewardType;
 
         // ===== Currency =====
         [ShowIf(nameof(IsCurrency))]
-        [LabelWidth(80)]
+        [LabelWidth(100)]
         public CurrencyType CurrencyType;
 
         // ===== Hero =====
         [ShowIf(nameof(IsHero))]
-        [LabelWidth(80)]
+        [LabelWidth(100)]
         public string HeroId;
 
         [ShowIf(nameof(IsHero))]
+        [LabelWidth(100)]
         public SummonRarity HeroRarity;
+
+        // ===== Skill =====
+        [ShowIf(nameof(IsSkill))]
+        [LabelWidth(100)]
+        public string SkillId;
+
+        [ShowIf(nameof(IsSkill))]
+        [LabelWidth(100)]
+        public SkillSummonGrade SkillGrade;
 
         // ===== Random Hero =====
         [ShowIf(nameof(IsRandomHero))]
@@ -57,16 +71,26 @@ namespace Immortal_Switch.Scripts.GachaSystem
         [LabelText("Pool Id (optional)")]
         public string PoolId;
 
+        // ===== Random Skill =====
+        [ShowIf(nameof(IsRandomSkill))]
+        [LabelText("Pool Grade")]
+        public SkillSummonGrade RandomSkillGrade;
+
+        [ShowIf(nameof(IsRandomSkill))]
+        [LabelText("Pool Id (optional)")]
+        public string SkillPoolId;
+
         // ===== Common =====
-        [LabelWidth(80)]
+        [LabelWidth(100)]
         public int Amount;
 
         public string Description;
 
-        // ===== Condition =====
-        private bool IsCurrency() => RewardType == HeroSummonRewardType.Currency;
-        private bool IsHero() => RewardType == HeroSummonRewardType.Hero;
-        private bool IsRandomHero() => RewardType == HeroSummonRewardType.RandomHero;
+        private bool IsCurrency() => RewardType == SummonRewardType.Currency;
+        private bool IsHero() => RewardType == SummonRewardType.Hero;
+        private bool IsSkill() => RewardType == SummonRewardType.Skill;
+        private bool IsRandomHero() => RewardType == SummonRewardType.RandomHero;
+        private bool IsRandomSkill() => RewardType == SummonRewardType.RandomSkill;
     }
 
     [Serializable]
@@ -97,10 +121,10 @@ namespace Immortal_Switch.Scripts.GachaSystem
     }
 
     [Serializable]
-    public class HeroSummonRewardPreviewData
+    public class SummonRewardPreviewData
     {
         public int SummonLevel;
-        public HeroSummonRewardItem RewardItem;
+        public SummonRewardItem RewardItem;
         public bool IsClaimable;
         public bool IsClaimed;
     }

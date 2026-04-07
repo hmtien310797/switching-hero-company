@@ -2,7 +2,6 @@
 using Immortal_Switch.Scripts.Summon;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
@@ -10,42 +9,55 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
     {
         [Header("Panels")]
         [SerializeField] private List<BaseSummonPanelView> panels;
+        [SerializeField] private List<GameObject> currencyViews;
 
         [Header("Default")]
         [SerializeField] private SummonCategory defaultCategory = SummonCategory.Hero;
 
-        [Header("Navigation Buttons")]
-        [SerializeField] private Button heroButton;
-        [SerializeField] private Button skillButton;
-        [SerializeField] private Button weaponButton;
-        [SerializeField] private Button petButton;
+        [Header("Navigation")]
+        [SerializeField] private SegmentedControlStatic segmentedControl;
+        [SerializeField] private bool useSliderHighlight = true;
 
         private BaseSummonPanelView currentPanel;
 
+        private static readonly List<string> DefaultLabels = new()
+        {
+            "Hero",
+            "Weapon",
+            "Skill",
+            "Pet"
+        };
+
         private void Awake()
         {
-            BindButtons();
+            BindSegmentedControl();
             HideAllPanelsImmediate();
         }
 
         private void Start()
         {
-            SwitchTo(defaultCategory);
+            if (segmentedControl != null)
+            {
+                segmentedControl.SetSelected((int)defaultCategory, true);
+            }
+            else
+            {
+                SwitchTo(defaultCategory);
+            }
         }
 
-        private void BindButtons()
+        private void BindSegmentedControl()
         {
-            if (heroButton != null)
-                heroButton.onClick.AddListener(() => SwitchTo(SummonCategory.Hero));
+            if (segmentedControl == null)
+                return;
 
-            if (skillButton != null)
-                skillButton.onClick.AddListener(() => SwitchTo(SummonCategory.Skill));
+            segmentedControl.Initialize((int)defaultCategory, OnSegmentChanged);
+        }
 
-            if (weaponButton != null)
-                weaponButton.onClick.AddListener(() => SwitchTo(SummonCategory.Weapon));
-
-            if (petButton != null)
-                petButton.onClick.AddListener(() => SwitchTo(SummonCategory.Pet));
+        private void OnSegmentChanged(int index)
+        {
+            var category = (SummonCategory)index;
+            SwitchTo(category);
         }
 
         private void HideAllPanelsImmediate()
@@ -54,16 +66,18 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             for (int i = 0; i < panels.Count; i++)
             {
-                if (panels[i] == null)
-                    continue;
+                if (panels[i] != null)
+                    panels[i].HidePanel();
 
-                panels[i].HidePanel();
+                if (currencyViews != null && i < currencyViews.Count && currencyViews[i] != null)
+                    currencyViews[i].SetActive(false);
             }
         }
 
         public void SwitchTo(SummonCategory category)
         {
             BaseSummonPanelView target = null;
+            int targetIndex = -1;
 
             for (int i = 0; i < panels.Count; i++)
             {
@@ -73,6 +87,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 if (panels[i].Category == category)
                 {
                     target = panels[i];
+                    targetIndex = i;
                     break;
                 }
             }
@@ -94,6 +109,9 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             currentPanel = target;
             currentPanel.ShowPanel();
             currentPanel.RefreshView();
+
+            if (currencyViews != null && targetIndex >= 0 && targetIndex < currencyViews.Count && currencyViews[targetIndex] != null)
+                currencyViews[targetIndex].SetActive(true);
         }
     }
 }

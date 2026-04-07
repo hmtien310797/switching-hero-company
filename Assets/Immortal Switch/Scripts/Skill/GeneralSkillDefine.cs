@@ -1,39 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.GachaSystem;
 
 namespace Immortal_Switch.Scripts.Skill
 {
-    public enum SkillSummonPaymentType
-    {
-        Ticket,
-        Gem
-    }
-
     public enum SkillSummonGrade
     {
         B,
         A,
         S,
         SS
-    }
-
-    public enum SkillSummonRewardType
-    {
-        Currency,
-        RandomSkill
-    }
-
-    [Serializable]
-    public class SkillSummonRewardItem
-    {
-        public SkillSummonRewardType RewardType;
-
-        public CurrencyType CurrencyType;
-        public SkillSummonGrade RandomSkillGrade;
-
-        public int Amount;
-        public string Description;
     }
 
     [Serializable]
@@ -51,7 +28,7 @@ namespace Immortal_Switch.Scripts.Skill
     [Serializable]
     public class SkillSummonResult
     {
-        public SkillSummonPaymentType PaymentType;
+        public SummonPaymentType PaymentType;
         public int PaidAmount;
 
         public int OldTotalRoll;
@@ -61,14 +38,5 @@ namespace Immortal_Switch.Scripts.Skill
 
         public List<int> NewlyUnlockedRewardLevels = new();
         public List<SkillSummonResultEntry> Entries = new();
-    }
-
-    [Serializable]
-    public class SkillSummonRewardPreviewData
-    {
-        public int SummonLevel;
-        public SkillSummonRewardItem RewardItem;
-        public bool IsClaimable;
-        public bool IsClaimed;
     }
 }

@@ -24,16 +24,15 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private Button claimButton;
         [SerializeField] private MonoBehaviour rewardReceiverBehaviour;
 
-        [Header("Reward Icons")]
-        [SerializeField] private Sprite skillTicketIcon;
-        [SerializeField] private Sprite ssSkillIcon;
+        [Header("Visual Config")]
+        [SerializeField] private SummonRewardVisualConfigSO rewardVisualConfig;
 
         [Header("Alpha")]
         [SerializeField] private float claimableAlpha = 1f;
         [SerializeField] private float claimedAlpha = 0.45f;
 
         private ISkillSummonRewardReceiver rewardReceiver;
-        private SkillSummonRewardPreviewData currentPreviewData;
+        private SummonRewardPreviewData currentPreviewData;
 
         private void Awake()
         {
@@ -55,7 +54,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             Bind(currentPreviewData);
         }
 
-        private void Bind(SkillSummonRewardPreviewData data)
+        private void Bind(SummonRewardPreviewData data)
         {
             int currentLevel = SkillSummonManager.Instance != null
                 ? SkillSummonManager.Instance.GetCurrentSummonLevel()
@@ -79,13 +78,18 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 return;
             }
 
+            // amount
             if (amountText != null)
-                amountText.text = BuildAmountText(data.RewardItem);
-
+                amountText.text = data.RewardItem.Amount.ToString();
+            
             if (rewardIcon != null)
             {
-                rewardIcon.sprite = GetRewardIcon(data.RewardItem);
-                rewardIcon.color = Color.white;
+                var visual = rewardVisualConfig != null
+                    ? rewardVisualConfig.Get(data.RewardItem)
+                    : null;
+
+                rewardIcon.sprite = visual != null ? visual.Icon : null;
+                rewardIcon.color = visual != null ? visual.Tint : Color.white;
                 rewardIcon.enabled = rewardIcon.sprite != null;
             }
 
@@ -94,49 +98,19 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
         private void ApplyState(bool isClaimable, bool isClaimed)
         {
+            bool canClaim = isClaimable && !isClaimed;
+
             if (canvasGroup != null)
-                canvasGroup.alpha = isClaimed ? claimedAlpha : (isClaimable ? claimableAlpha : claimedAlpha);
+                canvasGroup.alpha = canClaim ? claimableAlpha : claimedAlpha;
 
             if (claimableHighlight != null)
-                claimableHighlight.SetActive(isClaimable && !isClaimed);
+                claimableHighlight.SetActive(canClaim);
 
             if (redDot != null)
-                redDot.SetActive(isClaimable && !isClaimed);
+                redDot.SetActive(canClaim);
 
             if (claimButton != null)
-                claimButton.interactable = isClaimable && !isClaimed;
-        }
-
-        private string BuildAmountText(SkillSummonRewardItem reward)
-        {
-            if (reward == null)
-                return string.Empty;
-
-            switch (reward.RewardType)
-            {
-                case SkillSummonRewardType.Currency:
-                    return reward.Amount.ToString();
-                case SkillSummonRewardType.RandomSkill:
-                    return $"x{reward.Amount}";
-                default:
-                    return reward.Amount.ToString();
-            }
-        }
-
-        private Sprite GetRewardIcon(SkillSummonRewardItem reward)
-        {
-            if (reward == null)
-                return null;
-
-            switch (reward.RewardType)
-            {
-                case SkillSummonRewardType.Currency:
-                    return skillTicketIcon;
-                case SkillSummonRewardType.RandomSkill:
-                    return ssSkillIcon;
-                default:
-                    return null;
-            }
+                claimButton.interactable = canClaim;
         }
 
         private void HandleClaim()
@@ -150,7 +124,13 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 return;
             }
 
-            bool claimed = SkillSummonManager.Instance.ClaimReward(currentPreviewData.SummonLevel, rewardReceiver);
+            if (SkillSummonManager.Instance == null)
+                return;
+
+            bool claimed = SkillSummonManager.Instance.ClaimReward(
+                currentPreviewData.SummonLevel,
+                rewardReceiver);
+
             if (!claimed)
                 return;
 

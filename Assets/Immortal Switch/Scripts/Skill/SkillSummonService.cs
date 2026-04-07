@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.GachaSystem;
 using Scripts.Battle;
 using Sirenix.OdinInspector;
 
@@ -118,9 +119,9 @@ namespace Immortal_Switch.Scripts.SkillSummon
             return Mathf.Max(0, currentEntry.TotalRollRequired);
         }
 
-        public bool CanSummon(SkillSummonOptionEntry option, out SkillSummonPaymentType paymentType, out int paidAmount)
+        public bool CanSummon(SkillSummonOptionEntry option, out SummonPaymentType paymentType, out int paidAmount)
         {
-            paymentType = SkillSummonPaymentType.Ticket;
+            paymentType = SummonPaymentType.Ticket;
             paidAmount = 0;
 
             if (option == null || !option.Enabled)
@@ -128,14 +129,14 @@ namespace Immortal_Switch.Scripts.SkillSummon
 
             if (currencyGateway.CanSpendSkillTicket(option.TicketCost))
             {
-                paymentType = SkillSummonPaymentType.Ticket;
+                paymentType = SummonPaymentType.Ticket;
                 paidAmount = option.TicketCost;
                 return true;
             }
 
             if (currencyGateway.CanSpendGem(option.GemCost))
             {
-                paymentType = SkillSummonPaymentType.Gem;
+                paymentType = SummonPaymentType.Gem;
                 paidAmount = option.GemCost;
                 return true;
             }
@@ -143,7 +144,7 @@ namespace Immortal_Switch.Scripts.SkillSummon
             return false;
         }
 
-        public SkillSummonResult ExecuteSummon(SkillSummonOptionEntry option, SkillSummonPaymentType paymentType)
+        public SkillSummonResult ExecuteSummon(SkillSummonOptionEntry option, SummonPaymentType paymentType)
         {
             if (option == null)
                 return null;
@@ -264,13 +265,13 @@ namespace Immortal_Switch.Scripts.SkillSummon
             return saveData.ClaimedRewardLevels.Contains(summonLevel);
         }
 
-        public SkillSummonRewardPreviewData GetRewardPreviewData()
+        public SummonRewardPreviewData GetRewardPreviewData()
         {
             var entry = GetPreviewRewardEntry();
             if (entry == null || entry.RewardItems == null || entry.RewardItems.Count == 0)
                 return null;
 
-            return new SkillSummonRewardPreviewData
+            return new SummonRewardPreviewData
             {
                 SummonLevel = entry.SummonLevel,
                 RewardItem = entry.RewardItems[0],
@@ -279,7 +280,7 @@ namespace Immortal_Switch.Scripts.SkillSummon
             };
         }
 
-        public SkillSummonLevelRewardEntry GetPreviewRewardEntry()
+        public SummonLevelRewardEntry GetPreviewRewardEntry()
         {
             if (config == null || config.LevelRewards == null || config.LevelRewards.Count == 0)
                 return null;
@@ -303,9 +304,9 @@ namespace Immortal_Switch.Scripts.SkillSummon
             return RollSkillByGrade(grade);
         }
 
-        private void Spend(SkillSummonOptionEntry option, SkillSummonPaymentType paymentType)
+        private void Spend(SkillSummonOptionEntry option, SummonPaymentType paymentType)
         {
-            if (paymentType == SkillSummonPaymentType.Ticket)
+            if (paymentType == SummonPaymentType.Ticket)
                 currencyGateway.SpendSkillTicket(option.TicketCost);
             else
                 currencyGateway.SpendGem(option.GemCost);

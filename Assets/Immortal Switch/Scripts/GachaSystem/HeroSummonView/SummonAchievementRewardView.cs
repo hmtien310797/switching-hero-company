@@ -1,4 +1,6 @@
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.SkillSummon;
+using Immortal_Switch.Scripts.SkillSummon.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +9,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
     public class SummonAchievementRewardView : MonoBehaviour
     {
         [SerializeField] private GameObject root;
-        
+
         [Header("Tabs")]
         [SerializeField] private Button heroicTabButton;
         [SerializeField] private Button weaponTabButton;
@@ -26,7 +28,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
         [Header("Reward Visual")]
         [SerializeField] private SummonRewardVisualConfigSO rewardVisualConfig;
-        
+
         [SerializeField] private Button closeButton;
 
         private SimpleUIPool<SummonAchievementRewardItemUI> itemPool;
@@ -34,14 +36,14 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
         private void Awake()
         {
-            itemPool = new SimpleUIPool<SummonAchievementRewardItemUI>(itemPrefab, itemRoot);
+            EnsurePool();
 
             heroicTabButton?.onClick.AddListener(() => SelectTab(SummonAchievementTab.Heroic));
             weaponTabButton?.onClick.AddListener(() => SelectTab(SummonAchievementTab.Weapon));
             skillTabButton?.onClick.AddListener(() => SelectTab(SummonAchievementTab.Skill));
             petTabButton?.onClick.AddListener(() => SelectTab(SummonAchievementTab.Pet));
             closeButton?.onClick.AddListener(Hide);
-            
+
             Hide();
         }
 
@@ -50,6 +52,9 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             if (HeroSummonManager.Instance != null)
                 HeroSummonManager.Instance.OnSummonDataChanged += RefreshView;
 
+            if (SkillSummonManager.Instance != null)
+                SkillSummonManager.Instance.OnSummonDataChanged += RefreshView;
+
             SelectTab(currentTab);
         }
 
@@ -57,6 +62,23 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         {
             if (HeroSummonManager.Instance != null)
                 HeroSummonManager.Instance.OnSummonDataChanged -= RefreshView;
+
+            if (SkillSummonManager.Instance != null)
+                SkillSummonManager.Instance.OnSummonDataChanged -= RefreshView;
+        }
+
+        private void EnsurePool()
+        {
+            if (itemPool != null)
+                return;
+
+            if (itemPrefab == null || itemRoot == null)
+            {
+                Debug.LogError("SummonAchievementRewardView: itemPrefab or itemRoot is null.", this);
+                return;
+            }
+
+            itemPool = new SimpleUIPool<SummonAchievementRewardItemUI>(itemPrefab, itemRoot);
         }
 
         public void SelectTab(SummonAchievementTab tab)
@@ -68,6 +90,10 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
         public void RefreshView()
         {
+            EnsurePool();
+            if (itemPool == null)
+                return;
+
             SummonAchievementRewardListData data = BuildData(currentTab);
 
             for (int i = 0; i < data.Items.Count; i++)
@@ -95,8 +121,19 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                     );
                 }
 
-                case SummonAchievementTab.Weapon:
                 case SummonAchievementTab.Skill:
+                {
+                    if (SkillSummonManager.Instance == null)
+                        return new SummonAchievementRewardListData { Tab = tab };
+
+                    return SkillSummonAchievementRewardBuilder.BuildSkill(
+                        SkillSummonManager.Instance.Config,
+                        SkillSummonManager.Instance.SaveData,
+                        rewardVisualConfig
+                    );
+                }
+
+                case SummonAchievementTab.Weapon:
                 case SummonAchievementTab.Pet:
                 default:
                     return new SummonAchievementRewardListData { Tab = tab };
@@ -117,7 +154,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             if (petSelected != null)
                 petSelected.SetActive(currentTab == SummonAchievementTab.Pet);
         }
-        
+
         private void SetVisible(bool visible)
         {
             if (root != null)
@@ -127,10 +164,11 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         }
 
         public void Hide() => SetVisible(false);
+
         public void Show(SummonAchievementTab tab)
         {
-            SelectTab(tab);
             SetVisible(true);
+            SelectTab(tab);
         }
     }
 }

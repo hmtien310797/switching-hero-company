@@ -14,6 +14,6 @@ namespace Immortal_Switch.Scripts.GachaSystem
     
     public interface IHeroSummonRewardReceiver
     {
-        void GrantReward(HeroSummonRewardItem rewardItem);
+        void GrantReward(SummonRewardItem rewardItem);
     }
 }

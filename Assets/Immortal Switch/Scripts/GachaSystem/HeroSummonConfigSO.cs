@@ -11,7 +11,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
     {
         public List<HeroSummonOptionEntry> SummonOptions = new();
         public List<HeroSummonLevelEntry> SummonLevels = new();
-        public List<HeroSummonLevelRewardEntry> LevelRewards = new();
+        public List<SummonLevelRewardEntry> LevelRewards = new();
 
         [Header("Pity")]
         public bool EnablePity = true;
@@ -48,7 +48,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
             return result;
         }
 
-        public HeroSummonLevelRewardEntry GetRewardEntry(int summonLevel)
+        public SummonLevelRewardEntry GetRewardEntry(int summonLevel)
         {
             for (int i = 0; i < LevelRewards.Count; i++)
             {
@@ -90,9 +90,9 @@ namespace Immortal_Switch.Scripts.GachaSystem
     }
 
     [Serializable]
-    public class HeroSummonLevelRewardEntry
+    public class SummonLevelRewardEntry
     {
         [Min(1)] public int SummonLevel;
-        public List<HeroSummonRewardItem> RewardItems = new();
+        public List<SummonRewardItem> RewardItems = new();
     }
 }

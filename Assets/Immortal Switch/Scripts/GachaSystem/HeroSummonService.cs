@@ -132,7 +132,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
             return saveData.ClaimedRewardLevels.Contains(summonLevel);
         }
 
-        public HeroSummonLevelRewardEntry GetPreviewRewardEntry()
+        public SummonLevelRewardEntry GetPreviewRewardEntry()
         {
             if (config == null || config.LevelRewards == null || config.LevelRewards.Count == 0)
                 return null;
@@ -153,7 +153,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
             return sortedRewards.LastOrDefault();
         }
 
-        public HeroSummonRewardPreviewData GetRewardPreviewData()
+        public SummonRewardPreviewData GetRewardPreviewData()
         {
             var entry = GetPreviewRewardEntry();
             if (entry == null || entry.RewardItems == null || entry.RewardItems.Count == 0)
@@ -161,7 +161,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
 
             var rewardItem = entry.RewardItems[0];
 
-            return new HeroSummonRewardPreviewData
+            return new SummonRewardPreviewData
             {
                 SummonLevel = entry.SummonLevel,
                 RewardItem = rewardItem,

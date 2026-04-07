@@ -13,35 +13,71 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] private Image normalBackground;
 
         private int index;
-        private Action<int> onClick;
+        private Action<int> onClickWithIndex;
+        private Action onClickSimple;
 
+        /// <summary>
+        /// Kiểu cũ: dùng cho SegmentedControl spawn option runtime.
+        /// </summary>
         public void Initialize(string text, int optionIndex, Action<int> onClickCallback)
         {
             index = optionIndex;
-            onClick = onClickCallback;
+            onClickWithIndex = onClickCallback;
+            onClickSimple = null;
 
             if (label != null)
                 label.text = text;
 
-            if (button != null)
-            {
-                button.onClick.RemoveAllListeners();
-                button.onClick.AddListener(OnClick);
-            }
+            BindButton();
+        }
+
+        /// <summary>
+        /// Kiểu mới: dùng cho SegmentedControlStatic với option đã đặt sẵn trong scene.
+        /// </summary>
+        public void Bind(Action callback)
+        {
+            onClickSimple = callback;
+            onClickWithIndex = null;
+
+            BindButton();
+        }
+
+        /// <summary>
+        /// Optional: nếu muốn đổi text của option prebuilt.
+        /// </summary>
+        public void SetLabel(string text)
+        {
+            if (label != null)
+                label.text = text;
         }
 
         public void SetSelected(bool isSelected)
         {
             if (selectedBackground != null)
-                selectedBackground.enabled = isSelected;
+                selectedBackground.gameObject.SetActive(isSelected);
 
             if (normalBackground != null)
-                normalBackground.enabled = !isSelected;
+                normalBackground.gameObject.SetActive(!isSelected);
+        }
+
+        private void BindButton()
+        {
+            if (button == null)
+                return;
+
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(OnClick);
         }
 
         private void OnClick()
         {
-            onClick?.Invoke(index);
+            if (onClickSimple != null)
+            {
+                onClickSimple.Invoke();
+                return;
+            }
+
+            onClickWithIndex?.Invoke(index);
         }
 
         private void OnDestroy()

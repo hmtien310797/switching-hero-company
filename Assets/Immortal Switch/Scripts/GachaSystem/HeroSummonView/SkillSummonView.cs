@@ -23,15 +23,19 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private Image summonLevelProgressFill;
 
         [Header("Reward Preview")]
-        [SerializeField] private SummonLevelRewardPreviewUI levelRewardPreviewUI;
+        [SerializeField] private SkillSummonLevelRewardPreviewUI levelRewardPreviewUI;
 
         [Header("Popup")]
         [SerializeField] private SummonConfirmPopup confirmPopup;
         [SerializeField] private SkillSummonSequencePopup sequencePopup;
         [SerializeField] private SkillSummonProbabilityPopup probabilityPopup;
-
+        
         [Header("Achievement")]
+        [SerializeField] private Button summonAchievementButton;
         [SerializeField] private SummonAchievementRewardView summonAchievementRewardView;
+        
+        [Header("Probability")]
+        [SerializeField] private Button probabilityInfoButton;
 
         [Header("Option Id")]
         [SerializeField] private string optionAId = "summon_10";
@@ -86,13 +90,38 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 
             if (summonButtonB != null)
                 summonButtonB.Init(optionBId, TrySummon);
+            
+            if (summonAchievementButton != null)
+            {
+                summonAchievementButton.onClick.RemoveAllListeners();
+                summonAchievementButton.onClick.AddListener(OpenAchievementPopup);
+            }
+            
+            if (probabilityInfoButton != null)
+            {
+                probabilityInfoButton.onClick.RemoveAllListeners();
+                probabilityInfoButton.onClick.AddListener(OpenProbabilityPopup);
+            }
 
             isBound = true;
+        }
+        
+        private void OpenProbabilityPopup()
+        {
+            if (probabilityPopup == null || SkillSummonManager.Instance == null)
+                return;
+
+            probabilityPopup.Show(SkillSummonManager.Instance.GetCurrentSummonLevel());
         }
 
         private void HideAllPopups()
         {
 
+        }
+        
+        private void OpenAchievementPopup()
+        {
+            summonAchievementRewardView?.Show(SummonAchievementTab.Skill);
         }
 
         public override void RefreshView()
@@ -149,7 +178,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                 return;
             }
 
-            if (paymentType == SkillSummonPaymentType.Gem)
+            if (paymentType == SummonPaymentType.Gem)
             {
                 bool skipConfirm = SkillSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
                 if (skipConfirm)
@@ -169,14 +198,14 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         {
             if (confirmPopup == null)
             {
-                ExecuteSummon(optionId, SkillSummonPaymentType.Gem);
+                ExecuteSummon(optionId, SummonPaymentType.Gem);
                 return;
             }
 
-            confirmPopup.Show(gemCost, () => ExecuteSummon(optionId, SkillSummonPaymentType.Gem));
+            confirmPopup.Show(gemCost, () => ExecuteSummon(optionId, SummonPaymentType.Gem));
         }
 
-        private void ExecuteSummon(string optionId, SkillSummonPaymentType paymentType)
+        private void ExecuteSummon(string optionId, SummonPaymentType paymentType)
         {
             sequencePopup?.SetBusyReplacing(true);
 

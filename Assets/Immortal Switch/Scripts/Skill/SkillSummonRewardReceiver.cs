@@ -1,4 +1,5 @@
 ﻿using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.GachaSystem;
 using Immortal_Switch.Scripts.SkillSummon;
 using UnityEngine;
 
@@ -6,23 +7,23 @@ namespace Immortal_Switch.Scripts.Skill
 {
     public interface ISkillSummonRewardReceiver
     {
-        void GrantReward(SkillSummonRewardItem rewardItem);
+        void GrantReward(SummonRewardItem rewardItem);
     }
 
     public class SkillSummonRewardReceiver : MonoBehaviour, ISkillSummonRewardReceiver
     {
-        public void GrantReward(SkillSummonRewardItem rewardItem)
+        public void GrantReward(SummonRewardItem rewardItem)
         {
             if (rewardItem == null || SkillSummonManager.Instance == null || SkillSummonManager.Instance.Service == null)
                 return;
 
             switch (rewardItem.RewardType)
             {
-                case SkillSummonRewardType.Currency:
+                case SummonRewardType.Currency:
                     CurrencyManager.Instance.Add(rewardItem.CurrencyType, rewardItem.Amount);
                     break;
 
-                case SkillSummonRewardType.RandomSkill:
+                case SummonRewardType.RandomSkill:
                     for (int i = 0; i < rewardItem.Amount; i++)
                     {
                         var skill = SkillSummonManager.Instance.Service.GetRandomSkillByGrade(rewardItem.RandomSkillGrade);

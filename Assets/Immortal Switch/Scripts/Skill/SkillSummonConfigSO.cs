@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Immortal_Switch.Scripts.GachaSystem;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -10,7 +11,7 @@ namespace Immortal_Switch.Scripts.Skill
     {
         public List<SkillSummonOptionEntry> SummonOptions = new();
         public List<SkillSummonLevelEntry> SummonLevels = new();
-        public List<SkillSummonLevelRewardEntry> LevelRewards = new();
+        public List<SummonLevelRewardEntry> LevelRewards = new();
 
         [Header("Skill Pool")]
         public List<SkillDataSO> SkillPool = new();
@@ -25,7 +26,7 @@ namespace Immortal_Switch.Scripts.Skill
             return SummonLevels.Find(x => x != null && x.SummonLevel == summonLevel);
         }
 
-        public SkillSummonLevelRewardEntry GetRewardEntry(int summonLevel)
+        public SummonLevelRewardEntry GetRewardEntry(int summonLevel)
         {
             return LevelRewards.Find(x => x != null && x.SummonLevel == summonLevel);
         }
@@ -66,6 +67,6 @@ namespace Immortal_Switch.Scripts.Skill
     public class SkillSummonLevelRewardEntry
     {
         [Min(1)] public int SummonLevel;
-        public List<SkillSummonRewardItem> RewardItems = new();
+        public List<SummonRewardItem> RewardItems = new();
     }
 }

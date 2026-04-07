@@ -2,18 +2,19 @@
 using System.Linq;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Skill;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
-    [CreateAssetMenu(fileName = "HeroSummonRewardVisualConfig", menuName = "Game/Hero Summon/Reward Visual Config")]
+    [CreateAssetMenu(fileName = "SummonRewardVisualConfig", menuName = "Game/Summon/Reward Visual Config")]
     public class SummonRewardVisualConfigSO : ScriptableObject
     {
         [TableList(AlwaysExpanded = true)]
         public List<RewardVisualEntry> Entries = new();
 
-        public RewardVisualEntry Get(HeroSummonRewardItem item)
+        public RewardVisualEntry Get(SummonRewardItem item)
         {
             if (item == null)
                 return null;
@@ -25,22 +26,21 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
             return Entries.FirstOrDefault(e => e.MatchByType(item));
         }
     }
-    
+
     [System.Serializable]
     public class RewardVisualEntry
     {
         [HorizontalGroup("Row", 80)]
         [HideLabel]
-        public HeroSummonRewardType RewardType;
+        public SummonRewardType RewardType;
 
         [PreviewField(60)]
         public Sprite Icon;
 
         [LabelWidth(80)]
         public Color Tint = Color.white;
-        
-        public string DisplayName;
 
+        public string DisplayName;
         public string Description;
 
         [ShowIf(nameof(IsCurrency))]
@@ -52,36 +52,47 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [ShowIf(nameof(IsRandomHero))]
         public SummonRarity RandomHeroRarity;
 
-        // ===== Match logic =====
+        [ShowIf(nameof(IsSkill))]
+        public SkillSummonGrade SkillGrade;
 
-        public bool MatchExact(HeroSummonRewardItem item)
+        [ShowIf(nameof(IsRandomSkill))]
+        public SkillSummonGrade RandomSkillGrade;
+
+        public bool MatchExact(SummonRewardItem item)
         {
             if (item.RewardType != RewardType)
                 return false;
 
             switch (RewardType)
             {
-                case HeroSummonRewardType.Currency:
+                case SummonRewardType.Currency:
                     return item.CurrencyType == CurrencyType;
 
-                case HeroSummonRewardType.Hero:
+                case SummonRewardType.Hero:
                     return item.HeroRarity == HeroRarity;
 
-                case HeroSummonRewardType.RandomHero:
+                case SummonRewardType.RandomHero:
                     return item.RandomHeroRarity == RandomHeroRarity;
+
+                case SummonRewardType.Skill:
+                    return item.SkillGrade == SkillGrade;
+
+                case SummonRewardType.RandomSkill:
+                    return item.RandomSkillGrade == RandomSkillGrade;
             }
 
             return false;
         }
 
-        public bool MatchByType(HeroSummonRewardItem item)
+        public bool MatchByType(SummonRewardItem item)
         {
             return item.RewardType == RewardType;
         }
-        
 
-        private bool IsCurrency() => RewardType == HeroSummonRewardType.Currency;
-        private bool IsHero() => RewardType == HeroSummonRewardType.Hero;
-        private bool IsRandomHero() => RewardType == HeroSummonRewardType.RandomHero;
+        private bool IsCurrency() => RewardType == SummonRewardType.Currency;
+        private bool IsHero() => RewardType == SummonRewardType.Hero;
+        private bool IsRandomHero() => RewardType == SummonRewardType.RandomHero;
+        private bool IsSkill() => RewardType == SummonRewardType.Skill;
+        private bool IsRandomSkill() => RewardType == SummonRewardType.RandomSkill;
     }
 }

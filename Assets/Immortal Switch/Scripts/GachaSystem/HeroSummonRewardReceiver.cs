@@ -6,29 +6,29 @@ namespace Immortal_Switch.Scripts.GachaSystem
 {
     public class HeroSummonRewardReceiver : MonoBehaviour, IHeroSummonRewardReceiver
     {
-        public void GrantReward(HeroSummonRewardItem rewardItem)
+        public void GrantReward(SummonRewardItem rewardItem)
         {
             if (rewardItem == null)
                 return;
 
             switch (rewardItem.RewardType)
             {
-                case HeroSummonRewardType.Currency:
+                case SummonRewardType.Currency:
                     GrantCurrency(rewardItem);
                     break;
 
-                case HeroSummonRewardType.RandomHero:
+                case SummonRewardType.RandomHero:
                     GrantRandomHero(rewardItem);
                     break;
             }
         }
 
-        private void GrantCurrency(HeroSummonRewardItem rewardItem)
+        private void GrantCurrency(SummonRewardItem rewardItem)
         {
             CurrencyManager.Instance.Add(rewardItem.CurrencyType, rewardItem.Amount);
         }
 
-        private void GrantRandomHero(HeroSummonRewardItem rewardItem)
+        private void GrantRandomHero(SummonRewardItem rewardItem)
         {
             if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
                 return;

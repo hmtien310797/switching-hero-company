@@ -1,19 +1,20 @@
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using System.Linq;
+using Immortal_Switch.Scripts.GachaSystem;
+using Immortal_Switch.Scripts.GachaSystem.HeroSummonView;
+using Immortal_Switch.Scripts.Skill;
 
-namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
+namespace Immortal_Switch.Scripts.SkillSummon.UI
 {
-    public static class HeroSummonAchievementRewardBuilder
+    public static class SkillSummonAchievementRewardBuilder
     {
-        public static SummonAchievementRewardListData BuildHeroic(
-            HeroSummonConfigSO config,
-            HeroSummonSaveData saveData,
+        public static SummonAchievementRewardListData BuildSkill(
+            SkillSummonConfigSO config,
+            SkillSummonSaveData saveData,
             SummonRewardVisualConfigSO rewardVisualConfig)
         {
             var result = new SummonAchievementRewardListData
             {
-                Tab = SummonAchievementTab.Heroic
+                Tab = SummonAchievementTab.Skill
             };
 
             if (config == null || config.LevelRewards == null)
@@ -66,11 +67,20 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
                     return $"{name} x{reward.Amount}";
                 }
 
-                case SummonRewardType.RandomHero:
+                case SummonRewardType.RandomSkill:
                 {
                     string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
                         ? visual.DisplayName
-                        : $"Random {reward.HeroRarity} Hero";
+                        : $"Random {reward.RandomSkillGrade} Skill";
+
+                    return $"{name} x{reward.Amount}";
+                }
+
+                case SummonRewardType.Skill:
+                {
+                    string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
+                        ? visual.DisplayName
+                        : $"Skill {reward.SkillId}";
 
                     return $"{name} x{reward.Amount}";
                 }

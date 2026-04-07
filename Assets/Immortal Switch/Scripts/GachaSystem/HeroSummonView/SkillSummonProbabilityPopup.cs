@@ -1,5 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.SkillSummon;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
 {
@@ -8,68 +13,178 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [Header("Root")]
         [SerializeField] private GameObject root;
 
-        [Header("Content")]
-        [SerializeField] private Transform contentRoot;
-        [SerializeField] private SkillSummonProbabilityItemUI itemPrefab;
+        [Header("Buttons")]
+        [SerializeField] private Button closeButton;
+        [SerializeField] private Button prevButton;
+        [SerializeField] private Button nextButton;
 
-        private readonly List<SkillSummonProbabilityItemUI> _items = new();
+        [Header("Level")]
+        [SerializeField] private TMP_Text summonLevelText;
 
-        private bool _initialized;
+        [Header("Rows")]
+        [SerializeField] private SkillSummonProbabilityRowUI gradeBRow;
+        [SerializeField] private SkillSummonProbabilityRowUI gradeARow;
+        [SerializeField] private SkillSummonProbabilityRowUI gradeSRow;
+        [SerializeField] private SkillSummonProbabilityRowUI gradeSSRow;
+
+        private readonly List<SkillSummonLevelEntry> cachedLevels = new();
+        private int currentIndex = 0;
 
         private void Awake()
         {
-            if (root != null)
-                root.SetActive(false);
+            if (closeButton != null)
+            {
+                closeButton.onClick.RemoveAllListeners();
+                closeButton.onClick.AddListener(Hide);
+            }
 
-            _initialized = true;
+            if (prevButton != null)
+            {
+                prevButton.onClick.RemoveAllListeners();
+                prevButton.onClick.AddListener(ShowPrevLevel);
+            }
+
+            if (nextButton != null)
+            {
+                nextButton.onClick.RemoveAllListeners();
+                nextButton.onClick.AddListener(ShowNextLevel);
+            }
+
+            Hide();
         }
 
-        public void Show(List<SkillSummonProbabilityData> dataList)
+        public void Show(int currentSummonLevel)
         {
-            if (!_initialized)
-                Initialize();
+            BuildCachedLevels();
 
-            if (root != null)
-                root.SetActive(true);
+            if (cachedLevels.Count == 0)
+            {
+                Debug.LogWarning("SkillSummonProbabilityPopup: No summon levels found.");
+                SetVisible(true);
+                RefreshEmpty();
+                return;
+            }
 
-            Bind(dataList);
+            currentIndex = FindNearestIndex(currentSummonLevel);
+            SetVisible(true);
+            RefreshView();
         }
 
         public void Hide()
         {
-            if (root != null)
-                root.SetActive(false);
+            SetVisible(false);
         }
 
-        private void Initialize()
+        private void BuildCachedLevels()
         {
-            _initialized = true;
-        }
+            cachedLevels.Clear();
 
-        private void Bind(List<SkillSummonProbabilityData> dataList)
-        {
-            Clear();
-
-            if (dataList == null)
+            if (SkillSummonManager.Instance == null || SkillSummonManager.Instance.Config == null)
                 return;
 
-            for (int i = 0; i < dataList.Count; i++)
-            {
-                var item = Instantiate(itemPrefab, contentRoot);
-                item.Bind(dataList[i]);
-                _items.Add(item);
-            }
+            if (SkillSummonManager.Instance.Config.SummonLevels == null)
+                return;
+
+            cachedLevels.AddRange(
+                SkillSummonManager.Instance.Config.SummonLevels
+                    .Where(x => x != null)
+                    .OrderBy(x => x.SummonLevel)
+            );
         }
 
-        private void Clear()
+        private int FindNearestIndex(int summonLevel)
         {
-            for (int i = 0; i < _items.Count; i++)
+            if (cachedLevels.Count == 0)
+                return 0;
+
+            for (int i = 0; i < cachedLevels.Count; i++)
             {
-                if (_items[i] != null)
-                    Destroy(_items[i].gameObject);
+                if (cachedLevels[i].SummonLevel == summonLevel)
+                    return i;
             }
 
-            _items.Clear();
+            int nearestIndex = 0;
+            int nearestDistance = Mathf.Abs(cachedLevels[0].SummonLevel - summonLevel);
+
+            for (int i = 1; i < cachedLevels.Count; i++)
+            {
+                int distance = Mathf.Abs(cachedLevels[i].SummonLevel - summonLevel);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestIndex = i;
+                }
+            }
+
+            return nearestIndex;
+        }
+
+        private void ShowPrevLevel()
+        {
+            if (cachedLevels.Count == 0)
+                return;
+
+            currentIndex = Mathf.Max(0, currentIndex - 1);
+            RefreshView();
+        }
+
+        private void ShowNextLevel()
+        {
+            if (cachedLevels.Count == 0)
+                return;
+
+            currentIndex = Mathf.Min(cachedLevels.Count - 1, currentIndex + 1);
+            RefreshView();
+        }
+
+        private void RefreshView()
+        {
+            if (cachedLevels.Count == 0)
+            {
+                RefreshEmpty();
+                return;
+            }
+
+            var levelData = cachedLevels[currentIndex];
+
+            if (summonLevelText != null)
+                summonLevelText.text = $"Lv.{levelData.SummonLevel}";
+
+            gradeBRow?.Bind(levelData.GradeBRate);
+            gradeARow?.Bind(levelData.GradeARate);
+            gradeSRow?.Bind(levelData.GradeSRate);
+            gradeSSRow?.Bind(levelData.GradeSSRate);
+
+            if (prevButton != null)
+                prevButton.interactable = currentIndex > 0;
+
+            if (nextButton != null)
+                nextButton.interactable = currentIndex < cachedLevels.Count - 1;
+        }
+
+        private void RefreshEmpty()
+        {
+            if (summonLevelText != null)
+                summonLevelText.text = "Lv.-";
+
+            gradeBRow?.Bind(0f);
+            gradeARow?.Bind(0f);
+            gradeSRow?.Bind(0f);
+            gradeSSRow?.Bind(0f);
+
+            if (prevButton != null)
+                prevButton.interactable = false;
+
+            if (nextButton != null)
+                nextButton.interactable = false;
+        }
+
+        private void SetVisible(bool visible)
+        {
+            if (root != null)
+                root.SetActive(visible);
+            else
+                gameObject.SetActive(visible);
         }
     }
 }

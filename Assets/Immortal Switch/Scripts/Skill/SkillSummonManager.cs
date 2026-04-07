@@ -1,4 +1,5 @@
 ﻿using System;
+using Immortal_Switch.Scripts.GachaSystem;
 using Immortal_Switch.Scripts.Skill;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -68,9 +69,9 @@ namespace Immortal_Switch.Scripts.SkillSummon
                 saveData = new SkillSummonSaveData();
         }
 
-        public bool CanSummon(string optionId, out SkillSummonPaymentType paymentType, out int paidAmount)
+        public bool CanSummon(string optionId, out SummonPaymentType paymentType, out int paidAmount)
         {
-            paymentType = SkillSummonPaymentType.Ticket;
+            paymentType = SummonPaymentType.Ticket;
             paidAmount = 0;
 
             if (service == null)
@@ -80,7 +81,7 @@ namespace Immortal_Switch.Scripts.SkillSummon
             return service.CanSummon(option, out paymentType, out paidAmount);
         }
 
-        public SkillSummonResult ExecuteSummon(string optionId, SkillSummonPaymentType paymentType)
+        public SkillSummonResult ExecuteSummon(string optionId, SummonPaymentType paymentType)
         {
             if (service == null)
                 return null;

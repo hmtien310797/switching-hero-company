@@ -21,7 +21,7 @@ namespace Immortal_Switch.Scripts.GachaSystem.HeroSummonView
         [SerializeField] private Image summonLevelProgressFill;
 
         [Header("Reward Preview")]
-        [SerializeField] private SummonLevelRewardPreviewUI levelRewardPreviewUI;
+        [SerializeField] private HeroSummonLevelRewardPreviewUI levelRewardPreviewUI;
 
         [Header("Popup")]
         [SerializeField] private SummonConfirmPopup confirmPopup;
