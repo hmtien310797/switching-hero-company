@@ -1,5 +1,6 @@
 using System;
 using Immortal_Switch.Hero;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.GachaSystem
@@ -12,6 +13,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
         [SerializeField] private string saveKey = "hero_summon_save";
 
         private HeroSummonSaveData saveData;
+        [ShowInInspector]
         private HeroSummonService service;
         private IHeroSummonCurrencyGateway currencyGateway;
 

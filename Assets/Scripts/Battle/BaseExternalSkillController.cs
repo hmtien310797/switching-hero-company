@@ -10,13 +10,10 @@ namespace Scripts.Battle
 {
     public enum TierSkill
     {
+        B,
         A,
-        AA,
         S,
         SS,
-        SSR,
-        B,
-        BB,
     }
 
     public enum TierSkillGroup
@@ -118,22 +115,22 @@ namespace Scripts.Battle
                     await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: this.GetCancellationTokenOnDestroy());
                 }
             }
-            else if (skillData.Tier == TierSkill.SSR)
-            {
-                for (int i = 0; i < skillData.NumSpawn; i++)
-                {
-                    var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f)) + Vector3.up * 8;
-                    var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, nPos);
-                    fxObj.transform.rotation = Quaternion.FromToRotation(Vector3.right, Vector3.down);
-                    isFollow = fxObj.isFollow;
-                    fxObj.SetHeroPlayerController(pHc);
-                    fxObj.skillData = skillData;
-                    fxObj.endAct = i == skillData.NumSpawn - 1 ? endAct : null;
-                    fxObj.InitInnerSkillMultiSpawn(i == skillData.NumSpawn - 1, i == 0 ? camAct : null);
-
-                    await UniTask.Delay(TimeSpan.FromSeconds(0.075f), cancellationToken: this.GetCancellationTokenOnDestroy());
-                }
-            }
+            // else if (skillData.Tier == TierSkill.SSR)
+            // {
+            //     for (int i = 0; i < skillData.NumSpawn; i++)
+            //     {
+            //         var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f)) + Vector3.up * 8;
+            //         var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, nPos);
+            //         fxObj.transform.rotation = Quaternion.FromToRotation(Vector3.right, Vector3.down);
+            //         isFollow = fxObj.isFollow;
+            //         fxObj.SetHeroPlayerController(pHc);
+            //         fxObj.skillData = skillData;
+            //         fxObj.endAct = i == skillData.NumSpawn - 1 ? endAct : null;
+            //         fxObj.InitInnerSkillMultiSpawn(i == skillData.NumSpawn - 1, i == 0 ? camAct : null);
+            //
+            //         await UniTask.Delay(TimeSpan.FromSeconds(0.075f), cancellationToken: this.GetCancellationTokenOnDestroy());
+            //     }
+            // }
         }
 
         public virtual void InitInnerSkillMultiSpawn(bool isFinal, Action<float>camAct) { }

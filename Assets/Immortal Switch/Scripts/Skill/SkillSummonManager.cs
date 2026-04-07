@@ -1,5 +1,6 @@
 ﻿using System;
 using Immortal_Switch.Scripts.Skill;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SkillSummon
@@ -11,7 +12,9 @@ namespace Immortal_Switch.Scripts.SkillSummon
         [SerializeField] private SkillSummonConfigSO summonConfig;
         [SerializeField] private string saveKey = "skill_summon_save";
 
+        [ShowInInspector]
         private SkillSummonSaveData saveData;
+        [ShowInInspector]
         private SkillSummonService service;
         private ISkillSummonCurrencyGateway currencyGateway;
         private SkillProgressionService progressionService;

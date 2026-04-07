@@ -15,26 +15,27 @@ MonoBehaviour:
   SkillId: 101
   CooldownTime: 10
   SkillGroup: 0
-  Tier: 0
+  Tier: 1
   NumSpawn: 1
   SkillPrefab: {fileID: -3232101788176436050, guid: 43ac0b5e30de6a146a9e330d80070b2c, type: 3}
   skillIcon: {fileID: 712406670, guid: 8df9652ddfc2e464abcb32086b4a3bb4, type: 3}
   NomalDame: 60
   FinalDame: 60
   SkillKey: 
-  SkillName: 
+  SkillName: Blade Vortex
   DescriptionTemplate: 'Summons phantom blades from a spatial rift, rapidly striking
     enemies 10 times, each hit dealing {damage1}% ATK damage. The blades can pierce
     through up to 5 targets.
 
-    
 
-    After the combo, unleashes a finishing
-    X-shaped slash, dealing {damage2}% ATK damage to enemies within a 2.5m radius
-    around the main target.'
+
+    After the combo, unleashes a finishing X-shaped
+    slash, dealing {damage2}% ATK damage to enemies within a 2.5m radius around the
+    main target.'
   CastType: 0
   DefaultTargetType: 0
   MaxLevel: 3
+  UpgradeShardCosts: []
   Levels:
   - Level: 1
     Phases:
@@ -47,15 +48,10 @@ MonoBehaviour:
         Duration: 0
         StackCount: 1
         DamageMultiplier: 60
-        DamageMultiplierPerLevel: 0
-        ValuePerLevel: 0
-        DurationPerLevel: 0
         StatType: 0
         StatModifierPercent: 0
-        StatModifierPercentPerLevel: 0
         StatusType: 0
         ChancePercent: 100
-        ChancePercentPerLevel: 0
         ScalingStat: 0
         TargetTypeOverride: 0
     - PhaseId: 2
@@ -67,15 +63,10 @@ MonoBehaviour:
         Duration: 0
         StackCount: 1
         DamageMultiplier: 60
-        DamageMultiplierPerLevel: 0
-        ValuePerLevel: 0
-        DurationPerLevel: 0
         StatType: 0
         StatModifierPercent: 0
-        StatModifierPercentPerLevel: 0
         StatusType: 0
         ChancePercent: 100
-        ChancePercentPerLevel: 0
         ScalingStat: 0
         TargetTypeOverride: 0
     DescriptionParams:
@@ -98,15 +89,10 @@ MonoBehaviour:
         Duration: 0
         StackCount: 1
         DamageMultiplier: 120
-        DamageMultiplierPerLevel: 0
-        ValuePerLevel: 0
-        DurationPerLevel: 0
         StatType: 0
         StatModifierPercent: 0
-        StatModifierPercentPerLevel: 0
         StatusType: 0
         ChancePercent: 100
-        ChancePercentPerLevel: 0
         ScalingStat: 0
         TargetTypeOverride: 0
     - PhaseId: 2
@@ -118,15 +104,10 @@ MonoBehaviour:
         Duration: 0
         StackCount: 1
         DamageMultiplier: 120
-        DamageMultiplierPerLevel: 0
-        ValuePerLevel: 0
-        DurationPerLevel: 0
         StatType: 0
         StatModifierPercent: 0
-        StatModifierPercentPerLevel: 0
         StatusType: 0
         ChancePercent: 100
-        ChancePercentPerLevel: 0
         ScalingStat: 0
         TargetTypeOverride: 0
     DescriptionParams:
@@ -149,15 +130,10 @@ MonoBehaviour:
         Duration: 0
         StackCount: 1
         DamageMultiplier: 180
-        DamageMultiplierPerLevel: 0
-        ValuePerLevel: 0
-        DurationPerLevel: 0
         StatType: 0
         StatModifierPercent: 0
-        StatModifierPercentPerLevel: 0
         StatusType: 0
         ChancePercent: 100
-        ChancePercentPerLevel: 0
         ScalingStat: 0
         TargetTypeOverride: 0
     - PhaseId: 2
@@ -169,15 +145,10 @@ MonoBehaviour:
         Duration: 0
         StackCount: 1
         DamageMultiplier: 180
-        DamageMultiplierPerLevel: 0
-        ValuePerLevel: 0
-        DurationPerLevel: 0
         StatType: 0
         StatModifierPercent: 0
-        StatModifierPercentPerLevel: 0
         StatusType: 0
         ChancePercent: 100
-        ChancePercentPerLevel: 0
         ScalingStat: 0
         TargetTypeOverride: 0
     DescriptionParams:

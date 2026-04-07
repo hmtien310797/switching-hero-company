@@ -4,12 +4,15 @@ using UnityEngine;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.Currency;
 using Scripts.Battle;
+using Sirenix.OdinInspector;
 
 namespace Immortal_Switch.Scripts.SkillSummon
 {
     public class SkillSummonService
     {
+        [ShowInInspector]
         private readonly SkillSummonConfigSO config;
+        [ShowInInspector]
         private readonly SkillSummonSaveData saveData;
         private readonly ISkillSummonCurrencyGateway currencyGateway;
         private readonly SkillProgressionService progressionService;
@@ -39,47 +42,80 @@ namespace Immortal_Switch.Scripts.SkillSummon
                 return 1;
 
             int totalRoll = Mathf.Max(0, saveData.TotalRoll);
-            int result = 1;
+            int currentLevel = 1;
+            int consumed = 0;
 
-            foreach (var entry in config.SummonLevels)
+            var sorted = config.SummonLevels
+                .Where(x => x != null)
+                .OrderBy(x => x.SummonLevel)
+                .ToList();
+
+            for (int i = 0; i < sorted.Count; i++)
             {
-                if (entry == null) continue;
-                if (totalRoll >= entry.TotalRollRequired)
-                    result = Mathf.Max(result, entry.SummonLevel);
+                var entry = sorted[i];
+
+                // chỉ xử lý cost của level hiện tại
+                if (entry.SummonLevel != currentLevel)
+                    continue;
+
+                int need = Mathf.Max(0, entry.TotalRollRequired);
+
+                if (need <= 0)
+                    break;
+
+                if (totalRoll >= consumed + need)
+                {
+                    consumed += need;
+                    currentLevel++;
+                }
+                else
+                {
+                    break;
+                }
             }
 
-            return result;
+            return currentLevel;
         }
 
         public int GetCurrentLevelProgressRoll()
         {
-            int currentLevel = GetCurrentSummonLevel();
-            int nextLevel = currentLevel + 1;
-
-            var currentEntry = config.GetExactLevelEntry(currentLevel);
-            var nextEntry = config.GetExactLevelEntry(nextLevel);
-
-            if (currentEntry == null)
+            if (config == null || config.SummonLevels == null || config.SummonLevels.Count == 0)
                 return 0;
 
-            if (nextEntry == null)
-                return saveData.TotalRoll;
+            int totalRoll = Mathf.Max(0, saveData.TotalRoll);
+            int currentLevel = GetCurrentSummonLevel();
+            int consumed = 0;
 
-            return Mathf.Max(0, saveData.TotalRoll - currentEntry.TotalRollRequired);
+            var sorted = config.SummonLevels
+                .Where(x => x != null)
+                .OrderBy(x => x.SummonLevel)
+                .ToList();
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var entry = sorted[i];
+
+                if (entry.SummonLevel >= currentLevel)
+                    break;
+
+                consumed += Mathf.Max(0, entry.TotalRollRequired);
+            }
+
+            return Mathf.Max(0, totalRoll - consumed);
         }
 
         public int GetCurrentLevelRequiredRoll()
         {
-            int currentLevel = GetCurrentSummonLevel();
-            int nextLevel = currentLevel + 1;
-
-            var currentEntry = config.GetExactLevelEntry(currentLevel);
-            var nextEntry = config.GetExactLevelEntry(nextLevel);
-
-            if (currentEntry == null || nextEntry == null)
+            if (config == null)
                 return 0;
 
-            return Mathf.Max(0, nextEntry.TotalRollRequired - currentEntry.TotalRollRequired);
+            int currentLevel = GetCurrentSummonLevel();
+            var currentEntry = config.GetExactLevelEntry(currentLevel);
+
+            if (currentEntry == null)
+                return 0;
+
+            return Mathf.Max(0, currentEntry.TotalRollRequired);
         }
 
         public bool CanSummon(SkillSummonOptionEntry option, out SkillSummonPaymentType paymentType, out int paidAmount)

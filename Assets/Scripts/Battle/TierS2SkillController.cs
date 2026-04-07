@@ -87,16 +87,16 @@ namespace Scripts.Battle
                     DoActSkill(camAct).Forget();
                 }
             }
-            else if(TierBaseSkill == TierSkill.SSR)
-            {
-                if (IsAtkEvent)
-                {
-                    RegisterAnimEvent(AttackCallback);
-                    DoActSkill(camAct).Forget();
-                }
-                else
-                    DoActSkillSSR(camAct, isFinal).Forget();
-            }
+            // else if(TierBaseSkill == TierSkill.SSR)
+            // {
+            //     if (IsAtkEvent)
+            //     {
+            //         RegisterAnimEvent(AttackCallback);
+            //         DoActSkill(camAct).Forget();
+            //     }
+            //     else
+            //         DoActSkillSSR(camAct, isFinal).Forget();
+            // }
         }
 
         public void InitSka()

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Hero;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.GachaSystem
@@ -8,6 +9,7 @@ namespace Immortal_Switch.Scripts.GachaSystem
     public class HeroSummonService
     {
         private readonly HeroSummonConfigSO config;
+        [ShowInInspector]
         private readonly HeroSummonSaveData saveData;
         private readonly IHeroSummonCurrencyGateway currencyGateway;
         private readonly HeroProgressionManager heroProgressionManager;
