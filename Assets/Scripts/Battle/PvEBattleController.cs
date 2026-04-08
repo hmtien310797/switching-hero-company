@@ -9,7 +9,6 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.UI;
-using TransitionBlocks.Scripts;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
