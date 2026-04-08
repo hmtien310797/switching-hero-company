@@ -6,20 +6,21 @@ namespace Immortal_Switch.Scripts.Skill.UI
 {
     public class UISkillViewEnhanceAllController : MonoBehaviour
     {
-        [Header("Refs")]
         [SerializeField] private UISkillView uiSkillView;
-        [SerializeField] private SkillViewDataProvider dataProvider;
         [SerializeField] private Button enhanceAllButton;
         [SerializeField] private TMP_Text summaryText;
+        [SerializeField] private GameObject redDot;
 
         [Header("Debug")]
         [SerializeField] private bool enableDebugLog = true;
 
+        private SkillViewDataProvider dataProvider;
         private SkillEnhanceAllService enhanceAllService;
         private SkillInventoryEnhanceRepository repository;
 
         private void Awake()
         {
+            dataProvider = SkillViewDataProvider.Instance;
             repository = new SkillInventoryEnhanceRepository();
             enhanceAllService = new SkillEnhanceAllService(repository, dataProvider);
 
@@ -51,11 +52,16 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         public void RefreshInteractable()
         {
-            if (enhanceAllButton == null || enhanceAllService == null)
+            if (enhanceAllService == null)
                 return;
 
             bool canEnhance = enhanceAllService.CanEnhanceAnySkill();
-            enhanceAllButton.interactable = canEnhance;
+
+            if (enhanceAllButton != null)
+                enhanceAllButton.interactable = canEnhance;
+
+            if (redDot != null)
+                redDot.SetActive(canEnhance);
 
             Log($"RefreshInteractable -> canEnhance={canEnhance}");
         }
@@ -79,13 +85,9 @@ namespace Immortal_Switch.Scripts.Skill.UI
             );
 
             if (uiSkillView != null)
-            {
                 uiSkillView.RefreshAll();
-            }
             else
-            {
                 LogWarning("uiSkillView is null. RefreshAll was skipped.");
-            }
 
             if (dataProvider != null)
                 dataProvider.NotifyDataChanged();

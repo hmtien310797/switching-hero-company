@@ -86,18 +86,32 @@ namespace Scripts.Common
             AddOwnedHero(SelectedHeros.SubHeroId);
 
             // Class unlock
-            foreach (var e in classSkillUnlockInitSO.ClassEntries)
+            if (classSkillUnlockInitSO != null && classSkillUnlockInitSO.ClassEntries != null)
             {
-                SetUnlockedSkillsForClass(e.HeroClass, e.UnlockedSkillIds);
+                foreach (var e in classSkillUnlockInitSO.ClassEntries)
+                {
+                    if (e == null)
+                        continue;
+
+                    SetUnlockedSkillsForClass(e.HeroClass, e.UnlockedSkillIds);
+                }
             }
+
+            // Sync inventory unlock theo logic hiện tại của skill system
+            EnsureInitialSkillInventoryForUnlockedClassSkills();
 
             // Hero loadout
-            foreach (var e in heroSkillLoadoutInitSO.HeroEntries)
+            if (heroSkillLoadoutInitSO != null && heroSkillLoadoutInitSO.HeroEntries != null)
             {
-                AddOwnedHero(e.HeroId);
-                SetEquippedSkillsForHero(e.HeroId, e.EquippedSkillIds, false);
-            }
+                foreach (var e in heroSkillLoadoutInitSO.HeroEntries)
+                {
+                    if (e == null)
+                        continue;
 
+                    AddOwnedHero(e.HeroId);
+                    SetEquippedSkillsForHero(e.HeroId, e.EquippedSkillIds, false);
+                }
+            }
         }
 
         #endregion
@@ -132,7 +146,39 @@ namespace Scripts.Common
             if (!ClassSkillUnlock.UnlockedSkillIdsByClass.TryGetValue(heroClass, out var list))
                 return new List<int>();
 
-            return list;
+            return new List<int>(list);
+        }
+        
+        private void EnsureInitialSkillInventoryForUnlockedClassSkills()
+        {
+            if (classSkillUnlockInitSO == null || classSkillUnlockInitSO.ClassEntries == null)
+                return;
+
+            foreach (var e in classSkillUnlockInitSO.ClassEntries)
+            {
+                if (e == null || e.UnlockedSkillIds == null)
+                    continue;
+
+                foreach (int skillId in e.UnlockedSkillIds)
+                {
+                    if (skillId <= 0)
+                        continue;
+
+                    var data = Immortal_Switch.Scripts.Skill.UI.SkillInventorySaveService.GetOrCreate(skillId);
+
+                    // Rule: skill unlock for game must be owned in inventory 
+                    if (!data.IsOwned)
+                        data.IsOwned = true;
+
+                    if (data.Level <= 0)
+                        data.Level = 1;
+
+                    if (data.CurrentShard < 0)
+                        data.CurrentShard = 0;
+                }
+            }
+
+            Immortal_Switch.Scripts.Skill.UI.SkillInventorySaveService.Save();
         }
 
         public bool IsUnlocked(HeroClass heroClass, int skillId)
@@ -171,6 +217,9 @@ namespace Scripts.Common
         public bool Equip(int heroId, int skillId)
         {
             var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
+            if (hero == null)
+                return false;
+
             if (!IsUnlocked(hero.HeroClass, skillId))
                 return false;
 
