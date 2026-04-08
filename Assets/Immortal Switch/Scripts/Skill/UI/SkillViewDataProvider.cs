@@ -4,7 +4,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.SkillSummon;
 using Scripts.Battle;
 using Scripts.Common;
 using UnityEngine;
@@ -49,15 +48,18 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         [Header("Debug")]
         [SerializeField] private bool enableDebugLog = true;
+        [SerializeField] private List<SkillDataSO> allSkills = new();
+
+        private Dictionary<int, SkillDataSO> skillCache;
+        private Dictionary<HeroClass, List<SkillDataSO>> poolLookup;
 
         public event Action OnDataChanged;
-
-        private Dictionary<HeroClass, List<SkillDataSO>> poolLookup;
 
         public override UniTask InitializeAsync()
         {
             battleController = PvEBattleController.Instance;
             BuildLookup();
+            BuildCacheIfNeeded();
             return UniTask.CompletedTask;
         }
 
@@ -77,6 +79,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             if (UserDataCache.Instance != null)
                 UserDataCache.Instance.OnHeroSkillChanged -= HandleHeroSkillChanged;
+        }
+        
+        public void NotifyDataChanged()
+        {
+            OnDataChanged?.Invoke();
         }
 
         private void Log(string message)
@@ -120,7 +127,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             foreach (var entry in classPools)
             {
-                if (entry == null) continue;
+                if (entry == null) 
+                    continue;
 
                 var list = entry.Skills?
                     .Where(x => x != null)
@@ -132,6 +140,64 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 Log($"BuildLookup -> class={entry.HeroClass}, count={list.Count}");
             }
+        }
+
+        private void BuildCacheIfNeeded()
+        {
+            if (skillCache != null)
+                return;
+
+            skillCache = new Dictionary<int, SkillDataSO>();
+
+            if (allSkills == null)
+                return;
+
+            for (int i = 0; i < allSkills.Count; i++)
+            {
+                var skill = allSkills[i];
+                if (skill == null)
+                    continue;
+
+                skillCache[skill.SkillId] = skill;
+            }
+        }
+
+        public List<SkillDataSO> GetAllSkillData()
+        {
+            BuildCacheIfNeeded();
+
+            if (allSkills == null)
+                return new List<SkillDataSO>();
+
+            return allSkills
+                .Where(x => x != null)
+                .OrderBy(x => x.SkillId)
+                .ToList();
+        }
+
+        public SkillDataSO GetSkillData(int skillId)
+        {
+            if (skillId <= 0)
+                return null;
+
+            BuildCacheIfNeeded();
+
+            if (skillCache != null && skillCache.TryGetValue(skillId, out var localData))
+                return localData;
+
+            var masterData = MasterDataCache.Instance != null
+                ? MasterDataCache.Instance.GetSkillDataById(skillId)
+                : null;
+
+            if (masterData != null)
+            {
+                if (skillCache == null)
+                    skillCache = new Dictionary<int, SkillDataSO>();
+
+                skillCache[skillId] = masterData;
+            }
+
+            return masterData;
         }
 
         public bool HasAssignedHero(HeroClass heroClass)
@@ -241,17 +307,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
             return list;
         }
 
-        public SkillDataSO GetSkillData(int skillId)
-        {
-            if (skillId <= 0)
-                return null;
-
-            return MasterDataCache.Instance.GetSkillDataById(skillId);
-        }
-
-        private readonly Immortal_Switch.Scripts.SkillSummon.SkillProgressionService progressionService
-            = new Immortal_Switch.Scripts.SkillSummon.SkillProgressionService();
-
         public SkillViewSkillState BuildSkillState(SkillViewHeroContext heroContext, SkillDataSO skillData)
         {
             if (skillData == null)
@@ -259,10 +314,13 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             var equippedIds = heroContext != null ? heroContext.EquippedSkillIds : new List<int>();
 
-            int level = progressionService.GetLevel(skillData.SkillId);
-            int currentShard = progressionService.GetCurrentShard(skillData.SkillId);
-            int requiredShard = skillData.GetRequiredShardForLevel(level);
-            bool isOwned = progressionService.HasSkill(skillData.SkillId);
+            int level = SkillInventorySaveService.GetLevel(skillData.SkillId);
+            int currentShard = SkillInventorySaveService.GetCurrentShard(skillData.SkillId);
+            bool isOwned = SkillInventorySaveService.IsOwned(skillData.SkillId) || currentShard > 0;
+
+            int requiredShard = 0;
+            if (!skillData.IsMaxLevel(level))
+                requiredShard = skillData.GetRequiredShardForLevel(level);
 
             var state = new SkillViewSkillState
             {

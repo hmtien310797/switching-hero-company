@@ -103,6 +103,26 @@ namespace Immortal_Switch.Scripts.Skill.UI
             SaveAll();
         }
 
+        public static List<SkillProgressSaveData> GetAllSkillStates()
+        {
+            EnsureLoaded();
+
+            var result = new List<SkillProgressSaveData>();
+
+            foreach (var kv in cache)
+            {
+                if (kv.Value != null)
+                    result.Add(kv.Value);
+            }
+
+            return result;
+        }
+
+        public static void Save()
+        {
+            SaveAll();
+        }
+
         public static void ClearAll()
         {
             cache = new Dictionary<int, SkillProgressSaveData>();

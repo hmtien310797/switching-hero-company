@@ -192,6 +192,14 @@ namespace Immortal_Switch.Scripts.Skill.UI
             LogView($"OnClickHeroTab -> heroId={selectedHero.HeroId}, class={selectedClass}");
             RefreshCurrentContext();
         }
+        
+        public void RefreshAll()
+        {
+            // RefreshHeroTabs();
+            // RefreshSkillGrid();
+            // RefreshEquippedSlots();
+            // RefreshSelectedSkillDetail();
+        }
 
         private void OnClickEquippedSlot(int slotIndex)
         {
