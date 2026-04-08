@@ -1,28 +1,31 @@
-using Scripts.Common;
+using Common;
 using UnityEngine;
 
-public class HealthBarController : MonoBehaviour
+namespace UI
 {
-    [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] HealthTxtController healthTxtPrefab;
-
-    public void SetHealth(float health)
+    public class HealthBarController : MonoBehaviour
     {
-        var size = spriteRenderer.size;
-        size.x = health;
-        spriteRenderer.size = size;
-    }
+        [SerializeField] SpriteRenderer spriteRenderer;
+        [SerializeField] HealthTxtController healthTxtPrefab;
 
-    public void PreSetHealth()
-    {
-        var size = spriteRenderer.size;
-        size.x = 1;
-        spriteRenderer.size = size;
-    }
+        public void SetHealth(float health)
+        {
+            var size = spriteRenderer.size;
+            size.x = health;
+            spriteRenderer.size = size;
+        }
 
-    public void ShowHealthTxt(float dame, Vector3 pos)
-    {
-        var (ht,_) = PoolController.Instance.Get(healthTxtPrefab, pos);
-        ht.DoShowHealthTxt(dame, pos);
+        public void PreSetHealth()
+        {
+            var size = spriteRenderer.size;
+            size.x = 1;
+            spriteRenderer.size = size;
+        }
+
+        public void ShowHealthTxt(float dame, Vector3 pos)
+        {
+            var (ht,_) = PoolController.Instance.Get(healthTxtPrefab, pos);
+            ht.DoShowHealthTxt(dame, pos);
+        }
     }
 }

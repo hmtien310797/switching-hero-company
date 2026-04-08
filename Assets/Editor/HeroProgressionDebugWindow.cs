@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Immortal_Switch.Hero;
+using Immortal_Switch.Scripts.Hero;
 using UnityEditor;
 using UnityEngine;
 

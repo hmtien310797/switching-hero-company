@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Immortal_Switch.Scripts.GachaSystem;
+using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
+using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill

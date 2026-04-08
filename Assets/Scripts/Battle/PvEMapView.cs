@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class PvEMapView : MonoBehaviour
     {

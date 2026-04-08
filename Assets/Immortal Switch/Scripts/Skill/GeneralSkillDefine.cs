@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Currency;
-using Immortal_Switch.Scripts.GachaSystem;
+using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 
 namespace Immortal_Switch.Scripts.Skill
 {

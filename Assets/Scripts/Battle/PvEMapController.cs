@@ -1,8 +1,7 @@
-using Immortal_Switch.Scripts;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class PvEMapController : MonoBehaviour
     {

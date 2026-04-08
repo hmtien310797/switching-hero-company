@@ -1,5 +1,5 @@
-﻿using Immortal_Switch.Scripts.StatSystem;
-using Scripts.Battle;
+﻿using Battle;
+using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Boss

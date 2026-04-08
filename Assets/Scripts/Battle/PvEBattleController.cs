@@ -1,17 +1,19 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using Immortal_Switch.Hero;
+using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Level.Pattern;
+using Immortal_Switch.Scripts.UI;
+using TransitionBlocks.Scripts;
 using UnityEngine;
-using Scripts.Common;
-using Scripts.UI;
 using Random = UnityEngine.Random;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public enum BattleState
     {

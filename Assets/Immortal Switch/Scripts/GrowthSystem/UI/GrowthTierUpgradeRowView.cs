@@ -1,9 +1,8 @@
-﻿using Immortal_Switch.Scripts.GrowthSystem.UI;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Immortal_Switch.Scripts.GrowthSystem
+namespace Immortal_Switch.Scripts.GrowthSystem.UI
 {
     public class GrowthTierUpgradeRowView : MonoBehaviour
     {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Immortal_Switch.Scripts.PowerUpSystem;
 
 namespace Immortal_Switch.Scripts.StatSystem
 {

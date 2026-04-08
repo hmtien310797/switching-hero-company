@@ -1,17 +1,17 @@
-﻿using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.StatSystem;
-using Scripts.UI;
-using Spine.Unity;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Immortal_Switch.Hero;
+using Common;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.PowerUpSystem;
-using UnityEngine;
-using Scripts.Common;
+using Immortal_Switch.Scripts.StatSystem;
+using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
+using Spine.Unity;
+using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class UIHeroBehavior
     {

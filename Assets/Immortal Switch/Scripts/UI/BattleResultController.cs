@@ -4,7 +4,7 @@ using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scripts.UI
+namespace Immortal_Switch.Scripts.UI
 {
     public class BattleResultController : MonoBehaviour
     {

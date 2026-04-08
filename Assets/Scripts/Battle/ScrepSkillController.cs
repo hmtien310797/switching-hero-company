@@ -1,9 +1,9 @@
-using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class ScrepSkillController : BaseSkillController
     {

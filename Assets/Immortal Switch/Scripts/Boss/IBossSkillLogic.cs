@@ -1,11 +1,14 @@
-using Scripts.Battle;
+using Battle;
 
-public interface IBossSkillLogic
+namespace Immortal_Switch.Scripts.Boss
 {
-    void Initialize(MonsterBossController boss);
-    void OnBattleStart();
-    void OnNormalAttack();
-    void OnSkillCast();
-    void OnHitTaken(float damageTaken);
-    void OnHpChanged();
+    public interface IBossSkillLogic
+    {
+        void Initialize(MonsterBossController boss);
+        void OnBattleStart();
+        void OnNormalAttack();
+        void OnSkillCast();
+        void OnHitTaken(float damageTaken);
+        void OnHpChanged();
+    }
 }

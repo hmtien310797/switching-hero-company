@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Scripts.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

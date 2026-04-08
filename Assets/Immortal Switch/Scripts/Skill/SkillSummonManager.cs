@@ -1,10 +1,11 @@
 ﻿using System;
-using Immortal_Switch.Scripts.GachaSystem;
-using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.SkillSummon;
+using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
+using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Immortal_Switch.Scripts.SkillSummon
+namespace Immortal_Switch.Scripts.Skill
 {
     public class SkillSummonManager : MonoBehaviour
     {

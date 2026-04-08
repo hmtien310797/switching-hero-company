@@ -1,6 +1,6 @@
 using System;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public interface ICharacterSkillController
     {

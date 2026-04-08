@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Immortal_Switch.Hero
+namespace Immortal_Switch.Scripts.Hero
 {
     public class HeroProgressionService
     {

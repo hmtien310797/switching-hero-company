@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.Hero;
 using UnityEditor;
 using UnityEngine;
 

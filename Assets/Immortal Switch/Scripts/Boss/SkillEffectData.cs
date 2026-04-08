@@ -1,8 +1,9 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
-namespace Immortal_Switch.Scripts.Skill
+namespace Immortal_Switch.Scripts.Boss
 {
     [Serializable]
     public class SkillEffectData
@@ -36,15 +37,7 @@ namespace Immortal_Switch.Scripts.Skill
         [Header("Target")]
         public SkillTargetType TargetTypeOverride = SkillTargetType.CurrentTarget;
     }
-
-    public enum StatusEffectType
-    {
-        Curse,
-        Stun,
-        Freeze,
-        Mark,
-        CustomDebuff
-    }
+    
 
     public enum SkillEffectType
     {

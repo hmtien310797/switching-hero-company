@@ -1,16 +1,16 @@
-﻿using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using Immortal_Switch.Scripts.Core;
-using Scripts.Common;
-using Spine.Unity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Immortal_Switch.Hero;
+using Common;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
+using Spine.Unity;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public enum SkillSlot
     {

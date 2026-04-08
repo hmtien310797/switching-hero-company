@@ -1,8 +1,8 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using Battle;
 using Immortal_Switch.Scripts.StatSystem;
-using Scripts.Battle;
 using UnityEditor;
 using UnityEngine;
 

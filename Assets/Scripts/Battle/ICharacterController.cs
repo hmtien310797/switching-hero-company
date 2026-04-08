@@ -1,6 +1,7 @@
-using UnityEngine;
-
-public class ICharacterController
+namespace Battle
 {
+    public class ICharacterController
+    {
     
+    }
 }

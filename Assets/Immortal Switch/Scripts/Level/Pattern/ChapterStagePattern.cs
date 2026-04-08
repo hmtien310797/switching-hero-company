@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Immortal_Switch.Scripts
+namespace Immortal_Switch.Scripts.Level.Pattern
 {
     [CreateAssetMenu(fileName = "ChapterStage", menuName = "ScriptableObjects/ChapterStage")]
     public class ChapterStageSO : ScriptableObject

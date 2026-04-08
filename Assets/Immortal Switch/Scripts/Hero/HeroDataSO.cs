@@ -1,9 +1,7 @@
-﻿using Immortal_Switch.Scripts;
-using Scripts.Battle;
+﻿using Battle;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Immortal_Switch.Hero
+namespace Immortal_Switch.Scripts.Hero
 {
     [CreateAssetMenu(fileName = "HeroData", menuName = "ScriptableObjects/HeroData", order = 1)]
     public class HeroDataSO : ScriptableObject

@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using Scripts.Battle;
+using Battle;
 using UnityEngine;
 
-namespace Immortal_Switch.Scripts.Skill
+namespace Immortal_Switch.Scripts.Boss
 {
     [CreateAssetMenu(fileName = "BossData", menuName = "ScriptableObjects/BossData", order = 1)]
     public class BossDataSO : ScriptableObject

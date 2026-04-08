@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Common;
 using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
-using Scripts.Common;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class MonsterBossController : MonsterScrepController
     {

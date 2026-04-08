@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Skill;
 using UnityEditor;
 using UnityEngine;

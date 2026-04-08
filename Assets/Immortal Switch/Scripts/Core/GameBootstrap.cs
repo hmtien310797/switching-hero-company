@@ -1,9 +1,10 @@
+using Battle;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Skill.UI;
-using Scripts.Battle;
-using Scripts.Common;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Core

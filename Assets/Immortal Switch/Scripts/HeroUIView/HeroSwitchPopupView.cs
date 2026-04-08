@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Battle;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Immortal_Switch.Hero;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.UI;
-using Scripts.Battle;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Immortal_Switch.Scripts.Skill
+namespace Immortal_Switch.Scripts.Boss
 {
     [Serializable]
     public class BossSkillData

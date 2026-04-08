@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 
-namespace Scripts.Common
+namespace Common
 {
     [Serializable]
     public class HeroDataOwn

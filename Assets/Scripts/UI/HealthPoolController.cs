@@ -2,44 +2,47 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class HealthPoolController : MonoBehaviour
+namespace UI
 {
-    public static HealthPoolController Instance;
-
-    [SerializeField] HealthTxtController healthTxtPrefab;
-
-    private List<HealthTxtController> healthTxts = new List<HealthTxtController>();
-    private int healthTxtInitNum = 5;
-
-    private void Awake()
+    public class HealthPoolController : MonoBehaviour
     {
-        Instance = this;
+        public static HealthPoolController Instance;
 
-        //InitHealthTxt();
-    }
+        [SerializeField] HealthTxtController healthTxtPrefab;
 
-    private void InitHealthTxt()
-    {
-        for (int i = 0; i < healthTxtInitNum; i++)
+        private List<HealthTxtController> healthTxts = new List<HealthTxtController>();
+        private int healthTxtInitNum = 5;
+
+        private void Awake()
         {
-            CreateHealthTxt();
+            Instance = this;
+
+            //InitHealthTxt();
         }
-    }
 
-    private HealthTxtController CreateHealthTxt()
-    {
-        var ht = Instantiate(healthTxtPrefab, transform.position, Quaternion.identity);
-        ht.gameObject.SetActive(false);
-        healthTxts.Add(ht);
+        private void InitHealthTxt()
+        {
+            for (int i = 0; i < healthTxtInitNum; i++)
+            {
+                CreateHealthTxt();
+            }
+        }
 
-        return ht;
-    }
+        private HealthTxtController CreateHealthTxt()
+        {
+            var ht = Instantiate(healthTxtPrefab, transform.position, Quaternion.identity);
+            ht.gameObject.SetActive(false);
+            healthTxts.Add(ht);
 
-    public HealthTxtController GetHealthTxt(float damage)
-    {
-        var ht = healthTxts?.FirstOrDefault(x => x.IsFree());
-        if (ht == null) ht = CreateHealthTxt();
+            return ht;
+        }
 
-        return ht;
+        public HealthTxtController GetHealthTxt(float damage)
+        {
+            var ht = healthTxts?.FirstOrDefault(x => x.IsFree());
+            if (ht == null) ht = CreateHealthTxt();
+
+            return ht;
+        }
     }
 }

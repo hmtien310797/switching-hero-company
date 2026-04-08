@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
-namespace Immortal_Switch.Scripts.UI
+namespace Immortal_Switch.Scripts.GrowthSystem.UI
 {
     public class GrowthUpgradeAmountSelector : MonoBehaviour
     {

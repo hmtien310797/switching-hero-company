@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scripts.UI
+namespace Immortal_Switch.Scripts.UI
 {
     public class BattleTimerController : MonoBehaviour
     {

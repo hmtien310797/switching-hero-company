@@ -1,10 +1,10 @@
-using Immortal_Switch.Scripts.UI;
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scripts.UI
+namespace UI
 {
     public class UISwitchHeroController : MonoBehaviour
     {

@@ -1,6 +1,6 @@
 ﻿using Immortal_Switch.Scripts.Currency;
 
-namespace Immortal_Switch.Scripts.SkillSummon
+namespace Immortal_Switch.Scripts.Skill
 {
     public interface ISkillSummonCurrencyGateway
     {

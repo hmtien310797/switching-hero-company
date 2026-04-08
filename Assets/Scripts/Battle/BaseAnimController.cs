@@ -1,10 +1,10 @@
-﻿using Cysharp.Threading.Tasks;
-using Spine.Unity;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Spine.Unity;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class BaseAnimController : MonoBehaviour
     {

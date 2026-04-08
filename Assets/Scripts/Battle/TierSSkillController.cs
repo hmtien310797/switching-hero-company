@@ -1,10 +1,10 @@
-using Cysharp.Threading.Tasks;
-using Scripts.Common;
-using Spine.Unity;
 using System;
+using Common;
+using Cysharp.Threading.Tasks;
+using Spine.Unity;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class TierSSkillController : BaseExternalSkillController
     {

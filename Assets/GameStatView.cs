@@ -1,7 +1,7 @@
 ﻿using Immortal_Switch.Scripts.Core;
-using Scripts.Battle;
-using Scripts.UI;
 using System;
+using Battle;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

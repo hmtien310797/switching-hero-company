@@ -1,4 +1,4 @@
-namespace Immortal_Switch.Scripts.StatSystem
+namespace Immortal_Switch.Scripts.PowerUpSystem
 {
     public static class StatSourceIds
     {

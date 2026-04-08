@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Immortal_Switch.Hero;
+using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill

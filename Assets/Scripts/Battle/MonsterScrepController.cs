@@ -1,10 +1,10 @@
-using Immortal_Switch.Scripts;
-using Immortal_Switch.Scripts.StatSystem;
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     [Serializable]
     public class BaseStat

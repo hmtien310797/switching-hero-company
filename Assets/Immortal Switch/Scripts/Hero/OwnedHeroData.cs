@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Immortal_Switch.Scripts;
 
-namespace Immortal_Switch.Hero
+namespace Immortal_Switch.Scripts.Hero
 {
     [Serializable]
     public class OwnedHeroData

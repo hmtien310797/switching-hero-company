@@ -1,5 +1,4 @@
 using Immortal_Switch.Scripts.Core;
-using Scripts.Common;
 using System;
 using UnityEngine;
 using UnityEngine.UI;

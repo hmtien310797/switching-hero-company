@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Battle;
+using Common;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Hero;
 using Immortal_Switch.Scripts.Core;
-using Scripts.Battle;
-using Scripts.Common;
+using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill.UI

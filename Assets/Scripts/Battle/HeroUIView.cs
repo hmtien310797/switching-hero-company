@@ -1,11 +1,14 @@
 using UnityEngine;
 
-public class HeroUIView : MonoBehaviour
+namespace Battle
 {
-    [SerializeField] Sprite headIcon;
-    [SerializeField] Sprite swithSkillIcon;
+    public class HeroUIView : MonoBehaviour
+    {
+        [SerializeField] Sprite headIcon;
+        [SerializeField] Sprite swithSkillIcon;
 
-    public Sprite GetHeadIcon => headIcon;
+        public Sprite GetHeadIcon => headIcon;
 
-    public Sprite SwithSkillIcon => swithSkillIcon;
+        public Sprite SwithSkillIcon => swithSkillIcon;
+    }
 }

@@ -1,7 +1,4 @@
-using Scripts.Battle;
-using UnityEngine;
-
-namespace Scripts.Battle
+namespace Battle
 {
     public class BossAnimController : BaseAnimController
     {

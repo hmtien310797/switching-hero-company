@@ -1,12 +1,13 @@
-using Scripts.Battle;
 using System;
 using System.Collections.Generic;
+using Battle;
+using Common;
 using DG.Tweening;
+using UI;
 using UnityEngine;
 using UnityEngine.UI;
-using Immortal_Switch.Scripts.UI;
 
-namespace Scripts.UI
+namespace Immortal_Switch.Scripts.UI
 {
     public enum HeroNameAction
     {

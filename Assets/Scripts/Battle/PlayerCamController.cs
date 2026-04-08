@@ -1,8 +1,8 @@
-﻿using DG.Tweening;
-using System.Collections;
+﻿using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public enum ShakeType
     {

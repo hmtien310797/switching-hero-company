@@ -1,8 +1,8 @@
-﻿namespace Scripts.Common
-{
-    using System.Collections.Generic;
-    using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
+namespace Common
+{
     public class PoolController : MonoBehaviour
     {
         public static PoolController Instance;

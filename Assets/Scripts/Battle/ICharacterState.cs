@@ -1,4 +1,4 @@
-namespace Scripts.Battle
+namespace Battle
 {
     public interface ICharacterState<T> where T : class
     {

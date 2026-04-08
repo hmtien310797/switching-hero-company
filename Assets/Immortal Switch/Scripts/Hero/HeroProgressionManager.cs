@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Immortal_Switch.Hero
+namespace Immortal_Switch.Scripts.Hero
 {
     public class HeroProgressionManager : MonoBehaviour
     {

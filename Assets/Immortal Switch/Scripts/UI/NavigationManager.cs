@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Immortal_Switch.Scripts
+namespace Immortal_Switch.Scripts.UI
 {
     public class NavigationManager : MonoBehaviour
     {

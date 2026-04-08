@@ -1,11 +1,11 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Common;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Currency;
-using Scripts.Common;
-using System;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class BattleCoinView : MonoBehaviour
     {

@@ -1,9 +1,9 @@
-using Spine.Unity;
 using System;
 using System.Collections.Generic;
+using Spine.Unity;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public enum HeroSkills
     {

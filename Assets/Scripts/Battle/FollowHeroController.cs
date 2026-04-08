@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public class FollowHeroController : MonoBehaviour
     {

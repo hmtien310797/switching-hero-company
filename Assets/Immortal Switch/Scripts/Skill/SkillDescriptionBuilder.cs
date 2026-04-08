@@ -1,7 +1,7 @@
-﻿using Immortal_Switch.Scripts.Skill;
+﻿using Immortal_Switch.Scripts.Boss;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Immortal_Switch.Scripts.Skill
 {
     public static class SkillDescriptionBuilder
     {

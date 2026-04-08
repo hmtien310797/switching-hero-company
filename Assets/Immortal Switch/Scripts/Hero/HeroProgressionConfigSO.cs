@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Immortal_Switch.Hero
+namespace Immortal_Switch.Scripts.Hero
 {
     [CreateAssetMenu(fileName = "HeroProgressionConfig", menuName = "ScriptableObjects/Heroes/HeroProgressionConfig")]
     public class HeroProgressionConfigSO : ScriptableObject

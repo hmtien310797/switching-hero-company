@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Immortal_Switch.Scripts
+namespace Immortal_Switch.Scripts.UI
 {
     public enum NavState { Closed, Open, Locked }
 

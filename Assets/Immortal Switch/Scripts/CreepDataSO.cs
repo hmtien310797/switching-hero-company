@@ -1,4 +1,4 @@
-﻿using Scripts.Battle;
+﻿using Battle;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts

@@ -1,29 +1,30 @@
-using Immortal_Switch.Scripts.UI;
-using Scripts.UI;
 using UnityEngine;
 
-public class TopMainView : UIView
+namespace Immortal_Switch.Scripts.UI
 {
-    public static TopMainView Instance;
-
-    [SerializeField] BattleResultController battleResultController;
-    [SerializeField] BattleTimerController battleTimerController;
-    [SerializeField] CurrencyView currencyView;
-
-    private void Awake()
+    public class TopMainView : UIView
     {
-        Instance = this;
-    }
+        public static TopMainView Instance;
 
-    public BattleResultController GetBattleResultIntance()
-    {
-        return battleResultController;
-    }
+        [SerializeField] BattleResultController battleResultController;
+        [SerializeField] BattleTimerController battleTimerController;
+        [SerializeField] CurrencyView currencyView;
 
-    public BattleTimerController GetBattleTimerIntance()
-    {
-        return battleTimerController;
-    }
+        private void Awake()
+        {
+            Instance = this;
+        }
 
-    public CurrencyView CurrencyView => currencyView;
+        public BattleResultController GetBattleResultIntance()
+        {
+            return battleResultController;
+        }
+
+        public BattleTimerController GetBattleTimerIntance()
+        {
+            return battleTimerController;
+        }
+
+        public CurrencyView CurrencyView => currencyView;
+    }
 }

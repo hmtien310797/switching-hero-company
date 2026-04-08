@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
+using UI;
 using UnityEngine;
 
-namespace Scripts.Battle
+namespace Battle
 {
     public enum HeroType
     {
