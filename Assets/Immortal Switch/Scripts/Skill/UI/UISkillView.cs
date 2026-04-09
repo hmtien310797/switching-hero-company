@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.Hero;
-using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Skill.UI
 {
-    public class UISkillView : AnimatedUIView
+    public class UISkillView : MonoBehaviour
     {
         private SkillViewDataProvider dataProvider;
 

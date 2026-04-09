@@ -29,7 +29,7 @@ namespace Immortal_Switch.Scripts.UI
                 ButtonGrowth.onClick.AddListener(() => OnToggleMain<GrowthView>().Forget());
 
             if (ButtonEquip != null)
-                ButtonEquip.onClick.AddListener(() => OnToggleMain<UISkillView>().Forget());
+                ButtonEquip.onClick.AddListener(() => OnToggleMain<EquipView>().Forget());
 
 
             ButtonShop.onClick.AddListener(() => OnToggleMain<SummonHubView>().Forget());
