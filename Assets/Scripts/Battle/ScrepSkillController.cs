@@ -20,7 +20,7 @@ namespace Battle
         {
             SkaFx.transform.position = new Vector3(monsterScrep?.Target.transform.position.x??.5f, 0.5f, monsterScrep?.Target.transform.position.z ?? 0f);
             SkaFx.gameObject.SetActive(true);
-            PlayAmin(StandAnimName.Attack1);
+            PlayAmin(StandAnimName.Attack1, 1, false);
         }
 
         private void PlayAmin(string name, float speed = 1, bool isLooped = true)

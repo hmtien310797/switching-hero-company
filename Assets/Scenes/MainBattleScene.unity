@@ -409,10 +409,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maps:
-  - {fileID: 4587483345311444964, guid: 54719eb1afa57bd4da7ff4e23c662ecb, type: 3}
   - {fileID: -5293887979821469981, guid: 92eb612cdaed11d419870601205da609, type: 3}
-  - {fileID: -8844421624297335155, guid: 3d5e75cbd2e4cb84eb38d35b3fcc94e6, type: 3}
+  - {fileID: -5293887979821469981, guid: 82d6769224f6a534da23877ecf40b269, type: 3}
   - {fileID: -5293887979821469981, guid: 92eb612cdaed11d419870601205da609, type: 3}
+  - {fileID: -5293887979821469981, guid: 82d6769224f6a534da23877ecf40b269, type: 3}
   - {fileID: -8844421624297335155, guid: 3d5e75cbd2e4cb84eb38d35b3fcc94e6, type: 3}
   curChapterId: -1
 --- !u!1 &268590026
@@ -901,6 +901,20 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b695e4375a235d04b9f291059abb223e, type: 2}
   - {fileID: 11400000, guid: f72145f5f142a4941b53ed5f4499ce15, type: 2}
   - {fileID: 11400000, guid: 3136b54c5e7e28b4299640256372be57, type: 2}
+  - {fileID: 11400000, guid: 7af1b66462aa9cd468bbb89468a346c0, type: 2}
+  - {fileID: 11400000, guid: 86424ea8009e51744ab561946936087c, type: 2}
+  - {fileID: 11400000, guid: 06c79fc3b62943c4c8670f75185d5c64, type: 2}
+  - {fileID: 11400000, guid: 52b32860b3ce12e4daa73e9394ffdca4, type: 2}
+  - {fileID: 11400000, guid: 69b75e6ff07fb144ea0e5882225db0d6, type: 2}
+  - {fileID: 11400000, guid: ebaa54502824b9943bfdf89fb3f00d3c, type: 2}
+  - {fileID: 11400000, guid: 72a1c3a0cebae4e4eb6dc89e5550ae4a, type: 2}
+  - {fileID: 11400000, guid: cd55d517a7269c848b645a3716fbd381, type: 2}
+  - {fileID: 11400000, guid: d09bdd8f3e7dd614094968910f22ad45, type: 2}
+  - {fileID: 11400000, guid: c922b044c574a2648849984d6a4f3255, type: 2}
+  - {fileID: 11400000, guid: 5d7c0bb8f51badb4bbb1efe6bd06b385, type: 2}
+  - {fileID: 11400000, guid: ad8f30f0a9183b048942573f10fd33b1, type: 2}
+  - {fileID: 11400000, guid: 8343bb4f101a8b74db62e31a0d320989, type: 2}
+  - {fileID: 11400000, guid: 478e0fb71021d1c4680702c732835bd5, type: 2}
   skillDatas:
   - {fileID: 11400000, guid: 37d18d747bf2b0a4faaa4f28601bcddc, type: 2}
   - {fileID: 11400000, guid: 13e9baba27087ac41a27698eeba3d14d, type: 2}
@@ -1257,6 +1271,51 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 16fcf99c2f96f1d4280a795f08616df0, type: 3}
+--- !u!1 &1246934767
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1246934769}
+  - component: {fileID: 1246934768}
+  m_Layer: 0
+  m_Name: WeaponManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1246934768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246934767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 896f613b55184eb7a09178feb14e986d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  database: {fileID: 11400000, guid: 5dffae6fb1cf8a748b39653333173ebb, type: 2}
+--- !u!4 &1246934769
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246934767}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.1422527, y: -0.25388432, z: -1.0362992}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1300850862 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6042164394319573540, guid: d76312e609120d048acccc6888b73995, type: 3}
@@ -1572,7 +1631,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 1472
+    m_Bits: 1984
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1695,8 +1754,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 248f71ebfd2ae0d4f926e15f421a6141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <maxCreepsPerStage>k__BackingField: 60
-  <creepBatchSize>k__BackingField: 30
+  <maxCreepsPerStage>k__BackingField: 30
+  <creepBatchSize>k__BackingField: 15
 --- !u!4 &2093848898
 Transform:
   m_ObjectHideFlags: 0
@@ -1980,3 +2039,4 @@ SceneRoots:
   - {fileID: 268590027}
   - {fileID: 188864938}
   - {fileID: 1961475120}
+  - {fileID: 1246934769}

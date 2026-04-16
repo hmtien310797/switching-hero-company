@@ -3,6 +3,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Currency;
+using Scripts.Common;
 using UnityEngine;
 
 namespace Battle

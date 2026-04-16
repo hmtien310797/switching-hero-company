@@ -11,6 +11,8 @@ using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using Immortal_Switch.Scripts.StatSystem;
+using Scripts.Common;
 
 namespace Battle
 {
@@ -235,7 +237,7 @@ namespace Battle
         {
             // asign to 1 and 2
             switchHeroIds.Clear();
-            switchHeroIds = new List<int>() { 1, 3 };
+            switchHeroIds = new List<int>() { 1, 17 };
         }
 
         private async UniTask InitPlayerHeroById(bool isSwitch = false)
@@ -331,7 +333,7 @@ namespace Battle
             OnChangeHero(sourceHeroId, targetHeroId);
         }
 
-        private void HandleNextStage()
+        private async UniTaskVoid HandleNextStage()
         {
             result = BattleResult.None;
             SetState(BattleState.Initializing);
@@ -339,6 +341,7 @@ namespace Battle
             pvEMapController.InitMapByChapter(GetChapterIdByStage(currentStage));
             InitStage(currentStage);
             isReadyBattle = false;
+            await UniTask.Delay(1000);
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
@@ -348,7 +351,7 @@ namespace Battle
         {
             result = BattleResult.None;
             SetState(BattleState.Initializing);
-            ;
+            
             InitStage(currentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
@@ -564,8 +567,11 @@ namespace Battle
             };
 
             currentBoss.InitMonster(bossSo.Id, mainPlayerHeroController, this, bossStat, true,
-                new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });
+                new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });            
+        }
 
+        public void NotifyBossReady()
+        {
             firstPlayerHeroController.SetTarget(currentBoss);
             secondPlayerHeroController.SetTarget(currentBoss);
 
@@ -585,6 +591,7 @@ namespace Battle
 
         private void OnStageCleared()
         {
+            currentBoss.IsReady = false;
             result = BattleResult.Victory;
             SetState(BattleState.Ended);
             losingStage = false;
@@ -593,6 +600,7 @@ namespace Battle
         public void OnStageFailed()
         {
             result = BattleResult.Defeat;
+            PoolController.Instance.ReturnToPool(currentBoss.gameObject);
             currentBoss = null;
             SetState(BattleState.Ended);
             PlayCurrentStage().Forget();
@@ -678,13 +686,41 @@ namespace Battle
                 }
             }
 
-            if (target == null && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy &&
-                !currentBoss.IsDead)
+            if (target == null && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy && !currentBoss.IsDead && currentBoss.IsReady)
             {
                 target = currentBoss;
             }
 
             return target;
+        }
+
+        public bool IsExistMonsterInRange(Vector3 pos, float range)
+        {
+            if (!isReadyBattle) return false;
+
+            float sqrRange = range * range;
+            for (int i = 0; i < creeps.Count; i++)
+            {
+                var c = creeps[i];
+                if (c == null || !c.gameObject.activeInHierarchy) continue;
+
+                float sqrDist = (c.transform.position - pos).sqrMagnitude;
+                if (sqrDist <= sqrRange)
+                {
+                    return true;
+                }
+            }
+
+            if (State == BattleState.FightingBoss && currentBoss != null && currentBoss.gameObject.activeInHierarchy && !currentBoss.IsDead && currentBoss.IsReady)
+            {
+                float sqrDist = (currentBoss.transform.position - pos).sqrMagnitude;
+                if (sqrDist <= sqrRange)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public MonsterScrepController GetFarestMonster(Vector3 pos)
@@ -705,12 +741,68 @@ namespace Battle
             }
 
             if (target == null && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy &&
-                !currentBoss.IsDead)
+                !currentBoss.IsDead && currentBoss.IsReady)
             {
                 target = currentBoss;
             }
 
             return target;
+        }
+
+        public MonsterScrepController GetFarestMonsterỈnange(Vector3 pos, float range = 5)
+        {
+            if (!isReadyBattle) return null;
+
+            float farest = 0;
+            MonsterScrepController target = null;
+
+            for (int i = 0; i < creeps.Count; i++)
+            {
+                var c = creeps[i];
+                if (c.IsDead || c.gameObject.activeInHierarchy == false) continue;
+
+                float d = (c.transform.position - pos).magnitude;
+                if (d <= range && d > farest)
+                {
+                    farest = d;
+                    target = c;
+                }
+            }
+
+            if (target == null && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy &&
+                !currentBoss.IsDead && currentBoss.IsReady)
+            {
+                target = currentBoss;
+            }
+
+            return target;
+        }
+
+        public Vector3 GetWeakestMonster(Vector3 pos, float range)
+        {
+            Vector3 tPos = pos;
+            if (!isReadyBattle) return pos;
+
+            float minHp = float.MaxValue;
+            for (int i = 0; i < creeps.Count; i++)
+            {
+                var c = creeps[i];
+                if(c.IsDead || c.gameObject.activeInHierarchy == false) continue;
+
+                float d = (c.transform.position- pos).magnitude;
+                if (d < range && c.CurrentHp < minHp)
+                {
+                    minHp = c.CurrentHp;
+                    tPos = c.transform.position;
+                }
+            }
+
+            if (minHp == float.MaxValue && State == BattleState.FightingBoss && currentBoss.gameObject.activeInHierarchy && !currentBoss.IsDead && currentBoss.IsReady)
+            {
+                tPos = currentBoss.transform.position;
+            }
+
+            return tPos;
         }
 
         public void SpawnBossDirectly()
@@ -732,7 +824,8 @@ namespace Battle
                 if (currentBoss != null &&
                     currentBoss.gameObject.activeInHierarchy &&
                     !currentBoss.IsDead &&
-                    (currentBoss.transform.position - pos).sqrMagnitude < range * range)
+                    (currentBoss.transform.position - pos).sqrMagnitude < range * range && 
+                    currentBoss.IsReady)
                 {
                     return new List<MonsterScrepController> { currentBoss };
                 }
@@ -886,10 +979,10 @@ namespace Battle
             firstPlayerHeroController.ResetHeroData();
             secondPlayerHeroController.ResetHeroData();
 
-            HandleNextStage();
+            HandleNextStage().Forget();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
-            await UniTask.Delay(TimeSpan.FromSeconds(0.5));
+            await UniTask.Delay(TimeSpan.FromSeconds(1));
         }
 
         private async UniTask PlayCurrentStage()

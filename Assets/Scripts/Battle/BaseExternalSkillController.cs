@@ -3,6 +3,7 @@ using System.Threading;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Skill;
+using Scripts.Common;
 using Spine.Unity;
 using UnityEngine;
 
@@ -68,7 +69,7 @@ namespace Battle
             {
                 var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, pHc.transform.position);
                 
-                if(b)
+                //if(b)
                 {
                     isFollow = fxObj.isFollow;
                     fxObj.SetHeroPlayerController(pHc);
@@ -81,7 +82,7 @@ namespace Battle
             else if(skillData.SkillGroup == TierSkillGroup.SingleShot)
             {
                 var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, pHc.transform.position);
-                if (b)
+                //if (b)
                 {
                     isFollow = fxObj.isFollow;
                     fxObj.SetHeroPlayerController(pHc);
@@ -100,7 +101,7 @@ namespace Battle
         public async void DoS2SkillWithMultiSpawn(Action endAct, SkillDataSO skillData, PlayerHeroController pHc, Action<float>camAct)
         {
             var pos = pHc.GetNearestMonster();
-            if (skillData.Tier == TierSkill.SS)
+            //if (skillData.Tier == TierSkill.SS || skillData.Tier == TierSkill.S)
             {
                 for (int i = 0; i < skillData.NumSpawn; i++)
                 {
@@ -168,71 +169,19 @@ namespace Battle
 
         public async UniTaskVoid DoSkill(Func<float, CancellationToken, UniTask> heroAct, Action endAct, Transform targetTrans, CancellationToken token)
         {
-            /*if (isFollow)
-            {
-                transform.SetParent(targetTrans);
-                transform.localPosition = Vector3.zero;
-            }
-            else
-            {
-                transform.position = targetTrans.position;
-            }
-
-            SetFxState(true);
-            PlayAnim();
-            if (skillDuration <= 0)
-            {
-                skillDuration = skaFx.Skeleton.Data.FindAnimation(animSkill)?.Duration ?? 0;
-            }
-            Debug.Log($"skill action dur  = {skillDuration}");
-            await heroAct.Invoke(skillDuration, token);
-
-            SetFxState(false);
-            endAct?.Invoke();
-            PoolController.Instance.ReturnToPool(gameObject);*/
+            
         }
 
         public async UniTaskVoid DoSkill(Func<Vector3, float, CancellationToken, UniTask> heroAct, Action endAct, Vector3 targetPos, CancellationToken token)
         {
-            /*transform.position = targetPos;
-            SetFxState(true);
-            PlayAnim();
-            if (skillDuration <= 0)
-            {
-                skillDuration = skaFx.Skeleton.Data.FindAnimation(animSkill)?.Duration ?? 0;
-            }
-
-            await heroAct.Invoke(targetPos,skillDuration, token);
-
-            atkAct?.Invoke(RangeSkill, dameSkillFactor);
-            SetFxState(false);
-            endAct?.Invoke();
-            PoolController.Instance.ReturnToPool(gameObject);*/
+            
         }
 
         public async UniTaskVoid DoSkill(Vector3 targetPos, Func<Vector3,float, CancellationToken, Action<Vector3>, UniTask> heroAct, Action endAct, CancellationToken token)
         {
-            /*if (skillDuration <= 0)
-            {
-                skillDuration = skaFx.Skeleton.Data.FindAnimation(animSkill)?.Duration ?? 0;
-            }
-
-            Debug.Log($"skill action dur  = {skillDuration}");
-            await heroAct.Invoke(targetPos, skillDuration, token, (p) => DoSingleSkill(p));
-
-            atkAct?.Invoke(RangeSkill, DameSkillFactor);
-            SetFxState(false);
-            endAct?.Invoke();
-            PoolController.Instance.ReturnToPool(gameObject);*/
+            
         }
 
-        private void DoSingleSkill(Vector3 pos) 
-        {
-            /*SetFxState(false);
-            transform.position = pos;
-            PlayAnim();
-            SetFxState(true);*/
-        }
 
         public void SetFxState(bool isShow)
         {

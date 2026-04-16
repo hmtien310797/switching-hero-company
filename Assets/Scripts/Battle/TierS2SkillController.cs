@@ -1,6 +1,7 @@
 using System;
 using Common;
 using Cysharp.Threading.Tasks;
+using Scripts.Common;
 using Spine.Unity;
 using UnityEngine;
 
@@ -72,7 +73,7 @@ namespace Battle
         {
             InitSka();
             targetPos = transform.position;
-            if (TierBaseSkill == TierSkill.SS)
+            if (TierBaseSkill == TierSkill.SS || TierBaseSkill == TierSkill.S)
             {
                 if (!IsAtkEvent)
                 {

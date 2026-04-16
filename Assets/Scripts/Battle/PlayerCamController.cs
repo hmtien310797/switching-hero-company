@@ -13,7 +13,7 @@ namespace Battle
     public class PlayerCamController : MonoBehaviour
     {
         [SerializeField] Transform camHolder;
-        [SerializeField] float moveSpeed = 2f;
+        [SerializeField] float moveSpeed = 1.5f;
         [SerializeField] Vector3 offset = new Vector3(0, 7, 25);
 
         private Camera cam;

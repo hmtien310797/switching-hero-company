@@ -116,6 +116,17 @@ namespace Immortal_Switch.Scripts.StatSystem
             stat.SetClamp(minValue, maxValue);
             NotifyIfChanged(statType, oldValue, stat.FinalValue);
         }
+        
+        public void RemoveModifiersBySourcePrefix(string prefix)
+        {
+            if (string.IsNullOrEmpty(prefix))
+                return;
+
+            foreach (var pair in stats)
+            {
+                pair.Value.RemoveModifiersBySourcePrefix(prefix);
+            }
+        }
 
         private void NotifyIfChanged(StatType statType, float oldValue, float newValue)
         {

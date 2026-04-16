@@ -34,7 +34,7 @@ namespace Battle
             {
                 if(animName == entry.Animation.Name && e.Data.Name == eventName)
                 {
-                    eventAct?.Invoke(eventName == Player01SkillScontroller.eventFinalAttack);
+                    eventAct?.Invoke(eventName == PlayerSkillController.eventFinalAttack);
                 }
             };
         }

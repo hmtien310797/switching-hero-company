@@ -193,8 +193,7 @@ MeshRenderer:
   m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 2abb493530c4142468a65fb198e178c5, type: 2}
+  m_Materials: []
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -228,10 +227,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: 285597d2891f23246a0d9946265bfb93, type: 2}
+  skeletonDataAsset: {fileID: 11400000, guid: 1219ce0636198ca4f8c59e9b0ae10f5c, type: 2}
   initialSkinName: 
   fixPrefabOverrideViaMeshFilter: 2
-  initialFlipX: 1
+  initialFlipX: 0
   initialFlipY: 0
   updateWhenInvisible: 3
   separatorSlotNames: []
@@ -256,7 +255,7 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
-  _animationName: idle
+  _animationName: spawn
   loop: 1
   timeScale: 1
 --- !u!1 &5838788365786276607
@@ -442,10 +441,10 @@ MonoBehaviour:
   baseSkillController: {fileID: 5944730451845037371}
   heroType: 2
   statsController: {fileID: 467304586441868764}
+  dameTrans: {fileID: 0}
   healthBarController: {fileID: 3609043231527130644}
   baseStatData:
     Health: 0
-    RemainHealth: 0
     IdleStateTime: 0
     IdleIntervalTime: 0
     AttackRange: 0
@@ -473,6 +472,7 @@ MonoBehaviour:
   IsMissingSkills: 
   baseAnimController: {fileID: 3019956219047398968}
   skaFx: {fileID: 5009228127244539264}
+  moveAnimSpeed: 1
   monsterBoss: {fileID: 8313324362554653902}
 --- !u!114 &3019956219047398968
 MonoBehaviour:
@@ -529,7 +529,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8555083823808309548, guid: 7359c55ea991d1a498256160e702295a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.989
+      value: 6.46
       objectReference: {fileID: 0}
     - target: {fileID: 8555083823808309548, guid: 7359c55ea991d1a498256160e702295a, type: 3}
       propertyPath: m_LocalPosition.z

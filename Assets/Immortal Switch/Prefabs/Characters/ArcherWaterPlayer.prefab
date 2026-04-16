@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7982249090960025673}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: OArrowTrasn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,12 +42,14 @@ GameObject:
   - component: {fileID: 5137324121463227497}
   - component: {fileID: 491192442546481272}
   - component: {fileID: 4374813364255653229}
-  - component: {fileID: 8686406742812245777}
   - component: {fileID: 3541416523792417231}
   - component: {fileID: -6887672660385192121}
   - component: {fileID: 8550740779067930300}
   - component: {fileID: -2321336621784235455}
-  m_Layer: 7
+  - component: {fileID: 8959531262148125046}
+  - component: {fileID: 413792142189795195}
+  - component: {fileID: 4352947936478932992}
+  m_Layer: 9
   m_Name: ArcherWaterPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,9 +100,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd86dd3fb2121b4ca53ab09ac87a416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSkillController: {fileID: 8686406742812245777}
+  baseSkillController: {fileID: 8959531262148125046}
   heroType: 0
   statsController: {fileID: 3541416523792417231}
+  dameTrans: {fileID: 0}
   healthBarController: {fileID: 0}
   baseStatData:
     Health: 0
@@ -115,46 +118,16 @@ MonoBehaviour:
     Accuracy: 0
     MoveSpeed: 0
     Element: 0
-  playerCamController: {fileID: 0}
   hero: {fileID: 7753249893286820407}
   heroUIView: {fileID: 8550740779067930300}
   hideMat: {fileID: 2100000, guid: ecf734acdd466ab47b0f063dc046c5be, type: 2}
-  progressionBridge: {fileID: 0}
-  distFlashConst: 7
-  distSkillRange: 10
+  progressionBridge: {fileID: -2321336621784235455}
+  equipmentBridge: {fileID: 0}
+  distFlashConst: 5
+  distSkillRange: 5
   intervalSwitch: 20
-  switchArea: 10
-  isMain: 0
---- !u!114 &8686406742812245777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3433791974974161003}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a585b2517b558604e933cabf6865b5b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsMissingSkills: 
-  baseAnimController: {fileID: 491192442546481272}
-  skaFx: {fileID: 6187492517433885000}
-  moveAnimSpeed: 1
-  playerHeroController: {fileID: 4374813364255653229}
-  fxSkills:
-  - {fileID: 4956581297548654311, guid: 6459d4b5305608548b7a442db80b6249, type: 3}
-  - {fileID: 0}
-  - {fileID: 659613842275125512, guid: e3f74662b51936143947dbfde4301a59, type: 3}
-  - {fileID: 0}
-  - {fileID: 7590146775286044908, guid: db2084fa7e891f64caf04d20723e7cc8, type: 3}
-  winFx: {fileID: 3621413825147627468}
-  skillTrans: {fileID: 0}
-  externalSkillController: {fileID: -6887672660385192121}
-  arrowTrans: {fileID: 6208129103282587161, guid: 16dd6b4ec3dd23945a763dd4de579691, type: 3}
-  oArrowTrans: {fileID: 7982249090960025673}
-  boneArraw: BOW_ARROW
-  boneAiming: AIMING
+  switchArea: 5
+  behaviorParams: {fileID: 413792142189795195}
 --- !u!114 &3541416523792417231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,6 +186,63 @@ MonoBehaviour:
   heroData: {fileID: 0}
   playerHeroController: {fileID: 0}
   statsController: {fileID: 0}
+--- !u!114 &8959531262148125046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 302a2a093f6e4544eb0fc1e50513c04c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsMissingSkills: 
+  baseAnimController: {fileID: 491192442546481272}
+  skaFx: {fileID: 6187492517433885000}
+  moveAnimSpeed: 1
+  playerHeroController: {fileID: 4374813364255653229}
+  fxSkills: []
+  winFx: {fileID: 3621413825147627468}
+  skillTrans: {fileID: 0}
+  externalSkillController: {fileID: -6887672660385192121}
+  arrowTrans: {fileID: 6208129103282587161, guid: 16dd6b4ec3dd23945a763dd4de579691, type: 3}
+  oArrowTrans: {fileID: 7982249090960025673}
+  boneArraw: BOW_ARROW
+  boneAiming: AIMING
+--- !u!114 &413792142189795195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72f5f07e145fc1343956dace8b0e0b13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distFlashConst: 5
+  distSkillRange: 10
+  intervalSwitch: 20
+  switchArea: 7
+  isMain: 0
+  passiveTime: 5
+--- !u!114 &4352947936478932992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dca169b8dc6422c84903d8466b4d278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHeroController: {fileID: 4374813364255653229}
+  statsController: {fileID: 3541416523792417231}
 --- !u!1 &6117754734744368223
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,7 +255,7 @@ GameObject:
   - component: {fileID: 5825457021900614659}
   - component: {fileID: 5855227029332611290}
   - component: {fileID: 7753249893286820407}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Spine GameObject (hero_00)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,6 +308,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
+  - {fileID: 2100000, guid: d564ad182b967ab4aa6f650489179bcb, type: 2}
   - {fileID: 2100000, guid: 652508f41a76cb043ba3e7f9d044ebf0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -353,7 +384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2448719939140713753}
   - component: {fileID: 2497098853044910686}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: TrailFx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -503,7 +534,7 @@ GameObject:
   - component: {fileID: 2273315069556114321}
   - component: {fileID: 219124209176943358}
   - component: {fileID: 6187492517433885000}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Spine GameObject (fx_aura)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -633,7 +664,7 @@ GameObject:
   - component: {fileID: 1385120346679944741}
   - component: {fileID: 5561757862194153455}
   - component: {fileID: 3621413825147627468}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Spine GameObject (fx_win)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -1,7 +1,8 @@
+using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.StatSystem;
 using System;
 using System.Collections.Generic;
-using Immortal_Switch.Scripts;
-using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
 namespace Battle
@@ -27,6 +28,8 @@ namespace Battle
     {
         [SerializeField] bool isBoss = false;
 
+        private bool isReady = false;
+
         private List<PlayerHeroController> targets;
         private PlayerHeroController etarget;
         protected PvEBattleController pvEBattleController = null;
@@ -44,9 +47,11 @@ namespace Battle
             get => etarget;
             set => etarget = value;
         }
+        public bool IsReady { get => isReady; set => isReady = value; }
 
         public virtual void InitMonster(int hid, PlayerHeroController etarget, PvEBattleController pBc, BaseStat monsterData, bool isBoss = false, List<PlayerHeroController> eEargets = null)
         {
+            isReady = false;
             hId = hid;
             pvEBattleController = pBc;
             healthBarController?.PreSetHealth();
@@ -55,8 +60,8 @@ namespace Battle
             DoRotate(transform.position.x < etarget.transform.position.x);
             Stats.Initialize(monsterData);
             InitMonsterData();
-            SetAnimMoveSpeed(UnityEngine.Random.Range(0.9f,1.1f));
             SwitchState(SpawnState);
+            SetAnimMoveSpeed(UnityEngine.Random.Range(0.85f, 1f));
         }
 
         private void SetTargetTrans(PlayerHeroController pHc)
@@ -139,7 +144,6 @@ namespace Battle
             if (!IsBoss())
             {
                 var nPos = GetNextPos();
-                //isRight = transform.position.x < nPos.x;
                 DoRotate(isRight);
                 transform.position = nPos;
             }
@@ -149,7 +153,8 @@ namespace Battle
 
         private Vector3 GetNextPos()
         {
-            Vector3 targetPos = Vector3.MoveTowards(transform.position, etarget.transform.position, Time.deltaTime * 0.25f);
+            var offsetSpeed = 0.6f;
+            Vector3 targetPos = Vector3.MoveTowards(transform.position, etarget.transform.position, Time.deltaTime * offsetSpeed);
             var monsterArounds = pvEBattleController.GetNearestMonstesInRange(targetPos, 1f);
             if (monsterArounds == null || monsterArounds.Count <= 1) return targetPos;
 
@@ -161,7 +166,7 @@ namespace Battle
                 if (monster.gameObject == this.gameObject) continue;
                 Vector3 pushDir = targetPos - monster.transform.position;
                 float distance = pushDir.magnitude;
-                if (distance < 0.5f) continue;
+                if (distance < .35f) continue;
 
                 avoidanceDir += pushDir.normalized / distance;
                 count++;
@@ -169,7 +174,7 @@ namespace Battle
 
             if (count > 0)
             {
-                targetPos += (avoidanceDir / count) * Time.deltaTime * 0.25f;
+                targetPos += (avoidanceDir / count) * Time.deltaTime * offsetSpeed;
             }
 
             return targetPos;
@@ -217,6 +222,9 @@ namespace Battle
                 return;
             }
 
+            isReady = true;
+            if(isBoss)
+                pvEBattleController?.NotifyBossReady();
             SwitchState(IdleState);
         }
 
@@ -244,7 +252,10 @@ namespace Battle
 
         public void ResolveDeath()
         {
+            isReady = false;
             pvEBattleController?.NotifyMonsterDeath(this);
+
+            if(isBoss) GameEventManager.Trigger(GameEvents.OnStageCleared);
         }
 
         public void CheckDead(Action endAct)

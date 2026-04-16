@@ -58,6 +58,24 @@ namespace Immortal_Switch.Scripts.StatSystem
 
             return removedCount;
         }
+        
+        public void RemoveModifiersBySourcePrefix(string prefix)
+        {
+            bool changed = false;
+
+            for (int i = modifiers.Count - 1; i >= 0; i--)
+            {
+                string sourceId = modifiers[i].SourceId;
+                if (!string.IsNullOrEmpty(sourceId) && sourceId.StartsWith(prefix, System.StringComparison.Ordinal))
+                {
+                    modifiers.RemoveAt(i);
+                    changed = true;
+                }
+            }
+
+            if (changed)
+                Recalculate();
+        }
 
         public void ClearModifiers()
         {

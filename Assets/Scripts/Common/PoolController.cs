@@ -1,13 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Common
+namespace Scripts.Common
 {
+    [Serializable]
+    public class KeyValueDict
+    {
+        public string KeyPool;
+        public int CountKeyPool;
+    }
+
     public class PoolController : MonoBehaviour
     {
         public static PoolController Instance;
 
         private Dictionary<string, List<GameObject>> _poolDict = new Dictionary<string, List<GameObject>>();
+
+        public List<KeyValueDict> keyValueDict = new List<KeyValueDict>();
 
         private void Awake()
         {
@@ -22,6 +32,7 @@ namespace Common
             if (!_poolDict.ContainsKey(key))
             {
                 _poolDict[key] = new List<GameObject>();
+                keyValueDict.Add(new KeyValueDict() { KeyPool = key, CountKeyPool = 0 });
             }
 
             GameObject obj = _poolDict[key].Find(x => !x.activeInHierarchy);
@@ -34,6 +45,9 @@ namespace Common
                 _poolDict[key].Add(obj);
                 isNew = true;
                 obj.gameObject.SetActive(true);
+
+                var kv = keyValueDict.Find(x => x.KeyPool == key);
+                kv.CountKeyPool++;
             }
             else
             {

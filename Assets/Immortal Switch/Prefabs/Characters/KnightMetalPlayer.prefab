@@ -11,12 +11,14 @@ GameObject:
   - component: {fileID: 5137324121463227497}
   - component: {fileID: 491192442546481272}
   - component: {fileID: 4374813364255653229}
-  - component: {fileID: 8686406742812245777}
   - component: {fileID: 5390162923460574460}
   - component: {fileID: 5991103040437487263}
   - component: {fileID: 8935599472112453296}
   - component: {fileID: -3713057558822808144}
-  m_Layer: 7
+  - component: {fileID: 3981903850891098146}
+  - component: {fileID: 6531973289675615442}
+  - component: {fileID: -3786076776222880158}
+  m_Layer: 9
   m_Name: KnightMetalPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -66,9 +68,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd86dd3fb2121b4ca53ab09ac87a416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSkillController: {fileID: 8686406742812245777}
+  baseSkillController: {fileID: 3981903850891098146}
   heroType: 0
   statsController: {fileID: 5390162923460574460}
+  dameTrans: {fileID: 0}
   healthBarController: {fileID: 0}
   baseStatData:
     Health: 0
@@ -83,45 +86,16 @@ MonoBehaviour:
     Accuracy: 0
     MoveSpeed: 0
     Element: 0
-  playerCamController: {fileID: 0}
   hero: {fileID: 7056940943283354692}
   heroUIView: {fileID: 8935599472112453296}
   hideMat: {fileID: 2100000, guid: ecf734acdd466ab47b0f063dc046c5be, type: 2}
   progressionBridge: {fileID: -3713057558822808144}
-  distFlashConst: 7
+  equipmentBridge: {fileID: 0}
+  distFlashConst: 5
   distSkillRange: 5
   intervalSwitch: 20
   switchArea: 5
-  isMain: 0
---- !u!114 &8686406742812245777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3433791974974161003}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a585b2517b558604e933cabf6865b5b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsMissingSkills: 
-  baseAnimController: {fileID: 491192442546481272}
-  skaFx: {fileID: 6187492517433885000}
-  moveAnimSpeed: 1
-  playerHeroController: {fileID: 4374813364255653229}
-  fxSkills:
-  - {fileID: -3387359252744618707, guid: 4c9308e7b80c762499e2b2fbaee730fe, type: 3}
-  - {fileID: -4900122407423612865, guid: 5c9cbba3959fbd64f854ab3e2820096f, type: 3}
-  - {fileID: 659613842275125512, guid: e3f74662b51936143947dbfde4301a59, type: 3}
-  - {fileID: -607966872467342200, guid: 19034042a43474c478c8fe0ceb8f3cd7, type: 3}
-  - {fileID: 9176755199599937130, guid: 2e390b5247cc94d42af4eb29a874862e, type: 3}
-  winFx: {fileID: 3621413825147627468}
-  skillTrans: {fileID: 0}
-  externalSkillController: {fileID: 5991103040437487263}
-  arrowTrans: {fileID: 0}
-  oArrowTrans: {fileID: 0}
-  boneArraw: L_hand
+  behaviorParams: {fileID: 6531973289675615442}
 --- !u!114 &5390162923460574460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,6 +154,59 @@ MonoBehaviour:
   heroData: {fileID: 0}
   playerHeroController: {fileID: 4374813364255653229}
   statsController: {fileID: 5390162923460574460}
+--- !u!114 &3981903850891098146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f8c7c8bf89253147a0b35a66def4ac6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsMissingSkills: 
+  baseAnimController: {fileID: 491192442546481272}
+  skaFx: {fileID: 6187492517433885000}
+  moveAnimSpeed: 1
+  playerHeroController: {fileID: 4374813364255653229}
+  fxSkills: []
+  winFx: {fileID: 3621413825147627468}
+  skillTrans: {fileID: 0}
+  externalSkillController: {fileID: 5991103040437487263}
+--- !u!114 &6531973289675615442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72f5f07e145fc1343956dace8b0e0b13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distFlashConst: 5
+  distSkillRange: 5
+  intervalSwitch: 20
+  switchArea: 6
+  isMain: 0
+  passiveTime: 5
+--- !u!114 &-3786076776222880158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3433791974974161003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dca169b8dc6422c84903d8466b4d278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHeroController: {fileID: 4374813364255653229}
+  statsController: {fileID: 5390162923460574460}
 --- !u!1 &6894580092140334920
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,7 +217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2448719939140713753}
   - component: {fileID: 2497098853044910686}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: TrailFx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -340,7 +367,7 @@ GameObject:
   - component: {fileID: 2273315069556114321}
   - component: {fileID: 219124209176943358}
   - component: {fileID: 6187492517433885000}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Spine GameObject (fx_aura)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -470,7 +497,7 @@ GameObject:
   - component: {fileID: 1385120346679944741}
   - component: {fileID: 5561757862194153455}
   - component: {fileID: 3621413825147627468}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Spine GameObject (fx_win)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -601,7 +628,7 @@ GameObject:
   - component: {fileID: 1246721813008370022}
   - component: {fileID: 4683022290318646687}
   - component: {fileID: 7056940943283354692}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Spine GameObject (hero_001)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

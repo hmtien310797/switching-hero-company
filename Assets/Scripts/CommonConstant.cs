@@ -16,6 +16,7 @@ public class StandAnimName
     public const string Skill = "cast";
     public const string Switch = "switch";
     public const string PassiveSwitch = "passive";
+    public const string PassiveCast = "passive_cast";
     public const string Run = "run";
     public const string Injured = "hit";
     public const string Die = "dead";

@@ -16,7 +16,6 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] Transform startPos;
         [SerializeField] Transform lastPos;
 
-
         private Vector2 oPos;
         private int currentIdx = 0;
         private int lastIdx = 0;
@@ -29,7 +28,6 @@ namespace Immortal_Switch.Scripts.UI
         public bool IsIntutorial => isIntutorial;
         public float moveSpeed = 500f;
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
             lastIdx = targetBtns.Count;
@@ -87,6 +85,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private IEnumerator MoveAndFlash(RectTransform buttonRect)
         {
+            fingerRectTrans.gameObject.SetActive(false);
             // 1. Lấy vị trí đích (Button) trong không gian Canvas
             Vector3 targetPos = buttonRect.position;
 
@@ -107,6 +106,8 @@ namespace Immortal_Switch.Scripts.UI
             Image indicatorImg = centerRectTrans.GetComponent<Image>();
             float flashDuration = 0.3f;
 
+            fingerRectTrans.localPosition = startPos.localPosition;
+            fingerRectTrans.gameObject.SetActive(true);
             while (true) 
             {
                 // Mờ dần

@@ -9,7 +9,13 @@ namespace Immortal_Switch.Scripts.Currency
         Diamond,
         HeroTicket,
         WeaponTicket,
-        SkillTicket
+        SkillTicket,
+        WeaponEnhancementStone,
+        WeaponBreakThroughStone,
+        ArcherWeaponTranscendenceStone,
+        MageWeaponTranscendenceStone,
+        WarriorWeaponTranscendenceStone,
+        AssassinWeaponTranscendenceStone,
     }
     
     [Serializable]

@@ -20,6 +20,8 @@ namespace Battle
         [SerializeField] BaseSkillController baseSkillController;
         [SerializeField] HeroType heroType;
         [SerializeField] StatsController statsController;
+        [SerializeField] Transform dameTrans;
+
         public HealthBarController healthBarController;
         [ReadOnly]
         public BaseStat baseStatData = new BaseStat();
@@ -31,11 +33,10 @@ namespace Battle
         #region Properties
         public float CurrentHp => statsController.HealthModule?.CurrentHP ?? 0f;
         public float MaxHp => statsController.HealthModule?.MaxHP ?? 0f;
-        public bool IsDead => statsController == null || statsController.HealthModule == null ||
-                              statsController.HealthModule.IsDead;
+        public bool IsDead => statsController == null || statsController.HealthModule == null || statsController.HealthModule.IsDead;
         public float CurrentMoveSpeed => statsController.StatModule.GetFinalStat(StatType.MoveSpeed);
         public float CurrentDefense => statsController.StatModule.GetFinalStat(StatType.Def);
-        public float CurrentAttackSpeed => statsController.StatModule.GetFinalStat(StatType.Atk);
+        public float CurrentAttackSpeed => statsController.StatModule.GetFinalStat(StatType.AttackSpeed);
         #endregion
 
         public void InitSkill(List<int> skills, Transform obTrans)
@@ -172,7 +173,8 @@ namespace Battle
         public void TakeDamage(ICombatUnit attacker, float amount = 0)
         {
             DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, (ICombatUnit)this, amount);
-            healthBarController?.ShowHealthTxt((int)damageResult.Damage, transform.position + Vector3.up);
+            if(dameTrans != null)
+                healthBarController?.ShowHealthTxt((int)damageResult.Damage, dameTrans.position);
             statsController.HealthModule.TakeDamage(damageResult.Damage, damageResult.DamageTextType);
             healthBarController?.SetHealth(CurrentHp / MaxHp);
         }

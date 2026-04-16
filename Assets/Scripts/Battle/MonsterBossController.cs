@@ -4,6 +4,7 @@ using Common;
 using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
+using Scripts.Common;
 using UnityEngine;
 
 namespace Battle
@@ -53,7 +54,7 @@ namespace Battle
         }
 
         public override void OnReceiveDamage(float factorSkillDamage, Action endAct, PlayerHeroController target)
-        { ;
+        {
             base.OnReceiveDamage(factorSkillDamage, endAct, target);
             if (CurrentHp <= 0)
             {
@@ -61,7 +62,7 @@ namespace Battle
                 {
                     return;
                 }
-                GameEventManager.Trigger(GameEvents.OnStageCleared);
+                //GameEventManager.Trigger(GameEvents.OnStageCleared);
                 return;
             }
             skillLogic?.OnHitTaken(factorSkillDamage);
