@@ -20,15 +20,20 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [SerializeField] private Transform statLineContainer;
         [SerializeField] private UIWeaponStatLineItem statLinePrefab;
 
-        [Header("Buttons")]
+        [Header("Action Buttons")]
         [SerializeField] private Button btnEquip;
-        [SerializeField] private Button btnLevelUp;
-        [SerializeField] private Button btnLevelUpAll;
-        [SerializeField] private Button btnLimitBreak;
-        [SerializeField] private Button btnFuse;
+        [SerializeField] private Button btnAutoEquip;
+        [SerializeField] private Button btnOpenUpgrade;
+        [SerializeField] private Button btnFusion;
+        [SerializeField] private Button btnFuseAll;
 
         [Header("Upgrade Panel")]
         [SerializeField] private UIWeaponUpgradePanel upgradePanel;
+        [SerializeField] private GameObject upgradePanelRoot;
+        
+        [Header("Shard Info")]
+        [SerializeField] private TMP_Text txtShard;
+        [SerializeField] private Slider shardSlider;
 
         private readonly List<UIWeaponStatLineItem> statLineItems = new();
 
@@ -56,14 +61,32 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             }
 
             if (txtLevel != null)
-                txtLevel.text = $"Lv.{vm.Level}/{vm.CurrentMaxLevel}";
+                txtLevel.text = $"+{vm.Level}";
 
             BindStatLines(vm.EquipEffects);
+            BindButtons(vm);
 
             if (upgradePanel != null)
-                upgradePanel.Bind(vm.UpgradePanel);
+                upgradePanel.Bind(vm.UpgradePanel, vm, currentHeroId, HandleUpgradePanelChanged);
 
-            BindButtons(vm);
+            if (upgradePanelRoot != null)
+                upgradePanelRoot.SetActive(false);
+            else if (upgradePanel != null)
+                upgradePanel.gameObject.SetActive(false);
+            
+            if (txtShard != null)
+            {
+                txtShard.text = vm.MaxShard > 0
+                    ? $"{vm.CurrentShard}/{vm.MaxShard}"
+                    : vm.CurrentShard.ToString();
+            }
+
+            if (shardSlider != null)
+            {
+                shardSlider.minValue = 0f;
+                shardSlider.maxValue = 1f;
+                shardSlider.value = vm.ShardProgressNormalized;
+            }
         }
 
         private void BindStatLines(List<WeaponStatLineViewModel> stats)
@@ -95,41 +118,42 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         {
             if (btnEquip != null)
             {
-                btnEquip.gameObject.SetActive(vm.CanEquip);
+                btnEquip.gameObject.SetActive(vm.ShowEquip);
+                btnEquip.interactable = vm.CanEquip;
                 btnEquip.onClick.RemoveAllListeners();
                 btnEquip.onClick.AddListener(OnClickEquip);
             }
 
-            if (btnLevelUp != null)
+            if (btnAutoEquip != null)
             {
-                btnLevelUp.gameObject.SetActive(vm.UpgradePanel.ShowLevelUp);
-                btnLevelUp.interactable = vm.UpgradePanel.CanLevelUp;
-                btnLevelUp.onClick.RemoveAllListeners();
-                btnLevelUp.onClick.AddListener(OnClickLevelUp);
+                btnAutoEquip.gameObject.SetActive(vm.ShowAutoEquip);
+                btnAutoEquip.interactable = vm.CanAutoEquip;
+                btnAutoEquip.onClick.RemoveAllListeners();
+                btnAutoEquip.onClick.AddListener(OnClickAutoEquip);
             }
 
-            if (btnLevelUpAll != null)
+            if (btnOpenUpgrade != null)
             {
-                btnLevelUpAll.gameObject.SetActive(vm.UpgradePanel.ShowLevelUpAll);
-                btnLevelUpAll.interactable = vm.UpgradePanel.CanLevelUpAll;
-                btnLevelUpAll.onClick.RemoveAllListeners();
-                btnLevelUpAll.onClick.AddListener(OnClickLevelUpAll);
+                btnOpenUpgrade.gameObject.SetActive(vm.ShowOpenUpgrade);
+                btnOpenUpgrade.interactable = vm.CanOpenUpgrade;
+                btnOpenUpgrade.onClick.RemoveAllListeners();
+                btnOpenUpgrade.onClick.AddListener(OnClickOpenUpgrade);
             }
 
-            if (btnLimitBreak != null)
+            if (btnFusion != null)
             {
-                btnLimitBreak.gameObject.SetActive(vm.UpgradePanel.ShowLimitBreak);
-                btnLimitBreak.interactable = vm.UpgradePanel.CanLimitBreak;
-                btnLimitBreak.onClick.RemoveAllListeners();
-                btnLimitBreak.onClick.AddListener(OnClickLimitBreak);
+                btnFusion.gameObject.SetActive(vm.ShowFusion);
+                btnFusion.interactable = vm.CanFusion;
+                btnFusion.onClick.RemoveAllListeners();
+                btnFusion.onClick.AddListener(OnClickFusion);
             }
 
-            if (btnFuse != null)
+            if (btnFuseAll != null)
             {
-                btnFuse.gameObject.SetActive(!vm.IsExclusive);
-                btnFuse.interactable = vm.CanFuse;
-                btnFuse.onClick.RemoveAllListeners();
-                btnFuse.onClick.AddListener(OnClickFuse);
+                btnFuseAll.gameObject.SetActive(vm.ShowFuseAll);
+                btnFuseAll.interactable = vm.CanFuseAll;
+                btnFuseAll.onClick.RemoveAllListeners();
+                btnFuseAll.onClick.AddListener(OnClickFuseAll);
             }
         }
 
@@ -146,61 +170,42 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             RequestRefresh();
         }
 
-        private void OnClickLevelUp()
+        private void OnClickAutoEquip()
         {
             if (WeaponManager.Instance == null || currentVm == null)
                 return;
 
-            if (currentVm.IsExclusive)
-                WeaponManager.Instance.TryLevelUpExclusive(currentHeroId);
-            else
-                WeaponManager.Instance.TryLevelUpStandard(currentVm.WeaponId);
-
+            // Auto equip cho tất cả hero đang ra trận cùng class phù hợp là phase sau.
+            // Hiện tại tối thiểu auto equip cho hero focus.
+            WeaponManager.Instance.TryAutoEquip(currentHeroId, currentVm.HeroClass);
             RequestRefresh();
         }
 
-        private void OnClickLevelUpAll()
+        private void OnClickOpenUpgrade()
         {
-            if (WeaponManager.Instance == null || currentVm == null)
-                return;
-
-            if (currentVm.IsExclusive)
-            {
-                while (WeaponManager.Instance.TryLevelUpExclusive(currentHeroId, false)) { }
-
-                WeaponManager.Instance.Save();
-                WeaponManager.Instance.NotifyHeroWeaponChanged(currentHeroId);
-            }
-            else
-            {
-                while (WeaponManager.Instance.TryLevelUpStandard(currentVm.WeaponId, false)) { }
-
-                WeaponManager.Instance.Save();
-                WeaponManager.Instance.NotifyStandardWeaponChanged(currentVm.WeaponId);
-            }
-
-            RequestRefresh();
+            if (upgradePanelRoot != null)
+                upgradePanelRoot.SetActive(true);
+            else if (upgradePanel != null)
+                upgradePanel.gameObject.SetActive(true);
         }
 
-        private void OnClickLimitBreak()
-        {
-            if (WeaponManager.Instance == null || currentVm == null)
-                return;
-
-            if (currentVm.IsExclusive)
-                WeaponManager.Instance.TryLimitBreakExclusive(currentHeroId);
-            else
-                WeaponManager.Instance.TryLimitBreakStandard(currentVm.WeaponId);
-
-            RequestRefresh();
-        }
-
-        private void OnClickFuse()
+        private void OnClickFusion()
         {
             if (WeaponManager.Instance == null || currentVm == null || currentVm.IsExclusive)
                 return;
 
             WeaponManager.Instance.TryFuseStandard(currentVm.WeaponId);
+            RequestRefresh();
+        }
+
+        private void OnClickFuseAll()
+        {
+            // Phase sau: gọi service fuse all global
+            Debug.Log("[WeaponDetailPanel] Fuse All not implemented yet.");
+        }
+
+        private void HandleUpgradePanelChanged()
+        {
             RequestRefresh();
         }
 

@@ -12,6 +12,12 @@
         Standard = 1,
         Exclusive = 2
     }
+    
+    public enum WeaponUpgradePanelMode
+    {
+        Upgrade = 0,
+        LimitBreak = 1
+    }
 
     public enum WeaponTier
     {

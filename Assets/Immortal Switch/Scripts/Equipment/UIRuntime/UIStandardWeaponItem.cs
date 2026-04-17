@@ -28,6 +28,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
                 vm.Icon,
                 $"Lv.{vm.Level}",
                 shardText,
+                vm.ShardProgressNormalized,
+                vm.MaxShard > 0,
                 $"{vm.Star}",
                 vm.IsEquipped,
                 !vm.IsUnlocked,

@@ -13,15 +13,16 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 {
     public class WeaponViewDataProvider : MonoBehaviour
     {
-        [Header("Scene Hero Runtime")]
-        [SerializeField] private List<PlayerHeroController> deployedHeroes = new();
+        [Header("Scene Hero Runtime")] [SerializeField]
+        private List<PlayerHeroController> deployedHeroes = new();
 
         public void SetDeployedHeroes(List<PlayerHeroController> heroes)
         {
             deployedHeroes = heroes ?? new List<PlayerHeroController>();
         }
 
-        public StandardWeaponTabViewModel BuildStandardTab(HeroClass selectedClass, int selectedWeaponId, int focusedHeroId = 0)
+        public StandardWeaponTabViewModel BuildStandardTab(HeroClass selectedClass, int selectedWeaponId,
+            int focusedHeroId = 0)
         {
             int resolvedSelectedWeaponId = selectedWeaponId;
             if (resolvedSelectedWeaponId <= 0)
@@ -30,7 +31,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 if (standardWeaponDefinitionSos != null && standardWeaponDefinitionSos.Count > 0)
                     resolvedSelectedWeaponId = standardWeaponDefinitionSos[0].WeaponId;
             }
-            
+
             var vm = new StandardWeaponTabViewModel
             {
                 SelectedClass = selectedClass
@@ -65,14 +66,17 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                     Icon = def.Icon,
                     IsUnlocked = state.IsUnlocked,
                     IsEquipped = IsAnyHeroEquippingStandard(def.WeaponId),
+                    IsSelected = def.WeaponId == resolvedSelectedWeaponId,
                     Level = state.Level,
                     LimitBreakStage = state.LimitBreakStage,
                     CurrentShard = state.CurrentShard,
                     MaxShard = def.FuseShardRequired,
+                    ShardProgressNormalized = def.FuseShardRequired > 0
+                        ? Mathf.Clamp01((float)state.CurrentShard / def.FuseShardRequired)
+                        : 0f,
                     CanFuse = CanFuseStandard(def.WeaponId),
                     CanLevelUp = CanLevelUpStandard(def.WeaponId),
-                    CanLimitBreak = CanLimitBreakStandard(def.WeaponId),
-                    IsSelected = def.WeaponId == resolvedSelectedWeaponId,
+                    CanLimitBreak = CanLimitBreakStandard(def.WeaponId)
                 });
             }
 
@@ -82,7 +86,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             if (resolvedWeaponId > 0)
                 vm.SelectedDetail = BuildStandardDetail(resolvedWeaponId, focusedHeroId);
-            
+
             if (resolvedSelectedWeaponId > 0)
                 vm.SelectedDetail = BuildStandardDetail(resolvedSelectedWeaponId, focusedHeroId);
 
@@ -119,16 +123,17 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 Icon = def.Icon,
                 IsUnlocked = state.IsUnlocked,
                 IsEquipped = equip.EquippedExclusiveWeaponId == def.ExclusiveWeaponId && equip.UseExclusive,
+                IsSelected = true,
                 Level = state.Level,
                 LimitBreakStage = state.LimitBreakStage,
                 CurrentShard = state.CurrentShard,
-                MaxShard = 0, // phase hiện tại chưa có config shard requirement cho transcend
+                MaxShard = 0,
+                ShardProgressNormalized = 0f,
                 CurrentStar = state.CurrentStar,
                 MaxStar = def.MaxStar,
                 CanLevelUp = CanLevelUpExclusive(heroId),
                 CanLimitBreak = CanLimitBreakExclusive(heroId),
-                CanTranscend = false,
-                IsSelected = true
+                CanTranscend = false
             };
 
             vm.SelectedDetail = BuildExclusiveDetail(heroId);
@@ -160,11 +165,24 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 CurrentMaxLevel = GetCurrentMaxLevelForStandard(def.WeaponId),
                 IsUnlocked = state.IsUnlocked,
                 IsEquipped = IsAnyHeroEquippingStandard(def.WeaponId),
+
+                ShowEquip = true,
+                ShowAutoEquip = true,
+                ShowOpenUpgrade = true,
+                ShowFusion = IsHighestTierAndHighestStar(def),
+                ShowFuseAll = true,
+
                 CanEquip = state.IsUnlocked,
-                CanFuse = CanFuseStandard(def.WeaponId),
-                CanLevelUp = CanLevelUpStandard(def.WeaponId),
-                CanLimitBreak = CanLimitBreakStandard(def.WeaponId),
-                EquipEffects = BuildStatLines(def.EquipStats)
+                CanAutoEquip = HasAnyDeployedHeroOfClass(def.WeaponClass),
+                CanOpenUpgrade = state.IsUnlocked,
+                CanFusion = IsHighestTierAndHighestStar(def) && CanFuseStandard(def.WeaponId),
+                CanFuseAll = true, // phase này để true, sau này có service global thì check thật
+
+                EquipEffects = BuildStatLines(def.EquipStats),
+                MaxShard = def.FuseShardRequired,
+                ShardProgressNormalized = def.FuseShardRequired > 0
+                    ? Mathf.Clamp01((float)state.CurrentShard / def.FuseShardRequired)
+                    : 0f,
             };
 
             vm.UpgradePanel = BuildStandardUpgradePanel(def, state);
@@ -198,10 +216,19 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 CurrentMaxLevel = GetCurrentMaxLevelForExclusive(heroId),
                 IsUnlocked = state.IsUnlocked,
                 IsEquipped = equip.EquippedExclusiveWeaponId == def.ExclusiveWeaponId && equip.UseExclusive,
+
+                ShowEquip = true,
+                ShowAutoEquip = true,
+                ShowOpenUpgrade = true,
+                ShowFusion = false,
+                ShowFuseAll = false,
+
                 CanEquip = state.IsUnlocked,
-                CanFuse = false,
-                CanLevelUp = CanLevelUpExclusive(heroId),
-                CanLimitBreak = CanLimitBreakExclusive(heroId),
+                CanAutoEquip = true,
+                CanOpenUpgrade = state.IsUnlocked,
+                CanFusion = false,
+                CanFuseAll = false,
+
                 EquipEffects = BuildStatLines(def.EquipStats)
             };
 
@@ -209,7 +236,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             return vm;
         }
 
-        private WeaponUpgradePanelViewModel BuildStandardUpgradePanel(StandardWeaponDefinitionSO def, StandardWeaponState state)
+        private WeaponUpgradePanelViewModel BuildStandardUpgradePanel(StandardWeaponDefinitionSO def,
+            StandardWeaponState state)
         {
             var panel = new WeaponUpgradePanelViewModel();
 
@@ -217,28 +245,55 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             int nextLevel = state.Level + 1;
             int nextLevelCost = def.LevelConfig != null ? def.LevelConfig.GetCost(nextLevel) : 0;
 
-            panel.CurrentLevel = state.Level;
-            panel.CurrentMaxLevel = currentMaxLevel;
-            panel.NextLevelCost = nextLevelCost;
-            panel.LevelUpAllCost = CalculateLevelUpAllCostStandard(def, state);
-            panel.ShowLevelUp = state.Level < currentMaxLevel;
-            panel.ShowLevelUpAll = state.Level < currentMaxLevel;
-            panel.ShowLimitBreak = state.Level >= currentMaxLevel;
-            panel.CanLevelUp = CanLevelUpStandard(def.WeaponId);
-            panel.CanLevelUpAll = panel.LevelUpAllCost > 0 && CurrencyManager.Instance != null &&
-                                  CurrencyManager.Instance.HasEnough(CurrencyType.WeaponEnhancementStone, panel.LevelUpAllCost);
-
             var nextBreakEntry = def.LimitBreakConfig != null
                 ? def.LimitBreakConfig.GetEntryByStage(state.LimitBreakStage + 1)
                 : null;
 
+            bool isAtCurrentCap = state.Level >= currentMaxLevel;
+
+            panel.WeaponName = def.WeaponName;
+            panel.Icon = def.Icon;
+            panel.CurrentShard = state.CurrentShard;
+            panel.MaxShard = def.FuseShardRequired;
+            panel.CurrentStar = def.Star;
+            panel.MaxStar = def.Star;
+            panel.CurrentLevel = state.Level;
+            panel.CurrentMaxLevel = currentMaxLevel;
+
+            panel.Mode = isAtCurrentCap ? WeaponUpgradePanelMode.LimitBreak : WeaponUpgradePanelMode.Upgrade;
+
+            panel.ShowUpgradeMode = !isAtCurrentCap;
+            panel.ShowLevelUp = !isAtCurrentCap;
+            panel.ShowLevelUpAll = !isAtCurrentCap;
+            panel.CanLevelUp = CanLevelUpStandard(def.WeaponId);
+            panel.CanLevelUpAll = CalculateLevelUpAllCostStandard(def, state) > 0 &&
+                                  CurrencyManager.Instance != null &&
+                                  CurrencyManager.Instance.HasEnough(
+                                      CurrencyType.WeaponEnhancementStone,
+                                      CalculateLevelUpAllCostStandard(def, state)
+                                  );
+
+            panel.NextLevelCost = nextLevelCost;
+            panel.LevelUpAllCost = CalculateLevelUpAllCostStandard(def, state);
+
+            panel.ShowLimitBreakMode = isAtCurrentCap;
+            panel.ShowLimitBreak = isAtCurrentCap && nextBreakEntry != null;
             panel.CanLimitBreak = CanLimitBreakStandard(def.WeaponId);
             panel.BreakThroughCost = nextBreakEntry != null ? nextBreakEntry.BreakThroughStoneCost : 0;
             panel.LimitBreakSuccessRate = nextBreakEntry != null ? nextBreakEntry.SuccessRate : 0f;
             panel.NextBreakRequiredLevel = nextBreakEntry != null ? nextBreakEntry.RequiredLevel : 0;
+            panel.NextMaxLevel = def.LimitBreakConfig != null
+                ? def.LimitBreakConfig.GetMaxLevel(state.LimitBreakStage + 1)
+                : currentMaxLevel;
+            panel.ShardProgressNormalized = def.FuseShardRequired > 0
+                ? Mathf.Clamp01((float)state.CurrentShard / def.FuseShardRequired)
+                : 0f;
+
+            panel.StatPreviewLines = BuildStandardUpgradeStatPreview(def, state);
 
             return panel;
         }
+
 
         private WeaponUpgradePanelViewModel BuildExclusiveUpgradePanel(
             ExclusiveWeaponDefinitionSO def,
@@ -251,27 +306,111 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             int nextLevel = state.Level + 1;
             int nextLevelCost = def.LevelConfig != null ? def.LevelConfig.GetCost(nextLevel) : 0;
 
-            panel.CurrentLevel = state.Level;
-            panel.CurrentMaxLevel = currentMaxLevel;
-            panel.NextLevelCost = nextLevelCost;
-            panel.LevelUpAllCost = CalculateLevelUpAllCostExclusive(def, state, heroId);
-            panel.ShowLevelUp = state.Level < currentMaxLevel;
-            panel.ShowLevelUpAll = state.Level < currentMaxLevel;
-            panel.ShowLimitBreak = state.Level >= currentMaxLevel;
-            panel.CanLevelUp = CanLevelUpExclusive(heroId);
-            panel.CanLevelUpAll = panel.LevelUpAllCost > 0 && CurrencyManager.Instance != null &&
-                                  CurrencyManager.Instance.HasEnough(CurrencyType.WeaponEnhancementStone, panel.LevelUpAllCost);
-
             var nextBreakEntry = def.LimitBreakConfig != null
                 ? def.LimitBreakConfig.GetEntryByStage(state.LimitBreakStage + 1)
                 : null;
 
+            bool isAtCurrentCap = state.Level >= currentMaxLevel;
+
+            panel.WeaponName = def.WeaponName;
+            panel.Icon = def.Icon;
+            panel.CurrentShard = state.CurrentShard;
+            panel.MaxShard = 0;
+            panel.CurrentStar = state.CurrentStar;
+            panel.MaxStar = def.MaxStar;
+            panel.CurrentLevel = state.Level;
+            panel.CurrentMaxLevel = currentMaxLevel;
+
+            panel.Mode = isAtCurrentCap ? WeaponUpgradePanelMode.LimitBreak : WeaponUpgradePanelMode.Upgrade;
+
+            panel.ShowUpgradeMode = !isAtCurrentCap;
+            panel.ShowLevelUp = !isAtCurrentCap;
+            panel.ShowLevelUpAll = !isAtCurrentCap;
+            panel.CanLevelUp = CanLevelUpExclusive(heroId);
+            panel.CanLevelUpAll = CalculateLevelUpAllCostExclusive(def, state, heroId) > 0 &&
+                                  CurrencyManager.Instance != null &&
+                                  CurrencyManager.Instance.HasEnough(
+                                      CurrencyType.WeaponEnhancementStone,
+                                      CalculateLevelUpAllCostExclusive(def, state, heroId)
+                                  );
+
+            panel.NextLevelCost = nextLevelCost;
+            panel.LevelUpAllCost = CalculateLevelUpAllCostExclusive(def, state, heroId);
+
+            panel.ShowLimitBreakMode = isAtCurrentCap;
+            panel.ShowLimitBreak = isAtCurrentCap && nextBreakEntry != null;
             panel.CanLimitBreak = CanLimitBreakExclusive(heroId);
             panel.BreakThroughCost = nextBreakEntry != null ? nextBreakEntry.BreakThroughStoneCost : 0;
             panel.LimitBreakSuccessRate = nextBreakEntry != null ? nextBreakEntry.SuccessRate : 0f;
             panel.NextBreakRequiredLevel = nextBreakEntry != null ? nextBreakEntry.RequiredLevel : 0;
+            panel.NextMaxLevel = def.LimitBreakConfig != null
+                ? def.LimitBreakConfig.GetMaxLevel(state.LimitBreakStage + 1)
+                : currentMaxLevel;
+            panel.CurrentShard = state.CurrentShard;
+            panel.MaxShard = 0;
+            panel.ShardProgressNormalized = 0f;
+
+            panel.StatPreviewLines = BuildExclusiveUpgradeStatPreview(def, state);
 
             return panel;
+        }
+        
+        private List<WeaponUpgradeStatPreviewViewModel> BuildStandardUpgradeStatPreview(
+            StandardWeaponDefinitionSO def,
+            StandardWeaponState state)
+        {
+            var result = new List<WeaponUpgradeStatPreviewViewModel>();
+            if (def == null || def.EquipStats == null)
+                return result;
+
+            for (int i = 0; i < def.EquipStats.Length; i++)
+            {
+                var stat = def.EquipStats[i];
+                float currentValue = GetScaledWeaponStatValue(stat.Value, state.Level);
+                float nextValue = GetScaledWeaponStatValue(stat.Value, state.Level + 1);
+
+                result.Add(new WeaponUpgradeStatPreviewViewModel
+                {
+                    StatName = GetStatDisplayName(stat.StatType),
+                    CurrentValueText = GetStatDisplayValue(stat.Operation, currentValue),
+                    NextValueText = GetStatDisplayValue(stat.Operation, nextValue)
+                });
+            }
+
+            return result;
+        }
+
+        private List<WeaponUpgradeStatPreviewViewModel> BuildExclusiveUpgradeStatPreview(
+            ExclusiveWeaponDefinitionSO def,
+            ExclusiveWeaponState state)
+        {
+            var result = new List<WeaponUpgradeStatPreviewViewModel>();
+            if (def == null || def.EquipStats == null)
+                return result;
+
+            for (int i = 0; i < def.EquipStats.Length; i++)
+            {
+                var stat = def.EquipStats[i];
+                float currentValue = GetScaledWeaponStatValue(stat.Value, state.Level);
+                float nextValue = GetScaledWeaponStatValue(stat.Value, state.Level + 1);
+
+                result.Add(new WeaponUpgradeStatPreviewViewModel
+                {
+                    StatName = GetStatDisplayName(stat.StatType),
+                    CurrentValueText = GetStatDisplayValue(stat.Operation, currentValue),
+                    NextValueText = GetStatDisplayValue(stat.Operation, nextValue)
+                });
+            }
+
+            return result;
+        }
+
+        private float GetScaledWeaponStatValue(float baseValue, int level)
+        {
+            if (level <= 1)
+                return baseValue;
+
+            return baseValue * (1f + (level - 1) * 0.05f);
         }
 
         private List<WeaponStatLineViewModel> BuildStatLines(WeaponStatBlock[] stats)
@@ -402,7 +541,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             return state.Level >= entry.RequiredLevel &&
                    CurrencyManager.Instance != null &&
-                   CurrencyManager.Instance.HasEnough(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost);
+                   CurrencyManager.Instance.HasEnough(CurrencyType.WeaponBreakThroughStone,
+                       entry.BreakThroughStoneCost);
         }
 
         private bool CanLimitBreakExclusive(int heroId)
@@ -424,7 +564,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             return state.Level >= entry.RequiredLevel &&
                    CurrencyManager.Instance != null &&
-                   CurrencyManager.Instance.HasEnough(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost);
+                   CurrencyManager.Instance.HasEnough(CurrencyType.WeaponBreakThroughStone,
+                       entry.BreakThroughStoneCost);
         }
 
         private bool CanFuseStandard(int weaponId)
@@ -491,7 +632,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             return total;
         }
 
-        private int CalculateLevelUpAllCostExclusive(ExclusiveWeaponDefinitionSO def, ExclusiveWeaponState state, int heroId)
+        private int CalculateLevelUpAllCostExclusive(ExclusiveWeaponDefinitionSO def, ExclusiveWeaponState state,
+            int heroId)
         {
             if (def == null || def.LevelConfig == null)
                 return 0;
@@ -505,6 +647,33 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             }
 
             return total;
+        }
+
+        private bool HasAnyDeployedHeroOfClass(HeroClass heroClass)
+        {
+            if (deployedHeroes == null || deployedHeroes.Count == 0)
+                return false;
+
+            for (int i = 0; i < deployedHeroes.Count; i++)
+            {
+                var hero = deployedHeroes[i];
+                if (hero == null)
+                    continue;
+
+                if (hero.HeroClass == heroClass && hero.gameObject.activeInHierarchy)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool IsHighestTierAndHighestStar(StandardWeaponDefinitionSO def)
+        {
+            if (def == null)
+                return false;
+
+            // phase hiện tại rule là SS5
+            return def.Tier == WeaponTier.SS && def.Star == 5;
         }
 
         private string GetStatDisplayName(StatType statType)

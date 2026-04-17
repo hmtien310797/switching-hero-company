@@ -10,16 +10,18 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [Header("Common UI")]
         [SerializeField] protected Button button;
         [SerializeField] protected Image icon;
-        [SerializeField] protected Image tierImage;
         [SerializeField] protected TMP_Text txtLevel;
         [SerializeField] protected TMP_Text txtShard;
         [SerializeField] protected TMP_Text txtStar;
         [SerializeField] protected GameObject equippedMark;
         [SerializeField] protected GameObject lockedMask;
         [SerializeField] protected GameObject redDot;
-        
+
         [Header("Selection")]
         [SerializeField] protected GameObject selectedMark;
+
+        [Header("Shard Progress")]
+        [SerializeField] protected Slider shardSlider;
 
         protected Action onClick;
 
@@ -27,6 +29,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             Sprite iconSprite,
             string levelText,
             string shardText,
+            float shardProgressNormalized,
+            bool showShardSlider,
             string starText,
             bool isEquipped,
             bool isLocked,
@@ -59,6 +63,14 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (selectedMark != null)
                 selectedMark.SetActive(isSelected);
+
+            if (shardSlider != null)
+            {
+                shardSlider.gameObject.SetActive(showShardSlider);
+                shardSlider.minValue = 0f;
+                shardSlider.maxValue = 1f;
+                shardSlider.value = shardProgressNormalized;
+            }
 
             if (button != null)
             {
