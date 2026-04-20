@@ -44,6 +44,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         public bool CanLevelUp;
         public bool CanLimitBreak;
         public bool IsSelected;
+        public bool IsExclusive => false;
     }
 
     public class ExclusiveWeaponCardViewModel
@@ -68,6 +69,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         public bool CanLimitBreak;
         public bool CanTranscend;
         public bool IsSelected;
+        public bool IsExclusive => true;
     }
 
     public class WeaponUpgradePanelViewModel

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Battle;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
 using Immortal_Switch.Scripts.Equipment.Runtime;
@@ -173,6 +175,31 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                 Save();
 
             NotifyHeroWeaponChanged(heroId);
+            return true;
+        }
+        
+        public bool TryAutoEquipForHeroes(IEnumerable<PlayerHeroController> heroes, bool autoSave = true)
+        {
+            if (heroes == null)
+                return false;
+
+            var heroList = new List<PlayerHeroController>(heroes);
+            bool result = autoEquip.AutoEquipForHeroes(heroList);
+            if (!result)
+                return false;
+
+            if (autoSave)
+                Save();
+
+            for (int i = 0; i < heroList.Count; i++)
+            {
+                var hero = heroList[i];
+                if (hero == null || !hero.gameObject.activeInHierarchy)
+                    continue;
+
+                NotifyHeroWeaponChanged(hero.GetHeroId());
+            }
+
             return true;
         }
 

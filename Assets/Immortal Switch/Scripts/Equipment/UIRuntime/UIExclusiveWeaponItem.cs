@@ -1,14 +1,14 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {
     public class UIExclusiveWeaponItem : UIWeaponItemBase
     {
-        [SerializeField] private TMP_Text txtTier;
-
         private int heroId;
         private Action<int> onClickWithHeroId;
 
@@ -17,8 +17,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             heroId = vm.HeroId;
             onClickWithHeroId = clickCallback;
 
-            if (txtTier != null)
-                txtTier.text = "EX";
+            BindTierVisual(WeaponTier.SS);
 
             string shardText = vm.MaxShard > 0
                 ? $"{vm.CurrentShard}/{vm.MaxShard}"

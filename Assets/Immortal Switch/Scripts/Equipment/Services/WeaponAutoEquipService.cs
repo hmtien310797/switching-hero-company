@@ -32,9 +32,7 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             {
                 var exState = inventory.GetOrCreateExclusiveState(exclusive.ExclusiveWeaponId, heroId);
                 if (exState.IsUnlocked)
-                {
                     return equipService.EquipExclusive(heroId);
-                }
             }
 
             var unlockedStandards = inventory.GetUnlockedStandardsByClass(heroClass);
@@ -46,6 +44,31 @@ namespace Immortal_Switch.Scripts.Equipment.Services
                 return false;
 
             return equipService.EquipStandard(heroId, heroClass, best.WeaponId);
+        }
+
+        public bool AutoEquipForHeroes(IEnumerable<PlayerHeroController> heroes)
+        {
+            if (heroes == null)
+                return false;
+
+            bool changedAny = false;
+
+            foreach (var hero in heroes)
+            {
+                if (hero == null || !hero.gameObject.activeInHierarchy)
+                    continue;
+
+                bool changed = AutoEquip(hero.GetHeroId(), hero.HeroClass);
+                changedAny |= changed;
+            }
+
+            return changedAny;
+        }
+
+        public StandardWeaponDefinitionSO GetBestStandardForClass(HeroClass heroClass)
+        {
+            var unlockedStandards = inventory.GetUnlockedStandardsByClass(heroClass);
+            return GetBestStandard(unlockedStandards);
         }
 
         private StandardWeaponDefinitionSO GetBestStandard(List<StandardWeaponDefinitionSO> candidates)

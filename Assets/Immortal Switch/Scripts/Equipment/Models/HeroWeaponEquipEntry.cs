@@ -8,6 +8,6 @@ namespace Immortal_Switch.Scripts.Equipment.Models
         public int HeroId;
         public int EquippedStandardWeaponId;
         public int EquippedExclusiveWeaponId;
-        public bool UseExclusive = true;
+        public bool UseExclusive;
     }
 }

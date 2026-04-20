@@ -16,7 +16,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [SerializeField] private TMP_Text txtShard;
         [SerializeField] private TMP_Text txtStar;
         [SerializeField] private TMP_Text txtLevelRange;
-        [SerializeField] private Slider shardSlider;
+        [SerializeField] private Image shardSlider;
 
         [Header("Mode Roots")]
         [SerializeField] private GameObject upgradeModeRoot;
@@ -37,12 +37,20 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [SerializeField] private TMP_Text txtBreakRate;
         [SerializeField] private TMP_Text txtNextBreakRequiredLevel;
         [SerializeField] private Button btnLimitBreak;
+        
+        [Header("Tier Visual")]
+        [SerializeField] private Image imgTierLabel;
+        [SerializeField] private Image imgTierBackground;
+        [SerializeField] private WeaponTierVisualConfigSO tierVisualConfig;
+
+        [Header("Star Display")]
+        [SerializeField] private UIWeaponStarDisplay starDisplay;
 
         [Header("Close")]
         [SerializeField] private Button btnClose;
+        
 
         private readonly List<UIWeaponUpgradeStatLineItem> statPreviewItems = new();
-
         private WeaponUpgradePanelViewModel currentVm;
         private WeaponDetailViewModel currentDetailVm;
         private int currentHeroId;
@@ -94,9 +102,18 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (shardSlider != null)
             {
-                shardSlider.minValue = 0f;
-                shardSlider.maxValue = 1f;
-                shardSlider.value = vm.ShardProgressNormalized;
+                //shardSlider.gameObject.SetActive(vm.MaxShard > 0);
+                shardSlider.fillAmount = vm.ShardProgressNormalized;
+            }
+            
+            BindTierVisual(currentDetailVm.IsExclusive ? WeaponTier.SS : currentDetailVm.Tier);
+
+            if (starDisplay != null)
+            {
+                if (currentDetailVm.IsExclusive)
+                    starDisplay.BindExclusive(currentVm.CurrentStar);
+                else
+                    starDisplay.BindStandard(currentVm.CurrentStar);
             }
         }
 
@@ -113,6 +130,22 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (vm.ShowLimitBreakMode)
                 BindLimitBreakMode(vm);
+        }
+        
+        private void BindTierVisual(WeaponTier tier)
+        {
+            if (tierVisualConfig == null)
+                return;
+
+            var entry = tierVisualConfig.Get(tier);
+            if (entry == null)
+                return;
+
+            if (imgTierLabel != null)
+                imgTierLabel.sprite = entry.TierLabelSprite;
+
+            if (imgTierBackground != null)
+                imgTierBackground.sprite = entry.TierBackgroundSprite;
         }
 
         private void BindUpgradeMode(WeaponUpgradePanelViewModel vm)

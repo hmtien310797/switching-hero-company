@@ -2,13 +2,12 @@
 using Immortal_Switch.Scripts.Equipment.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {
     public class UIStandardWeaponItem : UIWeaponItemBase
     {
-        [SerializeField] private TMP_Text txtTier;
-
         private int weaponId;
         private Action<int> onClickWithId;
 
@@ -17,8 +16,10 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             weaponId = vm.WeaponId;
             onClickWithId = clickCallback;
 
-            if (txtTier != null)
-                txtTier.text = $"{vm.Tier}";
+            BindTierVisual(vm.Tier);
+
+            if (starDisplay != null)
+                starDisplay.BindStandard(vm.Star);
 
             string shardText = vm.MaxShard > 0
                 ? $"{vm.CurrentShard}/{vm.MaxShard}"
@@ -30,7 +31,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
                 shardText,
                 vm.ShardProgressNormalized,
                 vm.MaxShard > 0,
-                $"{vm.Star}",
+                string.Empty,
                 vm.IsEquipped,
                 !vm.IsUnlocked,
                 vm.CanFuse || vm.CanLevelUp || vm.CanLimitBreak,

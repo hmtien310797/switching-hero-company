@@ -29,11 +29,18 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         [Header("Upgrade Panel")]
         [SerializeField] private UIWeaponUpgradePanel upgradePanel;
-        [SerializeField] private GameObject upgradePanelRoot;
         
         [Header("Shard Info")]
         [SerializeField] private TMP_Text txtShard;
-        [SerializeField] private Slider shardSlider;
+        [SerializeField] private Image shardSlider;
+        
+        [Header("Tier Visual")]
+        [SerializeField] private Image imgTierLabel;
+        [SerializeField] private Image imgTierBackground;
+        [SerializeField] private WeaponTierVisualConfigSO tierVisualConfig;
+
+        [Header("Star Display")]
+        [SerializeField] private UIWeaponStarDisplay starDisplay;
 
         private readonly List<UIWeaponStatLineItem> statLineItems = new();
 
@@ -65,14 +72,14 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             BindStatLines(vm.EquipEffects);
             BindButtons(vm);
+            BindTierVisual(vm.Tier);
+            starDisplay.BindStandard(vm.Star);
 
             if (upgradePanel != null)
-                upgradePanel.Bind(vm.UpgradePanel, vm, currentHeroId, HandleUpgradePanelChanged);
-
-            if (upgradePanelRoot != null)
-                upgradePanelRoot.SetActive(false);
-            else if (upgradePanel != null)
+            {
                 upgradePanel.gameObject.SetActive(false);
+                upgradePanel.Bind(vm.UpgradePanel, vm, currentHeroId, HandleUpgradePanelChanged);
+            }
             
             if (txtShard != null)
             {
@@ -83,9 +90,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (shardSlider != null)
             {
-                shardSlider.minValue = 0f;
-                shardSlider.maxValue = 1f;
-                shardSlider.value = vm.ShardProgressNormalized;
+                shardSlider.fillAmount = vm.ShardProgressNormalized;
             }
         }
 
@@ -103,6 +108,22 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
                 statLineItems[i].Bind(stats[i]);
             }
+        }
+        
+        private void BindTierVisual(WeaponTier tier)
+        {
+            if (tierVisualConfig == null)
+                return;
+
+            var entry = tierVisualConfig.Get(tier);
+            if (entry == null)
+                return;
+
+            if (imgTierLabel != null)
+                imgTierLabel.sprite = entry.TierLabelSprite;
+
+            if (imgTierBackground != null)
+                imgTierBackground.sprite = entry.TierBackgroundSprite;
         }
 
         private void EnsureStatLinePool(int targetCount)
@@ -172,21 +193,21 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         private void OnClickAutoEquip()
         {
-            if (WeaponManager.Instance == null || currentVm == null)
+            if (WeaponManager.Instance == null)
                 return;
 
-            // Auto equip cho tất cả hero đang ra trận cùng class phù hợp là phase sau.
-            // Hiện tại tối thiểu auto equip cho hero focus.
-            WeaponManager.Instance.TryAutoEquip(currentHeroId, currentVm.HeroClass);
+            if (Battle.PvEBattleController.Instance == null)
+                return;
+
+            var activeHeroes = Battle.PvEBattleController.Instance.GetActiveHeroControllers();
+            WeaponManager.Instance.TryAutoEquipForHeroes(activeHeroes);
+
             RequestRefresh();
         }
 
         private void OnClickOpenUpgrade()
         {
-            if (upgradePanelRoot != null)
-                upgradePanelRoot.SetActive(true);
-            else if (upgradePanel != null)
-                upgradePanel.gameObject.SetActive(true);
+            upgradePanel.gameObject.SetActive(true);
         }
 
         private void OnClickFusion()

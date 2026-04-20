@@ -234,6 +234,14 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         {
             selectedClass = heroClass;
             selectedStandardWeaponId = 0;
+
+            if (PvEBattleController.Instance != null &&
+                PvEBattleController.Instance.TryGetActiveHeroByClass(heroClass, out var hero) &&
+                hero != null)
+            {
+                selectedHeroId = hero.GetHeroId();
+            }
+
             RefreshStandardTab();
         }
 

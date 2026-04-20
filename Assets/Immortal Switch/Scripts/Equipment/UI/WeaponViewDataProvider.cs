@@ -65,7 +65,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                     Star = def.Star,
                     Icon = def.Icon,
                     IsUnlocked = state.IsUnlocked,
-                    IsEquipped = IsAnyHeroEquippingStandard(def.WeaponId),
+                    IsEquipped = IsFocusedHeroEquippingStandard(focusedHeroId, def.WeaponId),
                     IsSelected = def.WeaponId == resolvedSelectedWeaponId,
                     Level = state.Level,
                     LimitBreakStage = state.LimitBreakStage,
@@ -79,14 +79,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                     CanLimitBreak = CanLimitBreakStandard(def.WeaponId)
                 });
             }
-
-            int resolvedWeaponId = selectedWeaponId;
-            if (resolvedWeaponId <= 0 && vm.Weapons.Count > 0)
-                resolvedWeaponId = vm.Weapons[0].WeaponId;
-
-            if (resolvedWeaponId > 0)
-                vm.SelectedDetail = BuildStandardDetail(resolvedWeaponId, focusedHeroId);
-
+            
             if (resolvedSelectedWeaponId > 0)
                 vm.SelectedDetail = BuildStandardDetail(resolvedSelectedWeaponId, focusedHeroId);
 
@@ -122,7 +115,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 HeroClass = def.HeroClass,
                 Icon = def.Icon,
                 IsUnlocked = state.IsUnlocked,
-                IsEquipped = equip.EquippedExclusiveWeaponId == def.ExclusiveWeaponId && equip.UseExclusive,
+                IsEquipped = IsFocusedHeroEquippingExclusive(heroId, def.ExclusiveWeaponId),
                 IsSelected = true,
                 Level = state.Level,
                 LimitBreakStage = state.LimitBreakStage,
@@ -147,7 +140,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return null;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateStandardState(weaponId);
-
+            bool isEquippedByFocusedHero = IsFocusedHeroEquippingStandard(focusedHeroId, def.WeaponId);
             var vm = new WeaponDetailViewModel
             {
                 ActiveSource = WeaponEquipSource.Standard,
@@ -164,15 +157,15 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 CurrentShard = state.CurrentShard,
                 CurrentMaxLevel = GetCurrentMaxLevelForStandard(def.WeaponId),
                 IsUnlocked = state.IsUnlocked,
-                IsEquipped = IsAnyHeroEquippingStandard(def.WeaponId),
+                IsEquipped = isEquippedByFocusedHero,
 
-                ShowEquip = true,
+                ShowEquip = state.IsUnlocked && !isEquippedByFocusedHero,
                 ShowAutoEquip = true,
                 ShowOpenUpgrade = true,
                 ShowFusion = IsHighestTierAndHighestStar(def),
                 ShowFuseAll = true,
 
-                CanEquip = state.IsUnlocked,
+                CanEquip = state.IsUnlocked && !isEquippedByFocusedHero,
                 CanAutoEquip = HasAnyDeployedHeroOfClass(def.WeaponClass),
                 CanOpenUpgrade = state.IsUnlocked,
                 CanFusion = IsHighestTierAndHighestStar(def) && CanFuseStandard(def.WeaponId),
@@ -197,7 +190,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
             var equip = WeaponManager.Instance.Inventory.GetOrCreateHeroEquip(heroId);
-
+            bool isEquippedByFocusedHero = IsFocusedHeroEquippingExclusive(heroId, def.ExclusiveWeaponId);
             var vm = new WeaponDetailViewModel
             {
                 ActiveSource = WeaponEquipSource.Exclusive,
@@ -215,15 +208,15 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 CurrentShard = state.CurrentShard,
                 CurrentMaxLevel = GetCurrentMaxLevelForExclusive(heroId),
                 IsUnlocked = state.IsUnlocked,
-                IsEquipped = equip.EquippedExclusiveWeaponId == def.ExclusiveWeaponId && equip.UseExclusive,
-
-                ShowEquip = true,
+                IsEquipped = isEquippedByFocusedHero,
+                
+                ShowEquip = state.IsUnlocked && !isEquippedByFocusedHero,
+                CanEquip = state.IsUnlocked && !isEquippedByFocusedHero,
                 ShowAutoEquip = true,
                 ShowOpenUpgrade = true,
                 ShowFusion = false,
                 ShowFuseAll = false,
-
-                CanEquip = state.IsUnlocked,
+                
                 CanAutoEquip = true,
                 CanOpenUpgrade = state.IsUnlocked,
                 CanFusion = false,
@@ -457,25 +450,6 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             return false;
         }
 
-        private bool IsAnyHeroEquippingStandard(int weaponId)
-        {
-            if (deployedHeroes == null || WeaponManager.Instance == null)
-                return false;
-
-            for (int i = 0; i < deployedHeroes.Count; i++)
-            {
-                var hero = deployedHeroes[i];
-                if (hero == null)
-                    continue;
-
-                var equip = WeaponManager.Instance.Inventory.GetOrCreateHeroEquip(hero.GetHeroId());
-                if (equip.EquippedStandardWeaponId == weaponId)
-                    return true;
-            }
-
-            return false;
-        }
-
         private bool CanLevelUpStandard(int weaponId)
         {
             if (WeaponManager.Instance == null)
@@ -697,6 +671,32 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return $"{value * 100f:0.##}%";
 
             return value.ToString("0.##");
+        }
+        
+        private bool IsFocusedHeroEquippingStandard(int heroId, int weaponId)
+        {
+            if (WeaponManager.Instance == null || heroId <= 0 || weaponId <= 0)
+                return false;
+
+            var equip = WeaponManager.Instance.Inventory.GetOrCreateHeroEquip(heroId);
+            if (equip == null)
+                return false;
+
+            return equip.EquippedStandardWeaponId == weaponId &&
+                   WeaponManager.Instance.Inventory.ResolveActiveSource(heroId) == WeaponEquipSource.Standard;
+        }
+
+        private bool IsFocusedHeroEquippingExclusive(int heroId, int exclusiveWeaponId)
+        {
+            if (WeaponManager.Instance == null || heroId <= 0 || exclusiveWeaponId <= 0)
+                return false;
+
+            var equip = WeaponManager.Instance.Inventory.GetOrCreateHeroEquip(heroId);
+            if (equip == null)
+                return false;
+
+            return equip.EquippedExclusiveWeaponId == exclusiveWeaponId &&
+                   WeaponManager.Instance.Inventory.ResolveActiveSource(heroId) == WeaponEquipSource.Exclusive;
         }
     }
 }
