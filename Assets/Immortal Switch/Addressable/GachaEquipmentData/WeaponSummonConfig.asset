@@ -1,0 +1,553 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9818c23650b46c1963072de43c7542d, type: 3}
+  m_Name: WeaponSummonConfig
+  m_EditorClassIdentifier: 
+  Options:
+  - OptionId: summon_30
+    Enabled: 1
+    RollCount: 10
+    TicketCost: 10
+    GemCost: 50
+  - OptionId: summon_50
+    Enabled: 1
+    RollCount: 20
+    TicketCost: 20
+    GemCost: 100
+  SummonLevels:
+  - SummonLevel: 1
+    TotalRollRequired: 10
+    GradeDRate: 90
+    GradeCRate: 10
+    GradeBRate: 0
+    GradeARate: 0
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 2
+    TotalRollRequired: 20
+    GradeDRate: 75
+    GradeCRate: 25
+    GradeBRate: 0
+    GradeARate: 0
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 3
+    TotalRollRequired: 50
+    GradeDRate: 73
+    GradeCRate: 25
+    GradeBRate: 2
+    GradeARate: 0
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 4
+    TotalRollRequired: 100
+    GradeDRate: 65
+    GradeCRate: 30
+    GradeBRate: 5
+    GradeARate: 0
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 5
+    TotalRollRequired: 150
+    GradeDRate: 63
+    GradeCRate: 30
+    GradeBRate: 5
+    GradeARate: 2
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 6
+    TotalRollRequired: 200
+    GradeDRate: 55
+    GradeCRate: 30
+    GradeBRate: 10
+    GradeARate: 5
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 7
+    TotalRollRequired: 300
+    GradeDRate: 53
+    GradeCRate: 30
+    GradeBRate: 10
+    GradeARate: 5
+    GradeSRate: 2
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 8
+    TotalRollRequired: 400
+    GradeDRate: 42
+    GradeCRate: 30
+    GradeBRate: 15
+    GradeARate: 10
+    GradeSRate: 3
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 9
+    TotalRollRequired: 500
+    GradeDRate: 41.9
+    GradeCRate: 30
+    GradeBRate: 15
+    GradeARate: 10
+    GradeSRate: 3
+    GradeSSRate: 0.1
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 10
+    TotalRollRequired: 600
+    GradeDRate: 29.85
+    GradeCRate: 30
+    GradeBRate: 20
+    GradeARate: 15
+    GradeSRate: 5
+    GradeSSRate: 0.15
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 11
+    TotalRollRequired: 700
+    GradeDRate: 18.8
+    GradeCRate: 30
+    GradeBRate: 25
+    GradeARate: 20
+    GradeSRate: 6
+    GradeSSRate: 0.2
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 12
+    TotalRollRequired: 800
+    GradeDRate: 12.75
+    GradeCRate: 25
+    GradeBRate: 30
+    GradeARate: 25
+    GradeSRate: 7
+    GradeSSRate: 0.25
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 13
+    TotalRollRequired: 900
+    GradeDRate: 11.7
+    GradeCRate: 20
+    GradeBRate: 30
+    GradeARate: 30
+    GradeSRate: 8
+    GradeSSRate: 0.4
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 14
+    TotalRollRequired: 1000
+    GradeDRate: 5.6
+    GradeCRate: 15
+    GradeBRate: 35
+    GradeARate: 35
+    GradeSRate: 9
+    GradeSSRate: 0.4
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  - SummonLevel: 15
+    TotalRollRequired: 1100
+    GradeDRate: 0
+    GradeCRate: 9.5
+    GradeBRate: 40
+    GradeARate: 40
+    GradeSRate: 10
+    GradeSSRate: 0.5
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+  LevelRewards:
+  - SummonLevel: 1
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 10
+      Description: 
+  - SummonLevel: 2
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 20
+      Description: 
+  - SummonLevel: 3
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 30
+      Description: 
+  - SummonLevel: 4
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 40
+      Description: 
+  - SummonLevel: 5
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 50
+      Description: 
+  - SummonLevel: 6
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 60
+      Description: 
+  - SummonLevel: 7
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 70
+      Description: 
+  - SummonLevel: 8
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 80
+      Description: 
+  - SummonLevel: 9
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 90
+      Description: 
+  - SummonLevel: 10
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 100
+      Description: 
+  - SummonLevel: 11
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 110
+      Description: 
+  - SummonLevel: 12
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 120
+      Description: 
+  - SummonLevel: 13
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 130
+      Description: 
+  - SummonLevel: 14
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 140
+      Description: 
+  - SummonLevel: 15
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 3
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 150
+      Description: 
+  WeaponPool:
+  - {fileID: 11400000, guid: 35ad6fd286fbc194d93ee8c6fdc8b37a, type: 2}
+  - {fileID: 11400000, guid: 2f0fc422af5d667468e15ee9f97a3c2f, type: 2}
+  - {fileID: 11400000, guid: 3bddf844108100147a8fef8e07f9c764, type: 2}
+  - {fileID: 11400000, guid: 0f538678725b9e34488c8319b2e6194f, type: 2}
+  - {fileID: 11400000, guid: b8d7bf6eb12ea9b43a413b227d5d78a2, type: 2}
+  - {fileID: 11400000, guid: dfcd4d116ac89584db90fe0a8144ca96, type: 2}
+  - {fileID: 11400000, guid: 9d9ca8c6f00c49e43ac1b23ed848c235, type: 2}
+  - {fileID: 11400000, guid: cc8f9d5cefad6c64a8f191a58e954faa, type: 2}
+  - {fileID: 11400000, guid: a0e903b378471714ab4bf06c403416ba, type: 2}
+  - {fileID: 11400000, guid: 0475218741f520d44bac1361a5607632, type: 2}
+  - {fileID: 11400000, guid: a1d131e0a8c00634d8cb60fb9e25260a, type: 2}
+  - {fileID: 11400000, guid: 9ea33ea14ba605441bb463e701a5b86a, type: 2}
+  - {fileID: 11400000, guid: d6d9f84ac77cb5a439110ca17ffd2b23, type: 2}
+  - {fileID: 11400000, guid: a67c447c6e2ed7249beaca88b7811b5c, type: 2}
+  - {fileID: 11400000, guid: 5372d2fa99391ab4e8df6ef23706a629, type: 2}
+  - {fileID: 11400000, guid: 9690f6ffc51cfff48915e215f94dc02f, type: 2}
+  - {fileID: 11400000, guid: 5b8aca1f635528e45892990102ca16f9, type: 2}
+  - {fileID: 11400000, guid: 05918c503989d514bbf1bca56d4afed5, type: 2}
+  - {fileID: 11400000, guid: db3d9c49c35627247b78214de65d7204, type: 2}
+  - {fileID: 11400000, guid: a1053dedc1c502a4984caa7abf34f70c, type: 2}
+  - {fileID: 11400000, guid: 9bcbb3c8850e8e94ab0e3e6a85d4160a, type: 2}
+  - {fileID: 11400000, guid: 51aeaaa97432109408604ba549ccc8de, type: 2}
+  - {fileID: 11400000, guid: b63e2323235471149a5c89f245cb6be8, type: 2}
+  - {fileID: 11400000, guid: d8625877dd8eaae4883786a3317adef8, type: 2}
+  - {fileID: 11400000, guid: e5a8bb5f3815dd1438bb6e1b4b294b8e, type: 2}
+  - {fileID: 11400000, guid: b6db08efc73cf9c4494406c5274e8042, type: 2}
+  - {fileID: 11400000, guid: 525373bb939d2e248a0cf8e434f31717, type: 2}
+  - {fileID: 11400000, guid: 1ef5378915cdb6b48bd9197a2004b5f9, type: 2}
+  - {fileID: 11400000, guid: b070da64840991c4e9880b9bc74c982d, type: 2}
+  - {fileID: 11400000, guid: b7f1e5f60f17fc74890a55e63aa5a25a, type: 2}
+  - {fileID: 11400000, guid: 259d7baa3b249aa44ac6e03cac24e315, type: 2}
+  - {fileID: 11400000, guid: 6f86ca9f7f644024098c18bb7f22fbb1, type: 2}
+  - {fileID: 11400000, guid: 51558ad64eaca4f4bbda574e88a83320, type: 2}
+  - {fileID: 11400000, guid: 90c01df736042714eaabf0ee85b7ab98, type: 2}
+  - {fileID: 11400000, guid: 8c12d079988a92f4b9ee5df5c010f7e9, type: 2}
+  - {fileID: 11400000, guid: 68917ff99564cfb4ab417fc696da2228, type: 2}
+  - {fileID: 11400000, guid: a0ed780392436594e939abfea36f38f6, type: 2}
+  - {fileID: 11400000, guid: 42045a79b90353b4caece6da318ec14a, type: 2}
+  - {fileID: 11400000, guid: b182219edcfca1143b5c03123b9039d7, type: 2}
+  - {fileID: 11400000, guid: 5dd37cf32086589458c5d17bf8b4373c, type: 2}
+  - {fileID: 11400000, guid: 6d14f4173e76eab458543dfd78616393, type: 2}
+  - {fileID: 11400000, guid: 068f9b716bd815a4d93b70d2af3158fd, type: 2}
+  - {fileID: 11400000, guid: d3ebdb30a8aae0749b13e10eb22005a4, type: 2}
+  - {fileID: 11400000, guid: 2541a1537968af643be8050084c40309, type: 2}
+  - {fileID: 11400000, guid: 18c6391ba09b7fb4590380d86d5751dd, type: 2}
+  - {fileID: 11400000, guid: 2dbdedfeb393169479b1f6b098318424, type: 2}
+  - {fileID: 11400000, guid: 0ae35d7eeacd0794482d675b689e8377, type: 2}
+  - {fileID: 11400000, guid: eac1b25042a50ca468b5f3b4798e7bd0, type: 2}
+  - {fileID: 11400000, guid: 6c2db96a5738932408d66f30ba1b507b, type: 2}
+  - {fileID: 11400000, guid: 75b92ae29a215ef4c936034bbdf17aa3, type: 2}
+  - {fileID: 11400000, guid: b3dba4b45762c18468ce873d23e746cd, type: 2}
+  - {fileID: 11400000, guid: 27928ab7368a9ed4c8d5115d918e8503, type: 2}
+  - {fileID: 11400000, guid: 43f2153b7a8683b4a9f095e408c93547, type: 2}
+  - {fileID: 11400000, guid: 650032e9686be5c43b4383cd86bd7656, type: 2}
+  - {fileID: 11400000, guid: 46637e3c3bc97cf41b8b0a8ca4701123, type: 2}
+  - {fileID: 11400000, guid: f37553201bf6ac247a53ca6fd72c51ce, type: 2}
+  - {fileID: 11400000, guid: fad3e5176aa9c0147b1d9e2f1be87634, type: 2}
+  - {fileID: 11400000, guid: 211c382a95995274bb8f50fab3091a22, type: 2}
+  - {fileID: 11400000, guid: 5dcee4f42f6cbb7489cb2d28b945332b, type: 2}
+  - {fileID: 11400000, guid: 575600a4ac0dad5419e33e5893fd4d09, type: 2}
+  - {fileID: 11400000, guid: a986ff87d320eba44a2186428134cb05, type: 2}
+  - {fileID: 11400000, guid: d020866e5b0ab4347942045ada945d33, type: 2}
+  - {fileID: 11400000, guid: b23ec46fd03fd4b4ea5322d1cad950c0, type: 2}
+  - {fileID: 11400000, guid: ba71cabc1c9ccb2428f7bf6ddbe981fc, type: 2}
+  - {fileID: 11400000, guid: 2d05c36e78e73e74799ef63ce13e9a55, type: 2}
+  - {fileID: 11400000, guid: 1f295f5773849b14e830a04ae96024f1, type: 2}
+  - {fileID: 11400000, guid: 9bdc1e9699ad96945af5100127ea0c35, type: 2}
+  - {fileID: 11400000, guid: a22819a8e72cb7240992748f4c4fdb84, type: 2}
+  - {fileID: 11400000, guid: 01893b6652576134687ab531414c403c, type: 2}
+  - {fileID: 11400000, guid: 04e16a1c031e9b14d8eeb95bbc890765, type: 2}
+  - {fileID: 11400000, guid: 532b663391922f0458f65ce2b9fb23f7, type: 2}
+  - {fileID: 11400000, guid: cdcd319b60cc5074b8bc9009b3dc85e1, type: 2}
+  - {fileID: 11400000, guid: 13a1cfc08ea2980439def79c6da4bb6e, type: 2}
+  - {fileID: 11400000, guid: b0b878880d457f542b2136c85891c03f, type: 2}
+  - {fileID: 11400000, guid: c7b5c10a2594ad841863a76856ba0c59, type: 2}
+  - {fileID: 11400000, guid: a63368bd237eeb844829fbba57394aa4, type: 2}
+  - {fileID: 11400000, guid: 2094ac5a3ed1c244482fc6741e200bf7, type: 2}
+  - {fileID: 11400000, guid: 0dc8fb46dd2ac0144a9d2d0e85b75bd8, type: 2}
+  - {fileID: 11400000, guid: 1781373fe2ff4604dbc68b66ad0fc0d8, type: 2}
+  - {fileID: 11400000, guid: 189c10d5b96f6b847960e1deeaa606ad, type: 2}
+  - {fileID: 11400000, guid: 3d4bb6be5c9c6ad4981a32689305e21a, type: 2}
+  - {fileID: 11400000, guid: dbdc5fed69b6e474ab0a112c5d9acdf1, type: 2}
+  - {fileID: 11400000, guid: d7c80fe5d2daa9844b5af9d571891722, type: 2}
+  - {fileID: 11400000, guid: 1cbdc28dab82e62458c1d1bbaae24ad4, type: 2}
+  - {fileID: 11400000, guid: 662fdb8a2ae7ea44bbc457382b33d7d3, type: 2}
+  - {fileID: 11400000, guid: ac8716e70cb3a3240b8af0a44b84da66, type: 2}
+  - {fileID: 11400000, guid: c46eb63547076d140b97e378034b8732, type: 2}
+  - {fileID: 11400000, guid: e2bdb6487902f7446acd5ab8e1bd2592, type: 2}
+  - {fileID: 11400000, guid: d1f12eac33ce51e498f349cfc8357184, type: 2}
+  - {fileID: 11400000, guid: 418b02f5a1c4ad041bd8a58f002bbe46, type: 2}
+  - {fileID: 11400000, guid: 2e9e7fcea5f26d84da61a1df1b999b76, type: 2}
+  - {fileID: 11400000, guid: c4f4255dec21e8a4bad4f15fe07c2826, type: 2}
+  - {fileID: 11400000, guid: 7f5315be5e951ab448923b3135ae63a8, type: 2}
+  - {fileID: 11400000, guid: cd4e72fb107079d42bda4e0de432c5a9, type: 2}
+  - {fileID: 11400000, guid: 6d63d2a7457162d48b9bab54c5a833ce, type: 2}
+  - {fileID: 11400000, guid: e712cc688768a1843aed40eb109bdf5e, type: 2}
+  - {fileID: 11400000, guid: 559d6f50710c26f4c8397b2284334ede, type: 2}
+  - {fileID: 11400000, guid: 9759808acdb7898438002c704b676e4e, type: 2}
+  - {fileID: 11400000, guid: b5e9243c044c9f34f9a674d5e0c01fe7, type: 2}
+  - {fileID: 11400000, guid: 19c56f25e5dd08949b5a5f7aa4f6d117, type: 2}
+  - {fileID: 11400000, guid: 614b58064a0027a438d737577cd84e71, type: 2}
+  - {fileID: 11400000, guid: 369047ccd0d0e234e8ed827b9c4951f6, type: 2}
+  - {fileID: 11400000, guid: 112694b942af717458c3b5e4d38ed2e3, type: 2}
+  - {fileID: 11400000, guid: b12135ef0c7c4524a9620490d86c54e0, type: 2}
+  - {fileID: 11400000, guid: 11833b2100e20394d989d80f28bd36a0, type: 2}
+  - {fileID: 11400000, guid: a85988bbf3d35774e88cd1276720c292, type: 2}
+  - {fileID: 11400000, guid: 142adeee94d72a24da564e347cdc3fbd, type: 2}
+  - {fileID: 11400000, guid: c332f3a28faa103419608d03e7807a7e, type: 2}
+  - {fileID: 11400000, guid: 851ce6e2f8ed0e146ba3a128d0d4f2cc, type: 2}
+  - {fileID: 11400000, guid: 45c960c043fa68b459c590cffa42d7ea, type: 2}
+  - {fileID: 11400000, guid: f16775a21347be1448bcfa2f76f56976, type: 2}
+  - {fileID: 11400000, guid: 96c02a1441f07c641a924d194fa29980, type: 2}
+  - {fileID: 11400000, guid: 1b1da0566bc5ce84982b17d400214820, type: 2}
+  - {fileID: 11400000, guid: 88897a2a48af01b48a4e29ba381098b9, type: 2}
+  - {fileID: 11400000, guid: 1f0ebe541531f4d4c97a202b1dc6c8de, type: 2}
+  - {fileID: 11400000, guid: 3a88e83a4f765cf4790d2e54913005d9, type: 2}
+  - {fileID: 11400000, guid: 52a0cf722d5eecb4db114d7b372a3cfc, type: 2}
+  - {fileID: 11400000, guid: 22145fa758c910a40b6b302f58969b09, type: 2}
+  - {fileID: 11400000, guid: 8389e9313269a3f448cd0ebfa402e6ca, type: 2}
+  - {fileID: 11400000, guid: fd93d1b7360c2854981418ac9a076bec, type: 2}

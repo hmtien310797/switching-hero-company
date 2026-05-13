@@ -66,22 +66,25 @@ namespace Scripts.Battle
             var targetPos = PlayerHeroController.GetMonsterPos() + Vector3.up * 1.5f;
             if (aimBone == null) aimBone = BaseAnimController.GetBaseSka().skeleton.FindBone(boneAiming);
 
-            var isAfterTarger = transform.position.z > targetPos.z;
-            var camPos = Camera.main.transform.position;
-            camPos.z *= (isAfterTarger ? -1 : 1);
-            camPos.y -= (isAfterTarger ? 9 : 0);
-            var dir = (targetPos - camPos).normalized;
-            Ray ray = new Ray(camPos, dir);
-            Plane planeZ = new Plane(Vector3.forward, transform.position);
-            var point = transform.position;
-            if (planeZ.Raycast(ray, out var distance))
+            if (aimBone != null)
             {
-                point = ray.GetPoint(distance);
-                point = transform.InverseTransformPoint(point);
-            }
+                var isAfterTarger = transform.position.z > targetPos.z;
+                var camPos = Camera.main.transform.position;
+                camPos.z *= (isAfterTarger ? -1 : 1);
+                camPos.y -= (isAfterTarger ? 9 : 0);
+                var dir = (targetPos - camPos).normalized;
+                Ray ray = new Ray(camPos, dir);
+                Plane planeZ = new Plane(Vector3.forward, transform.position);
+                var point = transform.position;
+                if (planeZ.Raycast(ray, out var distance))
+                {
+                    point = ray.GetPoint(distance);
+                    point = transform.InverseTransformPoint(point);
+                }
 
-            aimBone.X = point.x;
-            aimBone.Y = point.y;
+                aimBone.X = point.x;
+                aimBone.Y = point.y;
+            }
 
             await UniTask.Delay(TimeSpan.FromSeconds(dur), cancellationToken: DisableCts.Token);
             endAct?.Invoke();

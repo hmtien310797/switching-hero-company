@@ -3,6 +3,8 @@ using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.SkillSummon;
+using Immortal_Switch.Scripts.SummonSystem.WeaponSummon;
+using Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -136,6 +138,17 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 }
 
                 case SummonAchievementTab.Weapon:
+                {
+                    if (WeaponSummonManager.Instance == null)
+                        return new SummonAchievementRewardListData { Tab = tab };
+
+                    return WeaponSummonAchievementRewardBuilder.BuildWeapon(
+                        WeaponSummonManager.Instance.Config,
+                        WeaponSummonManager.Instance.SaveData,
+                        rewardVisualConfig
+                    );
+                }
+
                 case SummonAchievementTab.Pet:
                 default:
                     return new SummonAchievementRewardListData { Tab = tab };

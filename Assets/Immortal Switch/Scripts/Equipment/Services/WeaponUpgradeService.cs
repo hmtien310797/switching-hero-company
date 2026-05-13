@@ -2,7 +2,6 @@
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
-using Immortal_Switch.Scripts.Equipment.Models;
 
 namespace Immortal_Switch.Scripts.Equipment.Services
 {

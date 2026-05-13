@@ -5,6 +5,7 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
+using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
@@ -15,6 +16,9 @@ namespace Immortal_Switch.Scripts.Equipment.UI
     {
         [Header("Scene Hero Runtime")] [SerializeField]
         private List<PlayerHeroController> deployedHeroes = new();
+        
+        [Header("Visual Config")]
+        [SerializeField] private CurrencyVisualConfigSO currencyVisualConfig;
 
         public void SetDeployedHeroes(List<PlayerHeroController> heroes)
         {
@@ -168,7 +172,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 CanEquip = state.IsUnlocked && !isEquippedByFocusedHero,
                 CanAutoEquip = HasAnyDeployedHeroOfClass(def.WeaponClass),
                 CanOpenUpgrade = state.IsUnlocked,
-                CanFusion = IsHighestTierAndHighestStar(def) && CanFuseStandard(def.WeaponId),
+                CanFusion = IsHighestTierAndHighestStar(def),
                 CanFuseAll = true, // phase này để true, sau này có service global thì check thật
 
                 EquipEffects = BuildStatLines(def.EquipStats),
@@ -227,6 +231,59 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             vm.UpgradePanel = BuildExclusiveUpgradePanel(def, state, heroId);
             return vm;
+        }
+        
+        public WeaponFusionPopupViewModel BuildFusionPopup(int weaponId)
+        {
+            if (WeaponManager.Instance == null)
+                return null;
+
+            var def = WeaponManager.Instance.Database.GetStandard(weaponId);
+            if (def == null)
+                return null;
+
+            var state = WeaponManager.Instance.Inventory.GetOrCreateStandardState(weaponId);
+            if (state == null || !state.IsUnlocked)
+                return null;
+
+            var currencyType = WeaponCurrencyHelper.GetClassStoneCurrency(def.ExclusivePoolClass);
+            long currentCurrency = CurrencyManager.Instance != null
+                ? CurrencyManager.Instance.Get(currencyType)
+                : 0;
+
+            int maxByShard = def.FuseShardRequired > 0
+                ? state.CurrentShard / def.FuseShardRequired
+                : 0;
+
+            int maxByCurrency = def.ExclusiveClassStoneCost > 0
+                ? Mathf.FloorToInt((float)currentCurrency / def.ExclusiveClassStoneCost)
+                : 0;
+
+            int maxFusionCount = Mathf.Min(maxByShard, maxByCurrency);
+            maxFusionCount = Mathf.Max(0, maxFusionCount);
+
+            return new WeaponFusionPopupViewModel
+            {
+                WeaponId = def.WeaponId,
+                WeaponName = def.WeaponName,
+                WeaponIcon = def.Icon,
+                Tier = def.Tier,
+                Star = def.Star,
+                CurrentShard = state.CurrentShard,
+                RequiredShardPerFusion = def.FuseShardRequired,
+
+                ConsumableCurrencyType = currencyType,
+                ConsumableCurrencyIcon = currencyVisualConfig != null
+                    ? currencyVisualConfig.GetIcon(currencyType)
+                    : null,
+                CurrentConsumableAmount = currentCurrency,
+                ConsumableCostPerFusion = def.ExclusiveClassStoneCost,
+
+                CurrentFusionCount = maxFusionCount > 0 ? 1 : 0,
+                MaxFusionCount = maxFusionCount,
+
+                CanFusion = maxFusionCount > 0
+            };
         }
 
         private WeaponUpgradePanelViewModel BuildStandardUpgradePanel(StandardWeaponDefinitionSO def,

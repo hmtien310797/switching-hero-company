@@ -21,6 +21,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
     public class WeaponTierVisualEntry
     {
         public WeaponTier Tier;
+        public Color GlowColor;
         public Sprite TierLabelSprite;
         public Sprite TierBackgroundSprite;
     }

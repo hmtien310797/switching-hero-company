@@ -974,6 +974,7 @@ namespace Battle
 
         public async UniTask NextStageCallback()
         {
+            await UniTask.Delay(TimeSpan.FromSeconds(1f));
             Debug.Log("[PvE] Next Stage");
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
             firstPlayerHeroController.ResetHeroData();

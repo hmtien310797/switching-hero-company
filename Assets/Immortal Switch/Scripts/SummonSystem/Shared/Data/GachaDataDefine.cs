@@ -26,6 +26,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Data
         Currency,
         Hero,
         Skill,
+        Weapon,
         RandomHero,
         RandomSkill
     }

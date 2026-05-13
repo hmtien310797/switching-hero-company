@@ -13,7 +13,6 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [Header("Top Info")]
         [SerializeField] private TMP_Text txtWeaponName;
         [SerializeField] private Image imgIcon;
-        [SerializeField] private TMP_Text txtTierOrStar;
         [SerializeField] private TMP_Text txtLevel;
 
         [Header("Equip Effect")]
@@ -41,6 +40,13 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         [Header("Star Display")]
         [SerializeField] private UIWeaponStarDisplay starDisplay;
+        
+        [Header("Fuse All Result Popup")]
+        [SerializeField] private UIWeaponFuseAllResultPopup fuseAllResultPopup;
+        
+        [Header("Fusion Popup")]
+        [SerializeField] private UIWeaponFusionPopup fusionPopup;
+        [SerializeField] private WeaponViewDataProvider weaponViewDataProvider;
 
         private readonly List<UIWeaponStatLineItem> statLineItems = new();
 
@@ -59,13 +65,6 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (imgIcon != null)
                 imgIcon.sprite = vm.Icon;
-
-            if (txtTierOrStar != null)
-            {
-                txtTierOrStar.text = vm.IsExclusive
-                    ? $"Star {vm.Star}/{vm.MaxStar}"
-                    : $"{vm.Tier}{vm.Star}";
-            }
 
             if (txtLevel != null)
                 txtLevel.text = $"+{vm.Level}";
@@ -212,17 +211,89 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         private void OnClickFusion()
         {
-            if (WeaponManager.Instance == null || currentVm == null || currentVm.IsExclusive)
+            if (currentVm == null || currentVm.IsExclusive || fusionPopup == null || weaponViewDataProvider == null)
                 return;
 
-            WeaponManager.Instance.TryFuseStandard(currentVm.WeaponId);
-            RequestRefresh();
+            var vm = weaponViewDataProvider.BuildFusionPopup(currentVm.WeaponId);
+            if (vm == null)
+                return;
+
+            fusionPopup.Show(vm, RequestRefresh);
         }
 
         private void OnClickFuseAll()
         {
-            // Phase sau: gọi service fuse all global
-            Debug.Log("[WeaponDetailPanel] Fuse All not implemented yet.");
+            if (WeaponManager.Instance == null)
+                return;
+
+            var result = WeaponManager.Instance.TryFuseAllStandardWeapons();
+
+            if (result != null && result.HasAnyReward && fuseAllResultPopup != null)
+                fuseAllResultPopup.Show(result);
+
+            RequestRefresh();
+        }
+        
+        private WeaponFuseAllResult BuildMockFuseAllResultForPreview()
+        {
+            var result = new WeaponFuseAllResult();
+
+            if (WeaponManager.Instance == null || WeaponManager.Instance.Database == null)
+                return result;
+
+            var database = WeaponManager.Instance.Database;
+
+            // lấy vài món sample từ database để test popup
+            var std1 = database.GetStandard(1001);
+            var std2 = database.GetStandard(1006);
+            var std3 = database.GetStandard(1011);
+
+            if (std1 != null)
+            {
+                result.Rewards.Add(new WeaponFuseAllRewardEntry
+                {
+                    WeaponId = std1.WeaponId,
+                    WeaponName = std1.WeaponName,
+                    HeroClass = std1.WeaponClass,
+                    Tier = std1.Tier,
+                    Star = std1.Star,
+                    IsExclusive = false,
+                    Amount = 1,
+                    Icon = std1.Icon
+                });
+            }
+
+            if (std2 != null)
+            {
+                result.Rewards.Add(new WeaponFuseAllRewardEntry
+                {
+                    WeaponId = std2.WeaponId,
+                    WeaponName = std2.WeaponName,
+                    HeroClass = std2.WeaponClass,
+                    Tier = std2.Tier,
+                    Star = std2.Star,
+                    IsExclusive = false,
+                    Amount = 2,
+                    Icon = std2.Icon
+                });
+            }
+
+            if (std3 != null)
+            {
+                result.Rewards.Add(new WeaponFuseAllRewardEntry
+                {
+                    WeaponId = std3.WeaponId,
+                    WeaponName = std3.WeaponName,
+                    HeroClass = std3.WeaponClass,
+                    Tier = std3.Tier,
+                    Star = std3.Star,
+                    IsExclusive = false,
+                    Amount = 1,
+                    Icon = std3.Icon
+                });
+            }
+
+            return result;
         }
 
         private void HandleUpgradePanelChanged()
