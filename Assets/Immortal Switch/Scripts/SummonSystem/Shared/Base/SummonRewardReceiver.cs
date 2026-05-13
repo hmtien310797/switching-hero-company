@@ -3,6 +3,7 @@ using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
+using Immortal_Switch.Scripts.SummonSystem.WeaponSummon;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
@@ -48,6 +49,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
                     return HeroSummonManager.Instance.Service.GetRewardPreviewData();
                 case SummonCategory.Skill:
                     return SkillSummonManager.Instance.Service.GetRewardPreviewData();
+                case SummonCategory.Weapon:
+                    return WeaponSummonManager.Instance.Service.GetRewardPreviewData();
                 default:
                     return null;
             }
@@ -61,6 +64,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
                     return HeroSummonManager.Instance.ClaimReward(summonLevel, rewardReceiver);
                 case SummonCategory.Skill:
                     return SkillSummonManager.Instance.ClaimReward(summonLevel, rewardReceiver);
+                case SummonCategory.Weapon:
+                    return WeaponSummonManager.Instance.ClaimReward(summonLevel, rewardReceiver);
                 default:
                     return false;
             }

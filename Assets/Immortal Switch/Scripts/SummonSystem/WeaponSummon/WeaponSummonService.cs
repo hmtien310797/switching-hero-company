@@ -2,6 +2,8 @@
 using System.Linq;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
+using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
+using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
@@ -221,6 +223,89 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
             }
 
             return Mathf.Max(0, totalRoll - consumed);
+        }
+        
+        public SummonRewardPreviewData GetRewardPreviewData()
+        {
+            if (config == null || config.LevelRewards == null)
+                return null;
+
+            int currentLevel = GetCurrentSummonLevel();
+
+            var sorted = config.LevelRewards
+                .Where(x => x != null)
+                .OrderBy(x => x.SummonLevel)
+                .ToList();
+
+            // Ưu tiên reward claimable chưa nhận
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                var entry = sorted[i];
+
+                bool isClaimed = saveData.ClaimedRewardLevels.Contains(entry.SummonLevel);
+                bool isClaimable = currentLevel > entry.SummonLevel;
+
+                if (isClaimable && !isClaimed)
+                    return BuildRewardPreview(entry, true, false);
+            }
+
+            // Nếu không có claimable, show mốc hiện tại hoặc mốc kế tiếp
+            var preview = sorted.FirstOrDefault(x => x.SummonLevel >= currentLevel)
+                          ?? sorted.LastOrDefault();
+
+            if (preview == null)
+                return null;
+
+            bool claimed = saveData.ClaimedRewardLevels.Contains(preview.SummonLevel);
+            bool claimable = currentLevel > preview.SummonLevel && !claimed;
+
+            return BuildRewardPreview(preview, claimable, claimed);
+        }
+        
+        public bool ClaimReward(int rewardLevel, ISummonRewardReceiver receiver)
+        {
+            if (receiver == null)
+                return false;
+
+            if (saveData == null || config == null)
+                return false;
+
+            if (saveData.ClaimedRewardLevels.Contains(rewardLevel))
+                return false;
+
+            int currentLevel = GetCurrentSummonLevel();
+
+            // Quan trọng: phải vượt qua level đó mới được claim
+            if (currentLevel <= rewardLevel)
+                return false;
+
+            var rewardEntry = config.GetRewardEntry(rewardLevel);
+            if (rewardEntry == null || rewardEntry.RewardItems == null || rewardEntry.RewardItems.Count == 0)
+                return false;
+
+            for (int i = 0; i < rewardEntry.RewardItems.Count; i++)
+            {
+                receiver.GrantReward(rewardEntry.RewardItems[i]);
+            }
+
+            saveData.ClaimedRewardLevels.Add(rewardLevel);
+            return true;
+        }
+
+        private SummonRewardPreviewData BuildRewardPreview(
+            WeaponSummonLevelRewardEntry entry,
+            bool isClaimable,
+            bool isClaimed)
+        {
+            return new SummonRewardPreviewData
+            {
+                SummonLevel = entry.SummonLevel,
+                RewardItem = entry.RewardItems != null && entry.RewardItems.Count > 0
+                    ? entry.RewardItems[0]
+                    : null,
+                IsClaimable = isClaimable,
+                IsClaimed = isClaimed
+            };
         }
 
         public int GetCurrentLevelRequiredRoll()

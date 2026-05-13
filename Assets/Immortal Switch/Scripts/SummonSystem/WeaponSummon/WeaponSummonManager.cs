@@ -1,5 +1,6 @@
 ﻿using System;
 using Immortal_Switch.Scripts.Equipment.Core;
+using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
@@ -65,6 +66,21 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
 
             var option = service.GetOption(optionId);
             return service.CanSummon(option, out paymentType, out paidAmount);
+        }
+        
+        public bool ClaimReward(int rewardLevel, ISummonRewardReceiver receiver)
+        {
+            if (service == null)
+                return false;
+
+            bool success = service.ClaimReward(rewardLevel, receiver);
+            if (!success)
+                return false;
+
+            Save();
+            NotifyChanged();
+
+            return true;
         }
 
         public WeaponSummonResult ExecuteSummon(
