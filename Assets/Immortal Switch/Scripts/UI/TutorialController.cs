@@ -51,7 +51,7 @@ namespace Immortal_Switch.Scripts.UI
                         }
                         break;
                     case 1:
-                        if (uIHeroBattleController.IsSkillAvailable(HeroNameAction.SwithBtn))
+                        if (uIHeroBattleController.IsSkillAvailable(HeroNameAction.SwitchBtn))
                         {
                             PointToButton(targetBtns[currentIdx]);
                         }

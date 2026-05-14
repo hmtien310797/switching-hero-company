@@ -346,11 +346,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panelRoot: {fileID: 8637351277118781264}
-  scalePortrait: 1
-  yPosPortrait: 1
-  scaleLandscape: 0.6
-  yPosLandscape: 1
+  fitMode: 0
+  useSafeArea: 1
+  autoDetectDesignSize: 1
+  designSize: {x: 1300, y: 2200}
+  minScale: 0.35
+  maxScale: 1
   changePosY: 0
+  yPosPortrait: 1
+  yPosLandscape: 1
 --- !u!1 &1786135385608521957
 GameObject:
   m_ObjectHideFlags: 0
@@ -596,7 +600,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   panelView: {fileID: 5427790038406068870}
-  statUiDatabase: {fileID: 11400000, guid: ff3cd31ec589a474bb84ffc741b340ad, type: 2}
+  statUiDatabase: {fileID: 11400000, guid: e04686be90859df4399a0750d2a60810, type: 2}
   tierIcons:
   - {fileID: -1349698399, guid: 8df9652ddfc2e464abcb32086b4a3bb4, type: 3}
   - {fileID: -22456776, guid: f3b5ac43f402abb4eae98942241d1b71, type: 3}

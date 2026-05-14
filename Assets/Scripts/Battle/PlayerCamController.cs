@@ -31,12 +31,9 @@ namespace Battle
         private float zCam = 26;
         
 
-        public void InitCam(Transform player, bool isMain)
+        public void InitCam(Transform player, int heroIndex)
         {
-            if(isMain)
-                playerTrans[0] = player;
-            else 
-                playerTrans[1] = player;
+            playerTrans[heroIndex] = player;
         }
 
         private void Awake()

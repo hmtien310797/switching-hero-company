@@ -36,8 +36,7 @@ namespace Battle
     {
         [Header("Refs")] [SerializeField] PlayerCamController playerCamController;
         [SerializeField] Transform skillObjTrans;
-        [SerializeField] FollowHeroController mainFollow;
-        [SerializeField] FollowHeroController subFollow;
+        [SerializeField] FollowHeroController[] enemySpawnerCollection;
         [SerializeField] PvEMapController pvEMapController;
         [SerializeField] BattleCoinView coinPrefab;
 
@@ -68,31 +67,23 @@ namespace Battle
         private int[] enemyIds;
         private float[] rates;
 
-        private Dictionary<int, CreepDataSo> creepDataDict;
-        private Dictionary<int, BossDataSO> bossDataDict;
-        private Dictionary<int, PlayerHeroController> switchablePlayers = new();
+        private List<int> inBattleHeroIdList = new();
+        private Dictionary<int, CreepDataSo> creepDataMapper;
+        private Dictionary<int, BossDataSO> bossDataMapper;
+        private Dictionary<int, PlayerHeroController> inBattleHeroMapper = new();
         private GameData gameData;
         private MonsterBossController currentBoss;
-        private List<int> switchHeroIds = new();
-        private PlayerHeroController firstPlayerHeroController;
-        private PlayerHeroController secondPlayerHeroController;
-        private PlayerHeroController mainPlayerHeroController;
+
+        private PlayerHeroController[] inBattleHeroCollection;
         private bool isReadyBattle = false;
         private bool losingStage = false;
 
         public BattleState State { get; private set; } = BattleState.None;
         public List<MonsterScrepController> MonsterList => creeps;
-
-        public bool IsReadyBattle
-        {
-            get => isReadyBattle;
-            set => isReadyBattle = value;
-        }
         
         private void Start()
         {
             GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
-            //GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
         }
 
@@ -126,99 +117,42 @@ namespace Battle
             return pvEMapController.EndMapPoint;
         }
 
-        private void OnChangeHero(int sId, int tId)
+        private void OnChangeHero(int sourceHeroId, int targetHeroId)
         {
-            if (!CanSwitchHero(sId, tId))
+            if (!CanSwitchHero(sourceHeroId, targetHeroId))
                 return;
-
-            bool replaceFirst = firstPlayerHeroController != null && firstPlayerHeroController.GetHeroId() == sId;
-            bool replaceSecond = secondPlayerHeroController != null && secondPlayerHeroController.GetHeroId() == sId;
-
-            if (!replaceFirst && !replaceSecond)
-                return;
-
-            var oldHero = replaceFirst ? firstPlayerHeroController : secondPlayerHeroController;
+            
+            PlayerHeroController oldHero = inBattleHeroMapper.GetValueOrDefault(sourceHeroId);
             if (oldHero == null)
+            {
+                Debug.LogError($"[PvE] Cannot find hero with id={sourceHeroId}");
                 return;
-
-            bool wasMain = mainPlayerHeroController != null &&
-                           mainPlayerHeroController.GetHeroId() == sId;
+            }
             Vector3 spawnPos = oldHero.transform.position;
-            var heroDt = MasterDataCache.Instance.GetHeroDataById(tId);
-            if (heroDt == null)
+            
+            var newHeroData = MasterDataCache.Instance.GetHeroDataById(targetHeroId);
+            if (newHeroData == null)
                 return;
 
-            if (replaceFirst)
-                switchHeroIds[0] = tId;
-            else
-                switchHeroIds[1] = tId;
+            inBattleHeroIdList[oldHero.HeroIndex] = targetHeroId;
 
-            if (switchablePlayers.ContainsKey(sId))
-                switchablePlayers.Remove(sId);
+            inBattleHeroMapper.Remove(sourceHeroId);
 
             oldHero.gameObject.SetActive(false);
 
-            var (newHero, isNewInstance) = PoolController.Instance.Get(heroDt.PlayerHeroController, spawnPos);
+            var (newHero, isNewInstance) = PoolController.Instance.Get(newHeroData.PlayerHeroController, spawnPos);
             if (newHero == null)
                 return;
 
-            switchablePlayers[tId] = newHero;
-
-            if (replaceFirst)
-            {
-                firstPlayerHeroController = newHero;
-                if (wasMain)
-                {
-                    mainPlayerHeroController = firstPlayerHeroController;
-                }
-
-                firstPlayerHeroController.InitHero(
-                    heroDt,
-                    this,
-                    playerCamController,
-                    skillObjTrans,
-                    secondPlayerHeroController != null ? secondPlayerHeroController.transform : null,
-                    mainFollow,
-                    heroDt.HeroClass,
-                    false,
-                    wasMain
-                );
-
-                RefreshBattleUISlot(firstPlayerHeroController, true, tId);
-            }
-            else
-            {
-                secondPlayerHeroController = newHero;
-                if (wasMain)
-                {
-                    mainPlayerHeroController = secondPlayerHeroController;
-                }
-
-                secondPlayerHeroController.InitHero(
-                    heroDt,
-                    this,
-                    playerCamController,
-                    skillObjTrans,
-                    firstPlayerHeroController != null ? firstPlayerHeroController.transform : null,
-                    subFollow,
-                    heroDt.HeroClass,
-                    false,
-                    wasMain
-                );
-
-                RefreshBattleUISlot(secondPlayerHeroController, false, tId);
-            }
-
-            if (firstPlayerHeroController != null && secondPlayerHeroController != null)
-            {
-                firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
-                secondPlayerHeroController.SetPartner(firstPlayerHeroController.transform);
-            }
+            newHero.InitHero(newHeroData, this, playerCamController, skillObjTrans, enemySpawnerCollection[oldHero.HeroIndex], oldHero.HeroIndex);
+            inBattleHeroMapper[targetHeroId] = newHero;
+            RefreshBattleUISlot(newHero, targetHeroId);
+            inBattleHeroCollection[oldHero.HeroIndex] = newHero;
             NotifyActiveLineupChanged();
         }
         
 
-        private void RefreshBattleUISlot(PlayerHeroController heroController, bool isFirstSlot, int heroId)
+        private void RefreshBattleUISlot(PlayerHeroController heroController, int heroId)
         {
             if (heroController == null) return;
 
@@ -227,7 +161,6 @@ namespace Battle
 
             UIHeroBattleController.Instance?.ReplaceHeroSlot(
                 heroController,
-                isFirstSlot,
                 heroId,
                 heroController.SkillIdDict
             );
@@ -236,43 +169,30 @@ namespace Battle
         public void InitSwitchableHeroIds()
         {
             // asign to 1 and 2
-            switchHeroIds.Clear();
-            switchHeroIds = new List<int>() { 1, 17 };
+            inBattleHeroIdList.Clear();
+            inBattleHeroIdList = new List<int>() { 1, 17 };
         }
 
         private async UniTask InitPlayerHeroById(bool isSwitch = false)
         {
-            for (int i = 0; i < switchHeroIds.Count; i++)
+            for (int heroIndex = 0; heroIndex < inBattleHeroIdList.Count; heroIndex++)
             {
-                var id = switchHeroIds[i];
+                var id = inBattleHeroIdList[heroIndex];
                 var heroDt = MasterDataCache.Instance.GetHeroDataById(id);
-                await SpawnHero(heroDt, i == 0);
+                await SpawnHero(heroDt, heroIndex);
             }
 
             await UniTask.Delay(1000);
         }
 
-        private async UniTask SpawnHero(HeroDataSO heroDt, bool isMain = true)
+        private async UniTask SpawnHero(HeroDataSO heroDt, int heroIndex)
         {
-            var (hero, b) = PoolController.Instance.Get<PlayerHeroController>(heroDt.PlayerHeroController,
-                isMain ? Vector3.forward * 12 + Vector3.left * 1.5f : Vector3.forward * 12 + Vector3.right * 1.5f);
-            switchablePlayers[heroDt.Id] = hero;
-            if (isMain)
-            {
-                firstPlayerHeroController = hero;
-                firstPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans,
-                    secondPlayerHeroController?.transform ?? null, mainFollow, heroDt.HeroClass, false, true);
-                mainPlayerHeroController = firstPlayerHeroController;
-                mainFollow.SetFollowTarget(firstPlayerHeroController.transform);
-            }
-            else
-            {
-                secondPlayerHeroController = hero;
-                secondPlayerHeroController.InitHero(heroDt, this, playerCamController, skillObjTrans,
-                    firstPlayerHeroController.transform, subFollow, heroDt.HeroClass, false, false);
-                firstPlayerHeroController.SetPartner(secondPlayerHeroController.transform);
-                subFollow.SetFollowTarget(secondPlayerHeroController.transform);
-            }
+            var (hero, b) = PoolController.Instance.Get(heroDt.PlayerHeroController,
+                heroIndex == 0 ? Vector3.forward * 12 + Vector3.left * 1.5f : Vector3.forward * 12 + Vector3.right * 1.5f);
+            inBattleHeroMapper[heroDt.Id] = hero;
+
+            inBattleHeroCollection[heroIndex] = hero;
+            inBattleHeroCollection[heroIndex].InitHero(heroDt, this, playerCamController, skillObjTrans, enemySpawnerCollection[heroIndex], 0);
             
             await UniTask.Delay(1000);
             NotifyActiveLineupChanged();
@@ -280,7 +200,7 @@ namespace Battle
 
         private void BuildBossDataLookup()
         {
-            bossDataDict = new Dictionary<int, BossDataSO>();
+            bossDataMapper = new Dictionary<int, BossDataSO>();
 
             if (bossData == null) return;
 
@@ -289,23 +209,13 @@ namespace Battle
                 var data = bossData[i];
                 if (data == null) continue;
 
-                bossDataDict[data.Id] = data;
+                bossDataMapper[data.Id] = data;
             }
-        }
-
-        public void SwitchHero(int hId)
-        {
-            if (mainPlayerHeroController.GetHeroId() == hId) return;
-
-            var hero = firstPlayerHeroController.GetHeroId() == hId
-                ? firstPlayerHeroController
-                : secondPlayerHeroController;
-            mainPlayerHeroController = hero;
         }
 
         public List<int> GetCurrentSwitchHeroIds()
         {
-            return new List<int>(switchHeroIds);
+            return new List<int>(inBattleHeroIdList);
         }
 
         public bool CanSwitchHero(int sourceHeroId, int targetHeroId)
@@ -316,13 +226,10 @@ namespace Battle
             if (sourceHeroId == targetHeroId)
                 return false;
 
-            if (!switchHeroIds.Contains(sourceHeroId))
+            if (!inBattleHeroIdList.Contains(sourceHeroId))
                 return false;
 
-            if (switchHeroIds.Contains(targetHeroId))
-                return false;
-
-            return true;
+            return !inBattleHeroIdList.Contains(targetHeroId);
         }
 
         public void RequestSwitchHero(int sourceHeroId, int targetHeroId)
@@ -468,10 +375,10 @@ namespace Battle
             if (!TryGetChapterDataByStage(stage, out var chapterData, out _, out _))
                 return false;
 
-            if (bossDataDict == null || bossDataDict.Count == 0)
+            if (bossDataMapper == null || bossDataMapper.Count == 0)
                 return false;
 
-            return bossDataDict.TryGetValue(chapterData.BossId, out bossSo) && bossSo != null;
+            return bossDataMapper.TryGetValue(chapterData.BossId, out bossSo) && bossSo != null;
         }
 
         private void SpawnNextCreepBatch()
@@ -522,10 +429,9 @@ namespace Battle
                         Defense = creepData.BaseDef * Mathf.Pow(1.06f, currentStage - 1f),
                         MoveSpeed = creepData.BaseMoveSpeed,
                     };
-                    var target = UnityEngine.Random.Range(0, 2);
-                    creep.InitMonster(hid, target == 0 ? firstPlayerHeroController : secondPlayerHeroController, this,
-                        monsterStat, false,
-                        new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });
+                    var randomIndex = Random.Range(0, 2);
+                    creep.InitMonster(hid, inBattleHeroCollection[randomIndex], this,
+                        monsterStat, false, inBattleHeroCollection.ToList());
 
                     creeps.Add(creep);
                     aliveCreepCount++;
@@ -566,14 +472,15 @@ namespace Battle
                 AttackRange = bossSo.AttackRange
             };
 
-            currentBoss.InitMonster(bossSo.Id, mainPlayerHeroController, this, bossStat, true,
-                new List<PlayerHeroController>() { firstPlayerHeroController, secondPlayerHeroController });            
+            currentBoss.InitMonster(bossSo.Id, inBattleHeroCollection[0], this, bossStat, true, inBattleHeroCollection.ToList());            
         }
 
         public void NotifyBossReady()
         {
-            firstPlayerHeroController.SetTarget(currentBoss);
-            secondPlayerHeroController.SetTarget(currentBoss);
+            for (int i = 0; i < inBattleHeroCollection.Length; i++)
+            {
+                inBattleHeroCollection[i].SetTarget(currentBoss);
+            }
 
             GameStatView.Instance.InitTimer(battleTime, () =>
             {
@@ -618,7 +525,7 @@ namespace Battle
             if (creep == null) return;
             if (!creep.gameObject.activeInHierarchy) return;
 
-            DropCoinAsync(creep.transform.position).Forget();
+            DropCoinAsync(creep.transform.position);
             PoolController.Instance.ReturnToPool(creep.gameObject);
             creeps.Remove(creep);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
@@ -639,7 +546,7 @@ namespace Battle
             SpawnBoss();
         }
 
-        private async UniTaskVoid DropCoinAsync(Vector3 pos)
+        private void DropCoinAsync(Vector3 pos)
         {
             var numRand = Random.Range(2, 5);
             for (int i = 0; i < numRand; i++)
@@ -652,18 +559,14 @@ namespace Battle
 
         private Transform FindHeroNearestFromPos(Vector3 pos)
         {
-            float dist = float.MaxValue;
-            if (firstPlayerHeroController)
-                dist = (firstPlayerHeroController.transform.position - pos).magnitude;
-
-            if(secondPlayerHeroController)
-            {
-                var dist2 = (secondPlayerHeroController.transform.position - pos).magnitude;
-                if(dist2 < dist) return secondPlayerHeroController.transform;
-            }
-
-            if(dist < float.MaxValue)
-                return firstPlayerHeroController.transform;
+            Transform firstPlayerPos = inBattleHeroCollection[0].transform;
+            Transform secondPlayerPos = inBattleHeroCollection[1].transform;
+            
+            float dist = (firstPlayerPos.position - pos).magnitude;
+            float dist2 = (secondPlayerPos.position - pos).magnitude;
+            
+            if(dist2 < dist) return secondPlayerPos;
+            if(dist < float.MaxValue) return firstPlayerPos;
 
             return null;
         }
@@ -940,7 +843,7 @@ namespace Battle
 
         private void BuildCreepDataLookup()
         {
-            creepDataDict = new Dictionary<int, CreepDataSo>();
+            creepDataMapper = new Dictionary<int, CreepDataSo>();
 
             if (creepDataSo == null) return;
 
@@ -950,7 +853,7 @@ namespace Battle
                 if (data == null) continue;
 
                 // assumes CreepDataSo has int Id
-                creepDataDict[data.Id] = data;
+                creepDataMapper[data.Id] = data;
             }
         }
 
@@ -958,8 +861,8 @@ namespace Battle
         {
             creepData = null;
 
-            if (creepDataDict == null || creepDataDict.Count == 0) return false;
-            if (!creepDataDict.TryGetValue(enemyId, out var data) || data == null) return false;
+            if (creepDataMapper == null || creepDataMapper.Count == 0) return false;
+            if (!creepDataMapper.TryGetValue(enemyId, out var data) || data == null) return false;
 
             creepData = data;
 
@@ -977,8 +880,10 @@ namespace Battle
             await UniTask.Delay(TimeSpan.FromSeconds(1f));
             Debug.Log("[PvE] Next Stage");
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
-            firstPlayerHeroController.ResetHeroData();
-            secondPlayerHeroController.ResetHeroData();
+            for (int i = 0; i < inBattleHeroCollection.Length; i++)
+            {
+                inBattleHeroCollection[i].ResetHeroData();
+            }
 
             HandleNextStage().Forget();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
@@ -991,37 +896,26 @@ namespace Battle
             Debug.Log("[PvE] Play Current Stage");
             await UniTask.Delay(TimeSpan.FromSeconds(1.2f));
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
-            firstPlayerHeroController.gameObject.SetActive(false);
-            secondPlayerHeroController.gameObject.SetActive(false);
+            for (int i = 0; i < inBattleHeroCollection.Length; i++)
+            {
+                inBattleHeroCollection[i].gameObject.SetActive(false);
+            }
 
             HandleCurrentStage();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
-            firstPlayerHeroController.ResetHeroData();
-            secondPlayerHeroController.ResetHeroData();
+            for (int i = 0; i < inBattleHeroCollection.Length; i++)
+            {
+                inBattleHeroCollection[i].ResetHeroData();
+            }
+
         }
 
         public bool IsHeroCurrentlyActive(int heroId)
         {
             if (heroId <= 0) return false;
-            return switchHeroIds.Contains(heroId);
-        }
-
-        public int GetFirstActiveHeroId()
-        {
-            if (switchHeroIds == null || switchHeroIds.Count <= 0)
-                return -1;
-
-            return switchHeroIds[0];
-        }
-
-        public int GetSecondActiveHeroId()
-        {
-            if (switchHeroIds == null || switchHeroIds.Count <= 1)
-                return -1;
-
-            return switchHeroIds[1];
+            return inBattleHeroIdList.Contains(heroId);
         }
     }
 }

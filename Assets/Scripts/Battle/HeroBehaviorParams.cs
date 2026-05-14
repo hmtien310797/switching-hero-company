@@ -30,6 +30,5 @@ namespace Scripts.Battle
         public bool IsValid { get => isValid; set => isValid = value; }
         public bool IsPriorityNearTarget { get => isPriorityNearTarget; set => isPriorityNearTarget = value; }
         public int HeroId { get => heroId; set => heroId = value; }
-        public bool IsMain { get => isMain; set => isMain = value; }
     }
 }

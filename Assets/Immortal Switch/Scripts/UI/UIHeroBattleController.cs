@@ -18,14 +18,12 @@ namespace Immortal_Switch.Scripts.UI
         Skill3Btn,
         Skill4Btn,
         Skill5Btn,
-        SwithBtn,
+        SwitchBtn,
         None,
     }
 
     public class CoolingData
     {
-        public int Hid;
-        public bool isMain;
         public Dictionary<HeroNameAction, Action> callbackActs;
         public Dictionary <HeroNameAction, float> intervalCoolings;
         public Dictionary <HeroNameAction, float> timerCoolings;
@@ -34,9 +32,8 @@ namespace Immortal_Switch.Scripts.UI
         public Sprite IconHead;
         public List<HeroNameAction> keyTimerCooling;
 
-        public CoolingData(bool isMain =  false)
+        public CoolingData()
         {
-            this.isMain = isMain;
             callbackActs = new Dictionary<HeroNameAction, Action>();
             intervalCoolings = new Dictionary<HeroNameAction, float>();
             timerCoolings = new Dictionary<HeroNameAction, float>();
@@ -72,8 +69,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] Transform autoSwitchRotate;
         [SerializeField] List<Image> skillIcons;
 
-        private CoolingData firstHeroData = new CoolingData(true);
-        private CoolingData secondHeroData = new CoolingData(false);
+        private CoolingData[] inBattleHeroesCoolingData;
         private CoolingData selectedHeroData = null;
 
         private Dictionary<HeroNameAction,Image> covers = null;
@@ -206,13 +202,13 @@ namespace Immortal_Switch.Scripts.UI
                     }
                 }
 
-                DoSkillAction(HeroNameAction.SwithBtn);
+                DoSkillAction(HeroNameAction.SwitchBtn);
             });
         }
 
         private void Update()
         {
-            DoCoolingdownSkill();
+            DoCoolingDownSkill();
         }
 
         public void RegisterHeroSwitch(Action<int> heroAct)
@@ -220,19 +216,14 @@ namespace Immortal_Switch.Scripts.UI
             uISwitchHeroController?.RegisterActionHeroByIdx(heroAct);
         }
 
-        private void InitUIHeros(bool ismain, int hid)
+        private void InitUIHeroes(int index, int hid)
         {
-            if (ismain)
+            var currentHeroData = inBattleHeroesCoolingData[index];
+            selectedHeroData = currentHeroData;
+            uISwitchHeroController?.ChangeIconByIdx(0, currentHeroData.IconHead);
+            if (index == 0)
             {
-                firstHeroData.Hid = hid;
-                selectedHeroData = firstHeroData;
                 AppLySpriteSkillByIdx();
-                uISwitchHeroController?.ChangeIconByIdx(0, firstHeroData.IconHead);
-            }
-            else
-            {
-                secondHeroData.Hid = hid;
-                uISwitchHeroController?.ChangeIconByIdx(1, secondHeroData.IconHead);
             }
         }
 
@@ -267,7 +258,7 @@ namespace Immortal_Switch.Scripts.UI
                 {HeroNameAction.Skill3Btn, coverSkill3 },
                 {HeroNameAction.Skill4Btn, coverSkill4 },
                 {HeroNameAction.Skill5Btn, coverSkill5 },
-                {HeroNameAction.SwithBtn, coverSwitch },
+                {HeroNameAction.SwitchBtn, coverSwitch },
             };
         }
 
@@ -282,7 +273,7 @@ namespace Immortal_Switch.Scripts.UI
                 {HeroNameAction.Skill3Btn, skillIcons[2] },
                 {HeroNameAction.Skill4Btn, skillIcons[3] },
                 {HeroNameAction.Skill5Btn, skillIcons[4] },
-                {HeroNameAction.SwithBtn, skillIcons[5] },
+                {HeroNameAction.SwitchBtn, skillIcons[5] },
             };
         }
 
@@ -297,154 +288,84 @@ namespace Immortal_Switch.Scripts.UI
             DoSkillCallback(hak);
         }
 
-        private void DoAutoSkillAction(HeroNameAction hak, out bool isSuccessed)
+        private bool DoAutoSkillAction(HeroNameAction hak)
         {
-            isSuccessed = false;
-            if (selectedHeroData == null) return;
-            if (selectedHeroData.playerHeroController == null) return;
-            if (selectedHeroData.playerHeroController.IsInAction()) return;
-            if (!selectedHeroData.playerHeroController.IsExistTargetInRange()) return;
-            if (!selectedHeroData.callbackActs.ContainsKey(hak)) return;
-            if (hak == HeroNameAction.SwithBtn)
+            if (selectedHeroData == null) return false;
+            if (selectedHeroData.playerHeroController == null) return false;
+            if (selectedHeroData.playerHeroController.IsInAction()) return false;
+            if (!selectedHeroData.playerHeroController.IsExistTargetInRange()) return false;
+            if (!selectedHeroData.callbackActs.ContainsKey(hak)) return false;
+            if (hak == HeroNameAction.SwitchBtn)
             {
-                if (selectedHeroData.playerHeroController.IsInFlash()) return;
+                if (selectedHeroData.playerHeroController.IsInFlash()) return false;
             }
 
             DoSkillCallback(hak);
-            isSuccessed = true;
+            return true;
         }
 
-        private void DoAutoSkillAction(CoolingData data, HeroNameAction hak, out bool isSuccesed)
+        private bool DoAutoSkillAction(CoolingData data, HeroNameAction hak)
         {
-            isSuccesed = false;
-            if (data == null) return;
-            if (data.playerHeroController == null) return;
-            if (data.playerHeroController.IsInAction()) return;
-            if (!data.playerHeroController.IsExistTargetInRange()) return;
-            if (!data.callbackActs.ContainsKey(hak)) return;
-            if(hak == HeroNameAction.SwithBtn)
+            if (data == null) return false;
+            if (data.playerHeroController == null) return false;
+            if (data.playerHeroController.IsInAction()) return false;
+            if (!data.playerHeroController.IsExistTargetInRange()) return false;
+            if (!data.callbackActs.ContainsKey(hak)) return false;
+            if (hak == HeroNameAction.SwitchBtn)
             {
-                if(data.playerHeroController.IsInFlash()) return;
+                if(data.playerHeroController.IsInFlash()) return false;
             }
 
             ResetTimer(data, hak);
             data.callbackActs[hak]?.Invoke();
-            isSuccesed = true;
+            return true;
         }
 
-        public void SetPlayerHeroInstance(PlayerHeroController phc, bool isMain, int hid, Dictionary<SkillSlot,int> skillIds)
+        public void SetPlayerHeroInstance(PlayerHeroController phc, int index, int hid, Dictionary<SkillSlot,int> skillIds)
         {
-            if (isMain)
+            var currentHeroData = inBattleHeroesCoolingData[index];
+            currentHeroData.playerHeroController = phc;
+            currentHeroData.IconHead = currentHeroData.playerHeroController.HeroIcon;
+            uISwitchHeroController?.ChangeIconByIdx(0, currentHeroData.IconHead);
+            currentHeroData.Sprites.Clear();
+            currentHeroData.Sprites = new List<Sprite>()
             {
-                firstHeroData.playerHeroController = phc;
-                firstHeroData.IconHead = firstHeroData.playerHeroController.HeroIcon;
-                uISwitchHeroController?.ChangeIconByIdx(0, firstHeroData.IconHead);
-                firstHeroData.Sprites.Clear();
-                firstHeroData.Sprites = new List<Sprite>()
-                {
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
-                    firstHeroData.playerHeroController.UISprite.SwithSkillIcon
-                };
-            }
-            else
-            {
-                secondHeroData.playerHeroController = phc;
-                secondHeroData.IconHead = secondHeroData.playerHeroController.HeroIcon;
-                uISwitchHeroController?.ChangeIconByIdx(1, secondHeroData.IconHead);
-                secondHeroData.Sprites.Clear();
-                secondHeroData.Sprites = new List<Sprite>()
-                {
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
-                    MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
-                    secondHeroData.playerHeroController.UISprite.SwithSkillIcon
-                };
-            }
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
+                //temp
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon
+            };
 
-            InitUIHeros(isMain, hid);
+            InitUIHeroes(phc.HeroIndex, hid);
             uISwitchHeroController?.RegisterActionByIdx(ChangeMainHeroByIdx);
         }
 
-        private void ChangeMainHeroByIdx(int hid)
+        private void ChangeMainHeroByIdx(int index)
         {
-            if(hid == 0)
-            {
-                selectedHeroData = firstHeroData;
-            }
-            else
-            {
-                selectedHeroData = secondHeroData;
-            }
-
+            selectedHeroData = inBattleHeroesCoolingData[index];
             AppLySpriteSkillByIdx();
         }
-
-        public void ChangeSkillByIdx(HeroNameAction idx, float interval, int hid)
+        
+        public void RegisterActionByIdx(HeroNameAction idx, Action fAct, float interval, int heroIndex)
         {
-            if(firstHeroData.Hid == hid)
-            {
-                firstHeroData.intervalCoolings[idx] = interval;
-                ChangeIconSkillBySlot((int)idx, firstHeroData.Sprites);
-            }
-            else
-            {
-                secondHeroData.intervalCoolings[idx] = interval;
-                ChangeIconSkillBySlot((int)idx, secondHeroData.Sprites);
-            }
-        }
-
-        private void ChangeIconSkillBySlot(int slot, List<Sprite> sprites)
-        {
-            sprites[slot] = null;
-        }
-
-        public void RegisterActionByIdx(HeroNameAction idx, Action fAct, float interval, bool hasCoolDown = true, bool isFirst = true)
-        {
-            var data = isFirst ? firstHeroData : secondHeroData;
+            var data = inBattleHeroesCoolingData[heroIndex];
 
             if(fAct != null) data.callbackActs[idx] = fAct;
 
-            if (hasCoolDown)
-            {
-                data.intervalCoolings[idx] = interval;
+            data.intervalCoolings[idx] = interval;
+            data.timerCoolings.TryAdd(idx, interval);
 
-                if (!data.timerCoolings.ContainsKey(idx))
-                    data.timerCoolings[idx] = interval;
-
-                if(!data.keyTimerCooling.Contains(idx))
-                    data.keyTimerCooling.Add(idx);
-            }
-            else
-            {
-                if (data.timerCoolings.ContainsKey(idx))
-                    data.timerCoolings.Remove(idx);
-            }
+            if(!data.keyTimerCooling.Contains(idx))
+                data.keyTimerCooling.Add(idx);
         }
         
-        private void ResetHeroSlotData(CoolingData data)
-        {
-            bool keepIsMain = data.isMain;
-
-            data.callbackActs.Clear();
-            data.intervalCoolings.Clear();
-            data.timerCoolings.Clear();
-            data.playerHeroController = null;
-            data.Hid = 0;
-            data.isMain = keepIsMain;
-        }
         
-        public void ReplaceHeroSlot(PlayerHeroController phc, bool isFirstSlot, int hid, Dictionary<SkillSlot, int> skillIds)
+        public void ReplaceHeroSlot(PlayerHeroController phc, int heroId, Dictionary<SkillSlot, int> skillIds)
         {
-            var data = isFirstSlot ? firstHeroData : secondHeroData;
-            //ResetHeroSlotData(data);
-
-            data.Hid = hid;
+            var data = inBattleHeroesCoolingData[phc.HeroIndex];
             data.playerHeroController = phc;
 
             var newSprites = new List<Sprite>()
@@ -454,19 +375,13 @@ namespace Immortal_Switch.Scripts.UI
                 MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
                 MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
                 MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
-                phc.UISprite.SwithSkillIcon
+                //temp
+                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
             };
 
             data.IconHead = phc.HeroIcon;
             data.Sprites = newSprites;
-            if (isFirstSlot)
-            {
-                uISwitchHeroController?.ChangeIconByIdx(0, data.IconHead);
-            }
-            else
-            {
-                uISwitchHeroController?.ChangeIconByIdx(1, data.IconHead);
-            }
+            uISwitchHeroController?.ChangeIconByIdx(phc.HeroIndex, data.IconHead);
 
             AppLySpriteSkillByIdx();
         }
@@ -477,13 +392,15 @@ namespace Immortal_Switch.Scripts.UI
             selectedHeroData.callbackActs[nameAction]?.Invoke();
         }
 
-        private void DoCoolingdownSkill()
+        private void DoCoolingDownSkill()
         {
-            DoCoolingdownSkill(firstHeroData, firstHeroData.isMain);
-            DoCoolingdownSkill(secondHeroData, secondHeroData.isMain);
+            for (int i = 0; i < inBattleHeroesCoolingData.Length; i++)
+            {
+                DoCoolingDownSkill(inBattleHeroesCoolingData[i]);
+            }
         }
 
-        private void DoCoolingdownSkill(CoolingData data, bool isMain)
+        private void DoCoolingDownSkill(CoolingData data)
         {
             if (data == null) return;
 
@@ -540,34 +457,34 @@ namespace Immortal_Switch.Scripts.UI
             data.timerCoolings[name] = data.intervalCoolings[name];
         }
 
-        public void AutoActiveSkill(Func<HeroNameAction, int> endFucn = null, bool isMain = true)
+        public void AutoActiveSkill(Func<HeroNameAction, int> endFunc, int heroIndex)
         {
             HeroNameAction selectedAction = HeroNameAction.None;
             if (isAutoSkilling)
             {
-                var data = !isMain ? secondHeroData : firstHeroData;
+                var data = inBattleHeroesCoolingData[heroIndex];
                 foreach (var cl in data.timerCoolings)
                 {
                     selectedAction = cl.Key;
-                    if (selectedAction == HeroNameAction.SwithBtn || selectedAction == HeroNameAction.AutoSwitchBtn || selectedAction == HeroNameAction.AutoSkillBtn) continue;
+                    if (selectedAction == HeroNameAction.SwitchBtn || selectedAction == HeroNameAction.AutoSwitchBtn || selectedAction == HeroNameAction.AutoSkillBtn) continue;
 
                     if (cl.Value <= 0)
                     {
-                        var isSuccessed = false;
+                        bool isSuccess;
                         if (data.isMain == selectedHeroData.isMain)
                         {
-                            DoAutoSkillAction(selectedAction, out isSuccessed);
+                            isSuccess = DoAutoSkillAction(selectedAction);
                         }
                         else
                         {
-                            DoAutoSkillAction(data, selectedAction, out isSuccessed);
+                            isSuccess = DoAutoSkillAction(data, selectedAction);
                         }
                         
-                        if(isSuccessed) break;
+                        if(isSuccess) break;
                     }
                 }
             }
-            endFucn?.Invoke(selectedAction);
+            endFunc?.Invoke(selectedAction);
         }
 
         public void AutoActiveSkill(CoolingData data, HeroNameAction key)
@@ -575,18 +492,17 @@ namespace Immortal_Switch.Scripts.UI
             HeroNameAction selectedAction = key;
             Action act = () =>
             {
-                var isSuccessed = false;
                 if (data.isMain == selectedHeroData.isMain)
                 {
-                    DoAutoSkillAction(selectedAction, out isSuccessed);
+                    DoAutoSkillAction(selectedAction);
                 }
                 else
                 {
-                    DoAutoSkillAction(data, selectedAction, out isSuccessed);
+                    DoAutoSkillAction(data, selectedAction);
                 }
             };
 
-            if (key == HeroNameAction.SwithBtn)
+            if (key == HeroNameAction.SwitchBtn)
             {
                 if (isAutoSwitching)
                 {
@@ -601,41 +517,24 @@ namespace Immortal_Switch.Scripts.UI
             }
         }
 
-        public void AutoActiveSwitch(Action<HeroNameAction> endFucn = null, bool isMain = true)
+        public void AutoActiveSwitch(Action<HeroNameAction> endFunc, int index)
         {
-            if(isAutoSwitching)
+            endFunc?.Invoke(HeroNameAction.SwitchBtn);
+
+            if (!isAutoSwitching)
             {
-                var data = !isMain ? secondHeroData : firstHeroData;
-                if (data.timerCoolings[HeroNameAction.SwithBtn] <= 0)
-                {
-                    var isSuccessed = false;
-                    if (data.isMain == selectedHeroData.isMain)
-                    {
-                        DoAutoSkillAction(HeroNameAction.SwithBtn, out isSuccessed);
-                    }
-                    else
-                    {
-                        DoAutoSkillAction(data, HeroNameAction.SwithBtn, out isSuccessed);
-                    }
-                }
+                return;
             }
-
-            endFucn?.Invoke(HeroNameAction.SwithBtn);
-        }
-
-        public void SwapMainHero(int hid)
-        {
-            if(firstHeroData.isMain)
+            
+            var data = inBattleHeroesCoolingData[index];
+            if (!(data.timerCoolings[HeroNameAction.SwitchBtn] <= 0)) return;
+            if (data.isMain == selectedHeroData.isMain)
             {
-                firstHeroData.isMain = false;
-                secondHeroData.isMain = true;
-                selectedHeroData = secondHeroData;
+                DoAutoSkillAction(HeroNameAction.SwitchBtn);
             }
             else
             {
-                secondHeroData.isMain = false;
-                firstHeroData.isMain = true;
-                selectedHeroData = firstHeroData;
+                DoAutoSkillAction(data, HeroNameAction.SwitchBtn);
             }
         }
     }

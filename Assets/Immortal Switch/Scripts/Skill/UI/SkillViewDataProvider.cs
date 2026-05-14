@@ -22,7 +22,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public int HeroId;
         public HeroClass HeroClass;
         public Sprite HeroIcon;
-        public bool IsMain;
         public List<int> EquippedSkillIds = new();
         public PlayerHeroController RuntimeController;
     }
@@ -244,7 +243,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
                     HeroId = heroId,
                     HeroClass = hero.HeroClass,
                     HeroIcon = hero.HeroIcon,
-                    IsMain = hero.IsMainHero,
                     EquippedSkillIds = equipped,
                     RuntimeController = hero
                 });
@@ -281,7 +279,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 HeroId = heroId,
                 HeroClass = hero.HeroClass,
                 HeroIcon = hero.HeroIcon,
-                IsMain = hero.IsMainHero,
                 EquippedSkillIds = equipped,
                 RuntimeController = hero
             };

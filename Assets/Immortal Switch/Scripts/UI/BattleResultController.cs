@@ -19,8 +19,7 @@ namespace Immortal_Switch.Scripts.UI
         {
             GameEventManager.Subscribe(GameEvents.OnStageCleared, ()=>SetBattleResultState(true));
         }
-
-
+        
         void Start()
         {
             confirmBtn?.onClick.AddListener(OnConfirmBtnClick);
@@ -47,7 +46,6 @@ namespace Immortal_Switch.Scripts.UI
 
             confirmActs.Clear();
             SetBattleResultState(false);
-            //confirmAct = null;
         }
 
         private void SetBattleResultState(bool isEnable)
@@ -58,11 +56,6 @@ namespace Immortal_Switch.Scripts.UI
             {
                 Invoke(nameof(OnConfirmBtnClick), 3f);
             }
-        }
-
-        public void ShowBattleResult(bool isWin = true)
-        {
-            SetBattleResultState(true);
         }
 
         private void AutoNextCallback()

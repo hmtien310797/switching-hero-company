@@ -14,5 +14,6 @@
         public const string OnChangeHero = "OnChangeHero";
         // Change skill event
         public const string OnChangeSkill = "OnChangeSkill";
+        public const string OnNextStageButtonClicked = "OnNextStageButtonClicked";
     }
 }

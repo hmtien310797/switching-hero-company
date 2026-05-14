@@ -15,14 +15,6 @@ using UnityEngine;
 
 namespace Battle
 {
-    public class UIHeroBehavior
-    {
-        public bool IsAutoSwitch = false;
-        public bool IsAutoSkills = false;
-        public int SwitchIdx = -1;
-        public int SkillIdx = -1;
-    }
-    
     public class HeroCoolingTimeDefine
     {
         public float intervalSkill1;
@@ -43,62 +35,54 @@ namespace Battle
     public class PlayerHeroController : BaseCharacterController<PlayerHeroController>, ICombatUnit
     {
         [SerializeField] SkeletonAnimation hero;
-        [SerializeField] HeroUIView heroUIView;
-        [SerializeField] Material hideMat;
         [SerializeField] private HeroProgressionRuntimeBridge progressionBridge;
         [SerializeField] private HeroEquipmentRuntimeBridge equipmentBridge;
+        [SerializeField] private HeroBehaviorParams behaviorParams;
         [SerializeField] float distFlashConst = 5;
         [SerializeField] float distSkillRange = 5;
         [SerializeField] float intervalSwitch = 20;
         [SerializeField] float switchArea = 5;
 
         private Material originalMaterial;
-        [SerializeField] HeroBehaviorParams behaviorParams;
 
         private PlayerCamController playerCamController;
         private PvEBattleController pvEBattleController;
         private MonsterScrepController _monsterTarget;
-        private Action endAct = null;
-        private Transform partnerTrans = null;
         private HeroDataSO baseHeroData;
         private HeroCoolingTimeDefine intervalSkill = null; 
         private Vector3 targetPos = Vector3.zero;
         private FollowHeroController followHeroController;
         private Dictionary<SkillSlot, int> skillIdDict = new Dictionary<SkillSlot, int>();
         private Transform skillRootTrans;
-
-        public SpawnState SpawnState = new SpawnState();
-        public IdleState IdleState = new IdleState();
-        public MoveState MoveState = new MoveState();
-        public FlashState FlashState = new FlashState();
-        public AttackState AttackState = new AttackState();
-        public SwitchState SwitchHeroState = new SwitchState();
-        public InjuredState InjureedState = new InjuredState();
-        public DeathState DeathState = new DeathState();
-        public WinState WinState = new WinState();
+        private SpawnState SpawnState = new SpawnState();
+        private IdleState IdleState = new IdleState();
+        private MoveState MoveState = new MoveState();
+        private FlashState FlashState = new FlashState();
+        private AttackState AttackState = new AttackState();
+        private SwitchState SwitchHeroState = new SwitchState();
+        private DeathState DeathState = new DeathState();
+        private WinState WinState = new WinState();
 
         [ShowInInspector]
         public Dictionary<SkillSlot, int> SkillIdDict => skillIdDict;
-        public MonsterScrepController MonsterTarget { get => _monsterTarget; set => _monsterTarget = value; }
+        public MonsterScrepController MonsterTarget { get => _monsterTarget;
+            private set => _monsterTarget = value; }
         public FollowHeroController FollowHeroController { get => followHeroController; set => followHeroController = value; }
         public HeroClass HeroClass { get; private set; }
         public Sprite HeroIcon { get; private set; }
-        public bool IsMainHero => behaviorParams.IsMain;
+        public int HeroIndex { get; private set; } = -1;
 
         protected override void Awake()
         {
             base.Awake();
-            
             GameEventManager.Subscribe(GameEvents.OnStageCleared, RegisterBattleResult);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnGameLose);
         }
 
-        public void InitHero(HeroDataSO data, PvEBattleController pbc, PlayerCamController pcc, Transform soTrans,
-            Transform partnerTrans, FollowHeroController fHc, HeroClass heroClass, bool isSwitch = false, bool isMainHero = false)
+        public void InitHero(HeroDataSO data, PvEBattleController pbc, PlayerCamController pcc, Transform soTrans, FollowHeroController fHc, int index)
         {
+            HeroIndex = index;
             skillRootTrans = soTrans;
-            behaviorParams.IsMain = isMainHero;
-            behaviorParams.IsPriorityNearTarget = behaviorParams.IsMain;
             behaviorParams.IsValid = true;
             behaviorParams.HeroId = data.Id;
             pvEBattleController = pbc;
@@ -107,13 +91,13 @@ namespace Battle
             behaviorParams.IsInSkillAction = false;
             baseHeroData = data;
             followHeroController = fHc;
+            followHeroController.SetFollowTarget(transform);
             HeroClass = data.HeroClass;
             HeroIcon = data.PortraitIcon;
-
-            SetPartner(partnerTrans);
+            
             var skillIds = UserDataCache.Instance.GetEquippedSkills(behaviorParams.HeroId);
             SetIntervalSkills(skillIds);
-            playerCamController?.InitCam(transform, behaviorParams.IsMain);
+            playerCamController?.InitCam(transform, HeroIndex);
             InitSkill(skillIds, soTrans);
             SetTargetPos();
             InitHeroData();
@@ -121,15 +105,8 @@ namespace Battle
             InitUIHeroBattle();
         }
 
-        public HeroUIView UISprite => heroUIView;
-
         public float GetSwitchArea => behaviorParams.SwitchArea;
-
-        public void GotoInValid()
-        {
-            behaviorParams.IsValid = false;
-        }
-
+        
         public bool IsValid()
         {
             return behaviorParams.IsValid;
@@ -177,54 +154,7 @@ namespace Battle
 
             return MasterDataCache.Instance.GetSkillDataById(skillId)?.CooldownTime ?? 10f;
         }
-
-        private void OnChageSkillEvent(int slotId, int skillId)
-        {
-            switch(slotId)
-            {
-                case 0:
-                    skillIdDict[(SkillSlot)slotId] = skillId;
-                    intervalSkill.intervalSkill1 = MasterDataCache.Instance.GetSkillDataById(skillId)?.CooldownTime ?? 10f;
-                    UIHeroBattleController.Instance?.ChangeSkillByIdx(HeroNameAction.Skill1Btn, intervalSkill.intervalSkill1, behaviorParams.HeroId);
-                    ChangeSkillBySlot(slotId, skillId);
-                    break;
-                case 1:
-                    ChangeSkillCallback(slotId, skillId, ref intervalSkill.intervalSkill2);
-                    break;
-                case 2:
-                    ChangeSkillCallback(slotId, skillId, ref intervalSkill.intervalSkill3);
-                    break;
-                case 3:
-                    ChangeSkillCallback(slotId, skillId, ref intervalSkill.intervalSkill4);
-                    break;
-                case 4:
-                    ChangeSkillCallback(slotId, skillId, ref intervalSkill.intervalSkill5);
-                    break;
-            }
-        }
-
-        private void ChangeSkillCallback(int slotId, int skillId, ref float interval)
-        {
-            skillIdDict[(SkillSlot)slotId] = skillId;
-            interval = MasterDataCache.Instance.GetSkillDataById(skillId)?.CooldownTime ?? 10f;
-            UIHeroBattleController.Instance?.ChangeSkillByIdx(HeroNameAction.Skill1Btn, interval, behaviorParams.HeroId);
-            ChangeSkillBySlot(slotId, skillId);
-        }
-
-        public void SetPartner(Transform partnerTrans)
-        {
-            this.partnerTrans = partnerTrans;
-        }
-
-        public void DoSwitchHero(PlayerCamController pCc)
-        {
-            behaviorParams.IsValid = true;
-            playerCamController = pCc;
-            playerCamController?.InitCam(transform, behaviorParams.IsMain);
-            InitUIHeroBattle();
-            SwitchState(SpawnState);
-        }
-
+        
         private void InitHeroData()
         {
             baseStatData = new BaseStat
@@ -273,10 +203,7 @@ namespace Battle
             if (!behaviorParams.IsInSkillAction && !behaviorParams.IsInSwitchAction && IsInSkillRange(behaviorParams.DistSkillRange))
             {
                 return;
-                UIHeroBattleController.Instance?.AutoActiveSwitch((r) =>
-                {
-                    return;
-                }, behaviorParams.IsMain);
+                UIHeroBattleController.Instance?.AutoActiveSwitch(null, behaviorParams.IsMain);
             }
 
             if (!behaviorParams.IsInSwitchAction && !behaviorParams.IsInSkillAction && IsInSkillRange(behaviorParams.DistSkillRange))
@@ -300,35 +227,8 @@ namespace Battle
                         default:
                             return 0;
                     }
-                }, behaviorParams.IsMain);
+                }, HeroIndex);
             }
-        }
-
-        private void LateUpdate()
-        {
-            /*if (monsterStarget == null)
-            {
-                var renderer = hero.GetComponent<MeshRenderer>();
-                renderer.sortingOrder = 0;
-                hero.CustomMaterialOverride.Clear();
-                return;
-            }
-
-            bool isBehind = hero.transform.position.z > monsterStarget.transform.position.z;
-
-            if (isBehind)
-            {
-                var renderer = hero.GetComponent<MeshRenderer>();
-                renderer.sortingOrder = 2;
-                hero.CustomMaterialOverride.Clear();
-                hero.CustomMaterialOverride.Add(originalMaterial, hideMat);
-            }
-            else
-            {
-                var renderer = hero.GetComponent<MeshRenderer>();
-                renderer.sortingOrder = 0;
-                hero.CustomMaterialOverride.Clear();
-            }*/
         }
 
         public int GetHeroId()
@@ -357,19 +257,19 @@ namespace Battle
 
         private void InitUIHeroBattle()
         {
-            UIHeroBattleController.Instance?.SetPlayerHeroInstance(this, behaviorParams.IsMain, behaviorParams.HeroId, skillIdDict);
+            UIHeroBattleController.Instance?.SetPlayerHeroInstance(this, HeroIndex, behaviorParams.HeroId, skillIdDict);
             UIHeroBattleController.Instance?.RegisterHeroSwitch(ChangeToMain);
-            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.AutoSwitchBtn, null, 5, false, behaviorParams.IsMain);
-            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.AutoSkillBtn, null, 5, false, behaviorParams.IsMain);
-            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill1Btn, () => DoIntoSkill(HeroSkills.Skill1, EndAction), intervalSkill.intervalSkill1, true, behaviorParams.IsMain);
-            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill2Btn, () => DoIntoSkill(HeroSkills.Skill2, EndAction), intervalSkill.intervalSkill2, true, behaviorParams.IsMain);
-            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill3Btn, () => DoIntoSkill(HeroSkills.Skill3, EndAction), intervalSkill.intervalSkill3, true, behaviorParams.IsMain);
-            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill4Btn, () => DoIntoSkill(HeroSkills.Skill4, EndAction), intervalSkill.intervalSkill4, true, behaviorParams.IsMain);
-            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill5Btn, () => DoIntoSkill(HeroSkills.Skill5, EndAction), intervalSkill.intervalSkill5, true, behaviorParams.IsMain);
-            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.SwithBtn, () =>
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.AutoSwitchBtn, null, 0, HeroIndex);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.AutoSkillBtn, null, 0, HeroIndex);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill1Btn, () => DoIntoSkill(HeroSkills.Skill1, EndAction), intervalSkill.intervalSkill1, HeroIndex);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill2Btn, () => DoIntoSkill(HeroSkills.Skill2, EndAction), intervalSkill.intervalSkill2, HeroIndex);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill3Btn, () => DoIntoSkill(HeroSkills.Skill3, EndAction), intervalSkill.intervalSkill3, HeroIndex);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill4Btn, () => DoIntoSkill(HeroSkills.Skill4, EndAction), intervalSkill.intervalSkill4, HeroIndex);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.Skill5Btn, () => DoIntoSkill(HeroSkills.Skill5, EndAction), intervalSkill.intervalSkill5, HeroIndex);
+            UIHeroBattleController.Instance?.RegisterActionByIdx(HeroNameAction.SwitchBtn, () =>
             {
                 if(gameObject.activeInHierarchy) SwitchState(SwitchHeroState);
-            }, intervalSkill.intervalSwitch, true, behaviorParams.IsMain);
+            }, intervalSkill.intervalSwitch, HeroIndex);
         }
 
         private void ChangeToMain(int hid)
@@ -378,15 +278,8 @@ namespace Battle
 
             behaviorParams.IsPriorityNearTarget = !behaviorParams.IsPriorityNearTarget;
             SetTargetPos();
-            //if(isMain) pvEBattleController?.SwitchHero(heroId);
         }
-
-        public bool GetPriorityNearTarget() { return behaviorParams.IsPriorityNearTarget; }
-
-        public void SetPriorityNearTarget(bool isPriority)
-        {
-            behaviorParams.IsPriorityNearTarget = isPriority; 
-        }
+        
 
         public void DoShakeCam(float dur, int viration, ShakeType shakeType)
         {
@@ -620,18 +513,6 @@ namespace Battle
             DoChangeState();
         }
 
-        public Action SetEndAction(Action act)
-        {
-            endAct = act;
-
-            return endAct;
-        }
-
-        public void ResetEndAct()
-        {
-            endAct = null;
-        }
-
         public void ResetFlashParam()
         {
             behaviorParams.IsInFlashAction = false;
@@ -640,8 +521,6 @@ namespace Battle
         private void SetIsInActionState(bool isActive)
         {
             behaviorParams.IsInSkillAction = isActive;
-            if(!IsMainHero)
-                Debug.Log($"active skill is: {isActive}");
         }
 
         public bool IsInAction()
@@ -677,7 +556,7 @@ namespace Battle
             pos.y = transform.position.y;
             var isLeft = transform.position.x < pos.x;
             if(HeroClass is HeroClass.Assassin or HeroClass.Warrior)
-                return pos + new Vector3( - baseStatData.AttackRange * .9f * (behaviorParams.IsMain ? 1 : -1), 0, - baseStatData.AttackRange * .5f);
+                return pos + new Vector3( - baseStatData.AttackRange * .9f * (HeroIndex == 0 ? 1 : -1), 0, - baseStatData.AttackRange * .5f);
             else
             {
                 var posZ = baseStatData.AttackRange * .9f * (_monsterTarget.IsBoss() ? -1 : (behaviorParams.IsPriorityNearTarget ? 1 : -1));
@@ -707,7 +586,7 @@ namespace Battle
                 t.OnReceiveDamage(factorDam, ResetTarget, this);
             }
 
-            Debug.Log($"hero is main {behaviorParams.IsMain} dame is {factorDam} monsters is {targets.Count}");
+            Debug.Log($"hero is main {gameObject.name} dame is {factorDam} monsters is {targets.Count}");
         }
 
         public void AttackSpecificByArea(Vector3 pos, out bool isDeath, float attackRange = 0, float factorDam = 1)
@@ -728,7 +607,7 @@ namespace Battle
                 }
             }
 
-            Debug.Log($"hero is main {behaviorParams.IsMain} dame is {factorDam} monsters is {targets.Count}");
+            Debug.Log($"hero is main {gameObject.name} dame is {factorDam} monsters is {targets.Count}");
         }
 
         public Vector3 GetWeakestEnemy()
@@ -883,7 +762,7 @@ namespace Battle
     {
         public void EndState(PlayerHeroController state)
         {
-            state.ResetEndAct();
+            
         }
 
         public void StartState(PlayerHeroController state)
@@ -915,7 +794,7 @@ namespace Battle
     {
         public void EndState(PlayerHeroController state)
         {
-            state.ResetEndAct();
+            
         }
 
         public void StartState(PlayerHeroController state)
@@ -932,7 +811,6 @@ namespace Battle
     {
         public void EndState(PlayerHeroController state)
         {
-            state.ResetEndAct();
         }
 
         public void StartState(PlayerHeroController state)
