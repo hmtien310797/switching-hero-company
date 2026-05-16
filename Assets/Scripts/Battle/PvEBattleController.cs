@@ -85,6 +85,8 @@ namespace Battle
         {
             GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
+            GameEventManager.Subscribe(GameEvents.OnNextStageButtonClicked, () => NextStageCallback().Forget());
+            GameEventManager.Subscribe(GameEvents.OnStageLost, () => OnStageFailed().Forget());
         }
 
         public override async UniTask InitializeAsync()
@@ -504,8 +506,9 @@ namespace Battle
             losingStage = false;
         }
 
-        public void OnStageFailed()
+        public async UniTask OnStageFailed()
         {
+            await UniTask.Delay(2000);
             result = BattleResult.Defeat;
             PoolController.Instance.ReturnToPool(currentBoss.gameObject);
             currentBoss = null;
@@ -877,7 +880,7 @@ namespace Battle
 
         public async UniTask NextStageCallback()
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(1f));
+            await UniTask.Delay(TimeSpan.FromSeconds(7f));
             Debug.Log("[PvE] Next Stage");
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
             for (int i = 0; i < inBattleHeroCollection.Length; i++)

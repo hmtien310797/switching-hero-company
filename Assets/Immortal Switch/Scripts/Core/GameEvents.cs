@@ -15,5 +15,6 @@
         // Change skill event
         public const string OnChangeSkill = "OnChangeSkill";
         public const string OnNextStageButtonClicked = "OnNextStageButtonClicked";
+        public const string OnSpawnNextStage = "OnSpawnNextStage";
     }
 }

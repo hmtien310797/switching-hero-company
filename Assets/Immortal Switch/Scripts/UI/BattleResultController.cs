@@ -11,8 +11,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] Button confirmBtn;
         [SerializeField] Button autoNextBtn;
         [SerializeField] GameObject innerSelected;
-
-        private List<Action> confirmActs = new();
+        
         private bool isAutoActived = false;
 
         private void Awake()
@@ -26,12 +25,7 @@ namespace Immortal_Switch.Scripts.UI
             gameObject.SetActive(false);
             autoNextBtn?.onClick.AddListener(AutoNextCallback);
         }
-
-        public void RegisterConfirmAction(Action endAct)
-        {
-            confirmActs.Add(endAct);
-        }
-
+        
         private void OnConfirmBtnClick()
         {
             if (!gameObject.activeInHierarchy)
@@ -39,12 +33,7 @@ namespace Immortal_Switch.Scripts.UI
                 return;
             }
 
-            foreach (var action in confirmActs)
-            {
-                action?.Invoke();
-            }
-
-            confirmActs.Clear();
+            GameEventManager.Trigger(GameEvents.OnNextStageButtonClicked);
             SetBattleResultState(false);
         }
 

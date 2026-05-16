@@ -261,13 +261,14 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 return null;
             }
 
-            if (!battleController.TryGetActiveHeroByClass(heroClass, out var hero) || hero == null)
+            PlayerHeroController heroController = battleController.TryGetActiveHeroByClass(heroClass);
+            if (heroController == null)
             {
                 LogWarning($"GetAssignedHeroByClass -> no active hero for class={heroClass}");
                 return null;
             }
 
-            int heroId = hero.GetHeroId();
+            int heroId = heroController.GetHeroId();
             var equipped = UserDataCache.Instance != null
                 ? UserDataCache.Instance.GetEquippedSkills(heroId)
                 : new List<int>();
@@ -277,10 +278,10 @@ namespace Immortal_Switch.Scripts.Skill.UI
             return new SkillViewHeroContext
             {
                 HeroId = heroId,
-                HeroClass = hero.HeroClass,
-                HeroIcon = hero.HeroIcon,
+                HeroClass = heroController.HeroClass,
+                HeroIcon = heroController.HeroIcon,
                 EquippedSkillIds = equipped,
-                RuntimeController = hero
+                RuntimeController = heroController
             };
         }
 

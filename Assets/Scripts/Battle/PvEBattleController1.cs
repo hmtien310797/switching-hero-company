@@ -10,55 +10,28 @@ namespace Battle
 
         public IReadOnlyList<PlayerHeroController> GetActiveHeroControllers()
         {
-            var result = new List<PlayerHeroController>(2);
-
-            if (firstPlayerHeroController != null && firstPlayerHeroController.gameObject.activeInHierarchy)
-                result.Add(firstPlayerHeroController);
-
-            if (secondPlayerHeroController != null && secondPlayerHeroController.gameObject.activeInHierarchy)
-                result.Add(secondPlayerHeroController);
-
-            return result;
+            return inBattleHeroCollection;
         }
 
-        public bool TryGetActiveHeroByClass(HeroClass heroClass, out PlayerHeroController hero)
+        public PlayerHeroController TryGetActiveHeroByClass(HeroClass heroClass)
         {
-            hero = null;
-
-            if (firstPlayerHeroController != null &&
-                firstPlayerHeroController.gameObject.activeInHierarchy &&
-                firstPlayerHeroController.HeroClass == heroClass)
+            for (int i = 0; i < inBattleHeroCollection.Length; i++)
             {
-                hero = firstPlayerHeroController;
-                return true;
+                PlayerHeroController currentHero = inBattleHeroCollection[i];
+                if (currentHero.HeroClass == heroClass)
+                {
+                    return currentHero;
+                }
             }
 
-            if (secondPlayerHeroController != null &&
-                secondPlayerHeroController.gameObject.activeInHierarchy &&
-                secondPlayerHeroController.HeroClass == heroClass)
-            {
-                hero = secondPlayerHeroController;
-                return true;
-            }
-
-            return false;
+            return null;
         }
 
         public bool HasActiveHeroOfClass(HeroClass heroClass)
         {
-            return TryGetActiveHeroByClass(heroClass, out _);
+            return TryGetActiveHeroByClass(heroClass);
         }
-
-        public PlayerHeroController GetHeroInSlot(int slotIndex)
-        {
-            return slotIndex switch
-            {
-                0 => firstPlayerHeroController,
-                1 => secondPlayerHeroController,
-                _ => null
-            };
-        }
-
+        
         private void NotifyActiveLineupChanged()
         {
             OnActiveLineupChanged?.Invoke();
