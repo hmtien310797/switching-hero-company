@@ -58,6 +58,8 @@ namespace Battle
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
+        [Header("Hero Team")]
+        [SerializeField] private HeroTeamController heroTeamController;
 
         private BattleResult result = BattleResult.None;
         private readonly List<EnemyActor> creeps = new();
@@ -76,11 +78,15 @@ namespace Battle
         private GameData gameData;
         private BossActor currentBoss;
 
-        private HeroActor inBattleHeroA;
-        private HeroActor inBattleHeroB;
-
         private bool isReadyBattle = false;
         private bool losingStage = false;
+        
+        private readonly HeroActor[] inBattleHeroes = new HeroActor[2];
+
+        private readonly Dictionary<int, HeroActor> inBattleHeroMapper = new();
+
+        private HeroActor inBattleHeroA;
+        private HeroActor inBattleHeroB;
 
         public BattleState State { get; private set; } = BattleState.None;
         public List<EnemyActor> MonsterList => creeps;
@@ -125,36 +131,66 @@ namespace Battle
 
         private void OnChangeHero(int sourceHeroId, int targetHeroId)
         {
-            // if (!CanSwitchHero(sourceHeroId, targetHeroId))
-            //     return;
-            //
-            // PlayerHeroController oldHero = inBattleHeroMapper.GetValueOrDefault(sourceHeroId);
-            // if (oldHero == null)
-            // {
-            //     Debug.LogError($"[PvE] Cannot find hero with id={sourceHeroId}");
-            //     return;
-            // }
-            // Vector3 spawnPos = oldHero.transform.position;
-            //
-            // var newHeroData = MasterDataCache.Instance.GetHeroDataById(targetHeroId);
-            // if (newHeroData == null)
-            //     return;
-            //
-            // inBattleHeroIdList[oldHero.HeroIndex] = targetHeroId;
-            //
-            // inBattleHeroMapper.Remove(sourceHeroId);
-            //
-            // oldHero.gameObject.SetActive(false);
-            //
-            // var (newHero, isNewInstance) = PoolController.Instance.Get(newHeroData.PlayerHeroController, spawnPos);
-            //  if (newHero == null)
-            //      return;
-            //
-            //  newHero.InitHero(newHeroData, this, playerCamController, skillObjTrans, enemySpawnerCollection[oldHero.HeroIndex], oldHero.HeroIndex);
-            //  inBattleHeroMapper[targetHeroId] = newHero;
-            //  RefreshBattleUISlot(newHero, targetHeroId);
-            //  inBattleHeroCollection[oldHero.HeroIndex] = newHero;
-            //  NotifyActiveLineupChanged();
+            if (!CanSwitchHero(sourceHeroId, targetHeroId))
+                return;
+
+            int slotIndex = inBattleHeroIdList.IndexOf(sourceHeroId);
+
+            if (slotIndex < 0 || slotIndex >= inBattleHeroes.Length)
+            {
+                Debug.LogError($"[PvE] Cannot find slot for sourceHeroId={sourceHeroId}");
+                return;
+            }
+
+            HeroActor oldHero = inBattleHeroes[slotIndex];
+
+            if (oldHero == null)
+            {
+                Debug.LogError($"[PvE] Old hero is null. sourceHeroId={sourceHeroId}, slot={slotIndex}");
+                return;
+            }
+
+            Vector3 spawnPos = oldHero.transform.position;
+
+            HeroDataSO newHeroData = MasterDataCache.Instance.GetHeroDataById(targetHeroId);
+
+            if (newHeroData == null)
+            {
+                Debug.LogError($"[PvE] Cannot find target hero data. targetHeroId={targetHeroId}");
+                return;
+            }
+
+            if (newHeroData.HeroPrefab == null)
+            {
+                Debug.LogError($"[PvE] Target hero prefab is null. targetHeroId={targetHeroId}");
+                return;
+            }
+
+            inBattleHeroIdList[slotIndex] = targetHeroId;
+
+            inBattleHeroMapper.Remove(sourceHeroId);
+
+            oldHero.gameObject.SetActive(false);
+            PoolController.Instance.ReturnToPool(oldHero.gameObject);
+
+            var (newHero, _) = PoolController.Instance.Get(
+                newHeroData.HeroPrefab,
+                spawnPos
+            );
+
+            if (newHero == null)
+                return;
+
+            newHero.gameObject.SetActive(true);
+            newHero.Init(newHeroData, this);
+
+            inBattleHeroes[slotIndex] = newHero;
+            inBattleHeroMapper[targetHeroId] = newHero;
+
+            RefreshHeroSlotCache();
+            RefreshHeroTeamController();
+            RefreshEnemyHeroTargets();
+            NotifyActiveLineupChanged();
         }
         
 
@@ -176,7 +212,7 @@ namespace Battle
         {
             // asign to 1 and 2
             inBattleHeroIdList.Clear();
-            inBattleHeroIdList = new List<int>() { 1, 17 };
+            inBattleHeroIdList = new List<int>() { 2, 4 };
         }
 
         private async UniTask InitPlayerHeroById(bool isSwitch = false)
@@ -191,17 +227,72 @@ namespace Battle
             await UniTask.Delay(1000);
         }
 
-        private async UniTask SpawnHero(HeroDataSO heroDt, int heroIndex)
+        private async UniTask SpawnHero(HeroDataSO heroData, int heroIndex)
         {
-            // var (hero, b) = PoolController.Instance.Get(heroDt.PlayerHeroController,
-            //     heroIndex == 0 ? Vector3.forward * 12 + Vector3.left * 1.5f : Vector3.forward * 12 + Vector3.right * 1.5f);
-            // inBattleHeroMapper[heroDt.Id] = hero;
-            //
-            // inBattleHeroCollection[heroIndex] = hero;
-            // inBattleHeroCollection[heroIndex].InitHero(heroDt, this, playerCamController, skillObjTrans, enemySpawnerCollection[heroIndex], 0);
-            //
-            // await UniTask.Delay(1000);
-            // NotifyActiveLineupChanged();
+            if (heroData == null)
+            {
+                Debug.LogError($"[PvE] HeroData is null. heroIndex={heroIndex}");
+                return;
+            }
+
+            if (heroData.HeroPrefab == null)
+            {
+                Debug.LogError($"[PvE] HeroPrefab is null. heroId={heroData.Id}");
+                return;
+            }
+
+            Vector3 spawnPos = GetHeroSpawnPosition(heroIndex);
+
+            var (hero, _) = PoolController.Instance.Get(
+                heroData.HeroPrefab,
+                spawnPos
+            );
+
+            if (hero == null)
+            {
+                Debug.LogError($"[PvE] Cannot spawn hero. heroId={heroData.Id}");
+                return;
+            }
+
+            hero.gameObject.SetActive(true);
+            hero.Init(heroData, this);
+
+            inBattleHeroes[heroIndex] = hero;
+            inBattleHeroMapper[heroData.Id] = hero;
+
+            RefreshHeroSlotCache();
+            RefreshHeroTeamController();
+            RefreshEnemyHeroTargets();
+
+            await UniTask.Delay(100);
+        }
+        
+        private Vector3 GetHeroSpawnPosition(int heroIndex)
+        {
+            Vector3 center = Vector3.forward * 12f;
+            if (heroIndex == 0)
+            {
+                return center + Vector3.left * 1.5f;
+            }
+
+            return center + Vector3.right * 1.5f;
+        }
+        
+        private void RefreshHeroSlotCache()
+        {
+            inBattleHeroA = inBattleHeroes[0];
+            inBattleHeroB = inBattleHeroes[1];
+        }
+        
+        private void RefreshHeroTeamController()
+        {
+            if (heroTeamController == null)
+                return;
+
+            heroTeamController.SetHeroes(
+                inBattleHeroA,
+                inBattleHeroB
+            );
         }
 
         private void BuildBossDataLookup()
@@ -416,16 +507,22 @@ namespace Battle
                     var nPos = basePos + new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f));
 
                     var (creep, _) = PoolController.Instance.Get(creepData.CreepPrefab, nPos);
-                    if (k % 5 == 0)
-                    {
-                        creep.transform.localScale = Vector3.one * 1.5f;
-                    }
-                    else
-                    {
-                        creep.transform.localScale = Vector3.one;
-                    }
-                    
-                    creep.Init(creepData, inBattleHeroA, inBattleHeroB);
+
+                    creep.gameObject.SetActive(true);
+
+                    creep.transform.localScale = k % 5 == 0
+                        ? Vector3.one * 1.5f
+                        : Vector3.one;
+
+                    creep.Init(
+                        creepData,
+                        inBattleHeroA,
+                        inBattleHeroB
+                    );
+
+                    creep.OnDead -= NotifyMonsterDeath;
+                    creep.OnDead += NotifyMonsterDeath;
+
                     creeps.Add(creep);
                     aliveCreepCount++;
                     totalCreepsSpawnedThisStage++;
@@ -517,18 +614,24 @@ namespace Battle
         //khi monster chết 
         public void NotifyMonsterDeath(EnemyActor enemy)
         {
-            if (enemy == null) return;
-            if (!enemy.gameObject.activeInHierarchy) return;
+            if (enemy == null)
+                return;
 
+            enemy.OnDead -= NotifyMonsterDeath;
             DropCoinAsync(enemy.transform.position);
-            PoolController.Instance.ReturnToPool(enemy.gameObject);
             creeps.Remove(enemy);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
-            deadCreepCount = losingStage ? GameData.Instance.maxCreepsPerStage : deadCreepCount + 1;
+            deadCreepCount = losingStage
+                ? GameData.Instance.maxCreepsPerStage
+                : deadCreepCount + 1;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
-            if (State != BattleState.FightingCreeps) return;
-            if (aliveCreepCount != 0) return;
 
+            if (State != BattleState.FightingCreeps)
+                return;
+
+            if (aliveCreepCount != 0)
+                return;
+            
             if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage)
             {
                 isReadyBattle = false;
@@ -536,8 +639,34 @@ namespace Battle
                 isReadyBattle = true;
                 return;
             }
-
             SpawnBoss();
+        }
+        
+        private void RefreshEnemyHeroTargets()
+        {
+            for (int i = creeps.Count - 1; i >= 0; i--)
+            {
+                EnemyActor creep = creeps[i];
+
+                if (creep == null || creep.IsDead)
+                {
+                    creeps.RemoveAt(i);
+                    continue;
+                }
+
+                creep.SetHeroTargets(
+                    inBattleHeroA,
+                    inBattleHeroB
+                );
+            }
+
+            if (currentBoss != null && !currentBoss.IsDead)
+            {
+                currentBoss.SetHeroTargets(
+                    inBattleHeroA,
+                    inBattleHeroB
+                );
+            }
         }
 
         private void DropCoinAsync(Vector3 pos)
@@ -553,29 +682,76 @@ namespace Battle
 
         private Transform FindHeroNearestFromPos(Vector3 pos)
         {
-            //need implement
-            // Transform firstPlayerPos = inBattleHeroCollection[0].transform;
-            // Transform secondPlayerPos = inBattleHeroCollection[1].transform;
-            //
-            // float dist = (firstPlayerPos.position - pos).magnitude;
-            // float dist2 = (secondPlayerPos.position - pos).magnitude;
-            //
-            // if(dist2 < dist) return secondPlayerPos;
-            // if(dist < float.MaxValue) return firstPlayerPos;
+            HeroActor firstHero = inBattleHeroA;
+            HeroActor secondHero = inBattleHeroB;
 
-            return null;
+            if (firstHero == null && secondHero == null)
+                return null;
+
+            if (firstHero == null)
+                return secondHero.transform;
+
+            if (secondHero == null)
+                return firstHero.transform;
+
+            float distA = (firstHero.transform.position - pos).sqrMagnitude;
+            float distB = (secondHero.transform.position - pos).sqrMagnitude;
+
+            return distB < distA
+                ? secondHero.transform
+                : firstHero.transform;
         }
         
-        public EnemyActor GetNearestMonster(Vector3 pos)
+        public ICombatUnit GetNearestEnemy(Vector3 pos)
         {
-            //need implement
-            return null;
-        }
+            if (!isReadyBattle)
+                return null;
 
-        public bool IsExistMonsterInRange(Vector3 pos, float range)
-        {
-            //need implement
-            return false;
+            ICombatUnit nearest = null;
+            float nearestSqr = float.MaxValue;
+
+            Vector3 selfPos = pos;
+            selfPos.y = 0f;
+
+            for (int i = creeps.Count - 1; i >= 0; i--)
+            {
+                EnemyActor creep = creeps[i];
+
+                if (creep == null || creep.IsDead || !creep.gameObject.activeInHierarchy)
+                {
+                    creeps.RemoveAt(i);
+                    continue;
+                }
+
+                Vector3 creepPos = creep.Position;
+                creepPos.y = 0f;
+
+                float sqr = (creepPos - selfPos).sqrMagnitude;
+
+                if (sqr < nearestSqr)
+                {
+                    nearestSqr = sqr;
+                    nearest = creep;
+                }
+            }
+
+            if (State == BattleState.FightingBoss &&
+                currentBoss != null &&
+                !currentBoss.IsDead &&
+                currentBoss.gameObject.activeInHierarchy)
+            {
+                Vector3 bossPos = currentBoss.Position;
+                bossPos.y = 0f;
+
+                float bossSqr = (bossPos - selfPos).sqrMagnitude;
+
+                if (bossSqr < nearestSqr)
+                {
+                    nearest = currentBoss;
+                }
+            }
+
+            return nearest;
         }
         
         public Vector3 GetLowestHpEnemy(Vector3 pos, float range)

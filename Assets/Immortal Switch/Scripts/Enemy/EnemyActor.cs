@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Battle;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Immortal_Switch.Scripts.Enemy
 {
@@ -61,6 +63,8 @@ namespace Immortal_Switch.Scripts.Enemy
         public float MaxHp => stats != null && stats.HealthModule != null
             ? stats.HealthModule.MaxHP
             : 0f;
+        
+        public event Action<EnemyActor> OnDead;
 
         private void Awake()
         {
@@ -195,17 +199,6 @@ namespace Immortal_Switch.Scripts.Enemy
 
             if (heroB != null)
                 heroTargets.Add(heroB);
-        }
-
-        public void TakeDamage(ICombatUnit attacker, float amount = 1)
-        {
-            if (IsDead)
-                return;
-
-            if (stats == null || stats.HealthModule == null)
-                return;
-
-            stats.HealthModule.TakeDamage(amount, DamageType.Normal);
         }
 
         public void Heal(float amount)
@@ -457,9 +450,9 @@ namespace Immortal_Switch.Scripts.Enemy
         {
             if (currentState == EnemyState.Dead)
                 return;
-
+            
             ChangeState(EnemyState.Dead);
-
+            OnDead?.Invoke(this);
             locomotion?.Stop();
 
             if (destroyOnDead)

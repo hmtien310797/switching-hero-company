@@ -8,34 +8,32 @@ namespace Battle
     {
         public event Action OnActiveLineupChanged;
 
-        //lấy list Hero
-        public IReadOnlyList<PlayerHeroController> GetActiveHeroControllers()
+        public IReadOnlyList<HeroActor> GetActiveHeroControllers()
         {
-            //implement then
-            return null;
+            return inBattleHeroes;
         }
 
-        //lấy hero theo class
-        public PlayerHeroController TryGetActiveHeroByClass(HeroClass heroClass)
+        public HeroActor TryGetActiveHeroByClass(HeroClass heroClass)
         {
-            //implement then
-            // for (int i = 0; i < inBattleHeroCollection.Length; i++)
-            // {
-            //     PlayerHeroController currentHero = inBattleHeroCollection[i];
-            //     if (currentHero.HeroClass == heroClass)
-            //     {
-            //         return currentHero;
-            //     }
-            // }
-            //
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                HeroActor hero = inBattleHeroes[i];
+
+                if (hero == null || hero.IsDead)
+                    continue;
+
+                if (hero.HeroClass == heroClass)
+                    return hero;
+            }
+
             return null;
         }
 
         public bool HasActiveHeroOfClass(HeroClass heroClass)
         {
-            return TryGetActiveHeroByClass(heroClass);
+            return TryGetActiveHeroByClass(heroClass) != null;
         }
-        
+
         private void NotifyActiveLineupChanged()
         {
             OnActiveLineupChanged?.Invoke();

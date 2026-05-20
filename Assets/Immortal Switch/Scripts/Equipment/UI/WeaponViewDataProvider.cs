@@ -15,14 +15,14 @@ namespace Immortal_Switch.Scripts.Equipment.UI
     public class WeaponViewDataProvider : MonoBehaviour
     {
         [Header("Scene Hero Runtime")] [SerializeField]
-        private List<PlayerHeroController> deployedHeroes = new();
+        private List<HeroActor> deployedHeroes = new();
         
         [Header("Visual Config")]
         [SerializeField] private CurrencyVisualConfigSO currencyVisualConfig;
 
-        public void SetDeployedHeroes(List<PlayerHeroController> heroes)
+        public void SetDeployedHeroes(List<HeroActor> heroes)
         {
-            deployedHeroes = heroes ?? new List<PlayerHeroController>();
+            deployedHeroes = heroes ?? new List<HeroActor>();
         }
 
         public StandardWeaponTabViewModel BuildStandardTab(HeroClass selectedClass, int selectedWeaponId,

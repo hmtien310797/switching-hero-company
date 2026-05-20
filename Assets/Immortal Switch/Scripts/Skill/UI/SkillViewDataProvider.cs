@@ -23,7 +23,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public HeroClass HeroClass;
         public Sprite HeroIcon;
         public List<int> EquippedSkillIds = new();
-        public PlayerHeroController RuntimeController;
+        public HeroActor RuntimeController;
     }
 
     public class SkillViewSkillState
@@ -261,7 +261,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 return null;
             }
 
-            PlayerHeroController heroController = battleController.TryGetActiveHeroByClass(heroClass);
+            HeroActor heroController = battleController.TryGetActiveHeroByClass(heroClass);
             if (heroController == null)
             {
                 LogWarning($"GetAssignedHeroByClass -> no active hero for class={heroClass}");
@@ -388,6 +388,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 return false;
             }
 
+            //thay doi skill vao 1 slot 
             heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
 

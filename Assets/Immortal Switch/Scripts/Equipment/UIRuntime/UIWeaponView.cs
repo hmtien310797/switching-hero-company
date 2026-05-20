@@ -37,7 +37,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         private int selectedStandardWeaponId;
         private int selectedHeroId;
 
-        public void Setup(WeaponViewDataProvider provider, int heroId, HeroClass defaultClass, List<PlayerHeroController> deployedHeroes)
+        public void Setup(WeaponViewDataProvider provider, int heroId, HeroClass defaultClass, List<HeroActor> deployedHeroes)
         {
             dataProvider = provider;
             selectedHeroId = heroId;
@@ -76,7 +76,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             RefreshCurrentTab();
         }
         
-        public void SetDeployedHeroes(List<PlayerHeroController> heroes)
+        public void SetDeployedHeroes(List<HeroActor> heroes)
         {
             if (dataProvider != null)
                 dataProvider.SetDeployedHeroes(heroes);
@@ -235,7 +235,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             selectedClass = heroClass;
             selectedStandardWeaponId = 0;
 
-            PlayerHeroController heroController = PvEBattleController.Instance.TryGetActiveHeroByClass(heroClass);
+            HeroActor heroController = PvEBattleController.Instance.TryGetActiveHeroByClass(heroClass);
             if (PvEBattleController.Instance != null &&
                 heroController != null)
             {

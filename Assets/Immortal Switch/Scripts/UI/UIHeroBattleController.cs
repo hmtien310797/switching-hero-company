@@ -208,7 +208,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private void Update()
         {
-            DoCoolingDownSkill();
+            //DoCoolingDownSkill();
         }
 
         public void RegisterHeroSwitch(Action<int> heroAct)

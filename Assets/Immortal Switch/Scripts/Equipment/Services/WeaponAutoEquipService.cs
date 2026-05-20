@@ -46,7 +46,7 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             return equipService.EquipStandard(heroId, heroClass, best.WeaponId);
         }
 
-        public bool AutoEquipForHeroes(IEnumerable<PlayerHeroController> heroes)
+        public bool AutoEquipForHeroes(IEnumerable<HeroActor> heroes)
         {
             if (heroes == null)
                 return false;

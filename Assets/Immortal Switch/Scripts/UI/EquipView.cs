@@ -114,7 +114,7 @@ namespace Immortal_Switch.Scripts.UI
                     weaponViewDataProvider,
                     focusHero.GetHeroId(),
                     focusHero.HeroClass,
-                    new List<PlayerHeroController>(activeHeroes)
+                    new List<HeroActor>(activeHeroes)
                 );
             }
 
@@ -163,7 +163,7 @@ namespace Immortal_Switch.Scripts.UI
 
             if (uiWeaponView != null)
             {
-                uiWeaponView.SetDeployedHeroes(new List<PlayerHeroController>(activeHeroes));
+                uiWeaponView.SetDeployedHeroes(new List<HeroActor>(activeHeroes));
                 uiWeaponView.SetFocusedHero(focusHero.GetHeroId(), focusHero.HeroClass);
             }
 

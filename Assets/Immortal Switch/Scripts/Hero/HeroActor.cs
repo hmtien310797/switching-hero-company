@@ -1,9 +1,11 @@
 ﻿using System;
 using Battle;
+using Common;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -53,12 +55,13 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     [SerializeField] private float ultimateHitNormalizedTime = 0.5f;
     [SerializeField] private float passiveHitNormalizedTime = 0.5f;
 
-    private HeroStateMachine stateMachine;
+    [ShowInInspector]
     private ICombatUnit currentTarget;
-
+    private HeroStateMachine stateMachine;
     private int attackComboIndex;
     private float nextTargetSearchTime;
     private bool isDeathEventBound;
+    private PvEBattleController pveBattleController;
 
     public HeroDataSO HeroData => heroData;
 
@@ -106,6 +109,10 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     public float PassiveHitNormalizedTime => passiveHitNormalizedTime;
 
+    public int GetHeroId() => heroData.Id;
+
+    public Sprite HeroIcon => heroData.PortraitIcon;
+
     private void Awake()
     {
         if (stats == null)
@@ -138,7 +145,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         stateMachine?.Tick(Time.deltaTime);
     }
 
-    public void Init(HeroDataSO data)
+    public void Init(HeroDataSO data, PvEBattleController battleController)
     {
         heroData = data;
 
@@ -153,7 +160,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         currentTarget = null;
         attackComboIndex = 0;
         nextTargetSearchTime = 0f;
-
+        pveBattleController = battleController;
         stateMachine.ChangeState(HeroStateId.Idle, true);
     }
 
@@ -366,39 +373,13 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
         nextTargetSearchTime = Time.time + targetSearchInterval;
 
-        EnemyActor[] enemies = Object.FindObjectsByType<EnemyActor>(FindObjectsSortMode.None);
-
-        ICombatUnit nearest = null;
-        float nearestSqr = float.MaxValue;
-
-        Vector3 self = transform.position;
-        self.y = 0f;
-
-        float searchRangeSqr = targetSearchRange * targetSearchRange;
-
-        for (int i = 0; i < enemies.Length; i++)
+        if (pveBattleController == null)
         {
-            EnemyActor enemy = enemies[i];
-
-            if (enemy == null || enemy.IsDead)
-                continue;
-
-            Vector3 enemyPos = enemy.Position;
-            enemyPos.y = 0f;
-
-            float sqr = (enemyPos - self).sqrMagnitude;
-
-            if (sqr > searchRangeSqr)
-                continue;
-
-            if (sqr < nearestSqr)
-            {
-                nearestSqr = sqr;
-                nearest = enemy;
-            }
+            currentTarget = null;
+            return;
         }
 
-        currentTarget = nearest;
+        currentTarget = pveBattleController.GetNearestEnemy(transform.position);
     }
 
     // =========================================================
@@ -408,6 +389,17 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     public int GetCurrentAttackComboIndex()
     {
         return attackComboIndex;
+    }
+    
+    public void RefreshSelectedSkillsRuntime()
+    {
+        // var ids = UserDataCache.Instance.GetEquippedSkills(HeroId);
+        //
+        // Debug.Log($"[HeroRuntime] Refresh skills hero={behaviorParams.HeroId} -> {string.Join(",", ids)}");
+        //
+        // SetIntervalSkills(ids);
+        // InitSkill(ids, skillRootTrans);
+        // InitUIHeroBattle();
     }
 
     public void AdvanceAttackCombo()
@@ -438,7 +430,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         }
         else
         {
-            currentTarget.TakeDamage(this, Attack);
+            currentTarget.TakeDamage(this);
         }
     }
 
@@ -464,17 +456,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         );
 
         projectile.Init(currentTarget, this, Attack);
-    }
-
-    public void TakeDamage(ICombatUnit attacker, float amount = 1)
-    {
-        if (IsDead)
-            return;
-
-        if (stats == null || stats.HealthModule == null)
-            return;
-
-        stats.HealthModule.TakeDamage(amount, DamageType.Normal);
     }
 
     public void Heal(float amount)

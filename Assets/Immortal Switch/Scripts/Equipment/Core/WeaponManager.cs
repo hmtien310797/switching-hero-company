@@ -215,12 +215,12 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             return true;
         }
         
-        public bool TryAutoEquipForHeroes(IEnumerable<PlayerHeroController> heroes, bool autoSave = true)
+        public bool TryAutoEquipForHeroes(IEnumerable<HeroActor> heroes, bool autoSave = true)
         {
             if (heroes == null)
                 return false;
 
-            var heroList = new List<PlayerHeroController>(heroes);
+            var heroList = new List<HeroActor>(heroes);
             bool result = autoEquip.AutoEquipForHeroes(heroList);
             if (!result)
                 return false;
@@ -391,7 +391,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             // refresh runtime heroes
             if (Battle.PvEBattleController.Instance != null)
             {
-                var activeHeroes = Battle.PvEBattleController.Instance.GetActiveHeroControllers();
+                var activeHeroes = PvEBattleController.Instance.GetActiveHeroControllers();
                 for (int i = 0; i < activeHeroes.Count; i++)
                 {
                     var hero = activeHeroes[i];
