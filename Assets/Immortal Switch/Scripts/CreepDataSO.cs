@@ -1,4 +1,5 @@
 ﻿using Battle;
+using Immortal_Switch.Scripts.Enemy;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts
@@ -15,6 +16,6 @@ namespace Immortal_Switch.Scripts
         [field: SerializeField] public float BaseAtkSpeed { get; set; }
         [field: SerializeField] public float BaseRange { get; set; }
         [field: SerializeField] public float BaseMoveSpeed { get; set; }
-        [field: SerializeField] public MonsterScrepController CreepPrefab { get; set; }
+        [field: SerializeField] public EnemyActor CreepPrefab { get; set; }
     }
 }

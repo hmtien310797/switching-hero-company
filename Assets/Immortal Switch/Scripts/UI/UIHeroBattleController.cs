@@ -402,34 +402,34 @@ namespace Immortal_Switch.Scripts.UI
 
         private void DoCoolingDownSkill(CoolingData data)
         {
-            if (data == null) return;
-
-            var keys = data.keyTimerCooling;
-            bool isActivedAutoSkill = false;
-            foreach (var key in keys)
-            {
-                if (data.timerCoolings[key] > 0)
-                {
-                    data.timerCoolings[key] -= Time.deltaTime;
-                    if (isMain == selectedHeroData.isMain)
-                    {
-                        covers[key].fillAmount = data.timerCoolings[key] / data.intervalCoolings[key];
-                    }
-                }
-                else
-                {
-                    if(isMain == selectedHeroData.isMain)
-                        covers[key].gameObject.SetActive(false);
-
-                    AutoActiveSkill(data, key);
-                    isActivedAutoSkill = true;
-                }
-            }
-
-            if(isActivedAutoSkill)
-            {
-                ReOrderKeyTimerCooling(keys, data);
-            }
+            // if (data == null) return;
+            //
+            // var keys = data.keyTimerCooling;
+            // bool isActivedAutoSkill = false;
+            // foreach (var key in keys)
+            // {
+            //     if (data.timerCoolings[key] > 0)
+            //     {
+            //         data.timerCoolings[key] -= Time.deltaTime;
+            //         if (isMain == selectedHeroData.isMain)
+            //         {
+            //             covers[key].fillAmount = data.timerCoolings[key] / data.intervalCoolings[key];
+            //         }
+            //     }
+            //     else
+            //     {
+            //         if(isMain == selectedHeroData.isMain)
+            //             covers[key].gameObject.SetActive(false);
+            //
+            //         AutoActiveSkill(data, key);
+            //         isActivedAutoSkill = true;
+            //     }
+            // }
+            //
+            // if(isActivedAutoSkill)
+            // {
+            //     ReOrderKeyTimerCooling(keys, data);
+            // }
         }
 
         private void ReOrderKeyTimerCooling(List<HeroNameAction> keys, CoolingData data)
@@ -457,85 +457,34 @@ namespace Immortal_Switch.Scripts.UI
             data.timerCoolings[name] = data.intervalCoolings[name];
         }
 
-        public void AutoActiveSkill(Func<HeroNameAction, int> endFunc, int heroIndex)
-        {
-            HeroNameAction selectedAction = HeroNameAction.None;
-            if (isAutoSkilling)
-            {
-                var data = inBattleHeroesCoolingData[heroIndex];
-                foreach (var cl in data.timerCoolings)
-                {
-                    selectedAction = cl.Key;
-                    if (selectedAction == HeroNameAction.SwitchBtn || selectedAction == HeroNameAction.AutoSwitchBtn || selectedAction == HeroNameAction.AutoSkillBtn) continue;
-
-                    if (cl.Value <= 0)
-                    {
-                        bool isSuccess;
-                        if (data.isMain == selectedHeroData.isMain)
-                        {
-                            isSuccess = DoAutoSkillAction(selectedAction);
-                        }
-                        else
-                        {
-                            isSuccess = DoAutoSkillAction(data, selectedAction);
-                        }
-                        
-                        if(isSuccess) break;
-                    }
-                }
-            }
-            endFunc?.Invoke(selectedAction);
-        }
-
         public void AutoActiveSkill(CoolingData data, HeroNameAction key)
         {
-            HeroNameAction selectedAction = key;
-            Action act = () =>
-            {
-                if (data.isMain == selectedHeroData.isMain)
-                {
-                    DoAutoSkillAction(selectedAction);
-                }
-                else
-                {
-                    DoAutoSkillAction(data, selectedAction);
-                }
-            };
-
-            if (key == HeroNameAction.SwitchBtn)
-            {
-                if (isAutoSwitching)
-                {
-                    act.Invoke();
-                }
-                return;
-            }
-
-            if (isAutoSkilling)
-            {
-                act.Invoke();
-            }
-        }
-
-        public void AutoActiveSwitch(Action<HeroNameAction> endFunc, int index)
-        {
-            endFunc?.Invoke(HeroNameAction.SwitchBtn);
-
-            if (!isAutoSwitching)
-            {
-                return;
-            }
-            
-            var data = inBattleHeroesCoolingData[index];
-            if (!(data.timerCoolings[HeroNameAction.SwitchBtn] <= 0)) return;
-            if (data.isMain == selectedHeroData.isMain)
-            {
-                DoAutoSkillAction(HeroNameAction.SwitchBtn);
-            }
-            else
-            {
-                DoAutoSkillAction(data, HeroNameAction.SwitchBtn);
-            }
+            // HeroNameAction selectedAction = key;
+            // Action act = () =>
+            // {
+            //     if (data.isMain == selectedHeroData.isMain)
+            //     {
+            //         DoAutoSkillAction(selectedAction);
+            //     }
+            //     else
+            //     {
+            //         DoAutoSkillAction(data, selectedAction);
+            //     }
+            // };
+            //
+            // if (key == HeroNameAction.SwitchBtn)
+            // {
+            //     if (isAutoSwitching)
+            //     {
+            //         act.Invoke();
+            //     }
+            //     return;
+            // }
+            //
+            // if (isAutoSkilling)
+            // {
+            //     act.Invoke();
+            // }
         }
     }
 }

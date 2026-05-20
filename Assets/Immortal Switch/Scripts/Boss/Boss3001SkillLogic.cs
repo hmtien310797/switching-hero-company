@@ -49,15 +49,15 @@ namespace Immortal_Switch.Scripts.Boss
             if (target == null || target.IsDead) return;
 
             LogPassive("Hell Curse");
-            boss.ApplyBuffToTarget(target, BossBuffFactory.CreateHellCurseDebuff());
+            //boss.ApplyBuffToTarget(target, BossBuffFactory.CreateHellCurseDebuff());
         }
 
         private void CastActive()
         {
             LogActive("Hỏa Ngục Bùng Cháy");
             
-            boss.DealDamageToTarget(boss.Target, 180f);
-            boss.ApplyBuffToTarget(boss.Target, BossBuffFactory.CreateAtkDown25_5s());
+           // boss.DealDamageToTarget(boss.Target, 180f);
+           // boss.ApplyBuffToTarget(boss.Target, BossBuffFactory.CreateAtkDown25_5s());
         }
     }
 }

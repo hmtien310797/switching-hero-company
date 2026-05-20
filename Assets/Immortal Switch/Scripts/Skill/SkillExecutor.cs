@@ -12,15 +12,15 @@ namespace Immortal_Switch.Scripts.Skill
             if (caster == null || phase == null || phase.Effects == null || phase.Effects.Count == 0)
                 return;
 
-            var targets = PvEBattleController.Instance?.GetNearestMonstesInRange(targetPosition, range);
-
-            if (targets == null || targets.Count == 0)
-                return;
-
-            for (int i = 0; i < phase.Effects.Count; i++)
-            {
-                ExecuteEffect(caster, targets, phase.Effects[i]);
-            }
+            // var targets = PvEBattleController.Instance?.GetNearestEnemiesInRange(targetPosition, range);
+            //
+            // if (targets == null || targets.Count == 0)
+            //     return;
+            //
+            // for (int i = 0; i < phase.Effects.Count; i++)
+            // {
+            //     ExecuteEffect(caster, targets, phase.Effects[i]);
+            // }
         }
 
         public static void ExecuteEffect(PlayerHeroController caster, List<MonsterScrepController> targets, SkillEffectData effect)

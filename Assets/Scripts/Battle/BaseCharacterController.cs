@@ -15,7 +15,7 @@ namespace Battle
         Boss,
     }
 
-    public class BaseCharacterController<T> : MonoBehaviour where T : BaseCharacterController<T>, ICombatUnit
+    public class BaseCharacterController<T> : MonoBehaviour where T : BaseCharacterController<T>
     {
         [SerializeField] BaseSkillController baseSkillController;
         [SerializeField] HeroType heroType;

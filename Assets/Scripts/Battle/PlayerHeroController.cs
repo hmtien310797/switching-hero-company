@@ -40,7 +40,7 @@ namespace Battle
         }
     }
 
-    public class PlayerHeroController : BaseCharacterController<PlayerHeroController>, ICombatUnit
+    public class PlayerHeroController : BaseCharacterController<PlayerHeroController>
     {
         [SerializeField] SkeletonAnimation hero;
         [SerializeField] HeroUIView heroUIView;
@@ -277,7 +277,7 @@ namespace Battle
 
         public bool IsExistTargetInRange()
         {
-            return pvEBattleController?.IsExistMonsterInRange(transform.position, behaviorParams.DistSkillRange) ?? false;
+            return false;
         }
 
         public Vector3 GetNearestMonster()
@@ -295,7 +295,7 @@ namespace Battle
                 return;
             }
 
-            SetTarget(pvEBattleController?.GetNearestMonster(targetPos));
+            //SetTarget(pvEBattleController?.GetNearestMonster(targetPos));
 
             if (IsValidTarget())
             {
@@ -353,7 +353,7 @@ namespace Battle
         {
             if (_monsterTarget == null || _monsterTarget.IsDead)
             {
-                SetTarget(pvEBattleController?.GetNearestMonster(targetPos));
+               // SetTarget(pvEBattleController?.GetNearestMonster(targetPos));
                 if (_monsterTarget == null) SwitchState(IdleState);
 
                 return;
@@ -518,7 +518,7 @@ namespace Battle
         {
             if(_monsterTarget == null)
             {
-                SetTarget(pvEBattleController.GetNearestMonster(transform.position));
+                //SetTarget(pvEBattleController.GetNearestMonster(transform.position));
             }
 
             return _monsterTarget?.transform.position?? transform.position;
@@ -553,41 +553,40 @@ namespace Battle
 
         public void AttackByArea(Vector3 pos, float attackRange = 0, float factorDam = 1)
         {
-            var targets = pvEBattleController?.GetNearestMonstesInRange(pos, attackRange == 0 ? baseStatData.AttackRange : attackRange);
-            if (targets == null || targets.Count == 0) return;
-
-            foreach (var t in targets)
-            {
-                t.OnReceiveDamage(factorDam, ResetTarget, this);
-            }
-
-            Debug.Log($"hero is main dame is {transform.name} monsters is {targets.Count}");
+            // var targets = pvEBattleController?.GetNearestEnemiesInRange(pos, attackRange == 0 ? baseStatData.AttackRange : attackRange);
+            // if (targets == null || targets.Count == 0) return;
+            //
+            // // foreach (var t in targets)
+            // // {
+            // //     t.OnReceiveDamage(factorDam, ResetTarget, this);
+            // // }
+            //
+            // Debug.Log($"hero is main dame is {transform.name} monsters is {targets.Count}");
         }
 
         public void AttackSpecificByArea(Vector3 pos, out bool isDeath, float attackRange = 0, float factorDam = 1)
         {
             isDeath = false;
-            var targets = pvEBattleController?.GetNearestMonstesInRange(pos, attackRange == 0 ? baseStatData.AttackRange : attackRange);
-            if (targets == null || targets.Count == 0)
-            {
-                return;
-            }
-
-            foreach (var t in targets)
-            {
-                t.OnReceiveDamage(Stats.StatModule.GetFinalStat(StatType.Atk) * factorDam, ResetTarget, this);
-                if(isDeath == false && t.IsDead)
-                {
-                    isDeath = true;
-                }
-            }
-
-            Debug.Log($"hero is main {transform.name} dame is {factorDam} monsters is {targets.Count}");
+           // var targets = pvEBattleController?.GetNearestEnemiesInRange(pos, attackRange == 0 ? baseStatData.AttackRange : attackRange);
+            // if (targets == null || targets.Count == 0)
+            // {
+            //     return;
+            // }
+            //
+            // foreach (var t in targets)
+            // {
+            //     t.OnReceiveDamage(Stats.StatModule.GetFinalStat(StatType.Atk) * factorDam, ResetTarget, this);
+            //     if(isDeath == false && t.IsDead)
+            //     {
+            //         isDeath = true;
+            //     }
+            // }
+            
         }
 
         public Vector3 GetWeakestEnemy()
         {
-            return pvEBattleController?.GetWeakestMonster(transform.position, behaviorParams.DistSkillRange) ??transform.position;
+            return Vector3.zero;
         }
 
         public void ChangeToPosWithFlash()

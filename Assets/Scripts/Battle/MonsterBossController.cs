@@ -141,7 +141,7 @@ namespace Battle
             float atk = Stats.StatModule.GetFinalStat(StatType.Atk);
             float damage = atk * percentAtk / 100f;
 
-            target.TakeDamage(this);
+            //target.TakeDamage(this);
 
             Debug.Log($"boss deals {damage} damage ({percentAtk}% ATK) to target");
         }

@@ -3,28 +3,14 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Battle
 {
-    [Serializable]
-    public class BaseStat
-    {
-        public float Health;
-        public float IdleStateTime;
-        public float IdleIntervalTime;
-        public float AttackRange;
-        public float Defense;
-        public float Attack;
-        public float AttackSpeed;
-        public float CritChance;
-        public float CritDamage;
-        public float Accuracy;
-        public float MoveSpeed;
-        public Element Element;
-    }
 
-    public class MonsterScrepController : BaseCharacterController<MonsterScrepController>, ICombatUnit
+    public class MonsterScrepController : BaseCharacterController<MonsterScrepController>
     {
         [SerializeField] bool isBoss = false;
 
@@ -151,33 +137,34 @@ namespace Battle
                 DoMoveToTarget(etarget.transform, 3);
         }
 
+        //avoidance
         private Vector3 GetNextPos()
         {
-            var offsetSpeed = 0.6f;
-            Vector3 targetPos = Vector3.MoveTowards(transform.position, etarget.transform.position, Time.deltaTime * offsetSpeed);
-            var monsterArounds = pvEBattleController.GetNearestMonstesInRange(targetPos, 1f);
-            if (monsterArounds == null || monsterArounds.Count <= 1) return targetPos;
+            // var offsetSpeed = 0.6f;
+            // Vector3 targetPos = Vector3.MoveTowards(transform.position, etarget.transform.position, Time.deltaTime * offsetSpeed);
+            // var monsterArounds = pvEBattleController.GetNearestEnemiesInRange(targetPos, 1f);
+            // if (monsterArounds == null || monsterArounds.Count <= 1) return targetPos;
+            //
+            // Vector3 avoidanceDir = Vector3.zero;
+            // int count = 0;
+            //
+            // foreach (var monster in monsterArounds)
+            // {
+            //     if (monster.gameObject == this.gameObject) continue;
+            //     Vector3 pushDir = targetPos - monster.transform.position;
+            //     float distance = pushDir.magnitude;
+            //     if (distance < .35f) continue;
+            //
+            //     avoidanceDir += pushDir.normalized / distance;
+            //     count++;
+            // }
+            //
+            // if (count > 0)
+            // {
+            //     targetPos += (avoidanceDir / count) * Time.deltaTime * offsetSpeed;
+            // }
 
-            Vector3 avoidanceDir = Vector3.zero;
-            int count = 0;
-
-            foreach (var monster in monsterArounds)
-            {
-                if (monster.gameObject == this.gameObject) continue;
-                Vector3 pushDir = targetPos - monster.transform.position;
-                float distance = pushDir.magnitude;
-                if (distance < .35f) continue;
-
-                avoidanceDir += pushDir.normalized / distance;
-                count++;
-            }
-
-            if (count > 0)
-            {
-                targetPos += (avoidanceDir / count) * Time.deltaTime * offsetSpeed;
-            }
-
-            return targetPos;
+            return Vector3.zero;
         }
 
         private void ResetIdleTime()
@@ -237,7 +224,7 @@ namespace Battle
             }
 
             if (!isBoss) etarget = target;
-            TakeDamage(etarget, factorSkillDamage);
+            //TakeDamage(etarget, factorSkillDamage);
             if (CurrentHp <= 0)
             {
                 endAct?.Invoke();
@@ -252,10 +239,10 @@ namespace Battle
 
         public void ResolveDeath()
         {
-            isReady = false;
-            pvEBattleController?.NotifyMonsterDeath(this);
-
-            if(isBoss) GameEventManager.Trigger(GameEvents.OnStageCleared);
+            // isReady = false;
+            // pvEBattleController?.NotifyMonsterDeath(this);
+            //
+            // if(isBoss) GameEventManager.Trigger(GameEvents.OnStageCleared);
         }
 
         public void CheckDead(Action endAct)

@@ -24,8 +24,8 @@ namespace Immortal_Switch.Scripts.Boss
             if (Time.time < lastPassiveTime + 2f) return;
             if (!RollChance(30f)) return;
             
-            ICombatUnit randomTarget = boss.Target;
-            if (randomTarget == null) return;
+            //ICombatUnit randomTarget = boss.Target;
+            //if (randomTarget == null) return;
 
             lastPassiveTime = Time.time;
 
@@ -44,18 +44,18 @@ namespace Immortal_Switch.Scripts.Boss
         {
             LogActive("Lôi Vân Giáng Thế");
 
-            for (int i = 0; i < 5; i++)
-            {
-                ICombatUnit randomTarget = boss.Target;
-                if (randomTarget == null) continue;
-
-                boss.DealDamageToTarget(randomTarget, 150f);
-
-                if (RollChance(25f))
-                {
-                    boss.ApplyBuffToTarget(randomTarget, BossBuffFactory.CreateStun_1_5s());
-                }
-            }
+            // for (int i = 0; i < 5; i++)
+            // {
+            //     ICombatUnit randomTarget = boss.Target;
+            //     if (randomTarget == null) continue;
+            //
+            //     boss.DealDamageToTarget(randomTarget, 150f);
+            //
+            //     if (RollChance(25f))
+            //     {
+            //         boss.ApplyBuffToTarget(randomTarget, BossBuffFactory.CreateStun_1_5s());
+            //     }
+            // }
         }
     }
 }
