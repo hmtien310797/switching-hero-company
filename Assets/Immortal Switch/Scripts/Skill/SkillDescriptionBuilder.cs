@@ -33,47 +33,47 @@ namespace Immortal_Switch.Scripts.Skill
                 }
             }
 
-            ReplaceAutoTokens(levelData, ref result);
+            //ReplaceAutoTokens(levelData, ref result);
 
             return result;
         }
 
-        private static void ReplaceAutoTokens(SkillLevelData levelData, ref string result)
-        {
-            if (levelData.Phases == null) return;
-
-            int damageIndex = 1;
-            int valueIndex = 1;
-            int durationIndex = 1;
-            int chanceIndex = 1;
-
-            for (int i = 0; i < levelData.Phases.Count; i++)
-            {
-                var phase = levelData.Phases[i];
-                if (phase == null || phase.Effects == null) continue;
-
-                for (int j = 0; j < phase.Effects.Count; j++)
-                {
-                    var effect = phase.Effects[j];
-                    if (effect == null) continue;
-
-                    if (effect.EffectType == SkillEffectType.Damage)
-                    {
-                        result = result.Replace("{damage" + damageIndex + "}", Mathf.RoundToInt(effect.DamageMultiplier).ToString());
-                        result = result.Replace("{damage}", Mathf.RoundToInt(effect.DamageMultiplier).ToString());
-                        damageIndex++;
-                    }
-
-                    result = result.Replace("{value" + valueIndex + "}", Mathf.RoundToInt(effect.Value).ToString());
-                    result = result.Replace("{duration" + durationIndex + "}", effect.Duration.ToString("0.##"));
-                    result = result.Replace("{chance" + chanceIndex + "}", effect.ChancePercent.ToString("0.##"));
-
-                    valueIndex++;
-                    durationIndex++;
-                    chanceIndex++;
-                }
-            }
-        }
+        // private static void ReplaceAutoTokens(SkillLevelData levelData, ref string result)
+        // {
+        //     if (levelData.Phases == null) return;
+        //
+        //     int damageIndex = 1;
+        //     int valueIndex = 1;
+        //     int durationIndex = 1;
+        //     int chanceIndex = 1;
+        //
+        //     for (int i = 0; i < levelData.Phases.Count; i++)
+        //     {
+        //         var phase = levelData.Phases[i];
+        //         if (phase == null || phase.Effects == null) continue;
+        //
+        //         for (int j = 0; j < phase.Effects.Count; j++)
+        //         {
+        //             var effect = phase.Effects[j];
+        //             if (effect == null) continue;
+        //
+        //             if (effect.EffectType == SkillEffectType.Damage)
+        //             {
+        //                 result = result.Replace("{damage" + damageIndex + "}", Mathf.RoundToInt(effect.DamageMultiplier).ToString());
+        //                 result = result.Replace("{damage}", Mathf.RoundToInt(effect.DamageMultiplier).ToString());
+        //                 damageIndex++;
+        //             }
+        //
+        //             result = result.Replace("{value" + valueIndex + "}", Mathf.RoundToInt(effect.Value).ToString());
+        //             result = result.Replace("{duration" + durationIndex + "}", effect.Duration.ToString("0.##"));
+        //             result = result.Replace("{chance" + chanceIndex + "}", effect.ChancePercent.ToString("0.##"));
+        //
+        //             valueIndex++;
+        //             durationIndex++;
+        //             chanceIndex++;
+        //         }
+        //     }
+        // }
 
         private static string FormatValue(float value, bool isPercent, int decimalPlaces)
         {

@@ -335,7 +335,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return null;
 
             var pool = config.SkillPool
-                .Where(x => x != null && ConvertTier(x.Tier) == grade)
+                .Where(x => x != null && ConvertTier(x.SkillTier) == grade)
                 .ToList();
 
             if (pool.Count == 0)

@@ -1,7 +1,5 @@
 using System;
-using Common;
 using Cysharp.Threading.Tasks;
-using Scripts.Common;
 using Spine.Unity;
 using UnityEngine;
 
@@ -21,7 +19,7 @@ namespace Battle
             await UniTask.Delay(TimeSpan.FromSeconds(dur));
             if (!IsAtkEvent) PlayerHeroController.AttackByArea(transform.position, RangeSkill, DameSkillFactor);
             base.DoEndSkill().Forget();
-            PoolController.Instance?.ReturnToPool(gameObject);
+            //PoolController.Instance?.ReturnToPool(gameObject);
         }
 
         public void InitSka()
@@ -59,20 +57,20 @@ namespace Battle
 
         public override void RegisterAnimEvent(Action<float, float> eventAct)
         {
-            skaFx.AnimationState.Event += (entry, e) =>
-            {
-                if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
-                {
-                    Debug.Log($"Anim event {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
-                }
-
-                if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventFinalHit)
-                {
-                    Debug.Log($"Anim event {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
-                }
-            };
+            // skaFx.AnimationState.Event += (entry, e) =>
+            // {
+            //     if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
+            //     {
+            //         Debug.Log($"Anim event {EnventHit} triggered.");
+            //         eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
+            //     }
+            //
+            //     if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventFinalHit)
+            //     {
+            //         Debug.Log($"Anim event {EnventHit} triggered.");
+            //         eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
+            //     }
+            // };
         }
     }
 }

@@ -47,6 +47,7 @@ public class HeroTeamController : MonoBehaviour
     
     public HeroActor HeroA => heroA;
     public HeroActor HeroB => heroB;
+    public float TeamMoveSpeed => teamMoveSpeed;
 
     private void Start()
     {

@@ -1,7 +1,6 @@
 using System;
 using Common;
 using Cysharp.Threading.Tasks;
-using Scripts.Common;
 using Spine.Unity;
 using UnityEngine;
 
@@ -19,9 +18,9 @@ namespace Battle
             var dur = GetAnimDur(skaFx);
             camAct?.Invoke(dur);
             await UniTask.Delay(TimeSpan.FromSeconds(dur));
-            if(!IsAtkEvent) PlayerHeroController.AttackByArea(transform.position, RangeSkill, SkillData.FinalDame);
+            //if(!IsAtkEvent) PlayerHeroController.AttackByArea(transform.position, RangeSkill, SkillData.FinalDame);
             base.DoEndSkill().Forget();
-            PoolController.Instance?.ReturnToPool(gameObject);
+            //PoolController.Instance?.ReturnToPool(gameObject);
         }
 
         private async UniTaskVoid DoActSkillSSR(Action<float> camAct = null, bool isFinal = false)
@@ -36,9 +35,9 @@ namespace Battle
                 transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 50);
             }
             
-            PlayerHeroController.AttackByArea(targetPos, RangeSkill, isFinal ? SkillData.FinalDame : SkillData.NomalDame);
+            //PlayerHeroController.AttackByArea(targetPos, RangeSkill, isFinal ? SkillData.FinalDame : SkillData.NomalDame);
             if(isFinal) base.DoEndSkill().Forget();
-            PoolController.Instance?.ReturnToPool(gameObject);
+            //PoolController.Instance?.ReturnToPool(gameObject);
         }
 
         private async UniTaskVoid DoActSkillWithoutEndAct(Action<float> camAct)
@@ -47,8 +46,8 @@ namespace Battle
             var dur = GetAnimDur(skaFx);
             camAct?.Invoke(dur);
             await UniTask.Delay(TimeSpan.FromSeconds(dur));
-            if (!IsAtkEvent) PlayerHeroController.AttackByArea(transform.position, RangeSkill, SkillData.NomalDame);
-            PoolController.Instance?.ReturnToPool(gameObject);
+            //if (!IsAtkEvent) PlayerHeroController.AttackByArea(transform.position, RangeSkill, SkillData.NomalDame);
+            //PoolController.Instance?.ReturnToPool(gameObject);
         }
 
         public override void SetHeroPlayerController(PlayerHeroController phC)
@@ -127,12 +126,12 @@ namespace Battle
                 if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
                 {
                     Debug.Log($"Anim event {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
+                    //eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
                 }
                 if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventFinalHit)
                 {
                     Debug.Log($"Anim event final {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
+                    //eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
                 }
             };
         }

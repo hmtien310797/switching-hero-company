@@ -1,0 +1,846 @@
+{
+"skeleton": { "hash": "uvPDvA7fnzM", "spine": "4.2.33", "images": "../Main/", "audio": "./audio" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "VFX", "parent": "root", "y": 648, "scaleX": 0.52, "scaleY": 0.52 },
+	{ "name": "ULT_slash", "parent": "VFX", "x": -114, "y": 204, "scaleX": 2.0852, "scaleY": 2.0852 },
+	{ "name": "slash", "parent": "ULT_slash" },
+	{ "name": "ult_dg3", "parent": "slash" },
+	{ "name": "ult_dg4", "parent": "slash" },
+	{ "name": "ult_dg5", "parent": "slash" },
+	{ "name": "bone3", "parent": "VFX" },
+	{ "name": "bone", "parent": "bone3" },
+	{ "name": "big_slash_slash_skill2_0", "parent": "bone", "scaleX": 20.892, "scaleY": 20.892 },
+	{ "name": "big_slash_slash_skill2_1", "parent": "big_slash_slash_skill2_0", "scaleY": -1 },
+	{ "name": "big_slash_slah", "parent": "bone", "x": 1884, "y": 1272 },
+	{ "name": "big_slash_trail_00", "parent": "big_slash_slah", "x": 582, "y": -126, "scaleX": 18.2914, "scaleY": 23.7789 },
+	{
+		"name": "big_slash_impact2_0",
+		"parent": "bone",
+		"rotation": -57.73,
+		"x": 2496,
+		"y": 720,
+		"scaleX": 11.366,
+		"scaleY": 3.403
+	},
+	{ "name": "big_slash_impact3_0", "parent": "bone", "x": 2280, "y": 1284, "scaleX": 15.1614, "scaleY": 15.1614 },
+	{ "name": "ult_an", "parent": "ULT_slash" },
+	{ "name": "ult_hen", "parent": "ULT_slash" },
+	{ "name": "ult_kuo", "parent": "ULT_slash" },
+	{ "name": "ult_quan", "parent": "ULT_slash" },
+	{ "name": "ult_sg", "parent": "ULT_slash" },
+	{ "name": "ult_sg2", "parent": "ULT_slash" },
+	{ "name": "ult_xian", "parent": "ULT_slash" },
+	{ "name": "ult_xian2", "parent": "ULT_slash" },
+	{ "name": "ult_xian3", "parent": "ULT_slash" },
+	{ "name": "ult_xz", "parent": "ULT_slash" },
+	{ "name": "bone2", "parent": "bone3", "scaleX": -1 },
+	{ "name": "big_slash_slash_skill2_2", "parent": "bone2", "scaleX": 20.892, "scaleY": 20.892 },
+	{ "name": "big_slash_slash_skill2_3", "parent": "big_slash_slash_skill2_2", "scaleY": -1 },
+	{ "name": "big_slash_slah2", "parent": "bone2", "x": 1884, "y": 1272 },
+	{ "name": "big_slash_trail_01", "parent": "big_slash_slah2", "x": 582, "y": -126, "scaleX": 18.2914, "scaleY": 23.7789 },
+	{
+		"name": "big_slash_impact2_1",
+		"parent": "bone2",
+		"rotation": -57.73,
+		"x": 2496,
+		"y": 720,
+		"scaleX": 11.366,
+		"scaleY": 3.403
+	},
+	{ "name": "big_slash_impact3_1", "parent": "bone2", "x": 2280, "y": 1284, "scaleX": 15.1614, "scaleY": 15.1614 }
+],
+"slots": [
+	{ "name": "ult_dg3", "bone": "ult_dg3" },
+	{ "name": "ult_dg4", "bone": "ult_dg4" },
+	{ "name": "ult_dg5", "bone": "ult_dg5" },
+	{ "name": "big_slash_trail_00", "bone": "big_slash_trail_00", "blend": "additive" },
+	{ "name": "big_slash_trail_01", "bone": "big_slash_trail_01", "blend": "additive" },
+	{ "name": "big_slash_slash_skill2_0", "bone": "big_slash_slash_skill2_1" },
+	{ "name": "big_slash_slash_skill2_2", "bone": "big_slash_slash_skill2_3" },
+	{ "name": "big_slash_slash_skill2_1", "bone": "big_slash_slash_skill2_1", "blend": "additive" },
+	{ "name": "big_slash_slash_skill2_3", "bone": "big_slash_slash_skill2_3", "blend": "additive" },
+	{ "name": "big_slash_impact skill2_0", "bone": "big_slash_slash_skill2_1" },
+	{ "name": "big_slash_impact skill2_2", "bone": "big_slash_slash_skill2_3" },
+	{ "name": "big_slash_impact skill2_1", "bone": "big_slash_slash_skill2_1", "blend": "additive" },
+	{ "name": "big_slash_impact skill2_3", "bone": "big_slash_slash_skill2_3", "blend": "additive" },
+	{ "name": "big_slash_impact2_0", "bone": "big_slash_impact2_0", "blend": "additive" },
+	{ "name": "big_slash_impact2_1", "bone": "big_slash_impact2_1", "blend": "additive" },
+	{ "name": "big_slash_impact3_0", "bone": "big_slash_impact3_0" },
+	{ "name": "big_slash_impact3_2", "bone": "big_slash_impact3_1" },
+	{ "name": "big_slash_impact3_1", "bone": "big_slash_impact3_0", "blend": "additive" },
+	{ "name": "big_slash_impact3_3", "bone": "big_slash_impact3_1", "blend": "additive" },
+	{ "name": "ult_xz", "bone": "ult_xz" },
+	{ "name": "ult_an", "bone": "ult_an" },
+	{ "name": "ult_xian", "bone": "ult_xian", "blend": "additive" },
+	{ "name": "ult_xian2", "bone": "ult_xian2", "blend": "additive" },
+	{ "name": "ult_xian3", "bone": "ult_xian3", "blend": "additive" },
+	{ "name": "ult_quan", "bone": "ult_quan" },
+	{ "name": "ult_quan2", "bone": "ult_quan", "blend": "additive" },
+	{ "name": "ult_hen", "bone": "ult_hen", "blend": "additive" },
+	{ "name": "ult_sg", "bone": "ult_sg", "blend": "additive" },
+	{ "name": "ult_sg2", "bone": "ult_sg2", "blend": "additive" },
+	{ "name": "ult_kuo", "bone": "ult_kuo", "blend": "additive" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"big_slash_impact2_0": {
+				"VFX/FX/Impact/impact2_0": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_1": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_2": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_3": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_4": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_5": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_6": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_7": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_8": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_9": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_10": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_11": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_12": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_13": { "width": 342, "height": 182 }
+			},
+			"big_slash_impact2_1": {
+				"VFX/FX/Impact/impact2_0": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_1": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_2": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_3": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_4": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_5": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_6": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_7": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_8": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_9": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_10": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_11": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_12": { "width": 342, "height": 182 },
+				"VFX/FX/Impact/impact2_13": { "width": 342, "height": 182 }
+			},
+			"big_slash_impact3_0": {
+				"VFX/FX/Impact/impact3_0": { "width": 1, "height": 1 },
+				"VFX/FX/Impact/impact3_1": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_2": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_3": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_4": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_5": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_6": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_7": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_8": { "width": 484, "height": 271 }
+			},
+			"big_slash_impact3_1": {
+				"VFX/FX/Impact/impact3_0": { "width": 1, "height": 1 },
+				"VFX/FX/Impact/impact3_1": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_2": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_3": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_4": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_5": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_6": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_7": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_8": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_9": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_10": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_11": { "width": 484, "height": 271 }
+			},
+			"big_slash_impact3_2": {
+				"VFX/FX/Impact/impact3_0": { "width": 1, "height": 1 },
+				"VFX/FX/Impact/impact3_1": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_2": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_3": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_4": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_5": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_6": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_7": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_8": { "width": 484, "height": 271 }
+			},
+			"big_slash_impact3_3": {
+				"VFX/FX/Impact/impact3_0": { "width": 1, "height": 1 },
+				"VFX/FX/Impact/impact3_1": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_2": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_3": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_4": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_5": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_6": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_7": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_8": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_9": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_10": { "width": 484, "height": 271 },
+				"VFX/FX/Impact/impact3_11": { "width": 484, "height": 271 }
+			},
+			"big_slash_impact skill2_0": {
+				"VFX/FX/Impact/impact skill2_0": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_2": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_4": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_6": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_8": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_10": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_12": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_14": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_16": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 }
+			},
+			"big_slash_impact skill2_1": {
+				"VFX/FX/Impact/impact skill2_0": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_2": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_4": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_6": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_8": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_10": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_12": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_14": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_16": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 }
+			},
+			"big_slash_impact skill2_2": {
+				"VFX/FX/Impact/impact skill2_0": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_2": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_4": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_6": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_8": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_10": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_12": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_14": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_16": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 }
+			},
+			"big_slash_impact skill2_3": {
+				"VFX/FX/Impact/impact skill2_0": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_2": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_4": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_6": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_8": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_10": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_12": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_14": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 },
+				"VFX/FX/Impact/impact skill2_16": { "scaleX": 0.3672, "scaleY": 0.3672, "width": 350, "height": 350 }
+			},
+			"big_slash_slash_skill2_0": {
+				"VFX/FX/slash_skill2_0": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_1": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_2": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_3": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_4": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_5": { "width": 125, "height": 125 }
+			},
+			"big_slash_slash_skill2_1": {
+				"VFX/FX/slash_skill2_0": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_1": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_2": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_3": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_4": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_5": { "width": 125, "height": 125 }
+			},
+			"big_slash_slash_skill2_2": {
+				"VFX/FX/slash_skill2_0": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_1": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_2": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_3": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_4": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_5": { "width": 125, "height": 125 }
+			},
+			"big_slash_slash_skill2_3": {
+				"VFX/FX/slash_skill2_0": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_1": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_2": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_3": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_4": { "width": 125, "height": 125 },
+				"VFX/FX/slash_skill2_5": { "width": 125, "height": 125 }
+			},
+			"big_slash_trail_00": {
+				"VFX/FX/trail_00": { "width": 191, "height": 99 },
+				"VFX/FX/trail_01": { "width": 191, "height": 99 },
+				"VFX/FX/trail_02": { "width": 191, "height": 99 },
+				"VFX/FX/trail_03": { "width": 191, "height": 99 },
+				"VFX/FX/trail_04": { "width": 191, "height": 99 },
+				"VFX/FX/trail_05": { "width": 191, "height": 99 },
+				"VFX/FX/trail_06": { "width": 191, "height": 99 },
+				"VFX/FX/trail_07": { "width": 191, "height": 99 },
+				"VFX/FX/trail_08": { "width": 191, "height": 99 },
+				"VFX/FX/trail_09": { "width": 191, "height": 99 },
+				"VFX/FX/trail_10": { "width": 191, "height": 99 },
+				"VFX/FX/trail_11": { "width": 191, "height": 99 },
+				"VFX/FX/trail_12": { "width": 191, "height": 99 },
+				"VFX/FX/trail_13": { "width": 191, "height": 99 },
+				"VFX/FX/trail_14": { "width": 191, "height": 99 },
+				"VFX/FX/trail_15": { "width": 191, "height": 99 },
+				"VFX/FX/trail_16": { "width": 191, "height": 99 },
+				"VFX/FX/trail_17": { "width": 191, "height": 99 }
+			},
+			"big_slash_trail_01": {
+				"VFX/FX/trail_00": { "width": 191, "height": 99 },
+				"VFX/FX/trail_01": { "width": 191, "height": 99 },
+				"VFX/FX/trail_02": { "width": 191, "height": 99 },
+				"VFX/FX/trail_03": { "width": 191, "height": 99 },
+				"VFX/FX/trail_04": { "width": 191, "height": 99 },
+				"VFX/FX/trail_05": { "width": 191, "height": 99 },
+				"VFX/FX/trail_06": { "width": 191, "height": 99 },
+				"VFX/FX/trail_07": { "width": 191, "height": 99 },
+				"VFX/FX/trail_08": { "width": 191, "height": 99 },
+				"VFX/FX/trail_09": { "width": 191, "height": 99 },
+				"VFX/FX/trail_10": { "width": 191, "height": 99 },
+				"VFX/FX/trail_11": { "width": 191, "height": 99 },
+				"VFX/FX/trail_12": { "width": 191, "height": 99 },
+				"VFX/FX/trail_13": { "width": 191, "height": 99 },
+				"VFX/FX/trail_14": { "width": 191, "height": 99 },
+				"VFX/FX/trail_15": { "width": 191, "height": 99 },
+				"VFX/FX/trail_16": { "width": 191, "height": 99 },
+				"VFX/FX/trail_17": { "width": 191, "height": 99 }
+			},
+			"ult_an": {
+				"VFX/skill1/sg/1_00031": { "width": 154, "height": 147 },
+				"VFX/skill1/sg/1_00032": { "width": 154, "height": 147 },
+				"VFX/skill1/sg/1_00033": { "width": 154, "height": 147 },
+				"VFX/skill1/sg/1_00035": { "width": 154, "height": 147 }
+			},
+			"ult_dg3": {
+				"VFX/skill1/dg2/1_00000": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00001": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00002": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00003": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00004": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00005": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00006": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00007": { "width": 225, "height": 225 }
+			},
+			"ult_dg4": {
+				"VFX/skill1/dg2/1_00000": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00001": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00002": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00003": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00004": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00005": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00006": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00007": { "width": 225, "height": 225 }
+			},
+			"ult_dg5": {
+				"VFX/skill1/dg2/1_00000": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00001": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00002": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00003": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00004": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00005": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00006": { "width": 225, "height": 225 },
+				"VFX/skill1/dg2/1_00007": { "width": 225, "height": 225 }
+			},
+			"ult_hen": {
+				"VFX/skill1/glow2_00128": { "width": 108, "height": 79 }
+			},
+			"ult_kuo": {
+				"VFX/skill1/2_00033": { "width": 50, "height": 65 }
+			},
+			"ult_quan": {
+				"VFX/skill1/quan_00033": { "width": 30, "height": 29 }
+			},
+			"ult_quan2": {
+				"VFX/skill1/quan_00033": { "width": 30, "height": 29 }
+			},
+			"ult_sg": {
+				"VFX/skill1/sg2/1_00032": { "width": 54, "height": 55 },
+				"VFX/skill1/sg2/1_00033": { "width": 54, "height": 55 }
+			},
+			"ult_sg2": {
+				"VFX/skill1/sg3/1_00031": { "width": 96, "height": 115 },
+				"VFX/skill1/sg3/1_00032": { "width": 96, "height": 115 }
+			},
+			"ult_xian": {
+				"VFX/skill1/xian_00032": { "y": 67.65, "width": 26, "height": 86 }
+			},
+			"ult_xian2": {
+				"VFX/skill1/xian_00032": { "y": 67.65, "width": 26, "height": 86 }
+			},
+			"ult_xian3": {
+				"VFX/skill1/xian_00032": { "y": 67.65, "width": 26, "height": 86 }
+			},
+			"ult_xz": {
+				"VFX/skill1/xz2/1_00046": { "width": 150, "height": 119 },
+				"VFX/skill1/xz2/1_00048": { "width": 150, "height": 119 },
+				"VFX/skill1/xz2/1_00050": { "width": 150, "height": 119 }
+			}
+		}
+	}
+],
+"events": {
+	"finalhit": {},
+	"hit": {}
+},
+"animations": {
+	"animation": {
+		"slots": {
+			"big_slash_impact2_0": {
+				"attachment": [
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact2_0" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact2_2" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact2_4" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact2_6" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact2_8" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact2_10" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact2_12" },
+					{ "time": 1.7 }
+				]
+			},
+			"big_slash_impact2_1": {
+				"attachment": [
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact2_0" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact2_2" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact2_4" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact2_6" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact2_8" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact2_10" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact2_12" },
+					{ "time": 1.7 }
+				]
+			},
+			"big_slash_impact3_0": {
+				"attachment": [
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact3_0" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact3_1" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact3_2" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact3_3" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact3_4" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact3_5" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact3_6" },
+					{ "time": 1.7, "name": "VFX/FX/Impact/impact3_7" },
+					{ "time": 1.7333, "name": "VFX/FX/Impact/impact3_8" },
+					{ "time": 1.7667 }
+				]
+			},
+			"big_slash_impact3_1": {
+				"attachment": [
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact3_0" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact3_1" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact3_2" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact3_3" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact3_4" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact3_5" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact3_6" },
+					{ "time": 1.7, "name": "VFX/FX/Impact/impact3_7" },
+					{ "time": 1.7333, "name": "VFX/FX/Impact/impact3_8" },
+					{ "time": 1.7667 }
+				]
+			},
+			"big_slash_impact3_2": {
+				"attachment": [
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact3_0" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact3_1" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact3_2" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact3_3" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact3_4" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact3_5" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact3_6" },
+					{ "time": 1.7, "name": "VFX/FX/Impact/impact3_7" },
+					{ "time": 1.7333, "name": "VFX/FX/Impact/impact3_8" },
+					{ "time": 1.7667 }
+				]
+			},
+			"big_slash_impact3_3": {
+				"attachment": [
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact3_0" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact3_1" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact3_2" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact3_3" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact3_4" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact3_5" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact3_6" },
+					{ "time": 1.7, "name": "VFX/FX/Impact/impact3_7" },
+					{ "time": 1.7333, "name": "VFX/FX/Impact/impact3_8" },
+					{ "time": 1.7667 }
+				]
+			},
+			"big_slash_impact skill2_0": {
+				"rgba": [
+					{ "time": 1.4, "color": "ffffff8c" }
+				],
+				"attachment": [
+					{ "time": 1.4333, "name": "VFX/FX/Impact/impact skill2_0" },
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact skill2_2" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact skill2_4" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact skill2_6" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact skill2_8" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact skill2_10" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact skill2_12" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact skill2_14" },
+					{ "time": 1.7, "name": "VFX/FX/Impact/impact skill2_16" },
+					{ "time": 1.7333 }
+				]
+			},
+			"big_slash_impact skill2_1": {
+				"rgba": [
+					{ "time": 1.4, "color": "ffffff54" }
+				],
+				"attachment": [
+					{ "time": 1.4333, "name": "VFX/FX/Impact/impact skill2_0" },
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact skill2_2" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact skill2_4" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact skill2_6" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact skill2_8" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact skill2_10" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact skill2_12" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact skill2_14" },
+					{ "time": 1.7, "name": "VFX/FX/Impact/impact skill2_16" },
+					{ "time": 1.7333 }
+				]
+			},
+			"big_slash_impact skill2_2": {
+				"rgba": [
+					{ "time": 1.4, "color": "ffffff8c" }
+				],
+				"attachment": [
+					{ "time": 1.4333, "name": "VFX/FX/Impact/impact skill2_0" },
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact skill2_2" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact skill2_4" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact skill2_6" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact skill2_8" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact skill2_10" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact skill2_12" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact skill2_14" },
+					{ "time": 1.7, "name": "VFX/FX/Impact/impact skill2_16" },
+					{ "time": 1.7333 }
+				]
+			},
+			"big_slash_impact skill2_3": {
+				"rgba": [
+					{ "time": 1.4, "color": "ffffff54" }
+				],
+				"attachment": [
+					{ "time": 1.4333, "name": "VFX/FX/Impact/impact skill2_0" },
+					{ "time": 1.4667, "name": "VFX/FX/Impact/impact skill2_2" },
+					{ "time": 1.5, "name": "VFX/FX/Impact/impact skill2_4" },
+					{ "time": 1.5333, "name": "VFX/FX/Impact/impact skill2_6" },
+					{ "time": 1.5667, "name": "VFX/FX/Impact/impact skill2_8" },
+					{ "time": 1.6, "name": "VFX/FX/Impact/impact skill2_10" },
+					{ "time": 1.6333, "name": "VFX/FX/Impact/impact skill2_12" },
+					{ "time": 1.6667, "name": "VFX/FX/Impact/impact skill2_14" },
+					{ "time": 1.7, "name": "VFX/FX/Impact/impact skill2_16" },
+					{ "time": 1.7333 }
+				]
+			},
+			"big_slash_slash_skill2_0": {
+				"rgba": [
+					{ "time": 1.4, "color": "ffffff7f" }
+				],
+				"attachment": [
+					{ "time": 1.4, "name": "VFX/FX/slash_skill2_0" },
+					{ "time": 1.4333, "name": "VFX/FX/slash_skill2_1" },
+					{ "time": 1.4667, "name": "VFX/FX/slash_skill2_2" },
+					{ "time": 1.5, "name": "VFX/FX/slash_skill2_3" },
+					{ "time": 1.5333, "name": "VFX/FX/slash_skill2_4" },
+					{ "time": 1.5667, "name": "VFX/FX/slash_skill2_5" },
+					{ "time": 1.6 }
+				]
+			},
+			"big_slash_slash_skill2_1": {
+				"rgba": [
+					{ "time": 1.4, "color": "ffffff5e" }
+				],
+				"attachment": [
+					{ "time": 1.4, "name": "VFX/FX/slash_skill2_0" },
+					{ "time": 1.4333, "name": "VFX/FX/slash_skill2_1" },
+					{ "time": 1.4667, "name": "VFX/FX/slash_skill2_2" },
+					{ "time": 1.5, "name": "VFX/FX/slash_skill2_3" },
+					{ "time": 1.5333, "name": "VFX/FX/slash_skill2_4" },
+					{ "time": 1.5667, "name": "VFX/FX/slash_skill2_5" },
+					{ "time": 1.6 }
+				]
+			},
+			"big_slash_slash_skill2_2": {
+				"rgba": [
+					{ "time": 1.4, "color": "ffffff7f" }
+				],
+				"attachment": [
+					{ "time": 1.4, "name": "VFX/FX/slash_skill2_0" },
+					{ "time": 1.4333, "name": "VFX/FX/slash_skill2_1" },
+					{ "time": 1.4667, "name": "VFX/FX/slash_skill2_2" },
+					{ "time": 1.5, "name": "VFX/FX/slash_skill2_3" },
+					{ "time": 1.5333, "name": "VFX/FX/slash_skill2_4" },
+					{ "time": 1.5667, "name": "VFX/FX/slash_skill2_5" },
+					{ "time": 1.6 }
+				]
+			},
+			"big_slash_slash_skill2_3": {
+				"rgba": [
+					{ "time": 1.4, "color": "ffffff5e" }
+				],
+				"attachment": [
+					{ "time": 1.4, "name": "VFX/FX/slash_skill2_0" },
+					{ "time": 1.4333, "name": "VFX/FX/slash_skill2_1" },
+					{ "time": 1.4667, "name": "VFX/FX/slash_skill2_2" },
+					{ "time": 1.5, "name": "VFX/FX/slash_skill2_3" },
+					{ "time": 1.5333, "name": "VFX/FX/slash_skill2_4" },
+					{ "time": 1.5667, "name": "VFX/FX/slash_skill2_5" },
+					{ "time": 1.6 }
+				]
+			},
+			"big_slash_trail_00": {
+				"attachment": [
+					{ "time": 1.4333, "name": "VFX/FX/trail_00" },
+					{ "time": 1.4667, "name": "VFX/FX/trail_02" },
+					{ "time": 1.5, "name": "VFX/FX/trail_04" },
+					{ "time": 1.5333, "name": "VFX/FX/trail_06" },
+					{ "time": 1.5667, "name": "VFX/FX/trail_08" },
+					{ "time": 1.6, "name": "VFX/FX/trail_10" },
+					{ "time": 1.6333, "name": "VFX/FX/trail_12" },
+					{ "time": 1.6667, "name": "VFX/FX/trail_14" },
+					{ "time": 1.7, "name": "VFX/FX/trail_16" },
+					{ "time": 1.7333 }
+				]
+			},
+			"big_slash_trail_01": {
+				"attachment": [
+					{ "time": 1.4333, "name": "VFX/FX/trail_00" },
+					{ "time": 1.4667, "name": "VFX/FX/trail_02" },
+					{ "time": 1.5, "name": "VFX/FX/trail_04" },
+					{ "time": 1.5333, "name": "VFX/FX/trail_06" },
+					{ "time": 1.5667, "name": "VFX/FX/trail_08" },
+					{ "time": 1.6, "name": "VFX/FX/trail_10" },
+					{ "time": 1.6333, "name": "VFX/FX/trail_12" },
+					{ "time": 1.6667, "name": "VFX/FX/trail_14" },
+					{ "time": 1.7, "name": "VFX/FX/trail_16" },
+					{ "time": 1.7333 }
+				]
+			},
+			"ult_dg3": {
+				"attachment": [
+					{ "name": "VFX/skill1/dg2/1_00000" },
+					{ "time": 0.0333, "name": "VFX/skill1/dg2/1_00001" },
+					{ "time": 0.0667, "name": "VFX/skill1/dg2/1_00002" },
+					{ "time": 0.1, "name": "VFX/skill1/dg2/1_00003" },
+					{ "time": 0.1333, "name": "VFX/skill1/dg2/1_00004" },
+					{ "time": 0.1667, "name": "VFX/skill1/dg2/1_00005" },
+					{ "time": 0.2, "name": "VFX/skill1/dg2/1_00006" },
+					{ "time": 0.2333, "name": "VFX/skill1/dg2/1_00007" },
+					{ "time": 0.3 },
+					{ "time": 0.5, "name": "VFX/skill1/dg2/1_00000" },
+					{ "time": 0.5333, "name": "VFX/skill1/dg2/1_00001" },
+					{ "time": 0.5667, "name": "VFX/skill1/dg2/1_00002" },
+					{ "time": 0.6, "name": "VFX/skill1/dg2/1_00003" },
+					{ "time": 0.6333, "name": "VFX/skill1/dg2/1_00004" },
+					{ "time": 0.6667, "name": "VFX/skill1/dg2/1_00005" },
+					{ "time": 0.7, "name": "VFX/skill1/dg2/1_00006" },
+					{ "time": 0.7333, "name": "VFX/skill1/dg2/1_00007" },
+					{ "time": 0.8 },
+					{ "time": 1.2, "name": "VFX/skill1/dg2/1_00000" },
+					{ "time": 1.2333, "name": "VFX/skill1/dg2/1_00001" },
+					{ "time": 1.2667, "name": "VFX/skill1/dg2/1_00002" },
+					{ "time": 1.3, "name": "VFX/skill1/dg2/1_00003" },
+					{ "time": 1.3333, "name": "VFX/skill1/dg2/1_00004" },
+					{ "time": 1.3667, "name": "VFX/skill1/dg2/1_00005" },
+					{ "time": 1.4, "name": "VFX/skill1/dg2/1_00006" },
+					{ "time": 1.4333, "name": "VFX/skill1/dg2/1_00007" },
+					{ "time": 1.4667 }
+				]
+			},
+			"ult_dg4": {
+				"attachment": [
+					{ "time": 0.1667, "name": "VFX/skill1/dg2/1_00000" },
+					{ "time": 0.2, "name": "VFX/skill1/dg2/1_00001" },
+					{ "time": 0.2333, "name": "VFX/skill1/dg2/1_00002" },
+					{ "time": 0.2667, "name": "VFX/skill1/dg2/1_00003" },
+					{ "time": 0.3, "name": "VFX/skill1/dg2/1_00004" },
+					{ "time": 0.3333, "name": "VFX/skill1/dg2/1_00005" },
+					{ "time": 0.3667, "name": "VFX/skill1/dg2/1_00006" },
+					{ "time": 0.4, "name": "VFX/skill1/dg2/1_00007" },
+					{ "time": 0.4333 },
+					{ "time": 0.6333, "name": "VFX/skill1/dg2/1_00000" },
+					{ "time": 0.6667, "name": "VFX/skill1/dg2/1_00001" },
+					{ "time": 0.7, "name": "VFX/skill1/dg2/1_00002" },
+					{ "time": 0.7333, "name": "VFX/skill1/dg2/1_00003" },
+					{ "time": 0.7667, "name": "VFX/skill1/dg2/1_00004" },
+					{ "time": 0.8, "name": "VFX/skill1/dg2/1_00005" },
+					{ "time": 0.8333, "name": "VFX/skill1/dg2/1_00006" },
+					{ "time": 0.8667, "name": "VFX/skill1/dg2/1_00007" },
+					{ "time": 0.9 },
+					{ "time": 1.1, "name": "VFX/skill1/dg2/1_00000" },
+					{ "time": 1.1333, "name": "VFX/skill1/dg2/1_00001" },
+					{ "time": 1.1667, "name": "VFX/skill1/dg2/1_00002" },
+					{ "time": 1.2, "name": "VFX/skill1/dg2/1_00003" },
+					{ "time": 1.2333, "name": "VFX/skill1/dg2/1_00004" },
+					{ "time": 1.2667, "name": "VFX/skill1/dg2/1_00005" },
+					{ "time": 1.3, "name": "VFX/skill1/dg2/1_00006" },
+					{ "time": 1.3333, "name": "VFX/skill1/dg2/1_00007" },
+					{ "time": 1.3667 }
+				]
+			},
+			"ult_dg5": {
+				"attachment": [
+					{ "time": 0.2667, "name": "VFX/skill1/dg2/1_00000" },
+					{ "time": 0.3333, "name": "VFX/skill1/dg2/1_00001" },
+					{ "time": 0.4, "name": "VFX/skill1/dg2/1_00002" },
+					{ "time": 0.4333, "name": "VFX/skill1/dg2/1_00003" },
+					{ "time": 0.5, "name": "VFX/skill1/dg2/1_00004" },
+					{ "time": 0.5667, "name": "VFX/skill1/dg2/1_00005" },
+					{ "time": 0.6333, "name": "VFX/skill1/dg2/1_00006" },
+					{ "time": 0.7, "name": "VFX/skill1/dg2/1_00007" },
+					{ "time": 0.7667 },
+					{ "time": 0.9333, "name": "VFX/skill1/dg2/1_00000" },
+					{ "time": 0.9667, "name": "VFX/skill1/dg2/1_00001" },
+					{ "time": 1, "name": "VFX/skill1/dg2/1_00002" },
+					{ "time": 1.0333, "name": "VFX/skill1/dg2/1_00003" },
+					{ "time": 1.0667, "name": "VFX/skill1/dg2/1_00004" },
+					{ "time": 1.1, "name": "VFX/skill1/dg2/1_00005" },
+					{ "time": 1.1667, "name": "VFX/skill1/dg2/1_00006" },
+					{ "time": 1.2333, "name": "VFX/skill1/dg2/1_00007" },
+					{ "time": 1.3 }
+				]
+			}
+		},
+		"bones": {
+			"ULT_slash": {
+				"translate": [
+					{ "x": 137.67, "y": 83.8 }
+				],
+				"scale": [
+					{ "x": 1.12, "y": 1.12 }
+				]
+			},
+			"ult_dg3": {
+				"rotate": [
+					{ "value": -13.05, "curve": "stepped" },
+					{ "time": 0.3, "value": -13.05 },
+					{ "time": 0.5, "value": 34.53 },
+					{ "time": 0.8, "value": -20.67 },
+					{ "time": 1.2, "value": 99.77 }
+				],
+				"translate": [
+					{ "x": 12.54, "y": 50.41 }
+				],
+				"scale": [
+					{ "x": 1.379, "y": 0.904, "curve": "stepped" },
+					{ "time": 0.3, "x": 1.379, "y": 0.904 },
+					{ "time": 0.5, "x": -1.249, "y": 0.783 },
+					{ "time": 0.8, "x": -1.555, "y": 0.904 },
+					{ "time": 1.2, "x": -1.082, "y": 1.951 }
+				],
+				"shear": [
+					{ "time": 0.8 },
+					{ "time": 1.2, "x": 26.41, "y": 3.36 }
+				]
+			},
+			"slash": {
+				"scale": [
+					{ "x": 1.109, "y": 1.109 }
+				]
+			},
+			"ult_dg4": {
+				"rotate": [
+					{ "time": 0.1667, "value": 157.9, "curve": "stepped" },
+					{ "time": 0.4333, "value": 157.9 },
+					{ "time": 0.6333, "value": 172.26, "curve": "stepped" },
+					{ "time": 0.9, "value": 172.26 },
+					{ "time": 1.1, "value": 190.7 }
+				],
+				"translate": [
+					{ "time": 0.1667, "x": -10.23, "y": 50.41 }
+				],
+				"scale": [
+					{ "time": 0.1667, "x": -1.781, "y": 1.095, "curve": "stepped" },
+					{ "time": 0.4333, "x": -1.781, "y": 1.095 },
+					{ "time": 0.6333, "x": -1.674, "y": 0.775, "curve": "stepped" },
+					{ "time": 0.9, "x": -2.365, "y": 1.095 },
+					{ "time": 1.1, "x": 1.529, "y": 0.866 }
+				],
+				"shear": [
+					{ "time": 0.1667, "x": 23.4, "curve": "stepped" },
+					{ "time": 0.9, "x": 23.4 },
+					{ "time": 1.1, "x": 1 }
+				]
+			},
+			"ult_dg5": {
+				"rotate": [
+					{ "time": 0.2667, "value": 63.89, "curve": "stepped" },
+					{ "time": 0.7667, "value": 63.89 },
+					{ "time": 0.9333, "value": 114.22, "curve": "stepped" },
+					{ "time": 1.3, "value": 51.05 }
+				],
+				"translate": [
+					{ "time": 0.2667, "x": 6.23, "y": 49.3 }
+				],
+				"scale": [
+					{ "time": 0.2667, "x": -1.424, "y": 1.474, "curve": "stepped" },
+					{ "time": 0.7667, "x": -1.424, "y": 1.474 },
+					{ "time": 0.9333, "x": -1.17, "y": -1.342, "curve": "stepped" },
+					{ "time": 1.3, "x": -1.047, "y": -1.105 }
+				],
+				"shear": [
+					{ "time": 0.2667, "x": -46.53, "y": -12.31, "curve": "stepped" },
+					{ "time": 0.7667, "x": -46.53, "y": -12.31 },
+					{ "time": 0.9333, "x": 3.22, "y": 12.76, "curve": "stepped" },
+					{ "time": 1.3, "x": 3.22, "y": 17.49 }
+				]
+			},
+			"big_slash_slash_skill2_1": {
+				"rotate": [
+					{ "time": 1.4, "value": -80.13 },
+					{ "time": 1.4333, "value": -68.63 },
+					{
+						"time": 1.4667,
+						"value": -54.32,
+						"curve": [ 1.532, -89.6, 1.567, -87.7 ]
+					},
+					{ "time": 1.5667, "value": -87.7 }
+				]
+			},
+			"big_slash_slash_skill2_0": {
+				"translate": [
+					{ "time": 1.4, "x": -609.7, "y": 557.59 }
+				],
+				"scale": [
+					{ "time": 1.4, "x": 2.891, "y": -0.828 }
+				]
+			},
+			"big_slash_slash_skill2_3": {
+				"rotate": [
+					{ "time": 1.4, "value": -80.13 },
+					{ "time": 1.4333, "value": -68.63 },
+					{
+						"time": 1.4667,
+						"value": -54.32,
+						"curve": [ 1.532, -89.6, 1.567, -87.7 ]
+					},
+					{ "time": 1.5667, "value": -87.7 }
+				]
+			},
+			"big_slash_slash_skill2_2": {
+				"translate": [
+					{ "time": 1.4, "x": -609.7, "y": 557.59 }
+				],
+				"scale": [
+					{ "time": 1.4, "x": 2.891, "y": -0.828 }
+				]
+			},
+			"bone": {
+				"translate": [
+					{ "time": 1.3667, "y": 251.24 }
+				],
+				"scale": [
+					{ "time": 1.3667, "x": 0.094, "y": 0.22 }
+				]
+			},
+			"bone2": {
+				"translate": [
+					{ "time": 1.3667, "x": -58.31, "y": 508.11 }
+				],
+				"scale": [
+					{ "time": 1.3667, "x": 0.075, "y": -0.222 }
+				]
+			},
+			"VFX": {
+				"translate": [
+					{ "y": -1361.08 }
+				],
+				"scale": [
+					{ "x": 4.013, "y": 4.013 }
+				]
+			}
+		},
+		"events": [
+			{ "name": "hit" },
+			{ "time": 0.2, "name": "hit" },
+			{ "time": 0.3333, "name": "hit" },
+			{ "time": 0.5333, "name": "hit" },
+			{ "time": 0.6667, "name": "hit" },
+			{ "time": 0.9333, "name": "hit" },
+			{ "time": 1.1333, "name": "hit" },
+			{ "time": 1.2333, "name": "hit" },
+			{ "time": 1.4667, "name": "finalhit" }
+		]
+	}
+}
+}

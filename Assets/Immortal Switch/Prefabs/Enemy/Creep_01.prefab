@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8057062149923973952}
   - component: {fileID: 8723058953547970856}
   - component: {fileID: 2720760769804797650}
-  - component: {fileID: 5671167598135600421}
   m_Layer: 6
   m_Name: Creep
   m_TagString: Untagged
@@ -28,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5026060033453177647}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7434506558583344676}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!33 &8057062149923973952
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -66,7 +65,6 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 17f5f60354054cb4cbaefbc7a5a29a1c, type: 2}
   - {fileID: 2100000, guid: 04f934a21795eb14281531e0d1ae7f8c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -129,22 +127,9 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
-  _animationName: 
+  _animationName: spawn
   loop: 1
   timeScale: 1
---- !u!114 &5671167598135600421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5026060033453177647}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7773252b88b743d4807d08f66eddd615, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hp: 5000000
 --- !u!1 &7769961678186002482
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,7 +181,6 @@ MonoBehaviour:
   stats: {fileID: 6147910350317824579}
   animationDriver: {fileID: 4760040034150877837}
   locomotion: {fileID: 2532712611373174950}
-  hitEventName: hit
   destroyOnDead: 1
   destroyDelay: 1.2
 --- !u!114 &6147910350317824579
@@ -231,8 +215,6 @@ MonoBehaviour:
   winAnim: win
   attackAnims:
   - attack1
-  - attack2
-  - attack3
   ultimateAnim: ultimate
   passiveAnim: passive
   defaultSpawnDuration: 1

@@ -3,15 +3,15 @@ using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Currency;
-using Scripts.Common;
 using UnityEngine;
 
 namespace Battle
 {
-    public class BattleCoinView : MonoBehaviour
+    public class BattleCoinView : PoolableBehaviour
     {
         [SerializeField] SpriteRenderer spriteRenderer;
         public int CoinNum = 1;
+        private PoolHandle _poolHandle;
 
         public async UniTaskVoid DoDrop(float dur, Transform pos)
         {
@@ -56,9 +56,8 @@ namespace Battle
             dynamicDuration = Mathf.Clamp(dynamicDuration, 0.25f, 0.75f);
             transform.DOMove(pos.position + Vector3.up * 1.5f, dynamicDuration).SetEase(Ease.InCirc).OnComplete(() =>
             {
-                PoolController.Instance.ReturnToPool(gameObject);
                 CurrencyManager.Instance.Add(CurrencyType.Gold, CoinNum);
-                PoolController.Instance.ReturnToPool(gameObject);
+                DespawnSelf();
             });
         }
 
@@ -67,9 +66,8 @@ namespace Battle
             await UniTask.Delay(TimeSpan.FromSeconds(2.5f), cancellationToken: this.GetCancellationTokenOnDestroy());
             spriteRenderer?.DOFade(0, 1f).SetEase(Ease.OutCirc).OnComplete(() => 
             { 
-                PoolController.Instance.ReturnToPool(gameObject);
                 CurrencyManager.Instance.Add(CurrencyType.Gold, CoinNum);
-                PoolController.Instance.ReturnToPool(gameObject);
+                DespawnSelf();
             });
         }
 

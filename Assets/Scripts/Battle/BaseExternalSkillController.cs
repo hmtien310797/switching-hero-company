@@ -3,7 +3,6 @@ using System.Threading;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Skill;
-using Scripts.Common;
 using Spine.Unity;
 using UnityEngine;
 
@@ -15,13 +14,6 @@ namespace Battle
         A,
         S,
         SS,
-    }
-
-    public enum TierSkillGroup
-    {
-        FollowHero,
-        MultiShot,
-        SingleShot,
     }
 
     public class BaseExternalSkillController : MonoBehaviour
@@ -65,74 +57,40 @@ namespace Battle
 
         public void InitSkill(PlayerHeroController pHc, SkillDataSO skillData, Action endAct, Action<float> camAct)
         {
-            if (skillData.SkillGroup == TierSkillGroup.FollowHero)
-            {
-                var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, pHc.transform.position);
-                
-                //if(b)
-                {
-                    isFollow = fxObj.isFollow;
-                    fxObj.SetHeroPlayerController(pHc);
-                    fxObj.skillData = skillData;
-                    fxObj.endAct = endAct;
-                }
-
-                fxObj.InitInnerSkill(b, camAct);
-            }
-            else if(skillData.SkillGroup == TierSkillGroup.SingleShot)
-            {
-                var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, pHc.transform.position);
-                //if (b)
-                {
-                    isFollow = fxObj.isFollow;
-                    fxObj.SetHeroPlayerController(pHc);
-                    fxObj.skillData = skillData;
-                    fxObj.endAct = endAct;
-                }
-
-                fxObj.InitInnerSkill(b, camAct);
-            }
-            else if(skillData.SkillGroup == TierSkillGroup.MultiShot)
-            {
-                DoS2SkillWithMultiSpawn(endAct, skillData, pHc, camAct);
-            }
-        }
-
-        public async void DoS2SkillWithMultiSpawn(Action endAct, SkillDataSO skillData, PlayerHeroController pHc, Action<float>camAct)
-        {
-            var pos = pHc.GetNearestMonster();
-            //if (skillData.Tier == TierSkill.SS || skillData.Tier == TierSkill.S)
-            {
-                for (int i = 0; i < skillData.NumSpawn; i++)
-                {
-                    var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f));
-                    var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, nPos);
-                    isFollow = fxObj.isFollow;
-                    fxObj.SetHeroPlayerController(pHc);
-                    fxObj.skillData = skillData;
-                    fxObj.endAct = i == skillData.NumSpawn - 1 ? endAct : null;
-                    fxObj.InitInnerSkillMultiSpawn(i == skillData.NumSpawn - 1, i == 0 ? camAct : null);
-
-                    await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: this.GetCancellationTokenOnDestroy());
-                }
-            }
-            // else if (skillData.Tier == TierSkill.SSR)
+            // if (skillData.SkillGroup == TierSkillGroup.FollowHero)
             // {
-            //     for (int i = 0; i < skillData.NumSpawn; i++)
+            //     var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, pHc.transform.position);
+            //     
+            //     //if(b)
             //     {
-            //         var nPos = pos + new Vector3(UnityEngine.Random.Range(-3f, 3f), 0, UnityEngine.Random.Range(-3f, 3f)) + Vector3.up * 8;
-            //         var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, nPos);
-            //         fxObj.transform.rotation = Quaternion.FromToRotation(Vector3.right, Vector3.down);
             //         isFollow = fxObj.isFollow;
             //         fxObj.SetHeroPlayerController(pHc);
             //         fxObj.skillData = skillData;
-            //         fxObj.endAct = i == skillData.NumSpawn - 1 ? endAct : null;
-            //         fxObj.InitInnerSkillMultiSpawn(i == skillData.NumSpawn - 1, i == 0 ? camAct : null);
-            //
-            //         await UniTask.Delay(TimeSpan.FromSeconds(0.075f), cancellationToken: this.GetCancellationTokenOnDestroy());
+            //         fxObj.endAct = endAct;
             //     }
+            //
+            //     fxObj.InitInnerSkill(b, camAct);
+            // }
+            // else if(skillData.SkillGroup == TierSkillGroup.SingleShot)
+            // {
+            //     var (fxObj, b) = PoolController.Instance.Get(skillData.SkillPrefab, pHc.transform.position);
+            //     //if (b)
+            //     {
+            //         isFollow = fxObj.isFollow;
+            //         fxObj.SetHeroPlayerController(pHc);
+            //         fxObj.skillData = skillData;
+            //         fxObj.endAct = endAct;
+            //     }
+            //
+            //     fxObj.InitInnerSkill(b, camAct);
+            // }
+            // else if(skillData.SkillGroup == TierSkillGroup.MultiShot)
+            // {
+            //     DoS2SkillWithMultiSpawn(endAct, skillData, pHc, camAct);
             // }
         }
+
+        
 
         public virtual void InitInnerSkillMultiSpawn(bool isFinal, Action<float>camAct) { }
 

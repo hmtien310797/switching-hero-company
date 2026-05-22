@@ -35,7 +35,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
         [SerializeField] private Image detailIcon;
         [SerializeField] private TMP_Text detailLevelText;
         [SerializeField] private TMP_Text detailNameText;
-        [SerializeField] private TMP_Text detailTypeText;
         [SerializeField] private TMP_Text detailDescText;
         [SerializeField] private TMP_Text detailShardText;
         [SerializeField] private Image detailShardFill;
@@ -410,7 +409,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 bool isSelected = selectedSkill != null && skillData != null &&
                                   selectedSkill.SkillId == skillData.SkillId;
-                equippedSlots[i].Setup(i, skillId, skillData != null ? skillData.skillIcon : null, isSelected);
+                equippedSlots[i].Setup(i, skillId, skillData != null ? skillData.SkillIcon : null, isSelected);
             }
         }
 
@@ -446,7 +445,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 if (detailIcon != null) detailIcon.sprite = null;
                 if (detailLevelText != null) detailLevelText.text = string.Empty;
                 if (detailNameText != null) detailNameText.text = string.Empty;
-                if (detailTypeText != null) detailTypeText.text = string.Empty;
                 if (detailDescText != null) detailDescText.text = string.Empty;
                 if (detailShardText != null) detailShardText.text = string.Empty;
                 if (detailShardFill != null) detailShardFill.fillAmount = 0f;
@@ -458,11 +456,10 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             var state = dataProvider.BuildSkillState(hero, skillData);
 
-            if (detailIcon != null) detailIcon.sprite = skillData.skillIcon;
+            if (detailIcon != null) detailIcon.sprite = skillData.SkillIcon;
             if (detailLevelText != null) detailLevelText.text = $"Lv.{state.Level}";
             if (detailNameText != null) detailNameText.text = skillData.SkillName;
-            if (detailTypeText != null) detailTypeText.text = $"{skillData.CastType} Skill";
-            if (detailDescText != null) detailDescText.text = skillData.BuildDescription(state.Level);
+            //if (detailDescText != null) detailDescText.text = skillData.BuildDescription(state.Level);
             if (detailShardText != null) detailShardText.text = $"{state.CurrentShard}/{state.RequiredShard}";
             if (detailShardFill != null)
                 detailShardFill.fillAmount =
@@ -538,7 +535,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 replaceHeroPreview.Setup(selectedHero.HeroId, selectedHero.HeroIcon, true);
 
             if (replacePendingSkillIcon != null)
-                replacePendingSkillIcon.sprite = pendingReplaceSkill != null ? pendingReplaceSkill.skillIcon : null;
+                replacePendingSkillIcon.sprite = pendingReplaceSkill != null ? pendingReplaceSkill.SkillIcon : null;
 
             if (replaceInstructionText != null)
                 replaceInstructionText.text = "Please select the slot to equip";
@@ -558,7 +555,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 var skillData = dataProvider.GetClassPool(selectedHero.HeroClass)
                     .FirstOrDefault(x => x != null && x.SkillId == skillId);
 
-                replaceSlotViews[i].Setup(slotIndex, skillData != null ? skillData.skillIcon : null);
+                replaceSlotViews[i].Setup(slotIndex, skillData != null ? skillData.SkillIcon : null);
                 replaceSlotViews[i].Button.onClick.RemoveAllListeners();
                 replaceSlotViews[i].Button.onClick.AddListener(() => OnClickReplaceSlot(slotIndex));
             }

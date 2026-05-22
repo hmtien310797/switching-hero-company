@@ -28,7 +28,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             clickCallback = onClick;
 
             if (icon != null)
-                icon.sprite = state.SkillData != null ? state.SkillData.skillIcon : null;
+                icon.sprite = state.SkillData != null ? state.SkillData.SkillIcon : null;
 
             if (levelText != null)
                 levelText.text = $"Lv.{state.Level}";

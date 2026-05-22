@@ -26,7 +26,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                     grouped = new SkillSummonGroupedResultEntry
                     {
                         SkillAsset = skill,
-                        Icon = skill.skillIcon,
+                        Icon = skill.SkillIcon,
                         SkillName = entry.SkillName,
                         Count = 0,
                         IsNewSkill = false,

@@ -1,8 +1,6 @@
 using System;
-using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Skill;
-using Scripts.Common;
 using Spine.Unity;
 using UnityEngine;
 
@@ -19,7 +17,7 @@ namespace Battle
             camAct?.Invoke(dur);
             await UniTask.Delay(TimeSpan.FromSeconds(dur));
             base.DoEndSkill().Forget();
-            PoolController.Instance?.ReturnToPool(gameObject);
+            //PoolController.Instance?.ReturnToPool(gameObject);
         }
 
         private async UniTaskVoid DoActSkillByNum(Action<float> camAct, int numAtk)
@@ -31,11 +29,11 @@ namespace Battle
             await UniTask.Delay(TimeSpan.FromSeconds(dur));
             for (int i = 0; i < numAtk; i++)
             {
-                PlayerHeroController.AttackByArea(transform.position, RangeSkill, i == numAtk - 1? SkillData.FinalDame : SkillData.NomalDame);
+                //PlayerHeroController.AttackByArea(transform.position, RangeSkill, i == numAtk - 1? SkillData.FinalDame : SkillData.NomalDame);
                 await UniTask.Delay(TimeSpan.FromSeconds(dur));
             }
             base.DoEndSkill().Forget();
-            PoolController.Instance?.ReturnToPool(gameObject);
+            //PoolController.Instance?.ReturnToPool(gameObject);
         }
 
         public override void InitInnerSkill(bool isInit = true, Action<float> camAct = null)
@@ -80,30 +78,30 @@ namespace Battle
 
         public override void RegisterAnimEvent(Action<float,float> eventAct)
         {
-            skaFx.AnimationState.Event += (entry, e) =>
-            {
-                if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
-                {
-                    Debug.Log($"Anim event {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
-                }
-                if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventFinalHit)
-                {
-                    Debug.Log($"Anim event final {EnventHit} triggered.");
-                    eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
-                }
-            };
+            // skaFx.AnimationState.Event += (entry, e) =>
+            // {
+            //     if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventHit)
+            //     {
+            //         Debug.Log($"Anim event {EnventHit} triggered.");
+            //         eventAct?.Invoke(RangeSkill, SkillData.NomalDame);
+            //     }
+            //     if (AnimSkill == entry.Animation.Name && e.Data.Name == EnventFinalHit)
+            //     {
+            //         Debug.Log($"Anim event final {EnventHit} triggered.");
+            //         eventAct?.Invoke(RangeSkill, SkillData.FinalDame);
+            //     }
+            // };
         }
         
         protected virtual bool TryExecuteNewSkillPhase(string eventName, Vector3 Pos)
         {
-            if (PlayerHeroController == null) return false;
-            if (SkillData == null) return false;
-
-            var phase = SkillData.GetPhaseByEvent(defaultSkillLevel, eventName);
-            if (phase == null) return false;
-
-            SkillExecutor.ExecutePhase(PlayerHeroController, phase, Pos, RangeSkill);
+            // if (PlayerHeroController == null) return false;
+            // if (SkillData == null) return false;
+            //
+            // var phase = SkillData.GetPhaseByEvent(defaultSkillLevel, eventName);
+            // if (phase == null) return false;
+            //
+            // SkillExecutor.ExecutePhase(PlayerHeroController, phase, Pos, RangeSkill);
             return true;
         }
     }

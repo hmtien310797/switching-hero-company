@@ -1,0 +1,39 @@
+﻿using UnityEngine;
+
+namespace Common
+{
+    public abstract class PoolableBehaviour : MonoBehaviour, IPoolable
+    {
+        protected PoolHandle PoolHandle { get; private set; }
+
+        public void OnCreatedByPool(PoolHandle handle)
+        {
+            PoolHandle = handle;
+            OnCreated();
+        }
+
+        protected virtual void OnCreated()
+        {
+        }
+
+        public virtual void OnSpawnedFromPool()
+        {
+        }
+
+        public virtual void OnDespawnedToPool()
+        {
+        }
+
+        protected void DespawnSelf()
+        {
+            if (PoolHandle != null)
+            {
+                PoolHandle.Despawn();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+    }
+}

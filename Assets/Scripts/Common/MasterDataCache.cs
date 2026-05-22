@@ -41,10 +41,11 @@ namespace Common
         private void InitSkillData()
         {
             skillDataDicts.Clear();
-            foreach (var heroData in skillDatas)
-            {
-                skillDataDicts[heroData.SkillId] = heroData;
-            }
+            //remake later
+            // foreach (var heroData in skillDatas)
+            // {
+            //     skillDataDicts[heroData.SkillId] = heroData;
+            // }
         }
 
         public SkillDataSO GetSkillDataById(int id)

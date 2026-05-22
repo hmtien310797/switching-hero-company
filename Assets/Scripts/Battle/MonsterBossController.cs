@@ -4,7 +4,6 @@ using Common;
 using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
-using Scripts.Common;
 using UnityEngine;
 
 namespace Battle
@@ -148,7 +147,7 @@ namespace Battle
 
         private void OnDead()
         {
-            PoolController.Instance.ReturnToPool(gameObject);
+            //PoolController.Instance.ReturnToPool(gameObject);
         }
     }
     

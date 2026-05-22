@@ -13,7 +13,6 @@ using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Immortal_Switch.Scripts.StatSystem;
-using Scripts.Common;
 
 namespace Battle
 {
@@ -97,6 +96,7 @@ namespace Battle
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
             GameEventManager.Subscribe(GameEvents.OnNextStageButtonClicked, () => NextStageCallback().Forget());
             GameEventManager.Subscribe(GameEvents.OnStageLost, () => OnStageFailed().Forget());
+            PoolManager.Instance.Prewarm(coinPrefab, 10);
         }
 
         public override async UniTask InitializeAsync()
@@ -171,18 +171,16 @@ namespace Battle
             inBattleHeroMapper.Remove(sourceHeroId);
 
             oldHero.gameObject.SetActive(false);
-            PoolController.Instance.ReturnToPool(oldHero.gameObject);
+            //PoolManager.Instance.Despawn(oldHero);
 
-            var (newHero, _) = PoolController.Instance.Get(
-                newHeroData.HeroPrefab,
-                spawnPos
-            );
+            var newHero = Instantiate(newHeroData.HeroPrefab,
+                spawnPos, Quaternion.identity);
 
             if (newHero == null)
                 return;
 
             newHero.gameObject.SetActive(true);
-            newHero.Init(newHeroData, this);
+            newHero.Init(newHeroData, this, heroTeamController);
 
             inBattleHeroes[slotIndex] = newHero;
             inBattleHeroMapper[targetHeroId] = newHero;
@@ -242,11 +240,9 @@ namespace Battle
             }
 
             Vector3 spawnPos = GetHeroSpawnPosition(heroIndex);
-
-            var (hero, _) = PoolController.Instance.Get(
-                heroData.HeroPrefab,
-                spawnPos
-            );
+            
+            var hero = Instantiate(heroData.HeroPrefab,
+                spawnPos, Quaternion.identity);
 
             if (hero == null)
             {
@@ -255,7 +251,7 @@ namespace Battle
             }
 
             hero.gameObject.SetActive(true);
-            hero.Init(heroData, this);
+            hero.Init(heroData, this, heroTeamController);
 
             inBattleHeroes[heroIndex] = hero;
             inBattleHeroMapper[heroData.Id] = hero;
@@ -378,7 +374,7 @@ namespace Battle
             isBossAlive = false;
             if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
             {
-                PoolController.Instance.ReturnToPool(currentBoss.gameObject);
+                PoolManager.Instance.Despawn(currentBoss);
                 currentBoss = null;
             }
 
@@ -505,9 +501,8 @@ namespace Battle
                 {
                     var basePos = spawnPoss[Random.Range(0, spawnPoss.Count)].position;
                     var nPos = basePos + new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f));
-
-                    var (creep, _) = PoolController.Instance.Get(creepData.CreepPrefab, nPos);
-
+                    var creep = PoolManager.Instance.Spawn(creepData.CreepPrefab, nPos, Quaternion.identity);
+                    creep.name += creep.transform.GetInstanceID();
                     creep.gameObject.SetActive(true);
 
                     creep.transform.localScale = k % 5 == 0
@@ -598,7 +593,7 @@ namespace Battle
         {
             await UniTask.Delay(2000);
             result = BattleResult.Defeat;
-            PoolController.Instance.ReturnToPool(currentBoss.gameObject);
+            PoolManager.Instance.Despawn(currentBoss);
             currentBoss = null;
             SetState(BattleState.Ended);
             PlayCurrentStage().Forget();
@@ -611,7 +606,7 @@ namespace Battle
             State = newState;
         }
 
-        //khi monster chết 
+        //khi monster thường chết 
         public void NotifyMonsterDeath(EnemyActor enemy)
         {
             if (enemy == null)
@@ -674,9 +669,9 @@ namespace Battle
             var numRand = Random.Range(2, 5);
             for (int i = 0; i < numRand; i++)
             {
-                var coin = PoolController.Instance.Get(coinPrefab, pos + Vector3.up * 0.25f);
+                BattleCoinView coin = PoolManager.Instance.Spawn(coinPrefab, pos + Vector3.up * 0.25f, Quaternion.identity);
                 var trans = FindHeroNearestFromPos(pos);
-                coin.Item1.DoDrop(0.1f + i * 0.1f, trans).Forget();
+                coin.DoDrop(0.1f + i * 0.1f, trans).Forget();
             }
         }
 
@@ -788,7 +783,7 @@ namespace Battle
             aliveCreepCount = 0;
             for (int i = 0; i < creeps.Count; i++)
             {
-                PoolController.Instance.ReturnToPool(creeps[i].gameObject);
+                PoolManager.Instance.Despawn(creeps[i]);
                 creeps.RemoveAt(i);
             }
         }

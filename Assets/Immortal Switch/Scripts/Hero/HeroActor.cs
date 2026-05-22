@@ -1,13 +1,11 @@
 ﻿using System;
 using Battle;
-using Common;
 using Immortal_Switch.Scripts;
-using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 public enum HeroStateId
 {
@@ -35,13 +33,11 @@ public enum HeroAttackMode
 
 public class HeroActor : MonoBehaviour, ICombatUnit
 {
-    [Header("Data")]
-    [SerializeField] private HeroDataSO heroData;
-
     [Header("Components")]
     [SerializeField] private StatsController stats;
     [SerializeField] private HeroLocomotion locomotion;
     [SerializeField] private HeroAnimationDriver animationDriver;
+    [SerializeField] private HeroSkillController skillController;
 
     [Header("Attack")]
     [SerializeField] private HeroAttackMode attackMode = HeroAttackMode.Melee;
@@ -55,13 +51,16 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     [SerializeField] private float ultimateHitNormalizedTime = 0.5f;
     [SerializeField] private float passiveHitNormalizedTime = 0.5f;
 
-    [ShowInInspector]
+    [ShowInInspector, ReadOnly]
     private ICombatUnit currentTarget;
     private HeroStateMachine stateMachine;
+    private PvEBattleController pveBattleController;
+    private HeroTeamController heroTeamController;
+    private HeroDataSO heroData;
+    
     private int attackComboIndex;
     private float nextTargetSearchTime;
     private bool isDeathEventBound;
-    private PvEBattleController pveBattleController;
 
     public HeroDataSO HeroData => heroData;
 
@@ -74,6 +73,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     public HeroLocomotion Locomotion => locomotion;
 
     public HeroAnimationDriver Anim => animationDriver;
+
+    public HeroSkillController SkillController => skillController;
 
     public ICombatUnit CurrentTarget => currentTarget;
 
@@ -124,6 +125,9 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         if (animationDriver == null)
             animationDriver = GetComponent<HeroAnimationDriver>();
 
+        if (skillController == null)
+            skillController = GetComponent<HeroSkillController>();
+
         stateMachine = new HeroStateMachine(this);
     }
 
@@ -137,6 +141,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void OnDisable()
     {
+        skillController?.ResetRuntimeOnSwitchOut();
         UnbindDeathEvent();
     }
 
@@ -145,7 +150,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         stateMachine?.Tick(Time.deltaTime);
     }
 
-    public void Init(HeroDataSO data, PvEBattleController battleController)
+    public void Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController)
     {
         heroData = data;
 
@@ -156,11 +161,13 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         IsActionLocked = false;
         IsUnderPlayerControl = false;
         MoveMode = HeroMoveMode.Auto;
+        this.heroTeamController = heroTeamController;
 
         currentTarget = null;
         attackComboIndex = 0;
         nextTargetSearchTime = 0f;
         pveBattleController = battleController;
+        skillController?.Init(this, battleController);
         stateMachine.ChangeState(HeroStateId.Idle, true);
     }
 
@@ -324,7 +331,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         Vector3 direction = targetPosition - transform.position;
         direction.y = 0f;
 
-        float moveSpeed = stats.StatModule.GetFinalStat(StatType.MoveSpeed);
+        float moveSpeed = heroTeamController.TeamMoveSpeed;
 
         locomotion.MoveByDirection(direction, moveSpeed);
 
@@ -542,6 +549,16 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         locomotion?.Stop();
 
         stateMachine.ChangeState(HeroStateId.Win, true);
+    }
+
+    public void OnSpawnedFromPool()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnDespawnedToPool()
+    {
+        throw new NotImplementedException();
     }
 }
 

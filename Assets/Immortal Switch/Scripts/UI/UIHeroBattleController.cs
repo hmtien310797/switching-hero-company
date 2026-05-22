@@ -330,13 +330,13 @@ namespace Immortal_Switch.Scripts.UI
             currentHeroData.Sprites.Clear();
             currentHeroData.Sprites = new List<Sprite>()
             {
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
-                //temp
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
+                // //temp
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon
             };
 
             InitUIHeroes(phc.HeroIndex, hid);
@@ -370,13 +370,13 @@ namespace Immortal_Switch.Scripts.UI
 
             var newSprites = new List<Sprite>()
             {
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
-                //temp
-                MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot1]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot2]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot3]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot4]).skillIcon,
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
+                // //temp
+                // MasterDataCache.Instance.GetSkillDataById(skillIds[SkillSlot.Slot5]).skillIcon,
             };
 
             data.IconHead = phc.HeroIcon;

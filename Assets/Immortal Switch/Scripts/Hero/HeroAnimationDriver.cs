@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
@@ -103,11 +103,6 @@ namespace Immortal_Switch.Scripts.Hero
             FaceDirection(direction);
         }
 
-        public float PlaySpawn()
-        {
-            return PlayTimed(spawnAnim, false, defaultSpawnDuration);
-        }
-
         public void PlayIdle()
         {
             Play(idleAnim, true);
@@ -125,27 +120,42 @@ namespace Immortal_Switch.Scripts.Hero
             if (string.IsNullOrEmpty(animName))
                 return defaultAttackDuration;
 
-            return PlayTimed(animName, false, defaultAttackDuration);
+            return PlayTimed(
+                animName,
+                false,
+                defaultAttackDuration,
+                forceRestart: true
+            );
+        }
+
+        public float PlaySpawn()
+        {
+            return PlayTimed(spawnAnim, false, defaultSpawnDuration, forceRestart: true);
         }
 
         public float PlayUltimate()
         {
-            return PlayTimed(ultimateAnim, false, defaultUltimateDuration);
+            return PlayTimed(ultimateAnim, false, defaultUltimateDuration, forceRestart: true);
         }
 
         public float PlayPassive()
         {
-            return PlayTimed(passiveAnim, false, defaultPassiveDuration);
+            return PlayTimed(passiveAnim, false, defaultPassiveDuration, forceRestart: true);
+        }
+
+        public float PlaySkill(string animName, float fallbackDuration = 1f)
+        {
+            return PlayTimed(animName, false, fallbackDuration, forceRestart: true);
         }
 
         public float PlayDead()
         {
-            return PlayTimed(deadAnim, false, defaultDeadDuration);
+            return PlayTimed(deadAnim, false, defaultDeadDuration, forceRestart: true);
         }
 
         public float PlayWin()
         {
-            return PlayTimed(winAnim, false, defaultWinDuration);
+            return PlayTimed(winAnim, false, defaultWinDuration, forceRestart: true);
         }
 
         public string GetAttackAnimationName(int comboIndex)
@@ -172,7 +182,12 @@ namespace Immortal_Switch.Scripts.Hero
             currentAnim = animName;
         }
 
-        private float PlayTimed(string animName, bool loop, float fallbackDuration)
+        private float PlayTimed(
+            string animName,
+            bool loop,
+            float fallbackDuration,
+            bool forceRestart = false
+        )
         {
             if (skeletonAnimation == null)
                 return fallbackDuration;
@@ -180,16 +195,19 @@ namespace Immortal_Switch.Scripts.Hero
             if (string.IsNullOrEmpty(animName))
                 return fallbackDuration;
 
-            if (currentAnim != animName)
+            Spine.Animation animation = skeletonAnimation.Skeleton.Data.FindAnimation(animName);
+
+            if (animation == null)
+            {
+                Debug.LogWarning($"[{name}] Animation not found: {animName}", this);
+                return fallbackDuration;
+            }
+
+            if (forceRestart || currentAnim != animName)
             {
                 skeletonAnimation.AnimationState.SetAnimation(0, animName, loop);
                 currentAnim = animName;
             }
-
-            Spine.Animation animation = skeletonAnimation.Skeleton.Data.FindAnimation(animName);
-
-            if (animation == null)
-                return fallbackDuration;
 
             return Mathf.Max(0.01f, animation.Duration);
         }

@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Scripts.Common;
 using Spine.Unity;
 using System;
 using System.Collections.Generic;
@@ -92,36 +91,36 @@ namespace Scripts.Battle
 
         private void DoAttackByEvent(bool isFinal = false)
         {
-            if (oArrowTrans == null) return;
-            var (arrow, b) = PoolController.Instance.Get(arrowTrans, oArrowTrans.position);
-            var targetPos = PlayerHeroController.GetMonsterPos() + Vector3.up * 1.5f;
-            if (arrow != null)
-            {
-                if (handBone == null) handBone = BaseAnimController.GetBaseSka().skeleton.FindBone(boneArraw);
-                arrow.position = handBone != null ? handBone.GetWorldPosition(BaseAnimController.GetBaseSka().transform) : oArrowTrans.position;
-                Vector3 direction = (targetPos - arrow.position).normalized;
-                arrow.rotation = Quaternion.FromToRotation(Vector3.right, direction);
-            }
-
-            DoFlyAsync(arrow, targetPos).Forget();
+            // if (oArrowTrans == null) return;
+            // var (arrow, b) = PoolController.Instance.Get(arrowTrans, oArrowTrans.position);
+            // var targetPos = PlayerHeroController.GetMonsterPos() + Vector3.up * 1.5f;
+            // if (arrow != null)
+            // {
+            //     if (handBone == null) handBone = BaseAnimController.GetBaseSka().skeleton.FindBone(boneArraw);
+            //     arrow.position = handBone != null ? handBone.GetWorldPosition(BaseAnimController.GetBaseSka().transform) : oArrowTrans.position;
+            //     Vector3 direction = (targetPos - arrow.position).normalized;
+            //     arrow.rotation = Quaternion.FromToRotation(Vector3.right, direction);
+            // }
+            //
+            // DoFlyAsync(arrow, targetPos).Forget();
         }
 
         private async UniTaskVoid DoFlyAsync(Transform arrow, Vector3 target)
         {
-            if (arrow == null) return;
-            arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
-            while ((arrow.position - target).sqrMagnitude > 0.1f)
-            {
-                arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
-                arrow.Rotate(Vector3.right, 30, Space.Self);
-                await UniTask.Yield(PlayerLoopTiming.Update, DisableCts.Token);
-            }
-
-            DoAttackFx();
-            PlayerHeroController?.AttackBySpecific();
-            PoolController.Instance.ReturnToPool(arrow.gameObject);
-            await UniTask.Delay(TimeSpan.FromSeconds(.2f), cancellationToken: DisableCts.Token);
-            SkaFx.gameObject.SetActive(false);
+            // if (arrow == null) return;
+            // arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
+            // while ((arrow.position - target).sqrMagnitude > 0.1f)
+            // {
+            //     arrow.position = Vector3.MoveTowards(arrow.position, target, 30 * Time.deltaTime);
+            //     arrow.Rotate(Vector3.right, 30, Space.Self);
+            //     await UniTask.Yield(PlayerLoopTiming.Update, DisableCts.Token);
+            // }
+            //
+            // DoAttackFx();
+            // PlayerHeroController?.AttackBySpecific();
+            // PoolController.Instance.ReturnToPool(arrow.gameObject);
+            // await UniTask.Delay(TimeSpan.FromSeconds(.2f), cancellationToken: DisableCts.Token);
+            // SkaFx.gameObject.SetActive(false);
         }
 
         public override void DoSwitch(Action endAct)

@@ -166,7 +166,7 @@ namespace Battle
             if (!skillIdDict.TryGetValue(slot, out var skillId))
                 return 10f;
 
-            return MasterDataCache.Instance.GetSkillDataById(skillId)?.CooldownTime ?? 10f;
+            return 10f;
         }
 
         private void InitHeroData()

@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Battle;
+using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Immortal_Switch.Scripts.Enemy
 {
-    public class EnemyActor : MonoBehaviour, ICombatUnit
+    public class EnemyActor : PoolableBehaviour, ICombatUnit
     {
         public enum EnemyState
         {
@@ -23,9 +26,6 @@ namespace Immortal_Switch.Scripts.Enemy
         [SerializeField] private StatsController stats;
         [SerializeField] private HeroAnimationDriver animationDriver;
         [SerializeField] private HeroLocomotion locomotion;
-        
-        [Header("Animation")]
-        [SerializeField] private string hitEventName = "hit";
 
         [Header("Death")]
         [SerializeField] private bool destroyOnDead = true;
@@ -33,7 +33,9 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private readonly List<ICombatUnit> heroTargets = new();
 
+        [ShowInInspector, ReadOnly]
         private ICombatUnit currentTarget;
+        [ShowInInspector, ReadOnly]
         private EnemyState currentState;
 
         private CreepDataSo creepData;
@@ -65,30 +67,6 @@ namespace Immortal_Switch.Scripts.Enemy
             : 0f;
         
         public event Action<EnemyActor> OnDead;
-
-        private void Awake()
-        {
-            if (stats == null)
-                stats = GetComponent<StatsController>();
-
-            if (animationDriver == null)
-                animationDriver = GetComponent<HeroAnimationDriver>();
-
-            if (locomotion == null)
-                locomotion = GetComponent<HeroLocomotion>();
-        }
-
-        private void OnEnable()
-        {
-            BindDeathEvent();
-            BindAnimationEvents();
-        }
-
-        private void OnDisable()
-        {
-            UnbindDeathEvent();
-            UnbindAnimationEvents();
-        }
 
         private void Update()
         {
@@ -323,10 +301,7 @@ namespace Immortal_Switch.Scripts.Enemy
 
             if (hasHitThisAttack)
                 return;
-
-            if (eventName != hitEventName)
-                return;
-
+            
             hasHitThisAttack = true;
 
             if (currentTarget == null || currentTarget.IsDead)
@@ -441,9 +416,16 @@ namespace Immortal_Switch.Scripts.Enemy
                     break;
 
                 case EnemyState.Dead:
-                    animationDriver?.PlayDead();
+                    OnDeadEvent().Forget();
                     break;
             }
+        }
+
+        private async UniTask OnDeadEvent()
+        {
+            double dieAnimationTime = animationDriver.PlayDead();
+            await UniTask.Delay(TimeSpan.FromSeconds(dieAnimationTime));
+            DespawnSelf();
         }
 
         private void Die()
@@ -454,9 +436,8 @@ namespace Immortal_Switch.Scripts.Enemy
             ChangeState(EnemyState.Dead);
             OnDead?.Invoke(this);
             locomotion?.Stop();
-
-            if (destroyOnDead)
-                Destroy(gameObject, destroyDelay);
+            UnbindDeathEvent();
+            UnbindAnimationEvents();
         }
     }
 }

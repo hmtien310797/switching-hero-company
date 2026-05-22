@@ -1,6 +1,5 @@
 using Common;
 using DG.Tweening;
-using Scripts.Common;
 using TMPro;
 using UnityEngine;
 
@@ -43,7 +42,7 @@ namespace UI
             var nY = dameTxt.transform.position.y + offsetY;
             dameTxt.transform.DOMoveY(nY, moveTime).SetEase(Ease.OutCirc).OnComplete(() =>
             {
-                PoolController.Instance.ReturnToPool(gameObject);
+                //PoolController.Instance.ReturnToPool(gameObject);
             }).SetId("dameMoving");
         }
     }

@@ -1,5 +1,4 @@
-using Common;
-using Scripts.Common;
+
 using UnityEngine;
 
 namespace UI
@@ -25,8 +24,8 @@ namespace UI
 
         public void ShowHealthTxt(float dame, Vector3 pos)
         {
-            var (ht,_) = PoolController.Instance.Get(healthTxtPrefab, pos);
-            ht.DoShowHealthTxt(dame, pos);
+            //var (ht,_) = PoolController.Instance.Get(healthTxtPrefab, pos);
+            //ht.DoShowHealthTxt(dame, pos);
         }
     }
 }
