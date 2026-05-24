@@ -58,6 +58,7 @@ namespace Immortal_Switch.Scripts.Skill
         public SkillDataSO UltimateSkill => ultimateSkill;
         public SkillDataSO PassiveSkill => passiveSkill;
         public bool IsCasting => isCasting;
+        public bool IsSkillLocked { get; private set; }
 
         public float GetCooldownRemaining(SkillDataSO skillData)
         {
@@ -65,6 +66,11 @@ namespace Immortal_Switch.Scripts.Skill
                 return 0f;
 
             return cooldownRemainingBySkill.TryGetValue(skillData, out float remaining) ? Mathf.Max(0f, remaining) : 0f;
+        }
+        
+        public void SetSkillLock(bool locked)
+        {
+            IsSkillLocked = locked;
         }
 
         public bool IsCooldownReady(SkillDataSO skillData)
@@ -595,7 +601,13 @@ namespace Immortal_Switch.Scripts.Skill
             if (!isCasting || currentSkill == null)
                 return;
 
-            currentCustomBehaviour?.OnSpineEvent(eventName);
+            // Custom behaviours own their event flow. Do not also execute generic phases here,
+            // otherwise special skills such as Bastet Ultimate can double-trigger damage.
+            if (currentCustomBehaviour != null)
+            {
+                currentCustomBehaviour.OnSpineEvent(eventName);
+                return;
+            }
 
             SkillPhaseData phase = currentSkill.GetPhaseByEvent(currentSkillLevel, SkillPhaseTriggerType.SpineEvent, eventName);
             if (phase == null)
@@ -608,12 +620,53 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void OnAnimationComplete(string animationName)
         {
-            currentCustomBehaviour?.OnAnimationComplete(animationName);
+            // Custom behaviours decide when the skill is actually finished.
+            // Example: Bastet Ultimate replays the same animation up to N jumps.
+            if (currentCustomBehaviour != null)
+            {
+                currentCustomBehaviour.OnAnimationComplete(animationName);
+                return;
+            }
+
+            FinishCurrentSkill();
+        }
+
+        public bool IsCurrentCustomBehaviour(SkillBehaviour behaviour)
+        {
+            return behaviour != null && currentCustomBehaviour == behaviour;
+        }
+
+        public void ExecuteCustomBehaviourEvent(
+            SkillBehaviour behaviour,
+            SkillRuntimeContext context,
+            SkillPhaseTriggerType triggerType,
+            string eventName)
+        {
+            if (!IsCurrentCustomBehaviour(behaviour))
+                return;
+
+            if (context == null || context.SkillData == null)
+                return;
+
+            SkillPhaseData phase = context.SkillData.GetPhaseByEvent(context.SkillLevel, triggerType, eventName);
+            if (phase == null)
+                return;
+
+            executor.ExecutePhase(context, phase);
+        }
+
+        public void FinishCustomBehaviour(SkillBehaviour behaviour)
+        {
+            if (!IsCurrentCustomBehaviour(behaviour))
+                return;
+
             FinishCurrentSkill();
         }
 
         private void FinishCurrentSkill()
         {
+            SkillBehaviour behaviourToDestroy = currentCustomBehaviour;
+
             isCasting = false;
             currentSkill = null;
             currentSkillLevel = 0;
@@ -621,10 +674,14 @@ namespace Immortal_Switch.Scripts.Skill
 
             if (owner != null)
                 owner.SetActionLocked(false);
+
+            if (behaviourToDestroy != null)
+                Destroy(behaviourToDestroy.gameObject);
         }
 
         private void CancelCurrentSkill()
         {
+            IsSkillLocked = false;
             currentCustomBehaviour?.Cancel();
             if (currentCustomBehaviour != null)
                 Destroy(currentCustomBehaviour.gameObject);

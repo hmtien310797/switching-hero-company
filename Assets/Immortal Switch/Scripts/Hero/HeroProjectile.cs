@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.StatSystem;
+﻿using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
 public class HeroProjectile : MonoBehaviour
@@ -51,7 +52,8 @@ public class HeroProjectile : MonoBehaviour
 
         if (sqrDistance <= hitDistance * hitDistance)
         {
-            target.TakeDamage(attacker, damage);
+            DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, target);
+            target.TakeDamage(attacker, damageResult);
             Destroy(gameObject);
         }
     }

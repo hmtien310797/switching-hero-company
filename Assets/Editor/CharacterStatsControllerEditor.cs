@@ -274,7 +274,7 @@ public class CharacterStatsControllerEditor : UnityEditor.Editor
             EditorGUILayout.BeginVertical("box");
 
             if (GUILayout.Button("Damage 100"))
-                controller.HealthModule.TakeDamage(100f, DamageType.Normal);
+                controller.HealthModule.TakeDamage(new DamageResult{Damage = 100});
 
             if (GUILayout.Button("Heal 100"))
                 controller.HealthModule.ApplyHeal(100f);

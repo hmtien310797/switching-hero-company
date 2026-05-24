@@ -1,4 +1,5 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Combat;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.StatSystem
@@ -36,14 +37,14 @@ namespace Immortal_Switch.Scripts.StatSystem
             OnHPChanged?.Invoke(CurrentHP, MaxHP);
         }
 
-        public void TakeDamage(float amount, DamageType damageType = DamageType.Normal)
+        public void TakeDamage(DamageResult damageResult)
         {
-            if (amount <= 0f || IsDead)
+            if (damageResult.Damage <= 0f || IsDead)
                 return;
 
-            float finalDamage = amount;
+            float finalDamage = damageResult.Damage;
 
-            if (damageType != DamageType.True)
+            if (damageResult.DamageType != DamageType.True)
             {
                 float reduction = statModule.GetFinalStat(StatType.DamageReduction);
                 finalDamage *= (1f - reduction);
@@ -52,7 +53,7 @@ namespace Immortal_Switch.Scripts.StatSystem
             CurrentHP -= finalDamage;
             if (CurrentHP < 0f) CurrentHP = 0f;
 
-            OnDamaged?.Invoke(finalDamage, damageType);
+            OnDamaged?.Invoke(finalDamage, damageResult.DamageType);
             OnHPChanged?.Invoke(CurrentHP, MaxHP);
 
             if (CurrentHP <= 0f)

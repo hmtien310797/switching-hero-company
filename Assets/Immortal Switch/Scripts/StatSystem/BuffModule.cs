@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Combat;
 
 namespace Immortal_Switch.Scripts.StatSystem
 {
@@ -187,7 +188,12 @@ namespace Immortal_Switch.Scripts.StatSystem
             switch (instance.Data.PeriodicEffectType)
             {
                 case PeriodicEffectType.DamageOverTime:
-                    healthModule.TakeDamage(value, instance.Data.PeriodicDamageType);
+                    DamageResult damageResult = new DamageResult
+                    {
+                        Damage = value,
+                        DamageType = instance.Data.PeriodicDamageType,
+                    };
+                    healthModule.TakeDamage(damageResult);
                     break;
 
                 case PeriodicEffectType.HealOverTime:

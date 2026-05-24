@@ -7,7 +7,7 @@ namespace Immortal_Switch.Scripts.Combat
         public static DamageResult CalculateDamage(
             ICombatUnit attacker,
             ICombatUnit defender,
-            float skillCoefficient)
+            float skillCoefficient = 0)
         {
             DamageResult result = new DamageResult();
 
@@ -37,7 +37,7 @@ namespace Immortal_Switch.Scripts.Combat
                 (1f + atkPercentBonus);
 
             result.Damage = finalDamage;
-            result.DamageTextType = isCrit ? DamageType.Crit : DamageType.Normal;
+            result.DamageType = isCrit ? DamageType.Crit : DamageType.Normal;
 
             result.BaseATK = baseAtk;
             result.SkillCoefficient = skillCoefficient;

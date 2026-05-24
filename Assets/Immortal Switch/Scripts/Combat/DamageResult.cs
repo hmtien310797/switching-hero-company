@@ -5,7 +5,7 @@ namespace Immortal_Switch.Scripts.Combat
     public struct DamageResult
     {
         public float Damage;
-        public DamageType DamageTextType;
+        public DamageType DamageType;
 
         public float BaseATK;
         public float SkillCoefficient;

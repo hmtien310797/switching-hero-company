@@ -1,6 +1,7 @@
 ﻿using System;
 using Battle;
 using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.StatSystem;
@@ -147,6 +148,9 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void Update()
     {
+        if (SkillController != null && SkillController.IsSkillLocked)
+            return;
+        
         stateMachine?.Tick(Time.deltaTime);
     }
 
@@ -437,7 +441,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         }
         else
         {
-            currentTarget.TakeDamage(this);
+            DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
+            currentTarget.TakeDamage(this, damageResult);
         }
     }
 
@@ -448,7 +453,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
         if (projectilePrefab == null)
         {
-            currentTarget.TakeDamage(this, Attack);
+            DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
+            currentTarget.TakeDamage(this, damageResult);
             return;
         }
 

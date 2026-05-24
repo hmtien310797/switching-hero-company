@@ -17,13 +17,15 @@ namespace Immortal_Switch.Scripts.StatSystem
 
         float MaxHp { get; }
 
-        void TakeDamage(ICombatUnit attacker, float amount = 1)
+        DamageResult TakeDamage(ICombatUnit attacker, DamageResult damageResult)
         {
-            DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, (ICombatUnit)this, amount);
-            Stats.HealthModule.TakeDamage(damageResult.Damage, damageResult.DamageTextType);
+            //DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, this, amount);
+            Stats.HealthModule.TakeDamage(damageResult);
             //healthBarController?.SetHealth(CurrentHp / MaxHp);
             // if(dameTrans != null)
             //     healthBarController?.ShowHealthTxt((int)damageResult.Damage, dameTrans.position);
+            Debug.Log($"<color=green>{attacker.Stats.name}</color> ----> <color=red>{Stats.name}</color> {damageResult.Damage}");
+            return damageResult;
         }
 
         void Heal(float amount);

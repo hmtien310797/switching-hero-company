@@ -87,20 +87,15 @@ namespace Immortal_Switch.Scripts.Skill
             for (int i = 0; i < targets.Count; i++)
             {
                 ICombatUnit target = targets[i];
-                DamageResult result = DamageCalculator.CalculateDamage(
-                    context.Caster,
-                    target,
-                    action.Damage.SkillDamageBonusPercent
-                );
-
-                target.TakeDamage(context.Caster, action.Damage.SkillDamageBonusPercent);
-
+                DamageResult damageResult =
+                    DamageCalculator.CalculateDamage(context.Caster, target, action.Damage.SkillDamageBonusPercent);
+                target.TakeDamage(context.Caster, damageResult);
                 SkillCombatEventReporter.ReportDamageDealt(
                     context.Caster,
                     context.Caster,
                     target,
                     context.SkillData,
-                    result
+                    damageResult
                 );
             }
         }

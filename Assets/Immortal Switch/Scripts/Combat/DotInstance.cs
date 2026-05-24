@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Immortal_Switch.Scripts.StatSystem;
 using Battle;
 
@@ -68,7 +68,8 @@ namespace Immortal_Switch.Scripts.Combat
 
             while (tickTimer <= 0f && RemainingDuration > 0f)
             {
-                Target.TakeDamage(Source, TickDamage);
+                DamageResult damageResult = DamageCalculator.CalculateDamage(Source, Target, TickDamage);
+                Target.TakeDamage(Source, damageResult);
                 tickTimer += TickInterval;
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
@@ -307,7 +308,8 @@ namespace Immortal_Switch.Scripts.Enemy
             if (currentTarget == null || currentTarget.IsDead)
                 return;
 
-            currentTarget.TakeDamage(this, attackDamage);
+            DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget, 0);
+            currentTarget.TakeDamage(this, damageResult);
         }
 
         private void OnAnimationCompleted(string animationName)

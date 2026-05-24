@@ -65,6 +65,8 @@ namespace Immortal_Switch.Scripts.StatSystem
         Poison,
         Burn,
         True,
-        Crit
+        Crit, 
+        Skill,
+        
     }
 }

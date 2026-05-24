@@ -20,7 +20,7 @@ namespace Immortal_Switch.Scripts.Skill
                 Skill = skill,
                 DamageResult = result,
                 DamageAmount = result.Damage,
-                IsCritical = result.DamageTextType == DamageType.Crit
+                IsCritical = result.DamageType == DamageType.Crit
             });
 
             SkillEventBus.Raise(new SkillEventContext
@@ -32,10 +32,10 @@ namespace Immortal_Switch.Scripts.Skill
                 Skill = skill,
                 DamageResult = result,
                 DamageAmount = result.Damage,
-                IsCritical = result.DamageTextType == DamageType.Crit
+                IsCritical = result.DamageType == DamageType.Crit
             });
 
-            if (result.DamageTextType == DamageType.Crit)
+            if (result.DamageType == DamageType.Crit)
             {
                 SkillEventBus.Raise(new SkillEventContext
                 {

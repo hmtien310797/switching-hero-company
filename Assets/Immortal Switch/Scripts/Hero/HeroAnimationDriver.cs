@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
@@ -156,6 +156,22 @@ namespace Immortal_Switch.Scripts.Hero
         public float PlayWin()
         {
             return PlayTimed(winAnim, false, defaultWinDuration, forceRestart: true);
+        }
+        
+        public void PauseHeroSpine()
+        {
+            if (skeletonAnimation == null)
+                return;
+
+            skeletonAnimation.AnimationState.TimeScale = 0f;
+        }
+        
+        public void ResumeHeroSpine()
+        {
+            if (skeletonAnimation == null)
+                return;
+
+            skeletonAnimation.AnimationState.TimeScale = 1f;
         }
 
         public string GetAttackAnimationName(int comboIndex)

@@ -172,11 +172,6 @@ namespace Battle
 
         public void TakeDamage(ICombatUnit attacker, float amount = 0)
         {
-            DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, (ICombatUnit)this, amount);
-            if(dameTrans != null)
-                healthBarController?.ShowHealthTxt((int)damageResult.Damage, dameTrans.position);
-            statsController.HealthModule.TakeDamage(damageResult.Damage, damageResult.DamageTextType);
-            healthBarController?.SetHealth(CurrentHp / MaxHp);
         }
 
         public void Heal(float amount)
