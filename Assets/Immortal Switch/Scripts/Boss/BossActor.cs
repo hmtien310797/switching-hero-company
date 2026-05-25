@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Common;
 using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using UI;
@@ -13,6 +14,7 @@ namespace Immortal_Switch.Scripts.Boss
     {
         public enum BossState
         {
+            None = 0,
             Spawn,
             Idle,
             Run,
@@ -51,7 +53,6 @@ namespace Immortal_Switch.Scripts.Boss
         private float attackTimer;
         private float spawnTimer;
         private bool hasHitThisAttack;
-        private bool isDeathEventBound;
         
         public event Action<BossActor> OnDead;
 
@@ -92,20 +93,6 @@ namespace Immortal_Switch.Scripts.Boss
 
             if (locomotion == null)
                 locomotion = GetComponent<HeroLocomotion>();
-        }
-
-        private void OnEnable()
-        {
-            BindDeathEvent();
-            BindHealthEvents();
-            BindAnimationEvents();
-        }
-
-        private void OnDisable()
-        {
-            UnbindDeathEvent();
-            UnbindHealthEvents();
-            UnbindAnimationEvents();
         }
 
         private void Update()
@@ -180,25 +167,11 @@ namespace Immortal_Switch.Scripts.Boss
 
         private void BindDeathEvent()
         {
-            if (isDeathEventBound)
-                return;
-
             if (stats == null || stats.HealthModule == null)
                 return;
 
+            stats.HealthModule.OnDead -= Die;
             stats.HealthModule.OnDead += Die;
-            isDeathEventBound = true;
-        }
-
-        private void UnbindDeathEvent()
-        {
-            if (!isDeathEventBound)
-                return;
-
-            if (stats != null && stats.HealthModule != null)
-                stats.HealthModule.OnDead -= Die;
-
-            isDeathEventBound = false;
         }
 
         private void BindHealthEvents()
@@ -213,15 +186,6 @@ namespace Immortal_Switch.Scripts.Boss
             stats.HealthModule.OnHPChanged += OnHpChanged;
         }
 
-        private void UnbindHealthEvents()
-        {
-            if (stats == null || stats.HealthModule == null)
-                return;
-
-            stats.HealthModule.OnDamaged -= OnDamaged;
-            stats.HealthModule.OnHPChanged -= OnHpChanged;
-        }
-
         private void BindAnimationEvents()
         {
             if (animationDriver == null)
@@ -234,22 +198,21 @@ namespace Immortal_Switch.Scripts.Boss
             animationDriver.AnimationCompleted += OnAnimationCompleted;
         }
 
-        private void UnbindAnimationEvents()
-        {
-            if (animationDriver == null)
-                return;
-
-            animationDriver.SpineEventTriggered -= OnSpineEvent;
-            animationDriver.AnimationCompleted -= OnAnimationCompleted;
-        }
-
         private void OnDamaged(float damage, DamageType damageType)
         {
+            if (IsDead)
+            {
+                return;
+            }
             skillLogic?.OnHitTaken(damage);
         }
 
         private void OnHpChanged(float currentHp, float maxHp)
         {
+            if (IsDead)
+            {
+                return;
+            }
             skillLogic?.OnHpChanged();
         }
 
@@ -286,7 +249,10 @@ namespace Immortal_Switch.Scripts.Boss
             spawnTimer += deltaTime;
 
             if (spawnTimer >= spawnFallbackDuration)
+            {
+                GameEventManager.Trigger(GameEvents.OnBossSpawnAnimationComplete, true);
                 ChangeState(BossState.Idle);
+            }
         }
 
         private void TickIdle()
@@ -464,6 +430,7 @@ namespace Immortal_Switch.Scripts.Boss
             {
                 case BossState.Spawn:
                     spawnTimer = 0f;
+                    GameEventManager.Trigger(GameEvents.OnBossSpawnAnimationComplete, false);
                     animationDriver?.PlaySpawn();
                     break;
 
@@ -569,6 +536,7 @@ namespace Immortal_Switch.Scripts.Boss
             locomotion?.Stop();
             OnDead?.Invoke(this);
             DespawnSelf(destroyDelay);
+            GameEventManager.Trigger(GameEvents.OnStageCleared);
         }
     }
 }

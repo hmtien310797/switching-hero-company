@@ -16,7 +16,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private void Awake()
         {
-            GameEventManager.Subscribe(GameEvents.OnStageCleared, ()=>SetBattleResultState(true));
+            //GameEventManager.Subscribe(GameEvents.OnStageCleared, ()=>SetBattleResultState(true));
         }
         
         void Start()
@@ -33,7 +33,7 @@ namespace Immortal_Switch.Scripts.UI
                 return;
             }
 
-            GameEventManager.Trigger(GameEvents.OnNextStageButtonClicked);
+            //GameEventManager.Trigger(GameEvents.OnNextStageButtonClicked);
             SetBattleResultState(false);
         }
 

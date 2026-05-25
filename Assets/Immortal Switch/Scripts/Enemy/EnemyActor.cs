@@ -46,7 +46,6 @@ namespace Immortal_Switch.Scripts.Enemy
         private float attackTimer;
         private float attackCooldown;
         private bool hasHitThisAttack;
-        private bool isDeathEventBound;
         private float attackRange = 1.2f;
         private float attackDamage = 5f;
         private float attackSpeed = 1f;
@@ -129,25 +128,11 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private void BindDeathEvent()
         {
-            if (isDeathEventBound)
-                return;
-
             if (stats == null || stats.HealthModule == null)
                 return;
 
+            stats.HealthModule.OnDead -= Die;
             stats.HealthModule.OnDead += Die;
-            isDeathEventBound = true;
-        }
-
-        private void UnbindDeathEvent()
-        {
-            if (!isDeathEventBound)
-                return;
-
-            if (stats != null && stats.HealthModule != null)
-                stats.HealthModule.OnDead -= Die;
-
-            isDeathEventBound = false;
         }
 
         private void BindAnimationEvents()
@@ -160,15 +145,6 @@ namespace Immortal_Switch.Scripts.Enemy
 
             animationDriver.SpineEventTriggered += OnSpineEvent;
             animationDriver.AnimationCompleted += OnAnimationCompleted;
-        }
-
-        private void UnbindAnimationEvents()
-        {
-            if (animationDriver == null)
-                return;
-
-            animationDriver.SpineEventTriggered -= OnSpineEvent;
-            animationDriver.AnimationCompleted -= OnAnimationCompleted;
         }
 
         public void SetHeroTargets(ICombatUnit heroA, ICombatUnit heroB)
@@ -439,8 +415,20 @@ namespace Immortal_Switch.Scripts.Enemy
             ChangeState(EnemyState.Dead);
             OnDead?.Invoke(this);
             locomotion?.Stop();
-            UnbindDeathEvent();
-            UnbindAnimationEvents();
+        }
+        
+        public void KillImmediately()
+        {
+            if (IsDead)
+                return;
+            if (stats == null || stats.HealthModule == null)
+            {
+                Die();
+                return;
+            }
+            DamageResult damageResult = DamageCalculator.CalculateDamage(this, this, 999999999);
+            stats.HealthModule.TakeDamage(damageResult);
+
         }
     }
 }

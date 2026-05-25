@@ -97,7 +97,6 @@ namespace Battle
         {
             GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
-            GameEventManager.Subscribe(GameEvents.OnNextStageButtonClicked, () => NextStageCallback().Forget());
             GameEventManager.Subscribe(GameEvents.OnStageLost, () => OnStageFailed().Forget());
             PoolManager.Instance.Prewarm(coinPrefab, 10);
         }
@@ -174,7 +173,6 @@ namespace Battle
             inBattleHeroMapper.Remove(sourceHeroId);
 
             oldHero.gameObject.SetActive(false);
-            oldHero.OnDead -= OnHeroDead;
 
             var newHero = Instantiate(newHeroData.HeroPrefab,
                 spawnPos, Quaternion.identity);
@@ -184,6 +182,7 @@ namespace Battle
 
             newHero.gameObject.SetActive(true);
             newHero.Init(newHeroData, this, heroTeamController);
+            oldHero.OnDead -= OnHeroDead;
             newHero.OnDead += OnHeroDead;
 
             inBattleHeroes[slotIndex] = newHero;
@@ -255,7 +254,6 @@ namespace Battle
             
             var hero = Instantiate(heroData.HeroPrefab,
                 spawnPos, Quaternion.identity);
-            hero.OnDead += OnHeroDead;
             if (hero == null)
             {
                 Debug.LogError($"[PvE] Cannot spawn hero. heroId={heroData.Id}");
@@ -264,6 +262,8 @@ namespace Battle
 
             hero.gameObject.SetActive(true);
             hero.Init(heroData, this, heroTeamController);
+            hero.OnDead -= OnHeroDead;
+            hero.OnDead += OnHeroDead;
 
             inBattleHeroes[heroIndex] = hero;
             inBattleHeroMapper[heroData.Id] = hero;
@@ -583,6 +583,7 @@ namespace Battle
             result = BattleResult.Victory;
             SetState(BattleState.Ended);
             losingStage = false;
+            NextStageCallback().Forget();
         }
 
         private async UniTask OnStageFailed()
@@ -616,7 +617,6 @@ namespace Battle
                 ? GameData.Instance.maxCreepsPerStage
                 : deadCreepCount + 1;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
-            enemy.OnDead -= NotifyMonsterDeath;
             if (State != BattleState.FightingCreeps)
                 return;
 
@@ -776,13 +776,15 @@ namespace Battle
 
         public void SpawnBossDirectly()
         {
-            SpawnBoss();
-            aliveCreepCount = 0;
-            for (int i = 0; i < creeps.Count; i++)
+            for (int i = creeps.Count - 1; i >= 0; i--)
             {
-                PoolManager.Instance.Despawn(creeps[i]);
+                EnemyActor creep = creeps[i];
+                PoolManager.Instance.Despawn(creep);
+
                 creeps.RemoveAt(i);
             }
+            SpawnBoss();
+            aliveCreepCount = 0;
         }
 
         //dung để lấy quái gần nhất cho hero đang cần, not in use
@@ -927,22 +929,21 @@ namespace Battle
             return creepData != null;
         }
 
-        public async UniTask NextStageCallback()
+        private async UniTask NextStageCallback()
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(7f));
+            await UniTask.Delay(TimeSpan.FromSeconds(3f));
             Debug.Log("[PvE] Next Stage");
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
-            
-            // Dùng để reset hero data
-            // for (int i = 0; i < inBattleHeroCollection.Length; i++)
-            // {
-            //     inBattleHeroCollection[i].ResetHeroData();
-            // }
-
-            HandleNextStage().Forget();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
-            await UniTask.Delay(TimeSpan.FromSeconds(1));
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                Vector3 spawnPos = GetHeroSpawnPosition(i);
+                inBattleHeroes[i].ResetData();
+                inBattleHeroes[i].ResetSpawnPosition(spawnPos);
+                await UniTask.Delay(800);
+            }
+            HandleNextStage().Forget();
         }
 
         private async UniTask PlayCurrentStage()

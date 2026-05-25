@@ -2,6 +2,7 @@
 using Battle;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Skill;
@@ -65,7 +66,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     
     private int attackComboIndex;
     private float nextTargetSearchTime;
-    private bool isDeathEventBound;
     public event Action<HeroActor> OnDead;
 
     public HeroDataSO HeroData => heroData;
@@ -137,11 +137,15 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
         stateMachine = new HeroStateMachine(this);
     }
-    
+
+    private void Start()
+    {
+        GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
+    }
+
     private void OnDestroy()
     {
         skillController?.ResetRuntimeOnSwitchOut();
-        UnbindDeathEvent();
     }
 
     private void Update()
@@ -150,6 +154,11 @@ public class HeroActor : MonoBehaviour, ICombatUnit
             return;
         
         stateMachine?.Tick(Time.deltaTime);
+    }
+
+    private void OnBossSpawnAnimationComplete(bool completed)
+    {
+        SetActionLocked(!completed);
     }
 
     public void Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController)
@@ -161,7 +170,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         skillController?.Init(this, battleController);
 
         ResetData();
-        BindDeathEvent();
     }
 
     public void ResetData()
@@ -176,6 +184,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         attackComboIndex = 0;
         nextTargetSearchTime = 0f;
         stateMachine.ChangeState(HeroStateId.Spawn, true);
+        BindDeathEvent();
     }
     
     public void ResetSpawnPosition(Vector3 position)
@@ -206,26 +215,10 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void BindDeathEvent()
     {
-        if (isDeathEventBound)
-            return;
-
-        if (stats == null || stats.HealthModule == null)
-            return;
-
+        stats.HealthModule.OnDead -= Die;
         stats.HealthModule.OnDead += Die;
-        isDeathEventBound = true;
     }
 
-    private void UnbindDeathEvent()
-    {
-        if (!isDeathEventBound)
-            return;
-
-        if (stats != null && stats.HealthModule != null)
-            stats.HealthModule.OnDead -= Die;
-
-        isDeathEventBound = false;
-    }
 
     // =========================================================
     // Team Movement API

@@ -9,12 +9,12 @@
         public const string OnWaveEnd = "OnStageStart";
         public const string OnStageCleared = "OnStageCleared";
         public const string OnStageLost = "OnStageLost";
+        public const string OnBossSpawnAnimationComplete = "OnBossSpawnAnimationComplete";
         public const string OnBossDead = "OnBossDead";
         // Change hero event
         public const string OnChangeHero = "OnChangeHero";
         // Change skill event
         public const string OnChangeSkill = "OnChangeSkill";
-        public const string OnNextStageButtonClicked = "OnNextStageButtonClicked";
         public const string OnSpawnNextStage = "OnSpawnNextStage";
     }
 }
