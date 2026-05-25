@@ -88,8 +88,8 @@ namespace Battle
         {
             base.Awake();
             
-            GameEventManager.Subscribe(GameEvents.OnNextStageButtonClicked, PerformWinAnim);
-            GameEventManager.Subscribe(GameEvents.OnStageLost, OnGameLose);
+            //GameEventManager.Subscribe(GameEvents.OnNextStageButtonClicked, PerformWinAnim);
+            //GameEventManager.Subscribe(GameEvents.OnStageLost, OnGameLose);
         }
 
         public void InitHero(HeroDataSO data, PvEBattleController pbc, PlayerCamController pcc, Transform soTrans, FollowHeroController fHc, int heroIndex)

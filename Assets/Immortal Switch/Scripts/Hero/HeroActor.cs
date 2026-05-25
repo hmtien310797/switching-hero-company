@@ -3,9 +3,11 @@ using Battle;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
+using UI;
 using UnityEngine;
 
 public enum HeroStateId
@@ -16,7 +18,8 @@ public enum HeroStateId
     Ultimate,
     Passive,
     Dead,
-    Win
+    Win,
+    Spawn
 }
 
 public enum HeroMoveMode
@@ -39,6 +42,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     [SerializeField] private HeroLocomotion locomotion;
     [SerializeField] private HeroAnimationDriver animationDriver;
     [SerializeField] private HeroSkillController skillController;
+    [SerializeField] private HealthBarController healthBarController;
 
     [Header("Attack")]
     [SerializeField] private HeroAttackMode attackMode = HeroAttackMode.Melee;
@@ -62,10 +66,12 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     private int attackComboIndex;
     private float nextTargetSearchTime;
     private bool isDeathEventBound;
+    public event Action<HeroActor> OnDead;
 
     public HeroDataSO HeroData => heroData;
 
     public StatsController Stats => stats;
+    public HealthBarController HealthBarController => healthBarController;
 
     public Transform Transform => transform;
 
@@ -131,16 +137,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
         stateMachine = new HeroStateMachine(this);
     }
-
-    private void OnEnable()
-    {
-        BindDeathEvent();
-
-        if (stateMachine != null)
-            stateMachine.ChangeState(HeroStateId.Idle, true);
-    }
-
-    private void OnDisable()
+    
+    private void OnDestroy()
     {
         skillController?.ResetRuntimeOnSwitchOut();
         UnbindDeathEvent();
@@ -157,22 +155,32 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     public void Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController)
     {
         heroData = data;
+        
+        this.heroTeamController = heroTeamController;
+        pveBattleController = battleController;
+        skillController?.Init(this, battleController);
 
-        InitializeStatsFromHeroData(data);
-
+        ResetData();
         BindDeathEvent();
+    }
 
+    public void ResetData()
+    {
+        InitializeStatsFromHeroData(heroData);
+        PowerUpManager.Instance.BindPlayer(Stats);
+        HealthBarController.PreSetHealth();
         IsActionLocked = false;
         IsUnderPlayerControl = false;
         MoveMode = HeroMoveMode.Auto;
-        this.heroTeamController = heroTeamController;
-
         currentTarget = null;
         attackComboIndex = 0;
         nextTargetSearchTime = 0f;
-        pveBattleController = battleController;
-        skillController?.Init(this, battleController);
-        stateMachine.ChangeState(HeroStateId.Idle, true);
+        stateMachine.ChangeState(HeroStateId.Spawn, true);
+    }
+    
+    public void ResetSpawnPosition(Vector3 position)
+    {
+        transform.position = position;
     }
 
     private void InitializeStatsFromHeroData(HeroDataSO data)
@@ -527,11 +535,11 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     // Dead / Win
     // =========================================================
 
-    public void Die()
+    private void Die()
     {
         if (stateMachine == null)
             return;
-
+        OnDead?.Invoke(this);
         ResetAttackCombo();
 
         IsActionLocked = false;
@@ -539,7 +547,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         MoveMode = HeroMoveMode.Auto;
 
         locomotion?.Stop();
-
         stateMachine.ChangeState(HeroStateId.Dead, true);
     }
 

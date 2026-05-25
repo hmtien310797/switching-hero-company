@@ -41,6 +41,8 @@ namespace Immortal_Switch.Scripts.Skill
 
         [Header("Caster Lock")]
         public bool LockCasterWhileAlive;
+        
+        public bool LockCasterDuringHeroAnimation = true;
     }
 
     [Serializable]

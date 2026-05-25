@@ -1,18 +1,11 @@
-﻿using Battle;
-using Immortal_Switch.Scripts.StatSystem;
-using UnityEngine;
+﻿using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.Boss
 {
     public class Boss3001SkillLogic : BossSkillLogicBase
     {
-        private bool activeTriggered;
-        private int phase;
-
-        public override void Initialize(MonsterBossController boss)
-        {
-            base.Initialize(boss);
-        }
+        private readonly float[] thresholds = { 90f, 70f, 50f, 30f };
+        private readonly bool[] triggered = new bool[4];
 
         public override void OnNormalAttack()
         {
@@ -26,38 +19,50 @@ namespace Immortal_Switch.Scripts.Boss
 
         public override void OnHpChanged()
         {
-            if (HpPercent <= 70f && phase < 1)
+            for (int i = 0; i < thresholds.Length; i++)
             {
-                Debug.Log($"Current HP: {boss.CurrentHp} / Boss Max HP: {boss.MaxHp}");
-                phase = 1;
-                CastActive();
-            }
+                if (triggered[i])
+                    continue;
 
-            if (HpPercent <= 40f && phase < 2)
-            {
-                Debug.Log($"Current HP: {boss.CurrentHp} / Boss Max HP: {boss.MaxHp}");
-                phase = 2;
-                CastActive();
+                if (HpPercent <= thresholds[i])
+                {
+                    triggered[i] = true;
+                    CastActiveByPhase(i);
+                }
             }
         }
 
         private void TryCastPassive()
         {
-            if (!RollChance(30f)) return;
+            if (!RollChance(30f))
+                return;
 
-            var target = boss.Target;
-            if (target == null || target.IsDead) return;
+            ICombatUnit target = boss.Target;
+
+            if (target == null || target.IsDead)
+                return;
 
             LogPassive("Hell Curse");
-            //boss.ApplyBuffToTarget(target, BossBuffFactory.CreateHellCurseDebuff());
+
+            boss.ApplyBuffToTarget(
+                target,
+                BossBuffFactory.CreateHellCurseDebuff()
+            );
         }
 
-        private void CastActive()
+        private void CastActiveByPhase(int phaseIndex)
         {
-            LogActive("Hỏa Ngục Bùng Cháy");
-            
-           // boss.DealDamageToTarget(boss.Target, 180f);
-           // boss.ApplyBuffToTarget(boss.Target, BossBuffFactory.CreateAtkDown25_5s());
+            LogActive($"Hỏa Ngục Bùng Cháy Phase {phaseIndex + 1}");
+
+            boss.CastActiveSkillAnimation();
+
+            float[] damageMultipliers = { 150f, 180f, 210f, 240f };
+
+            boss.DealDamageToAllHeroTargets(
+                damageMultipliers[phaseIndex]
+            );
+
+            // Debuff ATK/DEF phase sau có thể bổ sung bằng BossBuffFactory.
         }
     }
 }

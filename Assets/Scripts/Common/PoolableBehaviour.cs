@@ -24,11 +24,11 @@ namespace Common
         {
         }
 
-        protected void DespawnSelf()
+        protected void DespawnSelf(float delay = 0f)
         {
             if (PoolHandle != null)
             {
-                PoolHandle.Despawn();
+                PoolHandle.Despawn(delay);
             }
             else
             {

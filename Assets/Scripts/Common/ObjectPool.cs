@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Common
 {
@@ -34,7 +37,7 @@ namespace Common
             for (int i = 0; i < count; i++)
             {
                 GameObject obj = CreateNewObject();
-                Despawn(obj);
+                Despawn(obj).Forget();
             }
         }
 
@@ -100,7 +103,7 @@ namespace Common
             return obj.GetComponent<T>();
         }
 
-        public void Despawn(GameObject obj)
+        public async UniTask Despawn(GameObject obj, float delay = 0f)
         {
             if (obj == null)
                 return;
@@ -123,6 +126,8 @@ namespace Common
 
             if (handle.IsInPool)
                 return;
+
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
             
             poolable.OnDespawnedToPool();
 

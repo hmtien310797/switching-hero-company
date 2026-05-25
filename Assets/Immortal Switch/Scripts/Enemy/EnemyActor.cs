@@ -7,6 +7,7 @@ using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
+using UI;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -25,6 +26,8 @@ namespace Immortal_Switch.Scripts.Enemy
         
         [Header("Components")]
         [SerializeField] private StatsController stats;
+
+        [SerializeField] private HealthBarController healthBarController;
         [SerializeField] private HeroAnimationDriver animationDriver;
         [SerializeField] private HeroLocomotion locomotion;
 
@@ -50,11 +53,10 @@ namespace Immortal_Switch.Scripts.Enemy
         private float moveSpeed = 3f;
 
         public StatsController Stats => stats;
-
+        public HealthBarController HealthBarController => healthBarController;
         public Transform Transform => transform;
-
         public Vector3 Position => transform.position;
-
+        
         public bool IsDead => stats != null &&
                               stats.HealthModule != null &&
                               stats.HealthModule.IsDead;
@@ -80,7 +82,7 @@ namespace Immortal_Switch.Scripts.Enemy
         public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB)
         {
             creepData = data;
-
+            HealthBarController.PreSetHealth();
             ApplyData(data);
             SetHeroTargets(heroA, heroB);
 
@@ -418,16 +420,15 @@ namespace Immortal_Switch.Scripts.Enemy
                     break;
 
                 case EnemyState.Dead:
-                    OnDeadEvent().Forget();
+                    OnDeadEvent();
                     break;
             }
         }
 
-        private async UniTask OnDeadEvent()
+        private void OnDeadEvent()
         {
-            double dieAnimationTime = animationDriver.PlayDead();
-            await UniTask.Delay(TimeSpan.FromSeconds(dieAnimationTime));
-            DespawnSelf();
+            float dieAnimationTime = animationDriver.PlayDead();
+            DespawnSelf(dieAnimationTime);
         }
 
         private void Die()

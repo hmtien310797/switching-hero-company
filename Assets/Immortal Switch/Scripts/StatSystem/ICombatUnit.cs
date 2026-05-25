@@ -1,4 +1,6 @@
 ﻿using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.DamageNumber;
+using UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.StatSystem
@@ -6,6 +8,7 @@ namespace Immortal_Switch.Scripts.StatSystem
     public interface ICombatUnit
     {
         StatsController Stats { get; }
+        HealthBarController HealthBarController { get; }
 
         Transform Transform { get; }
 
@@ -19,11 +22,13 @@ namespace Immortal_Switch.Scripts.StatSystem
 
         DamageResult TakeDamage(ICombatUnit attacker, DamageResult damageResult)
         {
-            //DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, this, amount);
             Stats.HealthModule.TakeDamage(damageResult);
-            //healthBarController?.SetHealth(CurrentHp / MaxHp);
-            // if(dameTrans != null)
-            //     healthBarController?.ShowHealthTxt((int)damageResult.Damage, dameTrans.position);
+            HealthBarController?.SetHealth(CurrentHp / MaxHp);
+            DamageNumberService.Instance?.ShowDamage(
+                damageResult.Damage,
+                Position,
+                damageResult.DamageType
+            );
             Debug.Log($"<color=green>{attacker.Stats.name}</color> ----> <color=red>{Stats.name}</color> {damageResult.Damage}");
             return damageResult;
         }

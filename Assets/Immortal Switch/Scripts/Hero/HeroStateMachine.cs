@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
 
 public interface IHeroState
 {
     HeroStateId Id { get; }
-    void Enter();
+    UniTask Enter();
     void Tick(float deltaTime);
     void Exit();
 }
@@ -29,6 +30,7 @@ public class HeroStateMachine
         states[HeroStateId.Passive] = new HeroPassiveState(owner, this);
         states[HeroStateId.Dead] = new HeroDeadState(owner, this);
         states[HeroStateId.Win] = new HeroWinState(owner, this);
+        states[HeroStateId.Spawn] = new HeroSpawnState(owner, this);
     }
 
     public void Tick(float deltaTime)
@@ -45,7 +47,6 @@ public class HeroStateMachine
             return;
 
         currentState?.Exit();
-
         currentState = states[id];
         currentState.Enter();
     }

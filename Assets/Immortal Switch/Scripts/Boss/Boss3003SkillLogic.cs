@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
 using Immortal_Switch.Scripts.StatSystem;
-using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Boss
 {
@@ -21,20 +20,28 @@ namespace Immortal_Switch.Scripts.Boss
 
         private void TryCastPassive()
         {
-            if (Time.time < lastPassiveTime + 2f) return;
-            if (!RollChance(30f)) return;
-            
-            //ICombatUnit randomTarget = boss.Target;
-            //if (randomTarget == null) return;
+            if (Time.time < lastPassiveTime + 2f)
+                return;
+
+            if (!RollChance(30f))
+                return;
+
+            ICombatUnit target = boss.Target;
+
+            if (target == null || target.IsDead)
+                return;
 
             lastPassiveTime = Time.time;
 
             LogPassive("Lõi Bão Tố");
+
+            boss.DealDamageToTarget(target, 90f);
         }
 
         private void TryCastActive()
         {
-            if (boss.NormalAttackCount < 7) return;
+            if (boss.NormalAttackCount < 7)
+                return;
 
             boss.ResetNormalAttackCount();
             CastActive();
@@ -44,18 +51,25 @@ namespace Immortal_Switch.Scripts.Boss
         {
             LogActive("Lôi Vân Giáng Thế");
 
-            // for (int i = 0; i < 5; i++)
-            // {
-            //     ICombatUnit randomTarget = boss.Target;
-            //     if (randomTarget == null) continue;
-            //
-            //     boss.DealDamageToTarget(randomTarget, 150f);
-            //
-            //     if (RollChance(25f))
-            //     {
-            //         boss.ApplyBuffToTarget(randomTarget, BossBuffFactory.CreateStun_1_5s());
-            //     }
-            // }
+            boss.CastActiveSkillAnimation();
+
+            for (int i = 0; i < 5; i++)
+            {
+                ICombatUnit target = boss.Target;
+
+                if (target == null || target.IsDead)
+                    continue;
+
+                boss.DealDamageToTarget(target, 150f);
+
+                if (RollChance(25f))
+                {
+                    boss.ApplyBuffToTarget(
+                        target,
+                        BossBuffFactory.CreateStun_1_5s()
+                    );
+                }
+            }
         }
     }
 }

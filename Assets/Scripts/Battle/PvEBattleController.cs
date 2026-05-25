@@ -13,6 +13,7 @@ using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Immortal_Switch.Scripts.StatSystem;
+using Sirenix.OdinInspector;
 
 namespace Battle
 {
@@ -34,34 +35,36 @@ namespace Battle
 
     public partial class PvEBattleController : Singleton<PvEBattleController>
     {
-        [Header("Refs")] [SerializeField] PlayerCamController playerCamController;
+        [Header("Refs")] 
+        [SerializeField] PlayerCamController playerCamController;
         [SerializeField] Transform skillObjTrans;
         [SerializeField] FollowHeroController[] enemySpawnerCollection;
         [SerializeField] PvEMapController pvEMapController;
         [SerializeField] BattleCoinView coinPrefab;
 
-        [Header("Spawn Positions")] [SerializeField]
-        private List<Transform> spawnPoss;
+        [Header("Spawn Positions")] 
+        [SerializeField]private List<Transform> spawnPoss;
 
         [Header("Data (Creeps)")] 
-        [SerializeField]
-        private CreepDataSo[] creepDataSo;
-
+        [SerializeField] private CreepDataSo[] creepDataSo;
         [SerializeField] private CreepSpawnPatternCollectionSO creepSpawnPatternCollection;
         [SerializeField] private SpawnRatePatternSO spawnRatePattern;
 
-        [Header("Data (Boss)")] [SerializeField]
-        private BossDataSO[] bossData;
-
-        [Header("Stage")] [SerializeField] private int currentStage = 1;
+        [Header("Data (Boss)")] 
+        [SerializeField] private BossDataSO[] bossData;
+        
+        [Header("Stage")] 
+        [SerializeField] private int currentStage = 1;
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
+        
         [Header("Hero Team")]
         [SerializeField] private HeroTeamController heroTeamController;
-
+        
+        [ShowInInspector] private readonly List<EnemyActor> creeps = new();
+        
         private BattleResult result = BattleResult.None;
-        private readonly List<EnemyActor> creeps = new();
         private int aliveCreepCount;
         private int deadCreepCount;
         private int totalCreepsSpawnedThisStage;
@@ -69,6 +72,7 @@ namespace Battle
         private int patternId;
         private int[] enemyIds;
         private float[] rates;
+        private int heroDeadCount;
 
         private List<int> inBattleHeroIdList = new();
         private Dictionary<int, CreepDataSo> creepDataMapper;
@@ -81,7 +85,6 @@ namespace Battle
         private bool losingStage = false;
         
         private readonly HeroActor[] inBattleHeroes = new HeroActor[2];
-
         private readonly Dictionary<int, HeroActor> inBattleHeroMapper = new();
 
         private HeroActor inBattleHeroA;
@@ -171,7 +174,7 @@ namespace Battle
             inBattleHeroMapper.Remove(sourceHeroId);
 
             oldHero.gameObject.SetActive(false);
-            //PoolManager.Instance.Despawn(oldHero);
+            oldHero.OnDead -= OnHeroDead;
 
             var newHero = Instantiate(newHeroData.HeroPrefab,
                 spawnPos, Quaternion.identity);
@@ -181,6 +184,7 @@ namespace Battle
 
             newHero.gameObject.SetActive(true);
             newHero.Init(newHeroData, this, heroTeamController);
+            newHero.OnDead += OnHeroDead;
 
             inBattleHeroes[slotIndex] = newHero;
             inBattleHeroMapper[targetHeroId] = newHero;
@@ -190,8 +194,17 @@ namespace Battle
             RefreshEnemyHeroTargets();
             NotifyActiveLineupChanged();
         }
-        
 
+        private void OnHeroDead(HeroActor hero)
+        {
+            heroDeadCount++;
+            if (heroDeadCount >= 2)
+            {
+                GameEventManager.Trigger(GameEvents.OnStageLost);
+                heroDeadCount = 0;
+            }
+        }
+        
         private void RefreshBattleUISlot(PlayerHeroController heroController, int heroId)
         {
             if (heroController == null) return;
@@ -208,7 +221,6 @@ namespace Battle
 
         public void InitSwitchableHeroIds()
         {
-            // asign to 1 and 2
             inBattleHeroIdList.Clear();
             inBattleHeroIdList = new List<int>() { 2, 4 };
         }
@@ -243,7 +255,7 @@ namespace Battle
             
             var hero = Instantiate(heroData.HeroPrefab,
                 spawnPos, Quaternion.identity);
-
+            hero.OnDead += OnHeroDead;
             if (hero == null)
             {
                 Debug.LogError($"[PvE] Cannot spawn hero. heroId={heroData.Id}");
@@ -260,7 +272,7 @@ namespace Battle
             RefreshHeroTeamController();
             RefreshEnemyHeroTargets();
 
-            await UniTask.Delay(100);
+            await UniTask.Delay(TimeSpan.FromSeconds(1f));
         }
         
         private Vector3 GetHeroSpawnPosition(int heroIndex)
@@ -335,6 +347,7 @@ namespace Battle
 
         private async UniTaskVoid HandleNextStage()
         {
+            heroDeadCount = 0;
             result = BattleResult.None;
             SetState(BattleState.Initializing);
             currentStage++;
@@ -527,71 +540,55 @@ namespace Battle
 
         private void SpawnBoss()
         {
-            // if (!TryGetBossDataByStage(currentStage, out var bossSo))
-            // {
-            //     Debug.LogError($"[PvE] Cannot resolve boss data for stage={currentStage}");
-            //     return;
-            // }
-            //
-            // if (bossSo.bossPrefab == null)
-            // {
-            //     Debug.LogError($"[PvE] Boss prefab missing for bossId={bossSo.Id}");
-            //     return;
-            // }
-            //
-            // if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
-            //     return;
-            //
-            // Debug.Log($"[PvE] Spawn Boss - Stage={currentStage}, BossId={bossSo.Id}, BossName={bossSo.Name}");
-            //
-            // var pos = GroupFlashController.Instance.GetPosByIdx(2);
-            // var (spawnedBoss, _) = PoolController.Instance.Get(bossSo.bossPrefab, pos);
-            // currentBoss = spawnedBoss;
-            //
-            // BaseStat bossStat = new BaseStat
-            // {
-            //     Element = bossSo.Element,
-            //     Health = bossSo.BaseHP * Mathf.Pow(1.15f, currentStage - 1f),
-            //     Attack = bossSo.BaseAtk * Mathf.Pow(1.10f, currentStage - 1f),
-            //     Defense = bossSo.BaseDef * Mathf.Pow(1.08f, currentStage - 1f),
-            //     AttackRange = bossSo.AttackRange
-            // };
-            //
-            // currentBoss.InitMonster(bossSo.Id, inBattleHeroCollection[0], this, bossStat, true, inBattleHeroCollection.ToList());            
-        }
+            if (!TryGetBossDataByStage(currentStage, out var bossSo))
+            {
+                Debug.LogError($"[PvE] Cannot resolve boss data for stage={currentStage}");
+                return;
+            }
+            
+            if (bossSo.bossPrefab == null)
+            {
+                Debug.LogError($"[PvE] Boss prefab missing for bossId={bossSo.Id}");
+                return;
+            }
+            
+            if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
+                return;
+            
+            Debug.Log($"[PvE] Spawn Boss - Stage={currentStage}, BossId={bossSo.Id}, BossName={bossSo.Name}");
+            
+            var pos = GroupFlashController.Instance.GetPosByIdx(2);
+            var spawnedBoss = PoolManager.Instance.Spawn(bossSo.bossPrefab, pos, Quaternion.identity);
+            currentBoss = spawnedBoss;
+            currentBoss.Init(bossSo, inBattleHeroA, inBattleHeroB);
+            
+            ///---------------------------------------------------------
 
-        public void NotifyBossReady()
-        {
-            // for (int i = 0; i < inBattleHeroCollection.Length; i++)
-            // {
-            //     inBattleHeroCollection[i].SetTarget(currentBoss);
-            // }
-            //
-            // GameStatView.Instance.InitTimer(battleTime, () =>
-            // {
-            //     if (State == BattleState.Ended)
-            //     {
-            //         return;
-            //     }
-            //
-            //     GameEventManager.Trigger(GameEvents.OnStageLost);
-            // });
-            //
-            // isBossAlive = true;
-            // SetState(BattleState.FightingBoss);
+            GameStatView.Instance.InitTimer(battleTime, () =>
+            {
+                if (State == BattleState.Ended)
+                {
+                    return;
+                }
+            
+                GameEventManager.Trigger(GameEvents.OnStageLost);
+            });
+            
+            isBossAlive = true;
+            SetState(BattleState.FightingBoss);
         }
 
         private void OnStageCleared()
         {
-            //currentBoss.IsReady = false;
             result = BattleResult.Victory;
             SetState(BattleState.Ended);
             losingStage = false;
         }
 
-        public async UniTask OnStageFailed()
+        private async UniTask OnStageFailed()
         {
-            await UniTask.Delay(2000);
+            await UniTask.Delay(1000);
+            heroDeadCount = 0;
             result = BattleResult.Defeat;
             PoolManager.Instance.Despawn(currentBoss);
             currentBoss = null;
@@ -606,13 +603,12 @@ namespace Battle
             State = newState;
         }
 
-        //khi monster thường chết 
-        public void NotifyMonsterDeath(EnemyActor enemy)
+        //When normal monster die
+        private void NotifyMonsterDeath(EnemyActor enemy)
         {
             if (enemy == null)
                 return;
-
-            enemy.OnDead -= NotifyMonsterDeath;
+            
             DropCoinAsync(enemy.transform.position);
             creeps.Remove(enemy);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
@@ -620,7 +616,7 @@ namespace Battle
                 ? GameData.Instance.maxCreepsPerStage
                 : deadCreepCount + 1;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
-
+            enemy.OnDead -= NotifyMonsterDeath;
             if (State != BattleState.FightingCreeps)
                 return;
 
@@ -749,6 +745,7 @@ namespace Battle
             return nearest;
         }
         
+        //not in use
         public Vector3 GetLowestHpEnemy(Vector3 pos, float range)
         {
             // Vector3 tPos = pos;
@@ -788,7 +785,7 @@ namespace Battle
             }
         }
 
-        //dung để lấy quái gần nhất cho hero đang cần
+        //dung để lấy quái gần nhất cho hero đang cần, not in use
         public List<EnemyActor> GetNearestEnemiesInRange(float range)
         {
             // List<MonsterScrepController> targets = null;
@@ -896,15 +893,6 @@ namespace Battle
 
         private void BuildSpawnPositions()
         {
-            /*var radiusX = 5;
-            var radiusZ = 8;
-            var offsetZ = 15;
-            for (int i = 0; i < spawnPoss.Count; i++)
-            {
-                var xz = new Vector3(radiusX * Mathf.Cos(60 * i), 0, radiusZ * Mathf.Sin(60 * i) + offsetZ);
-                spawnPoss[i].position = xz;
-            }*/
-
             if (spawnPoss.Count == 0)
                 Debug.LogError("[PvE] No spawn positions assigned");
             else
@@ -922,8 +910,7 @@ namespace Battle
             {
                 var data = creepDataSo[i];
                 if (data == null) continue;
-
-                // assumes CreepDataSo has int Id
+                
                 creepDataMapper[data.Id] = data;
             }
         }
@@ -961,26 +948,18 @@ namespace Battle
         private async UniTask PlayCurrentStage()
         {
             Debug.Log("[PvE] Play Current Stage");
-            await UniTask.Delay(TimeSpan.FromSeconds(1.2f));
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
-            
-            //dùng để set active hero == false
-            // for (int i = 0; i < inBattleHeroCollection.Length; i++)
-            // {
-            //     inBattleHeroCollection[i].gameObject.SetActive(false);
-            // }
-
-            HandleCurrentStage();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
-            
-            //dùng để reset hero data
-            // for (int i = 0; i < inBattleHeroCollection.Length; i++)
-            // {
-            //     inBattleHeroCollection[i].ResetHeroData();
-            // }
-
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                Vector3 spawnPos = GetHeroSpawnPosition(i);
+                inBattleHeroes[i].ResetData();
+                inBattleHeroes[i].ResetSpawnPosition(spawnPos);
+                await UniTask.Delay(800);
+            }
+            HandleCurrentStage();
         }
 
         public bool IsHeroCurrentlyActive(int heroId)

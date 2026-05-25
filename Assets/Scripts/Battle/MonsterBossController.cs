@@ -16,7 +16,7 @@ namespace Battle
         protected override void Awake()
         {
             base.Awake();
-            GameEventManager.Subscribe(GameEvents.OnStageLost, OnDead);
+            //.Subscribe(GameEvents.OnStageLost, OnDead);
         }
 
         public override void InitMonster(int hid, PlayerHeroController etarget, PvEBattleController pBc, BaseStat BossData, bool isBoss = true, List<PlayerHeroController> eTargets = null)
@@ -24,7 +24,7 @@ namespace Battle
             base.InitMonster(hid, etarget, pBc, BossData, isBoss, eTargets);
             normalAttackCount = 0;
             skillLogic = BossSkillLogicFactory.Create(hid);
-            skillLogic?.Initialize(this);
+            //skillLogic?.Initialize(this);
             skillLogic?.OnBattleStart();
         }
 

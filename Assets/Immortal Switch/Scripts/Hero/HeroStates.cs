@@ -1,4 +1,6 @@
-﻿using Immortal_Switch.Scripts.Hero;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
 public abstract class HeroStateBase : IHeroState
@@ -14,7 +16,7 @@ public abstract class HeroStateBase : IHeroState
         this.stateMachine = stateMachine;
     }
 
-    public virtual void Enter() { }
+    public virtual async UniTask Enter() { }
     public virtual void Tick(float deltaTime) { }
     public virtual void Exit() { }
 }
@@ -25,7 +27,7 @@ public class HeroIdleState : HeroStateBase
 
     public HeroIdleState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
 
-    public override void Enter()
+    public override async UniTask Enter()
     {
         owner.Anim.PlayIdle();
     }
@@ -57,7 +59,7 @@ public class HeroRunState : HeroStateBase
 
     public HeroRunState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
 
-    public override void Enter()
+    public override async UniTask Enter()
     {
         owner.Anim.PlayRun();
     }
@@ -104,7 +106,7 @@ public class HeroAttackState : HeroStateBase
     {
     }
 
-    public override void Enter()
+    public override async UniTask Enter()
     {
         if (owner.IsDead)
         {
@@ -220,7 +222,7 @@ public class HeroUltimateState : HeroStateBase
 
     public HeroUltimateState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
 
-    public override void Enter()
+    public override async UniTask Enter()
     {
         owner.SetActionLocked(true);
 
@@ -269,7 +271,7 @@ public class HeroPassiveState : HeroStateBase
 
     public HeroPassiveState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
 
-    public override void Enter()
+    public override async UniTask Enter()
     {
         owner.SetActionLocked(true);
 
@@ -315,7 +317,7 @@ public class HeroDeadState : HeroStateBase
 
     public HeroDeadState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
 
-    public override void Enter()
+    public override async UniTask Enter()
     {
         owner.SetActionLocked(false);
         owner.Anim.PlayDead();
@@ -328,13 +330,28 @@ public class HeroDeadState : HeroStateBase
     }
 }
 
+public class HeroSpawnState : HeroStateBase
+{
+    public override HeroStateId Id => HeroStateId.Dead;
+
+    public HeroSpawnState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+
+    public override async UniTask Enter()
+    {
+        owner.SetActionLocked(false);
+        owner.Anim.PlaySpawn();
+        await UniTask.Delay(TimeSpan.FromSeconds(2f));
+        stateMachine.ChangeState(HeroStateId.Idle);
+    }
+}
+
 public class HeroWinState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.Win;
 
     public HeroWinState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
 
-    public override void Enter()
+    public override async UniTask Enter()
     {
         owner.Anim.PlayWin();
     }

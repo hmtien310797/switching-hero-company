@@ -199,21 +199,7 @@ namespace Battle
 
             SwitchState(IdleState);
         }
-
-        public void DoEndSpawn()
-        {
-            IdleTimeToZero();
-            if (IsDead)
-            {
-                SwitchState(DeathState);
-                return;
-            }
-
-            isReady = true;
-            if(isBoss)
-                pvEBattleController?.NotifyBossReady();
-            SwitchState(IdleState);
-        }
+        
 
         public override void OnReceiveDamage(float factorSkillDamage, Action endAct, PlayerHeroController target)
         {
@@ -284,7 +270,7 @@ namespace Battle
 
         public void StartState(MonsterScrepController state)
         {
-            state.DoIntoSpawn(() => state.DoEndSpawn());
+            //state.DoIntoSpawn(() => state.DoEndSpawn());
         }
 
         public void UpdateState(MonsterScrepController state)

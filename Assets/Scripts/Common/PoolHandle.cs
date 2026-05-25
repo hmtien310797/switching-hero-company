@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Common
@@ -27,7 +28,7 @@ namespace Common
             IsInPool = true;
         }
 
-        public void Despawn()
+        public void Despawn(float delay = 0f)
         {
             if (OwnerPool == null)
             {
@@ -36,7 +37,7 @@ namespace Common
                 return;
             }
 
-            OwnerPool.Despawn(gameObject);
+            OwnerPool.Despawn(gameObject, delay).Forget();
         }
     }
 }

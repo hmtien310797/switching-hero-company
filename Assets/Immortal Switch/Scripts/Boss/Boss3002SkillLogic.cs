@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using Immortal_Switch.Scripts.StatSystem;
-
-namespace Immortal_Switch.Scripts.Boss
+﻿namespace Immortal_Switch.Scripts.Boss
 {
     public class Boss3002SkillLogic : BossSkillLogicBase
     {
-        private bool passiveTriggered;
+        private bool passive60Triggered;
+        private bool passive30Triggered;
 
         public override void OnNormalAttack()
         {
@@ -18,32 +16,39 @@ namespace Immortal_Switch.Scripts.Boss
 
         public override void OnHpChanged()
         {
-            if (passiveTriggered) return;
-
-            if (HpPercent <= 60f)
+            if (!passive60Triggered && HpPercent <= 60f)
             {
-                passiveTriggered = true;
-                CastPassive();
+                passive60Triggered = true;
+                CastPassive60();
+            }
+
+            if (!passive30Triggered && HpPercent <= 30f)
+            {
+                passive30Triggered = true;
+                CastPassive30();
             }
         }
 
-        private void CastPassive()
+        private void CastPassive60()
         {
-            LogPassive("Da Dung Nham");
-            //boss.ApplyBuffToSelf(BossBuffFactory.CreateDamageReduction40_10s());
+            LogPassive("Da Dung Nham 60%");
+            boss.ApplyBuffToSelf(BossBuffFactory.CreateDamageReduction40_10s());
+        }
+
+        private void CastPassive30()
+        {
+            LogPassive("Da Dung Nham 30%");
+            boss.ApplyBuffToSelf(BossBuffFactory.CreateDamageReduction40_10s());
         }
 
         private void CastActive()
         {
             LogActive("Nghiền Nát Dung Nham");
 
-            // List<ICombatUnit> targets = BossCombatRegistry.GetEnemyTargets(boss);
-            // boss.DealDamageToAllTargets(targets, 200f);
-            //
-            // for (int i = 0; i < targets.Count; i++)
-            // {
-            //     boss.ApplyBuffToTarget(targets[i], BossBuffFactory.CreateAttackSpeedDown20_5s());
-            // }
+            boss.CastActiveSkillAnimation();
+            boss.DealDamageToAllHeroTargets(200f);
+
+            // TODO: Apply ATK Speed down cho all hero.
         }
     }
 }

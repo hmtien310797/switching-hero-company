@@ -455,6 +455,10 @@ namespace Immortal_Switch.Scripts.Skill
                     SpawnRuntimeObjectSkill(context, runtimeConfig);
                     break;
 
+                case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:
+                    CastHeroSpineAndSpawnedSkillObject(context, castConfig, runtimeConfig);
+                    break;
+
                 case SkillRuntimeVisualType.ProjectileOnly:
                 case SkillRuntimeVisualType.Instant:
                     ExecuteManualPhases(context);
@@ -470,11 +474,24 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void SpawnRuntimeObjectSkill(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig)
         {
+            bool finishImmediatelyIfIndependent = true;
+            SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent);
+        }
+
+        private SkillRuntimeObject SpawnRuntimeObjectInternal(
+            SkillRuntimeContext context,
+            SkillRuntimeObjectConfig runtimeConfig,
+            bool finishImmediatelyIfIndependent)
+        {
             if (runtimeConfig == null || runtimeConfig.RuntimePrefab == null)
             {
-                ExecuteManualPhases(context);
-                FinishCurrentSkill();
-                return;
+                if (finishImmediatelyIfIndependent)
+                {
+                    ExecuteManualPhases(context);
+                    FinishCurrentSkill();
+                }
+
+                return null;
             }
 
             if (runtimeConfig.LockCasterWhileAlive && owner != null)
@@ -485,8 +502,10 @@ namespace Immortal_Switch.Scripts.Skill
 
             if (runtimeObject == null)
             {
-                FinishCurrentSkill();
-                return;
+                if (finishImmediatelyIfIndependent)
+                    FinishCurrentSkill();
+
+                return null;
             }
 
             SkillRuntimeContext runtimeContext = context.CloneForRuntimeObject(runtimeObject, spawnPosition);
@@ -494,8 +513,44 @@ namespace Immortal_Switch.Scripts.Skill
 
             // In phase 1, spawned skill objects are independent once created.
             // Projectile/AOE/skill object will live until its own lifetime/animation end.
-            if (!runtimeConfig.LockCasterWhileAlive)
+            if (finishImmediatelyIfIndependent && !runtimeConfig.LockCasterWhileAlive)
                 FinishCurrentSkill();
+
+            return runtimeObject;
+        }
+
+        private void CastHeroSpineAndSpawnedSkillObject(
+            SkillRuntimeContext context,
+            SkillCastConfig castConfig,
+            SkillRuntimeObjectConfig runtimeConfig)
+        {
+            if (context == null)
+            {
+                FinishCurrentSkill();
+                return;
+            }
+            // The spawned object is independent. Do not finish the skill here, because the hero
+            // must stay locked until the hero ultimate animation completes.
+            SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false);
+
+            bool lockCasterDuringHeroAnimation = runtimeConfig == null || runtimeConfig.LockCasterDuringHeroAnimation;
+            if (lockCasterDuringHeroAnimation && owner != null)
+            {
+                owner.SetActionLocked(true);
+                SetSkillLock(true);
+                owner.Locomotion?.Stop();
+            }
+
+            if (castConfig == null || string.IsNullOrEmpty(castConfig.AnimationName))
+            {
+                // No hero animation configured. The spawned object has already been created,
+                // so release the caster immediately.
+                FinishCurrentSkill();
+                return;
+            }
+
+            animationDriver?.PlaySkill(castConfig.AnimationName);
+            // FinishCurrentSkill() will be called by OnAnimationComplete() when the hero animation ends.
         }
 
         private Vector3 GetRuntimeObjectSpawnPosition(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig)
@@ -628,7 +683,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
             }
 
-            FinishCurrentSkill();
+            FinishCurrentSkill(animationName);
         }
 
         public bool IsCurrentCustomBehaviour(SkillBehaviour behaviour)
@@ -663,15 +718,18 @@ namespace Immortal_Switch.Scripts.Skill
             FinishCurrentSkill();
         }
 
-        private void FinishCurrentSkill()
+        private void FinishCurrentSkill(string animName = null)
         {
             SkillBehaviour behaviourToDestroy = currentCustomBehaviour;
-
+            if (animName == "ulti")
+            {
+                SetSkillLock(false);
+            }
             isCasting = false;
             currentSkill = null;
             currentSkillLevel = 0;
             currentCustomBehaviour = null;
-
+            
             if (owner != null)
                 owner.SetActionLocked(false);
 

@@ -67,6 +67,8 @@ namespace Immortal_Switch.Scripts.StatSystem
         True,
         Crit, 
         Skill,
+        Heal,
+        Miss,
         
     }
 }
