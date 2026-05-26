@@ -20,7 +20,8 @@ public enum HeroStateId
     Passive,
     Dead,
     Win,
-    Spawn
+    Spawn,
+    BossSpawn
 }
 
 public enum HeroMoveMode
@@ -158,7 +159,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void OnBossSpawnAnimationComplete(bool completed)
     {
-        SetActionLocked(!completed);
+        stateMachine.ChangeState(!completed ? HeroStateId.BossSpawn : HeroStateId.Idle);
     }
 
     public void Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController)
@@ -174,6 +175,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     public void ResetData()
     {
+        ActiveVisual(true);
         InitializeStatsFromHeroData(heroData);
         PowerUpManager.Instance.BindPlayer(Stats);
         HealthBarController.PreSetHealth();
@@ -192,6 +194,16 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         transform.position = position;
     }
 
+    public void ActiveVisual(bool active)
+    {
+        animationDriver.ActiveVisual(active);
+    }
+
+    public void ActiveHealthBar(bool active)
+    {
+        healthBarController.gameObject.SetActive(active);
+    }
+    
     private void InitializeStatsFromHeroData(HeroDataSO data)
     {
         if (stats == null)
@@ -218,8 +230,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         stats.HealthModule.OnDead -= Die;
         stats.HealthModule.OnDead += Die;
     }
-
-
+    
     // =========================================================
     // Team Movement API
     // =========================================================
@@ -523,6 +534,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     {
         IsActionLocked = locked;
     }
+    
 
     // =========================================================
     // Dead / Win

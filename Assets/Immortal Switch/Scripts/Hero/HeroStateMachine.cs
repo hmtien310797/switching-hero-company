@@ -31,6 +31,7 @@ public class HeroStateMachine
         states[HeroStateId.Dead] = new HeroDeadState(owner, this);
         states[HeroStateId.Win] = new HeroWinState(owner, this);
         states[HeroStateId.Spawn] = new HeroSpawnState(owner, this);
+        states[HeroStateId.BossSpawn] = new HeroBossSpawnState(owner, this);
     }
 
     public void Tick(float deltaTime)

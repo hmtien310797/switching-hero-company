@@ -330,9 +330,28 @@ public class HeroDeadState : HeroStateBase
     }
 }
 
+public class HeroBossSpawnState : HeroStateBase
+{
+    public override HeroStateId Id => HeroStateId.BossSpawn;
+
+    public HeroBossSpawnState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+
+    public override UniTask Enter()
+    {
+        owner.SetActionLocked(true);
+        owner.Anim.PlayIdle();
+        return UniTask.CompletedTask;
+    }
+
+    public override void Exit()
+    {
+        owner.SetActionLocked(true);
+    }
+}
+
 public class HeroSpawnState : HeroStateBase
 {
-    public override HeroStateId Id => HeroStateId.Dead;
+    public override HeroStateId Id => HeroStateId.Spawn;
 
     public HeroSpawnState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
 
@@ -341,6 +360,7 @@ public class HeroSpawnState : HeroStateBase
         owner.SetActionLocked(false);
         owner.Anim.PlaySpawn();
         await UniTask.Delay(TimeSpan.FromSeconds(2f));
+        owner.ActiveHealthBar(true);
         stateMachine.ChangeState(HeroStateId.Idle);
     }
 }

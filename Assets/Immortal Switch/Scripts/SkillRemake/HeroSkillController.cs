@@ -26,6 +26,8 @@ namespace Immortal_Switch.Scripts.Skill
 
         [Header("Runtime")]
         [SerializeField] private bool autoBindOnAwake = true;
+        [SerializeField] private HeroAutoSkillController autoSkillController;
+        [SerializeField] private bool autoCreateAutoSkillController = true;
 
         [Header("Debug Cast - Play Mode")]
         [SerializeField] private bool enableDebugHotkeys = true;
@@ -54,9 +56,13 @@ namespace Immortal_Switch.Scripts.Skill
         private SkillBehaviour currentCustomBehaviour;
         private bool isCasting;
 
+        public const int ClassSkillSlotCount = 5;
+        public event Action<HeroSkillController> SkillsChanged;
+
         public HeroActor Owner => owner;
         public SkillDataSO UltimateSkill => ultimateSkill;
         public SkillDataSO PassiveSkill => passiveSkill;
+        public HeroAutoSkillController AutoSkillController => autoSkillController;
         public bool IsCasting => isCasting;
         public bool IsSkillLocked { get; private set; }
 
@@ -78,6 +84,81 @@ namespace Immortal_Switch.Scripts.Skill
             return GetCooldownRemaining(skillData) <= 0f;
         }
 
+        public float GetCooldownDuration(SkillDataSO skillData)
+        {
+            if (skillData == null || owner == null)
+                return 0f;
+
+            int level = levelProvider.GetSkillLevel(skillData, owner);
+            SkillCastConfig castConfig = skillData.GetCastConfig(level);
+            return castConfig != null ? Mathf.Max(0f, castConfig.Cooldown) : 0f;
+        }
+
+        public SkillDataSO GetClassSkillAt(int slotIndex)
+        {
+            EnsureClassSkillSlotCapacity();
+
+            if (slotIndex < 0 || slotIndex >= ClassSkillSlotCount)
+                return null;
+
+            return classSkills[slotIndex];
+        }
+
+        public SkillDataSO GetUltimateSkill()
+        {
+            return ultimateSkill;
+        }
+
+        public void SetClassSkillAt(int slotIndex, SkillDataSO skillData)
+        {
+            EnsureClassSkillSlotCapacity();
+
+            if (slotIndex < 0 || slotIndex >= ClassSkillSlotCount)
+            {
+                Debug.LogWarning($"[HeroSkillController] Invalid class skill slot index: {slotIndex}", this);
+                return;
+            }
+
+            classSkills[slotIndex] = skillData;
+            SkillsChanged?.Invoke(this);
+        }
+
+        public bool CanCastClassSkillAt(int slotIndex)
+        {
+            SkillDataSO skillData = GetClassSkillAt(slotIndex);
+            return skillData != null && IsCooldownReady(skillData) && !isCasting;
+        }
+
+        public bool CanCastUltimate()
+        {
+            return ultimateSkill != null && IsCooldownReady(ultimateSkill) && !isCasting;
+        }
+
+        public float GetClassSkillCooldownRemaining(int slotIndex)
+        {
+            return GetCooldownRemaining(GetClassSkillAt(slotIndex));
+        }
+
+        public float GetClassSkillCooldownDuration(int slotIndex)
+        {
+            return GetCooldownDuration(GetClassSkillAt(slotIndex));
+        }
+
+        public float GetUltimateCooldownRemaining()
+        {
+            return GetCooldownRemaining(ultimateSkill);
+        }
+
+        public float GetUltimateCooldownDuration()
+        {
+            return GetCooldownDuration(ultimateSkill);
+        }
+
+        public bool TryCastClassSkillAt(int slotIndex)
+        {
+            return TryCastClassSkill(slotIndex);
+        }
+
         private void Awake()
         {
             if (!autoBindOnAwake)
@@ -86,6 +167,9 @@ namespace Immortal_Switch.Scripts.Skill
             owner = GetComponent<HeroActor>();
             animationDriver = GetComponent<HeroAnimationDriver>();
             executor = new SkillExecutor(targetResolver, objectSpawner);
+            EnsureClassSkillSlotCapacity();
+            EnsureAutoSkillController();
+
         }
 
         private void Update()
@@ -121,7 +205,8 @@ namespace Immortal_Switch.Scripts.Skill
                 this.levelProvider = levelProvider;
 
             executor = new SkillExecutor(targetResolver, objectSpawner);
-
+            EnsureClassSkillSlotCapacity();
+            EnsureAutoSkillController();
             BuildPassiveRuntime();
             BindEvents();
         }
@@ -129,9 +214,11 @@ namespace Immortal_Switch.Scripts.Skill
         public void SetSkills(List<SkillDataSO> classSkills, SkillDataSO ultimateSkill, SkillDataSO passiveSkill)
         {
             this.classSkills = classSkills ?? new List<SkillDataSO>();
+            EnsureClassSkillSlotCapacity();
             this.ultimateSkill = ultimateSkill;
             this.passiveSkill = passiveSkill;
             BuildPassiveRuntime();
+            SkillsChanged?.Invoke(this);
         }
 
         public void SetHeroBoundSkills(SkillDataSO ultimateSkill, SkillDataSO passiveSkill)
@@ -139,11 +226,14 @@ namespace Immortal_Switch.Scripts.Skill
             this.ultimateSkill = ultimateSkill;
             this.passiveSkill = passiveSkill;
             BuildPassiveRuntime();
+            SkillsChanged?.Invoke(this);
         }
 
         public void SetClassSkills(List<SkillDataSO> classSkills)
         {
             this.classSkills = classSkills ?? new List<SkillDataSO>();
+            EnsureClassSkillSlotCapacity();
+            SkillsChanged?.Invoke(this);
         }
 
         // Kept temporarily so old integration code still compiles while migrating from passive list to single passive.
@@ -153,9 +243,23 @@ namespace Immortal_Switch.Scripts.Skill
             SetSkills(classSkills, ultimateSkill, firstPassive);
         }
 
+        private void EnsureClassSkillSlotCapacity()
+        {
+            if (classSkills == null)
+                classSkills = new List<SkillDataSO>(ClassSkillSlotCount);
+
+            while (classSkills.Count < ClassSkillSlotCount)
+                classSkills.Add(null);
+
+            if (classSkills.Count > ClassSkillSlotCount)
+                classSkills.RemoveRange(ClassSkillSlotCount, classSkills.Count - ClassSkillSlotCount);
+        }
+
         public bool TryCastClassSkill(int index)
         {
-            if (classSkills == null || index < 0 || index >= classSkills.Count)
+            EnsureClassSkillSlotCapacity();
+
+            if (index < 0 || index >= ClassSkillSlotCount)
                 return false;
 
             return TryCastSkill(classSkills[index]);
@@ -529,6 +633,7 @@ namespace Immortal_Switch.Scripts.Skill
                 FinishCurrentSkill();
                 return;
             }
+
             // The spawned object is independent. Do not finish the skill here, because the hero
             // must stay locked until the hero ultimate animation completes.
             SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false);
@@ -795,6 +900,18 @@ namespace Immortal_Switch.Scripts.Skill
             }
 
             SkillEventBus.EventRaised -= OnSkillEvent;
+        }
+        
+        private void EnsureAutoSkillController()
+        {
+            if (autoSkillController == null)
+                autoSkillController = GetComponent<HeroAutoSkillController>();
+
+            if (autoSkillController == null && autoCreateAutoSkillController)
+                autoSkillController = gameObject.AddComponent<HeroAutoSkillController>();
+
+            if (autoSkillController != null)
+                autoSkillController.Init(this);
         }
     }
 }

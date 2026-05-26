@@ -1,0 +1,241 @@
+using System;
+using System.Collections.Generic;
+using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Skill;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace Immortal_Switch.Scripts.UI.Skill
+{
+    [Serializable]
+    public sealed class HeroSkillEquipRequestEvent : UnityEvent<HeroActor, int>
+    {
+    }
+
+    public sealed class HeroSkillBarUI : MonoBehaviour
+    {
+        [Header("Slots")]
+        [SerializeField] private List<HeroSkillDisplay> classSkillSlots = new();
+        [SerializeField] private HeroSkillDisplay ultimateSkillSlot;
+
+        [Header("Fallback Sprites")]
+        [SerializeField] private Sprite emptyClassSkillSprite;
+        [SerializeField] private Sprite missingUltimateSprite;
+
+        [Header("Behaviour")]
+        [SerializeField] private bool updateCooldownEveryFrame = true;
+        [SerializeField] private bool logClickResult = true;
+
+        [Header("Events")]
+        [SerializeField] private HeroSkillEquipRequestEvent onRequestEquipClassSkill = new();
+
+        public event Action<HeroActor, int> RequestEquipClassSkill;
+        public event Action<HeroActor> BoundHeroChanged;
+
+        private HeroActor currentHero;
+        private HeroSkillController currentSkillController;
+
+        public HeroActor CurrentHero => currentHero;
+        public HeroSkillController CurrentSkillController => currentSkillController;
+
+        private void Awake()
+        {
+            BindSlotClickEvents();
+        }
+
+        private void OnEnable()
+        {
+            BindControllerEvent();
+            Refresh();
+        }
+
+        private void OnDisable()
+        {
+            UnbindControllerEvent();
+        }
+
+        private void Update()
+        {
+            if (!updateCooldownEveryFrame)
+                return;
+
+            RefreshCooldowns();
+        }
+
+        public void BindHero(HeroActor hero)
+        {
+            if (currentHero == hero)
+            {
+                Refresh();
+                return;
+            }
+
+            UnbindControllerEvent();
+
+            currentHero = hero;
+            currentSkillController = hero != null ? hero.GetComponent<HeroSkillController>() : null;
+
+            BindControllerEvent();
+            Refresh();
+            BoundHeroChanged?.Invoke(currentHero);
+        }
+
+        public void Clear()
+        {
+            BindHero(null);
+        }
+
+        public void Refresh()
+        {
+            RefreshSlots();
+            RefreshCooldowns();
+        }
+
+        private void RefreshSlots()
+        {
+            for (int i = 0; i < classSkillSlots.Count; i++)
+            {
+                HeroSkillDisplay slot = classSkillSlots[i];
+                if (slot == null)
+                    continue;
+
+                SkillDataSO skill = currentSkillController != null ? currentSkillController.GetClassSkillAt(i) : null;
+                slot.BindClassSkill(i, skill, emptyClassSkillSprite);
+                slot.SetLocked(currentSkillController == null);
+                slot.SetInteractable(currentSkillController != null && currentHero != null);
+            }
+
+            if (ultimateSkillSlot != null)
+            {
+                SkillDataSO ultimateSkill = currentSkillController != null ? currentSkillController.GetUltimateSkill() : null;
+                ultimateSkillSlot.BindUltimateSkill(ultimateSkill, missingUltimateSprite);
+                ultimateSkillSlot.SetLocked(currentSkillController == null || ultimateSkill == null);
+                ultimateSkillSlot.SetInteractable(currentSkillController != null && ultimateSkill != null);
+            }
+        }
+
+        private void RefreshCooldowns()
+        {
+            if (currentSkillController == null)
+            {
+                ClearCooldowns();
+                return;
+            }
+
+            for (int i = 0; i < classSkillSlots.Count; i++)
+            {
+                HeroSkillDisplay slot = classSkillSlots[i];
+                if (slot == null)
+                    continue;
+
+                float remaining = currentSkillController.GetClassSkillCooldownRemaining(i);
+                float duration = currentSkillController.GetClassSkillCooldownDuration(i);
+                slot.SetCooldown(remaining, duration);
+            }
+
+            if (ultimateSkillSlot != null)
+            {
+                ultimateSkillSlot.SetCooldown(
+                    currentSkillController.GetUltimateCooldownRemaining(),
+                    currentSkillController.GetUltimateCooldownDuration());
+            }
+        }
+
+        private void ClearCooldowns()
+        {
+            for (int i = 0; i < classSkillSlots.Count; i++)
+            {
+                if (classSkillSlots[i] != null)
+                    classSkillSlots[i].SetCooldown(0f, 0f);
+            }
+
+            if (ultimateSkillSlot != null)
+                ultimateSkillSlot.SetCooldown(0f, 0f);
+        }
+
+        private void BindSlotClickEvents()
+        {
+            for (int i = 0; i < classSkillSlots.Count; i++)
+            {
+                HeroSkillDisplay slot = classSkillSlots[i];
+                if (slot == null)
+                    continue;
+
+                slot.Clicked -= HandleSlotClicked;
+                slot.Clicked += HandleSlotClicked;
+            }
+
+            if (ultimateSkillSlot != null)
+            {
+                ultimateSkillSlot.Clicked -= HandleSlotClicked;
+                ultimateSkillSlot.Clicked += HandleSlotClicked;
+            }
+        }
+
+        private void HandleSlotClicked(HeroSkillDisplay display)
+        {
+            if (display == null || currentHero == null || currentSkillController == null)
+                return;
+
+            if (display.SlotKind == HeroSkillSlotKind.ClassSkill)
+            {
+                HandleClassSkillSlotClicked(display);
+                return;
+            }
+
+            HandleUltimateSlotClicked();
+        }
+
+        private void HandleClassSkillSlotClicked(HeroSkillDisplay display)
+        {
+            int slotIndex = display.SlotIndex;
+
+            if (display.IsEmptyClassSlot)
+            {
+                RequestEquipClassSkill?.Invoke(currentHero, slotIndex);
+                onRequestEquipClassSkill?.Invoke(currentHero, slotIndex);
+
+                if (logClickResult)
+                    Debug.Log($"[HeroSkillBarUI] Request equip class skill. Hero={currentHero.name}, Slot={slotIndex}", this);
+
+                return;
+            }
+
+            bool success = currentSkillController.TryCastClassSkillAt(slotIndex);
+            if (logClickResult)
+                Debug.Log($"[HeroSkillBarUI] Cast class skill slot {slotIndex + 1}: {(success ? "OK" : "FAILED")}", this);
+        }
+
+        private void HandleUltimateSlotClicked()
+        {
+            bool success = currentSkillController.TryCastUltimate();
+            if (logClickResult)
+                Debug.Log($"[HeroSkillBarUI] Cast ultimate: {(success ? "OK" : "FAILED")}", this);
+        }
+
+        private void BindControllerEvent()
+        {
+            if (currentSkillController == null)
+                return;
+
+            currentSkillController.SkillsChanged -= HandleSkillsChanged;
+            currentSkillController.SkillsChanged += HandleSkillsChanged;
+        }
+
+        private void UnbindControllerEvent()
+        {
+            if (currentSkillController == null)
+                return;
+
+            currentSkillController.SkillsChanged -= HandleSkillsChanged;
+        }
+
+        private void HandleSkillsChanged(HeroSkillController controller)
+        {
+            if (controller != currentSkillController)
+                return;
+
+            Refresh();
+        }
+    }
+}

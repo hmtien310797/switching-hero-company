@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.Hero;
+﻿using System;
+using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
 public class HeroTeamController : MonoBehaviour
@@ -48,6 +49,8 @@ public class HeroTeamController : MonoBehaviour
     public HeroActor HeroA => heroA;
     public HeroActor HeroB => heroB;
     public float TeamMoveSpeed => teamMoveSpeed;
+    public SelectedHero CurrentSelectedHero => selectedHero;
+    public event Action<HeroActor, HeroActor, SelectedHero> ControlledHeroChanged;
 
     private void Start()
     {
@@ -68,6 +71,7 @@ public class HeroTeamController : MonoBehaviour
             : SelectedHero.HeroA;
 
         ResetFollowerSmoothTarget();
+        NotifyControlledHeroChanged();
     }
 
     public void SelectHeroA()
@@ -240,12 +244,32 @@ public class HeroTeamController : MonoBehaviour
         followerMoveVelocity = Vector3.zero;
     }
 
-    private HeroActor GetControlledHero()
+
+    private void EnsureSelectedHeroIsValid()
+    {
+        if (selectedHero == SelectedHero.HeroA && heroA == null && heroB != null)
+        {
+            selectedHero = SelectedHero.HeroB;
+            return;
+        }
+
+        if (selectedHero == SelectedHero.HeroB && heroB == null && heroA != null)
+        {
+            selectedHero = SelectedHero.HeroA;
+        }
+    }
+
+    private void NotifyControlledHeroChanged()
+    {
+        ControlledHeroChanged?.Invoke(GetControlledHero(), GetFollowerHero(), selectedHero);
+    }
+
+    public HeroActor GetControlledHero()
     {
         return selectedHero == SelectedHero.HeroA ? heroA : heroB;
     }
 
-    private HeroActor GetFollowerHero()
+    public HeroActor GetFollowerHero()
     {
         return selectedHero == SelectedHero.HeroA ? heroB : heroA;
     }

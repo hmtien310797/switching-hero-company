@@ -97,6 +97,11 @@ namespace Immortal_Switch.Scripts.Hero
                 skeletonAnimation.Skeleton.ScaleX = -1f;
         }
 
+        public void ActiveVisual(bool active)
+        {
+            skeletonAnimation.gameObject.SetActive(active);
+        }
+
         public void FaceTarget(Vector3 selfPosition, Vector3 targetPosition)
         {
             Vector3 direction = targetPosition - selfPosition;

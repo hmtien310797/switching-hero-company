@@ -22,17 +22,17 @@ MonoBehaviour:
   MaxLevel: 1
   SkillTier: 1
   CastConfig:
-    RequireTarget: 0
-    MoveToCastRange: 0
-    CastRange: 0
-    Cooldown: 5
+    RequireTarget: 1
+    MoveToCastRange: 1
+    CastRange: 9
+    Cooldown: 10
     TargetSelectType: 1
     AnimationName: animation
   RuntimeObjectConfig:
     RuntimeVisualType: 2
     RuntimePrefab: {fileID: 3972949462269165270, guid: 7d848e496c0db4a1badbeba10ae4a714, type: 3}
     SpawnPositionType: 0
-    FollowType: 0
+    FollowType: 1
     SpawnOffset: {x: 0, y: 0, z: 0}
     LifeTime: 5
     UseLifeTime: 0
@@ -40,6 +40,7 @@ MonoBehaviour:
     AnimationName: animation
     LoopAnimation: 0
     LockCasterWhileAlive: 0
+    LockCasterDuringHeroAnimation: 1
   PassiveConfig:
     StackKey: 
     RequiredStack: 3
@@ -76,6 +77,7 @@ MonoBehaviour:
       AnimationName: 
       LoopAnimation: 0
       LockCasterWhileAlive: 0
+      LockCasterDuringHeroAnimation: 1
     UsePassiveOverride: 0
     PassiveOverride:
       StackKey: 

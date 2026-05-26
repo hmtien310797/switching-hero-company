@@ -37,7 +37,9 @@ namespace Common
             for (int i = 0; i < count; i++)
             {
                 GameObject obj = CreateNewObject();
-                Despawn(obj).Forget();
+                IPoolable poolable = obj.GetComponent<IPoolable>();
+                if(poolable.DeSpawnedOnStart)
+                    Despawn(obj).Forget();
             }
         }
 

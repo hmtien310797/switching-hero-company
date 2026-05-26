@@ -1,24 +1,41 @@
-
 using UnityEngine;
 
-namespace UI
+public class HealthBarController : MonoBehaviour
 {
-    public class HealthBarController : MonoBehaviour
+    [SerializeField] private SpriteRenderer fillRenderer;
+
+    private float originalWidth;
+    private Vector3 originalLocalPosition;
+
+    private void Awake()
     {
-        [SerializeField] SpriteRenderer spriteRenderer;
+        if (fillRenderer == null)
+            fillRenderer = GetComponent<SpriteRenderer>();
 
-        public void SetHealth(float health)
-        {
-            var size = spriteRenderer.size;
-            size.x = health;
-            spriteRenderer.size = size;
-        }
+        originalWidth = fillRenderer.size.x;
+        originalLocalPosition = fillRenderer.transform.localPosition;
+    }
 
-        public void PreSetHealth()
-        {
-            var size = spriteRenderer.size;
-            size.x = 1;
-            spriteRenderer.size = size;
-        }
+    public void SetHealth(float healthRatio)
+    {
+        if (fillRenderer == null)
+            return;
+
+        healthRatio = Mathf.Clamp01(healthRatio);
+
+        var size = fillRenderer.size;
+        size.x = originalWidth * healthRatio;
+        fillRenderer.size = size;
+
+        // Nếu pivot của sprite fill đang nằm giữa, dùng đoạn này để giữ mép trái cố định.
+        // Nếu pivot đã là Left Center thì có thể bỏ đoạn dưới.
+        var pos = originalLocalPosition;
+        pos.x = originalLocalPosition.x - (originalWidth - size.x) * 0.5f;
+        fillRenderer.transform.localPosition = pos;
+    }
+
+    public void PreSetHealth()
+    {
+        SetHealth(1f);
     }
 }

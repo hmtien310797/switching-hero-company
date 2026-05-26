@@ -22,10 +22,10 @@ MonoBehaviour:
   MaxLevel: 1
   SkillTier: 0
   CastConfig:
-    RequireTarget: 0
+    RequireTarget: 1
     MoveToCastRange: 0
     CastRange: 2
-    Cooldown: 1
+    Cooldown: 17
     TargetSelectType: 0
     AnimationName: 
   RuntimeObjectConfig:
@@ -40,6 +40,7 @@ MonoBehaviour:
     AnimationName: 
     LoopAnimation: 0
     LockCasterWhileAlive: 0
+    LockCasterDuringHeroAnimation: 1
   PassiveConfig:
     StackKey: 
     RequiredStack: 3
@@ -76,6 +77,7 @@ MonoBehaviour:
       AnimationName: 
       LoopAnimation: 0
       LockCasterWhileAlive: 0
+      LockCasterDuringHeroAnimation: 1
     UsePassiveOverride: 0
     PassiveOverride:
       StackKey: 
