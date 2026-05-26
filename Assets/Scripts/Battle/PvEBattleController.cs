@@ -126,11 +126,7 @@ namespace Battle
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
         }
-
-        public Vector3 GetMapEndPoint()
-        {
-            return pvEMapController.EndMapPoint;
-        }
+        
 
         private void OnChangeHero(int sourceHeroId, int targetHeroId)
         {

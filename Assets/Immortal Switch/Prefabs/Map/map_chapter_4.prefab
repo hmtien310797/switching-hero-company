@@ -1229,6 +1229,7 @@ GameObject:
   - component: {fileID: 6821610363406359270}
   - component: {fileID: 844459691201631869}
   - component: {fileID: 8559657078060127319}
+  - component: {fileID: 2444949719124021301}
   m_Layer: 10
   m_Name: map_chapter_4
   m_TagString: Untagged
@@ -1289,12 +1290,25 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6074991242704863208}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09f1f4a0f4fe5154da121fc97c6a3a92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   parallaxCamera: {fileID: 0}
+--- !u!114 &2444949719124021301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6074991242704863208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6ccd7a667a76cf4db1876a72003ff73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  endMapTrans: {fileID: 0}
 --- !u!1 &6334597744323619998
 GameObject:
   m_ObjectHideFlags: 0

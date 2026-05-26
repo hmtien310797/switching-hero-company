@@ -272,6 +272,9 @@ namespace Immortal_Switch.Scripts.Skill
 
         public bool TryCastSkill(SkillDataSO skillData)
         {
+            if (owner.StateMachine.CurrentStateId == HeroStateId.BossSpawn)
+                return false;
+            
             if (skillData == null || owner == null || owner.IsDead)
                 return false;
 

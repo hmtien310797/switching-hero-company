@@ -210,7 +210,7 @@ namespace Battle
                 transform.position - Vector3.forward * 35 + Vector3.up *5,
                 transform.position - Vector3.forward * 20 + Vector3.right * 10,
                 transform.position + Vector3.forward * 0 + Vector3.right * 15,
-                PvEBattleController.Instance.GetMapEndPoint(),
+                //PvEBattleController.Instance.GetMapEndPoint(),
             };
 
             transform.DOPath(path, 3f, PathType.CatmullRom).SetEase(Ease.InQuart).OnComplete(() =>

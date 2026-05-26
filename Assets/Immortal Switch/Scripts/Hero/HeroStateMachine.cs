@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using UnityEngine;
 
 public interface IHeroState
 {
@@ -14,7 +18,6 @@ public class HeroStateMachine
 {
     private readonly HeroActor owner;
     private readonly Dictionary<HeroStateId, IHeroState> states = new();
-
     private IHeroState currentState;
 
     public HeroStateId CurrentStateId => currentState != null ? currentState.Id : HeroStateId.Idle;

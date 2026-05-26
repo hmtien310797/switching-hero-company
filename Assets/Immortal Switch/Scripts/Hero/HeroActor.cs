@@ -60,6 +60,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     [ShowInInspector, ReadOnly]
     private ICombatUnit currentTarget;
+    [SerializeField]
     private HeroStateMachine stateMachine;
     private PvEBattleController pveBattleController;
     private HeroTeamController heroTeamController;
@@ -121,6 +122,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     public int GetHeroId() => heroData.Id;
 
     public Sprite HeroIcon => heroData.PortraitIcon;
+    
+    public HeroStateMachine StateMachine => stateMachine;
 
     private void Awake()
     {

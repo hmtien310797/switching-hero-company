@@ -6,8 +6,7 @@ namespace Battle
     public class PvEMapController : MonoBehaviour
     {
         [SerializeField] List<PvEMapView> maps;
-
-        private Vector3 endMapTrans;
+        
         private Dictionary<int, PvEMapView> mapViewDict = new Dictionary<int,PvEMapView>();
         private PvEMapView curMapView;
 
@@ -34,9 +33,8 @@ namespace Battle
             }
 
             curMapView = Instantiate(mapViewDict[curChapterId], transform);
-            endMapTrans = curMapView.GetEndMapPoint;
+            curMapView.transform.SetLocalPositionAndRotation(new Vector3(0, 0, 7), Quaternion.identity);
         }
-
-        public Vector3 EndMapPoint => endMapTrans;
+        
     }
 }
