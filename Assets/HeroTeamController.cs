@@ -230,17 +230,42 @@ public class HeroTeamController : MonoBehaviour
         if (moveDir.sqrMagnitude <= 0.001f)
             return;
 
-        lastMoveDirection = moveDir;
+        Vector3 controlledPosition = controlledHero.transform.position;
+
+        Vector3 desiredNextPosition =
+            controlledPosition + moveDir * teamMoveSpeed * Time.deltaTime;
+
+        Vector3 clampedNextPosition =
+            ClampPositionToMovementLimit(desiredNextPosition);
+
+        Vector3 constrainedMove = clampedNextPosition - controlledPosition;
+
+        if (constrainedMove.sqrMagnitude <= 0.000001f)
+        {
+            controlledHero.StopTeamControl();
+            followerHero.StopTeamControl();
+            ResetFollowerVelocity();
+            return;
+        }
+
+        Vector3 constrainedMoveDir = constrainedMove.normalized;
+
+        lastMoveDirection = constrainedMoveDir;
+
+        float constrainedSpeed = constrainedMove.magnitude / Time.deltaTime;
 
         controlledHero.ManualMoveByTeam(
-            moveDir,
-            teamMoveSpeed
+            constrainedMoveDir,
+            constrainedSpeed
         );
 
         Vector3 rawFollowerTarget = GetBehindFormationPosition(
             controlledHero.transform.position,
-            moveDir
+            constrainedMoveDir
         );
+
+        if (constrainFollowerTarget)
+            rawFollowerTarget = ClampPositionToMovementLimit(rawFollowerTarget);
 
         smoothedFollowerTarget = Vector3.SmoothDamp(
             smoothedFollowerTarget,
@@ -248,6 +273,9 @@ public class HeroTeamController : MonoBehaviour
             ref followerTargetVelocity,
             formationTargetSmoothTime
         );
+
+        if (constrainFollowerTarget)
+            smoothedFollowerTarget = ClampPositionToMovementLimit(smoothedFollowerTarget);
 
         followerHero.FollowByTeam(
             smoothedFollowerTarget,
