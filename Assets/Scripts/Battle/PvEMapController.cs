@@ -33,7 +33,7 @@ namespace Battle
             }
 
             curMapView = Instantiate(mapViewDict[curChapterId], transform);
-            curMapView.transform.SetLocalPositionAndRotation(new Vector3(0, 0, 7), Quaternion.identity);
+            curMapView.transform.SetLocalPositionAndRotation(new Vector3(0, 0, 0), Quaternion.identity);
         }
         
     }

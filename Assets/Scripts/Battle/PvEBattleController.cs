@@ -98,7 +98,18 @@ namespace Battle
             GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
             GameEventManager.Subscribe(GameEvents.OnStageLost, () => OnStageFailed().Forget());
+            GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
             PoolManager.Instance.Prewarm(coinPrefab, 10);
+        }
+
+        private void OnBossSpawnAnimationComplete(bool result)
+        {
+            if (!result)
+            {
+                gameCameraController.FollowBoss();
+                return;
+            }
+            gameCameraController.FollowLastHeroTarget();
         }
 
         public override async UniTask InitializeAsync()
@@ -218,7 +229,7 @@ namespace Battle
                 await SpawnHero(heroDt, heroIndex);
                 if (heroIndex == 0)
                 {
-                    gameCameraController.SetFollow(inBattleHeroes[heroIndex].transform);
+                    gameCameraController.SetFollowHero(inBattleHeroes[heroIndex].transform);
                 }
             }
 
@@ -372,7 +383,7 @@ namespace Battle
             controlledHeroSlotIndex = slotIndex;
             ApplyControlledHeroSelectionToTeamController();
             RefreshControlledHeroSkillUI();
-            gameCameraController.SetFollow(inBattleHeroes[slotIndex].transform);
+            gameCameraController.SetFollowHero(inBattleHeroes[slotIndex].transform);
         }
 
         public void SwitchControlledHero()

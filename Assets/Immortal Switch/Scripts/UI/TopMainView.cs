@@ -15,6 +15,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] HeroSkillBarUI heroSkillBarUI;
         [SerializeField] private Button switchMainSubHeroButton;
         [SerializeField] CurrencyView currencyView;
+        [SerializeField] HeroJoystick heroJostick;
         
         public HeroSkillBarUI HeroSkillBarUI => heroSkillBarUI;
 
@@ -40,19 +41,9 @@ namespace Immortal_Switch.Scripts.UI
             PvEBattleController.Instance?.OnSwitchMainSubHeroButtonClicked();
         }
 
-        public void BindHeroSkillBar(HeroActor hero)
+        public void SetHeroTeamController(HeroTeamController heroTeamController)
         {
-            heroSkillBarUI?.BindHero(hero);
-        }
-
-        public BattleResultController GetBattleResultIntance()
-        {
-            return battleResultController;
-        }
-
-        public BattleTimerController GetBattleTimerIntance()
-        {
-            return battleTimerController;
+            heroJostick.SetTarget(heroTeamController);
         }
 
         public CurrencyView CurrencyView => currencyView;

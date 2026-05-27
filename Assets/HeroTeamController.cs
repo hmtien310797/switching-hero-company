@@ -9,48 +9,75 @@ public class HeroTeamController : MonoBehaviour
         HeroA,
         HeroB
     }
+    
+    public enum MoveInputSource
+    {
+        Keyboard,
+        External,
+        KeyboardAndExternal
+    }
 
-    [Header("Heroes")]
-    [SerializeField] private HeroActor heroA;
+    [Header("Heroes")] [SerializeField] private HeroActor heroA;
     [SerializeField] private HeroActor heroB;
 
-    [Header("Control")]
-    [SerializeField] private SelectedHero selectedHero = SelectedHero.HeroA;
+    [Header("Control")] [SerializeField] private SelectedHero selectedHero = SelectedHero.HeroA;
     [SerializeField] private KeyCode switchKey = KeyCode.Tab;
 
-    [Header("Team Movement")]
-    [SerializeField] private float teamMoveSpeed = 6f;
+    [Header("Team Movement")] [SerializeField]
+    private float teamMoveSpeed = 6f;
+
     [SerializeField] private float followerSpeedMultiplier = 1.5f;
 
-    [Header("Follow Formation")]
-    [SerializeField] private float followDistance = 1.1f;
+    [Header("Follow Formation")] [SerializeField]
+    private float followDistance = 1.1f;
+
     [SerializeField] private float followSideOffset = 0f;
     [SerializeField] private float formationTargetSmoothTime = 0.06f;
 
-    [Header("Follower Smooth")]
-    [SerializeField] private float followerStopDistance = 0.08f;
+    [Header("Follower Smooth")] [SerializeField]
+    private float followerStopDistance = 0.08f;
+
     [SerializeField] private float followerMoveSmoothTime = 0.08f;
 
-    [Header("Input")]
+    [Header("Input")] 
+    [SerializeField] private MoveInputSource moveInputSource = MoveInputSource.KeyboardAndExternal;
     [SerializeField] private float inputSmoothTime = 0.04f;
     [SerializeField] private float moveInputThreshold = 0.05f;
+    [SerializeField] private Vector3 externalMoveDirection;
+    [SerializeField] private bool hasExternalInput;
 
-    [Header("Runtime Debug")]
-    [SerializeField] private Vector3 rawMoveDirection;
+    [Header("Runtime Debug")] [SerializeField]
+    private Vector3 rawMoveDirection;
+
     [SerializeField] private Vector3 smoothMoveDirection;
     [SerializeField] private Vector3 lastMoveDirection = Vector3.forward;
+
+    [Header("Movement Constraint")] [SerializeField]
+    private bool useMovementConstraint = true;
+
+    [SerializeField] private Vector2 minLimit = new Vector2(-5f, -3f); // x, z
+    [SerializeField] private Vector2 maxLimit = new Vector2(5f, 3f); // x, z
+    [SerializeField] private bool constrainFollowerTarget = true;
 
     private Vector3 inputSmoothVelocity;
     private Vector3 smoothedFollowerTarget;
     private Vector3 followerTargetVelocity;
     private Vector3 followerMoveVelocity;
     private bool wasManualMoving;
-    
+
     public HeroActor HeroA => heroA;
     public HeroActor HeroB => heroB;
     public float TeamMoveSpeed => teamMoveSpeed;
     public SelectedHero CurrentSelectedHero => selectedHero;
     public event Action<HeroActor, HeroActor, SelectedHero> ControlledHeroChanged;
+
+    public bool UseMovementConstraint => useMovementConstraint;
+    public Vector2 MinLimit => minLimit;
+    public Vector2 MaxLimit => maxLimit;
+
+    public float MovementWidth => Mathf.Abs(maxLimit.x - minLimit.x);
+    public float MovementDepth => Mathf.Abs(maxLimit.y - minLimit.y);
+    public float MovementArea => MovementWidth * MovementDepth;
 
     private void Start()
     {
@@ -60,6 +87,7 @@ public class HeroTeamController : MonoBehaviour
     private void Update()
     {
         ReadInput();
+        SmoothInput();
         HandleSwitchInput();
         HandleTeamMovement();
     }
@@ -85,7 +113,7 @@ public class HeroTeamController : MonoBehaviour
         selectedHero = SelectedHero.HeroB;
         ResetFollowerSmoothTarget();
     }
-    
+
     public void SetHeroes(HeroActor heroA, HeroActor heroB)
     {
         this.heroA = heroA;
@@ -98,29 +126,51 @@ public class HeroTeamController : MonoBehaviour
 
     private void ReadInput()
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        float z = Input.GetAxisRaw("Vertical");
+        Vector3 keyboardInput = Vector3.zero;
 
-        rawMoveDirection = new Vector3(x, 0f, z);
+        if (moveInputSource == MoveInputSource.Keyboard ||
+            moveInputSource == MoveInputSource.KeyboardAndExternal)
+        {
+            float x = Input.GetAxisRaw("Horizontal");
+            float z = Input.GetAxisRaw("Vertical");
 
-        if (rawMoveDirection.sqrMagnitude > 1f)
-            rawMoveDirection.Normalize();
+            keyboardInput = new Vector3(x, 0f, z);
 
-        smoothMoveDirection = Vector3.SmoothDamp(
-            smoothMoveDirection,
-            rawMoveDirection,
-            ref inputSmoothVelocity,
-            inputSmoothTime
-        );
+            if (keyboardInput.sqrMagnitude > 1f)
+                keyboardInput.Normalize();
+        }
 
-        if (smoothMoveDirection.sqrMagnitude < 0.001f)
-            smoothMoveDirection = Vector3.zero;
+        switch (moveInputSource)
+        {
+            case MoveInputSource.Keyboard:
+                rawMoveDirection = keyboardInput;
+                break;
+
+            case MoveInputSource.External:
+                rawMoveDirection = externalMoveDirection;
+                break;
+
+            case MoveInputSource.KeyboardAndExternal:
+                rawMoveDirection = hasExternalInput ? externalMoveDirection : keyboardInput;
+                break;
+        }
     }
 
     private void HandleSwitchInput()
     {
         if (Input.GetKeyDown(switchKey))
             SwitchHero();
+    }
+
+    private Vector3 ClampPositionToMovementLimit(Vector3 position)
+    {
+        if (!useMovementConstraint)
+            return position;
+
+        position.x = Mathf.Clamp(position.x, minLimit.x, maxLimit.x);
+        position.z = Mathf.Clamp(position.z, minLimit.y, maxLimit.y);
+
+        return position;
     }
 
     private void HandleTeamMovement()
@@ -155,10 +205,23 @@ public class HeroTeamController : MonoBehaviour
 
         HandleManualMovement(controlledHero, followerHero);
     }
+    
+    private void SmoothInput()
+    {
+        smoothMoveDirection = Vector3.SmoothDamp(
+            smoothMoveDirection,
+            rawMoveDirection,
+            ref inputSmoothVelocity,
+            inputSmoothTime
+        );
+
+        if (smoothMoveDirection.sqrMagnitude < 0.001f)
+            smoothMoveDirection = Vector3.zero;
+    }
 
     private void HandleManualMovement(HeroActor controlledHero, HeroActor followerHero)
     {
-        Vector3 moveDir = rawMoveDirection;
+        Vector3 moveDir = smoothMoveDirection;
         moveDir.y = 0f;
 
         if (moveDir.sqrMagnitude > 1f)
@@ -170,7 +233,7 @@ public class HeroTeamController : MonoBehaviour
         lastMoveDirection = moveDir;
 
         controlledHero.ManualMoveByTeam(
-            smoothMoveDirection,
+            moveDir,
             teamMoveSpeed
         );
 
@@ -218,6 +281,7 @@ public class HeroTeamController : MonoBehaviour
         return target;
     }
 
+
     private void ResetFollowerSmoothTarget()
     {
         ResetFollowerVelocity();
@@ -263,6 +327,27 @@ public class HeroTeamController : MonoBehaviour
     {
         ControlledHeroChanged?.Invoke(GetControlledHero(), GetFollowerHero(), selectedHero);
     }
+    
+    private void OnDrawGizmosSelected()
+    {
+        if (!useMovementConstraint)
+            return;
+
+        Vector3 center = new Vector3(
+            (minLimit.x + maxLimit.x) * 0.5f,
+            0f,
+            (minLimit.y + maxLimit.y) * 0.5f
+        );
+
+        Vector3 size = new Vector3(
+            Mathf.Abs(maxLimit.x - minLimit.x),
+            0.05f,
+            Mathf.Abs(maxLimit.y - minLimit.y)
+        );
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(center, size);
+    }
 
     public HeroActor GetControlledHero()
     {
@@ -272,5 +357,39 @@ public class HeroTeamController : MonoBehaviour
     public HeroActor GetFollowerHero()
     {
         return selectedHero == SelectedHero.HeroA ? heroB : heroA;
+    }
+
+    public void SetMovementConstraint(bool enabled)
+    {
+        useMovementConstraint = enabled;
+    }
+
+    public void SetMovementConstraintBounds(Vector2 min, Vector2 max)
+    {
+        minLimit = min;
+        maxLimit = max;
+    }
+
+    public void SetMovementConstraintBounds(float minX, float maxX, float minZ, float maxZ)
+    {
+        minLimit = new Vector2(minX, minZ);
+        maxLimit = new Vector2(maxX, maxZ);
+    }
+    
+    public void SetMoveInput(Vector2 input)
+    {
+        Vector3 dir = new Vector3(input.x, 0f, input.y);
+
+        if (dir.sqrMagnitude > 1f)
+            dir.Normalize();
+
+        externalMoveDirection = dir;
+        hasExternalInput = dir.sqrMagnitude > 0.001f;
+    }
+
+    public void ClearMoveInput()
+    {
+        externalMoveDirection = Vector3.zero;
+        hasExternalInput = false;
     }
 }

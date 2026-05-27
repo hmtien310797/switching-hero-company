@@ -81,6 +81,9 @@ namespace Immortal_Switch.Scripts.UI
     {
         [Header("Backdrop Prefab (normal prefab, not Addressables)")] [SerializeField]
         private GameObject backdropPrefab;
+        
+        [SerializeField]
+        private HeroTeamController heroTeamController;
 
         // ===== Layer roots =====
         private readonly Dictionary<UILayer, RectTransform> _layerRoots = new();
@@ -678,10 +681,13 @@ namespace Immortal_Switch.Scripts.UI
         // Put BottomMainView on SubMain, TopMainView on OverMain (NOT Main)
         public async UniTask InitMainScene()
         {
-            await UniTask.WhenAll(
+            var result = await UniTask.WhenAll(
                 OpenPopupAsync<BottomMainView>(withBackdrop: false),
                 OpenPopupAsync<TopMainView>(withBackdrop: false)
             );
+
+            TopMainView topMainViewInstance = result.Item2;
+            topMainViewInstance.SetHeroTeamController(heroTeamController);
         }
 
         #endregion

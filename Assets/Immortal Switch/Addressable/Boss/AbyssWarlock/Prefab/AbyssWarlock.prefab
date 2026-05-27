@@ -49,6 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 237ec3f9546f43ba93da6221b6905e33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <DeSpawnedOnStart>k__BackingField: 1
   stats: {fileID: 4378392224121908283}
   animationDriver: {fileID: 2157218445760095175}
   locomotion: {fileID: 2301857392755416939}
@@ -199,7 +200,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7553619407417555059
 MonoBehaviour:
@@ -255,6 +256,14 @@ PrefabInstance:
     - target: {fileID: 6740417167127500171, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_Name
       value: HealthBarController
+      objectReference: {fileID: 0}
+    - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_LocalPosition.x
