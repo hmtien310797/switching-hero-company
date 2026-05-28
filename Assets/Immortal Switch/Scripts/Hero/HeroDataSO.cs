@@ -36,7 +36,7 @@ namespace Immortal_Switch.Scripts.Hero
         [Header("Prefab")]
         [AssetsOnly]
         [AssetSelector(
-            Paths = "Assets/Immortal Switch/Prefabs/Hero",
+            Paths = "Assets/Immortal Switch/Addressable/Hero",
             Filter = "t:Prefab",
             FlattenTreeView = true
         )]

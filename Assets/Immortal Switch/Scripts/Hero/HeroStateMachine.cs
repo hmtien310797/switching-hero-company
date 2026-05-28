@@ -13,13 +13,14 @@ public interface IHeroState
     void Tick(float deltaTime);
     void Exit();
 }
-
+[Serializable]
 public class HeroStateMachine
 {
     private readonly HeroActor owner;
     private readonly Dictionary<HeroStateId, IHeroState> states = new();
     private IHeroState currentState;
 
+    [ShowInInspector]
     public HeroStateId CurrentStateId => currentState != null ? currentState.Id : HeroStateId.Idle;
 
     public HeroStateMachine(HeroActor owner)
@@ -35,6 +36,7 @@ public class HeroStateMachine
         states[HeroStateId.Win] = new HeroWinState(owner, this);
         states[HeroStateId.Spawn] = new HeroSpawnState(owner, this);
         states[HeroStateId.BossSpawn] = new HeroBossSpawnState(owner, this);
+        states[HeroStateId.ManualMove] = new HeroManualMoveState(owner, this);
     }
 
     public void Tick(float deltaTime)

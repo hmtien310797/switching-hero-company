@@ -191,12 +191,16 @@ public class HeroTeamController : MonoBehaviour
             if (isManualMoving)
             {
                 ResetFollowerSmoothTarget();
+                Debug.Log("Manual move started");
+                controlledHero.StartTeamMovement();
+                followerHero.StartTeamMovement();
             }
             else
             {
                 controlledHero.StopTeamControl();
                 followerHero.StopTeamControl();
                 ResetFollowerVelocity();
+                Debug.Log("Manual move End");
             }
         }
 

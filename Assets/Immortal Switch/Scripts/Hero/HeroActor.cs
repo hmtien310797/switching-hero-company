@@ -21,7 +21,8 @@ public enum HeroStateId
     Dead,
     Win,
     Spawn,
-    BossSpawn
+    BossSpawn,
+    ManualMove
 }
 
 public enum HeroMoveMode
@@ -45,6 +46,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     [SerializeField] private HeroAnimationDriver animationDriver;
     [SerializeField] private HeroSkillController skillController;
     [SerializeField] private HealthBarController healthBarController;
+    [SerializeField] private HeroAutoSkillController autoSkillController;
 
     [Header("Attack")]
     [SerializeField] private HeroAttackMode attackMode = HeroAttackMode.Melee;
@@ -57,6 +59,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     [Header("Ability")]
     [SerializeField] private float ultimateHitNormalizedTime = 0.5f;
     [SerializeField] private float passiveHitNormalizedTime = 0.5f;
+    
+    [SerializeField] private GameObject winFx;
 
     [ShowInInspector, ReadOnly]
     private ICombatUnit currentTarget;
@@ -65,7 +69,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     private PvEBattleController pveBattleController;
     private HeroTeamController heroTeamController;
     private HeroDataSO heroData;
-    
     private int attackComboIndex;
     private float nextTargetSearchTime;
     public event Action<HeroActor> OnDead;
@@ -83,15 +86,16 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     public HeroAnimationDriver Anim => animationDriver;
 
-    public HeroSkillController SkillController => skillController;
-
     public ICombatUnit CurrentTarget => currentTarget;
 
     public HeroMoveMode MoveMode { get; private set; } = HeroMoveMode.Auto;
+    public bool IsChosen { get; private set;}
 
     public bool IsUnderPlayerControl { get; private set; }
 
     public bool IsActionLocked { get; private set; }
+    
+    public bool IsCastingUltimateSkill => skillController.IsCastingUltimateSkill;
 
     public bool IsDead => stats != null &&
                           stats.HealthModule != null &&
@@ -125,6 +129,11 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     
     public HeroStateMachine StateMachine => stateMachine;
 
+    public void SetAutoSkill(bool active)
+    {
+        autoSkillController.AutoCastEnabled = active;
+    }
+
     private void Awake()
     {
         if (stats == null)
@@ -154,7 +163,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void Update()
     {
-        if (SkillController != null && SkillController.IsSkillLocked)
+        if (skillController != null && skillController.IsCastingUltimateSkill)
             return;
         
         stateMachine?.Tick(Time.deltaTime);
@@ -174,6 +183,16 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         skillController?.Init(this, battleController);
 
         ResetData();
+    }
+
+    public void SetChosen(bool chosen)
+    {
+        IsChosen = chosen;
+    }
+
+    public void EnableWinFx(bool enable)
+    {
+        winFx.SetActive(enable);
     }
 
     public void ResetData()
@@ -240,7 +259,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     public void ManualMoveByTeam(Vector3 direction, float moveSpeed)
     {
-        if (IsDead || IsActionLocked)
+        if (IsDead || IsActionLocked || skillController.IsCastingUltimateSkill)
             return;
 
         if (stats != null && !stats.CanMove())
@@ -275,7 +294,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         ref Vector3 velocity
     )
     {
-        if (IsDead || IsActionLocked)
+        if (IsDead || IsActionLocked || skillController.IsCastingUltimateSkill)
             return;
 
         if (stats != null && !stats.CanMove())
@@ -319,6 +338,11 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         locomotion?.Stop();
 
         stateMachine.ChangeState(HeroStateId.Idle);
+    }
+
+    public void StartTeamMovement()
+    {
+        stateMachine.ChangeState(HeroStateId.ManualMove);
     }
 
     public void WarpTeamPosition(Vector3 position)

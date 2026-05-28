@@ -121,6 +121,14 @@ namespace Battle
             await StartAsync();        
         }
 
+        public void SetAutoSkill(bool isAutoSkill)
+        {
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                inBattleHeroes[i].SetAutoSkill(isAutoSkill);
+            }
+        }
+
         private async UniTask StartAsync()
         {
             SetState(BattleState.Initializing);
@@ -213,11 +221,15 @@ namespace Battle
             }
         }
         
-
         public void InitSwitchableHeroIds()
         {
             inBattleHeroIdList.Clear();
             inBattleHeroIdList = new List<int>() { 2, 4 };
+        }
+
+        public void OnSelectedHeroCastUltimateSkill()
+        {
+            gameCameraController.ZoomToHero().Forget();
         }
 
         private async UniTask InitPlayerHeroById(bool isSwitch = false)
@@ -232,7 +244,7 @@ namespace Battle
                     gameCameraController.SetFollowHero(inBattleHeroes[heroIndex].transform);
                 }
             }
-
+            
             await UniTask.Delay(1000);
         }
 
@@ -401,7 +413,22 @@ namespace Battle
         {
             if (heroTeamController == null)
                 return;
-
+            
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                var hero = inBattleHeroes[i];
+                if (hero == null)
+                {
+                    continue;
+                }
+                if (i == controlledHeroSlotIndex)
+                {
+                    hero.SetChosen(true);
+                    continue;
+                }
+                hero.SetChosen(false);
+            }
+            
             if (controlledHeroSlotIndex == 0)
                 heroTeamController.SelectHeroA();
             else

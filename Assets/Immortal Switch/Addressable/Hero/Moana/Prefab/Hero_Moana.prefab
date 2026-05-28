@@ -31,7 +31,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4785834991424550208}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6211555166235103773
+--- !u!1 &2638068557192415481
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -39,24 +39,24 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4990778955080685049}
-  - component: {fileID: 4317426748185331418}
-  - component: {fileID: 7400124037262323496}
-  - component: {fileID: 6447573187335590340}
-  m_Layer: 7
+  - component: {fileID: 6782563190704612944}
+  - component: {fileID: 1596269261548865362}
+  - component: {fileID: 5048033105492815338}
+  - component: {fileID: 1005801911340450105}
+  m_Layer: 0
   m_Name: Spine GameObject (hero_1003202_moana)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4990778955080685049
+--- !u!4 &6782563190704612944
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6211555166235103773}
+  m_GameObject: {fileID: 2638068557192415481}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -65,21 +65,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4785834991424550208}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4317426748185331418
+--- !u!33 &1596269261548865362
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6211555166235103773}
+  m_GameObject: {fileID: 2638068557192415481}
   m_Mesh: {fileID: 0}
---- !u!23 &7400124037262323496
+--- !u!23 &5048033105492815338
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6211555166235103773}
+  m_GameObject: {fileID: 2638068557192415481}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -119,13 +119,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6447573187335590340
+--- !u!114 &1005801911340450105
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6211555166235103773}
+  m_GameObject: {fileID: 2638068557192415481}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
@@ -197,9 +197,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4990778955080685049}
   - {fileID: 910151571242835769}
   - {fileID: 924180038648032528}
+  - {fileID: 6782563190704612944}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7660850797683027546
@@ -219,7 +219,8 @@ MonoBehaviour:
   animationDriver: {fileID: 4524964056122228985}
   skillController: {fileID: 4416500834578471195}
   healthBarController: {fileID: 67816127313860525}
-  attackMode: 0
+  autoSkillController: {fileID: 1751907790690962492}
+  attackMode: 1
   projectileSpawnPoint: {fileID: 910151571242835769}
   projectilePrefab: {fileID: 6946385455583904840, guid: f2ea924715098804db6f79539ad2723d, type: 3}
   targetSearchRange: 10
@@ -238,7 +239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40a35b591ae647b38b827e4ef9354a20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonAnimation: {fileID: 6447573187335590340}
+  skeletonAnimation: {fileID: 0}
   spawnAnim: spawn
   idleAnim: idle
   runAnim: run
@@ -297,7 +298,7 @@ MonoBehaviour:
   ultimateSkill: {fileID: 11400000, guid: c289cc1ee8b657e4e8a466b72f50f68a, type: 2}
   passiveSkill: {fileID: 0}
   autoBindOnAwake: 1
-  autoSkillController: {fileID: 0}
+  autoSkillController: {fileID: 1751907790690962492}
   autoCreateAutoSkillController: 1
   enableDebugHotkeys: 1
   debugLogCastResult: 1
@@ -329,6 +330,7 @@ MonoBehaviour:
   scanInterval: 0.15
   stopAfterFirstReadyAttempt: 1
   debugLog: 0
+  owner: {fileID: 7660850797683027546}
 --- !u!1001 &7657084194435272625
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -31,6 +31,8 @@ namespace Immortal_Switch.Scripts.Skill
 
         [Header("Debug")]
         [SerializeField] private bool debugLog;
+        
+        [SerializeField] private HeroActor owner;
 
         private HeroSkillController skillController;
         private float scanTimer;
@@ -77,9 +79,12 @@ namespace Immortal_Switch.Scripts.Skill
             Tick(Time.deltaTime);
         }
 
-        public void Tick(float deltaTime)
+        private void Tick(float deltaTime)
         {
             if (!autoCastEnabled)
+                return;
+
+            if (owner.StateMachine.CurrentStateId == HeroStateId.ManualMove)
                 return;
 
             scanTimer -= deltaTime;
@@ -125,7 +130,7 @@ namespace Immortal_Switch.Scripts.Skill
             if (!skillController.isActiveAndEnabled)
                 return false;
 
-            if (skillController.IsCasting || skillController.IsSkillLocked)
+            if (skillController.IsCasting || skillController.IsCastingUltimateSkill)
                 return false;
 
             HeroActor owner = skillController.Owner;

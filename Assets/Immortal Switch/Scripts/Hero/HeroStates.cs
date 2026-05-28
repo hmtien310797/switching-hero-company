@@ -338,6 +338,10 @@ public class HeroBossSpawnState : HeroStateBase
 
     public override UniTask Enter()
     {
+        if (owner.IsCastingUltimateSkill)
+        {
+            return UniTask.CompletedTask;
+        }
         owner.SetActionLocked(true);
         owner.Anim.PlayIdle();
         return UniTask.CompletedTask;
@@ -347,6 +351,14 @@ public class HeroBossSpawnState : HeroStateBase
     {
         owner.SetActionLocked(true);
     }
+}
+
+public class HeroManualMoveState : HeroStateBase
+{
+    public override HeroStateId Id => HeroStateId.ManualMove;
+
+    public HeroManualMoveState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    
 }
 
 public class HeroSpawnState : HeroStateBase
@@ -373,6 +385,23 @@ public class HeroWinState : HeroStateBase
 
     public override async UniTask Enter()
     {
-        owner.Anim.PlayWin();
+        float duration = owner.Anim.PlayWin();
+        await UniTask.Delay(TimeSpan.FromSeconds(duration));
+        owner.EnableWinFx(true);
+        Vector3[] path = new Vector3[] 
+        {
+            owner.transform.position - Vector3.forward * 20 - Vector3.right * 10,
+            owner.transform.position - Vector3.forward * 35 + Vector3.up *5,
+            owner.transform.position - Vector3.forward * 20 + Vector3.right * 10,
+            owner.transform.position + Vector3.forward * 0 + Vector3.right * 15,
+            PvEBattleController.Instance.GetMapEndPoint(),
+        };
+
+        transform.DOPath(path, 3f, PathType.CatmullRom).SetEase(Ease.InQuart).OnComplete(() =>
+        {
+            winFx.gameObject.SetActive(false);
+            endAct?.Invoke();
+        });
+        
     }
 }
