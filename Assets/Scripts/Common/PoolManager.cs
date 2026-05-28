@@ -107,14 +107,14 @@ namespace Common
                 return existingPool;
             }
 
-            if (!prefab.TryGetComponent(out IPoolable _))
+            if (!prefab.TryGetComponent(out IPoolable poolable))
             {
                 Debug.LogError($"[PoolManager] Prefab {prefab.name} must implement IPoolable to use pool.");
                 return null;
             }
 
             Transform parent = CreatePoolParent(prefab);
-            ObjectPool newPool = new ObjectPool(prefab, parent, defaultPrewarmCount);
+            ObjectPool newPool = new ObjectPool(prefab, parent, poolable.PoolSize == 0 ? defaultPrewarmCount : poolable.PoolSize);
 
             pools.Add(prefab, newPool);
 

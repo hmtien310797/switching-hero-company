@@ -62,6 +62,19 @@ namespace Battle
         [SerializeField] private HeroTeamController heroTeamController;
         [SerializeField, Min(0)] private int controlledHeroSlotIndex = 0;
         
+        [Header("Creep Spawn Formation")]
+        [SerializeField] private float spawnSpacingX = 1.6f;
+        [SerializeField] private float spawnSpacingZ = 1.25f;
+        [SerializeField] private float spawnJitter = 0.25f;
+        [SerializeField] private int spawnColumns = 5;
+        [SerializeField] private float groupRadius = 2.5f;
+        [SerializeField] private int spawnColumnsPerGroup = 3;
+        
+        [Header("Creep Spawn Multi Groups")]
+        [SerializeField] private int minSpawnGroupsPerBatch = 3;
+        [SerializeField] private int maxSpawnGroupsPerBatch = 6;
+        [SerializeField] private int maxCreepsPerGroup = 5;
+        
         [ShowInInspector] private readonly List<EnemyActor> creeps = new();
         
         private BattleResult result = BattleResult.None;
@@ -151,7 +164,6 @@ namespace Battle
             return pvEMapController.GetEndMapPosition();
         }
         
-
         private void OnChangeHero(int sourceHeroId, int targetHeroId)
         {
             if (!CanSwitchHero(sourceHeroId, targetHeroId))
@@ -599,6 +611,8 @@ namespace Battle
 
             int[] counts = AllocateCounts(spawnNow, rates);
             if (counts == null) return;
+            List<Vector3> spawnPositions = GenerateSpawnFormationPositions(spawnNow);
+            int spawnIndex = 0;
 
             for (int i = 0; i < enemyIds.Length; i++)
             {
@@ -613,8 +627,12 @@ namespace Battle
 
                 for (int k = 0; k < amount; k++)
                 {
-                    var basePos = spawnPoss[Random.Range(0, spawnPoss.Count)].position;
-                    var nPos = basePos + new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f));
+                    Vector3 nPos = spawnIndex < spawnPositions.Count
+                        ? spawnPositions[spawnIndex]
+                        : spawnPoss[Random.Range(0, spawnPoss.Count)].position;
+
+                    spawnIndex++;
+
                     var creep = PoolManager.Instance.Spawn(creepData.CreepPrefab, nPos, Quaternion.identity);
                     creep.name += creep.transform.GetInstanceID();
                     creep.gameObject.SetActive(true);
@@ -636,6 +654,131 @@ namespace Battle
                     aliveCreepCount++;
                     totalCreepsSpawnedThisStage++;
                 }
+            }
+        }
+        
+        private List<Vector3> GenerateSpawnFormationPositions(int amount)
+        {
+            List<Vector3> result = new List<Vector3>(amount);
+
+            if (amount <= 0)
+                return result;
+
+            if (spawnPoss == null || spawnPoss.Count == 0)
+                return result;
+
+            int maxPossibleGroups = Mathf.Min(spawnPoss.Count, amount);
+
+            int minGroup = Mathf.Clamp(minSpawnGroupsPerBatch, 1, maxPossibleGroups);
+            int maxGroup = Mathf.Clamp(maxSpawnGroupsPerBatch, minGroup, maxPossibleGroups);
+
+            int groupCount = Random.Range(minGroup, maxGroup + 1);
+
+            List<Transform> selectedAnchors = PickRandomSpawnAnchors(groupCount);
+            List<int> groupCounts = AllocateEvenGroupCounts(amount, selectedAnchors.Count);
+
+            for (int groupIndex = 0; groupIndex < selectedAnchors.Count; groupIndex++)
+            {
+                int countInGroup = groupCounts[groupIndex];
+
+                AddGroupFormationPositions(
+                    result,
+                    selectedAnchors[groupIndex].position,
+                    countInGroup
+                );
+            }
+
+            Shuffle(result);
+
+            return result;
+        }
+        
+        private List<int> AllocateEvenGroupCounts(int totalAmount, int groupCount)
+        {
+            List<int> counts = new List<int>(groupCount);
+
+            if (totalAmount <= 0 || groupCount <= 0)
+                return counts;
+
+            int baseCount = totalAmount / groupCount;
+            int remainder = totalAmount % groupCount;
+
+            for (int i = 0; i < groupCount; i++)
+            {
+                int count = baseCount;
+                
+                if (i < remainder)
+                    count++;
+
+                counts.Add(count);
+            }
+            
+            Shuffle(counts);
+
+            return counts;
+        }
+        
+        private List<Transform> PickRandomSpawnAnchors(int count)
+        {
+            List<Transform> candidates = new List<Transform>(spawnPoss);
+            List<Transform> result = new List<Transform>(count);
+
+            count = Mathf.Min(count, candidates.Count);
+
+            for (int i = 0; i < count; i++)
+            {
+                int randomIndex = Random.Range(0, candidates.Count);
+                result.Add(candidates[randomIndex]);
+                candidates.RemoveAt(randomIndex);
+            }
+
+            return result;
+        }
+        
+        private void AddGroupFormationPositions(
+            List<Vector3> result,
+            Vector3 anchorPosition,
+            int amount
+        )
+        {
+            if (amount <= 0)
+                return;
+
+            int columns = Mathf.Max(1, spawnColumnsPerGroup);
+            int rows = Mathf.CeilToInt(amount / (float)columns);
+
+            float totalWidth = (columns - 1) * spawnSpacingX;
+            float totalDepth = (rows - 1) * spawnSpacingZ;
+
+            for (int i = 0; i < amount; i++)
+            {
+                int row = i / columns;
+                int col = i % columns;
+
+                float x = col * spawnSpacingX - totalWidth * 0.5f;
+                float z = row * spawnSpacingZ - totalDepth * 0.5f;
+
+                // hàng lẻ lệch nửa ô để cụm nhìn tự nhiên hơn
+                if (row % 2 == 1)
+                    x += spawnSpacingX * 0.5f;
+
+                Vector3 jitter = new Vector3(
+                    Random.Range(-spawnJitter, spawnJitter),
+                    0f,
+                    Random.Range(-spawnJitter, spawnJitter)
+                );
+
+                Vector3 finalPosition = anchorPosition + new Vector3(x, 0f, z) + jitter;
+                result.Add(finalPosition);
+            }
+        }
+        
+        private void Shuffle<T>(List<T> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                int randomIndex = Random.Range(i, list.Count);
+                (list[i], list[randomIndex]) = (list[randomIndex], list[i]);
             }
         }
 

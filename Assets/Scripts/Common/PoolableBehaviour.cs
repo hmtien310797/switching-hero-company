@@ -6,6 +6,7 @@ namespace Common
     {
         protected PoolHandle PoolHandle { get; private set; }
 
+        [field: SerializeField] public int PoolSize { get; set; }
         [field: SerializeField] public bool DeSpawnedOnStart { get; private set; } = true;
 
         public void OnCreatedByPool(PoolHandle handle)
