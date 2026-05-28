@@ -21,6 +21,11 @@ namespace Battle
             }
         }
 
+        public Vector3 GetEndMapPosition()
+        {
+            return curMapView.GetEndMapPoint;
+        }
+
         public void InitMapByChapter(int chapter)
         {
             if (chapter == curChapterId || !mapViewDict.ContainsKey(chapter)) return;

@@ -1,5 +1,7 @@
 ﻿using System;
+using Battle;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
@@ -385,7 +387,9 @@ public class HeroWinState : HeroStateBase
 
     public override async UniTask Enter()
     {
-        float duration = owner.Anim.PlayWin();
+        owner.Anim.PlayIdle();
+        await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
+        float duration = owner.Anim.PlayWin() - 0.5f;
         await UniTask.Delay(TimeSpan.FromSeconds(duration));
         owner.EnableWinFx(true);
         Vector3[] path = new Vector3[] 
@@ -394,14 +398,14 @@ public class HeroWinState : HeroStateBase
             owner.transform.position - Vector3.forward * 35 + Vector3.up *5,
             owner.transform.position - Vector3.forward * 20 + Vector3.right * 10,
             owner.transform.position + Vector3.forward * 0 + Vector3.right * 15,
-            PvEBattleController.Instance.GetMapEndPoint(),
+            PvEBattleController.Instance.GetEndMapPoint(),
         };
 
-        transform.DOPath(path, 3f, PathType.CatmullRom).SetEase(Ease.InQuart).OnComplete(() =>
+        owner.transform.DOPath(path, 3f, PathType.CatmullRom).SetEase(Ease.InQuart).OnComplete(() =>
         {
-            winFx.gameObject.SetActive(false);
-            endAct?.Invoke();
+            owner.EnableWinFx(false);
         });
-        
     }
+    
+    
 }

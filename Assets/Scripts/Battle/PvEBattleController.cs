@@ -145,6 +145,11 @@ namespace Battle
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
         }
+
+        public Vector3 GetEndMapPoint()
+        {
+            return pvEMapController.GetEndMapPosition();
+        }
         
 
         private void OnChangeHero(int sourceHeroId, int targetHeroId)
@@ -1027,7 +1032,7 @@ namespace Battle
 
         private async UniTask NextStageCallback()
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(3f));
+            await UniTask.Delay(TimeSpan.FromSeconds(5.7f));
             Debug.Log("[PvE] Next Stage");
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
             for (int i = 0; i < inBattleHeroes.Length; i++)

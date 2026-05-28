@@ -39,7 +39,7 @@ namespace Immortal_Switch.Scripts.Boss
 
         [Header("Death")]
         [SerializeField] private bool destroyOnDead = false;
-        [SerializeField] private float destroyDelay = 1.2f;
+        [SerializeField] private float destroyDelay = 2f;
 
         private readonly List<ICombatUnit> heroTargets = new();
 

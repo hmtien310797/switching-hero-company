@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Common;
+using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -41,6 +43,11 @@ namespace Immortal_Switch.Scripts.Skill
             initialized = true;
 
             OnRuntimeInitialized();
+        }
+
+        private void Awake()
+        {
+            GameEventManager.Subscribe(GameEvents.OnStageCleared, ForceDespawn);
         }
 
         protected virtual void OnRuntimeInitialized()
