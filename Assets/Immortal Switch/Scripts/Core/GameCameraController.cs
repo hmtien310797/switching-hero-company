@@ -1,13 +1,14 @@
 using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class GameCameraController : MonoBehaviour
+public class GameCameraController : Singleton<GameCameraController>
 {
     [SerializeField] private CinemachineCamera followHeroCamera;
     [SerializeField] private CinemachineCamera followBossCamera;
@@ -158,5 +159,10 @@ public class GameCameraController : MonoBehaviour
             .SetEase(Ease.OutQuad)
             .AsyncWaitForCompletion()
             .AsUniTask();
+    }
+
+    public override UniTask InitializeAsync()
+    {
+        return UniTask.CompletedTask;
     }
 }

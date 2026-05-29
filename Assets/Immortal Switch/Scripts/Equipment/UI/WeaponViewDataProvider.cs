@@ -711,13 +711,13 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         {
             switch (statType)
             {
-                case StatType.Atk: return "Attack Power Increase";
-                case StatType.MaxHp: return "HP Increase";
-                case StatType.Def: return "Defense Increase";
-                case StatType.CritChance: return "Crit Chance Increase";
-                case StatType.CritDamage: return "Crit Damage Increase";
-                case StatType.AttackSpeed: return "Attack Speed Increase";
-                case StatType.Accuracy: return "Accuracy Increase";
+                case StatType.Atk: return "Tăng Công";
+                case StatType.MaxHp: return "Tăng HP";
+                case StatType.Def: return "Tăng Phòng thủ";
+                case StatType.CritChance: return "Tăng Tỷ lệ Chí mạng";
+                case StatType.CritDamage: return "Tăng Sát thương Chí mạng";
+                case StatType.AttackSpeed: return "Tăng Tốc độ Đánh";
+                case StatType.Accuracy: return "Tăng Chính xác";
                 default: return statType.ToString();
             }
         }

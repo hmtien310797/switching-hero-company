@@ -5,7 +5,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 {
     public abstract class BaseSummonPanelView : MonoBehaviour
     {
-        [SerializeField] private GameObject root;
+        [SerializeField] protected GameObject root;
 
         public abstract SummonCategory Category { get; }
 

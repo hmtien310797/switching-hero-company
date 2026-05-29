@@ -12,40 +12,34 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
     {
         [Header("Top Info")]
         [SerializeField] private TMP_Text txtWeaponName;
-        [SerializeField] private Image imgIcon;
-        [SerializeField] private TMP_Text txtLevel;
+        [Header("Equip Effect")] [SerializeField]
+        private Transform statLineContainer;
 
-        [Header("Equip Effect")]
-        [SerializeField] private Transform statLineContainer;
         [SerializeField] private UIWeaponStatLineItem statLinePrefab;
 
-        [Header("Action Buttons")]
-        [SerializeField] private Button btnEquip;
+        [Header("Action Buttons")] [SerializeField]
+        private Button btnEquip;
+
         [SerializeField] private Button btnAutoEquip;
         [SerializeField] private Button btnOpenUpgrade;
         [SerializeField] private Button btnFusion;
         [SerializeField] private Button btnFuseAll;
 
-        [Header("Upgrade Panel")]
-        [SerializeField] private UIWeaponUpgradePanel upgradePanel;
-        
-        [Header("Shard Info")]
-        [SerializeField] private TMP_Text txtShard;
-        [SerializeField] private Image shardSlider;
-        
-        [Header("Tier Visual")]
-        [SerializeField] private Image imgTierLabel;
-        [SerializeField] private Image imgTierBackground;
-        [SerializeField] private WeaponTierVisualConfigSO tierVisualConfig;
+        [Header("Upgrade Panel")] [SerializeField]
+        private UIWeaponUpgradePanel upgradePanel;
 
-        [Header("Star Display")]
-        [SerializeField] private UIWeaponStarDisplay starDisplay;
-        
-        [Header("Fuse All Result Popup")]
-        [SerializeField] private UIWeaponFuseAllResultPopup fuseAllResultPopup;
-        
-        [Header("Fusion Popup")]
-        [SerializeField] private UIWeaponFusionPopup fusionPopup;
+        [Header("Tier Visual")] [SerializeField]
+        private UIWeaponItemBase selectedWeapon;
+
+        [Header("Star Display")] [SerializeField]
+        private UIWeaponStarDisplay starDisplay;
+
+        [Header("Fuse All Result Popup")] [SerializeField]
+        private UIWeaponFuseAllResultPopup fuseAllResultPopup;
+
+        [Header("Fusion Popup")] [SerializeField]
+        private UIWeaponFusionPopup fusionPopup;
+
         [SerializeField] private WeaponViewDataProvider weaponViewDataProvider;
 
         private readonly List<UIWeaponStatLineItem> statLineItems = new();
@@ -53,6 +47,16 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         private WeaponDetailViewModel currentVm;
         private int currentHeroId;
         private Action onRequestRefresh;
+
+        private void OnEnable()
+        {
+            RefreshVisual();
+        }
+
+        private void RefreshVisual()
+        {
+            upgradePanel.gameObject.SetActive(false);
+        }
 
         public void Bind(WeaponDetailViewModel vm, int heroId, Action refreshCallback = null)
         {
@@ -62,35 +66,24 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (txtWeaponName != null)
                 txtWeaponName.text = vm.WeaponName;
-
-            if (imgIcon != null)
-                imgIcon.sprite = vm.Icon;
-
-            if (txtLevel != null)
-                txtLevel.text = $"+{vm.Level}";
+            selectedWeapon.BindCommon(
+                vm.Icon,
+                $"+{vm.Level}",
+                vm.MaxShard > 0
+                    ? $"{vm.CurrentShard}/{vm.MaxShard}"
+                    : vm.CurrentShard.ToString(), vm.ShardProgressNormalized,
+                true,
+                string.Empty,
+                false,
+                !vm.IsUnlocked,
+                false,
+                false,
+                () => { });
 
             BindStatLines(vm.EquipEffects);
             BindButtons(vm);
             BindTierVisual(vm.Tier);
             starDisplay.BindStandard(vm.Star);
-
-            if (upgradePanel != null)
-            {
-                upgradePanel.gameObject.SetActive(false);
-                upgradePanel.Bind(vm.UpgradePanel, vm, currentHeroId, HandleUpgradePanelChanged);
-            }
-            
-            if (txtShard != null)
-            {
-                txtShard.text = vm.MaxShard > 0
-                    ? $"{vm.CurrentShard}/{vm.MaxShard}"
-                    : vm.CurrentShard.ToString();
-            }
-
-            if (shardSlider != null)
-            {
-                shardSlider.fillAmount = vm.ShardProgressNormalized;
-            }
         }
 
         private void BindStatLines(List<WeaponStatLineViewModel> stats)
@@ -108,21 +101,10 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
                 statLineItems[i].Bind(stats[i]);
             }
         }
-        
+
         private void BindTierVisual(WeaponTier tier)
         {
-            if (tierVisualConfig == null)
-                return;
-
-            var entry = tierVisualConfig.Get(tier);
-            if (entry == null)
-                return;
-
-            if (imgTierLabel != null)
-                imgTierLabel.sprite = entry.TierLabelSprite;
-
-            if (imgTierBackground != null)
-                imgTierBackground.sprite = entry.TierBackgroundSprite;
+            selectedWeapon.BindTierVisual(tier);
         }
 
         private void EnsureStatLinePool(int targetCount)
@@ -179,7 +161,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         private void OnClickEquip()
         {
-            if (WeaponManager.Instance == null || currentVm == null)
+            if (WeaponManager.Instance == null ||
+                currentVm == null)
                 return;
 
             if (currentVm.IsExclusive)
@@ -206,15 +189,25 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         private void OnClickOpenUpgrade()
         {
+            var vm = weaponViewDataProvider.BuildStandardDetail(currentVm.WeaponId);
+
+            if (vm == null)
+                return;
+
             upgradePanel.gameObject.SetActive(true);
+            upgradePanel.Bind(vm.UpgradePanel, currentVm, currentHeroId, RequestRefresh);
         }
 
         private void OnClickFusion()
         {
-            if (currentVm == null || currentVm.IsExclusive || fusionPopup == null || weaponViewDataProvider == null)
+            if (currentVm == null ||
+                currentVm.IsExclusive ||
+                fusionPopup == null ||
+                weaponViewDataProvider == null)
                 return;
 
             var vm = weaponViewDataProvider.BuildFusionPopup(currentVm.WeaponId);
+
             if (vm == null)
                 return;
 
@@ -228,17 +221,20 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             var result = WeaponManager.Instance.TryFuseAllStandardWeapons();
 
-            if (result != null && result.HasAnyReward && fuseAllResultPopup != null)
+            if (result != null &&
+                result.HasAnyReward &&
+                fuseAllResultPopup != null)
                 fuseAllResultPopup.Show(result);
 
             RequestRefresh();
         }
-        
+
         private WeaponFuseAllResult BuildMockFuseAllResultForPreview()
         {
             var result = new WeaponFuseAllResult();
 
-            if (WeaponManager.Instance == null || WeaponManager.Instance.Database == null)
+            if (WeaponManager.Instance == null ||
+                WeaponManager.Instance.Database == null)
                 return result;
 
             var database = WeaponManager.Instance.Database;

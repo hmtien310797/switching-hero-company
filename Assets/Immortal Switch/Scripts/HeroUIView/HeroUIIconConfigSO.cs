@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.HeroUIView
@@ -28,13 +29,13 @@ namespace Immortal_Switch.Scripts.HeroUIView
     public class ElementIconEntry
     {
         public Element Element;
-        public Sprite Icon;
+        [PreviewField] public Sprite Icon;
     }
 
     [Serializable]
     public class HeroClassIconEntry
     {
         public HeroClass HeroClass;
-        public Sprite Icon;
+        [PreviewField] public Sprite Icon;
     }
 }

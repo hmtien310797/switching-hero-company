@@ -1,0 +1,66 @@
+using System.Collections.Generic;
+using Immortal_Switch.Scripts.StatSystem;
+
+namespace Immortal_Switch.Scripts.PlayerSystem.Models
+{
+    public class PlayerSystemData
+    {
+        /// <summary>
+        /// exp
+        /// </summary>
+        public int Exp;
+
+        /// <summary>
+        /// level hien tai
+        /// </summary>
+        public int Level;
+
+        /// <summary>
+        /// ten hien thi
+        /// </summary>
+        public string Nickname;
+
+        /// <summary>
+        /// avatar
+        /// </summary>
+        public string Avatar;
+
+        public void UpdateExp(int exp)
+        {
+            Exp = exp;
+        }
+
+        public void UpdateLevel(int level)
+        {
+            Level = level;
+        }
+    }
+
+    public class PlayerEquipItem
+    {
+        /// <summary>
+        /// cfg id cua equip item.
+        /// </summary>
+        public string CfgId;
+
+        /// <summary>
+        /// loai equip item
+        /// </summary>
+        public string ItemType;
+
+        /// <summary>
+        /// level item
+        /// </summary>
+        public int Level;
+
+        /// <summary>
+        /// loai tier
+        /// </summary>
+        public string Tier;
+
+        /// <summary>
+        /// ds modifier của equip
+        /// </summary>
+        public List<StatModifier> Modifiers = new();
+    }
+}

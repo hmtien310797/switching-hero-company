@@ -7,7 +7,9 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 {
     public class GrowthUpgradeAmountSelector : MonoBehaviour
     {
-        [SerializeField] private SegmentedControl segmentedControl;
+        [SerializeField] private SegmentedControlOption btnX1;
+        [SerializeField] private SegmentedControlOption btnX10;
+        [SerializeField] private SegmentedControlOption btnX100;
 
         private readonly List<int> amounts = new() { 1, 10, 100 };
         private Action<int> onAmountChanged;
@@ -15,30 +17,30 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         public void Initialize(int currentAmount, Action<int> onChanged)
         {
             onAmountChanged = onChanged;
-
-            int defaultIndex = GetIndexByAmount(currentAmount);
-
-            segmentedControl.Initialize(
-                new[] { "x1", "x10", "x100" },
-                defaultIndex,
-                OnSegmentChanged
-            );
+            btnX1.Bind(() => OnSegmentChanged(0));
+            btnX10.Bind(() => OnSegmentChanged(1));
+            btnX100.Bind(() => OnSegmentChanged(2));
+            
+            btnX1.SetSelected(currentAmount == 0);
+            btnX10.SetSelected(currentAmount == 1);
+            btnX100.SetSelected(currentAmount == 2);
         }
 
         public void SetCurrentAmount(int amount, bool notify = false)
         {
-            int index = GetIndexByAmount(amount);
-            segmentedControl.SetSelected(index, notify);
+            // int index = GetIndexByAmount(amount);
+            // segmentedControl.SetSelected(index, notify);
         }
 
         public void SetUseSlider(bool useSlider)
         {
-            segmentedControl.SetUseSliderHighlight(useSlider);
+            // segmentedControl.SetUseSliderHighlight(useSlider);
         }
 
         private void OnSegmentChanged(int index)
         {
-            if (index < 0 || index >= amounts.Count)
+            if (index < 0 ||
+                index >= amounts.Count)
                 return;
 
             onAmountChanged?.Invoke(amounts[index]);

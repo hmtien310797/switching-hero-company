@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -17,13 +18,13 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         [Header("Rows")]
         [SerializeField] private Transform contentRoot;
-        [SerializeField] private GrowthTierUpgradeRowView rowPrefab;
+        [SerializeField] private UIWeaponUpgradeStatLineItem rowPrefab;
 
         [Header("Buttons")]
         [SerializeField] private Button confirmButton;
         [SerializeField] private Button closeButton;
 
-        private readonly List<GrowthTierUpgradeRowView> rows = new();
+        private readonly List<UIWeaponUpgradeStatLineItem> rows = new();
         private Action onConfirm;
 
         private void Awake()
@@ -39,6 +40,8 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                 closeButton.onClick.RemoveAllListeners();
                 closeButton.onClick.AddListener(Hide);
             }
+
+            gameObject.SetActive(false);
         }
 
         public void Show(GrowthTierUpgradePopupData data, Action onConfirmCallback)
@@ -59,7 +62,10 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                 rows[i].gameObject.SetActive(active);
 
                 if (active)
-                    rows[i].Bind(data.Rows[i]);
+                {
+                    var row = data.Rows[i];
+                    rows[i].Bind(row.StatName, row.LeftValueText, row.RightValueText);
+                }
             }
 
             gameObject.SetActive(true);

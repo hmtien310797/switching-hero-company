@@ -1,9 +1,10 @@
-﻿Shader "Skybox/CloudFlow" {
+Shader "Skybox/CloudFlow" {
 Properties {
     _Tint ("Tint Color", Color) = (0.5, 0.5, 0.5, 0.5)
     [Gamma] _Exposure ("Exposure", Range(0, 8)) = 1.0
     _Rotation ("Manual Rotation", Range(0, 360)) = 0
     _FlowSpeed ("Cloud Flow Speed", Range(0, 10)) = 0.5
+    _DriftAngle ("Cloud Drift Direction (degrees)", Range(0, 360)) = 0
     [NoScaleOffset] _Tex ("Cubemap (HDR)", CUBE) = "grey" {}
 }
 
@@ -25,6 +26,7 @@ SubShader {
         half _Exposure;
         float _Rotation;
         float _FlowSpeed;
+        float _DriftAngle;
 
         struct appdata {
             float4 vertex : POSITION;
@@ -37,7 +39,7 @@ SubShader {
             UNITY_VERTEX_OUTPUT_STEREO
         };
 
-        // Hàm xoay vector quanh trục Y
+        // Xoay vector quanh trục Y (dùng cho skybox static position)
         float3 RotateAroundYInDegrees (float3 vertex, float degrees)
         {
             float alpha = degrees * UNITY_PI / 180.0;
@@ -53,13 +55,15 @@ SubShader {
             UNITY_SETUP_INSTANCE_ID(v);
             UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-            // Tính toán độ xoay: Xoay tay + (Tốc độ * Thời gian)
-            float totalRotation = _Rotation + (_Time.y * _FlowSpeed);
-            
-            float3 rotated = RotateAroundYInDegrees(v.vertex.xyz, totalRotation);
-            
+            // Clip position giữ nguyên (skybox bao phủ toàn màn hình)
+            float3 rotated = RotateAroundYInDegrees(v.vertex.xyz, _Rotation);
             o.vertex = UnityObjectToClipPos(rotated);
-            o.texcoord = v.vertex.xyz;
+
+            // Rotate texcoord (sampling direction) theo thời gian
+            // để mây thực sự trôi trong cubemap
+            float totalRotation = _DriftAngle + (_Time.y * _FlowSpeed);
+            o.texcoord = RotateAroundYInDegrees(v.vertex.xyz, totalRotation);
+
             return o;
         }
 

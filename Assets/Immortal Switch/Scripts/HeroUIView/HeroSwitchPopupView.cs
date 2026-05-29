@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Battle;
-using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Hero;
-using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.HeroUIView
 {
-    public class HeroSwitchPopupView : AnimatedUIView
+    public class HeroSwitchPopupView : BaseUIPopup
     {
         [Header("Data")]
         [SerializeField] private HeroProgressionDatabaseSO heroDatabase;
@@ -93,6 +91,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             selectedSourceHeroId = -1;
             selectedTargetHeroId = -1;
 
+            BindButtons();
             BindTopSlots(activeIds);
             RebuildCandidateList(activeIds);
             RefreshSelectionVisualState();
@@ -195,13 +194,13 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (instructionText != null)
             {
                 if (selectedSourceHeroId <= 0 && selectedTargetHeroId <= 0)
-                    instructionText.text = "Please select heroes";
+                    instructionText.text = "Vui lòng chọn Anh hùng";
                 else if (selectedSourceHeroId <= 0)
-                    instructionText.text = "Please select the hero to switch out";
+                    instructionText.text = "Vui lòng chọn Anh hùng để thay ra";
                 else if (selectedTargetHeroId <= 0)
-                    instructionText.text = "Please select the hero to switch in";
+                    instructionText.text = "Vui lòng chọn Anh hùng để thay vào";
                 else
-                    instructionText.text = "Ready to switch";
+                    instructionText.text = "Sẵn sàng thay đổi";
             }
             
             if (selectedSourceHeroId <= 0)
@@ -311,7 +310,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 return;
 
             battleController.RequestSwitchHero(selectedSourceHeroId, selectedTargetHeroId);
-            UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
+            gameObject.SetActive(false);
+            // UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
         }
 
         private void ClearItems()

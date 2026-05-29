@@ -4,13 +4,17 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 using Immortal_Switch.Scripts.GrowthSystem;
+using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.StatSystem;
+using Immortal_Switch.Scripts.TransmutationSystem;
+using Immortal_Switch.Scripts.TransmutationSystem.Models;
 
 namespace Immortal_Switch.Scripts.PowerUpSystem
 {
     public class PowerUpManager : Singleton<PowerUpManager>
     {
         private GrowthManager growthManager;
+        //private TransmutationSystemManager _transmutationSystemManager;
 
         private PowerUpSystemService service;
         private readonly List<StatsController> boundPlayerStats = new();
@@ -24,6 +28,7 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
         public override UniTask InitializeAsync()
         {
             growthManager = GrowthManager.Instance;
+            //_transmutationSystemManager = TransmutationSystemManager.Instance;
             service = new PowerUpSystemService();
             service.OnPowerUpRebuilt += HandlePowerUpRebuilt;
             TryInitializeSources();
@@ -38,6 +43,9 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
 
             if (growthManager != null)
                 growthManager.OnGrowthChanged -= HandleAnySourceChanged;
+
+            // if (_transmutationSystemManager != null)
+            //     _transmutationSystemManager.OnEquipChanged -= OnTransmutationSystemEquipChanged;
         }
 
         public void TryInitializeSources()
@@ -45,13 +53,20 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
             if (sourcesInitialized)
                 return;
 
-            if (growthManager != null && growthManager.Service != null)
+            if (growthManager != null &&
+                growthManager.Service != null)
             {
                 service.RegisterSource(growthManager.Service);
 
                 growthManager.OnGrowthChanged -= HandleAnySourceChanged;
                 growthManager.OnGrowthChanged += HandleAnySourceChanged;
             }
+
+            // if (_transmutationSystemManager != null)
+            // {
+            //     _transmutationSystemManager.OnEquipChanged -= OnTransmutationSystemEquipChanged;
+            //     _transmutationSystemManager.OnEquipChanged += OnTransmutationSystemEquipChanged;
+            // }
 
             sourcesInitialized = true;
         }
@@ -157,7 +172,8 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
 
         private void ApplyToOne(StatsController statsController)
         {
-            if (statsController == null || statsController.StatModule == null)
+            if (statsController == null ||
+                statsController.StatModule == null)
                 return;
 
             // Đảm bảo snapshot hiện tại đã có
@@ -178,6 +194,36 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
 
         private void HandleAnySourceChanged()
         {
+            RebuildAndApply();
+        }
+
+        private void OnTransmutationSystemEquipChanged(
+            PlayerEquipItem oldEquip,
+            PlayerEquipItem newEquip
+        )
+        {
+            if (oldEquip != null)
+            {
+                foreach (var entry in oldEquip.Modifiers)
+                {
+                    foreach (var stats in boundPlayerStats)
+                    {
+                        stats.StatModule.RemoveModifier(entry);
+                    }
+                }
+            }
+
+            if (newEquip != null)
+            {
+                foreach (var entry in newEquip.Modifiers)
+                {
+                    foreach (var stats in boundPlayerStats)
+                    {
+                        stats.StatModule.AddModifier(entry);
+                    }
+                }
+            }
+
             RebuildAndApply();
         }
 

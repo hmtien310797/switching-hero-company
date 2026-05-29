@@ -14,8 +14,8 @@ namespace Immortal_Switch.Scripts.Hero
         public Element Element;
         
         [Header("UI")]
-        public Sprite PortraitIcon;
-        public Sprite ShardIcon;
+        [PreviewField]public Sprite PortraitIcon;
+        [PreviewField]public Sprite ShardIcon;
 
         [Header("Summon")] 
         public SummonRarity SummonRarity;

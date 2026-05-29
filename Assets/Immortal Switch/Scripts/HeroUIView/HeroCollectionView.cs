@@ -17,6 +17,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private Transform contentRoot;
         [SerializeField] private HeroCollectionItemUI itemPrefab;
         [SerializeField] private Button combatFormationButton;
+        [SerializeField] private HeroSwitchPopupView heroSwitchPopupView;
 
         [Header("Element Filters")] [SerializeField]
         private HeroCollectionFilterButton allElementButton;
@@ -42,7 +43,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             InitFilters();
             RefreshAll();
-            combatFormationButton.onClick.AddListener(() => UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>());
+            combatFormationButton.onClick.AddListener(() =>
+            {
+                heroSwitchPopupView.gameObject.SetActive(true);
+                //UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>();
+            });
         }
 
         public void RefreshAll()
@@ -56,6 +61,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (HeroProgressionManager.Instance != null)
                 HeroProgressionManager.Instance.OnHeroCollectionChanged += HandleHeroCollectionChanged;
 
+            RefreshVisual();
             RefreshAll();
         }
 
@@ -63,6 +69,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             if (HeroProgressionManager.Instance != null)
                 HeroProgressionManager.Instance.OnHeroCollectionChanged -= HandleHeroCollectionChanged;
+        }
+
+        private void RefreshVisual()
+        {
+            heroSwitchPopupView.gameObject.SetActive(false);
         }
 
         private void HandleHeroCollectionChanged(HeroCollectionChangedArgs args)

@@ -1,0 +1,27 @@
+sourceId,sourceType,sourceName,unlockCondition,rewardType,rewardItemId,rewardAmount,rewardInterval,dailyLimit,isRepeatable,isActive,note
+TC_IDLE_001,IDLE,Idle Reward Stage 1,Clear Stage 1,ITEM,TRANSMUTE_CRYSTAL,20,60s,0,TRUE,TRUE,Reward tự sinh theo thời gian AFK
+TC_IDLE_002,IDLE,Idle Reward Stage 20,Clear Stage 20,ITEM,TRANSMUTE_CRYSTAL,2500,60s,0,TRUE,TRUE,Stage càng cao lượng ngọc tím/phút càng cao
+TC_IDLE_003,IDLE,Idle Reward Stage 50,Clear Stage 50,ITEM,TRANSMUTE_CRYSTAL,120000,60s,0,TRUE,TRUE,Main source mid game
+TC_IDLE_004,IDLE,Idle Reward Stage 80,Clear Stage 80,ITEM,TRANSMUTE_CRYSTAL,15000000,60s,0,TRUE,TRUE,Main source late game
+TC_KILL_NORMAL,KILL,Normal Enemy Kill,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,1,OnKill,0,TRUE,TRUE,Drop nhỏ từ quái thường
+TC_KILL_ELITE,KILL,Elite Enemy Kill,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,5,OnKill,0,TRUE,TRUE,Drop từ elite enemy
+TC_KILL_BOSS,KILL,Boss Kill,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,20,OnKill,0,TRUE,TRUE,Drop từ boss/stage boss
+TC_STAGE_CLEAR_001,STAGE_CLEAR,Clear Stage 10,Clear Stage 10,ITEM,TRANSMUTE_CRYSTAL,5000,Once,1,FALSE,TRUE,Reward 1 lần khi clear mốc stage
+TC_STAGE_CLEAR_002,STAGE_CLEAR,Clear Stage 20,Clear Stage 20,ITEM,TRANSMUTE_CRYSTAL,25000,Once,1,FALSE,TRUE,Reward 1 lần khi clear mốc stage
+TC_STAGE_CLEAR_003,STAGE_CLEAR,Clear Stage 50,Clear Stage 50,ITEM,TRANSMUTE_CRYSTAL,1000000,Once,1,FALSE,TRUE,Reward 1 lần khi clear mốc stage
+TC_STAGE_CLEAR_004,STAGE_CLEAR,Clear Stage 80,Clear Stage 80,ITEM,TRANSMUTE_CRYSTAL,50000000,Once,1,FALSE,TRUE,Reward 1 lần khi clear mốc stage
+TC_DUNGEON_001,DUNGEON,Artifact Dungeon 1,Clear Stage 20,ITEM,TRANSMUTE_CRYSTAL,50000,OnClear,3,TRUE,TRUE,Dungeon chuyên farm ngọc tím
+TC_DUNGEON_002,DUNGEON,Artifact Dungeon 2,Clear Stage 40,ITEM,TRANSMUTE_CRYSTAL,300000,OnClear,3,TRUE,TRUE,Dungeon chuyên farm ngọc tím
+TC_DUNGEON_003,DUNGEON,Artifact Dungeon 3,Clear Stage 60,ITEM,TRANSMUTE_CRYSTAL,2000000,OnClear,3,TRUE,TRUE,Dungeon chuyên farm ngọc tím
+TC_SALVAGE_D,SALVAGE,Salvage D Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,80,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_SALVAGE_C,SALVAGE,Salvage C Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,150,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_SALVAGE_B,SALVAGE,Salvage B Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,300,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_SALVAGE_A,SALVAGE,Salvage A Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,800,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_SALVAGE_S,SALVAGE,Salvage S Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,2500,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_SALVAGE_SS,SALVAGE,Salvage SS Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,8000,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_SALVAGE_SSS,SALVAGE,Salvage SSS Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,25000,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_SALVAGE_R,SALVAGE,Salvage R Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,80000,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_SALVAGE_SR,SALVAGE,Salvage SR Artifact,Unlock Transmutation,ITEM,TRANSMUTE_CRYSTAL,250000,OnSalvage,0,TRUE,TRUE,Hoàn trả một phần cost
+TC_EVENT_001,EVENT,Event Reward Small,Event Active,ITEM,TRANSMUTE_CRYSTAL,50000,Once,5,TRUE,TRUE,Event limited reward
+TC_EVENT_002,EVENT,Event Reward Medium,Event Active,ITEM,TRANSMUTE_CRYSTAL,500000,Once,3,TRUE,TRUE,Event limited reward
+TC_EVENT_003,EVENT,Event Reward Large,Event Active,ITEM,TRANSMUTE_CRYSTAL,5000000,Once,1,TRUE,TRUE,Event limited reward

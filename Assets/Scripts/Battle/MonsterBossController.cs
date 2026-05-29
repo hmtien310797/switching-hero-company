@@ -61,7 +61,7 @@ namespace Battle
                 {
                     return;
                 }
-                //GameEventManager.Trigger(GameEvents.OnStageCleared);
+                GameEventManager.Trigger(GameEvents.OnStageCleared);
                 return;
             }
             skillLogic?.OnHitTaken(factorSkillDamage);

@@ -23,7 +23,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             onClick = clickCallback;
 
             if (slotText != null)
-                slotText.text = $"Slot {slotIndex}";
+                slotText.text = $"Ô {slotIndex}";
 
             if (heroItemUI != null && data != null)
             {

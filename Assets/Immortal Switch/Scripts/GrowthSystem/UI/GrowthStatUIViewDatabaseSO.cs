@@ -1,4 +1,5 @@
 using Immortal_Switch.Scripts.StatSystem;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.GrowthSystem.UI
@@ -27,6 +28,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
     {
         public StatType Stat;
         public string DisplayName;
-        public Sprite Icon;
+        [PreviewField] public Sprite Icon;
     }
 }

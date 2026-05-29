@@ -51,7 +51,6 @@ namespace Common
         public SkillDataSO GetSkillDataById(int id)
         {
             if (!skillDataDicts.ContainsKey(id)) return null;
-
             return skillDataDicts[id];
         }
 

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.UI
 {
-    public enum NavState { Closed, Open, Locked }
+    public enum NavState { Closed, Open, Locked, Hover }
 
     public abstract class NavigationButtonBase : MonoBehaviour
     {
@@ -13,6 +13,9 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] private GameObject imageHide;    // ON when Closed
         [SerializeField] private GameObject imageLock;    // ON when Locked
         [SerializeField] private GameObject imageRedDot;
+        [SerializeField] private GameObject imageHover;
+        [SerializeField] private GameObject imageSelect;
+        [SerializeField] private GameObject imageUnselect;
         [SerializeField] private TMP_Text textTMP;
 
         [Header("Id")]
@@ -20,6 +23,7 @@ namespace Immortal_Switch.Scripts.UI
         public string NavId => navId;
 
         public NavState State { get; private set; } = NavState.Closed;
+        public Button Button => button;
 
         private bool hasNotification;
         private NavigationManager owner;
@@ -66,6 +70,7 @@ namespace Immortal_Switch.Scripts.UI
 
             var prev = State;
             State = newState;
+            Debug.Log($"Prev: {prev} - {newState}");
 
             if (button != null)
                 button.interactable = (State != NavState.Locked);
@@ -91,6 +96,15 @@ namespace Immortal_Switch.Scripts.UI
         {
             if (imageHide != null) imageHide.SetActive(State == NavState.Closed);
             if (imageLock != null) imageLock.SetActive(State == NavState.Locked);
+
+            if (imageHover != null)
+            {
+                var isHover = State == NavState.Hover;
+                imageHover.SetActive(isHover);
+                
+                if (imageSelect != null) imageSelect.SetActive(isHover);
+                if (imageUnselect != null) imageUnselect.SetActive(!isHover);
+            }
 
             // locked => never show red dot
             if (imageRedDot != null)

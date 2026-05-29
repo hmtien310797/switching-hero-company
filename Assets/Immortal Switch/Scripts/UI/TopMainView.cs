@@ -40,6 +40,8 @@ namespace Immortal_Switch.Scripts.UI
                 PvEBattleController.Instance.SetAutoSkill(isAutoActived);
                 rotateObject.transform.DOLocalRotate(new Vector3(0, 0, isAutoActived ? 180 : 0), 0.2f, RotateMode.FastBeyond360).SetEase(Ease.Linear).SetLoops(-1, LoopType.Incremental);
             });
+
+            SetHeroTeamController(HeroTeamController.Instance);
         }
 
         private void OnDestroy()

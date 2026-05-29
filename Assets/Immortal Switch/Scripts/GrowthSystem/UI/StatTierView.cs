@@ -29,12 +29,17 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             if (statProgress != null) statProgress.fillAmount = viewData.StatProgressPercent;
             if (statCurrentStackValue != null) statCurrentStackValue.text = $"{viewData.StatCurrentStack}/{viewData.StatMaxStack}";
             if (statValuePay != null) statValuePay.text = viewData.ValuePay;
-            if (maxImage != null) maxImage.enabled = viewData.IsMax;
+
+            if (maxImage != null)
+            {
+                maxImage.gameObject.SetActive(viewData.IsMax);
+                levelUpButton.gameObject.SetActive(!viewData.IsMax);
+            }
 
             if (levelUpButton != null)
             {
                 levelUpButton.onClick.RemoveListener(OnClickLevelUp);
-                levelUpButton.interactable = viewData.CanUpgrade;
+                levelUpButton.interactable = !viewData.IsMax;
                 levelUpButton.onClick.AddListener(OnClickLevelUp);
             }
         }

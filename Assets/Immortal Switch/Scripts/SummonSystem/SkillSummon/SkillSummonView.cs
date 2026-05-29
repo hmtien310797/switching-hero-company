@@ -3,6 +3,7 @@ using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -171,7 +172,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         private void TrySummon(string optionId)
         {
             if (SkillSummonManager.Instance == null)
+            {
+                Debug.Log("skill summon dont have instance");
                 return;
+            }
 
             if (!SkillSummonManager.Instance.CanSummon(optionId, out var paymentType, out var paidAmount))
             {
@@ -210,6 +214,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         {
             sequencePopup?.SetBusyReplacing(true);
 
+            Debug.Log($"OptionId: {optionId}");
             var result = SkillSummonManager.Instance.ExecuteSummon(optionId, paymentType);
 
             sequencePopup?.SetBusyReplacing(false);
@@ -217,6 +222,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (result == null)
                 return;
 
+            Debug.Log($"Result: {JsonConvert.SerializeObject(result)} - {sequencePopup?.IsShowing}");
             if (sequencePopup != null)
             {
                 if (sequencePopup.IsShowing)

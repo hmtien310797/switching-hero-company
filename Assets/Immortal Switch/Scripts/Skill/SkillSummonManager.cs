@@ -2,6 +2,7 @@
 using Immortal_Switch.Scripts.SkillSummon;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
+using Newtonsoft.Json;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -88,6 +89,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return null;
 
             var option = service.GetOption(optionId);
+            Debug.Log($"option: {JsonConvert.SerializeObject(option)}");
             var result = service.ExecuteSummon(option, paymentType);
 
             if (result != null)

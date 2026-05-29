@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.HeroUIView
@@ -21,6 +22,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
     public class HeroRarityVisualEntry
     {
         public HeroProgressTier Tier;
-        public Sprite Icon;
+        [PreviewField] public Sprite Icon;
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
-public class HeroTeamController : MonoBehaviour
+public class HeroTeamController : Singleton<HeroTeamController>
 {
     public enum SelectedHero
     {
@@ -423,5 +425,10 @@ public class HeroTeamController : MonoBehaviour
     {
         externalMoveDirection = Vector3.zero;
         hasExternalInput = false;
+    }
+
+    public override UniTask InitializeAsync()
+    {
+        return UniTask.CompletedTask;
     }
 }

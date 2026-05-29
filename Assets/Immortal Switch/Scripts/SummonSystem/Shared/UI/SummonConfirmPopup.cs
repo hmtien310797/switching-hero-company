@@ -32,7 +32,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             confirmAction = onConfirm;
 
             if (messageText != null)
-                messageText.text = $"Not enough Hero Tickets.\nThis summon will cost {gemCost} Diamonds.\nConfirm?";
+                messageText.text = $"Không đủ Vé Anh hùng.\nLần triệu hồi này sẽ tiêu tốn {gemCost} Kim cương.\nXác nhận?";
 
             if (skipToggle != null)
                 skipToggle.isOn = HeroSummonManager.Instance != null &&

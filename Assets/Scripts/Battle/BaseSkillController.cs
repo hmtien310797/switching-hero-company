@@ -20,7 +20,8 @@ namespace Battle
         Win,
         Switch,
         Spawn,
-        Flash
+        Flash,
+        Skill6,
     }
 
     public class BaseSkillController : MonoBehaviour, ICharacterSkillController

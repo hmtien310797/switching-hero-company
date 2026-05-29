@@ -8,15 +8,10 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {
-    public class UIWeaponUpgradePanel : MonoBehaviour
+    public class UIWeaponUpgradePanel : BaseUIPopup
     {
         [Header("Shared Preview")]
         [SerializeField] private TMP_Text txtWeaponName;
-        [SerializeField] private Image imgWeaponIcon;
-        [SerializeField] private TMP_Text txtShard;
-        [SerializeField] private TMP_Text txtStar;
-        [SerializeField] private TMP_Text txtLevelRange;
-        [SerializeField] private Image shardSlider;
 
         [Header("Mode Roots")]
         [SerializeField] private GameObject upgradeModeRoot;
@@ -38,17 +33,11 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [SerializeField] private TMP_Text txtNextBreakRequiredLevel;
         [SerializeField] private Button btnLimitBreak;
         
-        [Header("Tier Visual")]
-        [SerializeField] private Image imgTierLabel;
-        [SerializeField] private Image imgTierBackground;
-        [SerializeField] private WeaponTierVisualConfigSO tierVisualConfig;
+        [Header("Tier Visual")] [SerializeField]
+        private UIWeaponItemBase selectedWeapon;
 
         [Header("Star Display")]
         [SerializeField] private UIWeaponStarDisplay starDisplay;
-
-        [Header("Close")]
-        [SerializeField] private Button btnClose;
-        
 
         private readonly List<UIWeaponUpgradeStatLineItem> statPreviewItems = new();
         private WeaponUpgradePanelViewModel currentVm;
@@ -77,34 +66,19 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (txtWeaponName != null)
                 txtWeaponName.text = vm.WeaponName;
 
-            if (imgWeaponIcon != null)
-                imgWeaponIcon.sprite = vm.Icon;
-
-            if (txtShard != null)
-            {
-                txtShard.text = vm.MaxShard > 0
+            selectedWeapon.BindCommon(
+                vm.Icon,
+                "+1",
+                vm.MaxShard > 0
                     ? $"{vm.CurrentShard}/{vm.MaxShard}"
-                    : vm.CurrentShard.ToString();
-            }
-
-            if (txtStar != null)
-                txtStar.text = $"{vm.CurrentStar}/{vm.MaxStar}";
-
-            if (txtLevelRange != null)
-                txtLevelRange.text = $"{vm.CurrentLevel}/{vm.CurrentMaxLevel}";
-            
-            if (txtShard != null)
-            {
-                txtShard.text = vm.MaxShard > 0
-                    ? $"{vm.CurrentShard}/{vm.MaxShard}"
-                    : vm.CurrentShard.ToString();
-            }
-
-            if (shardSlider != null)
-            {
-                //shardSlider.gameObject.SetActive(vm.MaxShard > 0);
-                shardSlider.fillAmount = vm.ShardProgressNormalized;
-            }
+                    : vm.CurrentShard.ToString(), vm.ShardProgressNormalized,
+                true,
+                string.Empty,
+                false,
+                false,
+                false,
+                false,
+                () => { });
             
             BindTierVisual(currentDetailVm.IsExclusive ? WeaponTier.SS : currentDetailVm.Tier);
 
@@ -134,18 +108,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         
         private void BindTierVisual(WeaponTier tier)
         {
-            if (tierVisualConfig == null)
-                return;
-
-            var entry = tierVisualConfig.Get(tier);
-            if (entry == null)
-                return;
-
-            if (imgTierLabel != null)
-                imgTierLabel.sprite = entry.TierLabelSprite;
-
-            if (imgTierBackground != null)
-                imgTierBackground.sprite = entry.TierBackgroundSprite;
+            selectedWeapon.BindTierVisual(tier);
         }
 
         private void BindUpgradeMode(WeaponUpgradePanelViewModel vm)
@@ -165,7 +128,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             }
 
             if (txtNextLevelCost != null)
-                txtNextLevelCost.text = vm.NextLevelCost.ToString();
+                txtNextLevelCost.text = $"<color=#93fd36>{vm.CurrentLevel}</color>/{vm.NextLevelCost}";
 
             if (txtLevelUpAllCost != null)
                 txtLevelUpAllCost.text = vm.LevelUpAllCost.ToString();
@@ -207,8 +170,10 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             }
         }
 
-        private void BindButtons()
+        protected override void BindButtons()
         {
+            base.BindButtons();
+
             if (btnLevelUp != null)
             {
                 btnLevelUp.onClick.RemoveAllListeners();
@@ -225,12 +190,6 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             {
                 btnLimitBreak.onClick.RemoveAllListeners();
                 btnLimitBreak.onClick.AddListener(OnClickLimitBreak);
-            }
-
-            if (btnClose != null)
-            {
-                btnClose.onClick.RemoveAllListeners();
-                btnClose.onClick.AddListener(OnClickClose);
             }
         }
 
@@ -288,11 +247,6 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
                 WeaponManager.Instance.TryLimitBreakStandard(currentDetailVm.WeaponId);
 
             onChanged?.Invoke();
-        }
-
-        private void OnClickClose()
-        {
-            gameObject.SetActive(false);
         }
     }
 }

@@ -36,7 +36,6 @@ namespace Battle
     public partial class PvEBattleController : Singleton<PvEBattleController>
     {
         [Header("Refs")] 
-        [SerializeField] GameCameraController gameCameraController;
         [SerializeField] FollowHeroController[] enemySpawnerCollection;
         [SerializeField] PvEMapController pvEMapController;
         [SerializeField] BattleCoinView coinPrefab;
@@ -99,6 +98,7 @@ namespace Battle
         
         private readonly HeroActor[] inBattleHeroes = new HeroActor[2];
         private readonly Dictionary<int, HeroActor> inBattleHeroMapper = new();
+        private GameCameraController gameCameraController;
 
         private HeroActor inBattleHeroA;
         private HeroActor inBattleHeroB;
@@ -112,6 +112,7 @@ namespace Battle
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
             GameEventManager.Subscribe(GameEvents.OnStageLost, () => OnStageFailed().Forget());
             GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
+            gameCameraController = GameCameraController.Instance;
             PoolManager.Instance.Prewarm(coinPrefab, 10);
         }
 
@@ -226,6 +227,10 @@ namespace Battle
             RefreshEnemyHeroTargets();
             NotifyActiveLineupChanged();
             RefreshControlledHeroSkillUI();
+            if (oldHero.IsChosen)
+            {
+                gameCameraController.SetFollowHero(newHero.transform);
+            }
         }
 
         private void OnHeroDead(HeroActor hero)
@@ -860,13 +865,15 @@ namespace Battle
             deadCreepCount = losingStage
                 ? GameData.Instance.maxCreepsPerStage
                 : deadCreepCount + 1;
+            Debug.Log($"Enemy DEad creep count : {deadCreepCount}");
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
+            Debug.Log($"Enemy DEad creep count : {deadCreepCount}_1.1");
             if (State != BattleState.FightingCreeps)
                 return;
-
+            Debug.Log($"Enemy DEad creep count : {deadCreepCount}_____2");
             if (aliveCreepCount != 0)
                 return;
-            
+            Debug.Log($"Enemy DEad creep count : {deadCreepCount}_____3");
             if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage)
             {
                 isReadyBattle = false;
@@ -874,6 +881,7 @@ namespace Battle
                 isReadyBattle = true;
                 return;
             }
+            Debug.Log($"Enemy DEad creep count : {deadCreepCount}_____4");
             SpawnBoss();
         }
         

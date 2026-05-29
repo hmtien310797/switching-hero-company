@@ -35,6 +35,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         [SerializeField] private Image detailIcon;
         [SerializeField] private TMP_Text detailLevelText;
         [SerializeField] private TMP_Text detailNameText;
+        [SerializeField] private TMP_Text detailTypeText;
         [SerializeField] private TMP_Text detailDescText;
         [SerializeField] private TMP_Text detailShardText;
         [SerializeField] private Image detailShardFill;
@@ -445,20 +446,22 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 if (detailIcon != null) detailIcon.sprite = null;
                 if (detailLevelText != null) detailLevelText.text = string.Empty;
                 if (detailNameText != null) detailNameText.text = string.Empty;
+                if (detailTypeText != null) detailTypeText.text = string.Empty;
                 if (detailDescText != null) detailDescText.text = string.Empty;
                 if (detailShardText != null) detailShardText.text = string.Empty;
                 if (detailShardFill != null) detailShardFill.fillAmount = 0f;
 
                 if (equipButton != null) equipButton.interactable = false;
-                if (equipButtonText != null) equipButtonText.text = "Equip";
+                if (equipButtonText != null) equipButtonText.text = "Trang bị";
                 return;
             }
 
             var state = dataProvider.BuildSkillState(hero, skillData);
 
             if (detailIcon != null) detailIcon.sprite = skillData.SkillIcon;
-            if (detailLevelText != null) detailLevelText.text = $"Lv.{state.Level}";
+            if (detailLevelText != null) detailLevelText.text = $"Cấp.{state.Level}";
             if (detailNameText != null) detailNameText.text = skillData.SkillName;
+            //if (detailTypeText != null) detailTypeText.text = $"{skillData.CastType} kỹ năng";
             //if (detailDescText != null) detailDescText.text = skillData.BuildDescription(state.Level);
             if (detailShardText != null) detailShardText.text = $"{state.CurrentShard}/{state.RequiredShard}";
             if (detailShardFill != null)
@@ -468,12 +471,12 @@ namespace Immortal_Switch.Scripts.Skill.UI
             if (!state.IsOwned)
             {
                 if (equipButton != null) equipButton.interactable = false;
-                if (equipButtonText != null) equipButtonText.text = "Equip";
+                if (equipButtonText != null) equipButtonText.text = "Trang bị";
                 return;
             }
 
             if (equipButton != null) equipButton.interactable = hero != null;
-            if (equipButtonText != null) equipButtonText.text = state.IsEquipped ? "Unequip" : "Equip";
+            if (equipButtonText != null) equipButtonText.text = state.IsEquipped ? "Tháo trang bị" : "Trang bị";
         }
 
         private void OnClickEquipOrUnequip()
@@ -538,7 +541,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 replacePendingSkillIcon.sprite = pendingReplaceSkill != null ? pendingReplaceSkill.SkillIcon : null;
 
             if (replaceInstructionText != null)
-                replaceInstructionText.text = "Please select the slot to equip";
+                replaceInstructionText.text = "Vui lòng chọn ô để trang bị.";
 
             for (int i = 0; i < replaceSlotViews.Length; i++)
             {

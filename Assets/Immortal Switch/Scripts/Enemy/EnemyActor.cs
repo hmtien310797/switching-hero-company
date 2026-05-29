@@ -286,7 +286,7 @@ namespace Immortal_Switch.Scripts.Enemy
             if (currentTarget == null || currentTarget.IsDead)
                 return;
 
-            DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget, 0);
+            DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
             currentTarget.TakeDamage(this, damageResult);
         }
 

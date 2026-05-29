@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Core
 {
@@ -35,8 +36,13 @@ namespace Immortal_Switch.Scripts.Core
 
         public static void Trigger(string eventName)
         {
+            Debug.Log($"Trigger event: {eventName}");
             if (eventTable.TryGetValue(eventName, out var action))
                 action?.Invoke();
+            else
+            {
+                Debug.Log("Event not found: " + eventName);
+            }
         }
 
         #endregion

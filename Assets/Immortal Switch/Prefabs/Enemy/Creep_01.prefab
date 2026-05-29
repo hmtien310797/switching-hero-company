@@ -179,6 +179,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a184109bb254cc089f932e7b4db0b19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <PoolSize>k__BackingField: 0
+  <DeSpawnedOnStart>k__BackingField: 1
   stats: {fileID: 6147910350317824579}
   healthBarController: {fileID: 7601024436941284725}
   animationDriver: {fileID: 4760040034150877837}
@@ -246,6 +248,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7434506558583344676}
     m_Modifications:
+    - target: {fileID: 21923426121854481, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5747702851054592359, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6740417167127500171, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_Name
       value: HealthBarController

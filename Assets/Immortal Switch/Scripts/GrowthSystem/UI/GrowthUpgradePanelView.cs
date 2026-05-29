@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -10,45 +11,44 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 {
     public class GrowthUpgradePanelView : MonoBehaviour
     {
-        [Header("Top")]
+        [Header("Progress")] [SerializeField] private TextMeshProUGUI txtProgress;
+        [SerializeField] private Image imgSlider;
+
         [SerializeField] private TMP_Text goldText;
         [SerializeField] private GrowthUpgradeAmountSelector amountSelector;
 
-        [Header("Tier Progress")]
-        [SerializeField] private Image tierProgressBar;
-
-        [Header("Stats")]
         [SerializeField] private Transform contentRoot;
         [SerializeField] private StatTierView prefab;
 
         private readonly List<StatTierView> views = new();
 
         public void Bind(
-            GrowthUpgradePanelData panelData,
+            List<StatTierViewData> datas,
             int gold,
             int selectedAmount,
             Action<StatType> onUpgrade,
             Action<int> onAmountChanged)
         {
-            if (goldText != null)
-                goldText.text = gold.ToString("N0");
+            goldText.text = gold.ToString("N0");
 
-            if (amountSelector != null)
-                amountSelector.Initialize(selectedAmount, onAmountChanged);
+            amountSelector.Initialize(selectedAmount, onAmountChanged);
 
-            if (tierProgressBar != null)
-                tierProgressBar.fillAmount = panelData.TierProgressPercent;
-
-            Ensure(panelData.Rows.Count);
+            Ensure(datas.Count);
 
             for (int i = 0; i < views.Count; i++)
             {
-                bool active = i < panelData.Rows.Count;
+                bool active = i < datas.Count;
                 views[i].gameObject.SetActive(active);
 
                 if (active)
-                    views[i].Initialize(panelData.Rows[i], onUpgrade);
+                    views[i].Initialize(datas[i], onUpgrade);
             }
+
+            var sum = datas.Sum(v => v.StatMaxStack);
+            var cur = datas.Sum(v => v.StatCurrentStack);
+            var progress = cur / (sum * 1f);
+            txtProgress.text = $"{Mathf.RoundToInt(progress * 100)}%";
+            imgSlider.fillAmount = Mathf.Clamp01(progress);
         }
 
         private void Ensure(int count)

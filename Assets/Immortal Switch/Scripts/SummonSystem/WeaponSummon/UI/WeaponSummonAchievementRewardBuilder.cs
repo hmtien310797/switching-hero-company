@@ -39,7 +39,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 result.Items.Add(new SummonAchievementRewardItemData
                 {
                     Level = entry.SummonLevel,
-                    Title = $"Summon Level {entry.SummonLevel}",
+                    Title = $"Cấp Triệu hồi {entry.SummonLevel}",
                     RewardText = BuildRewardText(reward, visual),
                     RewardIcon = visual != null ? visual.Icon : null,
                     State = isClaimed

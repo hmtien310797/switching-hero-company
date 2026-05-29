@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Battle;
 using Immortal_Switch.Scripts.Equipment.Core;
+using Sirenix.OdinInspector;
 
 namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {
@@ -22,7 +23,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
     {
         public WeaponTier Tier;
         public Color GlowColor;
-        public Sprite TierLabelSprite;
-        public Sprite TierBackgroundSprite;
+        [PreviewField] public Sprite TierLabelSprite;
+        [PreviewField] public Sprite TierBackgroundSprite;
+        [PreviewField] public Sprite TierBorderSprite;
     }
 }

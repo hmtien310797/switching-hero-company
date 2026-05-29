@@ -11,7 +11,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
         public int MaxStack;
         public StatGrowthData[] StatGrowths;
     }
-
+    
     public enum GrowthValueType
     {
         Percent = 0, 

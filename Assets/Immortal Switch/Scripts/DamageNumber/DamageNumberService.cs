@@ -31,6 +31,10 @@ namespace Immortal_Switch.Scripts.DamageNumber
 
         public void ShowDamage(float value, Vector3 position, DamageType type)
         {
+            if (value <= 1)
+            {
+                return;
+            }
             DamageNumbersPro.DamageNumber prefab = GetPrefab(type);
 
             if (prefab == null)

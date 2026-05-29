@@ -4,6 +4,7 @@ using Battle;
 using Immortal_Switch.Scripts.SkillSummon;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
+using Newtonsoft.Json;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -146,15 +147,16 @@ namespace Immortal_Switch.Scripts.Skill
 
         public SkillSummonResult ExecuteSummon(SkillSummonOptionEntry option, SummonPaymentType paymentType)
         {
+            Debug.Log("1234");
             if (option == null)
                 return null;
-
+            Debug.Log("12345");
             if (!CanSummon(option, out var actualPaymentType, out var paidAmount))
                 return null;
-
+            Debug.Log("12346");
             if (actualPaymentType != paymentType)
                 return null;
-
+            Debug.Log("12347");
             Spend(option, paymentType);
 
             var result = new SkillSummonResult
@@ -164,13 +166,17 @@ namespace Immortal_Switch.Scripts.Skill
                 OldTotalRoll = saveData.TotalRoll,
                 OldSummonLevel = GetCurrentSummonLevel()
             };
+            Debug.Log($"12348: {option.RollCount}");
 
             for (int i = 0; i < option.RollCount; i++)
             {
                 int currentLevel = GetCurrentSummonLevel();
                 var levelEntry = config.GetExactLevelEntry(currentLevel);
                 if (levelEntry == null)
+                {
+                    Debug.Log($"Index: {i} - empty");
                     break;
+                }
 
                 var rolledGrade = RollGrade(levelEntry);
                 var skill = RollSkillByGrade(rolledGrade);
@@ -185,6 +191,7 @@ namespace Immortal_Switch.Scripts.Skill
                 progressionService.AcquireOrAddDuplicate(skill, 1);
 
                 saveData.TotalRoll++;
+                Debug.Log($"Index: {i} - {JsonConvert.SerializeObject(levelEntry)}");
 
                 result.Entries.Add(new SkillSummonResultEntry
                 {

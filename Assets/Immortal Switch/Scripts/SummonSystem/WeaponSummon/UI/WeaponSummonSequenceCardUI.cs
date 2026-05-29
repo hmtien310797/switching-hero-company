@@ -127,12 +127,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 tierBackground.enabled = false;
             }
 
-            amountText.text = string.Empty;
-            
             if (newTag != null)
                 newTag.SetActive(false);
-            
-            starDisplay.BindStandard(0);
+
+            if (starDisplay != null)
+                starDisplay.BindStandard(0);
 
             ResetGlow();
 

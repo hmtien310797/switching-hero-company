@@ -1,5 +1,6 @@
 ﻿using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,8 +15,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         [SerializeField] private TMP_Text rollCountText;
 
         [Header("Icons")]
-        [SerializeField] private Sprite heroTicketIcon;
-        [SerializeField] private Sprite diamondIcon;
+        [PreviewField][SerializeField] private Sprite heroTicketIcon;
+        [PreviewField][SerializeField] private Sprite diamondIcon;
 
         [Header("Visual")]
         [SerializeField] private GameObject redDot;
@@ -122,7 +123,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         {
             // IMPORTANT: vẫn cho click kể cả không đủ resource
             // Logic check sẽ nằm ở HeroSummonView
-
             clickAction?.Invoke(optionId);
         }
     }

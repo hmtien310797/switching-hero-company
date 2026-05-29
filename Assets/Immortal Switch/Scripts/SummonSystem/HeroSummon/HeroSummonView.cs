@@ -161,7 +161,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         private void HideAllPopups()
         {
-
         }
 
         private void TrySummon(string optionId)

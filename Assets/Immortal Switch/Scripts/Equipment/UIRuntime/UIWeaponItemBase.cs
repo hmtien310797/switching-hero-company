@@ -17,7 +17,6 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [SerializeField] protected GameObject equippedMark;
         [SerializeField] protected GameObject lockedMask;
         [SerializeField] protected GameObject redDot;
-        [SerializeField] protected GameObject deployedStandardMark;
 
         [Header("Selection")]
         [SerializeField] protected GameObject selectedMark;
@@ -28,6 +27,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [Header("Tier Visual")]
         [SerializeField] protected Image tierLabelImage;
         [SerializeField] protected Image tierBackgroundImage;
+        [SerializeField] protected Image tierBorderImage;
         [SerializeField] protected WeaponTierVisualConfigSO tierVisualConfig;
 
         [Header("Star Display")]
@@ -35,7 +35,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         protected Action onClick;
 
-        protected void BindCommon(
+        public void BindCommon(
             Sprite iconSprite,
             string levelText,
             string shardText,
@@ -59,8 +59,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (txtShard != null)
                 txtShard.text = shardText;
 
-            if (txtStar != null)
-                txtStar.text = starText;
+            /*if (txtStar != null)
+                txtStar.text = starText;*/
 
             if (equippedMark != null)
                 equippedMark.SetActive(isEquipped);
@@ -92,7 +92,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             onClick?.Invoke();
         }
         
-        protected void BindTierVisual(WeaponTier tier)
+        public void BindTierVisual(WeaponTier tier)
         {
             if (tierVisualConfig == null)
                 return;
@@ -106,6 +106,11 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (tierBackgroundImage != null)
                 tierBackgroundImage.sprite = entry.TierBackgroundSprite;
+
+            if (tierBorderImage != null)
+            {
+                tierBorderImage.sprite = entry.TierBorderSprite;
+            }
         }
     }
 }

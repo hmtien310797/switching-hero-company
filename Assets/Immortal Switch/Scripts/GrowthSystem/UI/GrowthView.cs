@@ -3,6 +3,7 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.PowerUpSystem;
  using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.GrowthSystem.UI
@@ -13,6 +14,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         [SerializeField] private GrowthStatUIViewDatabaseSO statUiDatabase;
 
         [Header("Tier Popup")]
+        [PreviewField]
         [SerializeField] private Sprite[] tierIcons; 
 
         [Header("UI State")]

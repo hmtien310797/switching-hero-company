@@ -17,8 +17,6 @@ public class Transitioner : MonoBehaviour
     public bool _automaticallyTransitionIn = true;
     [Tooltip("If true this transitioner will be a singleton that follows you into every scene. You will only need to place one down in your first scene if this is true. Otherwise, you'll need a transitioner in each scene you make. Either way you will call it the same way using Transitioner.Instance.TransitionToScene(LevelName); or Transitioner.Instance.TransitionToScene(levelNumber);.")]
     public bool dontDestroyOnLoad = true;
-    [Tooltip("The camera that will display the transition. If one is not specified this will default to the main camera.")]
-    public Camera _transitionCamera;
 
     [Header("Transition Block Settings")]
     [Tooltip("The transition block that will be used in this transition")]
@@ -50,6 +48,7 @@ public class Transitioner : MonoBehaviour
     public bool _transitionInTriggered = false;
 
     public GameObject _transitionOrdererObject;
+    private Camera _transitionCamera;
 
     #region singleton
     private static Transitioner instance;
@@ -90,6 +89,7 @@ public class Transitioner : MonoBehaviour
         {
             DestroyNonInstanceTransitioners();
         }
+        _transitionCamera = Camera.main;
     }
 
     public void OnApplicationQuit()

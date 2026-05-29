@@ -4,7 +4,9 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Skill;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Common
@@ -39,6 +41,7 @@ namespace Common
         [Header("Init Config")]
         [SerializeField] private ClassSkillUnlockInitSO classSkillUnlockInitSO;
         [SerializeField] private HeroSkillLoadoutInitSO heroSkillLoadoutInitSO;
+        [SerializeField] private UserLevelConfigSO userLevelConfigSO;
 
         [Header("Debug")]
         [SerializeField] private bool enableLog = true;
@@ -202,7 +205,7 @@ namespace Common
 
             var valid = Normalize(ids)
                 .Where(unlocked.Contains)
-                .Take(5)
+                .Take(6)
                 .ToList();
 
             HeroSkillLoadout.EquippedSkillIdsByHero[heroId] = valid;

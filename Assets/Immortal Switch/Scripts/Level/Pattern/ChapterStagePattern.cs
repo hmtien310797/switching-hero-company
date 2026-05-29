@@ -8,5 +8,6 @@ namespace Immortal_Switch.Scripts.Level.Pattern
         //total stage in chaper, each chapter can have different total stage 
         public int TotalStage;
         public int BossId;
+        public int Exp;
     }
 }

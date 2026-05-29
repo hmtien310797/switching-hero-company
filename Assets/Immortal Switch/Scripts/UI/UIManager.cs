@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -83,7 +84,10 @@ namespace Immortal_Switch.Scripts.UI
         private GameObject backdropPrefab;
         
         [SerializeField]
-        private HeroTeamController heroTeamController;
+        private CanvasGroup loadingSceneCanvasGroup;
+        
+        [SerializeField]
+        private GameObject tapeAnimator;
 
         // ===== Layer roots =====
         private readonly Dictionary<UILayer, RectTransform> _layerRoots = new();
@@ -383,6 +387,7 @@ namespace Immortal_Switch.Scripts.UI
                     return null;
                 }
 
+                Debug.Log("OpenPopupAsync: " + prefab.name);
                 var go = Instantiate(prefab, parent, false);
                 var typed = go.GetComponent<T>();
                 if (typed == null)
@@ -686,8 +691,11 @@ namespace Immortal_Switch.Scripts.UI
                 OpenPopupAsync<TopMainView>(withBackdrop: false)
             );
 
-            TopMainView topMainViewInstance = result.Item2;
-            topMainViewInstance.SetHeroTeamController(heroTeamController);
+            tapeAnimator.transform.parent = GetLayerRoot(UILayer.Main);
+            
+            loadingSceneCanvasGroup.DOFade(0f, 0.5f).SetEase(Ease.OutCubic);
+            loadingSceneCanvasGroup.blocksRaycasts = false;
+            loadingSceneCanvasGroup.interactable = false;
         }
 
         #endregion

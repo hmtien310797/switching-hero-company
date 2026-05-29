@@ -38,7 +38,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         [Header("Tier Background")]
         [SerializeField] private Image backgroundImage;
-        [SerializeField] private UIGradient gradient;
         [SerializeField] private HeroTierVisualConfigSO tierVisualConfig;
 
         [Header("Star")]
@@ -98,9 +97,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
                     progressFill.fillAmount = 0f;
 
                 RefreshStars(0, 0);
-
-                if (gradient != null)
-                    gradient.enabled = false;
 
                 if (backgroundImage != null)
                 {
@@ -179,23 +175,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             if (tierVisualConfig.Mode == TierVisualMode.Gradient)
             {
-                if (gradient != null)
-                {
-                    gradient.enabled = true;
-                    gradient.TopColor = entry.TopColor;
-                    gradient.BottomColor = entry.BottomColor;
-                }
-
                 backgroundImage.sprite = null;
-                backgroundImage.color = Color.white;
             }
             else
             {
-                if (gradient != null)
-                    gradient.enabled = false;
-
                 backgroundImage.sprite = entry.BackgroundSprite;
-                backgroundImage.color = Color.white;
             }
         }
 
