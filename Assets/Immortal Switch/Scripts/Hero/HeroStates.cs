@@ -218,43 +218,12 @@ public class HeroUltimateState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.Ultimate;
 
-    private float duration;
-    private float timer;
-    private bool hasTriggered;
-
     public HeroUltimateState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
 
-    public override async UniTask Enter()
+    public override UniTask Enter()
     {
         owner.SetActionLocked(true);
-
-        duration = owner.Anim.PlayUltimate();
-        timer = 0f;
-        hasTriggered = false;
-    }
-
-    public override void Tick(float deltaTime)
-    {
-        timer += deltaTime;
-
-        float triggerTime = duration * owner.UltimateHitNormalizedTime;
-
-        if (!hasTriggered && timer >= triggerTime)
-        {
-            hasTriggered = true;
-
-            // TODO:
-            // Ultimate thật nên gọi HeroUltimateAbility / AbilityExecutor ở đây.
-            // Hiện tại showcase tạm damage current target.
-            // if (owner.HasValidTarget())
-            //     owner.CurrentTarget.ReceiveDamage(3f);
-        }
-
-        if (timer >= duration)
-        {
-            owner.SetActionLocked(false);
-            stateMachine.ChangeState(HeroStateId.Idle);
-        }
+        return UniTask.CompletedTask;
     }
 
     public override void Exit()
@@ -321,14 +290,13 @@ public class HeroDeadState : HeroStateBase
 
     public override async UniTask Enter()
     {
-        owner.SetActionLocked(false);
+        owner.SetActionLocked(true);
         owner.Anim.PlayDead();
     }
 
-    public override void Tick(float deltaTime)
+    public override void Exit()
     {
-        // Dead là terminal state.
-        // Không cho thực hiện hành động khác.
+        owner.SetActionLocked(false);
     }
 }
 
@@ -340,10 +308,6 @@ public class HeroBossSpawnState : HeroStateBase
 
     public override UniTask Enter()
     {
-        if (owner.IsCastingUltimateSkill)
-        {
-            return UniTask.CompletedTask;
-        }
         owner.SetActionLocked(true);
         owner.Anim.PlayIdle();
         return UniTask.CompletedTask;
@@ -360,6 +324,19 @@ public class HeroManualMoveState : HeroStateBase
     public override HeroStateId Id => HeroStateId.ManualMove;
 
     public HeroManualMoveState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    
+    public override async UniTask Enter()
+    {
+        owner.Anim.PlayRun();
+    }
+
+    public override void Tick(float deltaTime)
+    {
+        if (owner.IsUnderPlayerControl)
+            return;
+
+        owner.MoveTowards(owner.CurrentTarget.Position);
+    }
     
 }
 

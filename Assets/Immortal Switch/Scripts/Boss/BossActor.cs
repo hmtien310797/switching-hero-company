@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Battle;
 using Common;
+using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
@@ -220,10 +222,6 @@ namespace Immortal_Switch.Scripts.Boss
         {
             switch (currentState)
             {
-                case BossState.Spawn:
-                    TickSpawn(deltaTime);
-                    break;
-
                 case BossState.Idle:
                     TickIdle();
                     break;
@@ -241,17 +239,6 @@ namespace Immortal_Switch.Scripts.Boss
 
                 case BossState.Dead:
                     break;
-            }
-        }
-
-        private void TickSpawn(float deltaTime)
-        {
-            spawnTimer += deltaTime;
-
-            if (spawnTimer >= spawnFallbackDuration)
-            {
-                GameEventManager.Trigger(GameEvents.OnBossSpawnAnimationComplete, true);
-                ChangeState(BossState.Idle);
             }
         }
 
@@ -431,6 +418,7 @@ namespace Immortal_Switch.Scripts.Boss
                 case BossState.Spawn:
                     spawnTimer = 0f;
                     GameEventManager.Trigger(GameEvents.OnBossSpawnAnimationComplete, false);
+                    DOVirtual.DelayedCall(spawnFallbackDuration, OnBossSpawnAnimationComplete);
                     animationDriver?.PlaySpawn();
                     break;
 
@@ -453,6 +441,11 @@ namespace Immortal_Switch.Scripts.Boss
                     animationDriver?.PlayDead();
                     break;
             }
+        }
+
+        private void OnBossSpawnAnimationComplete()
+        {
+            GameEventManager.Trigger(GameEvents.OnBossSpawnAnimationComplete, true);
         }
 
         public void ResetNormalAttackCount()
@@ -531,12 +524,11 @@ namespace Immortal_Switch.Scripts.Boss
         {
             if (currentState == BossState.Dead)
                 return;
-
+            
             ChangeState(BossState.Dead);
             locomotion?.Stop();
             OnDead?.Invoke(this);
             DespawnSelf(destroyDelay);
-            GameEventManager.Trigger(GameEvents.OnStageCleared);
         }
     }
 }

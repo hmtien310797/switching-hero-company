@@ -48,6 +48,7 @@ namespace Immortal_Switch.Scripts.Skill
         private void Awake()
         {
             GameEventManager.Subscribe(GameEvents.OnStageCleared, ForceDespawn);
+            GameEventManager.Subscribe(GameEvents.OnStageLost, ForceDespawn);
         }
 
         protected virtual void OnRuntimeInitialized()

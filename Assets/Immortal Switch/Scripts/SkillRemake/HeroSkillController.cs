@@ -4,7 +4,9 @@ using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 using Battle;
 using DG.Tweening;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
+using Sirenix.OdinInspector;
 
 namespace Immortal_Switch.Scripts.Skill
 {
@@ -55,7 +57,8 @@ namespace Immortal_Switch.Scripts.Skill
         private SkillDataSO currentSkill;
         private int currentSkillLevel;
         private SkillBehaviour currentCustomBehaviour;
-        private bool isCasting;
+        //ra chieu dong loat nen ko can
+        //private bool isCasting;
 
         public const int ClassSkillSlotCount = 5;
         public event Action<HeroSkillController> SkillsChanged;
@@ -64,8 +67,8 @@ namespace Immortal_Switch.Scripts.Skill
         public SkillDataSO UltimateSkill => ultimateSkill;
         public SkillDataSO PassiveSkill => passiveSkill;
         public HeroAutoSkillController AutoSkillController => autoSkillController;
-        public bool IsCasting => isCasting;
-        public bool IsCastingUltimateSkill { get; private set; }
+        //ra chieu dong loat nen ko can
+        //public bool IsCasting => isCasting;
 
         public float GetCooldownRemaining(SkillDataSO skillData)
         {
@@ -75,15 +78,6 @@ namespace Immortal_Switch.Scripts.Skill
             return cooldownRemainingBySkill.TryGetValue(skillData, out float remaining) ? Mathf.Max(0f, remaining) : 0f;
         }
         
-        public void SetSkillLock(bool locked)
-        {
-            if (gameObject.name == "Hero_Moana(Clone)")
-            {
-                Debug.Log("Hero_Moana(Clone) locked: " + locked);
-            }
-            IsCastingUltimateSkill = locked;
-        }
-
         public bool IsCooldownReady(SkillDataSO skillData)
         {
             return GetCooldownRemaining(skillData) <= 0f;
@@ -131,12 +125,12 @@ namespace Immortal_Switch.Scripts.Skill
         public bool CanCastClassSkillAt(int slotIndex)
         {
             SkillDataSO skillData = GetClassSkillAt(slotIndex);
-            return skillData != null && IsCooldownReady(skillData) && !isCasting;
+            return skillData != null && IsCooldownReady(skillData);
         }
 
         public bool CanCastUltimate()
         {
-            return ultimateSkill != null && IsCooldownReady(ultimateSkill) && !isCasting;
+            return ultimateSkill != null && IsCooldownReady(ultimateSkill);
         }
 
         public float GetClassSkillCooldownRemaining(int slotIndex)
@@ -173,8 +167,7 @@ namespace Immortal_Switch.Scripts.Skill
             animationDriver = GetComponent<HeroAnimationDriver>();
             executor = new SkillExecutor(targetResolver, objectSpawner);
             EnsureClassSkillSlotCapacity();
-            EnsureAutoSkillController();
-
+            autoSkillController.Init(this);
         }
 
         private void Update()
@@ -211,7 +204,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             executor = new SkillExecutor(targetResolver, objectSpawner);
             EnsureClassSkillSlotCapacity();
-            EnsureAutoSkillController();
+            autoSkillController.Init(this);
             BuildPassiveRuntime();
             BindEvents();
         }
@@ -270,9 +263,15 @@ namespace Immortal_Switch.Scripts.Skill
             return TryCastSkill(classSkills[index]);
         }
 
+        // ultimate skill cast first input
         public bool TryCastUltimate()
         {
-            return TryCastSkill(ultimateSkill, true);
+            bool result = TryCastSkill(ultimateSkill, true);
+            if (result)
+            {
+                owner.CastingUltimate(true);
+            }
+            return result;
         }
 
         public bool TryCastSkill(SkillDataSO skillData, bool isUltimate = false)
@@ -304,7 +303,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return false;
             }
 
-            bool result = CastSkillInternal(skillData, level, target, interrupt: true);
+            bool result = CastSkillInternal(skillData, level, target, interrupt: true, isUltimate);
             if (owner.IsChosen && result && isUltimate)
             {
                 PvEBattleController.Instance.OnSelectedHeroCastUltimateSkill();
@@ -313,7 +312,7 @@ namespace Immortal_Switch.Scripts.Skill
             return true;
         }
 
-        public void CastSkillImmediately(SkillDataSO skillData)
+        public void CastSkillImmediately(SkillDataSO skillData, bool isUltimate)
         {
             if (skillData == null)
                 return;
@@ -325,7 +324,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             SkillCastConfig castConfig = skillData.GetCastConfig(level);
             ICombatUnit target = targetResolver.ResolveMainTarget(CreateContext(skillData, level, null), castConfig.TargetSelectType);
-            CastSkillInternal(skillData, level, target, interrupt: true);
+            CastSkillInternal(skillData, level, target, interrupt: true, isUltimate);
         }
 
         public void CastPassiveTriggeredSkill(SkillDataSO triggeredPassiveSkill)
@@ -345,7 +344,7 @@ namespace Immortal_Switch.Scripts.Skill
                     ? battleController.GetNearestEnemy(owner.Position)
                     : null;
 
-            CastSkillInternal(skillToCast, level, target, interrupt: true);
+            CastSkillInternal(skillToCast, level, target, interrupt: true, false);
         }
 
         public int CountEnemiesInRange(float range)
@@ -395,6 +394,12 @@ namespace Immortal_Switch.Scripts.Skill
 
         [ContextMenu("Debug Cast/Passive")]
         private void ContextDebugCastPassive() => DebugCastAndLog("Passive", TryDebugCastPassive);
+
+        private void Start()
+        {
+            GameEventManager.Subscribe(GameEvents.OnStageCleared, ResetAllCooldowns);
+            GameEventManager.Subscribe(GameEvents.OnStageLost, ResetAllCooldowns);
+        }
 
         public void ResetRuntimeOnSwitchOut()
         {
@@ -524,14 +529,13 @@ namespace Immortal_Switch.Scripts.Skill
             });
         }
 
-        private bool CastSkillInternal(SkillDataSO skillData, int level, ICombatUnit target, bool interrupt)
+        private bool CastSkillInternal(SkillDataSO skillData, int level, ICombatUnit target, bool interrupt, bool isUltimate)
         {
             if (interrupt)
                 CancelCurrentSkill();
-
+            
             currentSkill = skillData;
             currentSkillLevel = level;
-            isCasting = true;
 
             StartCooldown(skillData, level);
 
@@ -570,45 +574,45 @@ namespace Immortal_Switch.Scripts.Skill
             switch (runtimeType)
             {
                 case SkillRuntimeVisualType.SpawnedSkillObject:
-                    result = SpawnRuntimeObjectSkill(context, runtimeConfig);
+                    result = SpawnRuntimeObjectSkill(context, runtimeConfig, isUltimate);
                     break;
 
                 case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:
-                    result = CastHeroSpineAndSpawnedSkillObject(context, castConfig, runtimeConfig);
+                    result = CastHeroSpineAndSpawnedSkillObject(context, castConfig, runtimeConfig, isUltimate);
                     break;
 
                 case SkillRuntimeVisualType.ProjectileOnly:
                 case SkillRuntimeVisualType.Instant:
                     ExecuteManualPhases(context);
-                    FinishCurrentSkill();
+                    FinishCurrentSkill(isUltimate);
                     break;
 
                 case SkillRuntimeVisualType.HeroSpineAnimation:
                 default:
-                    CastHeroSpineSkill(context, castConfig);
+                    CastHeroSpineSkill(context, castConfig, isUltimate);
                     break;
             }
             return result;
         }
 
-        private bool SpawnRuntimeObjectSkill(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig)
+        private bool SpawnRuntimeObjectSkill(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
         {
             bool finishImmediatelyIfIndependent = true;
-            var result = SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent);
+            var result = SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent, isUltimate);
             return result != null;
         }
 
         private SkillRuntimeObject SpawnRuntimeObjectInternal(
             SkillRuntimeContext context,
             SkillRuntimeObjectConfig runtimeConfig,
-            bool finishImmediatelyIfIndependent)
+            bool finishImmediatelyIfIndependent, bool isUltimate)
         {
             if (runtimeConfig == null || runtimeConfig.RuntimePrefab == null)
             {
                 if (finishImmediatelyIfIndependent)
                 {
                     ExecuteManualPhases(context);
-                    FinishCurrentSkill();
+                    FinishCurrentSkill(isUltimate);
                 }
 
                 return null;
@@ -623,7 +627,7 @@ namespace Immortal_Switch.Scripts.Skill
             if (runtimeObject == null)
             {
                 if (finishImmediatelyIfIndependent)
-                    FinishCurrentSkill();
+                    FinishCurrentSkill(isUltimate);
 
                 return null;
             }
@@ -634,7 +638,7 @@ namespace Immortal_Switch.Scripts.Skill
             // In phase 1, spawned skill objects are independent once created.
             // Projectile/AOE/skill object will live until its own lifetime/animation end.
             if (finishImmediatelyIfIndependent && !runtimeConfig.LockCasterWhileAlive)
-                FinishCurrentSkill();
+                FinishCurrentSkill(isUltimate);
 
             return runtimeObject;
         }
@@ -642,23 +646,22 @@ namespace Immortal_Switch.Scripts.Skill
         private bool CastHeroSpineAndSpawnedSkillObject(
             SkillRuntimeContext context,
             SkillCastConfig castConfig,
-            SkillRuntimeObjectConfig runtimeConfig)
+            SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
         {
             if (context == null)
             {
-                FinishCurrentSkill();
+                FinishCurrentSkill(isUltimate);
                 return false;
             }
 
             // The spawned object is independent. Do not finish the skill here, because the hero
             // must stay locked until the hero ultimate animation completes.
-            SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false);
+            SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
 
             bool lockCasterDuringHeroAnimation = runtimeConfig == null || runtimeConfig.LockCasterDuringHeroAnimation;
             if (lockCasterDuringHeroAnimation && owner != null)
             {
                 owner.SetActionLocked(true);
-                SetSkillLock(true);
                 owner.Locomotion?.Stop();
             }
 
@@ -666,7 +669,7 @@ namespace Immortal_Switch.Scripts.Skill
             {
                 // No hero animation configured. The spawned object has already been created,
                 // so release the caster immediately.
-                FinishCurrentSkill();
+                FinishCurrentSkill(isUltimate);
                 return false;
             }
 
@@ -674,7 +677,7 @@ namespace Immortal_Switch.Scripts.Skill
             DOVirtual.DelayedCall(delay,() =>
             {
                 Debug.Log($"[DelayedCall Callback] time = {delay}");
-                FinishCurrentSkill(true);
+                FinishCurrentSkill(isUltimate);
             });
             return true;
             // FinishCurrentSkill() will be called by OnAnimationComplete() when the hero animation ends.
@@ -706,12 +709,11 @@ namespace Immortal_Switch.Scripts.Skill
             return basePosition + runtimeConfig.SpawnOffset;
         }
 
-        private void CastHeroSpineSkill(SkillRuntimeContext context, SkillCastConfig castConfig)
+        private void CastHeroSpineSkill(SkillRuntimeContext context, SkillCastConfig castConfig, bool isUltimate)
         {
             if (owner != null)
             {
                 owner.SetActionLocked(true);
-                SetSkillLock(true);
             }
 
             if (!string.IsNullOrEmpty(castConfig.AnimationName))
@@ -720,13 +722,13 @@ namespace Immortal_Switch.Scripts.Skill
                 DOVirtual.DelayedCall(delay,() =>
                 {
                     Debug.Log($"[DelayedCall Callback] time = {delay}");
-                    FinishCurrentSkill(true);
+                    FinishCurrentSkill(isUltimate);
                 });
             }
             else
             {
                 ExecuteManualPhases(context);
-                FinishCurrentSkill();
+                FinishCurrentSkill(isUltimate);
             }
         }
 
@@ -790,7 +792,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void OnSpineEvent(string eventName)
         {
-            if (!isCasting || currentSkill == null)
+            if (currentSkill == null)
                 return;
 
             // Custom behaviours own their event flow. Do not also execute generic phases here,
@@ -820,7 +822,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
             }
 
-            FinishCurrentSkill();
+            FinishCurrentSkill(false);
         }
 
         public bool IsCurrentCustomBehaviour(SkillBehaviour behaviour)
@@ -847,18 +849,17 @@ namespace Immortal_Switch.Scripts.Skill
             executor.ExecutePhase(context, phase);
         }
 
-        public void FinishCustomBehaviour(SkillBehaviour behaviour)
+        public void FinishCustomBehaviour(SkillBehaviour behaviour, bool isUltimate)
         {
             if (!IsCurrentCustomBehaviour(behaviour))
                 return;
 
-            FinishCurrentSkill();
+            FinishCurrentSkill(isUltimate);
         }
 
-        private void FinishCurrentSkill(bool isUltimate = false)
+        private void FinishCurrentSkill(bool isUltimate)
         {
             SkillBehaviour behaviourToDestroy = currentCustomBehaviour;
-            isCasting = false;
             currentSkill = null;
             currentSkillLevel = 0;
             currentCustomBehaviour = null;
@@ -867,7 +868,7 @@ namespace Immortal_Switch.Scripts.Skill
                 owner.SetActionLocked(false);
             
             if(isUltimate)
-                SetSkillLock(false);
+                owner.CastingUltimate(false);
 
             if (behaviourToDestroy != null)
                 Destroy(behaviourToDestroy.gameObject);
@@ -875,12 +876,10 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void CancelCurrentSkill()
         {
-            IsCastingUltimateSkill = false;
             currentCustomBehaviour?.Cancel();
             if (currentCustomBehaviour != null)
                 Destroy(currentCustomBehaviour.gameObject);
-
-            isCasting = false;
+            
             currentSkill = null;
             currentSkillLevel = 0;
             currentCustomBehaviour = null;
@@ -933,16 +932,18 @@ namespace Immortal_Switch.Scripts.Skill
             SkillEventBus.EventRaised -= OnSkillEvent;
         }
         
-        private void EnsureAutoSkillController()
+        public void ResetCooldown(SkillDataSO skillData)
         {
-            if (autoSkillController == null)
-                autoSkillController = GetComponent<HeroAutoSkillController>();
+            if (skillData == null)
+                return;
 
-            if (autoSkillController == null && autoCreateAutoSkillController)
-                autoSkillController = gameObject.AddComponent<HeroAutoSkillController>();
-
-            if (autoSkillController != null)
-                autoSkillController.Init(this);
+            cooldownRemainingBySkill.Remove(skillData);
+        }
+        
+        [Button]
+        public void ResetAllCooldowns()
+        {
+            cooldownRemainingBySkill.Clear();
         }
     }
 }

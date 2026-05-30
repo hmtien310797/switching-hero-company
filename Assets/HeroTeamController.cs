@@ -67,6 +67,8 @@ public class HeroTeamController : Singleton<HeroTeamController>
     private Vector3 followerMoveVelocity;
     private bool wasManualMoving;
 
+    private bool blockTeamMovement;
+
     public HeroActor HeroA => heroA;
     public HeroActor HeroB => heroB;
     public float TeamMoveSpeed => teamMoveSpeed;
@@ -84,10 +86,15 @@ public class HeroTeamController : Singleton<HeroTeamController>
     private void Start()
     {
         ResetFollowerSmoothTarget();
+        GameEventManager.Subscribe(GameEvents.OnWaveStart, UnblockTeamControl);
+        GameEventManager.Subscribe(GameEvents.OnStageLost, BlockTeamControl);
+        GameEventManager.Subscribe(GameEvents.OnStageCleared, BlockTeamControl);
     }
 
     private void Update()
     {
+        if(blockTeamMovement)
+            return;
         ReadInput();
         SmoothInput();
         HandleSwitchInput();
@@ -193,9 +200,6 @@ public class HeroTeamController : Singleton<HeroTeamController>
             if (isManualMoving)
             {
                 ResetFollowerSmoothTarget();
-                Debug.Log("Manual move started");
-                controlledHero.StartTeamMovement();
-                followerHero.StartTeamMovement();
             }
             else
             {
@@ -360,6 +364,16 @@ public class HeroTeamController : Singleton<HeroTeamController>
     private void NotifyControlledHeroChanged()
     {
         ControlledHeroChanged?.Invoke(GetControlledHero(), GetFollowerHero(), selectedHero);
+    }
+
+    private void BlockTeamControl()
+    {
+        blockTeamMovement = true;
+    }
+    
+    private void UnblockTeamControl()
+    {
+        blockTeamMovement = false;
     }
     
     private void OnDrawGizmosSelected()

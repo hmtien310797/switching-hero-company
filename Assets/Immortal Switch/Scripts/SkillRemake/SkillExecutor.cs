@@ -33,6 +33,8 @@ namespace Immortal_Switch.Scripts.Skill
 
             if (Random.Range(0f, 100f) > action.ChancePercent)
                 return;
+            
+            bool isUltimate = context.SkillData.OwnerType == SkillOwnerType.UltimateSkill;
 
             SkillTargetType targetType = action.TargetTypeOverride != SkillTargetType.CurrentTarget
                 ? action.TargetTypeOverride
@@ -58,7 +60,7 @@ namespace Immortal_Switch.Scripts.Skill
 
                 case SkillActionType.TriggerSkill:
                     if (action.TriggerSkill != null && context.SkillController != null)
-                        context.SkillController.CastSkillImmediately(action.TriggerSkill);
+                        context.SkillController.CastSkillImmediately(action.TriggerSkill, isUltimate);
                     break;
 
                 case SkillActionType.ApplyBuff:

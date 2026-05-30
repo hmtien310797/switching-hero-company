@@ -1,6 +1,7 @@
 using System;
 using Battle;
 using DG.Tweening;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
@@ -20,6 +21,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] HeroJoystick heroJostick;
         [SerializeField] private Button autoSkillButton;
         [SerializeField] private GameObject rotateObject;
+        [SerializeField] private GameObject[] hideAbleObjects;
         
         public HeroSkillBarUI HeroSkillBarUI => heroSkillBarUI;
         private bool isAutoActived = false;
@@ -30,6 +32,8 @@ namespace Immortal_Switch.Scripts.UI
 
             if (switchMainSubHeroButton != null)
                 switchMainSubHeroButton.onClick.AddListener(OnSwitchMainSubHeroButtonClicked);
+
+            OnStageEnd();
         }
 
         private void Start()
@@ -42,6 +46,9 @@ namespace Immortal_Switch.Scripts.UI
             });
 
             SetHeroTeamController(HeroTeamController.Instance);
+            GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageEnd);
+            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageEnd);
+            GameEventManager.Subscribe(GameEvents.OnWaveStart, OnStageStart);
         }
 
         private void OnDestroy()
@@ -58,11 +65,27 @@ namespace Immortal_Switch.Scripts.UI
             PvEBattleController.Instance?.OnSwitchMainSubHeroButtonClicked();
         }
 
-        public void SetHeroTeamController(HeroTeamController heroTeamController)
+        private void SetHeroTeamController(HeroTeamController heroTeamController)
         {
             heroJostick.SetTarget(heroTeamController);
         }
 
         public CurrencyView CurrencyView => currencyView;
+
+        private void OnStageEnd()
+        {
+            for (int i = 0; i < hideAbleObjects.Length; i++)
+            {
+                hideAbleObjects[i].SetActive(false);
+            }
+        }
+        
+        private void OnStageStart()
+        {
+            for (int i = 0; i < hideAbleObjects.Length; i++)
+            {
+                hideAbleObjects[i].SetActive(true);
+            }
+        }
     }
 }

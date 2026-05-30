@@ -57,10 +57,10 @@ namespace Battle
             base.OnReceiveDamage(factorSkillDamage, endAct, target);
             if (CurrentHp <= 0)
             {
-                if (pvEBattleController.State == BattleState.Ended)
-                {
-                    return;
-                }
+                // if (pvEBattleController.State == BattleState.Ended)
+                // {
+                //     return;
+                // }
                 GameEventManager.Trigger(GameEvents.OnStageCleared);
                 return;
             }

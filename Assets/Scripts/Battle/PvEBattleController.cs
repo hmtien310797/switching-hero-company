@@ -154,7 +154,6 @@ namespace Battle
             NotifyActiveLineupChanged();
             RefreshControlledHeroSkillUI();
             InitStage(currentStage);
-
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
@@ -426,6 +425,11 @@ namespace Battle
             SelectControlledHeroSlot(nextSlotIndex);
         }
 
+        public BossActor GetActiveBossActor()
+        {
+            return currentBoss;
+        }
+
         public void OnSwitchMainSubHeroButtonClicked()
         {
             SwitchControlledHero();
@@ -463,7 +467,7 @@ namespace Battle
             TopMainView.Instance?.HeroSkillBarUI?.BindHero(controlledHero);
         }
 
-        private async UniTaskVoid HandleNextStage()
+        private void HandleNextStage()
         {
             heroDeadCount = 0;
             result = BattleResult.None;
@@ -472,7 +476,6 @@ namespace Battle
             pvEMapController.InitMapByChapter(GetChapterIdByStage(currentStage));
             InitStage(currentStage);
             isReadyBattle = false;
-            await UniTask.Delay(1000);
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
@@ -694,7 +697,6 @@ namespace Battle
             }
 
             Shuffle(result);
-
             return result;
         }
         
@@ -810,6 +812,8 @@ namespace Battle
             var spawnedBoss = PoolManager.Instance.Spawn(bossSo.bossPrefab, pos, Quaternion.identity);
             currentBoss = spawnedBoss;
             currentBoss.Init(bossSo, inBattleHeroA, inBattleHeroB);
+            currentBoss.OnDead -= OnBossDead;
+            currentBoss.OnDead += OnBossDead;
             
             ///---------------------------------------------------------
 
@@ -827,22 +831,32 @@ namespace Battle
             SetState(BattleState.FightingBoss);
         }
 
+        private void OnBossDead(BossActor boss)
+        {
+            if (State == BattleState.Ended)
+            {
+                return;
+            }
+            GameEventManager.Trigger(GameEvents.OnStageCleared);
+        }
+
         private void OnStageCleared()
         {
             result = BattleResult.Victory;
             SetState(BattleState.Ended);
+            currentBoss = null;
             losingStage = false;
             NextStageCallback().Forget();
         }
 
         private async UniTask OnStageFailed()
         {
+            SetState(BattleState.Ended);
             await UniTask.Delay(1000);
             heroDeadCount = 0;
             result = BattleResult.Defeat;
             PoolManager.Instance.Despawn(currentBoss);
             currentBoss = null;
-            SetState(BattleState.Ended);
             PlayCurrentStage().Forget();
             losingStage = true;
         }
@@ -865,15 +879,11 @@ namespace Battle
             deadCreepCount = losingStage
                 ? GameData.Instance.maxCreepsPerStage
                 : deadCreepCount + 1;
-            Debug.Log($"Enemy DEad creep count : {deadCreepCount}");
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
-            Debug.Log($"Enemy DEad creep count : {deadCreepCount}_1.1");
             if (State != BattleState.FightingCreeps)
                 return;
-            Debug.Log($"Enemy DEad creep count : {deadCreepCount}_____2");
             if (aliveCreepCount != 0)
                 return;
-            Debug.Log($"Enemy DEad creep count : {deadCreepCount}_____3");
             if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage)
             {
                 isReadyBattle = false;
@@ -881,7 +891,6 @@ namespace Battle
                 isReadyBattle = true;
                 return;
             }
-            Debug.Log($"Enemy DEad creep count : {deadCreepCount}_____4");
             SpawnBoss();
         }
         
@@ -1200,7 +1209,7 @@ namespace Battle
                 inBattleHeroes[i].ResetData();
                 await UniTask.Delay(800);
             }
-            HandleNextStage().Forget();
+            HandleNextStage();
         }
 
         private async UniTask PlayCurrentStage()

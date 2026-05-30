@@ -22,7 +22,8 @@ public enum HeroStateId
     Win,
     Spawn,
     BossSpawn,
-    ManualMove
+    ManualMove,
+    TimeOut
 }
 
 public enum HeroMoveMode
@@ -94,8 +95,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     public bool IsUnderPlayerControl { get; private set; }
 
     public bool IsActionLocked { get; private set; }
-    
-    public bool IsCastingUltimateSkill => skillController.IsCastingUltimateSkill;
 
     public bool IsDead => stats != null &&
                           stats.HealthModule != null &&
@@ -136,18 +135,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void Awake()
     {
-        if (stats == null)
-            stats = GetComponent<StatsController>();
-
-        if (locomotion == null)
-            locomotion = GetComponent<HeroLocomotion>();
-
-        if (animationDriver == null)
-            animationDriver = GetComponent<HeroAnimationDriver>();
-
-        if (skillController == null)
-            skillController = GetComponent<HeroSkillController>();
-
         stateMachine = new HeroStateMachine(this);
     }
 
@@ -159,6 +146,10 @@ public class HeroActor : MonoBehaviour, ICombatUnit
             ActiveHealthBar(false);
             stateMachine.ChangeState(HeroStateId.Win);
         });
+        GameEventManager.Subscribe(GameEvents.OnStageLost, () =>
+        {
+            stateMachine.ChangeState(HeroStateId.Dead);
+        });
     }
 
     private void OnDestroy()
@@ -168,14 +159,15 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void Update()
     {
-        if (skillController != null && skillController.IsCastingUltimateSkill)
-            return;
-        
         stateMachine?.Tick(Time.deltaTime);
     }
 
     private void OnBossSpawnAnimationComplete(bool completed)
     {
+        if (stateMachine.CurrentStateId == HeroStateId.Ultimate)
+        {
+            return;
+        }
         stateMachine.ChangeState(!completed ? HeroStateId.BossSpawn : HeroStateId.Idle);
     }
 
@@ -212,7 +204,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         currentTarget = null;
         attackComboIndex = 0;
         nextTargetSearchTime = 0f;
-        stateMachine.ChangeState(HeroStateId.Spawn, true);
+        stateMachine.ChangeState(HeroStateId.Spawn);
         BindDeathEvent();
     }
     
@@ -264,7 +256,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     public void ManualMoveByTeam(Vector3 direction, float moveSpeed)
     {
-        if (IsDead || IsActionLocked || skillController.IsCastingUltimateSkill)
+        if (IsDead || IsActionLocked)
             return;
 
         if (stats != null && !stats.CanMove())
@@ -283,7 +275,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         if (locomotion.IsMoving)
         {
             animationDriver?.FaceDirection(locomotion.LastVelocity);
-            stateMachine.ChangeState(HeroStateId.Run);
+            stateMachine.ChangeState(HeroStateId.ManualMove);
         }
         else
         {
@@ -299,7 +291,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         ref Vector3 velocity
     )
     {
-        if (IsDead || IsActionLocked || skillController.IsCastingUltimateSkill)
+        if (IsDead || IsActionLocked)
             return;
 
         if (stats != null && !stats.CanMove())
@@ -324,7 +316,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         if (locomotion.IsMoving)
         {
             animationDriver?.FaceDirection(locomotion.LastVelocity);
-            stateMachine.ChangeState(HeroStateId.Run);
+            stateMachine.ChangeState(HeroStateId.ManualMove);
         }
         else
         {
@@ -334,7 +326,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     public void StopTeamControl()
     {
-        if (IsDead || IsActionLocked)
+        if (IsDead || IsActionLocked || stateMachine.CurrentStateId == HeroStateId.Ultimate)
             return;
 
         IsUnderPlayerControl = false;
@@ -343,11 +335,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         locomotion?.Stop();
 
         stateMachine.ChangeState(HeroStateId.Idle);
-    }
-
-    public void StartTeamMovement()
-    {
-        stateMachine.ChangeState(HeroStateId.ManualMove);
     }
 
     public void WarpTeamPosition(Vector3 position)
@@ -530,20 +517,25 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     // Skill / Ability
     // =========================================================
 
-    public void CastUltimate()
+    public void CastingUltimate(bool isCastingUltimate)
     {
         if (IsDead || IsActionLocked)
             return;
-
-        if (stats != null && !stats.CanCastSkill())
-            return;
-
-        IsUnderPlayerControl = false;
-        MoveMode = HeroMoveMode.Auto;
-
+        
         ResetAttackCombo();
+        if (isCastingUltimate)
+        {
+            stateMachine.ChangeState(HeroStateId.Ultimate);
+            return;
+        }
 
-        stateMachine.ChangeState(HeroStateId.Ultimate, true);
+        if (stateMachine.CurrentStateId == HeroStateId.Win)
+        {
+            return;
+        }
+        
+        stateMachine.ChangeState(HeroStateId.Idle);
+        
     }
 
     public void CastPassive()
@@ -559,14 +551,13 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
         ResetAttackCombo();
 
-        stateMachine.ChangeState(HeroStateId.Passive, true);
+        stateMachine.ChangeState(HeroStateId.Passive);
     }
 
     public void SetActionLocked(bool locked)
     {
         IsActionLocked = locked;
     }
-    
 
     // =========================================================
     // Dead / Win
@@ -574,8 +565,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void Die()
     {
-        if (stateMachine == null)
-            return;
         OnDead?.Invoke(this);
         ResetAttackCombo();
 
@@ -584,7 +573,12 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         MoveMode = HeroMoveMode.Auto;
 
         locomotion?.Stop();
-        stateMachine.ChangeState(HeroStateId.Dead, true);
+        stateMachine.ChangeState(HeroStateId.Dead);
+    }
+
+    private void OnTimeOut()
+    {
+        
     }
 
     public void Win()
@@ -595,9 +589,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         IsActionLocked = false;
         IsUnderPlayerControl = false;
         MoveMode = HeroMoveMode.Auto;
-
         locomotion?.Stop();
-
         stateMachine.ChangeState(HeroStateId.Win, true);
     }
 

@@ -96,10 +96,10 @@ public class LoginScene : MonoBehaviour
 
     private async UniTask DoLogin(string username, string password)
     {
-        // loginPanel.gameObject.SetActive(false);
-        // await SceneManager.LoadSceneAsync("MainBattleScene");
-        // await GameBootstrap.Instance.RunAsync();
-        // return;
+        loginPanel.gameObject.SetActive(false);
+        await SceneManager.LoadSceneAsync("MainBattleScene");
+        await GameBootstrap.Instance.RunAsync();
+        return;
         
         var request = new Login.LoginRequest
         {

@@ -72,9 +72,4 @@ public class GameStatView : MonoBehaviour
         buttonGiveUp.gameObject.SetActive(true);
         buttonBoss.gameObject.SetActive(false);
     }
-
-    public void SetCoin(int value)
-    {
-        currentDeadMonsterQuantityText.text = value.ToString();
-    }
 }

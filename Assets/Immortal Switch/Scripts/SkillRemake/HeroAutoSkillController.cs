@@ -81,10 +81,9 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void Tick(float deltaTime)
         {
-            if (!autoCastEnabled)
-                return;
-
-            if (owner.StateMachine.CurrentStateId == HeroStateId.ManualMove)
+            if (!autoCastEnabled || owner.StateMachine.CurrentStateId == HeroStateId.ManualMove || 
+                owner.StateMachine.CurrentStateId == HeroStateId.Spawn ||
+                owner.IsDead || owner.StateMachine.CurrentStateId == HeroStateId.Dead)
                 return;
 
             scanTimer -= deltaTime;
@@ -124,23 +123,13 @@ namespace Immortal_Switch.Scripts.Skill
 
         private bool CanAutoCastNow()
         {
-            if (skillController == null)
-                return false;
-
-            if (!skillController.isActiveAndEnabled)
-                return false;
-
-            if (skillController.IsCasting || skillController.IsCastingUltimateSkill)
-                return false;
-
-            HeroActor owner = skillController.Owner;
             if (owner == null || owner.IsDead)
                 return false;
 
             if (owner.Stats != null && !owner.Stats.CanCastSkill())
                 return false;
-
-            return true;
+            
+            return owner.StateMachine.CurrentStateId != HeroStateId.Ultimate;
         }
 
         private bool TryCastUltimate()

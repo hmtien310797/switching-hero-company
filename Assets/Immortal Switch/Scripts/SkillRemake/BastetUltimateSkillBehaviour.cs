@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Battle;
 using DG.Tweening;
+using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
@@ -54,7 +55,7 @@ namespace Immortal_Switch.Scripts.Skill
         public override void Cast()
         {
             cancelled = false;
-            Context.SkillController.SetSkillLock(true);
+            Context.Caster.CastingUltimate(true);
             routine = StartCoroutine(CastRoutine());
         }
 
@@ -77,6 +78,8 @@ namespace Immortal_Switch.Scripts.Skill
                 moveTween.Kill(false);
                 moveTween = null;
             }
+            
+            Context.Caster.CastingUltimate(false);
         }
 
         public override void OnSpineEvent(string eventName)
@@ -137,8 +140,7 @@ namespace Immortal_Switch.Scripts.Skill
                 currentTarget = FindRandomAliveEnemy();
                 if (currentTarget == null)
                 {
-                    if (debugLog)
-                        Debug.Log($"[BastetUltimate] Stop at jump {jumpIndex + 1}. No alive enemy found.", this);
+                    Debug.Log($"[BastetUltimate] Stop at jump {jumpIndex + 1}. No alive enemy found.", this);
                     break;
                 }
 
@@ -155,9 +157,7 @@ namespace Immortal_Switch.Scripts.Skill
 
                 float animationDuration = PlayUltimateAnimation();
                 yield return new WaitForSeconds(0.3f);
-                //Context.Caster.Anim.PauseHeroSpine();
                 yield return MoveTweenRoutine(landingPosition);
-                //Context.Caster.Anim.ResumeHeroSpine();
 
                 if (waitAnimationCompleteBeforeNextJump)
                     yield return WaitForAnimationOrFallback(Mathf.Max(animationDuration, fallbackJumpDuration));
@@ -167,9 +167,8 @@ namespace Immortal_Switch.Scripts.Skill
                 waitingForHit = false;
             }
             
-            Context.SkillController.SetSkillLock(false);
             routine = null;
-            Context.SkillController.FinishCustomBehaviour(this);
+            Context.SkillController.FinishCustomBehaviour(this, true);
         }
 
         private float PlayUltimateAnimation()
@@ -247,9 +246,12 @@ namespace Immortal_Switch.Scripts.Skill
             candidates.Clear();
 
             PvEBattleController battleController = Context.BattleController;
-            if (battleController == null || battleController.MonsterList == null)
-                return null;
-
+            BossActor currentBoss = battleController.GetActiveBossActor();
+            if (currentBoss != null)
+            {
+                return currentBoss;
+            }
+            
             List<EnemyActor> enemies = battleController.MonsterList;
             for (int i = 0; i < enemies.Count; i++)
             {
