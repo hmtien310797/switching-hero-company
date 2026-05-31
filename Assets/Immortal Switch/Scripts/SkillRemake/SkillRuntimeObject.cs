@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Common;
-using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -12,7 +11,17 @@ namespace Immortal_Switch.Scripts.Skill
     /// </summary>
     public class SkillRuntimeObject : PoolableBehaviour
     {
+        public event Action<SkillRuntimeObject> Despawned;
+
         private static readonly List<SkillPhaseData> PhaseBuffer = new();
+
+        [Header("Debug Runtime Event")]
+        [SerializeField] private bool debugCountRuntimeEvent;
+        [SerializeField] private string debugCountEventName = "hit";
+        [SerializeField] private bool debugLogRuntimeEventCount = true;
+        [SerializeField] private bool debugLogRuntimeEventTotalOnDespawn = true;
+
+        private int debugRuntimeEventCount;
 
         protected SkillRuntimeContext Context;
         protected SkillRuntimeObjectConfig Config;
@@ -42,13 +51,9 @@ namespace Immortal_Switch.Scripts.Skill
             lifeTimer = config != null ? config.LifeTime : 0f;
             initialized = true;
 
-            OnRuntimeInitialized();
-        }
+            debugRuntimeEventCount = 0;
 
-        private void Awake()
-        {
-            GameEventManager.Subscribe(GameEvents.OnStageCleared, ForceDespawn);
-            GameEventManager.Subscribe(GameEvents.OnStageLost, ForceDespawn);
+            OnRuntimeInitialized();
         }
 
         protected virtual void OnRuntimeInitialized()
@@ -104,6 +109,8 @@ namespace Immortal_Switch.Scripts.Skill
         /// </summary>
         public void EmitRuntimeEvent(string eventName)
         {
+            DebugCountRuntimeEvent(eventName);
+
             if (Context == null || Context.SkillData == null || Executor == null)
                 return;
 
@@ -126,12 +133,83 @@ namespace Immortal_Switch.Scripts.Skill
 
         public override void OnDespawnedToPool()
         {
+            DebugLogRuntimeEventTotal();
+
+            Despawned?.Invoke(this);
+            Despawned = null;
+
             initialized = false;
             Context = null;
             Config = null;
             Executor = null;
             TargetResolver = null;
             Spawner = null;
+
+            debugRuntimeEventCount = 0;
+        }
+
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        private void DebugCountRuntimeEvent(string eventName)
+        {
+            if (!debugCountRuntimeEvent)
+                return;
+
+            if (string.IsNullOrEmpty(eventName))
+                return;
+
+            if (!string.Equals(eventName, debugCountEventName, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            debugRuntimeEventCount++;
+
+            if (!debugLogRuntimeEventCount)
+                return;
+
+            string skillName = Context != null && Context.SkillData != null
+                ? Context.SkillData.SkillName
+                : "NULL_SKILL";
+
+            string casterName = Context != null && Context.Caster != null
+                ? Context.Caster.name
+                : "NULL_CASTER";
+
+            Debug.Log(
+                $"<color=#FFCA28>[Skill Event Count]</color> " +
+                $"Skill: <b>{skillName}</b> | " +
+                $"Caster: <b>{casterName}</b> | " +
+                $"Object: <b>{name}</b> | " +
+                $"Event: <color=#81C784>{eventName}</color> | " +
+                $"Count: <color=#4FC3F7>{debugRuntimeEventCount}</color>",
+                this
+            );
+        }
+
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        private void DebugLogRuntimeEventTotal()
+        {
+            if (!debugCountRuntimeEvent || !debugLogRuntimeEventTotalOnDespawn)
+                return;
+
+            if (debugRuntimeEventCount <= 0)
+                return;
+
+            string skillName = Context != null && Context.SkillData != null
+                ? Context.SkillData.SkillName
+                : "NULL_SKILL";
+
+            string casterName = Context != null && Context.Caster != null
+                ? Context.Caster.name
+                : "NULL_CASTER";
+
+            Debug.Log(
+                $"<color=#AB47BC>[Skill Event Total]</color> " +
+                $"Skill: <b>{skillName}</b> | " +
+                $"Caster: <b>{casterName}</b> | " +
+                $"Object: <b>{name}</b> | " +
+                $"Event: <color=#81C784>{debugCountEventName}</color> | " +
+                $"Total Count: <color=#4FC3F7>{debugRuntimeEventCount}</color>",
+                this
+            );
         }
     }
 }

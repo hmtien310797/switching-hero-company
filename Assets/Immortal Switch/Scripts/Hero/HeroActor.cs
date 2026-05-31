@@ -256,7 +256,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     public void ManualMoveByTeam(Vector3 direction, float moveSpeed)
     {
-        if (IsDead || IsActionLocked)
+        if (IsDead || IsActionLocked || stateMachine.CurrentStateId == HeroStateId.Ultimate)
             return;
 
         if (stats != null && !stats.CanMove())
@@ -291,7 +291,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         ref Vector3 velocity
     )
     {
-        if (IsDead || IsActionLocked)
+        if (IsDead || IsActionLocked || stateMachine.CurrentStateId == HeroStateId.Ultimate)
             return;
 
         if (stats != null && !stats.CanMove())

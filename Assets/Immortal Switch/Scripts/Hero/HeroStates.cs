@@ -348,7 +348,7 @@ public class HeroSpawnState : HeroStateBase
 
     public override async UniTask Enter()
     {
-        owner.SetActionLocked(false);
+        owner.SetActionLocked(true);
         owner.Anim.PlaySpawn();
         await UniTask.Delay(TimeSpan.FromSeconds(2f));
         owner.ActiveHealthBar(true);
