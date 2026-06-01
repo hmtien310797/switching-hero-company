@@ -26,14 +26,17 @@ namespace Immortal_Switch.Scripts.Enemy
         
         [Header("Components")]
         [SerializeField] private StatsController stats;
-
         [SerializeField] private HealthBarController healthBarController;
         [SerializeField] private HeroAnimationDriver animationDriver;
         [SerializeField] private HeroLocomotion locomotion;
+        [SerializeField] private GameObject spineAnimation;
 
         [Header("Death")]
         [SerializeField] private bool destroyOnDead = true;
         [SerializeField] private float destroyDelay = 1.2f;
+        
+        [Header("Properties")]
+        [field: SerializeField] public ActorType ActorType { get; private set;}
 
         private readonly List<ICombatUnit> heroTargets = new();
 
@@ -81,7 +84,7 @@ namespace Immortal_Switch.Scripts.Enemy
         public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB)
         {
             creepData = data;
-            HealthBarController.PreSetHealth();
+            HealthBarController.ResetHealth();
             ApplyData(data);
             SetHeroTargets(heroA, heroB);
 
@@ -95,6 +98,11 @@ namespace Immortal_Switch.Scripts.Enemy
             ChangeState(EnemyState.Spawn);
         }
 
+        public void SetScale(float scale)
+        {
+            spineAnimation.transform.localScale = new Vector3(scale, scale, scale);
+        }
+        
         private void ApplyData(CreepDataSo data)
         {
             if (data == null)

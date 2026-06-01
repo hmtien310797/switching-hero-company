@@ -62,6 +62,9 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     [SerializeField] private float passiveHitNormalizedTime = 0.5f;
     
     [SerializeField] private GameObject winFx;
+    
+    [Header("Properties")]
+    [field: SerializeField] public ActorType ActorType { get; private set;}
 
     [ShowInInspector, ReadOnly]
     private ICombatUnit currentTarget;
@@ -197,7 +200,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         ActiveVisual(true);
         InitializeStatsFromHeroData(heroData);
         PowerUpManager.Instance.BindPlayer(Stats);
-        HealthBarController.PreSetHealth();
+        HealthBarController.ResetHealth();
         IsActionLocked = false;
         IsUnderPlayerControl = false;
         MoveMode = HeroMoveMode.Auto;
@@ -474,6 +477,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         {
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
             currentTarget.TakeDamage(this, damageResult);
+            HitEffectManager.Instance.Play(currentTarget);
         }
     }
 

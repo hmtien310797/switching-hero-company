@@ -1,0 +1,206 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 727400d8e1c143a4b86a6ec1f07fe5a1, type: 3}
+  m_Name: Warrior_ShadowDash
+  m_EditorClassIdentifier: 
+  SkillId: 3
+  SkillKey: 
+  SkillName: Shadow Dash
+  SkillIcon: {fileID: 21300000, guid: 5bdeeab694a8feb42a193987d56827f8, type: 3}
+  DescriptionTemplate: 
+  OwnerType: 0
+  DefaultTargetType: 0
+  MaxLevel: 1
+  SkillTier: 1
+  CastConfig:
+    RequireTarget: 1
+    MoveToCastRange: 1
+    CastRange: 9
+    Cooldown: 10
+    TargetSelectType: 1
+    AnimationName: animation
+  RuntimeObjectConfig:
+    RuntimeVisualType: 2
+    RuntimePrefab: {fileID: 3972949462269165270, guid: 7d848e496c0db4a1badbeba10ae4a714, type: 3}
+    SpawnPositionType: 0
+    FollowType: 1
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    LifeTime: 5
+    UseLifeTime: 0
+    DespawnOnAnimationComplete: 1
+    AnimationName: animation
+    LoopAnimation: 0
+    LockCasterWhileAlive: 0
+    LockCasterDuringHeroAnimation: 1
+  PassiveConfig:
+    StackKey: 
+    RequiredStack: 3
+    MaxStack: 3
+    ResetStackOnTrigger: 1
+    ConsumeStackOnTrigger: 1
+    StackGainTriggers: []
+    EnemyCountCondition:
+      Enabled: 0
+      MinEnemyCount: 1
+      Range: 5
+  CustomBehaviourPrefab: {fileID: 0}
+  UpgradeShardCosts: []
+  Levels:
+  - Level: 1
+    UseCastOverride: 0
+    CastOverride:
+      RequireTarget: 0
+      MoveToCastRange: 0
+      CastRange: 2
+      Cooldown: 1
+      TargetSelectType: 1
+      AnimationName: 
+    UseRuntimeObjectOverride: 0
+    RuntimeObjectOverride:
+      RuntimeVisualType: 2
+      RuntimePrefab: {fileID: 0}
+      SpawnPositionType: 0
+      FollowType: 0
+      SpawnOffset: {x: 0, y: 0, z: 0}
+      LifeTime: 1
+      UseLifeTime: 1
+      DespawnOnAnimationComplete: 1
+      AnimationName: 
+      LoopAnimation: 0
+      LockCasterWhileAlive: 0
+      LockCasterDuringHeroAnimation: 1
+    UsePassiveOverride: 0
+    PassiveOverride:
+      StackKey: 
+      RequiredStack: 3
+      MaxStack: 3
+      ResetStackOnTrigger: 1
+      ConsumeStackOnTrigger: 1
+      StackGainTriggers: []
+      EnemyCountCondition:
+        Enabled: 0
+        MinEnemyCount: 1
+        Range: 5
+    Phases:
+    - PhaseId: 0
+      TriggerType: 1
+      EventName: hit
+      SpineEventName: hit
+      Delay: 0
+      NormalizedTime: 0
+      TargetTypeOverride: 10
+      Actions:
+      - ActionType: 0
+        ChancePercent: 100
+        TargetTypeOverride: 10
+        Damage:
+          SkillDamageBonusPercent: 150
+          CountAsSkillDamage: 1
+        Dot:
+          EffectId: DOT
+          TickDamageBonusPercent: 0
+          TickInterval: 1
+          Duration: 5
+          DamageType: 0
+          StackRule: 0
+        StatModifier:
+          ModifierId: 
+          StatType: 0
+          PercentValue: 0
+          Duration: 5
+        Area:
+          AreaPrefab: {fileID: 0}
+          Shape: 0
+          PositionType: 1
+          Radius: 7
+          BoxSize: {x: 2, y: 2}
+          Duration: 0
+          TickInterval: 0
+          HitOncePerTarget: 0
+          OnHitActions: []
+        Projectile:
+          ProjectilePrefab: {fileID: 0}
+          MoveType: 1
+          HitDetectionType: 0
+          SpawnPositionType: 2
+          FollowType: 0
+          CustomSocketName: 
+          Count: 1
+          SpreadAngle: 0
+          DelayBetweenShots: 0
+          Speed: 8
+          LifeTime: 3
+          HitRadius: 0.25
+          Pierce: 0
+          PierceCount: 0
+          OnHitActions: []
+        Stack:
+          StackKey: 
+          Amount: 1
+        TriggerSkill: {fileID: 0}
+    - PhaseId: 0
+      TriggerType: 1
+      EventName: finalhit
+      SpineEventName: finalhit
+      Delay: 0
+      NormalizedTime: 0
+      TargetTypeOverride: 0
+      Actions:
+      - ActionType: 0
+        ChancePercent: 100
+        TargetTypeOverride: 10
+        Damage:
+          SkillDamageBonusPercent: 225
+          CountAsSkillDamage: 1
+        Dot:
+          EffectId: DOT
+          TickDamageBonusPercent: 0
+          TickInterval: 1
+          Duration: 5
+          DamageType: 0
+          StackRule: 0
+        StatModifier:
+          ModifierId: 
+          StatType: 0
+          PercentValue: 0
+          Duration: 5
+        Area:
+          AreaPrefab: {fileID: 0}
+          Shape: 0
+          PositionType: 1
+          Radius: 9
+          BoxSize: {x: 2, y: 2}
+          Duration: 0
+          TickInterval: 0
+          HitOncePerTarget: 1
+          OnHitActions: []
+        Projectile:
+          ProjectilePrefab: {fileID: 0}
+          MoveType: 1
+          HitDetectionType: 0
+          SpawnPositionType: 2
+          FollowType: 0
+          CustomSocketName: 
+          Count: 1
+          SpreadAngle: 0
+          DelayBetweenShots: 0
+          Speed: 8
+          LifeTime: 3
+          HitRadius: 0.25
+          Pierce: 0
+          PierceCount: 0
+          OnHitActions: []
+        Stack:
+          StackKey: 
+          Amount: 1
+        TriggerSkill: {fileID: 0}
+    DescriptionParams: []

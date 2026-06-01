@@ -54,6 +54,7 @@ public class HeroProjectile : MonoBehaviour
         {
             DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, target);
             target.TakeDamage(attacker, damageResult);
+            HitEffectManager.Instance.Play(target);
             Destroy(gameObject);
         }
     }

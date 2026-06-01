@@ -103,7 +103,63 @@ MonoBehaviour:
         ChancePercent: 100
         TargetTypeOverride: 10
         Damage:
-          SkillDamageBonusPercent: 120
+          SkillDamageBonusPercent: 360
+          CountAsSkillDamage: 1
+        Dot:
+          EffectId: DOT
+          TickDamageBonusPercent: 0
+          TickInterval: 1
+          Duration: 5
+          DamageType: 0
+          StackRule: 0
+        StatModifier:
+          ModifierId: 
+          StatType: 0
+          PercentValue: 0
+          Duration: 5
+        Area:
+          AreaPrefab: {fileID: 0}
+          Shape: 0
+          PositionType: 1
+          Radius: 7
+          BoxSize: {x: 2, y: 2}
+          Duration: 0
+          TickInterval: 0
+          HitOncePerTarget: 0
+          OnHitActions: []
+        Projectile:
+          ProjectilePrefab: {fileID: 0}
+          MoveType: 1
+          HitDetectionType: 0
+          SpawnPositionType: 2
+          FollowType: 0
+          CustomSocketName: 
+          Count: 1
+          SpreadAngle: 0
+          DelayBetweenShots: 0
+          Speed: 8
+          LifeTime: 3
+          HitRadius: 0.25
+          Pierce: 0
+          PierceCount: 0
+          OnHitActions: []
+        Stack:
+          StackKey: 
+          Amount: 1
+        TriggerSkill: {fileID: 0}
+    - PhaseId: 0
+      TriggerType: 1
+      EventName: finalhit
+      SpineEventName: finalhit
+      Delay: 0
+      NormalizedTime: 0
+      TargetTypeOverride: 10
+      Actions:
+      - ActionType: 0
+        ChancePercent: 100
+        TargetTypeOverride: 10
+        Damage:
+          SkillDamageBonusPercent: 720
           CountAsSkillDamage: 1
         Dot:
           EffectId: DOT

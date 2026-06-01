@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
@@ -13,6 +14,10 @@ public class GameCameraController : Singleton<GameCameraController>
     [SerializeField] private CinemachineCamera followHeroCamera;
     [SerializeField] private CinemachineCamera followBossCamera;
     [SerializeField] private Camera renderHeroCamera;
+    [SerializeField] private CinemachineBasicMultiChannelPerlin followHeroCameraNoise;
+    [SerializeField] private float amplitude = 1f;
+    [SerializeField] private float frequency = 1f;
+    [SerializeField] private float duration = 0.2f;
 
     [Header("POV per Screen")] [SerializeField]
     private float horizontalPlayerPov;
@@ -40,11 +45,16 @@ public class GameCameraController : Singleton<GameCameraController>
 
     private int activePriority = 20;
     private int inactivePriority = 10;
+    private CancellationTokenSource shakeCts;
+    private Tween shakeTween;
 
     private void Start()
     {
         ScreenOrientationTracker.Instance.OnOrientationChanged += SetCameraFieldOfView;
         SetCameraFieldOfView(ScreenOrientationTracker.Instance.CurrentMode);
+        followHeroCameraNoise.enabled = true;
+        followHeroCameraNoise.AmplitudeGain = 0f;
+        followHeroCameraNoise.FrequencyGain = frequency;
     }
 
     private void SetCameraFieldOfView(ScreenOrientationTracker.ScreenViewMode mode)
@@ -160,6 +170,32 @@ public class GameCameraController : Singleton<GameCameraController>
             .AsyncWaitForCompletion()
             .AsUniTask();
     }
+
+    [Button]
+    public void ShakeCamera()
+    {
+        if (followHeroCameraNoise == null)
+            return;
+
+        shakeTween?.Kill();
+
+        followHeroCameraNoise.AmplitudeGain = amplitude;
+        followHeroCameraNoise.FrequencyGain = frequency;
+
+        shakeTween = DOTween.To(
+                () => followHeroCameraNoise.AmplitudeGain,
+                value => followHeroCameraNoise.AmplitudeGain = value,
+                0f,
+                duration
+            )
+            .SetEase(Ease.OutQuad)
+            .OnKill(() =>
+            {
+                if (followHeroCameraNoise != null)
+                    followHeroCameraNoise.AmplitudeGain = 0f;
+            });
+    }
+
 
     public override UniTask InitializeAsync()
     {

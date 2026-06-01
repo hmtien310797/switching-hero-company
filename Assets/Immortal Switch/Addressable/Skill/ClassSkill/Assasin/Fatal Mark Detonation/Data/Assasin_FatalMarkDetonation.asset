@@ -23,7 +23,7 @@ MonoBehaviour:
   SkillTier: 1
   CastConfig:
     RequireTarget: 1
-    MoveToCastRange: 1
+    MoveToCastRange: 0
     CastRange: 7
     Cooldown: 10
     TargetSelectType: 1
@@ -38,7 +38,7 @@ MonoBehaviour:
     UseLifeTime: 0
     DespawnOnAnimationComplete: 1
     AnimationName: animation
-    LoopAnimation: 1
+    LoopAnimation: 0
     LockCasterWhileAlive: 0
     LockCasterDuringHeroAnimation: 1
   PassiveConfig:
@@ -121,7 +121,7 @@ MonoBehaviour:
           AreaPrefab: {fileID: 0}
           Shape: 0
           PositionType: 1
-          Radius: 7
+          Radius: 3.5
           BoxSize: {x: 2, y: 2}
           Duration: 0
           TickInterval: 0

@@ -40,7 +40,7 @@ namespace Battle
             isReady = false;
             hId = hid;
             pvEBattleController = pBc;
-            healthBarController?.PreSetHealth();
+            //healthBarController?.rese();
             targets = eEargets;
             SetTargetTrans(etarget);
             DoRotate(transform.position.x < etarget.transform.position.x);

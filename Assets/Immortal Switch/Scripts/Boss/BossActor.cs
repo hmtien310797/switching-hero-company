@@ -42,6 +42,9 @@ namespace Immortal_Switch.Scripts.Boss
         [Header("Death")]
         [SerializeField] private bool destroyOnDead = false;
         [SerializeField] private float destroyDelay = 2f;
+        
+        [Header("Properties")]
+        [field: SerializeField] public ActorType ActorType { get; private set;}
 
         private readonly List<ICombatUnit> heroTargets = new();
 
@@ -57,7 +60,7 @@ namespace Immortal_Switch.Scripts.Boss
         private bool hasHitThisAttack;
         
         public event Action<BossActor> OnDead;
-
+        
         public StatsController Stats => stats;
         public HealthBarController HealthBarController => healthBarController;
 

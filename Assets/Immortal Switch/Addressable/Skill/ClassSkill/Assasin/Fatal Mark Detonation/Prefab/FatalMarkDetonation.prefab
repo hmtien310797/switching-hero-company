@@ -127,7 +127,7 @@ MonoBehaviour:
   updateTiming: 1
   unscaledTime: 0
   _animationName: 
-  loop: 1
+  loop: 0
   timeScale: 1
 --- !u!1 &3166562778667976113
 GameObject:
@@ -178,6 +178,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PoolSize>k__BackingField: 2
   <DeSpawnedOnStart>k__BackingField: 0
+  debugCountRuntimeEvent: 0
+  debugCountEventName: hit
+  debugLogRuntimeEventCount: 1
+  debugLogRuntimeEventTotalOnDespawn: 1
   skeletonAnimation: {fileID: 520108655579512466}
   fallbackAnimationName: 
   fallbackLoop: 0

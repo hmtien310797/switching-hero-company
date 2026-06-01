@@ -35,47 +35,47 @@ namespace Battle
 
     public partial class PvEBattleController : Singleton<PvEBattleController>
     {
-        [Header("Refs")] 
-        [SerializeField] FollowHeroController[] enemySpawnerCollection;
+        [Header("Refs")] [SerializeField] FollowHeroController[] enemySpawnerCollection;
         [SerializeField] PvEMapController pvEMapController;
         [SerializeField] BattleCoinView coinPrefab;
 
-        [Header("Spawn Positions")] 
-        [SerializeField]private List<Transform> spawnPoss;
+        [Header("Spawn Positions")] [SerializeField]
+        private List<Transform> spawnPoss;
 
-        [Header("Data (Creeps)")] 
-        [SerializeField] private CreepDataSo[] creepDataSo;
+        [Header("Data (Creeps)")] [SerializeField]
+        private CreepDataSo[] creepDataSo;
+
         [SerializeField] private CreepSpawnPatternCollectionSO creepSpawnPatternCollection;
         [SerializeField] private SpawnRatePatternSO spawnRatePattern;
 
-        [Header("Data (Boss)")] 
-        [SerializeField] private BossDataSO[] bossData;
-        
-        [Header("Stage")] 
-        [SerializeField] private int currentStage = 1;
+        [Header("Data (Boss)")] [SerializeField]
+        private BossDataSO[] bossData;
+
+        [Header("Stage")] [SerializeField] private int currentStage = 1;
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
-        
-        [Header("Hero Team")]
-        [SerializeField] private HeroTeamController heroTeamController;
+
+        [Header("Hero Team")] [SerializeField] private HeroTeamController heroTeamController;
         [SerializeField, Min(0)] private int controlledHeroSlotIndex = 0;
-        
-        [Header("Creep Spawn Formation")]
-        [SerializeField] private float spawnSpacingX = 1.6f;
+
+        [Header("Creep Spawn Formation")] [SerializeField]
+        private float spawnSpacingX = 1.6f;
+
         [SerializeField] private float spawnSpacingZ = 1.25f;
         [SerializeField] private float spawnJitter = 0.25f;
         [SerializeField] private int spawnColumns = 5;
         [SerializeField] private float groupRadius = 2.5f;
         [SerializeField] private int spawnColumnsPerGroup = 3;
-        
-        [Header("Creep Spawn Multi Groups")]
-        [SerializeField] private int minSpawnGroupsPerBatch = 3;
+
+        [Header("Creep Spawn Multi Groups")] [SerializeField]
+        private int minSpawnGroupsPerBatch = 3;
+
         [SerializeField] private int maxSpawnGroupsPerBatch = 6;
         [SerializeField] private int maxCreepsPerGroup = 5;
-        
+
         [ShowInInspector] private readonly List<EnemyActor> creeps = new();
-        
+
         private BattleResult result = BattleResult.None;
         private int aliveCreepCount;
         private int deadCreepCount;
@@ -95,7 +95,7 @@ namespace Battle
 
         private bool isReadyBattle = false;
         private bool losingStage = false;
-        
+
         private readonly HeroActor[] inBattleHeroes = new HeroActor[2];
         private readonly Dictionary<int, HeroActor> inBattleHeroMapper = new();
         private GameCameraController gameCameraController;
@@ -105,7 +105,7 @@ namespace Battle
 
         public BattleState State { get; private set; } = BattleState.None;
         public List<EnemyActor> MonsterList => creeps;
-        
+
         private void Start()
         {
             GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
@@ -123,6 +123,7 @@ namespace Battle
                 gameCameraController.FollowBoss();
                 return;
             }
+
             gameCameraController.FollowLastHeroTarget();
         }
 
@@ -132,7 +133,7 @@ namespace Battle
             BuildSpawnPositions();
             BuildBossDataLookup();
             gameData = GameData.Instance;
-            await StartAsync();        
+            await StartAsync();
         }
 
         public void SetAutoSkill(bool isAutoSkill)
@@ -163,7 +164,7 @@ namespace Battle
         {
             return pvEMapController.GetEndMapPosition();
         }
-        
+
         private void OnChangeHero(int sourceHeroId, int targetHeroId)
         {
             if (!CanSwitchHero(sourceHeroId, targetHeroId))
@@ -241,7 +242,7 @@ namespace Battle
                 heroDeadCount = 0;
             }
         }
-        
+
         public void InitSwitchableHeroIds()
         {
             inBattleHeroIdList.Clear();
@@ -265,7 +266,7 @@ namespace Battle
                     gameCameraController.SetFollowHero(inBattleHeroes[heroIndex].transform);
                 }
             }
-            
+
             await UniTask.Delay(1000);
         }
 
@@ -284,7 +285,7 @@ namespace Battle
             }
 
             Vector3 spawnPos = GetHeroSpawnPosition(heroIndex);
-            
+
             var hero = Instantiate(heroData.HeroPrefab,
                 spawnPos, Quaternion.identity);
             if (hero == null)
@@ -307,7 +308,7 @@ namespace Battle
 
             await UniTask.Delay(TimeSpan.FromSeconds(1f));
         }
-        
+
         private Vector3 GetHeroSpawnPosition(int heroIndex)
         {
             Vector3 center = Vector3.forward * 12f;
@@ -318,13 +319,13 @@ namespace Battle
 
             return center + Vector3.right * 1.5f;
         }
-        
+
         private void RefreshHeroSlotCache()
         {
             inBattleHeroA = inBattleHeroes[0];
             inBattleHeroB = inBattleHeroes[1];
         }
-        
+
         private void RefreshHeroTeamController()
         {
             if (heroTeamController == null)
@@ -439,7 +440,7 @@ namespace Battle
         {
             if (heroTeamController == null)
                 return;
-            
+
             for (int i = 0; i < inBattleHeroes.Length; i++)
             {
                 var hero = inBattleHeroes[i];
@@ -447,14 +448,16 @@ namespace Battle
                 {
                     continue;
                 }
+
                 if (i == controlledHeroSlotIndex)
                 {
                     hero.SetChosen(true);
                     continue;
                 }
+
                 hero.SetChosen(false);
             }
-            
+
             if (controlledHeroSlotIndex == 0)
                 heroTeamController.SelectHeroA();
             else
@@ -485,7 +488,7 @@ namespace Battle
         {
             result = BattleResult.None;
             SetState(BattleState.Initializing);
-            
+
             InitStage(currentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
@@ -645,9 +648,13 @@ namespace Battle
                     creep.name += creep.transform.GetInstanceID();
                     creep.gameObject.SetActive(true);
 
-                    creep.transform.localScale = k % 5 == 0
-                        ? Vector3.one * 1.5f
-                        : Vector3.one;
+                    creep.SetScale(k % 5 == 0
+                        ? 1.5f
+                        : 1f);
+                    
+                    creep.HealthBarController.SetOffsetPosition(k % 5 == 0
+                        ? 0.5f
+                        : 0f, 0f);
 
                     creep.Init(
                         creepData,
@@ -664,7 +671,7 @@ namespace Battle
                 }
             }
         }
-        
+
         private List<Vector3> GenerateSpawnFormationPositions(int amount)
         {
             List<Vector3> result = new List<Vector3>(amount);
@@ -699,7 +706,7 @@ namespace Battle
             Shuffle(result);
             return result;
         }
-        
+
         private List<int> AllocateEvenGroupCounts(int totalAmount, int groupCount)
         {
             List<int> counts = new List<int>(groupCount);
@@ -713,18 +720,18 @@ namespace Battle
             for (int i = 0; i < groupCount; i++)
             {
                 int count = baseCount;
-                
+
                 if (i < remainder)
                     count++;
 
                 counts.Add(count);
             }
-            
+
             Shuffle(counts);
 
             return counts;
         }
-        
+
         private List<Transform> PickRandomSpawnAnchors(int count)
         {
             List<Transform> candidates = new List<Transform>(spawnPoss);
@@ -741,7 +748,7 @@ namespace Battle
 
             return result;
         }
-        
+
         private void AddGroupFormationPositions(
             List<Vector3> result,
             Vector3 anchorPosition,
@@ -779,7 +786,7 @@ namespace Battle
                 result.Add(finalPosition);
             }
         }
-        
+
         private void Shuffle<T>(List<T> list)
         {
             for (int i = 0; i < list.Count; i++)
@@ -796,25 +803,25 @@ namespace Battle
                 Debug.LogError($"[PvE] Cannot resolve boss data for stage={currentStage}");
                 return;
             }
-            
+
             if (bossSo.bossPrefab == null)
             {
                 Debug.LogError($"[PvE] Boss prefab missing for bossId={bossSo.Id}");
                 return;
             }
-            
+
             if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
                 return;
-            
+
             Debug.Log($"[PvE] Spawn Boss - Stage={currentStage}, BossId={bossSo.Id}, BossName={bossSo.Name}");
-            
+
             var pos = GroupFlashController.Instance.GetPosByIdx(2);
             var spawnedBoss = PoolManager.Instance.Spawn(bossSo.bossPrefab, pos, Quaternion.identity);
             currentBoss = spawnedBoss;
             currentBoss.Init(bossSo, inBattleHeroA, inBattleHeroB);
             currentBoss.OnDead -= OnBossDead;
             currentBoss.OnDead += OnBossDead;
-            
+
             ///---------------------------------------------------------
 
             GameStatView.Instance.InitTimer(battleTime, () =>
@@ -823,10 +830,10 @@ namespace Battle
                 {
                     return;
                 }
-            
+
                 GameEventManager.Trigger(GameEvents.OnStageLost);
             });
-            
+
             isBossAlive = true;
             SetState(BattleState.FightingBoss);
         }
@@ -837,6 +844,7 @@ namespace Battle
             {
                 return;
             }
+
             GameEventManager.Trigger(GameEvents.OnStageCleared);
         }
 
@@ -872,7 +880,7 @@ namespace Battle
         {
             if (enemy == null)
                 return;
-            
+
             DropCoinAsync(enemy.transform.position);
             creeps.Remove(enemy);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
@@ -891,9 +899,10 @@ namespace Battle
                 isReadyBattle = true;
                 return;
             }
+
             SpawnBoss();
         }
-        
+
         private void RefreshEnemyHeroTargets()
         {
             for (int i = creeps.Count - 1; i >= 0; i--)
@@ -926,7 +935,8 @@ namespace Battle
             var numRand = Random.Range(2, 5);
             for (int i = 0; i < numRand; i++)
             {
-                BattleCoinView coin = PoolManager.Instance.Spawn(coinPrefab, pos + Vector3.up * 0.25f, Quaternion.identity);
+                BattleCoinView coin =
+                    PoolManager.Instance.Spawn(coinPrefab, pos + Vector3.up * 0.25f, Quaternion.identity);
                 var trans = FindHeroNearestFromPos(pos);
                 coin.DoDrop(0.1f + i * 0.1f, trans).Forget();
             }
@@ -953,7 +963,7 @@ namespace Battle
                 ? secondHero.transform
                 : firstHero.transform;
         }
-        
+
         public ICombatUnit GetNearestEnemy(Vector3 pos)
         {
             if (!isReadyBattle)
@@ -1005,7 +1015,18 @@ namespace Battle
 
             return nearest;
         }
-        
+
+        public ICombatUnit GetRandomEnemyAlive()
+        {
+            if (currentBoss != null && !currentBoss.IsDead)
+            {
+                return currentBoss;
+            }
+
+            int index = Random.Range(0, creeps.Count);
+            return creeps[index];
+        }
+
         //not in use
         public Vector3 GetLowestHpEnemy(Vector3 pos, float range)
         {
@@ -1044,6 +1065,7 @@ namespace Battle
 
                 creeps.RemoveAt(i);
             }
+
             SpawnBoss();
             aliveCreepCount = 0;
         }
@@ -1173,7 +1195,7 @@ namespace Battle
             {
                 var data = creepDataSo[i];
                 if (data == null) continue;
-                
+
                 creepDataMapper[data.Id] = data;
             }
         }
@@ -1202,6 +1224,7 @@ namespace Battle
                 inBattleHeroes[i].ActiveVisual(false);
                 inBattleHeroes[i].ResetSpawnPosition(spawnPos);
             }
+
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
             for (int i = 0; i < inBattleHeroes.Length; i++)
@@ -1209,6 +1232,7 @@ namespace Battle
                 inBattleHeroes[i].ResetData();
                 await UniTask.Delay(800);
             }
+
             HandleNextStage();
         }
 
@@ -1223,6 +1247,7 @@ namespace Battle
                 inBattleHeroes[i].ActiveVisual(false);
                 inBattleHeroes[i].ResetSpawnPosition(spawnPos);
             }
+
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
@@ -1231,6 +1256,7 @@ namespace Battle
                 inBattleHeroes[i].ResetData();
                 await UniTask.Delay(800);
             }
+
             HandleCurrentStage();
         }
 

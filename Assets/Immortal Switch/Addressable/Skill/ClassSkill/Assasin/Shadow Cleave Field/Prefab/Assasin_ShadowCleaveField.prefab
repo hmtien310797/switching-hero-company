@@ -47,6 +47,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PoolSize>k__BackingField: 2
   <DeSpawnedOnStart>k__BackingField: 0
+  debugCountRuntimeEvent: 0
+  debugCountEventName: hit
+  debugLogRuntimeEventCount: 1
+  debugLogRuntimeEventTotalOnDespawn: 1
   skeletonAnimation: {fileID: 619994822060194734}
   fallbackAnimationName: 
   fallbackLoop: 0
@@ -77,13 +81,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4671638004229425124}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5191010416017113526}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
 --- !u!33 &807671874930502575
 MeshFilter:
   m_ObjectHideFlags: 0

@@ -137,7 +137,7 @@ namespace Immortal_Switch.Scripts.Skill
                 if (cancelled || Context.Caster == null || Context.Caster.IsDead)
                     break;
 
-                currentTarget = FindRandomAliveEnemy();
+                currentTarget = PvEBattleController.Instance.GetRandomEnemyAlive();
                 if (currentTarget == null)
                 {
                     Debug.Log($"[BastetUltimate] Stop at jump {jumpIndex + 1}. No alive enemy found.", this);
@@ -165,6 +165,7 @@ namespace Immortal_Switch.Scripts.Skill
                     yield return WaitForHitOrFallback(Mathf.Max(animationDuration, fallbackJumpDuration));
 
                 waitingForHit = false;
+                GameCameraController.Instance.ShakeCamera();
             }
             
             routine = null;
@@ -239,34 +240,6 @@ namespace Immortal_Switch.Scripts.Skill
                 position.y = Context.Caster.Position.y;
 
             return position;
-        }
-
-        private ICombatUnit FindRandomAliveEnemy()
-        {
-            candidates.Clear();
-
-            PvEBattleController battleController = Context.BattleController;
-            BossActor currentBoss = battleController.GetActiveBossActor();
-            if (currentBoss != null)
-            {
-                return currentBoss;
-            }
-            
-            List<EnemyActor> enemies = battleController.MonsterList;
-            for (int i = 0; i < enemies.Count; i++)
-            {
-                EnemyActor enemy = enemies[i];
-                if (enemy == null || enemy.IsDead || !enemy.gameObject.activeInHierarchy)
-                    continue;
-
-                candidates.Add(enemy);
-            }
-
-            if (candidates.Count <= 0)
-                return null;
-
-            int index = Random.Range(0, candidates.Count);
-            return candidates[index];
         }
     }
 }

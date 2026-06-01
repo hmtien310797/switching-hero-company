@@ -1,5 +1,6 @@
 using System.Collections;
 using Common;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -12,36 +13,36 @@ namespace Immortal_Switch.Scripts.Skill
     /// the same SkillDataSO/context, so child Spine events like "hit" execute the phases/actions
     /// configured on the parent SkillDataSO.
     /// </summary>
-    public sealed class SkillMultiSpawnRuntimeObject : SkillRuntimeObject
+    public class SkillMultiSpawnRuntimeObject : SkillRuntimeObject
     {
         [Header("Child Runtime Object")]
-        [SerializeField] private SkillRuntimeObject childRuntimePrefab;
-        [SerializeField] private string childAnimationName;
-        [SerializeField] private bool childLoopAnimation;
-        [SerializeField] private bool childUseLifeTime = true;
-        [SerializeField] private float childLifeTime = 1.5f;
-        [SerializeField] private bool childDespawnOnAnimationComplete = true;
+        [SerializeField] protected SkillRuntimeObject childRuntimePrefab;
+        [SerializeField] protected string childAnimationName;
+        [SerializeField] protected bool childLoopAnimation;
+        [SerializeField] protected bool childUseLifeTime = true;
+        [SerializeField] protected float childLifeTime = 1.5f;
+        [SerializeField] protected bool childDespawnOnAnimationComplete = true;
 
         [Header("Spawn Pattern")]
-        [SerializeField, Min(1)] private int spawnCount = 10;
-        [SerializeField, Min(0f)] private float startDelay = 0f;
-        [SerializeField, Min(0f)] private float spawnInterval = 0.15f;
-        [SerializeField, Min(0f)] private float spawnRadius = 2.5f;
-        [SerializeField] private bool randomInsideCircle = true;
-        [SerializeField] private bool includeCenterAsFirstSpawn = true;
+        [SerializeField, Min(1)] protected int spawnCount = 10;
+        [SerializeField, Min(0f)] protected float startDelay = 0f;
+        [SerializeField, Min(0f)] protected float spawnInterval = 0.15f;
+        [SerializeField, Min(0f)] protected float spawnRadius = 2.5f;
+        [SerializeField] protected bool randomInsideCircle = true;
+        [SerializeField] protected bool includeCenterAsFirstSpawn = true;
 
         [Header("Position Offset")]
-        [SerializeField] private Vector3 childSpawnOffset;
-        [SerializeField] private bool randomizeYRotation;
+        [SerializeField] protected Vector3 childSpawnOffset;
+        [SerializeField] protected bool randomizeYRotation;
 
         [Header("Controller Lifetime")]
-        [SerializeField] private bool despawnControllerAfterSpawn = true;
-        [SerializeField, Min(0f)] private float despawnDelayAfterLastSpawn = 0.25f;
+        [SerializeField] protected bool despawnControllerAfterSpawn = true;
+        [SerializeField, Min(0f)] protected float despawnDelayAfterLastSpawn = 0.25f;
 
         [Header("Debug")]
-        [SerializeField] private bool debugDrawSpawnRadius;
+        [SerializeField] protected bool debugDrawSpawnRadius;
 
-        private Coroutine spawnRoutine;
+        protected Coroutine spawnRoutine;
 
         protected override void OnRuntimeInitialized()
         {
@@ -83,7 +84,7 @@ namespace Immortal_Switch.Scripts.Skill
             }
         }
 
-        private void SpawnChild(int index)
+        protected virtual async UniTask SpawnChild(int index)
         {
             if (Context == null || Spawner == null || childRuntimePrefab == null)
                 return;
@@ -103,7 +104,7 @@ namespace Immortal_Switch.Scripts.Skill
             child.Init(childContext, childConfig, Executor, TargetResolver, Spawner);
         }
 
-        private Vector3 GetChildSpawnPosition(int index)
+        protected Vector3 GetChildSpawnPosition(int index)
         {
             Vector3 center = transform.position;
 
@@ -127,7 +128,7 @@ namespace Immortal_Switch.Scripts.Skill
             return center + offset + childSpawnOffset;
         }
 
-        private SkillRuntimeObjectConfig BuildChildConfig()
+        protected SkillRuntimeObjectConfig BuildChildConfig()
         {
             // Child object reuses the same skill context/data, but has its own visual/lifetime config.
             // Its Spine events will execute phases from Context.SkillData.

@@ -61,6 +61,7 @@ MonoBehaviour:
   spawnFallbackDuration: 3
   destroyOnDead: 0
   destroyDelay: 2
+  <ActorType>k__BackingField: 1
 --- !u!114 &4378392224121908283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,6 +255,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 928569817342324788}
     m_Modifications:
+    - target: {fileID: 259362268101369255, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 883789372701347768, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Size.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990987390485026203, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5076356489107135116, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Size.x
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6740417167127500171, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_Name
       value: HealthBarController
@@ -268,11 +285,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.06
+      value: 7.83
       objectReference: {fileID: 0}
     - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_LocalPosition.z
@@ -305,6 +322,10 @@ PrefabInstance:
     - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688634025904658460, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: maxWidth
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

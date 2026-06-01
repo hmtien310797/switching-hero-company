@@ -199,7 +199,7 @@ MonoBehaviour:
     fromNumber: 10
     toNumber: 100
   durationFadeIn: 0.05
-  enableOffsetFadeIn: 0
+  enableOffsetFadeIn: 1
   offsetFadeIn: {x: 0.5, y: 0}
   enableScaleFadeIn: 1
   scaleFadeIn: {x: 0.5, y: 0.5}
@@ -221,8 +221,8 @@ MonoBehaviour:
   enableLerp: 1
   lerpSettings:
     speed: 5
-    minX: -0.4
-    maxX: 0.4
+    minX: -1
+    maxX: 1
     minY: 0.5
     maxY: 1
     randomFlip: 0
@@ -618,8 +618,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 7
-  m_fontSizeBase: 7
+  m_fontSize: 8
+  m_fontSizeBase: 8
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -1,41 +1,96 @@
 using UnityEngine;
 
-public class HealthBarController : MonoBehaviour
+public sealed class HealthBarController : MonoBehaviour
 {
+    [Header("Renderers")]
+    [SerializeField] private SpriteRenderer backgroundRenderer;
     [SerializeField] private SpriteRenderer fillRenderer;
 
-    private float originalWidth;
-    private Vector3 originalLocalPosition;
+    [Header("Settings")]
+    [SerializeField] private float maxWidth = 1f;
+    [SerializeField] private bool hideWhenFull = false;
+    [SerializeField] private bool hideWhenEmpty = true;
+
+    private Vector2 fillOriginalSize;
 
     private void Awake()
     {
-        if (fillRenderer == null)
-            fillRenderer = GetComponent<SpriteRenderer>();
+        if (fillRenderer != null)
+        {
+            fillOriginalSize = fillRenderer.size;
 
-        originalWidth = fillRenderer.size.x;
-        originalLocalPosition = fillRenderer.transform.localPosition;
+            if (maxWidth <= 0f)
+                maxWidth = fillOriginalSize.x;
+        }
+        
+        float yPos = transform.localPosition.y;
+        transform.localPosition = new Vector3(-(maxWidth / 2f), yPos, 0);
     }
 
-    public void SetHealth(float healthRatio)
+    public void SetHealthNormalized(float normalizedHealth)
+    {
+        normalizedHealth = Mathf.Clamp01(normalizedHealth);
+
+        SetFill(normalizedHealth);
+        UpdateVisible(normalizedHealth);
+    }
+
+    public void SetOffsetPosition(float xOffset, float yOffset)
+    {
+        transform.localPosition += new Vector3(xOffset, yOffset, 0);
+    }
+
+    public void SetHealth(float currentHp, float maxHp)
+    {
+        if (maxHp <= 0f)
+        {
+            SetHealthNormalized(0f);
+            return;
+        }
+
+        float normalizedHealth = currentHp / maxHp;
+        SetHealthNormalized(normalizedHealth);
+    }
+
+    public void ResetHealth()
+    {
+        SetHealthNormalized(1f);
+    }
+
+    public void Show()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void Hide()
+    {
+        gameObject.SetActive(false);
+    }
+
+    private void SetFill(float normalizedHealth)
     {
         if (fillRenderer == null)
             return;
 
-        healthRatio = Mathf.Clamp01(healthRatio);
-
-        var size = fillRenderer.size;
-        size.x = originalWidth * healthRatio;
+        Vector2 size = fillRenderer.size;
+        size.x = maxWidth * normalizedHealth;
         fillRenderer.size = size;
-
-        // Nếu pivot của sprite fill đang nằm giữa, dùng đoạn này để giữ mép trái cố định.
-        // Nếu pivot đã là Left Center thì có thể bỏ đoạn dưới.
-        var pos = originalLocalPosition;
-        pos.x = originalLocalPosition.x - (originalWidth - size.x) * 0.5f;
-        fillRenderer.transform.localPosition = pos;
     }
 
-    public void PreSetHealth()
+    private void UpdateVisible(float normalizedHealth)
     {
-        SetHealth(1f);
+        if (hideWhenEmpty && normalizedHealth <= 0f)
+        {
+            Hide();
+            return;
+        }
+
+        if (hideWhenFull && normalizedHealth >= 1f)
+        {
+            Hide();
+            return;
+        }
+
+        Show();
     }
 }
