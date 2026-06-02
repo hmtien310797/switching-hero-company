@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Battle;
+using Immortal_Switch.Scripts.SkillRemake;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.Skill
 {
@@ -15,8 +17,8 @@ namespace Immortal_Switch.Scripts.Skill
         [Min(0f)] public float Cooldown = 1f;
         public SkillTargetSelectType TargetSelectType = SkillTargetSelectType.NearestEnemy;
 
-        [Header("Hero Animation Case")]
-        public string AnimationName;
+        [FormerlySerializedAs("AnimationName")]
+        public string HeroAnimationName;
     }
 
     [Serializable]
@@ -26,6 +28,9 @@ namespace Immortal_Switch.Scripts.Skill
 
         [Header("Spawned Skill Object")]
         public SkillRuntimeObject RuntimePrefab;
+        [Header("Spawned Skill Object")]
+        public BulletSpawnerSkillRuntimeObject runtimeObjectBulletSpawner;
+        
         public SkillSpawnPositionType SpawnPositionType = SkillSpawnPositionType.Self;
         public SkillFollowType FollowType = SkillFollowType.None;
         public Vector3 SpawnOffset;
@@ -86,25 +91,29 @@ namespace Immortal_Switch.Scripts.Skill
     public class SkillLevelData
     {
         [Min(1)] public int Level = 1;
+        public bool UseCastOverride;
+        public bool UseRuntimeObjectOverride;
+        public bool UsePassiveOverride;
+        public bool HasBulletSpawner;
 
+        [ShowIf("UseCastOverride")]
         [Header("Cast Override")]
         [Tooltip("Off = use SkillDataSO.CastConfig. On = use CastOverride for this level.")]
-        public bool UseCastOverride;
-        [ShowIf("UseCastOverride")]
         public SkillCastConfig CastOverride = new();
 
+        [ShowIf("UseRuntimeObjectOverride")]
         [Header("Runtime Object Override")]
         [Tooltip("Off = use SkillDataSO.RuntimeObjectConfig. On = use RuntimeObjectOverride for this level.")]
-        public bool UseRuntimeObjectOverride;
-        [ShowIf("UseRuntimeObjectOverride")]
         public SkillRuntimeObjectConfig RuntimeObjectOverride = new();
 
+        [ShowIf("UsePassiveOverride")]
         [Header("Passive Override")]
         [Tooltip("Off = use SkillDataSO.PassiveConfig. On = use PassiveOverride for this level.")]
-        public bool UsePassiveOverride;
-        [ShowIf("UsePassiveOverride")]
         public SkillPassiveConfig PassiveOverride = new();
-
+        
+        [ShowIf("HasBulletSpawner")]
+        [Header("Bullet Spawner Config")]
+        public BulletPatternConfig BulletSpawnerConfig = new();
         public List<SkillPhaseData> Phases = new();
         public List<SkillDescriptionParam> DescriptionParams = new();
     }
@@ -118,18 +127,9 @@ namespace Immortal_Switch.Scripts.Skill
         [Tooltip("Generic event name. For Spine objects, this is the Spine event name, e.g. hit/shoot/finalhit.")]
         public string EventName = "hit";
 
-        [Tooltip("Legacy field. Kept so old SpineEvent data does not break.")]
-        public string SpineEventName = "hit";
-
         [Min(0f)] public float Delay;
         [Range(0f, 1f)] public float NormalizedTime;
-        public SkillTargetType TargetTypeOverride = SkillTargetType.CurrentTarget;
         public List<SkillActionData> Actions = new();
-
-        public string GetResolvedEventName()
-        {
-            return !string.IsNullOrEmpty(EventName) ? EventName : SpineEventName;
-        }
     }
 
     [Serializable]
@@ -151,15 +151,16 @@ namespace Immortal_Switch.Scripts.Skill
 
         [Header("Type")]
         public SkillOwnerType OwnerType = SkillOwnerType.ClassSkill;
-        public SkillTargetType DefaultTargetType = SkillTargetType.CurrentTarget;
         [Min(1)] public int MaxLevel = 1;
 
+        [ShowIf("OwnerType", SkillOwnerType.ClassSkill)]
         [Header("Summon / Rarity")]
         public TierSkill SkillTier;
 
         [Header("Default Config")]
         public SkillCastConfig CastConfig = new();
         public SkillRuntimeObjectConfig RuntimeObjectConfig = new();
+        [ShowIf("OwnerType", SkillOwnerType.PassiveSkill)]
         public SkillPassiveConfig PassiveConfig = new();
 
         [Header("Custom Behaviour")]
@@ -240,7 +241,7 @@ namespace Immortal_Switch.Scripts.Skill
                 if (phase == null || phase.TriggerType != triggerType)
                     continue;
 
-                if (string.Equals(phase.GetResolvedEventName(), eventName, StringComparison.Ordinal))
+                if (string.Equals(phase.EventName, eventName, StringComparison.Ordinal))
                     return phase;
             }
 
@@ -263,7 +264,7 @@ namespace Immortal_Switch.Scripts.Skill
                 if (phase == null || phase.TriggerType != triggerType)
                     continue;
 
-                if (string.Equals(phase.GetResolvedEventName(), eventName, StringComparison.Ordinal))
+                if (string.Equals(phase.EventName, eventName, StringComparison.Ordinal))
                     results.Add(phase);
             }
         }
@@ -509,7 +510,7 @@ namespace Immortal_Switch.Scripts.Skill
                 CastRange = source.CastRange,
                 Cooldown = source.Cooldown,
                 TargetSelectType = source.TargetSelectType,
-                AnimationName = source.AnimationName
+                HeroAnimationName = source.HeroAnimationName
             };
         }
 
@@ -598,10 +599,8 @@ namespace Immortal_Switch.Scripts.Skill
                 PhaseId = source.PhaseId,
                 TriggerType = source.TriggerType,
                 EventName = source.EventName,
-                SpineEventName = source.SpineEventName,
                 Delay = source.Delay,
                 NormalizedTime = source.NormalizedTime,
-                TargetTypeOverride = source.TargetTypeOverride,
                 Actions = CloneActions(source.Actions)
             };
         }

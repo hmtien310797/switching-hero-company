@@ -4,6 +4,7 @@ using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.PlayerSystem.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +21,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] CurrencyView currencyView;
         [SerializeField] HeroJoystick heroJostick;
         [SerializeField] private Button autoSkillButton;
+        [SerializeField] private Button profileBtn;
         [SerializeField] private GameObject rotateObject;
         [SerializeField] private GameObject[] hideAbleObjects;
         
@@ -33,7 +35,13 @@ namespace Immortal_Switch.Scripts.UI
             if (switchMainSubHeroButton != null)
                 switchMainSubHeroButton.onClick.AddListener(OnSwitchMainSubHeroButtonClicked);
 
+            profileBtn.onClick.AddListener(OnClickProfile);
             OnStageEnd();
+        }
+
+        private void OnClickProfile()
+        {
+            UIManager.Instance.OpenPopupAsync<UIProfileView>();
         }
 
         private void Start()

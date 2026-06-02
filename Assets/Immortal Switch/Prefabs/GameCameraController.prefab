@@ -29,14 +29,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 699346998048564425}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.11261425, y: 0.000000027151097, z: -0.000000003077175, w: 0.9936388}
+  m_LocalRotation: {x: 0.11261363, y: 0, z: 0, w: 0.9936389}
   m_LocalPosition: {x: -1.5, y: 11, z: -21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8631796194764098763}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 12.932, y: 0, z: 0}
 --- !u!20 &3471696155095352930
 Camera:
   m_ObjectHideFlags: 0
@@ -192,6 +192,10 @@ MonoBehaviour:
   followHeroCamera: {fileID: 0}
   followBossCamera: {fileID: 0}
   renderHeroCamera: {fileID: 9097243558221480606}
+  followHeroCameraNoise: {fileID: 0}
+  amplitude: 5
+  frequency: 1
+  duration: 0.4
   horizontalPlayerPov: 30
   verticalPlayerPov: 50
   horizontalSceneryPov: 35

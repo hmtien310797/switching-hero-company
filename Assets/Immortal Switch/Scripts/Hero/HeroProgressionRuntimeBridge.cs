@@ -23,16 +23,6 @@ namespace Immortal_Switch.Scripts.Hero
             }
         }
 
-        private void OnEnable()
-        {
-            TryRegister();
-        }
-
-        private void OnDisable()
-        {
-            TryUnregister();
-        }
-
         public void Setup(HeroDataSO data, HeroActor heroActor)
         {
             TryUnregister();
@@ -64,28 +54,10 @@ namespace Immortal_Switch.Scripts.Hero
 
         public void RefreshFromProgression()
         {
-            if (heroData == null)
-            {
-                Debug.LogWarning("HeroProgressionRuntimeBridge: missing HeroData");
-                return;
-            }
-
-            if (statsController == null)
-            {
-                Debug.LogWarning("HeroProgressionRuntimeBridge: missing StatsController");
-                return;
-            }
-
-            if (HeroProgressionManager.Instance == null || HeroProgressionManager.Instance.Service == null)
-            {
-                Debug.LogWarning("HeroProgressionRuntimeBridge: HeroProgressionManager not found");
-                return;
-            }
-
             var stat = HeroProgressionManager.Instance.Service.GetCurrentStats(heroData.Id);
             if (stat == null)
             {
-                Debug.LogWarning($"HeroProgressionRuntimeBridge: stat snapshot null for hero {heroData.Id}");
+                Debug.LogError($"HeroProgressionRuntimeBridge: stat snapshot null for hero {heroData.Id}");
                 return;
             }
 
@@ -97,19 +69,20 @@ namespace Immortal_Switch.Scripts.Hero
             var module = statsController.StatModule;
             if (module == null)
             {
-                Debug.LogWarning("HeroProgressionRuntimeBridge: StatModule is null");
+                Debug.LogError("HeroProgressionRuntimeBridge: StatModule is null");
                 return;
             }
 
             module.SetBaseStat(StatType.MaxHp, stat.Health);
             module.SetBaseStat(StatType.Atk, stat.Attack);
             module.SetBaseStat(StatType.Def, stat.Defense);
-            module.SetBaseStat(StatType.Accuracy, stat.Accuracy);
-            module.SetBaseStat(StatType.AttackSpeed, stat.AttackSpeed);
-            module.SetBaseStat(StatType.AttackRange, stat.AttackRange);
-            module.SetBaseStat(StatType.MoveSpeed, stat.MoveSpeed);
-            module.SetBaseStat(StatType.CritChance, stat.CritChance);
-            module.SetBaseStat(StatType.CritDamage, stat.CritDamage);
+            //temp lock
+            // module.SetBaseStat(StatType.Accuracy, stat.Accuracy);
+            // module.SetBaseStat(StatType.AttackSpeed, stat.AttackSpeed);
+            // module.SetBaseStat(StatType.AttackRange, stat.AttackRange);
+            // module.SetBaseStat(StatType.MoveSpeed, stat.MoveSpeed);
+            // module.SetBaseStat(StatType.CritChance, stat.CritChance);
+            // module.SetBaseStat(StatType.CritDamage, stat.CritDamage);
         }
     }
 }

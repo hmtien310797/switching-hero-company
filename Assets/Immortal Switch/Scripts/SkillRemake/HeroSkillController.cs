@@ -67,8 +67,6 @@ namespace Immortal_Switch.Scripts.Skill
         public SkillDataSO UltimateSkill => ultimateSkill;
         public SkillDataSO PassiveSkill => passiveSkill;
         public HeroAutoSkillController AutoSkillController => autoSkillController;
-        //ra chieu dong loat nen ko can
-        //public bool IsCasting => isCasting;
 
         public float GetCooldownRemaining(SkillDataSO skillData)
         {
@@ -665,7 +663,7 @@ namespace Immortal_Switch.Scripts.Skill
                 owner.Locomotion?.Stop();
             }
 
-            if (castConfig == null || string.IsNullOrEmpty(castConfig.AnimationName))
+            if (castConfig == null || string.IsNullOrEmpty(castConfig.HeroAnimationName))
             {
                 // No hero animation configured. The spawned object has already been created,
                 // so release the caster immediately.
@@ -673,7 +671,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return false;
             }
 
-            float delay = animationDriver.PlaySkill(castConfig.AnimationName);
+            float delay = animationDriver.PlaySkill(castConfig.HeroAnimationName);
             DOVirtual.DelayedCall(delay,() =>
             {
                 Debug.Log($"[DelayedCall Callback] time = {delay}");
@@ -716,9 +714,9 @@ namespace Immortal_Switch.Scripts.Skill
                 owner.SetActionLocked(true);
             }
 
-            if (!string.IsNullOrEmpty(castConfig.AnimationName))
+            if (!string.IsNullOrEmpty(castConfig.HeroAnimationName))
             {
-                float delay = animationDriver.PlaySkill(castConfig.AnimationName);
+                float delay = animationDriver.PlaySkill(castConfig.HeroAnimationName);
                 DOVirtual.DelayedCall(delay,() =>
                 {
                     Debug.Log($"[DelayedCall Callback] time = {delay}");

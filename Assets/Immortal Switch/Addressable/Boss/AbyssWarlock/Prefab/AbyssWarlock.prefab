@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4378392224121908283}
   - component: {fileID: 2157218445760095175}
   - component: {fileID: 2301857392755416939}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: AbyssWarlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,6 +87,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 7553619407417555059}
+  heroActor: {fileID: 0}
+  ultimateAnimationInHero: 0
   spawnAnim: spawn
   idleAnim: idle
   runAnim: run
@@ -129,7 +131,7 @@ GameObject:
   - component: {fileID: 3126365133328429950}
   - component: {fileID: 8683438125368156162}
   - component: {fileID: 7553619407417555059}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Spine GameObject (boss)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -271,9 +273,17 @@ PrefabInstance:
       propertyPath: m_Size.x
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 5988986580598352522, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 6740417167127500171, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_Name
       value: HealthBarController
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740417167127500171, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_LocalScale.x
@@ -326,6 +336,10 @@ PrefabInstance:
     - target: {fileID: 7688634025904658460, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: maxWidth
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8882419513620984265, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

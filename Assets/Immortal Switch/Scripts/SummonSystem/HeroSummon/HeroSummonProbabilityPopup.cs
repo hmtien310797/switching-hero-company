@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.HeroUIView;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -81,6 +82,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
             prevButton.interactable = currentIndex > 0;
             nextButton.interactable = currentIndex < availableLevels.Count - 1;
+            
+            var rootRect = sectionRoot as RectTransform;
+            if (rootRect != null)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
         }
 
         private void GoPrev()

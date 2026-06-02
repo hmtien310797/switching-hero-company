@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.HeroUIView
@@ -42,7 +43,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         public SummonRarity Rarity;
 
         [Header("Icon")]
-        public Sprite Icon;
+        [PreviewField] public Sprite Icon;
 
         [Header("Gradient")]
         public Color TopColor = Color.white;

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c31095d0824d4de39a067953447c840b, type: 3}
+  m_Name: NewBulletPattern
+  m_EditorClassIdentifier: 
+  patternType: 3
+  bulletPrefab: {fileID: 804791343669178177, guid: b66a75eb36632cc449817963a73f22f6, type: 3}
+  bulletSpeed: 50
+  bulletLifeTime: 3
+  totalWaves: 10
+  timeBetweenWaves: 0.02
+  bulletsPerWave: 5
+  spreadAngle: 104
+  rotationSpeedPerWave: 30
+  bulletSpawnDelay: 0.01
+  alternateBulletOrderEachWave: 1

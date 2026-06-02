@@ -15,7 +15,8 @@ namespace Immortal_Switch.Scripts.Skill
         HeroSpineAnimation,
         SpawnedSkillObject,
         ProjectileOnly,
-        HeroSpineAndSpawnedSkillObject
+        HeroSpineAndSpawnedSkillObject,
+        SpawnedSkillObjectAndProjectile
     }
 
     public enum SkillPhaseTriggerType

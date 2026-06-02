@@ -10,6 +10,7 @@ namespace Battle
 {
     public enum TierSkill
     {
+        None,
         B,
         A,
         S,

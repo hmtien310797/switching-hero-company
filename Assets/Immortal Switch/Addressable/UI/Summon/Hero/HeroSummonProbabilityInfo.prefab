@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3910304465677313}
   - component: {fileID: 2610485517942586596}
+  - component: {fileID: 3716159903464376697}
+  - component: {fileID: 2473760608990828854}
   m_Layer: 5
   m_Name: HeroSummonProbabilityInfo
   m_TagString: Untagged
@@ -51,10 +53,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a4c46654197463f8886ecdbd3ec23f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rarityText: {fileID: 0}
+  heroSummonRarityVisualConfig: {fileID: 11400000, guid: d3049491bfac04d41a37c53d44ad2fc2, type: 2}
+  imgRarity: {fileID: 3543934568257761200}
   totalRateText: {fileID: 7582326733515247643}
   itemRoot: {fileID: 6915551525433210260}
   itemPrefab: {fileID: 8200954725287455097, guid: efc48d8649ad8ec43bdb0f2ba6a9c784, type: 3}
+--- !u!114 &3716159903464376697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2063076438167795908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &2473760608990828854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2063076438167795908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 10
+  m_ChildAlignment: 0
+  m_Spacing: -10
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &2748139490632984400
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,8 +345,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 610, y: -34.7}
-  m_SizeDelta: {x: 1220, y: 0}
+  m_AnchoredPosition: {x: 185, y: -60.3179}
+  m_SizeDelta: {x: 370, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &42995949933338993
 MonoBehaviour:
@@ -359,8 +402,8 @@ MonoBehaviour:
   m_ChildAlignment: 1
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 600, y: 150}
-  m_Spacing: {x: 16.6, y: 16}
+  m_CellSize: {x: 370, y: 90}
+  m_Spacing: {x: 14, y: 16}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!1 &6220809601583195309
@@ -396,10 +439,10 @@ RectTransform:
   m_Father: {fileID: 3910304465677313}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 70.3179}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &6833032509199574854
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,6 +454,7 @@ GameObject:
   - component: {fileID: 608380123840994453}
   - component: {fileID: 1231388499342996323}
   - component: {fileID: 6923989724332432539}
+  - component: {fileID: 5270896237585715769}
   m_Layer: 5
   m_Name: Underline
   m_TagString: Untagged
@@ -475,3 +519,23 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5270896237585715769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6833032509199574854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 1
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1

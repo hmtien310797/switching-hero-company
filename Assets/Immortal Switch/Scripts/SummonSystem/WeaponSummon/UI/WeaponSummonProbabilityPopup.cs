@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.HeroUIView;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,20 +29,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         [SerializeField] private WeaponSummonProbabilityRowUI gradeSRow;
         [SerializeField] private WeaponSummonProbabilityRowUI gradeSSRow;
 
-        [Header("Star Rows")]
-        [SerializeField] private WeaponSummonStarProbabilityRowUI star1Row;
-        [SerializeField] private WeaponSummonStarProbabilityRowUI star2Row;
-        [SerializeField] private WeaponSummonStarProbabilityRowUI star3Row;
-        [SerializeField] private WeaponSummonStarProbabilityRowUI star4Row;
-        [SerializeField] private WeaponSummonStarProbabilityRowUI star5Row;
-
         [Header("Tier Icons")]
-        [SerializeField] private Sprite gradeDIcon;
-        [SerializeField] private Sprite gradeCIcon;
-        [SerializeField] private Sprite gradeBIcon;
-        [SerializeField] private Sprite gradeAIcon;
-        [SerializeField] private Sprite gradeSIcon;
-        [SerializeField] private Sprite gradeSSIcon;
+        [SerializeField] private HeroRarityVisualConfigSO heroRarityVisualConfigSO;
 
         private readonly List<WeaponSummonLevelEntry> cachedLevels = new();
         private int currentIndex;
@@ -164,18 +154,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (summonLevelText != null)
                 summonLevelText.text = $"Lv.{levelData.SummonLevel}";
 
-            gradeDRow?.Bind(gradeDIcon, levelData.GradeDRate);
-            gradeCRow?.Bind(gradeCIcon, levelData.GradeCRate);
-            gradeBRow?.Bind(gradeBIcon, levelData.GradeBRate);
-            gradeARow?.Bind(gradeAIcon, levelData.GradeARate);
-            gradeSRow?.Bind(gradeSIcon, levelData.GradeSRate);
-            gradeSSRow?.Bind(gradeSSIcon, levelData.GradeSSRate);
+            gradeDRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Epic), levelData.GradeDRate);
+            gradeCRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Rare), levelData.GradeCRate);
+            gradeBRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.UnCommon), levelData.GradeBRate);
+            gradeARow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Common), levelData.GradeARate);
+            gradeSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Legendary), levelData.GradeSRate);
+            gradeSSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Mythic), levelData.GradeSSRate);
 
-            star1Row?.Bind(1, levelData.Star1Rate);
+            /*star1Row?.Bind(1, levelData.Star1Rate);
             star2Row?.Bind(2, levelData.Star2Rate);
             star3Row?.Bind(3, levelData.Star3Rate);
             star4Row?.Bind(4, levelData.Star4Rate);
-            star5Row?.Bind(5, levelData.Star5Rate);
+            star5Row?.Bind(5, levelData.Star5Rate);*/
 
             if (prevButton != null)
                 prevButton.interactable = currentIndex > 0;
@@ -189,18 +179,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (summonLevelText != null)
                 summonLevelText.text = "Lv.-";
 
-            gradeDRow?.Bind(gradeDIcon, 0f);
-            gradeCRow?.Bind(gradeCIcon, 0f);
-            gradeBRow?.Bind(gradeBIcon, 0f);
-            gradeARow?.Bind(gradeAIcon, 0f);
-            gradeSRow?.Bind(gradeSIcon, 0f);
-            gradeSSRow?.Bind(gradeSSIcon, 0f);
+            gradeDRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Epic), 0f);
+            gradeCRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Rare), 0f);
+            gradeBRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.UnCommon), 0f);
+            gradeARow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Common), 0f);
+            gradeSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Legendary), 0f);
+            gradeSSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Mythic), 0f);
 
-            star1Row?.Bind(1, 0f);
+            /*star1Row?.Bind(1, 0f);
             star2Row?.Bind(2, 0f);
             star3Row?.Bind(3, 0f);
             star4Row?.Bind(4, 0f);
-            star5Row?.Bind(5, 0f);
+            star5Row?.Bind(5, 0f);*/
 
             if (prevButton != null)
                 prevButton.interactable = false;

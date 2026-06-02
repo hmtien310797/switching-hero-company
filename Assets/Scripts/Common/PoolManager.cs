@@ -1,27 +1,17 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 
 namespace Common
 {
-    public sealed class PoolManager : MonoBehaviour
+    public sealed class PoolManager : Singleton<PoolManager>
     {
-        public static PoolManager Instance { get; private set; }
-
         [SerializeField] private int defaultPrewarmCount = 0;
 
         private readonly Dictionary<GameObject, ObjectPool> pools = new();
         private readonly Dictionary<GameObject, Transform> poolParents = new();
-
-        private void Awake()
-        {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-        }
+        
 
         public void Prewarm<T>(T prefab, int count) where T : Component, IPoolable
         {
@@ -130,6 +120,11 @@ namespace Common
             poolParents.Add(prefab, parent);
 
             return parent;
+        }
+
+        public override UniTask InitializeAsync()
+        {
+            return UniTask.CompletedTask;
         }
     }
 }

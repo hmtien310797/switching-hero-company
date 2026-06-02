@@ -17,20 +17,6 @@ namespace Immortal_Switch.Scripts.Equipment.Runtime
 
         public int HeroId => heroId;
 
-        private void OnEnable()
-        {
-            TryCacheHeroInfo();
-
-            if (heroId > 0)
-                HeroEquipmentRuntimeRegistry.Register(heroId, this);
-        }
-
-        private void OnDisable()
-        {
-            if (heroId > 0)
-                HeroEquipmentRuntimeRegistry.Unregister(heroId, this);
-        }
-
         public void Setup(HeroActor heroActor)
         {
             this.heroActor = heroActor;
@@ -43,25 +29,14 @@ namespace Immortal_Switch.Scripts.Equipment.Runtime
 
         private void TryCacheHeroInfo()
         {
-            if (heroActor == null)
-                return;
-
             heroId = heroActor.GetHeroId();
             heroClass = heroActor.HeroClass;
         }
 
         public void RefreshFromEquipment()
         {
-            if (WeaponManager.Instance == null)
-                return;
-
-            if (statsController == null || statsController.StatModule == null)
-                return;
-
             TryCacheHeroInfo();
-
             var module = statsController.StatModule;
-            
             RemoveCurrentWeaponSources(module);
 
             var inventory = WeaponManager.Instance.Inventory;

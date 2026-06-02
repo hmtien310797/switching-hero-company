@@ -48,8 +48,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             if (claimedIconObject != null)
                 claimedIconObject.SetActive(isClaimed);
 
-            if (contentCanvasGroup != null)
-                contentCanvasGroup.alpha = isClaimed ? claimedAlpha : normalAlpha;
+            /*if (contentCanvasGroup != null)
+                contentCanvasGroup.alpha = isClaimed ? claimedAlpha : normalAlpha;*/
         }
     }
 }

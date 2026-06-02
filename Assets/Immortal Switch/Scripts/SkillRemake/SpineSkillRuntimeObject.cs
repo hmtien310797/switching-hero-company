@@ -17,11 +17,8 @@ namespace Immortal_Switch.Scripts.Skill
         protected override void OnRuntimeInitialized()
         {
             if (skeletonAnimation == null)
-                skeletonAnimation = GetComponentInChildren<SkeletonAnimation>();
-
-            if (skeletonAnimation == null)
             {
-                Debug.LogWarning($"[{nameof(SpineSkillRuntimeObject)}] Missing SkeletonAnimation on {name}.");
+                Debug.LogError($"[{nameof(SpineSkillRuntimeObject)}] Missing SkeletonAnimation on {name}.");
                 return;
             }
 

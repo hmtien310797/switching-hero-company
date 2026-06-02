@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,10 +24,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         [SerializeField] private TMP_Text summonLevelText;
 
         [Header("Rows")]
-        [SerializeField] private SkillSummonProbabilityRowUI gradeBRow;
-        [SerializeField] private SkillSummonProbabilityRowUI gradeARow;
-        [SerializeField] private SkillSummonProbabilityRowUI gradeSRow;
-        [SerializeField] private SkillSummonProbabilityRowUI gradeSSRow;
+        [SerializeField] private WeaponSummonProbabilityRowUI gradeBRow;
+        [SerializeField] private WeaponSummonProbabilityRowUI gradeARow;
+        [SerializeField] private WeaponSummonProbabilityRowUI gradeSRow;
+        [SerializeField] private WeaponSummonProbabilityRowUI gradeSSRow;
+        
+        [Header("Tier Icons")]
+        [SerializeField] private HeroRarityVisualConfigSO heroRarityVisualConfigSO;
 
         private readonly List<SkillSummonLevelEntry> cachedLevels = new();
         private int currentIndex = 0;
@@ -149,10 +155,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (summonLevelText != null)
                 summonLevelText.text = $"Lv.{levelData.SummonLevel}";
 
-            gradeBRow?.Bind(levelData.GradeBRate);
-            gradeARow?.Bind(levelData.GradeARate);
-            gradeSRow?.Bind(levelData.GradeSRate);
-            gradeSSRow?.Bind(levelData.GradeSSRate);
+            gradeBRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.UnCommon), 0f);
+            gradeARow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Common), 0f);
+            gradeSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Legendary), 0f);
+            gradeSSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Mythic), 0f);
 
             if (prevButton != null)
                 prevButton.interactable = currentIndex > 0;
@@ -166,10 +172,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (summonLevelText != null)
                 summonLevelText.text = "Lv.-";
 
-            gradeBRow?.Bind(0f);
-            gradeARow?.Bind(0f);
-            gradeSRow?.Bind(0f);
-            gradeSSRow?.Bind(0f);
+            gradeBRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.UnCommon), 0f);
+            gradeARow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Common), 0f);
+            gradeSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Legendary), 0f);
+            gradeSSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Mythic), 0f);
 
             if (prevButton != null)
                 prevButton.interactable = false;

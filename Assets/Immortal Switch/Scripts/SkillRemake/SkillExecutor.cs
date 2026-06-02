@@ -23,10 +23,10 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             for (int i = 0; i < phase.Actions.Count; i++)
-                ExecuteAction(context, phase.Actions[i], phase.TargetTypeOverride);
+                ExecuteAction(context, phase.Actions[i]);
         }
 
-        public void ExecuteAction(SkillRuntimeContext context, SkillActionData action, SkillTargetType inheritedTargetType)
+        public void ExecuteAction(SkillRuntimeContext context, SkillActionData action)
         {
             if (context == null || action == null)
                 return;
@@ -36,9 +36,7 @@ namespace Immortal_Switch.Scripts.Skill
             
             bool isUltimate = context.SkillData.OwnerType == SkillOwnerType.UltimateSkill;
 
-            SkillTargetType targetType = action.TargetTypeOverride != SkillTargetType.CurrentTarget
-                ? action.TargetTypeOverride
-                : inheritedTargetType;
+            SkillTargetType targetType = action.TargetTypeOverride;
 
             switch (action.ActionType)
             {
@@ -76,7 +74,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             for (int i = 0; i < actions.Count; i++)
-                ExecuteAction(context, actions[i], SkillTargetType.CurrentTarget);
+                ExecuteAction(context, actions[i]);
         }
 
         private void ExecuteDamage(SkillRuntimeContext context, SkillActionData action, SkillTargetType targetType)

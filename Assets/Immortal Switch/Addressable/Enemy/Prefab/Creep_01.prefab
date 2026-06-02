@@ -13,7 +13,9 @@ GameObject:
   - component: {fileID: 6147910350317824579}
   - component: {fileID: 4760040034150877837}
   - component: {fileID: 2532712611373174950}
-  m_Layer: 0
+  - component: {fileID: 3616456325688318095}
+  - component: {fileID: 5043881446724912241}
+  m_Layer: 6
   m_Name: Creep_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84,6 +86,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 93480560878679480}
+  heroActor: {fileID: 0}
+  ultimateAnimationInHero: 0
   spawnAnim: spawn
   idleAnim: idle
   runAnim: run
@@ -112,6 +116,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25ea273746fe4887b2eeb6b9493b5b40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &3616456325688318095
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7769961678186002482}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2.4939713, z: 1}
+  m_Center: {x: 0, y: 0.7469857, z: 0}
+--- !u!54 &5043881446724912241
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7769961678186002482}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &9176618852123199023
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,7 +176,7 @@ GameObject:
   - component: {fileID: 2290801028155500301}
   - component: {fileID: 8356753689099502487}
   - component: {fileID: 93480560878679480}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Spine GameObject (monster_creep)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,9 +302,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7434506558583344676}
     m_Modifications:
+    - target: {fileID: 5988986580598352522, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 6740417167127500171, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_Name
       value: HealthBarController
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740417167127500171, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_LocalPosition.x
@@ -293,6 +353,10 @@ PrefabInstance:
     - target: {fileID: 7390465643818902177, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8882419513620984265, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

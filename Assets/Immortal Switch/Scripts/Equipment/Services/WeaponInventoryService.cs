@@ -96,7 +96,6 @@ namespace Immortal_Switch.Scripts.Equipment.Services
         public WeaponEquipSource ResolveActiveSource(int heroId)
         {
             var equip = GetOrCreateHeroEquip(heroId);
-
             if (equip.UseExclusive && equip.EquippedExclusiveWeaponId > 0)
             {
                 var exDef = database.GetExclusive(equip.EquippedExclusiveWeaponId);
