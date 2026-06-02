@@ -6,26 +6,18 @@ namespace Immortal_Switch.Scripts.Hero
 {
     public class HeroProgressionRuntimeBridge : MonoBehaviour
     {
-        [Header("References")]
-        [SerializeField] private HeroDataSO heroData;
-        [SerializeField] private PlayerHeroController playerHeroController;
-        [SerializeField] private StatsController statsController;
-
         private int registeredHeroId = -1;
 
-        public HeroDataSO HeroData => heroData;
-        public PlayerHeroController PlayerHeroController => playerHeroController;
-        public StatsController StatsController => statsController;
+        private HeroDataSO heroData;
+        private HeroActor heroActor;
+        private StatsController statsController;
 
         private void Awake()
         {
-            if (playerHeroController == null)
-                playerHeroController = GetComponent<PlayerHeroController>();
-
             if (statsController == null)
             {
-                if (playerHeroController != null)
-                    statsController = playerHeroController.Stats;
+                if (heroActor != null)
+                    statsController = heroActor.Stats;
                 else
                     statsController = GetComponentInChildren<StatsController>();
             }
@@ -41,17 +33,13 @@ namespace Immortal_Switch.Scripts.Hero
             TryUnregister();
         }
 
-        public void Setup(HeroDataSO data, PlayerHeroController controller = null)
+        public void Setup(HeroDataSO data, HeroActor heroActor)
         {
             TryUnregister();
 
             heroData = data;
-
-            if (controller != null)
-                playerHeroController = controller;
-
-            if (playerHeroController != null && statsController == null)
-                statsController = playerHeroController.Stats;
+            this.heroActor = heroActor;
+            statsController = heroActor.Stats;
 
             TryRegister();
         }

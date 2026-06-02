@@ -3,6 +3,7 @@ using Battle;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Equipment.Runtime;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Skill;
@@ -48,6 +49,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     [SerializeField] private HeroSkillController skillController;
     [SerializeField] private HealthBarController healthBarController;
     [SerializeField] private HeroAutoSkillController autoSkillController;
+    [SerializeField] private HeroProgressionRuntimeBridge progressionBridge;
+    [SerializeField] private HeroEquipmentRuntimeBridge equipmentBridge;
 
     [Header("Attack")]
     [SerializeField] private HeroAttackMode attackMode = HeroAttackMode.Melee;
@@ -209,6 +212,10 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         nextTargetSearchTime = 0f;
         stateMachine.ChangeState(HeroStateId.Spawn);
         BindDeathEvent();
+        progressionBridge.Setup(heroData, this);
+        progressionBridge.RefreshFromProgression();
+        equipmentBridge.Setup(this);
+        equipmentBridge.RefreshFromEquipment();
     }
     
     public void ResetSpawnPosition(Vector3 position)

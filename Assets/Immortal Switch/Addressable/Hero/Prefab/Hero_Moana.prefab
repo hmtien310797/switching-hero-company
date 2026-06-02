@@ -177,6 +177,8 @@ GameObject:
   - component: {fileID: 1178138274413127813}
   - component: {fileID: 4416500834578471195}
   - component: {fileID: 1751907790690962492}
+  - component: {fileID: 6172233964851025024}
+  - component: {fileID: 1261478195413075374}
   m_Layer: 7
   m_Name: Hero_Moana
   m_TagString: Untagged
@@ -221,6 +223,8 @@ MonoBehaviour:
   skillController: {fileID: 4416500834578471195}
   healthBarController: {fileID: 67816127313860525}
   autoSkillController: {fileID: 1751907790690962492}
+  progressionBridge: {fileID: 1261478195413075374}
+  equipmentBridge: {fileID: 6172233964851025024}
   attackMode: 1
   projectileSpawnPoint: {fileID: 910151571242835769}
   projectilePrefab: {fileID: 6946385455583904840, guid: f2ea924715098804db6f79539ad2723d, type: 3}
@@ -229,6 +233,7 @@ MonoBehaviour:
   ultimateHitNormalizedTime: 0.5
   passiveHitNormalizedTime: 0.5
   winFx: {fileID: 6959661282021579749}
+  <ActorType>k__BackingField: 0
 --- !u!114 &4524964056122228985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,6 +247,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 1005801911340450105}
+  heroActor: {fileID: 7660850797683027546}
+  ultimateAnimationInHero: 1
   spawnAnim: spawn
   idleAnim: idle
   runAnim: run
@@ -337,6 +344,30 @@ MonoBehaviour:
   stopAfterFirstReadyAttempt: 1
   debugLog: 0
   owner: {fileID: 7660850797683027546}
+--- !u!114 &6172233964851025024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9024580411616284147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dca169b8dc6422c84903d8466b4d278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1261478195413075374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9024580411616284147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1143ac4471e40e0a33aa71913ce4137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &7657084194435272625
 PrefabInstance:
   m_ObjectHideFlags: 0

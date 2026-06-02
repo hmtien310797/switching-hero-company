@@ -9,6 +9,8 @@ namespace Immortal_Switch.Scripts.Hero
     {
         [Header("Spine")]
         [SerializeField] private SkeletonAnimation skeletonAnimation;
+        [SerializeField] private HeroActor heroActor;
+        [SerializeField] private bool ultimateAnimationInHero;
 
         [Header("Base Animation Names")]
         [SerializeField] private string spawnAnim = "spawn";
@@ -59,6 +61,11 @@ namespace Immortal_Switch.Scripts.Hero
             skeletonAnimation.AnimationState.Complete += OnSpineComplete;
         }
 
+        private void Start()
+        {
+            heroActor = GetComponent<HeroActor>();
+        }
+
         private void OnDestroy()
         {
             if (skeletonAnimation == null)
@@ -74,6 +81,11 @@ namespace Immortal_Switch.Scripts.Hero
                 return;
 
             SpineEventTriggered?.Invoke(e.Data.Name);
+            if (e.Data.Name == "finalhit" && heroActor.StateMachine.CurrentStateId == HeroStateId.Ultimate &&
+                ultimateAnimationInHero)
+            {
+                GameCameraController.Instance.ShakeCamera();
+            }
         }
 
         private void OnSpineComplete(TrackEntry trackEntry)

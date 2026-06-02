@@ -174,9 +174,6 @@ public class GameCameraController : Singleton<GameCameraController>
     [Button]
     public void ShakeCamera()
     {
-        if (followHeroCameraNoise == null)
-            return;
-
         shakeTween?.Kill();
 
         followHeroCameraNoise.AmplitudeGain = amplitude;

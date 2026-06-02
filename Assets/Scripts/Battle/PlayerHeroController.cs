@@ -195,7 +195,7 @@ namespace Battle
 
             if (progressionBridge != null)
             {
-                progressionBridge.Setup(baseHeroData, this);
+                //progressionBridge.Setup(baseHeroData, this);
                 progressionBridge.RefreshFromProgression();
             }
             
@@ -204,7 +204,7 @@ namespace Battle
 
             if (equipmentBridge != null)
             {
-                equipmentBridge.Setup(this);
+                //equipmentBridge.Setup(this);
                 equipmentBridge.RefreshFromEquipment();
             }
         }

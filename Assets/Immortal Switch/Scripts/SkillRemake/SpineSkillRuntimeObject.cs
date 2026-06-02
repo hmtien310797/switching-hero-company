@@ -46,6 +46,11 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             EmitRuntimeEvent(e.Data.Name);
+
+            if (e.Data.Name == "finalhit")
+            {
+                GameCameraController.Instance.ShakeCamera();
+            }
         }
 
         private void OnSpineComplete(TrackEntry trackEntry)

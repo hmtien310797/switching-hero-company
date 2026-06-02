@@ -4,27 +4,18 @@ using Immortal_Switch.Scripts.Equipment.Services;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.Equipment.Runtime
 {
     public class HeroEquipmentRuntimeBridge : MonoBehaviour
     {
-        [SerializeField] private PlayerHeroController playerHeroController;
-        [SerializeField] private StatsController statsController;
-
         private int heroId = -1;
         private HeroClass heroClass;
+        private HeroActor heroActor;
+        private StatsController statsController;
 
         public int HeroId => heroId;
-
-        private void Awake()
-        {
-            if (playerHeroController == null)
-                playerHeroController = GetComponent<PlayerHeroController>();
-
-            if (statsController == null && playerHeroController != null)
-                statsController = playerHeroController.Stats;
-        }
 
         private void OnEnable()
         {
@@ -40,10 +31,10 @@ namespace Immortal_Switch.Scripts.Equipment.Runtime
                 HeroEquipmentRuntimeRegistry.Unregister(heroId, this);
         }
 
-        public void Setup(PlayerHeroController controller)
+        public void Setup(HeroActor heroActor)
         {
-            playerHeroController = controller;
-            statsController = controller != null ? controller.Stats : null;
+            this.heroActor = heroActor;
+            statsController = heroActor.Stats;
             TryCacheHeroInfo();
 
             if (heroId > 0)
@@ -52,11 +43,11 @@ namespace Immortal_Switch.Scripts.Equipment.Runtime
 
         private void TryCacheHeroInfo()
         {
-            if (playerHeroController == null)
+            if (heroActor == null)
                 return;
 
-            heroId = playerHeroController.GetHeroId();
-            heroClass = playerHeroController.HeroClass;
+            heroId = heroActor.GetHeroId();
+            heroClass = heroActor.HeroClass;
         }
 
         public void RefreshFromEquipment()

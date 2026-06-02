@@ -146,6 +146,8 @@ GameObject:
   - component: {fileID: 6084908883512209015}
   - component: {fileID: 3804418355453525778}
   - component: {fileID: 6673218268438846018}
+  - component: {fileID: 7029057739495643735}
+  - component: {fileID: 7307328446167154966}
   m_Layer: 7
   m_Name: Hero_Emily
   m_TagString: Untagged
@@ -190,6 +192,8 @@ MonoBehaviour:
   skillController: {fileID: 3804418355453525778}
   healthBarController: {fileID: 6207221250241753667}
   autoSkillController: {fileID: 6673218268438846018}
+  progressionBridge: {fileID: 7029057739495643735}
+  equipmentBridge: {fileID: 7307328446167154966}
   attackMode: 0
   projectileSpawnPoint: {fileID: 9015270375427547981}
   projectilePrefab: {fileID: 6946385455583904840, guid: f2ea924715098804db6f79539ad2723d, type: 3}
@@ -198,6 +202,7 @@ MonoBehaviour:
   ultimateHitNormalizedTime: 0.5
   passiveHitNormalizedTime: 0.5
   winFx: {fileID: 142036343665197109}
+  <ActorType>k__BackingField: 0
 --- !u!114 &5932289009177479308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,6 +216,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 8382149384867813313}
+  heroActor: {fileID: 1569397935256796101}
+  ultimateAnimationInHero: 1
   spawnAnim: spawn
   idleAnim: idle
   runAnim: run
@@ -306,6 +313,30 @@ MonoBehaviour:
   stopAfterFirstReadyAttempt: 1
   debugLog: 0
   owner: {fileID: 1569397935256796101}
+--- !u!114 &7029057739495643735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4656476538786154654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1143ac4471e40e0a33aa71913ce4137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7307328446167154966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4656476538786154654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dca169b8dc6422c84903d8466b4d278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7424987498624733327
 GameObject:
   m_ObjectHideFlags: 0

@@ -158,6 +158,7 @@ namespace Immortal_Switch.Scripts.Skill
                 float animationDuration = PlayUltimateAnimation();
                 yield return new WaitForSeconds(0.3f);
                 yield return MoveTweenRoutine(landingPosition);
+                GameCameraController.Instance.ShakeCamera();
 
                 if (waitAnimationCompleteBeforeNextJump)
                     yield return WaitForAnimationOrFallback(Mathf.Max(animationDuration, fallbackJumpDuration));
@@ -165,7 +166,6 @@ namespace Immortal_Switch.Scripts.Skill
                     yield return WaitForHitOrFallback(Mathf.Max(animationDuration, fallbackJumpDuration));
 
                 waitingForHit = false;
-                GameCameraController.Instance.ShakeCamera();
             }
             
             routine = null;
