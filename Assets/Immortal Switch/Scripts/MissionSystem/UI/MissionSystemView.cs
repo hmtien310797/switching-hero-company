@@ -1,6 +1,5 @@
-using Immortal_Switch.Scripts.MissionSystem.Models;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.UI;
-using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,43 +23,46 @@ namespace Immortal_Switch.Scripts.MissionSystem.UI
         private Button btnClaim;
 
         // --- Private Field ---
+        private DynamicHeroesGlobalSpecificationsMissionConfigRow _currentCfg;
 
         private void Awake()
         {
-            MissionSystemManager.Instance.OnUpdateProgress += OnMissionSystemUpdateProgress;
+            MissionSystemManager.Instance.OnChangeProgress += OnMissionSystemChangeProgress;
             btnClaim.onClick.AddListener(OnClaim);
         }
 
-        private void OnMissionSystemUpdateProgress(EMissionSystemType arg1, int arg2)
+        private void OnMissionSystemChangeProgress(string arg1, float arg2, string arg3)
         {
-            var entry = MissionSystemManager.Instance.Entry;
-
-            if (entry != null &&
-                entry.Value.type == arg1)
+            if (arg1 == MissionSystemTypes.MAIN)
             {
-                txtTitle.text = entry.Value.FormatTitle;
-                txtDescription.text = $"( {arg2} / {entry.Value.target} )";
-                txtRewardQuantity.text = $"{entry.Value.reward.quantity}";
-                RefreshVisual();
+                var cfg = MissionSystemManager.Instance.GetMission(arg3);
+
+                if (cfg != null)
+                {
+                    _currentCfg = cfg;
+                    txtTitle.text = cfg.title;
+                    txtDescription.text = $"( {arg2:F0} / {cfg.target:F0} )";
+                    RefreshVisual(cfg);
+                }
             }
         }
 
-        private void RefreshVisual()
+        private void RefreshVisual(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
         {
-            var isClaim = MissionSystemManager.Instance.IsComplete && !MissionSystemManager.Instance.Data.IsClaimed;
-            goTaskDone.SetActive(isClaim);
-            btnClaim.interactable = isClaim;
+            var isCompleted = MissionSystemManager.Instance.IsCompleted(cfg);
+            goTaskDone.SetActive(isCompleted);
+            btnClaim.interactable = isCompleted;
         }
 
         private void OnClaim()
         {
-            var entry = MissionSystemManager.Instance.Entry;
-
-            if (entry != null)
+            if (_currentCfg == null)
             {
-                // todo: claim reward.
-                MissionSystemManager.Instance.Complete();
+                Debug.LogError("MissionSystem Claim Not Found");
+                return;
             }
+
+            MissionSystemManager.Instance.Claim(_currentCfg);
         }
     }
 }

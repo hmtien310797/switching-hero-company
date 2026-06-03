@@ -34,15 +34,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void Initialize()
         {
-            var first = _db.FirstMission.Value;
-
-            if (Data.Id < first.id)
-            {
-                Data.SetId(first.id);
-                Data.SetProgress(0);
-                Data.SetIsClaimed(false);
-                Save();
-            }
+            // todo: add mission type vào dữ liệu của users.
         }
     }
 }

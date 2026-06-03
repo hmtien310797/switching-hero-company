@@ -295,7 +295,7 @@ namespace Immortal_Switch.Scripts.Enemy
                 return;
 
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
-            currentTarget.TakeDamage(this, damageResult);
+            currentTarget.TakeDamage(damageResult);
         }
 
         private void OnAnimationCompleted(string animationName)

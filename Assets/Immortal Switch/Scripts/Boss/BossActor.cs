@@ -344,7 +344,7 @@ namespace Immortal_Switch.Scripts.Boss
                 return;
 
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
-            currentTarget.TakeDamage(this, damageResult);
+            currentTarget.TakeDamage(damageResult);
 
             NormalAttackCount++;
             skillLogic?.OnNormalAttack();
@@ -477,7 +477,7 @@ namespace Immortal_Switch.Scripts.Boss
                 return;
             
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget, damageMultiplierPercent);
-            target.TakeDamage(this, damageResult);
+            target.TakeDamage(damageResult);
         }
 
         public void DealDamageToAllHeroTargets(float damageMultiplierPercent)
@@ -489,7 +489,7 @@ namespace Immortal_Switch.Scripts.Boss
                 if (target == null || target.IsDead)
                     continue;
                 DamageResult damageResult = DamageCalculator.CalculateDamage(this, target, damageMultiplierPercent);
-                target.TakeDamage(this, damageResult);
+                target.TakeDamage(damageResult);
             }
         }
 

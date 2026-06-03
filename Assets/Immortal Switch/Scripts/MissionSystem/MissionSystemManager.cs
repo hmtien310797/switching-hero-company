@@ -1,9 +1,10 @@
 using System;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.MissionSystem
@@ -16,14 +17,13 @@ namespace Immortal_Switch.Scripts.MissionSystem
         private IMissionSystemStorage Storage { get; set; }
         public MissionSystemData Data => Storage.Data;
 
-        public MissionEntry? Entry => database.GetEntry(Data.Id);
-
         /// <summary>
         /// event fire khi progress thay đổi
         /// 1: type nhiem vu
-        /// 2: progress
+        /// 2: progress value
+        /// 3: id nhiem vu
         /// </summary>
-        public event Action<EMissionSystemType, int> OnUpdateProgress;
+        public event Action<string, float, string> OnChangeProgress;
 
         // --- Private Field ---
         private volatile bool _isInitialized;
@@ -41,17 +41,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         private void OnEnemyDead(int deadCnt)
         {
-            if (deadCnt < 1)
+            if (deadCnt >= 1)
             {
-                return;
-            }
-
-            var entry = Entry;
-
-            if (entry is { type: EMissionSystemType.KillMonsters, } &&
-                entry.Value.target != Storage.Data.Progress)
-            {
-                UpdateProgress(entry.Value.type, Storage.Data.Progress + 1);
+                Service.ChangeProgress(MissionSystemEventKeys.EVENT_KILL_MONSTER, 1);
             }
         }
 
@@ -69,45 +61,66 @@ namespace Immortal_Switch.Scripts.MissionSystem
             }
 
             Storage = new MissionSystemStorage(database);
-            Service = new MissionSystemService(Storage, database);
+            Service = new MissionSystemService(Storage);
             _isInitialized = true;
 
-            database.Load();
             Storage.Load();
             Storage.Initialize();
-            _DispatchProgress();
+            _DispatchProgressMainMission();
         }
 
-        public void UpdateProgress(EMissionSystemType type, int progress)
+        public DynamicHeroesGlobalSpecificationsMissionConfigRow GetMission(string id)
         {
-            var isUpdate = Service.UpdateProgress(type, progress);
+            return database.MissionConfig.rows.Find(v => v.missionId == id);
+        }
 
-            if (isUpdate)
+        public bool IsCompleted(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
+        {
+            return Storage.Data.Missions
+                .SelectMany(v => v.Value)
+                .Where(v => v.Id == cfg.missionId)
+                .Any(v => v.Progress >= cfg.target && !v.IsClaimed);
+        }
+
+        public void Claim(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
+        {
+            var isCompleted = IsCompleted(cfg);
+
+            if (!isCompleted)
             {
-                _DispatchProgress();
+                Debug.LogError("MissionSystem Claim Failed");
+                return;
+            }
+
+            // todo: phát thưởng và hiện phần thưởng cho user.
+
+            // xử lý logic cho các type mission
+            switch (cfg.type)
+            {
+                // tiep nhiem vu moi.
+                case MissionSystemTypes.MAIN:
+                    Service.NextMission(cfg);
+                    break;
+
+                case MissionSystemTypes.DAILY:
+                    break;
+
+                case MissionSystemTypes.WEEKLY:
+                    break;
+
+                case MissionSystemTypes.ACHIEVEMENT:
+                    break;
             }
         }
 
-        public bool IsComplete => Service.IsComplete();
-
-        public void Complete()
+        private void _DispatchProgressMainMission()
         {
-            if (IsComplete)
+            if (Storage.Data.Missions.TryGetValue(MissionSystemTypes.MAIN, out var list))
             {
-                Storage.Data.SetIsClaimed(true);
-                Service.Complete();
-                _DispatchProgress();
-            }
-        }
-
-        private void _DispatchProgress()
-        {
-            var entry = Entry;
-
-            if (entry != null)
-            {
-                // fire event
-                OnUpdateProgress?.Invoke(entry.Value.type, Data.Progress);
+                foreach (var entry in list)
+                {
+                    OnChangeProgress?.Invoke(MissionSystemTypes.MAIN, entry.Progress, entry.Id);
+                }
             }
         }
     }

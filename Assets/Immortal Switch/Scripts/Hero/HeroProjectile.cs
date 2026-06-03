@@ -53,7 +53,7 @@ public class HeroProjectile : MonoBehaviour
         if (sqrDistance <= hitDistance * hitDistance)
         {
             DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, target);
-            target.TakeDamage(attacker, damageResult);
+            target.TakeDamage(damageResult);
             HitEffectManager.Instance.Play(target);
             Destroy(gameObject);
         }

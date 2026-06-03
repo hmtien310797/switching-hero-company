@@ -44,6 +44,8 @@ namespace Immortal_Switch.Scripts.Combat
             result.DefenseMultiplier = defenseMultiplier;
             result.FlatATKBonus = flatAtkBonus;
             result.ATKPercentBonus = atkPercentBonus;
+            result.Source = attacker;
+            result.Target = defender;
 
             return result;
         }

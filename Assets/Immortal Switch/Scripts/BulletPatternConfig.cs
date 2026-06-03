@@ -27,8 +27,6 @@ public struct BulletPatternConfig
     [Header("Wave Order")]
     public bool alternateBulletOrderEachWave;
 
-    public bool isFollow;
-
     public float damage;
 }
 

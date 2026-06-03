@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
@@ -248,13 +249,18 @@ namespace Immortal_Switch.Scripts.HeroUIView
             currentSelectedItem.SetSelected(true);
             currentSelectedItem.SetReadyHighlight(false);
 
-            OpenHeroInfo(item.Data.HeroId);
+            OpenHeroInfo(item.Data.HeroId).Forget();
         }
 
-        private void OpenHeroInfo(int heroId)
+        private async UniTask OpenHeroInfo(int heroId)
         {
             Debug.Log($"Open hero info: {heroId}");
-            
+            var ui = await UIManager.Instance.OpenPopupAsync<HeroInfoView>();
+
+            if (ui != null)
+            {
+                ui.Bind(heroId);
+            }
         }
 
         private bool MatchElement(Element element, ElementFilterMode filter)

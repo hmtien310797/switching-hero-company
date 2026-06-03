@@ -102,6 +102,9 @@ namespace Battle
 
         private HeroActor inBattleHeroA;
         private HeroActor inBattleHeroB;
+        
+        private readonly List<ICombatUnit> farthestCandidates = new(8);
+        private readonly List<float> farthestDistances = new(8);
 
         public BattleState State { get; private set; } = BattleState.None;
         public List<EnemyActor> MonsterList => creeps;
@@ -246,7 +249,7 @@ namespace Battle
         public void InitSwitchableHeroIds()
         {
             inBattleHeroIdList.Clear();
-            inBattleHeroIdList = new List<int>() { 2, 4 };
+            inBattleHeroIdList = new List<int>() { 7, 4 };
         }
 
         public void OnSelectedHeroCastUltimateSkill()
@@ -1015,6 +1018,58 @@ namespace Battle
 
             return nearest;
         }
+        
+        public ICombatUnit GetFarthestEnemy(Vector3 pos)
+        {
+            if (!isReadyBattle)
+                return null;
+
+            ICombatUnit farthest = null;
+            float farthestSqr = -1f;
+
+            Vector3 selfPos = pos;
+            selfPos.y = 0f;
+
+            for (int i = creeps.Count - 1; i >= 0; i--)
+            {
+                EnemyActor creep = creeps[i];
+
+                if (creep == null || creep.IsDead || !creep.gameObject.activeInHierarchy)
+                {
+                    creeps.RemoveAt(i);
+                    continue;
+                }
+
+                Vector3 creepPos = creep.Position;
+                creepPos.y = 0f;
+
+                float sqr = (creepPos - selfPos).sqrMagnitude;
+
+                if (sqr > farthestSqr)
+                {
+                    farthestSqr = sqr;
+                    farthest = creep;
+                }
+            }
+
+            if (State == BattleState.FightingBoss &&
+                currentBoss != null &&
+                !currentBoss.IsDead &&
+                currentBoss.gameObject.activeInHierarchy)
+            {
+                Vector3 bossPos = currentBoss.Position;
+                bossPos.y = 0f;
+
+                float bossSqr = (bossPos - selfPos).sqrMagnitude;
+
+                if (bossSqr > farthestSqr)
+                {
+                    farthest = currentBoss;
+                }
+            }
+
+            return farthest;
+        }
 
         public ICombatUnit GetRandomEnemyAlive()
         {
@@ -1054,6 +1109,123 @@ namespace Battle
             //
             // return tPos;
             return Vector3.zero;
+        }
+        
+        public ICombatUnit GetRandomFromFarthestEnemies(
+            Vector3 pos,
+            IReadOnlyList<ICombatUnit> excludedTargets,
+            int topCount = 5)
+        {
+            if (!isReadyBattle)
+                return null;
+
+            if (topCount <= 0)
+                topCount = 1;
+
+            farthestCandidates.Clear();
+            farthestDistances.Clear();
+
+            Vector3 selfPos = pos;
+            selfPos.y = 0f;
+
+            for (int i = creeps.Count - 1; i >= 0; i--)
+            {
+                EnemyActor creep = creeps[i];
+
+                if (creep == null || creep.IsDead || !creep.gameObject.activeInHierarchy)
+                {
+                    creeps.RemoveAt(i);
+                    continue;
+                }
+
+                if (IsExcluded(creep, excludedTargets))
+                    continue;
+
+                Vector3 creepPos = creep.Position;
+                creepPos.y = 0f;
+
+                float sqr = (creepPos - selfPos).sqrMagnitude;
+
+                InsertCandidateByDistanceDesc(
+                    farthestCandidates,
+                    farthestDistances,
+                    creep,
+                    sqr,
+                    topCount
+                );
+            }
+
+            if (State == BattleState.FightingBoss &&
+                currentBoss != null &&
+                !currentBoss.IsDead &&
+                currentBoss.gameObject.activeInHierarchy &&
+                !IsExcluded(currentBoss, excludedTargets))
+            {
+                Vector3 bossPos = currentBoss.Position;
+                bossPos.y = 0f;
+
+                float bossSqr = (bossPos - selfPos).sqrMagnitude;
+
+                InsertCandidateByDistanceDesc(
+                    farthestCandidates,
+                    farthestDistances,
+                    currentBoss,
+                    bossSqr,
+                    topCount
+                );
+            }
+
+            if (farthestCandidates.Count == 0)
+                return null;
+
+            int randomIndex = Random.Range(0, farthestCandidates.Count);
+            return farthestCandidates[randomIndex];
+        }
+        
+        private void InsertCandidateByDistanceDesc(
+            List<ICombatUnit> candidates,
+            List<float> distances,
+            ICombatUnit unit,
+            float sqrDistance,
+            int maxCount)
+        {
+            int insertIndex = candidates.Count;
+
+            for (int i = 0; i < distances.Count; i++)
+            {
+                if (sqrDistance > distances[i])
+                {
+                    insertIndex = i;
+                    break;
+                }
+            }
+
+            if (insertIndex >= maxCount)
+                return;
+
+            candidates.Insert(insertIndex, unit);
+            distances.Insert(insertIndex, sqrDistance);
+
+            if (candidates.Count > maxCount)
+            {
+                int lastIndex = candidates.Count - 1;
+                candidates.RemoveAt(lastIndex);
+                distances.RemoveAt(lastIndex);
+            }
+        }
+        
+        private bool IsExcluded(ICombatUnit unit, IReadOnlyList<ICombatUnit> excludedTargets)
+        {
+            if (unit == null || excludedTargets == null)
+                return false;
+
+            for (int i = 0; i < excludedTargets.Count; i++)
+            {
+                if (excludedTargets[i] == unit)
+                    return true;
+            }
+
+            return false;
         }
 
         public void SpawnBossDirectly()

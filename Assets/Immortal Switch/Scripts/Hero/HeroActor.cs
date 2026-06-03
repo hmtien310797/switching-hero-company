@@ -212,10 +212,10 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         nextTargetSearchTime = 0f;
         stateMachine.ChangeState(HeroStateId.Spawn);
         BindDeathEvent();
-        progressionBridge.Setup(heroData, this);
-        progressionBridge.RefreshFromProgression();
-        equipmentBridge.Setup(this);
-        equipmentBridge.RefreshFromEquipment();
+        // progressionBridge.Setup(heroData, this);
+        // progressionBridge.RefreshFromProgression();
+        // equipmentBridge.Setup(this);
+        // equipmentBridge.RefreshFromEquipment();
     }
     
     public void ResetSpawnPosition(Vector3 position)
@@ -483,7 +483,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         else
         {
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
-            currentTarget.TakeDamage(this, damageResult);
+            currentTarget.TakeDamage(damageResult);
             HitEffectManager.Instance.Play(currentTarget);
         }
     }
@@ -496,7 +496,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         if (projectilePrefab == null)
         {
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
-            currentTarget.TakeDamage(this, damageResult);
+            currentTarget.TakeDamage(damageResult);
             return;
         }
 

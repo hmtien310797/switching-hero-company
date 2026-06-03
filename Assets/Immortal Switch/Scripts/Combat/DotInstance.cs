@@ -69,7 +69,7 @@ namespace Immortal_Switch.Scripts.Combat
             while (tickTimer <= 0f && RemainingDuration > 0f)
             {
                 DamageResult damageResult = DamageCalculator.CalculateDamage(Source, Target, TickDamage);
-                Target.TakeDamage(Source, damageResult);
+                Target.TakeDamage(damageResult);
                 tickTimer += TickInterval;
             }
         }

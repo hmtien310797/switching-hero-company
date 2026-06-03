@@ -15,7 +15,7 @@ namespace Immortal_Switch.Scripts.StatSystem
         bool IsDead { get; }
         float CurrentHp { get; }
         float MaxHp { get; }
-        DamageResult TakeDamage(ICombatUnit attacker, DamageResult damageResult)
+        DamageResult TakeDamage(DamageResult damageResult)
         {
             Stats.HealthModule.TakeDamage(damageResult);
             HealthBarController?.SetHealth(CurrentHp, MaxHp);

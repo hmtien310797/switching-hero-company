@@ -25,11 +25,19 @@ namespace Immortal_Switch.Scripts.Skill
     public class SkillRuntimeObjectConfig
     {
         public SkillRuntimeVisualType RuntimeVisualType = SkillRuntimeVisualType.SpawnedSkillObject;
-
+        
+        [ShowIf( "IsUsingSpineRuntime")]
         [Header("Spawned Skill Object")]
-        public SkillRuntimeObject RuntimePrefab;
-        [Header("Spawned Skill Object")]
-        public BulletSpawnerSkillRuntimeObject runtimeObjectBulletSpawner;
+        [FormerlySerializedAs("RuntimePrefab")]
+        public SkillRuntimeObject SpineRuntimePrefab;
+        
+        [ShowIf( "IsUsingBulletSpawner")]
+        [Header("Spawned Projectile Pattern Spawner")]
+        public BulletSpawnerSkillRuntimeObject runtimeObjectProjectileSpawner;
+        
+        [ShowIf( "IsUsingHomingChainBulletSpawner")]
+        [Header("Spawned Homing Projectile")]
+        public HomingChainBulletSkillRuntimeObject homingChainBulletSpawner;
         
         public SkillSpawnPositionType SpawnPositionType = SkillSpawnPositionType.Self;
         public SkillFollowType FollowType = SkillFollowType.None;
@@ -38,16 +46,39 @@ namespace Immortal_Switch.Scripts.Skill
         [Header("Lifetime")]
         [Min(0f)] public float LifeTime = 1f;
         public bool UseLifeTime = true;
+        
+        [ShowIf( nameof(IsUsingSpineRuntime))]
         public bool DespawnOnAnimationComplete = true;
 
+        [ShowIf( "IsUsingSpineRuntime")]
         [Header("Animation / Visual")]
         public string AnimationName;
+        
+        [ShowIf( "IsUsingSpineRuntime")]
         public bool LoopAnimation;
 
         [Header("Caster Lock")]
         public bool LockCasterWhileAlive;
         
         public bool LockCasterDuringHeroAnimation = true;
+
+        private bool IsUsingSpineRuntime()
+        {
+            return RuntimeVisualType == SkillRuntimeVisualType.SpawnedSkillObject ||
+                   RuntimeVisualType == SkillRuntimeVisualType.SpawnedSpineSkillObjectAndProjectile ||
+                   RuntimeVisualType == SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject;
+        }
+
+        private bool IsUsingBulletSpawner()
+        {
+            return RuntimeVisualType == SkillRuntimeVisualType.SpawnedSpineSkillObjectAndProjectile ||
+                   RuntimeVisualType == SkillRuntimeVisualType.SpawnProjectilePatternBehavior;
+        }
+        
+        private bool IsUsingHomingChainBulletSpawner()
+        {
+            return RuntimeVisualType == SkillRuntimeVisualType.SpawnHomingProjectile;
+        }
     }
 
     [Serializable]
@@ -522,7 +553,7 @@ namespace Immortal_Switch.Scripts.Skill
             return new SkillRuntimeObjectConfig
             {
                 RuntimeVisualType = source.RuntimeVisualType,
-                RuntimePrefab = source.RuntimePrefab,
+                SpineRuntimePrefab = source.SpineRuntimePrefab,
                 SpawnPositionType = source.SpawnPositionType,
                 FollowType = source.FollowType,
                 SpawnOffset = source.SpawnOffset,

@@ -1,4 +1,4 @@
-using Immortal_Switch.Scripts.MissionSystem.Models;
+using Game.Configs.Generated;
 
 namespace Immortal_Switch.Scripts.MissionSystem.Interfaces
 {
@@ -7,20 +7,15 @@ namespace Immortal_Switch.Scripts.MissionSystem.Interfaces
         /// <summary>
         /// cap nhat progress mission
         /// </summary>
-        /// <param name="type">loai nhiem vu can tang tien du lieu</param>
-        /// <param name="progress">so luong can tang.</param>
+        /// <param name="eventKey">loai nhiem vu can tang tien du lieu</param>
+        /// <param name="value">so luong can tang.</param>
         /// <returns>true neu cap nhat thanh cong, otherwise false.</returns>
-        bool UpdateProgress(EMissionSystemType type, int progress);
-
-        /// <summary>
-        /// kiem tra mission complete hay chua
-        /// </summary>
-        /// <returns>true neu da hoan thanh, otherwise false.</returns>
-        bool IsComplete();
+        void ChangeProgress(string eventKey, int value);
 
         /// <summary>
         /// hoàn thành mission hien tai. va chuyen sang mission moi.
         /// </summary>
-        void Complete();
+        /// <param name="cfg">nhiem vu tiep theo</param>
+        void NextMission(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg);
     }
 }

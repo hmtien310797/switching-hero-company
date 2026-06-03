@@ -82,7 +82,7 @@ public class BulletProjectile : PoolableBehaviour
             return;
         
         DamageResult damageResult = DamageCalculator.CalculateDamage(sourceCombatUnit, combatUnit, damage);
-        combatUnit.TakeDamage(sourceCombatUnit, damageResult);
+        combatUnit.TakeDamage(damageResult);
         
         if (despawnOnHit)
         {

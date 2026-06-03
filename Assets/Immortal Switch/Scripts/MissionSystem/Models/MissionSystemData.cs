@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Immortal_Switch.Scripts.MissionSystem.Models
 {
     /// <summary>
@@ -57,9 +60,27 @@ namespace Immortal_Switch.Scripts.MissionSystem.Models
     public class MissionSystemData
     {
         /// <summary>
+        /// Ds các nhiệm vụ của user.
+        /// key: mission type
+        /// value: ds mission của type đó
+        /// </summary>
+        public Dictionary<string, List<MissionSystemEntry>> Missions = new();
+    }
+
+    /// <summary>
+    /// Dữ liệu tiến trình nhiệm vụ của người chơi.
+    /// </summary>
+    public class MissionSystemEntry
+    {
+        /// <summary>
         /// Id nhiệm vụ trong config.
         /// </summary>
-        public int Id;
+        public string Id;
+
+        /// <summary>
+        /// Loại nhiệm vụ của id.
+        /// </summary>
+        public string EventKey;
 
         /// <summary>
         /// Tiến độ hiện tại của nhiệm vụ.
@@ -76,7 +97,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Models
             Progress = value;
         }
 
-        public void SetId(int id)
+        public void SetId(string id)
         {
             Id = id;
         }
