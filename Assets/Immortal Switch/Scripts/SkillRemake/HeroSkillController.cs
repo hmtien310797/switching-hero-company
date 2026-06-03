@@ -586,6 +586,10 @@ namespace Immortal_Switch.Scripts.Skill
                 case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:
                     result = CastHeroSpineAndSpawnedSkillObject(context, castConfig, runtimeConfig, isUltimate);
                     break;
+                
+                case SkillRuntimeVisualType.HeroSpineObjectAndProjectile:
+                    result = CastHeroSpineAndSpawnedProjectile(context, castConfig, runtimeConfig, isUltimate);
+                    break;
 
                 case SkillRuntimeVisualType.ProjectileOnly:
                 case SkillRuntimeVisualType.Instant:
@@ -785,7 +789,45 @@ namespace Immortal_Switch.Scripts.Skill
             // FinishCurrentSkill() will be called by OnAnimationComplete() when the hero animation ends.
         }
         
-        
+        private bool CastHeroSpineAndSpawnedProjectile(
+            SkillRuntimeContext context,
+            SkillCastConfig castConfig,
+            SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
+        {
+            if (context == null)
+            {
+                FinishCurrentSkill(isUltimate);
+                return false;
+            }
+
+            // The spawned object is independent. Do not finish the skill here, because the hero
+            // must stay locked until the hero ultimate animation completes.
+            SpawnProjectileSpawnerInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
+
+            bool lockCasterDuringHeroAnimation = runtimeConfig == null || runtimeConfig.LockCasterDuringHeroAnimation;
+            if (lockCasterDuringHeroAnimation && owner != null)
+            {
+                owner.SetActionLocked(true);
+                owner.Locomotion?.Stop();
+            }
+
+            if (castConfig == null || string.IsNullOrEmpty(castConfig.HeroAnimationName))
+            {
+                // No hero animation configured. The spawned object has already been created,
+                // so release the caster immediately.
+                FinishCurrentSkill(isUltimate);
+                return false;
+            }
+
+            float delay = animationDriver.PlaySkill(castConfig.HeroAnimationName);
+            DOVirtual.DelayedCall(delay,() =>
+            {
+                Debug.Log($"[DelayedCall Callback] time = {delay}");
+                FinishCurrentSkill(isUltimate);
+            });
+            return true;
+            // FinishCurrentSkill() will be called by OnAnimationComplete() when the hero animation ends.
+        }
 
         private Vector3 GetRuntimeObjectSpawnPosition(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig)
         {

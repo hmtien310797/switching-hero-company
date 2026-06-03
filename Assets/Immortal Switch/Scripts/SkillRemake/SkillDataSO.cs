@@ -64,14 +64,12 @@ namespace Immortal_Switch.Scripts.Skill
 
         private bool IsUsingSpineRuntime()
         {
-            return RuntimeVisualType == SkillRuntimeVisualType.SpawnedSkillObject ||
-                   RuntimeVisualType == SkillRuntimeVisualType.SpawnedSpineSkillObjectAndProjectile ||
-                   RuntimeVisualType == SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject;
+            return RuntimeVisualType == SkillRuntimeVisualType.SpawnedSkillObject;
         }
 
         private bool IsUsingBulletSpawner()
         {
-            return RuntimeVisualType == SkillRuntimeVisualType.SpawnedSpineSkillObjectAndProjectile ||
+            return RuntimeVisualType == SkillRuntimeVisualType.HeroSpineObjectAndProjectile ||
                    RuntimeVisualType == SkillRuntimeVisualType.SpawnProjectilePatternBehavior;
         }
         

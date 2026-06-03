@@ -26,14 +26,15 @@ MonoBehaviour:
     CastRange: 10
     Cooldown: 1
     TargetSelectType: 0
-    HeroAnimationName: animation
+    HeroAnimationName: ulti
   RuntimeObjectConfig:
-    RuntimeVisualType: 6
+    RuntimeVisualType: 5
     SpineRuntimePrefab: {fileID: 4163558728880364041, guid: d0accb2e82587134697a2ac23d200cd8, type: 3}
     runtimeObjectProjectileSpawner: {fileID: 4163558728880364041, guid: d0accb2e82587134697a2ac23d200cd8, type: 3}
+    homingChainBulletSpawner: {fileID: 0}
     SpawnPositionType: 0
-    FollowType: 1
-    SpawnOffset: {x: 0, y: 1, z: 0}
+    FollowType: 0
+    SpawnOffset: {x: 0, y: 1.5, z: 0}
     LifeTime: 1
     UseLifeTime: 0
     DespawnOnAnimationComplete: 0
@@ -73,6 +74,7 @@ MonoBehaviour:
       RuntimeVisualType: 2
       SpineRuntimePrefab: {fileID: 0}
       runtimeObjectProjectileSpawner: {fileID: 0}
+      homingChainBulletSpawner: {fileID: 0}
       SpawnPositionType: 0
       FollowType: 0
       SpawnOffset: {x: 0, y: 0, z: 0}

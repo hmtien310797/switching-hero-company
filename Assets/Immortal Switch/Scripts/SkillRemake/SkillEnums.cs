@@ -16,7 +16,7 @@ namespace Immortal_Switch.Scripts.Skill
         SpawnedSkillObject,
         ProjectileOnly,
         HeroSpineAndSpawnedSkillObject,
-        SpawnedSpineSkillObjectAndProjectile,
+        HeroSpineObjectAndProjectile,
         SpawnProjectilePatternBehavior,
         SpawnHomingProjectile
     }

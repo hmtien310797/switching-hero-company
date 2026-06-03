@@ -28,6 +28,7 @@ public struct BulletPatternConfig
     public bool alternateBulletOrderEachWave;
 
     public float damage;
+    public float delayWhenStartFiring;
 }
 
 public enum PatternType
