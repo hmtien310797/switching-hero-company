@@ -1,3 +1,6 @@
+using System;
+using System.Collections;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.UI
@@ -11,38 +14,48 @@ namespace Immortal_Switch.Scripts.UI
             FitHeight
         }
 
-        [SerializeField] private RectTransform panelRoot;
+        [Required] [SerializeField] private RectTransform panelRoot;
 
-        [Header("Mode")]
-        [SerializeField] private FitMode fitMode = FitMode.FitInside;
+        [Header("Mode")] [SerializeField] private FitMode fitMode = FitMode.FitInside;
         [SerializeField] private bool useSafeArea = true;
 
-        [Header("Auto Detect Design Size")]
-        [SerializeField] private bool autoDetectDesignSize = true;
-        [SerializeField] private Vector2 designSize = new Vector2(1300, 2200);
+        /*[Header("Auto Detect Design Size")] [SerializeField]
+        private bool autoDetectDesignSize = true;*/
 
-        [Header("Clamp")]
-        [SerializeField] private float minScale = 0.35f;
+        /*[SerializeField] private Vector2 designSize = new Vector2(1300, 2200);*/
+
+        [Header("Clamp")] [SerializeField] private float minScale = 0.35f;
         [SerializeField] private float maxScale = 1f;
 
-        [Header("Optional Y Offset")]
-        [SerializeField] private bool changePosY = false;
+        [Header("Optional Y Offset")] [SerializeField]
+        private bool changePosY = false;
+
         [SerializeField] private float yPosPortrait = 0f;
         [SerializeField] private float yPosLandscape = 0f;
 
         private Vector2Int lastScreenSize;
         private Rect lastSafeArea;
         private bool cachedDesignSize;
-        private const float defaultRatio = 2.05f;
-        private const float defaultPortraitHeight = 1440f;
 
-        private void OnEnable()
+        /*private const float defaultRatio = 2.05f;
+        private const float defaultPortraitHeight = 1440f;*/
+
+        /*private void OnEnable()
         {
             CacheDesignSize();
             Apply();
+        }*/
+
+        private IEnumerator Start()
+        {
+            // cho unity tinh toan height chinh xac cua canvas.
+            yield return null;
+
+            //CacheDesignSize();
+            Apply();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (NeedRefresh())
             {
@@ -52,7 +65,8 @@ namespace Immortal_Switch.Scripts.UI
 
         private bool NeedRefresh()
         {
-            if (lastScreenSize.x != Screen.width || lastScreenSize.y != Screen.height)
+            if (lastScreenSize.x != Screen.width ||
+                lastScreenSize.y != Screen.height)
                 return true;
 
             if (useSafeArea && lastSafeArea != Screen.safeArea)
@@ -63,7 +77,9 @@ namespace Immortal_Switch.Scripts.UI
 
         private void CacheDesignSize()
         {
-            if (!autoDetectDesignSize || cachedDesignSize || panelRoot == null)
+            if (/*!autoDetectDesignSize ||*/
+                cachedDesignSize ||
+                panelRoot == null)
                 return;
 
             // lấy size gốc (unscaled)
@@ -79,16 +95,19 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             // fallback tránh lỗi
-            if (size.x > 0 && size.y > 0)
+            if (size.x > 0 &&
+                size.y > 0)
             {
-                designSize = size;
+                /*designSize = size;*/
                 cachedDesignSize = true;
             }
         }
 
+        [Button]
         private void Apply()
         {
-            if (panelRoot == null) return;
+            if (panelRoot == null)
+                return;
 
             bool isPortrait = Screen.height >= Screen.width;
 
@@ -116,39 +135,20 @@ namespace Immortal_Switch.Scripts.UI
                 ? Screen.safeArea
                 : new Rect(0, 0, Screen.width, Screen.height);
 
-            float yOffset = 0f;
+            float yOffset = Mathf.Max(0f, panelRoot.anchoredPosition.y);
+            float finalY = (panelRoot.root as RectTransform)!.rect.height;
 
-            if (panelRoot != null)
-                yOffset = Mathf.Max(0f, panelRoot.anchoredPosition.y);
-
-            float finalY = 1440;
-            
-            float currentRatio = Screen.width / Screen.height;
-            bool isSameRatio = Mathf.Abs(currentRatio - defaultRatio) < 0.1f;
-            
-            if(area.height <= 1080)
-            {
-                finalY = 1440;
-            }
-            else if (area.height <= 1220)
-            {
-                finalY = 1320;
-            }
-
-            float widthRatio = area.width / designSize.x;
-            float heightRatio = (finalY - yOffset)  / designSize.y;
-            if (isSameRatio)
-            {
-                float newHeightRatio = defaultPortraitHeight / Screen.height;
-                heightRatio -= newHeightRatio / 100;
-            }
-
+            var sizeDelta = panelRoot.sizeDelta;
+            float widthRatio = area.width / sizeDelta.x;
+            float heightRatio = (finalY - yOffset) / sizeDelta.y;
             float scale = 1f;
 
             switch (fitMode)
             {
                 case FitMode.FitInside:
-                    scale = Mathf.Min(widthRatio, heightRatio);
+                    // fit inside sua lai co logic la tu scale de phu hop voi man hinh hien tai.
+                    heightRatio = (finalY - yOffset) / Screen.currentResolution.height;
+                    scale = heightRatio;
                     break;
 
                 case FitMode.FitWidth:

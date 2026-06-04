@@ -46,6 +46,7 @@ namespace Immortal_Switch.Scripts.Hero
 
         public event Action<string> SpineEventTriggered;
         public event Action<string> AnimationCompleted;
+        public SkeletonAnimation SkeletonAnim => skeletonAnimation;
 
         private void Awake()
         {

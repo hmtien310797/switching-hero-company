@@ -17,13 +17,31 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void ChangeProgress(string eventKey, int value)
         {
+            var flag = false;
+
             foreach (var mission in _storage.Data.Missions
                          .SelectMany(pair => pair.Value.Where(mission => mission.EventKey == eventKey)))
             {
-                mission.Progress += value;
+                if (!mission.IsClaimed)
+                {
+                    if (mission.EventKey is MissionSystemEventKeys.EVENT_CLEAR_STAGE or MissionSystemEventKeys.EVENT_HERO_LEVELUP)
+                    {
+                        mission.Progress = value;
+                    }
+                    else
+                    {
+                        mission.Progress += value;
+                    }
+
+                    flag = true;
+                    break;
+                }
             }
 
-            _storage.Save();
+            if (flag)
+            {
+                _storage.Save();
+            }
         }
 
         public void NextMission(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
@@ -38,6 +56,28 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     EventKey = cfg.eventKey,
                 },
             };
+
+            _storage.Save();
+        }
+
+        public void SetIsClaimed(string missionId, string type, bool isClaimed)
+        {
+            if (_storage.Data.Missions.TryGetValue(type, out var missions))
+            {
+                var flag = false;
+
+                foreach (var entry in missions.Where(entry => entry.Id == missionId))
+                {
+                    entry.IsClaimed = isClaimed;
+                    flag = true;
+                    break;
+                }
+
+                if (flag)
+                {
+                    _storage.Save();
+                }
+            }
         }
     }
 }

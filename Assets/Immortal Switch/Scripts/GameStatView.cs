@@ -26,7 +26,7 @@ public class GameStatView : MonoBehaviour
         Instance = this;
         GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         GameEventManager.Subscribe(GameEvents.OnWaveStart, OnInitNewStage);
-        GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
+        GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
         GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
         
         buttonBoss.onClick.AddListener(PvEBattleController.Instance.SpawnBossDirectly);
@@ -52,7 +52,7 @@ public class GameStatView : MonoBehaviour
         buttonBoss.gameObject.SetActive(true);
     }
 
-    private void OnStageCleared()
+    private void OnStageCleared(int _)
     {
         buttonBoss.interactable = false;
         battleTimerController.HideTimer();

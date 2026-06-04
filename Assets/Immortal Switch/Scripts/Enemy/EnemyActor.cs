@@ -5,6 +5,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using UI;
@@ -83,9 +84,14 @@ namespace Immortal_Switch.Scripts.Enemy
 
         public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB)
         {
+            Init(data, heroA, heroB, StageStatScale.Identity);
+        }
+
+        public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB, StageStatScale scale)
+        {
             creepData = data;
             HealthBarController.ResetHealth();
-            ApplyData(data);
+            ApplyData(data, scale);
             SetHeroTargets(heroA, heroB);
 
             currentTarget = null;
@@ -103,7 +109,7 @@ namespace Immortal_Switch.Scripts.Enemy
             spineAnimation.transform.localScale = new Vector3(scale, scale, scale);
         }
         
-        private void ApplyData(CreepDataSo data)
+        private void ApplyData(CreepDataSo data, StageStatScale scale)
         {
             if (data == null)
             {
@@ -111,7 +117,13 @@ namespace Immortal_Switch.Scripts.Enemy
                 return;
             }
 
-            attackDamage = data.BaseAtk;
+            scale.Normalize();
+
+            float scaledHp = data.BaseHp * scale.HpMultiplier;
+            float scaledAtk = data.BaseAtk * scale.AtkMultiplier;
+            float scaledDef = data.BaseDef * scale.DefMultiplier;
+
+            attackDamage = scaledAtk;
             attackRange = data.BaseRange;
             attackSpeed = Mathf.Max(0.1f, data.BaseAtkSpeed);
             moveSpeed = data.BaseMoveSpeed;
@@ -122,9 +134,9 @@ namespace Immortal_Switch.Scripts.Enemy
 
             BaseStat baseStat = new BaseStat
             {
-                Health = data.BaseHp,
-                Attack = data.BaseAtk,
-                Defense = data.BaseDef,
+                Health = scaledHp,
+                Attack = scaledAtk,
+                Defense = scaledDef,
                 AttackSpeed = data.BaseAtkSpeed,
                 AttackRange = data.BaseRange,
                 MoveSpeed = data.BaseMoveSpeed,
@@ -153,6 +165,9 @@ namespace Immortal_Switch.Scripts.Enemy
 
             animationDriver.SpineEventTriggered += OnSpineEvent;
             animationDriver.AnimationCompleted += OnAnimationCompleted;
+
+            animationDriver.SkeletonAnim.LimitRuntimeUpdateRate = true;
+            animationDriver.SkeletonAnim.TargetRuntimeFps = 30;
         }
 
         public void SetHeroTargets(ICombatUnit heroA, ICombatUnit heroB)

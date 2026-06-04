@@ -147,7 +147,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     private void Start()
     {
         GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
-        GameEventManager.Subscribe(GameEvents.OnStageCleared, () =>
+        GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, (_) =>
         {
             ActiveHealthBar(false);
             stateMachine.ChangeState(HeroStateId.Win);

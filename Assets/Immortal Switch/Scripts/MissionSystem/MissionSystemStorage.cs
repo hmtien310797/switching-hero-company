@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using Newtonsoft.Json;
@@ -34,7 +36,27 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void Initialize()
         {
-            // todo: add mission type vào dữ liệu của users.
+            if (!Data.Missions.TryGetValue(MissionSystemTypes.MAIN, out var list) ||
+                list.Count == 0)
+            {
+                var firstMainMission = _db.MissionConfig.rows.FirstOrDefault(v => v.type == MissionSystemTypes.MAIN);
+
+                if (firstMainMission != null)
+                {
+                    Data.Missions.TryAdd(MissionSystemTypes.MAIN, new List<MissionSystemEntry>
+                    {
+                        new()
+                        {
+                            EventKey = firstMainMission.eventKey,
+                            Id = firstMainMission.missionId,
+                            IsClaimed = false,
+                            Progress = 0,
+                        },
+                    });
+
+                    Save();
+                }
+            }
         }
     }
 }

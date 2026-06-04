@@ -1,11 +1,10 @@
 using System.Numerics;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
-using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.TransmutationSystem;
-using Immortal_Switch.Scripts.TransmutationSystem.UI;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -55,7 +54,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnTransmutationSystemEnergyChanged(BigInteger obj)
         {
-            txtEnergy.SetText(TransmutationSystemHelper.Format(obj));
+            txtEnergy.SetText(BigIntegerHelper.Format(obj));
         }
 
         private void OnDestroy()

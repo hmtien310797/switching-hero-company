@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.ItemSystem;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
@@ -41,15 +42,15 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         {
             var weights = new Dictionary<string, float>
             {
-                { TransmutationSystemTierConstants.D, row.d },
-                { TransmutationSystemTierConstants.C, row.c },
-                { TransmutationSystemTierConstants.B, row.b },
-                { TransmutationSystemTierConstants.A, row.a },
-                { TransmutationSystemTierConstants.S, row.s },
-                { TransmutationSystemTierConstants.SS, row.sS },
-                { TransmutationSystemTierConstants.SSS, row.sSS },
-                { TransmutationSystemTierConstants.R, row.r },
-                { TransmutationSystemTierConstants.SR, row.sR },
+                { ItemSystemTierConstants.D, row.d },
+                { ItemSystemTierConstants.C, row.c },
+                { ItemSystemTierConstants.B, row.b },
+                { ItemSystemTierConstants.A, row.a },
+                { ItemSystemTierConstants.S, row.s },
+                { ItemSystemTierConstants.SS, row.sS },
+                { ItemSystemTierConstants.SSS, row.sSS },
+                { ItemSystemTierConstants.R, row.r },
+                { ItemSystemTierConstants.SR, row.sR },
             };
 
             // loại bỏ các weight <= 0
@@ -59,7 +60,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
             if (validWeights.Count <= 0)
             {
-                return TransmutationSystemTierConstants.D;
+                return ItemSystemTierConstants.D;
             }
 
             // tổng weight

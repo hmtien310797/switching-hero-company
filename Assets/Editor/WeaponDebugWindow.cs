@@ -327,8 +327,8 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("RUNTIME PREVIEW", EditorStyles.boldLabel);
 
-            var heroes = GameObject.FindObjectsOfType<PlayerHeroController>();
-            PlayerHeroController runtimeHero = null;
+            var heroes = GameObject.FindObjectsOfType<HeroActor>();
+            HeroActor runtimeHero = null;
 
             for (int i = 0; i < heroes.Length; i++)
             {

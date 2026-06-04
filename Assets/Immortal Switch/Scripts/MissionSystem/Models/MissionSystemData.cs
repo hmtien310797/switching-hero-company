@@ -1,61 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Immortal_Switch.Scripts.MissionSystem.Models
 {
     /// <summary>
-    /// Các loại nhiệm vụ trong game.
-    /// </summary>
-    public enum EMissionSystemType
-    {
-        /// <summary>
-        /// Tiêu diệt quái vật.
-        /// </summary>
-        KillMonsters,
-
-        /// <summary>
-        /// Thực hiện transmute / hợp thành.
-        /// </summary>
-        Transmute,
-
-        /// <summary>
-        /// Triệu hồi hero.
-        /// </summary>
-        SummonHeroes,
-
-        /// <summary>
-        /// Triệu hồi kỹ năng.
-        /// </summary>
-        SummonSkills,
-
-        /// <summary>
-        /// Đạt tới stage yêu cầu.
-        /// </summary>
-        ReachStage,
-
-        /// <summary>
-        /// Đạt tới cấp training HP yêu cầu.
-        /// </summary>
-        ReachTrainingHp,
-
-        /// <summary>
-        /// Đạt tới cấp training ATK yêu cầu.
-        /// </summary>
-        ReachTrainingAtk,
-
-        /// <summary>
-        /// Thay đổi hero.
-        /// </summary>
-        SwitchHero,
-
-        /// <summary>
-        /// Sử dụng kỹ năng.
-        /// </summary>
-        UseSkill,
-    }
-
-    /// <summary>
     /// Dữ liệu tiến trình nhiệm vụ của người chơi.
+    /// sau này sẽ tối ưu lại. tách riêng thành từng cụm main mission, daily mission, achievement mission.
     /// </summary>
     public class MissionSystemData
     {
@@ -91,20 +40,5 @@ namespace Immortal_Switch.Scripts.MissionSystem.Models
         /// Đã nhận thưởng.
         /// </summary>
         public bool IsClaimed;
-
-        public void SetProgress(int value)
-        {
-            Progress = value;
-        }
-
-        public void SetId(string id)
-        {
-            Id = id;
-        }
-
-        public void SetIsClaimed(bool value)
-        {
-            IsClaimed = value;
-        }
     }
 }

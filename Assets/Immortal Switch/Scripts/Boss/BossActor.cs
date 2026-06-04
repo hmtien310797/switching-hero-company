@@ -6,6 +6,7 @@ using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.StatSystem;
 using UI;
 using UnityEngine;
@@ -110,9 +111,14 @@ namespace Immortal_Switch.Scripts.Boss
 
         public void Init(BossDataSO data, ICombatUnit heroA, ICombatUnit heroB)
         {
+            Init(data, heroA, heroB, StageStatScale.Identity);
+        }
+
+        public void Init(BossDataSO data, ICombatUnit heroA, ICombatUnit heroB, StageStatScale scale)
+        {
             bossData = data;
 
-            ApplyData(data);
+            ApplyData(data, scale);
             SetHeroTargets(heroA, heroB);
 
             NormalAttackCount = 0;
@@ -132,24 +138,30 @@ namespace Immortal_Switch.Scripts.Boss
             skillLogic.OnBattleStart();
         }
 
-        private void ApplyData(BossDataSO data)
+        private void ApplyData(BossDataSO data, StageStatScale scale)
         {
             if (data == null)
             {
                 Debug.LogWarning($"{name}: BossDataSO is null.");
                 return;
             }
-            
-            attackCooldown = 1f / data.AtkSpeed;
+
+            scale.Normalize();
+
+            float scaledHp = data.BaseHP * scale.HpMultiplier;
+            float scaledAtk = data.BaseAtk * scale.AtkMultiplier;
+            float scaledDef = data.BaseDef * scale.DefMultiplier;
+
+            attackCooldown = 1f / Mathf.Max(0.1f, data.AtkSpeed);
 
             if (stats == null)
                 return;
 
             BaseStat baseStat = new BaseStat
             {
-                Health = data.BaseHP,
-                Attack = data.BaseAtk,
-                Defense = data.BaseDef,
+                Health = scaledHp,
+                Attack = scaledAtk,
+                Defense = scaledDef,
                 AttackSpeed = data.AtkSpeed,
                 AttackRange = data.AttackRange,
                 MoveSpeed = data.MoveSpeed,

@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60ce6834a4204ec88b81191f6937ecc3, type: 3}
+  m_Name: EnemyPatternRule
+  m_EditorClassIdentifier: 
+  Rules:
+  - RuleId: earth_pattern_rule_0
+    RequiredElement: 0
+    PickMode: 0
+    PatternLoopIds:
+    - earth_pattern_1
+    - earth_pattern_2
+  - RuleId: fire_pattern_rule_0
+    RequiredElement: 1
+    PickMode: 0
+    PatternLoopIds:
+    - fire_pattern_1
+    - fire_pattern_2
+  - RuleId: water_pattern_rule_0
+    RequiredElement: 3
+    PickMode: 0
+    PatternLoopIds:
+    - water_pattern_1
+    - water_pattern_2
+  - RuleId: earth_pattern_rule_1
+    RequiredElement: 0
+    PickMode: 0
+    PatternLoopIds:
+    - earth_pattern_1
+    - earth_pattern_2
+  - RuleId: fire_pattern_rule_1
+    RequiredElement: 1
+    PickMode: 0
+    PatternLoopIds:
+    - fire_pattern_1
+    - fire_pattern_2
+  - RuleId: water_pattern_rule_1
+    RequiredElement: 3
+    PickMode: 0
+    PatternLoopIds:
+    - water_pattern_1
+    - water_pattern_2
+  Patterns:
+  - PatternId: metal_pattern_1
+    RequiredElement: 4
+    EnemyIds: e9030000ea030000
+    Rates:
+    - 60
+    - 40
+  - PatternId: metal_pattern_2
+    RequiredElement: 4
+    EnemyIds: e9030000ea030000
+    Rates:
+    - 60
+    - 40
+  - PatternId: wood_pattern_1
+    RequiredElement: 2
+    EnemyIds: d1070000d1070000
+    Rates:
+    - 60
+    - 40
+  - PatternId: wood_pattern_2
+    RequiredElement: 2
+    EnemyIds: d1070000d1070000
+    Rates:
+    - 60
+    - 40
+  - PatternId: water_pattern_1
+    RequiredElement: 3
+    EnemyIds: b90b0000ba0b0000
+    Rates:
+    - 60
+    - 40
+  - PatternId: water_pattern_2
+    RequiredElement: 3
+    EnemyIds: b90b0000ba0b0000
+    Rates:
+    - 60
+    - 40
+  - PatternId: fire_pattern_1
+    RequiredElement: 1
+    EnemyIds: a10f0000a20f0000
+    Rates:
+    - 60
+    - 40
+  - PatternId: fire_pattern_2
+    RequiredElement: 1
+    EnemyIds: a10f0000a20f0000
+    Rates:
+    - 60
+    - 40
+  - PatternId: earth_pattern_1
+    RequiredElement: 0
+    EnemyIds: 891300008a130000
+    Rates:
+    - 60
+    - 40
+  - PatternId: earth_pattern_2
+    RequiredElement: 0
+    EnemyIds: 891300008a130000
+    Rates:
+    - 60
+    - 40

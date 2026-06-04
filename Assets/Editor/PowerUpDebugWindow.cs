@@ -73,7 +73,7 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
         {
             playerList.Clear();
 
-            var all = FindObjectsByType<PlayerHeroController>(FindObjectsSortMode.None);
+            var all = FindObjectsByType<HeroActor>(FindObjectsSortMode.None);
             if (all == null) return;
 
             // fallback cuối

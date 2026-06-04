@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.ItemSystem.Models;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using UnityEngine;
@@ -26,16 +29,17 @@ namespace Immortal_Switch.Scripts.MissionSystem
         public event Action<string, float, string> OnChangeProgress;
 
         // --- Private Field ---
-        private volatile bool _isInitialized;
 
         protected override void OnSingletonAwake()
         {
-            //GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
+            GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
+            GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
         }
 
         protected override void OnDestroy()
         {
-            //GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
+            GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
+            GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             base.OnDestroy();
         }
 
@@ -47,6 +51,11 @@ namespace Immortal_Switch.Scripts.MissionSystem
             }
         }
 
+        private void OnStageCleared(int stage)
+        {
+            Service.ChangeProgress(MissionSystemEventKeys.EVENT_CLEAR_STAGE, stage);
+        }
+
         public override UniTask InitializeAsync()
         {
             Load();
@@ -55,18 +64,42 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void Load()
         {
-            if (_isInitialized)
-            {
-                return;
-            }
-
             Storage = new MissionSystemStorage(database);
             Service = new MissionSystemService(Storage);
-            _isInitialized = true;
 
             Storage.Load();
             Storage.Initialize();
-            _DispatchProgressMainMission();
+        }
+
+        public List<RewardEntry> ParseRewards(string rewards)
+        {
+            Debug.Log($"ParseRewards: {rewards}");
+            var results = new List<RewardEntry>();
+            var splitRewards = rewards.Split(';');
+
+            foreach (var reward in splitRewards)
+            {
+                var splits = reward.Split(':');
+
+                // có 2 key là item key va quantity
+                if (splits.Length > 1)
+                {
+                    var itemKey = splits[0];
+                    BigInteger.TryParse(splits[1], out var quantity);
+
+                    results.Add(new RewardEntry
+                    {
+                        itemKey = itemKey,
+                        quantity = quantity,
+                    });
+                }
+                else
+                {
+                    Debug.LogError($"Reward {reward} wrong config");
+                }
+            }
+
+            return results;
         }
 
         public DynamicHeroesGlobalSpecificationsMissionConfigRow GetMission(string id)
@@ -79,7 +112,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             return Storage.Data.Missions
                 .SelectMany(v => v.Value)
                 .Where(v => v.Id == cfg.missionId)
-                .Any(v => v.Progress >= cfg.target && !v.IsClaimed);
+                .Any(v => CheckComplete(cfg.target, cfg.eventKey) && !v.IsClaimed);
         }
 
         public void Claim(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
@@ -93,27 +126,41 @@ namespace Immortal_Switch.Scripts.MissionSystem
             }
 
             // todo: phát thưởng và hiện phần thưởng cho user.
+            Debug.Log($"rewards: {cfg.rewards}");
 
             // xử lý logic cho các type mission
             switch (cfg.type)
             {
                 // tiep nhiem vu moi.
                 case MissionSystemTypes.MAIN:
-                    Service.NextMission(cfg);
+                    var nextCfg = database.MissionConfig.rows.Find(v => v.missionId == cfg.nextMission);
+
+                    if (nextCfg != null)
+                    {
+                        Service.NextMission(nextCfg);
+                    }
+                    else
+                    {
+                        Service.SetIsClaimed(cfg.missionId, cfg.type, true);
+                    }
+
+                    DispatchProgressMainMission();
                     break;
 
                 case MissionSystemTypes.DAILY:
-                    break;
-
                 case MissionSystemTypes.WEEKLY:
-                    break;
-
                 case MissionSystemTypes.ACHIEVEMENT:
+                    Service.SetIsClaimed(cfg.missionId, cfg.type, true);
                     break;
             }
         }
 
-        private void _DispatchProgressMainMission()
+        public void NotifyReady()
+        {
+            DispatchProgressMainMission();
+        }
+
+        private void DispatchProgressMainMission()
         {
             if (Storage.Data.Missions.TryGetValue(MissionSystemTypes.MAIN, out var list))
             {
@@ -122,6 +169,18 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     OnChangeProgress?.Invoke(MissionSystemTypes.MAIN, entry.Progress, entry.Id);
                 }
             }
+        }
+
+        private bool CheckComplete(float target, string eventKey)
+        {
+            return true;
+            /*switch (eventKey)
+            {
+                case MissionSystemEventKeys.EVENT_CLEAR_STAGE:
+                    return PlayerSystemManager.Instance.Data.CurrentStage >= target;
+            }
+
+            return false;*/
         }
     }
 }

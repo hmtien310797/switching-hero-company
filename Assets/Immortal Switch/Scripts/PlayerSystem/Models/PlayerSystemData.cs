@@ -16,6 +16,11 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Models
         public int Level;
 
         /// <summary>
+        /// current stage
+        /// </summary>
+        public int CurrentStage;
+
+        /// <summary>
         /// ten hien thi
         /// </summary>
         public string Nickname;

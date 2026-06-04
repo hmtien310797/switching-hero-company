@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 using Battle;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
@@ -395,8 +396,8 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void Start()
         {
-            GameEventManager.Subscribe(GameEvents.OnStageCleared, ResetAllCooldowns);
-            GameEventManager.Subscribe(GameEvents.OnStageLost, ResetAllCooldowns);
+            GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
         }
 
         public void ResetRuntimeOnSwitchOut()
@@ -780,13 +781,15 @@ namespace Immortal_Switch.Scripts.Skill
             }
 
             float delay = animationDriver.PlaySkill(castConfig.HeroAnimationName);
-            DOVirtual.DelayedCall(delay,() =>
-            {
-                Debug.Log($"[DelayedCall Callback] time = {delay}");
-                FinishCurrentSkill(isUltimate);
-            });
+            DelayFinishCurrentSkill(delay, isUltimate).Forget();
             return true;
             // FinishCurrentSkill() will be called by OnAnimationComplete() when the hero animation ends.
+        }
+
+        private async UniTask DelayFinishCurrentSkill(float delay, bool isUltimate)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+            FinishCurrentSkill(isUltimate);
         }
         
         private bool CastHeroSpineAndSpawnedProjectile(
@@ -820,11 +823,7 @@ namespace Immortal_Switch.Scripts.Skill
             }
 
             float delay = animationDriver.PlaySkill(castConfig.HeroAnimationName);
-            DOVirtual.DelayedCall(delay,() =>
-            {
-                Debug.Log($"[DelayedCall Callback] time = {delay}");
-                FinishCurrentSkill(isUltimate);
-            });
+            DelayFinishCurrentSkill(delay, isUltimate).Forget();
             return true;
             // FinishCurrentSkill() will be called by OnAnimationComplete() when the hero animation ends.
         }
@@ -863,11 +862,7 @@ namespace Immortal_Switch.Scripts.Skill
             if (!string.IsNullOrEmpty(castConfig.HeroAnimationName))
             {
                 float delay = animationDriver.PlaySkill(castConfig.HeroAnimationName);
-                DOVirtual.DelayedCall(delay,() =>
-                {
-                    Debug.Log($"[DelayedCall Callback] time = {delay}");
-                    FinishCurrentSkill(isUltimate);
-                });
+                DelayFinishCurrentSkill(delay, isUltimate).Forget();
             }
             else
             {
@@ -1082,6 +1077,16 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             cooldownRemainingBySkill.Remove(skillData);
+        }
+
+        private void OnStageLost()
+        {
+            ResetAllCooldowns();
+        }
+        
+        private void OnStageCleared(int _)
+        {
+            ResetAllCooldowns();
         }
         
         [Button]

@@ -8,6 +8,11 @@ using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.Skill
 {
+    public enum TierSkill
+    {
+        B,A,S,SS
+    }
+    
     [Serializable]
     public class SkillCastConfig
     {

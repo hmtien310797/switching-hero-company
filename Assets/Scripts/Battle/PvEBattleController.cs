@@ -9,6 +9,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
+using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -51,10 +52,13 @@ namespace Battle
         [Header("Data (Boss)")] [SerializeField]
         private BossDataSO[] bossData;
 
-        [Header("Stage")] [SerializeField] private int currentStage = 1;
+        [Header("Stage")] [field: SerializeField] public int currentStage { get; private set; }= 1;
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
+        
+        [Header("Stage Resolver")]
+        [SerializeField] private StageDataResolverSO stageDataResolver;
 
         [Header("Hero Team")] [SerializeField] private HeroTeamController heroTeamController;
         [SerializeField, Min(0)] private int controlledHeroSlotIndex = 0;
@@ -105,13 +109,15 @@ namespace Battle
         
         private readonly List<ICombatUnit> farthestCandidates = new(8);
         private readonly List<float> farthestDistances = new(8);
+        
+        private StageRuntimeData stageRuntimeData;
 
         public BattleState State { get; private set; } = BattleState.None;
         public List<EnemyActor> MonsterList => creeps;
 
         private void Start()
         {
-            GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageCleared);
+            GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
             GameEventManager.Subscribe(GameEvents.OnStageLost, () => OnStageFailed().Forget());
             GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
@@ -152,7 +158,7 @@ namespace Battle
             SetState(BattleState.Initializing);
 
             currentStage = Mathf.Max(1, currentStage);
-            pvEMapController.InitMapByChapter(GetChapterIdByStage(currentStage));
+            pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(currentStage));
             InitSwitchableHeroIds();
             await InitPlayerHeroById();
             NotifyActiveLineupChanged();
@@ -479,7 +485,7 @@ namespace Battle
             result = BattleResult.None;
             SetState(BattleState.Initializing);
             currentStage++;
-            pvEMapController.InitMapByChapter(GetChapterIdByStage(currentStage));
+            pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(currentStage));
             InitStage(currentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
@@ -497,6 +503,14 @@ namespace Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+        }
+        
+        private int GetResolvedChapterIndexByStage(int stage)
+        {
+            if (stageDataResolver != null)
+                return stageDataResolver.GetChapterIndexByStage(stage);
+
+            return GetChapterIdByStage(stage);
         }
 
         // ======================
@@ -523,6 +537,39 @@ namespace Battle
 
         private void CacheStageSpawnData(int stage)
         {
+            if (stageDataResolver != null)
+            {
+                stageRuntimeData = stageDataResolver.Resolve(
+                    stage,
+                    creepDataMapper,
+                    bossDataMapper
+                );
+
+                if (stageRuntimeData == null || !stageRuntimeData.IsValid)
+                {
+                    Debug.LogError($"[PvE] StageRuntimeData invalid. stage={stage}");
+                    enemyIds = null;
+                    rates = null;
+                    return;
+                }
+
+                patternId = 0;
+                enemyIds = stageRuntimeData.EnemyIds;
+                rates = stageRuntimeData.EnemyRates;
+
+                Debug.Log(
+                    $"[PvE] Resolve Stage={stageRuntimeData.GlobalStage}, " +
+                    $"Chapter={stageRuntimeData.ChapterName}, " +
+                    $"LocalStage={stageRuntimeData.LocalStage}, " +
+                    $"Element={stageRuntimeData.ChapterElement}, " +
+                    $"EnemyPattern={stageRuntimeData.EnemyPatternId}, " +
+                    $"BossId={stageRuntimeData.BossId}"
+                );
+
+                return;
+            }
+
+            // Fallback old logic
             patternId = GetPatternIdByStageLoop(stage, stagesPerPattern);
 
             enemyIds = creepSpawnPatternCollection.GetSpawnPatternBaseOnId(patternId);
@@ -605,10 +652,15 @@ namespace Battle
         {
             bossSo = null;
 
-            if (!TryGetChapterDataByStage(stage, out var chapterData, out _, out _))
+            if (bossDataMapper == null || bossDataMapper.Count == 0)
                 return false;
 
-            if (bossDataMapper == null || bossDataMapper.Count == 0)
+            if (stageRuntimeData != null && stageRuntimeData.BossId > 0)
+            {
+                return bossDataMapper.TryGetValue(stageRuntimeData.BossId, out bossSo) && bossSo != null;
+            }
+            
+            if (!TryGetChapterDataByStage(stage, out var chapterData, out _, out _))
                 return false;
 
             return bossDataMapper.TryGetValue(chapterData.BossId, out bossSo) && bossSo != null;
@@ -659,10 +711,15 @@ namespace Battle
                         ? 0.5f
                         : 0f, 0f);
 
+                    StageStatScale enemyScale = stageRuntimeData != null
+                        ? stageRuntimeData.EnemyScale
+                        : StageStatScale.Identity;
+
                     creep.Init(
                         creepData,
                         inBattleHeroA,
-                        inBattleHeroB
+                        inBattleHeroB,
+                        enemyScale
                     );
 
                     creep.OnDead -= NotifyMonsterDeath;
@@ -821,7 +878,11 @@ namespace Battle
             var pos = GroupFlashController.Instance.GetPosByIdx(2);
             var spawnedBoss = PoolManager.Instance.Spawn(bossSo.bossPrefab, pos, Quaternion.identity);
             currentBoss = spawnedBoss;
-            currentBoss.Init(bossSo, inBattleHeroA, inBattleHeroB);
+            StageStatScale bossScale = stageRuntimeData != null
+                ? stageRuntimeData.BossScale
+                : StageStatScale.Identity;
+
+            currentBoss.Init(bossSo, inBattleHeroA, inBattleHeroB, bossScale);
             currentBoss.OnDead -= OnBossDead;
             currentBoss.OnDead += OnBossDead;
 
@@ -848,10 +909,10 @@ namespace Battle
                 return;
             }
 
-            GameEventManager.Trigger(GameEvents.OnStageCleared);
+            GameEventManager.Trigger(GameEvents.OnStageCleared, currentStage);
         }
 
-        private void OnStageCleared()
+        private void OnStageCleared(int _)
         {
             result = BattleResult.Victory;
             SetState(BattleState.Ended);
@@ -884,7 +945,7 @@ namespace Battle
             if (enemy == null)
                 return;
 
-            DropCoinAsync(enemy.transform.position);
+            //DropCoinAsync(enemy.transform.position);
             creeps.Remove(enemy);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
             deadCreepCount = losingStage
@@ -941,7 +1002,7 @@ namespace Battle
                 BattleCoinView coin =
                     PoolManager.Instance.Spawn(coinPrefab, pos + Vector3.up * 0.25f, Quaternion.identity);
                 var trans = FindHeroNearestFromPos(pos);
-                coin.DoDrop(0.1f + i * 0.1f, trans).Forget();
+                coin.DoDrop(0.1f + i * 0.1f, trans);
             }
         }
 

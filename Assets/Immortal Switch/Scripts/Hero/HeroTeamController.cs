@@ -88,7 +88,7 @@ public class HeroTeamController : Singleton<HeroTeamController>
         ResetFollowerSmoothTarget();
         GameEventManager.Subscribe(GameEvents.OnWaveStart, UnblockTeamControl);
         GameEventManager.Subscribe(GameEvents.OnStageLost, BlockTeamControl);
-        GameEventManager.Subscribe(GameEvents.OnStageCleared, BlockTeamControl);
+        GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
     }
 
     private void Update()
@@ -364,6 +364,11 @@ public class HeroTeamController : Singleton<HeroTeamController>
     private void NotifyControlledHeroChanged()
     {
         ControlledHeroChanged?.Invoke(GetControlledHero(), GetFollowerHero(), selectedHero);
+    }
+
+    private void OnStageCleared(int _)
+    {
+        BlockTeamControl();
     }
 
     private void BlockTeamControl()

@@ -1,8 +1,11 @@
+using System;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.GrowthSystem;
+using Immortal_Switch.Scripts.MissionSystem;
+using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.UI;
@@ -19,18 +22,28 @@ namespace Immortal_Switch.Scripts.Core
 
         public async UniTask RunAsync()
         {
-            await MasterDataCache.Instance.InitializeAsync();
-            await UserDataCache.Instance.InitializeAsync();
-            await GrowthManager.Instance.InitializeAsync();
-            await PowerUpManager.Instance.InitializeAsync();
-            await UIManager.Instance.InitializeAsync();
-            await SkillViewDataProvider.Instance.InitializeAsync();
-            await PvEBattleController.Instance.InitializeAsync();
-            //await PlayerSystemManager.Instance.InitializeAsync();
-            //await MissionSystemManager.Instance.InitializeAsync();
-            //await TransmutationSystemManager.Instance.InitializeAsync();
+            try
+            {
+                // init dau tien. có các manager khác sử dụng tới. tránh lỗi.
+                await PlayerSystemManager.Instance.InitializeAsync();
+                await MissionSystemManager.Instance.InitializeAsync();
 
-            Debug.Log("Bootstrap completed");
+                //await TransmutationSystemManager.Instance.InitializeAsync();
+
+                await MasterDataCache.Instance.InitializeAsync();
+                await UserDataCache.Instance.InitializeAsync();
+                await GrowthManager.Instance.InitializeAsync();
+                await PowerUpManager.Instance.InitializeAsync();
+                await UIManager.Instance.InitializeAsync();
+                await SkillViewDataProvider.Instance.InitializeAsync();
+                await PvEBattleController.Instance.InitializeAsync();
+
+                Debug.Log("Bootstrap completed");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         // private async UniTask FetchPlayerDataAsync()

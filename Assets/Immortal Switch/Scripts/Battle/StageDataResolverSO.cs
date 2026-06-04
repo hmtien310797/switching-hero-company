@@ -1,0 +1,361 @@
+﻿using System.Collections.Generic;
+using Battle;
+using Immortal_Switch.Scripts.Boss;
+using UnityEngine;
+
+namespace Immortal_Switch.Scripts.Level.Stage
+{
+    [CreateAssetMenu(fileName = "StageDataResolver", menuName = "ScriptableObjects/Stage/StageDataResolver")]
+    public class StageDataResolverSO : ScriptableObject
+    {
+        [SerializeField] private ChapterConfigSO chapterConfig;
+        [SerializeField] private EnemyPatternRuleSO enemyPatternRuleConfig;
+        [SerializeField] private BossPatternRuleSO bossPatternRuleConfig;
+
+        public int GetChapterIndexByStage(int globalStage)
+        {
+            if (chapterConfig == null || chapterConfig.Chapters == null)
+                return 0;
+
+            globalStage = Mathf.Max(1, globalStage);
+
+            int accumulatedStage = 0;
+
+            for (int i = 0; i < chapterConfig.Chapters.Length; i++)
+            {
+                ChapterConfig chapter = chapterConfig.Chapters[i];
+                if (chapter == null || chapter.StageCount <= 0)
+                    continue;
+
+                int chapterEndStage = accumulatedStage + chapter.StageCount;
+
+                if (globalStage <= chapterEndStage)
+                    return i;
+
+                accumulatedStage = chapterEndStage;
+            }
+
+            return Mathf.Max(0, chapterConfig.Chapters.Length - 1);
+        }
+
+        public StageRuntimeData Resolve(
+            int globalStage,
+            Dictionary<int, CreepDataSo> creepDataMapper,
+            Dictionary<int, BossDataSO> bossDataMapper
+        )
+        {
+            globalStage = Mathf.Max(1, globalStage);
+
+            if (!TryResolveChapter(globalStage, out ChapterConfig chapter, out int chapterIndex, out int localStage))
+            {
+                Debug.LogError($"[StageResolver] Cannot resolve chapter. globalStage={globalStage}");
+                return null;
+            }
+
+            EnemyPatternRule enemyRule = FindEnemyRule(chapter.EnemyPatternRuleId);
+            if (enemyRule == null)
+            {
+                Debug.LogError($"[StageResolver] Cannot find enemy rule: {chapter.EnemyPatternRuleId}");
+                return null;
+            }
+
+            if (enemyRule.RequiredElement != chapter.ChapterElement)
+            {
+                Debug.LogError(
+                    $"[StageResolver] Chapter element mismatch enemy rule. " +
+                    $"chapter={chapter.ChapterName}, chapterElement={chapter.ChapterElement}, " +
+                    $"rule={enemyRule.RuleId}, ruleElement={enemyRule.RequiredElement}"
+                );
+                return null;
+            }
+
+            EnemyPatternData enemyPattern = ResolveEnemyPattern(enemyRule, localStage);
+            if (enemyPattern == null)
+            {
+                Debug.LogError($"[StageResolver] Cannot resolve enemy pattern. rule={enemyRule.RuleId}, localStage={localStage}");
+                return null;
+            }
+
+            if (!ValidateEnemyPattern(enemyPattern, enemyRule.RequiredElement, creepDataMapper))
+                return null;
+
+            BossPatternRule bossRule = FindBossRule(chapter.BossPatternRuleId);
+            if (bossRule == null)
+            {
+                Debug.LogError($"[StageResolver] Cannot find boss rule: {chapter.BossPatternRuleId}");
+                return null;
+            }
+
+            if (bossRule.RequiredElement != chapter.ChapterElement)
+            {
+                Debug.LogError(
+                    $"[StageResolver] Chapter element mismatch boss rule. " +
+                    $"chapter={chapter.ChapterName}, chapterElement={chapter.ChapterElement}, " +
+                    $"rule={bossRule.RuleId}, ruleElement={bossRule.RequiredElement}"
+                );
+                return null;
+            }
+
+            int bossId = ResolveBossId(bossRule, localStage);
+            if (!ValidateBoss(bossId, bossRule.RequiredElement, bossDataMapper))
+                return null;
+
+            StageRuntimeData runtimeData = new StageRuntimeData
+            {
+                GlobalStage = globalStage,
+                ChapterIndex = chapterIndex,
+                ChapterId = chapter.ChapterId,
+                ChapterName = chapter.ChapterName,
+                LocalStage = localStage,
+                ChapterElement = chapter.ChapterElement,
+
+                EnemyPatternRuleId = enemyRule.RuleId,
+                EnemyPatternId = enemyPattern.PatternId,
+                EnemyIds = enemyPattern.EnemyIds,
+                EnemyRates = NormalizeRates(enemyPattern.Rates),
+
+                BossPatternRuleId = bossRule.RuleId,
+                BossId = bossId,
+
+                AfkRewardMultiplier = Mathf.Max(0f, chapter.AfkRewardMultiplier),
+
+                EnemyScale = StageScalingFormula.GetEnemyScale(globalStage),
+                BossScale = StageScalingFormula.GetBossScale(globalStage)
+            };
+
+            return runtimeData;
+        }
+
+        private bool TryResolveChapter(
+            int globalStage,
+            out ChapterConfig chapter,
+            out int chapterIndex,
+            out int localStage
+        )
+        {
+            chapter = null;
+            chapterIndex = -1;
+            localStage = -1;
+
+            if (chapterConfig == null || chapterConfig.Chapters == null || chapterConfig.Chapters.Length == 0)
+                return false;
+
+            int accumulatedStage = 0;
+
+            for (int i = 0; i < chapterConfig.Chapters.Length; i++)
+            {
+                ChapterConfig data = chapterConfig.Chapters[i];
+                if (data == null || data.StageCount <= 0)
+                    continue;
+
+                int chapterStartStage = accumulatedStage + 1;
+                int chapterEndStage = accumulatedStage + data.StageCount;
+
+                if (globalStage >= chapterStartStage && globalStage <= chapterEndStage)
+                {
+                    chapter = data;
+                    chapterIndex = i;
+                    localStage = globalStage - accumulatedStage;
+                    return true;
+                }
+
+                accumulatedStage = chapterEndStage;
+            }
+
+            // Nếu stage vượt quá config hiện tại, dùng chapter cuối cùng làm loop/fallback.
+            ChapterConfig lastChapter = chapterConfig.Chapters[chapterConfig.Chapters.Length - 1];
+            if (lastChapter == null || lastChapter.StageCount <= 0)
+                return false;
+
+            chapter = lastChapter;
+            chapterIndex = chapterConfig.Chapters.Length - 1;
+
+            int overflowStage = globalStage - accumulatedStage;
+            localStage = ((overflowStage - 1) % lastChapter.StageCount) + 1;
+
+            return true;
+        }
+
+        private EnemyPatternRule FindEnemyRule(string ruleId)
+        {
+            if (enemyPatternRuleConfig == null || enemyPatternRuleConfig.Rules == null)
+                return null;
+
+            for (int i = 0; i < enemyPatternRuleConfig.Rules.Length; i++)
+            {
+                EnemyPatternRule rule = enemyPatternRuleConfig.Rules[i];
+                if (rule != null && rule.RuleId == ruleId)
+                    return rule;
+            }
+
+            return null;
+        }
+
+        private EnemyPatternData ResolveEnemyPattern(EnemyPatternRule rule, int localStage)
+        {
+            if (rule == null || rule.PatternLoopIds == null || rule.PatternLoopIds.Length == 0)
+                return null;
+
+            int index = (localStage - 1) % rule.PatternLoopIds.Length;
+            string patternId = rule.PatternLoopIds[index];
+
+            return FindEnemyPattern(patternId);
+        }
+
+        private EnemyPatternData FindEnemyPattern(string patternId)
+        {
+            if (enemyPatternRuleConfig == null || enemyPatternRuleConfig.Patterns == null)
+                return null;
+
+            for (int i = 0; i < enemyPatternRuleConfig.Patterns.Length; i++)
+            {
+                EnemyPatternData pattern = enemyPatternRuleConfig.Patterns[i];
+                if (pattern != null && pattern.PatternId == patternId)
+                    return pattern;
+            }
+
+            return null;
+        }
+
+        private BossPatternRule FindBossRule(string ruleId)
+        {
+            if (bossPatternRuleConfig == null || bossPatternRuleConfig.Rules == null)
+                return null;
+
+            for (int i = 0; i < bossPatternRuleConfig.Rules.Length; i++)
+            {
+                BossPatternRule rule = bossPatternRuleConfig.Rules[i];
+                if (rule != null && rule.RuleId == ruleId)
+                    return rule;
+            }
+
+            return null;
+        }
+
+        private int ResolveBossId(BossPatternRule rule, int localStage)
+        {
+            if (rule == null || rule.BossLoopIds == null || rule.BossLoopIds.Length == 0)
+                return 0;
+
+            int stagesPerBoss = Mathf.Max(1, rule.StagesPerBoss);
+            int bossIndex = ((localStage - 1) / stagesPerBoss) % rule.BossLoopIds.Length;
+
+            return rule.BossLoopIds[bossIndex];
+        }
+
+        private bool ValidateEnemyPattern(
+            EnemyPatternData pattern,
+            Element requiredElement,
+            Dictionary<int, CreepDataSo> creepDataMapper
+        )
+        {
+            if (pattern == null)
+                return false;
+
+            if (pattern.RequiredElement != requiredElement)
+            {
+                Debug.LogError(
+                    $"[StageResolver] Pattern element mismatch. " +
+                    $"pattern={pattern.PatternId}, patternElement={pattern.RequiredElement}, required={requiredElement}"
+                );
+                return false;
+            }
+
+            if (pattern.EnemyIds == null || pattern.EnemyIds.Length == 0)
+            {
+                Debug.LogError($"[StageResolver] Pattern has no enemy ids. pattern={pattern.PatternId}");
+                return false;
+            }
+
+            if (pattern.Rates == null || pattern.Rates.Length != pattern.EnemyIds.Length)
+            {
+                Debug.LogError(
+                    $"[StageResolver] Pattern rates invalid. pattern={pattern.PatternId}, " +
+                    $"enemyCount={pattern.EnemyIds.Length}, rateCount={(pattern.Rates == null ? 0 : pattern.Rates.Length)}"
+                );
+                return false;
+            }
+
+            for (int i = 0; i < pattern.EnemyIds.Length; i++)
+            {
+                int enemyId = pattern.EnemyIds[i];
+
+                if (creepDataMapper == null || !creepDataMapper.TryGetValue(enemyId, out CreepDataSo creepData) || creepData == null)
+                {
+                    Debug.LogError($"[StageResolver] Missing creep data. enemyId={enemyId}, pattern={pattern.PatternId}");
+                    return false;
+                }
+
+                if (creepData.Element != requiredElement)
+                {
+                    Debug.LogError(
+                        $"[StageResolver] Enemy element mismatch. " +
+                        $"enemyId={enemyId}, enemyElement={creepData.Element}, required={requiredElement}, pattern={pattern.PatternId}"
+                    );
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool ValidateBoss(
+            int bossId,
+            Element requiredElement,
+            Dictionary<int, BossDataSO> bossDataMapper
+        )
+        {
+            if (bossId <= 0)
+            {
+                Debug.LogError("[StageResolver] Invalid boss id.");
+                return false;
+            }
+
+            if (bossDataMapper == null || !bossDataMapper.TryGetValue(bossId, out BossDataSO bossData) || bossData == null)
+            {
+                Debug.LogError($"[StageResolver] Missing boss data. bossId={bossId}");
+                return false;
+            }
+
+            if (bossData.Element != requiredElement)
+            {
+                Debug.LogError(
+                    $"[StageResolver] Boss element mismatch. " +
+                    $"bossId={bossId}, bossElement={bossData.Element}, required={requiredElement}"
+                );
+                return false;
+            }
+
+            return true;
+        }
+
+        private float[] NormalizeRates(float[] source)
+        {
+            if (source == null || source.Length == 0)
+                return null;
+
+            float[] result = new float[source.Length];
+
+            float sum = 0f;
+            for (int i = 0; i < source.Length; i++)
+            {
+                result[i] = Mathf.Max(0f, source[i]);
+                sum += result[i];
+            }
+
+            if (sum <= 0f)
+            {
+                float equal = 1f / source.Length;
+                for (int i = 0; i < result.Length; i++)
+                    result[i] = equal;
+
+                return result;
+            }
+
+            for (int i = 0; i < result.Length; i++)
+                result[i] /= sum;
+
+            return result;
+        }
+    }
+}

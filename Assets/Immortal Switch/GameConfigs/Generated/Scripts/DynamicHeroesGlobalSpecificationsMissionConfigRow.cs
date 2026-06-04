@@ -20,6 +20,11 @@ namespace Game.Configs.Generated
         public string type;
 
         /// <summary>
+        /// CSV Column: nextMission
+        /// </summary>
+        public string nextMission;
+
+        /// <summary>
         /// CSV Column: title
         /// </summary>
         public string title;

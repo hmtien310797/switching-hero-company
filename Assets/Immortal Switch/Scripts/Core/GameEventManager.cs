@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Core
@@ -77,6 +78,7 @@ namespace Immortal_Switch.Scripts.Core
 
         public static void Trigger<T>(string eventName, T value)
         {
+            Debug.Log($"Trigger event: {eventName} --- args: {JsonUtility.ToJson(value)}");
             if (eventTableWithParam.TryGetValue(eventName, out var action))
                 action?.Invoke(value);
         }
@@ -135,6 +137,7 @@ namespace Immortal_Switch.Scripts.Core
 
         public static void Trigger(string eventName, params object[] args)
         {
+            Debug.Log($"Trigger event: {eventName} --- args: {JsonUtility.ToJson(args)}");
             if (eventTableMulti.TryGetValue(eventName, out Action<object[]> action))
             {
                 action?.Invoke(args);

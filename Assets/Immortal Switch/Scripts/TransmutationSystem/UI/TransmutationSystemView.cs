@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.ItemSystem;
 using Immortal_Switch.Scripts.ItemSystem.UI;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.UI;
@@ -41,15 +43,15 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.UI
 
             _slots = new Dictionary<string, ItemSystemView>
             {
-                { TransmutationSystemItemTypeConstants.WEAPON, slotWeapon },
-                { TransmutationSystemItemTypeConstants.GLOVES, slotGloves },
-                { TransmutationSystemItemTypeConstants.SHIELD, slotShield },
-                { TransmutationSystemItemTypeConstants.ARMOR, slotArmor },
-                { TransmutationSystemItemTypeConstants.BOOTS, slotBoots },
-                { TransmutationSystemItemTypeConstants.RING, slotRing },
-                { TransmutationSystemItemTypeConstants.NECKLACE, slotNecklace },
-                { TransmutationSystemItemTypeConstants.RELIC, slotRelic },
-                { TransmutationSystemItemTypeConstants.PENDANT, slotPendant },
+                { ItemSystemTypeConstants.WEAPON, slotWeapon },
+                { ItemSystemTypeConstants.GLOVES, slotGloves },
+                { ItemSystemTypeConstants.SHIELD, slotShield },
+                { ItemSystemTypeConstants.ARMOR, slotArmor },
+                { ItemSystemTypeConstants.BOOTS, slotBoots },
+                { ItemSystemTypeConstants.RING, slotRing },
+                { ItemSystemTypeConstants.NECKLACE, slotNecklace },
+                { ItemSystemTypeConstants.RELIC, slotRelic },
+                { ItemSystemTypeConstants.PENDANT, slotPendant },
             };
         }
 
@@ -60,7 +62,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.UI
 
         private void OnTransmutationSystemEnergyChanged(BigInteger obj)
         {
-            txtEnergy.SetText(TransmutationSystemHelper.Format(obj));
+            txtEnergy.SetText(BigIntegerHelper.Format(obj));
         }
 
         private void Start()

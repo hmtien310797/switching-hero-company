@@ -36,7 +36,7 @@ namespace Immortal_Switch.Scripts.UI
                 switchMainSubHeroButton.onClick.AddListener(OnSwitchMainSubHeroButtonClicked);
 
             profileBtn.onClick.AddListener(OnClickProfile);
-            OnStageEnd();
+            HideAbleObjects();
         }
 
         private void OnClickProfile()
@@ -54,8 +54,8 @@ namespace Immortal_Switch.Scripts.UI
             });
 
             SetHeroTeamController(HeroTeamController.Instance);
-            GameEventManager.Subscribe(GameEvents.OnStageCleared, OnStageEnd);
-            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageEnd);
+            GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
+            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
             GameEventManager.Subscribe(GameEvents.OnWaveStart, OnStageStart);
         }
 
@@ -80,7 +80,17 @@ namespace Immortal_Switch.Scripts.UI
 
         public CurrencyView CurrencyView => currencyView;
 
-        private void OnStageEnd()
+        private void OnStageLost()
+        {
+            HideAbleObjects();
+        }
+        
+        private void OnStageEnd(int _)
+        {
+            HideAbleObjects();
+        }
+
+        private void HideAbleObjects()
         {
             for (int i = 0; i < hideAbleObjects.Length; i++)
             {
