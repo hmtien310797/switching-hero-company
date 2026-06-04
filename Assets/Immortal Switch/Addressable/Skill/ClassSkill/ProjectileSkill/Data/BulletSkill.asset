@@ -35,7 +35,7 @@ MonoBehaviour:
     SpawnPositionType: 0
     FollowType: 0
     SpawnOffset: {x: 0, y: 1.5, z: 0}
-    LifeTime: 1
+    LifeTime: 0.6
     UseLifeTime: 0
     DespawnOnAnimationComplete: 0
     AnimationName: animation
@@ -100,7 +100,7 @@ MonoBehaviour:
       patternType: 1
       bulletPrefab: {fileID: 804791343669178177, guid: b66a75eb36632cc449817963a73f22f6, type: 3}
       bulletSpeed: 50
-      bulletLifeTime: 0.5
+      bulletLifeTime: 0.4
       totalWaves: 12
       timeBetweenWaves: 0.1
       bulletsPerWave: 5
@@ -109,6 +109,7 @@ MonoBehaviour:
       bulletSpawnDelay: 0
       alternateBulletOrderEachWave: 0
       damage: 150
+      delayWhenStartFiring: 0.8
     Phases:
     - PhaseId: 0
       TriggerType: 1
