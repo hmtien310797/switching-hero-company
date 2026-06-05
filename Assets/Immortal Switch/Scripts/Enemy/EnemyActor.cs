@@ -103,6 +103,46 @@ namespace Immortal_Switch.Scripts.Enemy
 
             ChangeState(EnemyState.Spawn);
         }
+        
+        public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB, BaseStat cachedBaseStat)
+        {
+            creepData = data;
+
+            HealthBarController.ResetHealth();
+
+            ApplyBaseStat(data, cachedBaseStat);
+
+            SetHeroTargets(heroA, heroB);
+
+            currentTarget = null;
+            attackTimer = 0f;
+            hasHitThisAttack = false;
+
+            BindDeathEvent();
+            BindAnimationEvents();
+
+            ChangeState(EnemyState.Spawn);
+        }
+
+        private void ApplyBaseStat(CreepDataSo data, BaseStat baseStat)
+        {
+            if (data == null)
+            {
+                Debug.LogWarning($"{name}: CreepDataSo is null.");
+                return;
+            }
+
+            attackDamage = baseStat.Attack;
+            attackRange = baseStat.AttackRange;
+            attackSpeed = Mathf.Max(0.1f, baseStat.AttackSpeed);
+            moveSpeed = baseStat.MoveSpeed;
+            attackCooldown = 1f / attackSpeed;
+
+            if (stats == null)
+                return;
+
+            stats.Initialize(baseStat);
+        }
 
         public void SetScale(float scale)
         {

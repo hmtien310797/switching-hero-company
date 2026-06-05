@@ -52,13 +52,16 @@ namespace Battle
         [Header("Data (Boss)")] [SerializeField]
         private BossDataSO[] bossData;
 
-        [Header("Stage")] [field: SerializeField] public int currentStage { get; private set; }= 1;
+        [Header("Stage")]
+        [field: SerializeField]
+        public int currentStage { get; private set; } = 1;
+
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
-        
-        [Header("Stage Resolver")]
-        [SerializeField] private StageDataResolverSO stageDataResolver;
+
+        [Header("Stage Resolver")] [SerializeField]
+        private StageDataResolverSO stageDataResolver;
 
         [Header("Hero Team")] [SerializeField] private HeroTeamController heroTeamController;
         [SerializeField, Min(0)] private int controlledHeroSlotIndex = 0;
@@ -102,14 +105,16 @@ namespace Battle
 
         private readonly HeroActor[] inBattleHeroes = new HeroActor[2];
         private readonly Dictionary<int, HeroActor> inBattleHeroMapper = new();
+        private readonly Dictionary<int, BaseStat> cachedScaledCreepStats = new();
+        private readonly Dictionary<int, BaseStat> cachedScaledBossStats = new();
         private GameCameraController gameCameraController;
 
         private HeroActor inBattleHeroA;
         private HeroActor inBattleHeroB;
-        
+
         private readonly List<ICombatUnit> farthestCandidates = new(8);
         private readonly List<float> farthestDistances = new(8);
-        
+
         private StageRuntimeData stageRuntimeData;
 
         public BattleState State { get; private set; } = BattleState.None;
@@ -255,7 +260,7 @@ namespace Battle
         public void InitSwitchableHeroIds()
         {
             inBattleHeroIdList.Clear();
-            inBattleHeroIdList = new List<int>() { 7, 4 };
+            inBattleHeroIdList = new List<int>() { 2, 4 };
         }
 
         public void OnSelectedHeroCastUltimateSkill()
@@ -504,7 +509,7 @@ namespace Battle
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
         }
-        
+
         private int GetResolvedChapterIndexByStage(int stage)
         {
             if (stageDataResolver != null)
@@ -552,6 +557,8 @@ namespace Battle
                     rates = null;
                     return;
                 }
+                
+                RebuildStageStatCache();
 
                 patternId = 0;
                 enemyIds = stageRuntimeData.EnemyIds;
@@ -659,7 +666,7 @@ namespace Battle
             {
                 return bossDataMapper.TryGetValue(stageRuntimeData.BossId, out bossSo) && bossSo != null;
             }
-            
+
             if (!TryGetChapterDataByStage(stage, out var chapterData, out _, out _))
                 return false;
 
@@ -706,21 +713,33 @@ namespace Battle
                     creep.SetScale(k % 5 == 0
                         ? 1.5f
                         : 1f);
-                    
+
                     creep.HealthBarController.SetOffsetPosition(k % 5 == 0
                         ? 0.5f
                         : 0f, 0f);
 
-                    StageStatScale enemyScale = stageRuntimeData != null
-                        ? stageRuntimeData.EnemyScale
-                        : StageStatScale.Identity;
+                    if (cachedScaledCreepStats.TryGetValue(enemyId, out BaseStat cachedStat))
+                    {
+                        creep.Init(
+                            creepData,
+                            inBattleHeroA,
+                            inBattleHeroB,
+                            cachedStat
+                        );
+                    }
+                    else
+                    {
+                        StageStatScale enemyScale = stageRuntimeData != null
+                            ? stageRuntimeData.EnemyScale
+                            : StageStatScale.Identity;
 
-                    creep.Init(
-                        creepData,
-                        inBattleHeroA,
-                        inBattleHeroB,
-                        enemyScale
-                    );
+                        creep.Init(
+                            creepData,
+                            inBattleHeroA,
+                            inBattleHeroB,
+                            enemyScale
+                        );
+                    }
 
                     creep.OnDead -= NotifyMonsterDeath;
                     creep.OnDead += NotifyMonsterDeath;
@@ -856,6 +875,88 @@ namespace Battle
             }
         }
 
+        private void RebuildStageStatCache()
+        {
+            cachedScaledCreepStats.Clear();
+            cachedScaledBossStats.Clear();
+
+            if (stageRuntimeData == null)
+                return;
+
+            CacheScaledCreepStats();
+            CacheScaledBossStats();
+        }
+
+        private void CacheScaledCreepStats()
+        {
+            if (stageRuntimeData.EnemyIds == null || stageRuntimeData.EnemyIds.Length == 0)
+                return;
+
+            StageStatScale scale = stageRuntimeData.EnemyScale;
+            scale.Normalize();
+
+            for (int i = 0; i < stageRuntimeData.EnemyIds.Length; i++)
+            {
+                int enemyId = stageRuntimeData.EnemyIds[i];
+
+                if (cachedScaledCreepStats.ContainsKey(enemyId))
+                    continue;
+
+                if (!creepDataMapper.TryGetValue(enemyId, out CreepDataSo data) || data == null)
+                {
+                    Debug.LogError($"[PvE] Cannot cache creep stat. Missing CreepDataSo. enemyId={enemyId}");
+                    continue;
+                }
+
+                BaseStat stat = new BaseStat
+                {
+                    Health = data.BaseHp * scale.HpMultiplier,
+                    Attack = data.BaseAtk * scale.AtkMultiplier,
+                    Defense = data.BaseDef * scale.DefMultiplier,
+
+                    AttackSpeed = data.BaseAtkSpeed,
+                    AttackRange = data.BaseRange,
+                    MoveSpeed = data.BaseMoveSpeed,
+
+                    Element = data.Element
+                };
+
+                cachedScaledCreepStats.Add(enemyId, stat);
+            }
+        }
+
+        private void CacheScaledBossStats()
+        {
+            if (stageRuntimeData.BossId <= 0)
+                return;
+
+            StageStatScale scale = stageRuntimeData.BossScale;
+            scale.Normalize();
+
+            int bossId = stageRuntimeData.BossId;
+
+            if (!bossDataMapper.TryGetValue(bossId, out BossDataSO data) || data == null)
+            {
+                Debug.LogError($"[PvE] Cannot cache boss stat. Missing BossDataSO. bossId={bossId}");
+                return;
+            }
+
+            BaseStat stat = new BaseStat
+            {
+                Health = data.BaseHP * scale.HpMultiplier,
+                Attack = data.BaseAtk * scale.AtkMultiplier,
+                Defense = data.BaseDef * scale.DefMultiplier,
+
+                AttackSpeed = data.AtkSpeed,
+                AttackRange = data.AttackRange,
+                MoveSpeed = data.MoveSpeed,
+
+                Element = data.Element
+            };
+
+            cachedScaledBossStats[bossId] = stat;
+        }
+
         private void SpawnBoss()
         {
             if (!TryGetBossDataByStage(currentStage, out var bossSo))
@@ -878,11 +979,29 @@ namespace Battle
             var pos = GroupFlashController.Instance.GetPosByIdx(2);
             var spawnedBoss = PoolManager.Instance.Spawn(bossSo.bossPrefab, pos, Quaternion.identity);
             currentBoss = spawnedBoss;
-            StageStatScale bossScale = stageRuntimeData != null
-                ? stageRuntimeData.BossScale
-                : StageStatScale.Identity;
 
-            currentBoss.Init(bossSo, inBattleHeroA, inBattleHeroB, bossScale);
+            if (cachedScaledBossStats.TryGetValue(bossSo.Id, out BaseStat cachedBossStat))
+            {
+                currentBoss.Init(
+                    bossSo,
+                    inBattleHeroA,
+                    inBattleHeroB,
+                    cachedBossStat
+                );
+            }
+            else
+            {
+                StageStatScale bossScale = stageRuntimeData != null
+                    ? stageRuntimeData.BossScale
+                    : StageStatScale.Identity;
+
+                currentBoss.Init(
+                    bossSo,
+                    inBattleHeroA,
+                    inBattleHeroB,
+                    bossScale
+                );
+            }
             currentBoss.OnDead -= OnBossDead;
             currentBoss.OnDead += OnBossDead;
 
@@ -1033,6 +1152,11 @@ namespace Battle
             if (!isReadyBattle)
                 return null;
 
+            if (currentBoss != null)
+            {
+                return currentBoss;
+            }
+
             ICombatUnit nearest = null;
             float nearestSqr = float.MaxValue;
 
@@ -1079,7 +1203,7 @@ namespace Battle
 
             return nearest;
         }
-        
+
         public ICombatUnit GetFarthestEnemy(Vector3 pos)
         {
             if (!isReadyBattle)
@@ -1140,7 +1264,7 @@ namespace Battle
             }
 
             int index = Random.Range(0, creeps.Count);
-            return creeps[index];
+            return creeps.Count <= 0 ? null : creeps[index];
         }
 
         //not in use
@@ -1171,7 +1295,7 @@ namespace Battle
             // return tPos;
             return Vector3.zero;
         }
-        
+
         public ICombatUnit GetRandomFromFarthestEnemies(
             Vector3 pos,
             IReadOnlyList<ICombatUnit> excludedTargets,
@@ -1179,6 +1303,11 @@ namespace Battle
         {
             if (!isReadyBattle)
                 return null;
+
+            if (currentBoss != null)
+            {
+                return currentBoss;
+            }
 
             if (topCount <= 0)
                 topCount = 1;
@@ -1242,7 +1371,7 @@ namespace Battle
             int randomIndex = Random.Range(0, farthestCandidates.Count);
             return farthestCandidates[randomIndex];
         }
-        
+
         private void InsertCandidateByDistanceDesc(
             List<ICombatUnit> candidates,
             List<float> distances,
@@ -1274,7 +1403,7 @@ namespace Battle
                 distances.RemoveAt(lastIndex);
             }
         }
-        
+
         private bool IsExcluded(ICombatUnit unit, IReadOnlyList<ICombatUnit> excludedTargets)
         {
             if (unit == null || excludedTargets == null)

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Immortal_Switch.Scripts.Enemy;
 using UnityEngine;
 using Battle;
+using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -85,6 +86,17 @@ namespace Immortal_Switch.Scripts.Skill
 
             int count = 0;
             float sqrRange = range * range;
+            
+            BossActor boss = context.BattleController.GetActiveBossActor();
+            if (boss != null)
+            {
+                Vector3 pos = boss.Position;
+                pos.y = center.y;
+
+                if ((pos - center).sqrMagnitude <= sqrRange)
+                    count++;
+            }
+            
             List<EnemyActor> enemies = context.BattleController.MonsterList;
 
             if (enemies == null)
@@ -110,6 +122,10 @@ namespace Immortal_Switch.Scripts.Skill
         {
             if (context.BattleController == null)
                 return;
+            
+            BossActor boss = context.BattleController.GetActiveBossActor();
+            if(boss != null)
+                buffer.Add(boss);
 
             float radius = overrideRadius > 0f ? overrideRadius : areaData != null ? areaData.Radius : 0f;
             float sqrRadius = radius * radius;

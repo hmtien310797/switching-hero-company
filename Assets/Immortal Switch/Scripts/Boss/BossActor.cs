@@ -137,6 +137,47 @@ namespace Immortal_Switch.Scripts.Boss
 
             skillLogic.OnBattleStart();
         }
+        
+        public void Init(BossDataSO data, ICombatUnit heroA, ICombatUnit heroB, BaseStat cachedBaseStat)
+        {
+            bossData = data;
+
+            ApplyBaseStat(data, cachedBaseStat);
+
+            SetHeroTargets(heroA, heroB);
+
+            NormalAttackCount = 0;
+            currentTarget = null;
+            attackTimer = 0f;
+            hasHitThisAttack = false;
+
+            skillLogic = BossSkillLogicFactory.Create(BossId);
+            skillLogic.Initialize(this);
+
+            BindDeathEvent();
+            BindHealthEvents();
+            BindAnimationEvents();
+
+            ChangeState(useSpawnState ? BossState.Spawn : BossState.Idle);
+
+            skillLogic.OnBattleStart();
+        }
+
+        private void ApplyBaseStat(BossDataSO data, BaseStat baseStat)
+        {
+            if (data == null)
+            {
+                Debug.LogWarning($"{name}: BossDataSO is null.");
+                return;
+            }
+
+            attackCooldown = 1f / Mathf.Max(0.1f, baseStat.AttackSpeed);
+
+            if (stats == null)
+                return;
+
+            stats.Initialize(baseStat);
+        }
 
         private void ApplyData(BossDataSO data, StageStatScale scale)
         {
