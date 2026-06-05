@@ -63,6 +63,7 @@ namespace Immortal_Switch.Scripts.Boss
         public event Action<BossActor> OnDead;
         
         public StatsController Stats => stats;
+        public Element Element => bossData.Element;
         public HealthBarController HealthBarController => healthBarController;
 
         public Transform Transform => transform;

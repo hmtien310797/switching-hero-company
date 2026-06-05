@@ -36,6 +36,14 @@ namespace Immortal_Switch.Scripts.Combat
                 (atk1 + flatAtkBonus) *
                 (1f + atkPercentBonus);
 
+            float elementDamageMultiplier = ElementDamageResolver.GetDamageMultiplier(
+                attacker.Element,
+                defender.Element,
+                CombatConfig.CurrentElementRule
+            );
+
+            finalDamage *= elementDamageMultiplier;
+
             result.Damage = finalDamage;
             result.DamageType = isCrit ? DamageType.Crit : DamageType.Normal;
 

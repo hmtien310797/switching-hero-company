@@ -56,6 +56,7 @@ namespace Immortal_Switch.Scripts.Enemy
         private float moveSpeed = 3f;
 
         public StatsController Stats => stats;
+        public Element Element => creepData.Element;
         public HealthBarController HealthBarController => healthBarController;
         public Transform Transform => transform;
         public Vector3 Position => transform.position;

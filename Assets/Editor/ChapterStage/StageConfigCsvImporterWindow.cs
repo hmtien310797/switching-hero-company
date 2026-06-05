@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using Battle;
 using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Level.Stage;
 using UnityEditor;
 using UnityEngine;
@@ -32,6 +33,7 @@ public class StageConfigCsvImporterWindow : EditorWindow
     private static string bossPatternRulesCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=1880814643&single=true&output=csv";
     private static string rewardRulesCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=861091833&single=true&output=csv";
     private static string stageScalingRulesCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=844833132&single=true&output=csv";
+    private string elementRulesCsvUrl ="https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=1120185136&single=true&output=csv";
 
     [Header("Output Folder")] [SerializeField]
     private string outputFolder = "Assets/_Project/Generated/StageConfig";
@@ -113,30 +115,17 @@ public class StageConfigCsvImporterWindow : EditorWindow
         );
     }
     
-    private string GetCsvText(TextAsset localAsset, string url, string label, bool required)
+    private string GetCsvText(string url, string label, bool required)
     {
-        if (useCsvUrls)
-        {
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                if (required)
-                    throw new Exception($"Missing required CSV URL: {label}");
-
-                return string.Empty;
-            }
-
-            return DownloadCsv(url, label);
-        }
-
-        if (localAsset == null)
+        if (string.IsNullOrWhiteSpace(url))
         {
             if (required)
-                throw new Exception($"Missing required CSV TextAsset: {label}");
+                throw new Exception($"Missing required CSV URL: {label}");
 
             return string.Empty;
         }
 
-        return localAsset.text;
+        return DownloadCsv(url, label);
     }
 
     private static string DownloadCsv(string url, string label)
@@ -166,13 +155,13 @@ public class StageConfigCsvImporterWindow : EditorWindow
 
         try
         {
-            string chaptersText = GetCsvText(chaptersCsv, chaptersCsvUrl, "Chapters", true);
-            string enemyPatternRulesText = GetCsvText(enemyPatternRulesCsv, enemyPatternRulesCsvUrl, "EnemyPatternRules", true);
-            string enemyPatternsText = GetCsvText(enemyPatternsCsv, enemyPatternsCsvUrl, "EnemyPatterns", true);
-            string bossPatternRulesText = GetCsvText(bossPatternRulesCsv, bossPatternRulesCsvUrl, "BossPatternRules", true);
-
-            string rewardRulesText = GetCsvText(rewardRulesCsv, rewardRulesCsvUrl, "RewardRules", false);
-            string stageScalingRulesText = GetCsvText(stageScalingRulesCsv, stageScalingRulesCsvUrl, "StageScalingRules", false);
+            string chaptersText = GetCsvText( chaptersCsvUrl, "Chapters", true);
+            string enemyPatternRulesText = GetCsvText( enemyPatternRulesCsvUrl, "EnemyPatternRules", true);
+            string enemyPatternsText = GetCsvText(enemyPatternsCsvUrl, "EnemyPatterns", true);
+            string bossPatternRulesText = GetCsvText(bossPatternRulesCsvUrl, "BossPatternRules", true);
+            string elementRulesText = GetCsvText( elementRulesCsvUrl, "ElementRules", false);
+            string rewardRulesText = GetCsvText( rewardRulesCsvUrl, "RewardRules", false);
+            string stageScalingRulesText = GetCsvText( stageScalingRulesCsvUrl, "StageScalingRules", false);
 
             ChapterConfigSO chapterConfig = ImportChapters(chaptersText);
             EnemyPatternRuleSO enemyPatternRule = ImportEnemyPatternConfig(enemyPatternRulesText, enemyPatternsText);
@@ -185,10 +174,17 @@ public class StageConfigCsvImporterWindow : EditorWindow
             StageScalingRuleSO scalingRule = null;
             if (!string.IsNullOrWhiteSpace(stageScalingRulesText))
                 scalingRule = ImportStageScalingRules(stageScalingRulesText);
+            
+            ElementRuleSO elementRule = null;
+            if (!string.IsNullOrWhiteSpace(elementRulesText))
+                elementRule = ImportElementRules(elementRulesText);
 
             EditorUtility.SetDirty(chapterConfig);
             EditorUtility.SetDirty(enemyPatternRule);
             EditorUtility.SetDirty(bossPatternRule);
+            
+            if (elementRule != null)
+                EditorUtility.SetDirty(elementRule);
 
             if (rewardRule != null)
                 EditorUtility.SetDirty(rewardRule);
@@ -537,6 +533,43 @@ public class StageConfigCsvImporterWindow : EditorWindow
         Debug.Log($"[StageConfigImporter] Imported StageScalingRules: {asset.Rules.Length}");
         return asset;
     }
+    
+    private ElementRuleSO ImportElementRules(string csvText)
+    {
+        CsvTable table = CsvTable.Parse(csvText);
+
+        ElementRuleSO asset = LoadOrCreateAsset<ElementRuleSO>("ElementRule.asset");
+
+        List<ElementDamageRule> rules = new List<ElementDamageRule>();
+
+        foreach (CsvRow row in table.Rows)
+        {
+            if (row.IsEmpty)
+                continue;
+
+            string ruleId = row.GetStringAny("ElementRuleId", "RuleId");
+            if (string.IsNullOrWhiteSpace(ruleId))
+                continue;
+
+            ElementDamageRule rule = new ElementDamageRule
+            {
+                ElementRuleId = ruleId,
+                AdvantageDamageBonus = row.GetFloat("AdvantageDamageBonus", 0.3f),
+                DisadvantageDamagePenalty = row.GetFloat("DisadvantageDamagePenalty", -0.2f),
+                SameElementDamageModifier = row.GetFloat("SameElementDamageModifier", 0f),
+                NeutralDamageModifier = row.GetFloat("NeutralDamageModifier", 0f),
+                EnableSameElementModifier = row.GetBool("EnableSameElementModifier", true),
+                EnableNeutralModifier = row.GetBool("EnableNeutralModifier", true)
+            };
+
+            rules.Add(rule);
+        }
+
+        asset.Rules = rules.ToArray();
+
+        Debug.Log($"[StageConfigImporter] Imported ElementRules: {asset.Rules.Length}");
+        return asset;
+    }
 
     // =========================================================
     // Asset Helpers
@@ -779,6 +812,25 @@ public class StageConfigCsvImporterWindow : EditorWindow
                 return defaultValue;
 
             return string.IsNullOrWhiteSpace(value) ? defaultValue : value.Trim();
+        }
+        
+        public bool GetBool(string key, bool defaultValue = false)
+        {
+            string value = GetString(key, string.Empty);
+
+            if (string.IsNullOrWhiteSpace(value))
+                return defaultValue;
+
+            if (bool.TryParse(value, out bool result))
+                return result;
+
+            if (value == "1")
+                return true;
+
+            if (value == "0")
+                return false;
+
+            return defaultValue;
         }
 
         public string GetStringAny(params string[] keys)

@@ -83,6 +83,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     public HeroDataSO HeroData => heroData;
 
     public StatsController Stats => stats;
+    public Element Element => heroData.Element;
     public HealthBarController HealthBarController => healthBarController;
 
     public Transform Transform => transform;

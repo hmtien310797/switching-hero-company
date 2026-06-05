@@ -9,6 +9,7 @@ namespace Immortal_Switch.Scripts.StatSystem
     {
         ActorType ActorType { get; }
         StatsController Stats { get; }
+        Element Element { get; }
         HealthBarController HealthBarController { get; }
         Transform Transform { get; }
         Vector3 Position { get; }
