@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Common;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Reward;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Currency
@@ -9,10 +10,7 @@ namespace Immortal_Switch.Scripts.Currency
     {
         public static CurrencyManager Instance { get; private set; }
 
-        private string saveKey = "currency_save_data";
-
-        private CurrencySaveData saveData;
-        private Dictionary<CurrencyType, CurrencyEntry> entryMap;
+        [SerializeField] private List<CurrencyEntry> currencies = new List<CurrencyEntry>();
 
         public event Action<CurrencyChangedArgs> OnCurrencyChanged;
         public event Action OnAnyCurrencyChanged;
@@ -26,183 +24,206 @@ namespace Immortal_Switch.Scripts.Currency
             }
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            Load();
-            BuildMap();
-            EnsureAllCurrencyTypesExist();
+            InitDefaultCurrencies();
         }
 
-        private void BuildMap()
+        private void InitDefaultCurrencies()
         {
-            entryMap = new Dictionary<CurrencyType, CurrencyEntry>();
+            Array values = Enum.GetValues(typeof(CurrencyType));
 
-            if (saveData == null)
-                saveData = new CurrencySaveData();
-
-            for (int i = 0; i < saveData.Entries.Count; i++)
+            for (int i = 0; i < values.Length; i++)
             {
-                var entry = saveData.Entries[i];
-                if (entry == null) continue;
+                CurrencyType type = (CurrencyType)values.GetValue(i);
 
-                if (!entryMap.ContainsKey(entry.CurrencyType))
-                    entryMap.Add(entry.CurrencyType, entry);
-            }
-        }
+                if (FindEntry(type) != null)
+                    continue;
 
-        private void EnsureAllCurrencyTypesExist()
-        {
-            var allTypes = Enum.GetValues(typeof(CurrencyType));
-            for (int i = 0; i < allTypes.Length; i++)
-            {
-                var type = (CurrencyType)allTypes.GetValue(i);
-                if (!entryMap.ContainsKey(type))
+                currencies.Add(new CurrencyEntry
                 {
-                    var entry = new CurrencyEntry
-                    {
-                        CurrencyType = type,
-                        Amount = 0
-                    };
-
-                    saveData.Entries.Add(entry);
-                    entryMap.Add(type, entry);
-                }
+                    CurrencyType = type,
+                    Amount = BigNumber.Zero
+                });
             }
-
-            Save();
         }
 
-        public int Get(CurrencyType currencyType)
+        public BigNumber Get(CurrencyType currencyType)
         {
             return GetEntry(currencyType).Amount;
         }
 
-        public bool HasEnough(CurrencyType currencyType, int amount)
+        public bool HasEnough(CurrencyType currencyType, BigNumber amount)
         {
-            if (amount <= 0) return true;
+            if (amount <= BigNumber.Zero)
+                return true;
+
             return Get(currencyType) >= amount;
         }
 
-        public void Set(CurrencyType currencyType, int amount)
+        /// <summary>
+        /// Dùng cho debug/local demo. Server mode không nên gọi trực tiếp cho giao dịch thật.
+        /// </summary>
+        public void AddLocalDemo(CurrencyType currencyType, BigNumber amount)
         {
-            if (amount < 0) amount = 0;
+            if (amount <= BigNumber.Zero)
+                return;
 
-            var entry = GetEntry(currencyType);
-            int oldAmount = entry.Amount;
+            CurrencyEntry entry = GetEntry(currencyType);
+            BigNumber oldAmount = entry.Amount;
+            BigNumber newAmount = oldAmount + amount;
+
+            entry.Amount = newAmount;
+
+            NotifyChanged(currencyType, oldAmount, newAmount);
+        }
+
+        /// <summary>
+        /// Dùng cho debug/local demo. Server mode không nên gọi trực tiếp cho giao dịch thật.
+        /// </summary>
+        public bool SpendLocalDemo(CurrencyType currencyType, BigNumber amount)
+        {
+            if (amount <= BigNumber.Zero)
+                return true;
+
+            CurrencyEntry entry = GetEntry(currencyType);
+
+            if (entry.Amount < amount)
+                return false;
+
+            BigNumber oldAmount = entry.Amount;
+            BigNumber newAmount = oldAmount - amount;
+
+            entry.Amount = newAmount;
+
+            NotifyChanged(currencyType, oldAmount, newAmount);
+            return true;
+        }
+
+        /// <summary>
+        /// Source of truth từ server.
+        /// Server trả balances cuối cùng, client apply vào đây.
+        /// </summary>
+        public void ApplyServerBalances(List<RewardAmountDto> balances)
+        {
+            if (balances == null)
+                return;
+
+            for (int i = 0; i < balances.Count; i++)
+            {
+                RewardAmountDto dto = balances[i];
+
+                if (!TryParseCurrencyType(dto.currencyType, out CurrencyType currencyType))
+                    continue;
+
+                if (!TryParseAmount(dto.amount, out BigNumber amount))
+                    continue;
+
+                SetFromServer(currencyType, amount);
+            }
+        }
+
+        /// <summary>
+        /// Tạm dùng cho demo reward local trước khi tích hợp server.
+        /// Sau này không dùng hàm này cho reward thật nữa.
+        /// </summary>
+        public void AddLocalDemoRewards(List<RewardAmountDto> rewards)
+        {
+            if (rewards == null)
+                return;
+
+            for (int i = 0; i < rewards.Count; i++)
+            {
+                RewardAmountDto dto = rewards[i];
+
+                if (!TryParseCurrencyType(dto.currencyType, out CurrencyType currencyType))
+                    continue;
+
+                if (!TryParseAmount(dto.amount, out BigNumber amount))
+                    continue;
+
+                AddLocalDemo(currencyType, amount);
+            }
+        }
+
+        private void SetFromServer(CurrencyType currencyType, BigNumber amount)
+        {
+            if (amount < BigNumber.Zero)
+                amount = BigNumber.Zero;
+
+            CurrencyEntry entry = GetEntry(currencyType);
+            BigNumber oldAmount = entry.Amount;
 
             if (oldAmount == amount)
                 return;
 
             entry.Amount = amount;
-            Save();
-            NotifyChanged(currencyType, oldAmount, entry.Amount);
-        }
 
-        public void Add(CurrencyType currencyType, int amount)
-        {
-            if (amount <= 0) return;
-
-            var entry = GetEntry(currencyType);
-            int oldAmount = entry.Amount;
-
-            entry.Amount += amount;
-
-            Save();
-            NotifyChanged(currencyType, oldAmount, entry.Amount);
-        }
-
-        public bool Spend(CurrencyType currencyType, int amount)
-        {
-            if (amount <= 0) return true;
-
-            var entry = GetEntry(currencyType);
-            if (entry.Amount < amount)
-                return false;
-
-            int oldAmount = entry.Amount;
-            entry.Amount -= amount;
-
-            Save();
-            NotifyChanged(currencyType, oldAmount, entry.Amount);
-
-            return true;
-        }
-
-        public void ResetAll()
-        {
-            if (saveData == null)
-                saveData = new CurrencySaveData();
-
-            for (int i = 0; i < saveData.Entries.Count; i++)
-            {
-                saveData.Entries[i].Amount = 0;
-            }
-
-            Save();
-
-            var allTypes = Enum.GetValues(typeof(CurrencyType));
-            for (int i = 0; i < allTypes.Length; i++)
-            {
-                var type = (CurrencyType)allTypes.GetValue(i);
-                NotifyChanged(type, 0, 0);
-            }
-        }
-
-        public void Save()
-        {
-            ES3.Save(saveKey, saveData);
-        }
-
-        public void Load()
-        {
-            
-            if (ES3.KeyExists(saveKey))
-                saveData = ES3.Load<CurrencySaveData>(saveKey);
-            else
-                saveData = new CurrencySaveData
-                {
-                    Entries = new List<CurrencyEntry>
-                    {
-                        new CurrencyEntry
-                        {
-                            CurrencyType = CurrencyType.HeroTicket,
-                            Amount = UserDataCache.Instance.initialHeroTicket
-                        },
-                        new CurrencyEntry
-                        {
-                            CurrencyType = CurrencyType.Diamond,
-                            Amount = UserDataCache.Instance.initialDiamond
-                        },
-                        new CurrencyEntry
-                        {
-                            CurrencyType = CurrencyType.Gold,
-                            Amount = UserDataCache.Instance.initialGold
-                        }
-                    }
-                };
+            NotifyChanged(currencyType, oldAmount, amount);
         }
 
         private CurrencyEntry GetEntry(CurrencyType currencyType)
         {
-            if (entryMap == null)
-                BuildMap();
+            CurrencyEntry entry = FindEntry(currencyType);
 
-            if (!entryMap.TryGetValue(currencyType, out var entry))
+            if (entry != null)
+                return entry;
+
+            entry = new CurrencyEntry
             {
-                entry = new CurrencyEntry
-                {
-                    CurrencyType = currencyType,
-                    Amount = 0
-                };
+                CurrencyType = currencyType,
+                Amount = BigNumber.Zero
+            };
 
-                saveData.Entries.Add(entry);
-                entryMap.Add(currencyType, entry);
-            }
-
+            currencies.Add(entry);
             return entry;
         }
 
-        private void NotifyChanged(CurrencyType currencyType, int oldAmount, int newAmount)
+        private CurrencyEntry FindEntry(CurrencyType currencyType)
+        {
+            for (int i = 0; i < currencies.Count; i++)
+            {
+                if (currencies[i].CurrencyType == currencyType)
+                    return currencies[i];
+            }
+
+            return null;
+        }
+
+        private bool TryParseCurrencyType(string value, out CurrencyType currencyType)
+        {
+            if (Enum.TryParse(value, true, out currencyType))
+                return true;
+
+            Debug.LogError($"[CurrencyManager] Unknown currency type: {value}");
+            return false;
+        }
+
+        private bool TryParseAmount(string value, out BigNumber amount)
+        {
+            amount = BigNumber.Zero;
+
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            // Ưu tiên format server nếu đã có: "mantissa|tier"
+            // if (BigNumber.TryParseServerString(value, out amount))
+            //     return true;
+
+            // Fallback tạm thời: server/client gửi số thường dạng string "1200".
+            if (double.TryParse(
+                    value,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out double number))
+            {
+                amount = BigNumber.FromDouble(number);
+                return true;
+            }
+
+            Debug.LogError($"[CurrencyManager] Cannot parse amount: {value}");
+            return false;
+        }
+
+        private void NotifyChanged(CurrencyType currencyType, BigNumber oldAmount, BigNumber newAmount)
         {
             OnCurrencyChanged?.Invoke(new CurrencyChangedArgs
             {

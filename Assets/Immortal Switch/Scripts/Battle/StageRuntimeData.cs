@@ -22,6 +22,9 @@ namespace Immortal_Switch.Scripts.Level.Stage
         public int BossId;
 
         public float AfkRewardMultiplier;
+        
+        public StageReward[] BaseRewards;
+        public StageReward[] ClearRewards;
 
         public StageStatScale EnemyScale;
         public StageStatScale BossScale;

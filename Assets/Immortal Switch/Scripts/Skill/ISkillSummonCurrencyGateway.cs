@@ -1,56 +1,57 @@
-﻿using Immortal_Switch.Scripts.Currency;
+﻿using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 
 namespace Immortal_Switch.Scripts.Skill
 {
     public interface ISkillSummonCurrencyGateway
     {
-        int GetSkillTicket();
-        int GetGem();
+        BigNumber GetSkillTicket();
+        BigNumber GetGem();
 
-        bool CanSpendSkillTicket(int amount);
-        bool CanSpendGem(int amount);
+        bool CanSpendSkillTicket(BigNumber amount);
+        bool CanSpendGem(BigNumber amount);
 
-        void SpendSkillTicket(int amount);
-        void SpendGem(int amount);
+        void SpendSkillTicket(BigNumber amount);
+        void SpendGem(BigNumber amount);
 
-        void AddCurrency(CurrencyType currencyType, int amount);
+        void AddCurrency(CurrencyType currencyType, BigNumber amount);
     }
 
     public class GameSkillSummonCurrencyGateway : ISkillSummonCurrencyGateway
     {
-        public int GetSkillTicket()
+        public BigNumber GetSkillTicket()
         {
             return CurrencyManager.Instance.Get(CurrencyType.SkillTicket);
         }
 
-        public int GetGem()
+        public BigNumber GetGem()
         {
             return CurrencyManager.Instance.Get(CurrencyType.Diamond);
         }
 
-        public bool CanSpendSkillTicket(int amount)
+        public bool CanSpendSkillTicket(BigNumber amount)
         {
             return CurrencyManager.Instance.HasEnough(CurrencyType.SkillTicket, amount);
         }
 
-        public bool CanSpendGem(int amount)
+        public bool CanSpendGem(BigNumber amount)
         {
             return CurrencyManager.Instance.HasEnough(CurrencyType.Diamond, amount);
         }
 
-        public void SpendSkillTicket(int amount)
+        public void SpendSkillTicket(BigNumber amount)
         {
-            CurrencyManager.Instance.Spend(CurrencyType.SkillTicket, amount);
+            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.SkillTicket, amount);
         }
 
-        public void SpendGem(int amount)
+        public void SpendGem(BigNumber amount)
         {
-            CurrencyManager.Instance.Spend(CurrencyType.Diamond, amount);
+            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.Diamond, amount);
         }
 
-        public void AddCurrency(CurrencyType currencyType, int amount)
+        public void AddCurrency(CurrencyType currencyType, BigNumber amount)
         {
-            CurrencyManager.Instance.Add(currencyType, amount);
+            CurrencyManager.Instance.AddLocalDemo(currencyType, amount);
         }
     }
 }

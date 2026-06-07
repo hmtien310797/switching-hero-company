@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Battle;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Hero;
@@ -346,7 +347,7 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
                 asset.NextWeaponId = nextWeaponId;
                 asset.FuseShardRequired = fuseShardRequired;
                 asset.ExclusivePoolClass = exclusivePoolClass;
-                asset.ExclusiveClassStoneCost = exclusiveClassStoneCost;
+                BigNumber.TryParse(exclusiveClassStoneCost.ToString(), out asset.ExclusiveClassStoneCost);
 
                 asset.LevelConfig = levelConfigMap.TryGetValue(levelConfigId, out var lv) ? lv : null;
                 asset.LimitBreakConfig = limitBreakConfigMap.TryGetValue(limitBreakConfigId, out var lb) ? lb : null;

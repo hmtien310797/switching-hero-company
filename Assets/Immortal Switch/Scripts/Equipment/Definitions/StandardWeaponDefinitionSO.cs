@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.Equipment.Core;
+﻿using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace Immortal_Switch.Scripts.Equipment.Definitions
         public int NextWeaponId;
         public int FuseShardRequired = 3;
         public HeroClass ExclusivePoolClass;
-        public int ExclusiveClassStoneCost = 0;
+        public BigNumber ExclusiveClassStoneCost;
 
         [Header("Shared Config")]
         public WeaponLevelConfigSO LevelConfig;

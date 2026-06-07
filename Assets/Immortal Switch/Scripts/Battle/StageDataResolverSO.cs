@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Battle;
 using Immortal_Switch.Scripts.Boss;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace Immortal_Switch.Scripts.Level.Stage
         [SerializeField] private ChapterConfigSO chapterConfig;
         [SerializeField] private EnemyPatternRuleSO enemyPatternRuleConfig;
         [SerializeField] private BossPatternRuleSO bossPatternRuleConfig;
+        [SerializeField] private RewardRuleSO rewardRuleConfig;
 
         public int GetChapterIndexByStage(int globalStage)
         {
@@ -72,7 +74,8 @@ namespace Immortal_Switch.Scripts.Level.Stage
             EnemyPatternData enemyPattern = ResolveEnemyPattern(enemyRule, localStage);
             if (enemyPattern == null)
             {
-                Debug.LogError($"[StageResolver] Cannot resolve enemy pattern. rule={enemyRule.RuleId}, localStage={localStage}");
+                Debug.LogError(
+                    $"[StageResolver] Cannot resolve enemy pattern. rule={enemyRule.RuleId}, localStage={localStage}");
                 return null;
             }
 
@@ -119,11 +122,116 @@ namespace Immortal_Switch.Scripts.Level.Stage
 
                 AfkRewardMultiplier = Mathf.Max(0f, chapter.AfkRewardMultiplier),
 
+                BaseRewards = ResolveBaseRewards(chapter, globalStage, localStage, chapterIndex),
+                ClearRewards = ResolveClearRewards(chapter, globalStage, localStage, chapterIndex),
+
                 EnemyScale = StageScalingFormula.GetEnemyScale(globalStage),
                 BossScale = StageScalingFormula.GetBossScale(globalStage)
             };
 
             return runtimeData;
+        }
+
+        private StageReward[] ResolveBaseRewards(
+            ChapterConfig chapter,
+            int globalStage,
+            int localStage,
+            int chapterIndex
+        )
+        {
+            RewardRule rule = FindRewardRule(chapter.RewardRuleId);
+            if (rule == null || rule.BaseRewards == null)
+                return Array.Empty<StageReward>();
+
+            return EvaluateRewardEntries(rule.BaseRewards, chapter, globalStage, localStage, chapterIndex,
+                applyAfkMultiplier: true);
+        }
+
+        private StageReward[] ResolveClearRewards(
+            ChapterConfig chapter,
+            int globalStage,
+            int localStage,
+            int chapterIndex
+        )
+        {
+            RewardRule rule = FindRewardRule(chapter.RewardRuleId);
+            if (rule == null || rule.ClearRewards == null)
+                return Array.Empty<StageReward>();
+
+            return EvaluateRewardEntries(rule.ClearRewards, chapter, globalStage, localStage, chapterIndex,
+                applyAfkMultiplier: false);
+        }
+
+        private StageReward[] EvaluateRewardEntries(
+            RewardFormulaEntry[] entries,
+            ChapterConfig chapter,
+            int globalStage,
+            int localStage,
+            int chapterIndex,
+            bool applyAfkMultiplier
+        )
+        {
+            if (entries == null || entries.Length == 0)
+                return Array.Empty<StageReward>();
+
+            StageFormulaContext context = new StageFormulaContext
+            {
+                GlobalStage = globalStage,
+                LocalStage = localStage,
+                ChapterId = chapter.ChapterId,
+                ChapterIndex = chapterIndex
+            };
+
+            List<StageReward> result = new List<StageReward>();
+
+            for (int i = 0; i < entries.Length; i++)
+            {
+                RewardFormulaEntry entry = entries[i];
+
+                if (entry == null || string.IsNullOrWhiteSpace(entry.ResourceType))
+                    continue;
+
+                double amount = StageFormulaEvaluator.EvaluateDouble(
+                    entry.Formula,
+                    context,
+                    0d
+                );
+
+                if (applyAfkMultiplier)
+                    amount *= Mathf.Max(0f, chapter.AfkRewardMultiplier);
+
+                amount = Math.Max(0d, amount);
+
+                StageReward reward = new StageReward(
+                    entry.ResourceType.Trim(),
+                    amount
+                );
+
+                if (reward.IsValid)
+                    result.Add(reward);
+            }
+
+            return result.ToArray();
+        }
+
+        private RewardRule FindRewardRule(string rewardRuleId)
+        {
+            if (rewardRuleConfig == null || rewardRuleConfig.Rules == null)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(rewardRuleId))
+            {
+                for (int i = 0; i < rewardRuleConfig.Rules.Length; i++)
+                {
+                    RewardRule rule = rewardRuleConfig.Rules[i];
+                    if (rule != null && rule.RewardRuleId == rewardRuleId)
+                        return rule;
+                }
+            }
+
+            return rewardRuleConfig.Rules.Length > 0
+                ? rewardRuleConfig.Rules[0]
+                : null;
         }
 
         private bool TryResolveChapter(
@@ -280,9 +388,11 @@ namespace Immortal_Switch.Scripts.Level.Stage
             {
                 int enemyId = pattern.EnemyIds[i];
 
-                if (creepDataMapper == null || !creepDataMapper.TryGetValue(enemyId, out CreepDataSo creepData) || creepData == null)
+                if (creepDataMapper == null || !creepDataMapper.TryGetValue(enemyId, out CreepDataSo creepData) ||
+                    creepData == null)
                 {
-                    Debug.LogError($"[StageResolver] Missing creep data. enemyId={enemyId}, pattern={pattern.PatternId}");
+                    Debug.LogError(
+                        $"[StageResolver] Missing creep data. enemyId={enemyId}, pattern={pattern.PatternId}");
                     return false;
                 }
 
@@ -311,7 +421,8 @@ namespace Immortal_Switch.Scripts.Level.Stage
                 return false;
             }
 
-            if (bossDataMapper == null || !bossDataMapper.TryGetValue(bossId, out BossDataSO bossData) || bossData == null)
+            if (bossDataMapper == null || !bossDataMapper.TryGetValue(bossId, out BossDataSO bossData) ||
+                bossData == null)
             {
                 Debug.LogError($"[StageResolver] Missing boss data. bossId={bossId}");
                 return false;

@@ -92,15 +92,7 @@ namespace Immortal_Switch.Scripts.Core
         //         Debug.LogError($"[Bootstrap] FetchPlayerData failed: {e.Message}");
         //     }
         // }
-
-        private void ApplyPlayerData(PlayerMeResponse player)
-        {
-            CurrencyManager.Instance.Set(CurrencyType.Gold, player.coins);
-            CurrencyManager.Instance.Set(CurrencyType.Diamond, player.gems);
-            CurrencyManager.Instance.Set(CurrencyType.HeroTicket, player.tickets);
-
-            Debug.Log($"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, Tickets={player.tickets}");
-        }
+        
 
         public override UniTask InitializeAsync()
         {

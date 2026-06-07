@@ -10,6 +10,7 @@ using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -62,6 +63,8 @@ namespace Battle
 
         [Header("Stage Resolver")] [SerializeField]
         private StageDataResolverSO stageDataResolver;
+        
+        [SerializeField] private RewardSyncService rewardSyncService;
 
         [Header("Hero Team")] [SerializeField] private HeroTeamController heroTeamController;
         [SerializeField, Min(0)] private int controlledHeroSlotIndex = 0;
@@ -1037,6 +1040,7 @@ namespace Battle
             SetState(BattleState.Ended);
             currentBoss = null;
             losingStage = false;
+            rewardSyncService?.ClaimClearStageReward(stageRuntimeData).Forget();
             NextStageCallback().Forget();
         }
 
@@ -1265,6 +1269,26 @@ namespace Battle
 
             int index = Random.Range(0, creeps.Count);
             return creeps.Count <= 0 ? null : creeps[index];
+        }
+        
+        private string FormatRewards(StageReward[] rewards)
+        {
+            if (rewards == null || rewards.Length == 0)
+                return "None";
+
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+            for (int i = 0; i < rewards.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(", ");
+
+                builder.Append(rewards[i].ResourceType);
+                builder.Append(":");
+                builder.Append(rewards[i].Amount.ToString("0"));
+            }
+
+            return builder.ToString();
         }
 
         //not in use

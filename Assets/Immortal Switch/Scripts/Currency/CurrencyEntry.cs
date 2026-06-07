@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Core;
 
 namespace Immortal_Switch.Scripts.Currency
 {
@@ -22,7 +23,7 @@ namespace Immortal_Switch.Scripts.Currency
     public class CurrencyEntry
     {
         public CurrencyType CurrencyType;
-        public int Amount;
+        public BigNumber Amount;
     }
 
     [Serializable]
@@ -34,8 +35,8 @@ namespace Immortal_Switch.Scripts.Currency
     public class CurrencyChangedArgs
     {
         public CurrencyType CurrencyType;
-        public int OldAmount;
-        public int NewAmount;
-        public int Delta;
+        public BigNumber OldAmount;
+        public BigNumber NewAmount;
+        public BigNumber Delta;
     }
 }

@@ -53,7 +53,7 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(nextLevel) : 0;
             if (cost <= 0) return false;
 
-            if (!CurrencyManager.Instance.Spend(CurrencyType.WeaponEnhancementStone, cost))
+            if (!CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponEnhancementStone, cost))
                 return false;
 
             state.Level = nextLevel;
@@ -75,7 +75,7 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(nextLevel) : 0;
             if (cost <= 0) return false;
 
-            if (!CurrencyManager.Instance.Spend(CurrencyType.WeaponEnhancementStone, cost))
+            if (!CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponEnhancementStone, cost))
                 return false;
 
             state.Level = nextLevel;
@@ -100,7 +100,7 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             if (state.Level < entry.RequiredLevel)
                 return WeaponLimitBreakResult.RequiredLevelNotReached;
 
-            if (!CurrencyManager.Instance.Spend(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost))
+            if (!CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost))
                 return WeaponLimitBreakResult.NotEnoughCurrency;
 
             if (Random.value <= entry.SuccessRate)
@@ -130,7 +130,7 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             if (state.Level < entry.RequiredLevel)
                 return WeaponLimitBreakResult.RequiredLevelNotReached;
 
-            if (!CurrencyManager.Instance.Spend(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost))
+            if (!CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost))
                 return WeaponLimitBreakResult.NotEnoughCurrency;
 
             if (Random.value <= entry.SuccessRate)

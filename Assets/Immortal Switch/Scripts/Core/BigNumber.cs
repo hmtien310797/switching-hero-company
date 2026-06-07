@@ -65,38 +65,41 @@ namespace Immortal_Switch.Scripts.Core
 
         public void Normalize()
         {
-            if (Mantissa == 0 || double.IsNaN(Mantissa) || double.IsInfinity(Mantissa))
+            if (double.IsNaN(Mantissa) || double.IsInfinity(Mantissa))
             {
-                if (Mantissa == 0) Tier = 0;
+                Mantissa = 0;
+                Tier = 0;
+                return;
+            }
+
+            if (Mantissa == 0)
+            {
+                Tier = 0;
                 return;
             }
 
             double abs = Math.Abs(Mantissa);
 
-            // Bring to [1, 1000)
             while (abs >= 1000.0)
             {
                 Mantissa /= 1000.0;
-                Tier += 1;
+                Tier++;
                 abs = Math.Abs(Mantissa);
             }
 
             while (abs > 0 && abs < 1.0)
             {
                 Mantissa *= 1000.0;
-                Tier -= 1;
+                Tier--;
                 abs = Math.Abs(Mantissa);
             }
 
-            // Avoid negative tier going too far for tiny numbers: convert to normal tier 0 when possible
             if (Tier < 0)
             {
-                // e.g. 0.5 with Tier -1 => 0.0005 tier 0
                 Mantissa *= Pow1000(Tier);
                 Tier = 0;
+                Normalize();
             }
-
-            if (Mantissa == 0) Tier = 0;
         }
 
         private static double Pow1000(int tier)
@@ -213,16 +216,19 @@ namespace Immortal_Switch.Scripts.Core
 
         public static BigNumber FromDouble(double value)
         {
-            if (value == 0) return Zero;
+            if (value == 0 || double.IsNaN(value) || double.IsInfinity(value))
+                return Zero;
 
             double abs = Math.Abs(value);
             int tier = 0;
+
             while (abs >= 1000.0)
             {
                 value /= 1000.0;
                 abs /= 1000.0;
                 tier++;
             }
+
             return new BigNumber(value, tier);
         }
 
@@ -334,10 +340,50 @@ namespace Immortal_Switch.Scripts.Core
                 return $"{Mantissa.ToString($"F{decimals}", CultureInfo.InvariantCulture)}e{Tier * 3}";
             }
 
-            string suffix = AlphabetSuffix.FromTier(Tier);
+            string suffix = BigNumberSuffix.FromTier(Tier);
             return Mantissa.ToString($"F{decimals}", CultureInfo.InvariantCulture) + suffix;
         }
 
         public override string ToString() => ToStringAlphabet(decimals: 1, minSuffixTier: 2);
+    }
+    
+    public static class BigNumberSuffix
+    {
+        private static readonly string[] BaseSuffixes =
+        {
+            "", "K", "M", "B", "T"
+        };
+
+        private const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        public static string FromTier(int tier)
+        {
+            if (tier <= 0)
+                return "";
+
+            if (tier < BaseSuffixes.Length)
+                return BaseSuffixes[tier];
+
+            int index = tier - BaseSuffixes.Length;
+            return ToDoubleLetterSuffix(index);
+        }
+
+        private static string ToDoubleLetterSuffix(int index)
+        {
+            // tier 5 -> AA
+            // tier 6 -> AB
+            // tier 30 -> AZ
+            // tier 31 -> BA
+
+            string result = "";
+
+            int first = index / 26;
+            int second = index % 26;
+
+            result += Alphabet[first % 26];
+            result += Alphabet[second];
+
+            return result;
+        }
     }
 }
