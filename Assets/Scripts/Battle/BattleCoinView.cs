@@ -75,7 +75,7 @@ namespace Battle
 
         private void OnFlyToTargetComplete()
         {
-            CurrencyManager.Instance.Add(CurrencyType.Gold, CoinNum);
+            CurrencyManager.Instance.AddLocalDemo(CurrencyType.gold, CoinNum);
             DespawnSelf();
         }
 

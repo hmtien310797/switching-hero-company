@@ -13,6 +13,7 @@ namespace Immortal_Switch.Scripts.Level.Stage
         public int LocalStage;
         public Element ChapterElement;
 
+        public string RewardRuleId;
         public string EnemyPatternRuleId;
         public string EnemyPatternId;
         public int[] EnemyIds;

@@ -6,8 +6,10 @@ namespace Immortal_Switch.Scripts.Currency
 {
     public enum CurrencyType
     {
-        Gold,
-        Diamond,
+        gold,
+        diamond,
+        crystal,
+        
         HeroTicket,
         WeaponTicket,
         SkillTicket,
@@ -17,6 +19,7 @@ namespace Immortal_Switch.Scripts.Currency
         MageWeaponTranscendenceStone,
         WarriorWeaponTranscendenceStone,
         AssassinWeaponTranscendenceStone,
+        exp
     }
     
     [Serializable]

@@ -1,5 +1,6 @@
 ﻿using System;
 using Battle;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
 using TMPro;
@@ -62,7 +63,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             currentVm = vm;
             onFusionCompleted = fusionCompleted;
             currentCount = vm != null && vm.MaxFusionCount > 0
-                ? Mathf.Clamp(vm.CurrentFusionCount, 1, vm.MaxFusionCount)
+                ? Math.Clamp(vm.CurrentFusionCount, 1, vm.MaxFusionCount)
                 : 0;
 
             if (root != null)
@@ -133,7 +134,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (starDisplay != null)
                 starDisplay.BindStandard(currentVm.Star);
 
-            int requiredShard = currentVm.RequiredShardPerFusion * Mathf.Max(1, currentCount);
+            int requiredShard = currentVm.RequiredShardPerFusion * Math.Max(1, currentCount);
             bool enoughShard = currentVm.CurrentShard >= requiredShard;
 
             if (txtShard != null)
@@ -145,14 +146,14 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (shardSlider != null)
             {
                 shardSlider.fillAmount = requiredShard > 0
-                    ? Mathf.Clamp01((float)currentVm.CurrentShard / requiredShard)
+                    ? Mathf.Clamp01(currentVm.CurrentShard / requiredShard)
                     : 0f;
             }
 
             if (imgConsumableIcon != null)
                 imgConsumableIcon.sprite = currentVm.ConsumableCurrencyIcon;
 
-            long requiredCurrency = (long)currentVm.ConsumableCostPerFusion * Mathf.Max(1, currentCount);
+            BigNumber requiredCurrency = currentVm.ConsumableCostPerFusion * BigNumber.Max(1, currentCount);
             bool enoughCurrency = currentVm.CurrentConsumableAmount >= requiredCurrency;
 
             if (txtConsumableAmount != null)
@@ -162,7 +163,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             }
 
             if (txtCount != null)
-                txtCount.text = Mathf.Max(0, currentCount).ToString();
+                txtCount.text = BigNumber.Max(0, currentCount).ToString();
 
             bool canFusionNow =
                 currentVm.MaxFusionCount > 0 &&
@@ -221,7 +222,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (currentVm == null || currentVm.MaxFusionCount <= 0)
                 return;
 
-            currentCount = Mathf.Max(1, currentCount - 1);
+            currentCount = Math.Max(1, currentCount - 1);
             RefreshUI();
         }
 
@@ -230,7 +231,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (currentVm == null || currentVm.MaxFusionCount <= 0)
                 return;
 
-            currentCount = Mathf.Min(currentVm.MaxFusionCount, currentCount + 1);
+            currentCount = Math.Min(currentVm.MaxFusionCount, currentCount + 1);
             RefreshUI();
         }
 

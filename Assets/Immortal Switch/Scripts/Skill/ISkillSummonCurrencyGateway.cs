@@ -26,7 +26,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public BigNumber GetGem()
         {
-            return CurrencyManager.Instance.Get(CurrencyType.Diamond);
+            return CurrencyManager.Instance.Get(CurrencyType.diamond);
         }
 
         public bool CanSpendSkillTicket(BigNumber amount)
@@ -36,7 +36,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public bool CanSpendGem(BigNumber amount)
         {
-            return CurrencyManager.Instance.HasEnough(CurrencyType.Diamond, amount);
+            return CurrencyManager.Instance.HasEnough(CurrencyType.diamond, amount);
         }
 
         public void SpendSkillTicket(BigNumber amount)
@@ -46,7 +46,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public void SpendGem(BigNumber amount)
         {
-            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.Diamond, amount);
+            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.diamond, amount);
         }
 
         public void AddCurrency(CurrencyType currencyType, BigNumber amount)

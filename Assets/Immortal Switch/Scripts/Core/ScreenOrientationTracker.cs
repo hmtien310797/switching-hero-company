@@ -7,7 +7,6 @@ namespace Immortal_Switch.Scripts.UI
 {
     public class ScreenOrientationTracker : Singleton<ScreenOrientationTracker>
     {
-        public BigNumber bigNumer;
         public enum ScreenViewMode
         {
             Portrait,

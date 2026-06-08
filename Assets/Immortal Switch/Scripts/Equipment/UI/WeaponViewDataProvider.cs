@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Battle;
 using Common;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
@@ -247,7 +248,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return null;
 
             var currencyType = WeaponCurrencyHelper.GetClassStoneCurrency(def.ExclusivePoolClass);
-            long currentCurrency = CurrencyManager.Instance != null
+            BigNumber currentCurrency = CurrencyManager.Instance != null
                 ? CurrencyManager.Instance.Get(currencyType)
                 : 0;
 
@@ -256,7 +257,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 : 0;
 
             int maxByCurrency = def.ExclusiveClassStoneCost > 0
-                ? Mathf.FloorToInt((float)currentCurrency / def.ExclusiveClassStoneCost)
+                ? (currentCurrency / def.ExclusiveClassStoneCost).FloorToIntSafe()
                 : 0;
 
             int maxFusionCount = Mathf.Min(maxByShard, maxByCurrency);

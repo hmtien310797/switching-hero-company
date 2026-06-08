@@ -1,16 +1,17 @@
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 {
     public interface IHeroSummonCurrencyGateway
     {
-        int GetHeroTicket();
-        int GetGem();
+        BigNumber GetHeroTicket();
+        BigNumber GetGem();
 
-        bool CanSpendHeroTicket(int amount);
+        bool CanSpendHeroTicket(BigNumber amount);
         bool CanSpendGem(int amount);
 
-        void SpendHeroTicket(int amount);
+        void SpendHeroTicket(BigNumber amount);
         void SpendGem(int amount);
     }
     

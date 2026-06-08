@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -24,12 +25,12 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         public void Bind(
             List<StatTierViewData> datas,
-            int gold,
+            BigNumber gold,
             int selectedAmount,
             Action<StatType> onUpgrade,
             Action<int> onAmountChanged)
         {
-            goldText.text = gold.ToString("N0");
+            goldText.text = gold.ToString();
 
             amountSelector.Initialize(selectedAmount, onAmountChanged);
 

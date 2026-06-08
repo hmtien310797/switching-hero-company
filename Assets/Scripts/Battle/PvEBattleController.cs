@@ -65,6 +65,7 @@ namespace Battle
         private StageDataResolverSO stageDataResolver;
         
         [SerializeField] private RewardSyncService rewardSyncService;
+        [SerializeField] private OfflineAfkRewardService offlineAfkRewardService;
 
         [Header("Hero Team")] [SerializeField] private HeroTeamController heroTeamController;
         [SerializeField, Min(0)] private int controlledHeroSlotIndex = 0;
@@ -121,6 +122,7 @@ namespace Battle
         private StageRuntimeData stageRuntimeData;
 
         public BattleState State { get; private set; } = BattleState.None;
+        public RewardSyncService RewardSyncService => rewardSyncService;
         public List<EnemyActor> MonsterList => creeps;
 
         private void Start()
@@ -172,6 +174,7 @@ namespace Battle
             NotifyActiveLineupChanged();
             RefreshControlledHeroSkillUI();
             InitStage(currentStage);
+            offlineAfkRewardService?.Initialize(currentStage);
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
@@ -547,11 +550,7 @@ namespace Battle
         {
             if (stageDataResolver != null)
             {
-                stageRuntimeData = stageDataResolver.Resolve(
-                    stage,
-                    creepDataMapper,
-                    bossDataMapper
-                );
+                stageRuntimeData = stageDataResolver.Resolve(stage);
 
                 if (stageRuntimeData == null || !stageRuntimeData.IsValid)
                 {
@@ -562,7 +561,8 @@ namespace Battle
                 }
                 
                 RebuildStageStatCache();
-
+                rewardSyncService?.SetCurrentStageData(stageRuntimeData);
+                offlineAfkRewardService?.SetCurrentAfkStage(stageRuntimeData.GlobalStage);
                 patternId = 0;
                 enemyIds = stageRuntimeData.EnemyIds;
                 rates = stageRuntimeData.EnemyRates;

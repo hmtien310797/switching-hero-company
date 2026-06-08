@@ -310,7 +310,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return totalCost;
         }
 
-        public int GetAffordableUpgradeAmount(StatType stat, int desiredAmount, int currentGold)
+        public int GetAffordableUpgradeAmount(StatType stat, BigNumber desiredAmount, BigNumber currentGold)
         {
             if (desiredAmount <= 0 || currentGold <= 0)
                 return 0;
@@ -320,11 +320,11 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             int currentStack = GetCurrentStack(stat);
             int remaining = GetRemainingUpgradableStacks(stat);
-            int buyLimit = Math.Min(desiredAmount, remaining);
+            BigNumber buyLimit = BigNumber.Min(desiredAmount, remaining);
 
             int bought = 0;
             int stackCursor = currentStack;
-            int goldLeft = currentGold;
+            BigNumber goldLeft = currentGold;
 
             for (int i = 0; i < buyLimit; i++)
             {
@@ -346,7 +346,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         public int Upgrade(StatType stat, int desiredAmount)
         {
-            BigNumber currentGold = CurrencyManager.Instance.Get(CurrencyType.Gold);
+            BigNumber currentGold = CurrencyManager.Instance.Get(CurrencyType.gold);
             int buyAmount = GetAffordableUpgradeAmount(stat, desiredAmount, currentGold);
             if (buyAmount <= 0)
                 return 0;
@@ -355,7 +355,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             if (totalCost <= 0 || currentGold < totalCost)
                 return 0;
 
-            CurrencyManager.Instance.Spend(CurrencyType.Gold, totalCost);
+            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.gold, totalCost);
             saveData.AddStack(stat, buyAmount);
             return buyAmount;
         }

@@ -1,3 +1,4 @@
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 
@@ -5,34 +6,34 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 {
     public class GameCurrencyGateway : IHeroSummonCurrencyGateway
     {
-        public int GetHeroTicket()
+        public BigNumber GetHeroTicket()
         {
             return CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
         }
 
-        public int GetGem()
+        public BigNumber GetGem()
         {
-            return CurrencyManager.Instance.Get(CurrencyType.Diamond);
+            return CurrencyManager.Instance.Get(CurrencyType.diamond);
         }
 
-        public bool CanSpendHeroTicket(int amount)
+        public bool CanSpendHeroTicket(BigNumber amount)
         {
             return CurrencyManager.Instance.HasEnough(CurrencyType.HeroTicket, amount);
         }
 
         public bool CanSpendGem(int amount)
         {
-            return CurrencyManager.Instance.HasEnough(CurrencyType.Diamond, amount);
+            return CurrencyManager.Instance.HasEnough(CurrencyType.diamond, amount);
         }
 
-        public void SpendHeroTicket(int amount)
+        public void SpendHeroTicket(BigNumber amount)
         {
-            CurrencyManager.Instance.Spend(CurrencyType.HeroTicket, amount);
+            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.HeroTicket, amount);
         }
 
         public void SpendGem(int amount)
         {
-            CurrencyManager.Instance.Spend(CurrencyType.Diamond, amount);
+            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.diamond, amount);
         }
     }
 }

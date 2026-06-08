@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.PowerUpSystem;
  using Immortal_Switch.Scripts.StatSystem;
@@ -55,7 +56,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         public void RefreshUI()
         {
-            int currentGold = CurrencyManager.Instance.Get(CurrencyType.Gold);
+            BigNumber currentGold = CurrencyManager.Instance.Get(CurrencyType.gold);
             var panelData = binder.Build(
                 currentGold,
                 selectedUpgradeAmount

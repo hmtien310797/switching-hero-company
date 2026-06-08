@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.Currency;
+﻿using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -53,8 +54,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             if (rollCountText != null)
                 rollCountText.text = option.RollCount.ToString();
 
-            int ticket = CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
-            int gem = CurrencyManager.Instance.Get(CurrencyType.Diamond);
+            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
+            BigNumber gem = CurrencyManager.Instance.Get(CurrencyType.diamond);
 
             bool hasEnoughTicket = ticket >= option.TicketCost;
             bool hasEnoughGem = gem >= option.GemCost;

@@ -1,4 +1,5 @@
 ﻿using Battle;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using UnityEngine;
@@ -17,8 +18,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         public CurrencyType ConsumableCurrencyType;
         public Sprite ConsumableCurrencyIcon;
-        public long CurrentConsumableAmount;
-        public int ConsumableCostPerFusion;
+        public BigNumber CurrentConsumableAmount;
+        public BigNumber ConsumableCostPerFusion;
 
         public int CurrentFusionCount;
         public int MaxFusionCount;

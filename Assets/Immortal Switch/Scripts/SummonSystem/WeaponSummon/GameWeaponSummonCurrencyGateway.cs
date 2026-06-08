@@ -11,17 +11,17 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
 
         public bool CanSpendGem(int amount)
         {
-            return CurrencyManager.Instance.Get(CurrencyType.Diamond) >= amount;
+            return CurrencyManager.Instance.Get(CurrencyType.diamond) >= amount;
         }
 
         public void SpendWeaponTicket(int amount)
         {
-            CurrencyManager.Instance.Spend(CurrencyType.WeaponTicket, amount);
+            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponTicket, amount);
         }
 
         public void SpendGem(int amount)
         {
-            CurrencyManager.Instance.Spend(CurrencyType.Diamond, amount);
+            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.diamond, amount);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Immortal_Switch.Scripts.Currency
 {
     public class CurrencyDebug : MonoBehaviour
     {
-        [SerializeField] private CurrencyType currencyType = CurrencyType.Gold;
+        [SerializeField] private CurrencyType currencyType = CurrencyType.gold;
         [SerializeField] private int amount = 100;
 
         // [Button]

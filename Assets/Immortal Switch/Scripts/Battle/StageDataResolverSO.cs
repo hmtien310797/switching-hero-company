@@ -40,11 +40,7 @@ namespace Immortal_Switch.Scripts.Level.Stage
             return Mathf.Max(0, chapterConfig.Chapters.Length - 1);
         }
 
-        public StageRuntimeData Resolve(
-            int globalStage,
-            Dictionary<int, CreepDataSo> creepDataMapper,
-            Dictionary<int, BossDataSO> bossDataMapper
-        )
+        public StageRuntimeData Resolve(int globalStage)
         {
             globalStage = Mathf.Max(1, globalStage);
 
@@ -79,9 +75,6 @@ namespace Immortal_Switch.Scripts.Level.Stage
                 return null;
             }
 
-            if (!ValidateEnemyPattern(enemyPattern, enemyRule.RequiredElement, creepDataMapper))
-                return null;
-
             BossPatternRule bossRule = FindBossRule(chapter.BossPatternRuleId);
             if (bossRule == null)
             {
@@ -100,8 +93,6 @@ namespace Immortal_Switch.Scripts.Level.Stage
             }
 
             int bossId = ResolveBossId(bossRule, localStage);
-            if (!ValidateBoss(bossId, bossRule.RequiredElement, bossDataMapper))
-                return null;
 
             StageRuntimeData runtimeData = new StageRuntimeData
             {
@@ -349,95 +340,6 @@ namespace Immortal_Switch.Scripts.Level.Stage
             int bossIndex = ((localStage - 1) / stagesPerBoss) % rule.BossLoopIds.Length;
 
             return rule.BossLoopIds[bossIndex];
-        }
-
-        private bool ValidateEnemyPattern(
-            EnemyPatternData pattern,
-            Element requiredElement,
-            Dictionary<int, CreepDataSo> creepDataMapper
-        )
-        {
-            if (pattern == null)
-                return false;
-
-            if (pattern.RequiredElement != requiredElement)
-            {
-                Debug.LogError(
-                    $"[StageResolver] Pattern element mismatch. " +
-                    $"pattern={pattern.PatternId}, patternElement={pattern.RequiredElement}, required={requiredElement}"
-                );
-                return false;
-            }
-
-            if (pattern.EnemyIds == null || pattern.EnemyIds.Length == 0)
-            {
-                Debug.LogError($"[StageResolver] Pattern has no enemy ids. pattern={pattern.PatternId}");
-                return false;
-            }
-
-            if (pattern.Rates == null || pattern.Rates.Length != pattern.EnemyIds.Length)
-            {
-                Debug.LogError(
-                    $"[StageResolver] Pattern rates invalid. pattern={pattern.PatternId}, " +
-                    $"enemyCount={pattern.EnemyIds.Length}, rateCount={(pattern.Rates == null ? 0 : pattern.Rates.Length)}"
-                );
-                return false;
-            }
-
-            for (int i = 0; i < pattern.EnemyIds.Length; i++)
-            {
-                int enemyId = pattern.EnemyIds[i];
-
-                if (creepDataMapper == null || !creepDataMapper.TryGetValue(enemyId, out CreepDataSo creepData) ||
-                    creepData == null)
-                {
-                    Debug.LogError(
-                        $"[StageResolver] Missing creep data. enemyId={enemyId}, pattern={pattern.PatternId}");
-                    return false;
-                }
-
-                if (creepData.Element != requiredElement)
-                {
-                    Debug.LogError(
-                        $"[StageResolver] Enemy element mismatch. " +
-                        $"enemyId={enemyId}, enemyElement={creepData.Element}, required={requiredElement}, pattern={pattern.PatternId}"
-                    );
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private bool ValidateBoss(
-            int bossId,
-            Element requiredElement,
-            Dictionary<int, BossDataSO> bossDataMapper
-        )
-        {
-            if (bossId <= 0)
-            {
-                Debug.LogError("[StageResolver] Invalid boss id.");
-                return false;
-            }
-
-            if (bossDataMapper == null || !bossDataMapper.TryGetValue(bossId, out BossDataSO bossData) ||
-                bossData == null)
-            {
-                Debug.LogError($"[StageResolver] Missing boss data. bossId={bossId}");
-                return false;
-            }
-
-            if (bossData.Element != requiredElement)
-            {
-                Debug.LogError(
-                    $"[StageResolver] Boss element mismatch. " +
-                    $"bossId={bossId}, bossElement={bossData.Element}, required={requiredElement}"
-                );
-                return false;
-            }
-
-            return true;
         }
 
         private float[] NormalizeRates(float[] source)

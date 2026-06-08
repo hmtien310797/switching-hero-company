@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.GrowthSystem.UI
@@ -16,7 +17,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             this.uiDb = uiDb;
         }
 
-        public List<StatTierViewData> Build(int gold, int amount)
+        public List<StatTierViewData> Build(BigNumber gold, int amount)
         {
             var result = new List<StatTierViewData>();
 
@@ -30,7 +31,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             return result;
         }
 
-        private StatTierViewData BuildOne(StatType stat, int gold, int amount)
+        private StatTierViewData BuildOne(StatType stat, BigNumber gold, int amount)
         {
             var ui = uiDb.Get(stat);
 

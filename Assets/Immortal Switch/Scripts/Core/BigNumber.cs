@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Immortal_Switch.Scripts.Core
 {
@@ -83,6 +84,13 @@ namespace Immortal_Switch.Scripts.Core
             while (abs >= 1000.0)
             {
                 Mantissa /= 1000.0;
+
+                if (Tier == int.MaxValue)
+                {
+                    Mantissa = 999.999999;
+                    return;
+                }
+
                 Tier++;
                 abs = Math.Abs(Mantissa);
             }
@@ -90,20 +98,48 @@ namespace Immortal_Switch.Scripts.Core
             while (abs > 0 && abs < 1.0)
             {
                 Mantissa *= 1000.0;
+
+                if (Tier == int.MinValue)
+                {
+                    Mantissa = 0;
+                    Tier = 0;
+                    return;
+                }
+
                 Tier--;
                 abs = Math.Abs(Mantissa);
             }
 
             if (Tier < 0)
             {
-                Mantissa *= Pow1000(Tier);
+                double multiplier = Pow1000Safe(Tier);
+
+                if (multiplier == 0)
+                {
+                    Mantissa = 0;
+                    Tier = 0;
+                    return;
+                }
+
+                Mantissa *= multiplier;
                 Tier = 0;
-                Normalize();
+
+                if (Math.Abs(Mantissa) < double.Epsilon)
+                {
+                    Mantissa = 0;
+                    Tier = 0;
+                }
             }
         }
 
-        private static double Pow1000(int tier)
+        private static double Pow1000Safe(int tier)
         {
+            if (tier > 102)
+                return double.PositiveInfinity;
+
+            if (tier < -108)
+                return 0d;
+
             return Math.Pow(1000.0, tier);
         }
     
@@ -226,10 +262,193 @@ namespace Immortal_Switch.Scripts.Core
             {
                 value /= 1000.0;
                 abs /= 1000.0;
+
+                if (tier == int.MaxValue)
+                    return new BigNumber(999.999999, int.MaxValue, normalize: false);
+
                 tier++;
             }
 
             return new BigNumber(value, tier);
+        }
+        
+        public static implicit operator BigNumber(int value)
+        {
+            return FromDouble(value);
+        }
+
+        public static implicit operator BigNumber(long value)
+        {
+            return FromDouble(value);
+        }
+        
+        public int FloorToIntSafe()
+        {
+            if (this <= Zero)
+                return 0;
+
+            // Nếu số quá lớn thì trả int.MaxValue để tránh overflow.
+            if (Tier > 3)
+                return int.MaxValue;
+
+            double value = Mantissa * Pow1000Safe(Tier);
+
+            if (double.IsNaN(value) || double.IsInfinity(value))
+                return int.MaxValue;
+
+            if (value >= int.MaxValue)
+                return int.MaxValue;
+
+            return (int)Math.Floor(value);
+        }
+
+        public static int DivideToIntFloor(BigNumber value, int divisor)
+        {
+            if (divisor <= 0)
+                return 0;
+
+            if (value <= Zero)
+                return 0;
+
+            BigNumber result = value / FromInt(divisor);
+            return result.FloorToIntSafe();
+        }
+        
+        public static BigNumber FromInt(int value)
+        {
+            return FromDouble(value);
+        }
+
+        public static BigNumber FromLong(long value)
+        {
+            return FromDouble(value);
+        }
+        
+        public static BigNumber Min(BigNumber a, BigNumber b)
+        {
+            return a <= b ? a : b;
+        }
+
+        public static BigNumber Max(BigNumber a, BigNumber b)
+        {
+            return a >= b ? a : b;
+        }
+
+        public static BigNumber Clamp(BigNumber value, BigNumber min, BigNumber max)
+        {
+            if (min > max)
+            {
+                BigNumber temp = min;
+                min = max;
+                max = temp;
+            }
+
+            if (value < min)
+                return min;
+
+            if (value > max)
+                return max;
+
+            return value;
+        }
+
+        public static bool TryParseInputString(string input, out BigNumber result)
+        {
+            result = Zero;
+
+            if (string.IsNullOrWhiteSpace(input))
+                return false;
+
+            input = input.Trim();
+
+            // Support server format: "1.25|5"
+            // if (TryParseServerString(input, out result))
+            //     return true;
+
+            // Remove comma separators: "1,000,000" -> "1000000"
+            input = input.Replace(",", "");
+
+            // Match:
+            // "1000"
+            // "1.5K"
+            // "2M"
+            // "3.25B"
+            // "1AA"
+            Match match = Regex.Match(
+                input,
+                @"^([+-]?\d+(\.\d+)?)([a-zA-Z]*)$"
+            );
+
+            if (!match.Success)
+                return false;
+
+            string numberText = match.Groups[1].Value;
+            string suffixText = match.Groups[3].Value;
+
+            if (!double.TryParse(
+                    numberText,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out double mantissa))
+            {
+                return false;
+            }
+
+            int tier = SuffixToTier(suffixText);
+
+            if (tier < 0)
+                return false;
+
+            result = new BigNumber(mantissa, tier);
+            result.Normalize();
+            return true;
+        }
+
+        private static int SuffixToTier(string suffix)
+        {
+            if (string.IsNullOrWhiteSpace(suffix))
+                return 0;
+
+            suffix = suffix.Trim().ToUpperInvariant();
+
+            switch (suffix)
+            {
+                case "K": return 1;
+                case "M": return 2;
+                case "B": return 3;
+                case "T": return 4;
+            }
+
+            // AA, AB, AC...
+            if (suffix.Length == 2)
+            {
+                char a = suffix[0];
+                char b = suffix[1];
+
+                if (a < 'A' || a > 'Z' || b < 'A' || b > 'Z')
+                    return -1;
+
+                int index = (a - 'A') * 26 + (b - 'A');
+
+                // Tier 5 = AA
+                return 5 + index;
+            }
+
+            return -1;
+        }
+        
+        public string ToInputString(int decimalPlaces = 2)
+        {
+            if (this == Zero)
+                return "0";
+
+            string suffix = BigNumberSuffix.FromTier(Tier);
+
+            string format = decimalPlaces <= 0
+                ? "0"
+                : "0." + new string('#', decimalPlaces);
+
+            return Mantissa.ToString(format, CultureInfo.InvariantCulture) + suffix;
         }
 
         // ---------- Operators ----------
@@ -248,12 +467,12 @@ namespace Immortal_Switch.Scripts.Core
             if (diff > 0)
             {
                 // bring b up to a tier: bMantissa / 1000^diff
-                double scaledB = b.Mantissa / Pow1000(diff);
+                double scaledB = b.Mantissa / Pow1000Safe(diff);
                 return new BigNumber(a.Mantissa + scaledB, a.Tier);
             }
             else
             {
-                double scaledA = a.Mantissa / Pow1000(-diff);
+                double scaledA = a.Mantissa / Pow1000Safe(-diff);
                 return new BigNumber(scaledA + b.Mantissa, b.Tier);
             }
         }
@@ -263,22 +482,59 @@ namespace Immortal_Switch.Scripts.Core
 
         public static BigNumber operator *(BigNumber a, BigNumber b)
         {
-            if (a.IsZero || b.IsZero) return Zero;
-            return new BigNumber(a.Mantissa * b.Mantissa, a.Tier + b.Tier);
+            if (a.IsZero || b.IsZero)
+                return Zero;
+
+            double mantissa = a.Mantissa * b.Mantissa;
+
+            if (double.IsNaN(mantissa) || double.IsInfinity(mantissa))
+                return Zero;
+
+            long tier = (long)a.Tier + b.Tier;
+
+            return new BigNumber(mantissa, ClampTier(tier));
         }
 
         public static BigNumber operator /(BigNumber a, BigNumber b)
         {
-            if (b.IsZero) throw new DivideByZeroException();
-            if (a.IsZero) return Zero;
-            return new BigNumber(a.Mantissa / b.Mantissa, a.Tier - b.Tier);
+            if (a.IsZero)
+                return Zero;
+
+            if (b.IsZero)
+                return Zero;
+
+            long tier = (long)a.Tier - b.Tier;
+
+            return new BigNumber(
+                a.Mantissa / b.Mantissa,
+                ClampTier(tier)
+            );
+        }
+        
+        private static int ClampTier(long tier)
+        {
+            if (tier > int.MaxValue)
+                return int.MaxValue;
+
+            if (tier < int.MinValue)
+                return int.MinValue;
+
+            return (int)tier;
         }
 
         public static BigNumber operator *(BigNumber a, double k)
             => k == 0 ? Zero : new BigNumber(a.Mantissa * k, a.Tier);
 
         public static BigNumber operator /(BigNumber a, double k)
-            => k == 0 ? throw new DivideByZeroException() : new BigNumber(a.Mantissa / k, a.Tier);
+        {
+            if (a.IsZero)
+                return Zero;
+
+            if (k == 0 || double.IsNaN(k) || double.IsInfinity(k))
+                return Zero;
+
+            return new BigNumber(a.Mantissa / k, a.Tier);
+        }
 
         // ---------- Compare ----------
         public int CompareTo(BigNumber other)
@@ -332,7 +588,7 @@ namespace Immortal_Switch.Scripts.Core
             {
                 if (Tier <= 5)
                 {
-                    double v = Mantissa * Pow1000(Tier);
+                    double v = Mantissa * Pow1000Safe(Tier);
                     string fmt = useGroupingSeparators ? "N0" : "F0";
                     return v.ToString(fmt, CultureInfo.InvariantCulture);
                 }

@@ -19,7 +19,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                 case HeroClass.Assassin:
                     return CurrencyType.AssassinWeaponTranscendenceStone;
                 default:
-                    return CurrencyType.Gold;
+                    return CurrencyType.gold;
             }
         }
     }
