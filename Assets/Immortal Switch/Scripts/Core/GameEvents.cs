@@ -16,5 +16,6 @@
         // Change skill event
         public const string OnChangeSkill = "OnChangeSkill";
         public const string OnSpawnNextStage = "OnSpawnNextStage";
+        public const string OnMoveStageRequested = "OnMoveStageRequested";
     }
 }

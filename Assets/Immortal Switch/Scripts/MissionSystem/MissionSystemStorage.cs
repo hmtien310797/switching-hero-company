@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
@@ -34,28 +34,84 @@ namespace Immortal_Switch.Scripts.MissionSystem
             Debug.Log($"{SAVE_KEY}: Load {JsonConvert.SerializeObject(Data)}");
         }
 
+        public void ResetDaily()
+        {
+            Data.DailyTask = new MissionSystemTask
+            {
+                Tasks = _db.MissionConfig.rows
+                    .FindAll(v => v.type == MissionSystemTypes.DAILY)
+                    .Select(v => new MissionSystemEntry
+                    {
+                        Id = v.missionId,
+                        Progress = 0,
+                        EventKey = v.eventKey,
+                        IsClaimed = false,
+                    })
+                    .ToArray(),
+                Point = 0,
+                PointsClaimed = Array.Empty<MissionSystemPoint>(),
+            };
+        }
+
+        public void ResetWeekly()
+        {
+            Data.WeeklyTask = new MissionSystemTask
+            {
+                Tasks = _db.MissionConfig.rows
+                    .FindAll(v => v.type == MissionSystemTypes.WEEKLY)
+                    .Select(v => new MissionSystemEntry
+                    {
+                        Id = v.missionId,
+                        Progress = 0,
+                        EventKey = v.eventKey,
+                        IsClaimed = false,
+                    })
+                    .ToArray(),
+                Point = 0,
+                PointsClaimed = Array.Empty<MissionSystemPoint>(),
+            };
+        }
+
+        public void InitRepeat()
+        {
+            Data.RepeatTask = _db.MissionConfig.rows
+                .FindAll(v => v.type == MissionSystemTypes.REPEAT)
+                .Select(v => new MissionSystemEntry
+                {
+                    Id = v.missionId,
+                    Progress = 0,
+                    EventKey = v.eventKey,
+                    IsClaimed = false,
+                })
+                .ToArray();
+        }
+
+        public void InitMain()
+        {
+            var main = _db.MissionConfig.rows.FirstOrDefault(v => v.type == MissionSystemTypes.MAIN);
+
+            if (main != null)
+            {
+                Data.Main = new MissionSystemEntry
+                {
+                    EventKey = main.eventKey,
+                    Id = main.missionId,
+                    IsClaimed = false,
+                    Progress = 0,
+                };
+            }
+        }
+
         public void Initialize()
         {
-            if (!Data.Missions.TryGetValue(MissionSystemTypes.MAIN, out var list) ||
-                list.Count == 0)
+            if (Data.Main == null ||
+                string.IsNullOrWhiteSpace(Data.Main.Id))
             {
-                var firstMainMission = _db.MissionConfig.rows.FirstOrDefault(v => v.type == MissionSystemTypes.MAIN);
-
-                if (firstMainMission != null)
-                {
-                    Data.Missions.TryAdd(MissionSystemTypes.MAIN, new List<MissionSystemEntry>
-                    {
-                        new()
-                        {
-                            EventKey = firstMainMission.eventKey,
-                            Id = firstMainMission.missionId,
-                            IsClaimed = false,
-                            Progress = 0,
-                        },
-                    });
-
-                    Save();
-                }
+                InitMain();
+                ResetDaily();
+                ResetWeekly();
+                InitRepeat();
+                Save();
             }
         }
     }

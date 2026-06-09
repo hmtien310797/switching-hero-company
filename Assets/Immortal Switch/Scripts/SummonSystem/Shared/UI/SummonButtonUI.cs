@@ -52,10 +52,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
 
             if (rollCountText != null)
-                rollCountText.text = option.RollCount.ToString();
+                //rollCountText.text = option.RollCount.ToString();
+                rollCountText.text = "0";
 
-            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
-            BigNumber gem = CurrencyManager.Instance.Get(CurrencyType.diamond);
+            BigNumber ticket = CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.HeroTicket);
+            BigNumber gem = CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.diamond);
 
             bool hasEnoughTicket = ticket >= option.TicketCost;
             bool hasEnoughGem = gem >= option.GemCost;
@@ -109,7 +110,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         {
             if (amountText != null)
             {
-                amountText.text = amount.ToString();
+                //amountText.text = amount.ToString();
+                amountText.text = "0";
                 amountText.color = color;
             }
 

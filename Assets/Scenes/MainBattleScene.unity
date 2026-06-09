@@ -293,6 +293,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c784bde4fa4c30846b45f1455a4d7b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
 --- !u!1 &417113858
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,6 +323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5543b31b19fc4b29aa0f9e6e61935f00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   growthDatabase: {fileID: 11400000, guid: aae22e943d5177b479d943194fa765b8, type: 2}
   defaultGold: 100000
 --- !u!4 &417113860
@@ -454,6 +456,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74585dedc910493c9175a32a2610b44c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   classPools:
   - HeroClass: 0
     Skills:
@@ -548,6 +551,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21a033b6eaa5e6c49bd32eec30c64186, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   classSkillUnlockInitSO: {fileID: 11400000, guid: 4fe5815935f9a9d4981232bd6943d500, type: 2}
   heroSkillLoadoutInitSO: {fileID: 11400000, guid: c36d832d7bf17f249b2a81b389217b4c, type: 2}
   userLevelConfigSO: {fileID: 0}
@@ -589,6 +593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68bb7207fc0f4bd69ad6c0e5adcb3f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
 --- !u!4 &648741407
 Transform:
   m_ObjectHideFlags: 0
@@ -615,7 +620,7 @@ GameObject:
   - component: {fileID: 659182060}
   - component: {fileID: 659182059}
   m_Layer: 0
-  m_Name: MasterCache
+  m_Name: ____MasterDataCache____
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -633,6 +638,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8809cd3984074ec4bb3552a6c1134e54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   heroDatas:
   - {fileID: 11400000, guid: b695e4375a235d04b9f291059abb223e, type: 2}
   - {fileID: 11400000, guid: f72145f5f142a4941b53ed5f4499ce15, type: 2}
@@ -649,6 +655,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ad8f30f0a9183b048942573f10fd33b1, type: 2}
   - {fileID: 11400000, guid: 8343bb4f101a8b74db62e31a0d320989, type: 2}
   - {fileID: 11400000, guid: 478e0fb71021d1c4680702c732835bd5, type: 2}
+  creepDatas:
+  - {fileID: 11400000, guid: b4561a02d52fc1c49a931ca2df94c03f, type: 2}
+  - {fileID: 11400000, guid: 6db39b5fc60459846875d5253cee9b05, type: 2}
+  - {fileID: 11400000, guid: 7e388f0b036f7fb4ca47221928acbee7, type: 2}
+  - {fileID: 11400000, guid: 8e98947d10e256b44bf469aab4798d19, type: 2}
+  - {fileID: 11400000, guid: b5f83ee31f1ebb94aa6bba6d10cdd9bd, type: 2}
+  - {fileID: 11400000, guid: 8b35ac73132e19847b7da7dfef841611, type: 2}
+  - {fileID: 11400000, guid: 11bd996f95f2d1b41a8363f3e333ec5b, type: 2}
+  - {fileID: 11400000, guid: e984b7edc7e2d824cae1c76acac9ba80, type: 2}
+  - {fileID: 11400000, guid: d1579077e87f1d647bb52591d7c71a72, type: 2}
+  - {fileID: 11400000, guid: 199869431071fee4b97bf5b16ae4d3cc, type: 2}
+  bossDatas:
+  - {fileID: 11400000, guid: b2e145fc54d4b3547b1e1e4e5e4ba36d, type: 2}
+  - {fileID: 11400000, guid: e0bb9f562c6541b438ce1bf1a6d55764, type: 2}
+  - {fileID: 11400000, guid: 2043a68d34eb8554da09f9060ad64a33, type: 2}
+  - {fileID: 11400000, guid: bb5ccb7f14a782747b4c0b65afaef4b8, type: 2}
+  - {fileID: 11400000, guid: c0f0026b9a7cc88419b7045d4b09cdb6, type: 2}
+  - {fileID: 11400000, guid: 5375061ce7e417b47a04292eb4b737c4, type: 2}
+  - {fileID: 11400000, guid: 90d5e23a77d8a5f408e7ffcc6ad2a344, type: 2}
+  - {fileID: 11400000, guid: 3b1fd5edf1bd31a448de0d3c27e23b9a, type: 2}
+  - {fileID: 11400000, guid: a344c73f29181ff468471179fd12db79, type: 2}
+  - {fileID: 11400000, guid: ec6d5cab1367490469541de89ccb2be8, type: 2}
   skillDatas: []
 --- !u!4 &659182060
 Transform:
@@ -1447,6 +1475,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 248f71ebfd2ae0d4f926e15f421a6141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   <maxCreepsPerStage>k__BackingField: 40
   <creepBatchSize>k__BackingField: 20
 --- !u!4 &2093848898

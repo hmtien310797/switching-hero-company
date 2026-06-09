@@ -248,8 +248,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return null;
 
             var currencyType = WeaponCurrencyHelper.GetClassStoneCurrency(def.ExclusivePoolClass);
-            BigNumber currentCurrency = CurrencyManager.Instance != null
-                ? CurrencyManager.Instance.Get(currencyType)
+            BigNumber currentCurrency = CurrencyLedgerService.Instance != null
+                ? CurrencyLedgerService.Instance.GetDisplayBalance(currencyType)
                 : 0;
 
             int maxByShard = def.FuseShardRequired > 0

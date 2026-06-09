@@ -135,5 +135,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
         /// Thành tựu.
         /// </summary>
         public const string ACHIEVEMENT = "ACHIEVEMENT";
+
+        /// <summary>
+        /// Lặp lại.
+        /// </summary>
+        public const string REPEAT = "REPEAT";
     }
 }

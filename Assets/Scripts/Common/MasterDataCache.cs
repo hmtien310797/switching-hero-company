@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
@@ -10,26 +12,44 @@ namespace Common
     public class MasterDataCache : Singleton<MasterDataCache>
     {
         [SerializeField] List<HeroDataSO> heroDatas;
+        [SerializeField] List<CreepDataSo> creepDatas;
+        [SerializeField] List<BossDataSO> bossDatas;
         [SerializeField] List<SkillDataSO> skillDatas;
 
         private Dictionary<int,HeroDataSO> heroDataDicts = new Dictionary<int, HeroDataSO> ();
         private Dictionary<int,SkillDataSO> skillDataDicts = new Dictionary<int, SkillDataSO> ();
+        private Dictionary<int,CreepDataSo> creepDataMapper = new Dictionary<int, CreepDataSo> ();
+        private Dictionary<int,BossDataSO> bossDataMapper = new Dictionary<int, BossDataSO> ();
     
         public override UniTask InitializeAsync()
         {
             InitHeroData();
             InitSkillData();
+            InitCreepData();
+            InitBossData();
             return UniTask.CompletedTask;
         }
-
-        private void InitHeroData()
+        
+        public bool TryGetCreepData(int enemyId, out CreepDataSo creepData)
         {
-            heroDataDicts.Clear ();
-            foreach (var heroData in heroDatas)
-            {
-                heroDataDicts[heroData.Id] = heroData;
-            }
+            creepData = null;
+
+            if (creepDataMapper == null || creepDataMapper.Count == 0) return false;
+            if (!creepDataMapper.TryGetValue(enemyId, out creepData)) return false;
+            
+            return creepData != null;
         }
+        
+        public bool TryGetBossData(int enemyId, out BossDataSO bossData)
+        {
+            bossData = null;
+
+            if (bossDataMapper == null || bossDataMapper.Count == 0) return false;
+            if (!bossDataMapper.TryGetValue(enemyId, out bossData)) return false;
+            
+            return bossData != null;
+        }
+        
 
         public HeroDataSO GetHeroDataById(int id)
         {
@@ -38,26 +58,44 @@ namespace Common
             return heroDataDicts[id];
         }
 
-        private void InitSkillData()
-        {
-            skillDataDicts.Clear();
-            //remake later
-            // foreach (var heroData in skillDatas)
-            // {
-            //     skillDataDicts[heroData.SkillId] = heroData;
-            // }
-        }
-
         public SkillDataSO GetSkillDataById(int id)
         {
             if (!skillDataDicts.ContainsKey(id)) return null;
             return skillDataDicts[id];
         }
-
-        public Dictionary<int,SkillDataSO> GetAllSkills()
+        
+        #region Init Data
+        private void InitSkillData()
         {
-            return skillDataDicts;
+            skillDataDicts.Clear();
         }
-
+        
+        private void InitHeroData()
+        {
+            heroDataDicts.Clear ();
+            foreach (var heroData in heroDatas)
+            {
+                heroDataDicts[heroData.Id] = heroData;
+            }
+        }
+        
+        private void InitCreepData()
+        {
+            creepDataMapper.Clear ();
+            foreach (var creepData in creepDatas)
+            {
+                creepDataMapper[creepData.Id] = creepData;
+            }
+        }
+        
+        private void InitBossData()
+        {
+            bossDataMapper.Clear ();
+            foreach (var bossData in bossDatas)
+            {
+                bossDataMapper[bossData.Id] = bossData;
+            }
+        }
+        #endregion
     }
 }

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Immortal_Switch.Scripts.MissionSystem.Models
 {
     /// <summary>
@@ -9,11 +7,55 @@ namespace Immortal_Switch.Scripts.MissionSystem.Models
     public class MissionSystemData
     {
         /// <summary>
-        /// Ds các nhiệm vụ của user.
-        /// key: mission type
-        /// value: ds mission của type đó
+        /// nhiem vu chinh
         /// </summary>
-        public Dictionary<string, List<MissionSystemEntry>> Missions = new();
+        public MissionSystemEntry Main;
+
+        /// <summary>
+        /// nhiem vu theo ngay
+        /// </summary>
+        public MissionSystemTask DailyTask;
+
+        /// <summary>
+        /// nhiem vu theo tuan
+        /// </summary>
+        public MissionSystemTask WeeklyTask;
+
+        /// <summary>
+        /// ds nhiem vu lap lai
+        /// </summary>
+        public MissionSystemEntry[] RepeatTask;
+    }
+
+    public class MissionSystemTask
+    {
+        /// <summary>
+        /// tong diem
+        /// </summary>
+        public int Point;
+
+        /// <summary>
+        /// ds nhiem vu theo tuan
+        /// </summary>
+        public MissionSystemEntry[] Tasks;
+
+        /// <summary>
+        /// gia tri cua cac group da nhan thuong
+        /// </summary>
+        public MissionSystemPoint[] PointsClaimed;
+    }
+
+    public class MissionSystemPoint
+    {
+        /// <summary>
+        /// moc nhan
+        /// </summary>
+        public int Target;
+
+        /// <summary>
+        /// da nhan x2 hay chua
+        /// </summary>
+        public bool X2Claimed;
     }
 
     /// <summary>

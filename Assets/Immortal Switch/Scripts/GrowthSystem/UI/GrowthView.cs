@@ -56,7 +56,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         public void RefreshUI()
         {
-            BigNumber currentGold = CurrencyManager.Instance.Get(CurrencyType.gold);
+            BigNumber currentGold = CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.gold);
             var panelData = binder.Build(
                 currentGold,
                 selectedUpgradeAmount

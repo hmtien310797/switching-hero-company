@@ -1,5 +1,7 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.PlayerSystem.Interfaces;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
 using UnityEngine;
@@ -12,7 +14,11 @@ namespace Immortal_Switch.Scripts.PlayerSystem
 
         private IPlayerSystemService Service { get; set; }
         private IPlayerSystemStorage Storage { get; set; }
-        public PlayerSystemData Data => Storage.Data;
+
+        /// <summary>
+        /// event fire khi login vao ngay moi
+        /// </summary>
+        public event Action OnLoginNewDay;
 
         protected override void OnSingletonAwake()
         {
@@ -36,6 +42,18 @@ namespace Immortal_Switch.Scripts.PlayerSystem
 
             database.Load();
             Storage.Load();
+            CheckLoginNewDay();
+        }
+
+        private void CheckLoginNewDay()
+        {
+            if (Storage.Data.LastLogin == null ||
+                DateTimeHelper.IsNewDay(Storage.Data.LastLogin.Value))
+            {
+                Storage.Data.LastLogin = DateTime.UtcNow;
+                Storage.Save();
+                OnLoginNewDay?.Invoke();
+            }
         }
     }
 }

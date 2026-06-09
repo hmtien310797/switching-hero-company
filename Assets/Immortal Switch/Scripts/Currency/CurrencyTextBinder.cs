@@ -21,10 +21,9 @@ namespace Immortal_Switch.Scripts.Currency
         {
             rewardSyncService = PvEBattleController.Instance.RewardSyncService;
             
-            if (CurrencyManager.Instance != null)
+            if (CurrencyLedgerService.Instance != null)
             {
-                CurrencyManager.Instance.OnCurrencyChanged += HandleCurrencyChanged;
-                CurrencyManager.Instance.OnAnyCurrencyChanged += Refresh;
+                CurrencyLedgerService.Instance.OnCurrencyLedgerChanged += HandleCurrencyChanged;
             }
 
             if (rewardSyncService != null)
@@ -40,8 +39,7 @@ namespace Immortal_Switch.Scripts.Currency
         {
             if (CurrencyManager.Instance != null)
             {
-                CurrencyManager.Instance.OnCurrencyChanged -= HandleCurrencyChanged;
-                CurrencyManager.Instance.OnAnyCurrencyChanged -= Refresh;
+                CurrencyLedgerService.Instance.OnCurrencyLedgerChanged -= HandleCurrencyChanged;
             }
 
             if (rewardSyncService != null)
@@ -50,7 +48,7 @@ namespace Immortal_Switch.Scripts.Currency
             }
         }
 
-        private void HandleCurrencyChanged(CurrencyChangedArgs args)
+        private void HandleCurrencyChanged(CurrencyLedgerChangedArgs args)
         {
             if (args.CurrencyType != currencyType)
                 return;
@@ -58,25 +56,12 @@ namespace Immortal_Switch.Scripts.Currency
             Refresh();
         }
 
-        public void Refresh()
+        private void Refresh()
         {
             if (amountText == null)
                 return;
-
-            BigNumber displayAmount;
-
-            if (CurrencyLedgerService.Instance != null)
-            {
-                displayAmount = CurrencyLedgerService.Instance.GetDisplayBalance(currencyType);
-            }
-            else if (CurrencyManager.Instance != null)
-            {
-                displayAmount = CurrencyManager.Instance.Get(currencyType);
-            }
-            else
-            {
-                displayAmount = BigNumber.Zero;
-            }
+            
+            BigNumber displayAmount = CurrencyLedgerService.Instance != null ? CurrencyLedgerService.Instance.GetDisplayBalance(currencyType) : BigNumber.Zero;
 
             amountText.text = displayAmount.ToInputString();
         }

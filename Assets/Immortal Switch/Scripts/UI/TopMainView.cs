@@ -1,10 +1,12 @@
 using System;
 using Battle;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.PlayerSystem.UI;
+using Immortal_Switch.Scripts.StageSelection;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +20,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] BattleTimerController battleTimerController;
         [SerializeField] HeroSkillBarUI heroSkillBarUI;
         [SerializeField] private Button switchMainSubHeroButton;
+        [SerializeField] private Button moveButton;
         [SerializeField] CurrencyView currencyView;
         [SerializeField] HeroJoystick heroJostick;
         [SerializeField] private Button autoSkillButton;
@@ -35,7 +38,7 @@ namespace Immortal_Switch.Scripts.UI
             if (switchMainSubHeroButton != null)
                 switchMainSubHeroButton.onClick.AddListener(OnSwitchMainSubHeroButtonClicked);
 
-            profileBtn.onClick.AddListener(OnClickProfile);
+            //profileBtn.onClick.AddListener(OnClickProfile);
             HideAbleObjects();
         }
 
@@ -57,6 +60,14 @@ namespace Immortal_Switch.Scripts.UI
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
             GameEventManager.Subscribe(GameEvents.OnWaveStart, OnStageStart);
+            moveButton.onClick.AddListener(() =>
+            {
+                UIManager.Instance.TogglePopupAsync<StageSelectionView>(new StageSelectionOpenArgs
+                {
+                    CurrentStage = PvEBattleController.Instance.CurrentStage,
+                    HighestUnlockedStage = PvEBattleController.Instance.HighestUnlockedStage
+                }).Forget();
+            });
         }
 
         private void OnDestroy()

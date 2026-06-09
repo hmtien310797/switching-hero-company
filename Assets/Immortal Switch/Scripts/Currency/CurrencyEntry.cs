@@ -8,6 +8,10 @@ namespace Immortal_Switch.Scripts.Currency
     {
         gold,
         diamond,
+        energy,
+        arena_token,
+        guild_coin,
+        event_token,
         crystal,
         
         HeroTicket,

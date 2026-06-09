@@ -37,26 +37,21 @@ namespace Battle
 
     public partial class PvEBattleController : Singleton<PvEBattleController>
     {
-        [Header("Refs")] [SerializeField] FollowHeroController[] enemySpawnerCollection;
+        [Header("Refs")] 
+        [SerializeField] FollowHeroController[] enemySpawnerCollection;
         [SerializeField] PvEMapController pvEMapController;
         [SerializeField] BattleCoinView coinPrefab;
 
-        [Header("Spawn Positions")] [SerializeField]
-        private List<Transform> spawnPoss;
-
-        [Header("Data (Creeps)")] [SerializeField]
-        private CreepDataSo[] creepDataSo;
-
+        [Header("Spawn Positions ")] 
+        [SerializeField] private List<Transform> spawnPoss;
+        
         [SerializeField] private CreepSpawnPatternCollectionSO creepSpawnPatternCollection;
         [SerializeField] private SpawnRatePatternSO spawnRatePattern;
-
-        [Header("Data (Boss)")] [SerializeField]
-        private BossDataSO[] bossData;
-
+        
         [Header("Stage")]
         [field: SerializeField]
-        public int currentStage { get; private set; } = 1;
-
+        public int CurrentStage { get; private set; } = 1;
+        [SerializeField] private int temporaryHighestUnlockedStage = 50;
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
@@ -67,12 +62,12 @@ namespace Battle
         [SerializeField] private RewardSyncService rewardSyncService;
         [SerializeField] private OfflineAfkRewardService offlineAfkRewardService;
 
-        [Header("Hero Team")] [SerializeField] private HeroTeamController heroTeamController;
+        [Header("Hero Team")] 
+        [SerializeField] private HeroTeamController heroTeamController;
         [SerializeField, Min(0)] private int controlledHeroSlotIndex = 0;
 
-        [Header("Creep Spawn Formation")] [SerializeField]
-        private float spawnSpacingX = 1.6f;
-
+        [Header("Creep Spawn Formation")] 
+        [SerializeField] private float spawnSpacingX = 1.6f;
         [SerializeField] private float spawnSpacingZ = 1.25f;
         [SerializeField] private float spawnJitter = 0.25f;
         [SerializeField] private int spawnColumns = 5;
@@ -85,7 +80,8 @@ namespace Battle
         [SerializeField] private int maxSpawnGroupsPerBatch = 6;
         [SerializeField] private int maxCreepsPerGroup = 5;
 
-        [ShowInInspector] private readonly List<EnemyActor> creeps = new();
+        [ShowInInspector] 
+        private readonly List<EnemyActor> creeps = new();
 
         private BattleResult result = BattleResult.None;
         private int aliveCreepCount;
@@ -98,9 +94,6 @@ namespace Battle
         private int heroDeadCount;
 
         private List<int> inBattleHeroIdList = new();
-        private Dictionary<int, CreepDataSo> creepDataMapper;
-        private Dictionary<int, BossDataSO> bossDataMapper;
-
         private GameData gameData;
         private BossActor currentBoss;
 
@@ -121,9 +114,11 @@ namespace Battle
 
         private StageRuntimeData stageRuntimeData;
 
-        public BattleState State { get; private set; } = BattleState.None;
+        private BattleState State { get; set; } = BattleState.None;
         public RewardSyncService RewardSyncService => rewardSyncService;
-        public List<EnemyActor> MonsterList => creeps;
+        public List<EnemyActor> CreepList => creeps;
+        public int HighestUnlockedStage => temporaryHighestUnlockedStage;
+        
 
         private void Start()
         {
@@ -133,6 +128,7 @@ namespace Battle
             GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
             gameCameraController = GameCameraController.Instance;
             PoolManager.Instance.Prewarm(coinPrefab, 10);
+            GameEventManager.Subscribe<int>(GameEvents.OnMoveStageRequested, HandleMoveStageRequested);
         }
 
         private void OnBossSpawnAnimationComplete(bool result)
@@ -148,9 +144,7 @@ namespace Battle
 
         public override async UniTask InitializeAsync()
         {
-            BuildCreepDataLookup();
             BuildSpawnPositions();
-            BuildBossDataLookup();
             gameData = GameData.Instance;
             await StartAsync();
         }
@@ -167,17 +161,50 @@ namespace Battle
         {
             SetState(BattleState.Initializing);
 
-            currentStage = Mathf.Max(1, currentStage);
-            pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(currentStage));
+            CurrentStage = Mathf.Max(1, CurrentStage);
+            pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(CurrentStage));
             InitSwitchableHeroIds();
             await InitPlayerHeroById();
             NotifyActiveLineupChanged();
             RefreshControlledHeroSkillUI();
-            InitStage(currentStage);
-            offlineAfkRewardService?.Initialize(currentStage);
+            InitStage(CurrentStage);
+            offlineAfkRewardService?.Initialize(CurrentStage);
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+        }
+        
+        private void HandleMoveStageRequested(int targetStage)
+        {
+            MoveToStage(targetStage);
+        }
+        
+        public void MoveToStage(int targetStage)
+        {
+            targetStage = Mathf.Max(1, targetStage);
+
+            CurrentStage = targetStage;
+
+            // Clear creep/boss hiện tại nếu cần
+            //ClearCurrentBattleObjects();
+
+            // Resolve data stage mới
+            CacheStageSpawnData(CurrentStage);
+
+            // Reset stage state
+            totalCreepsSpawnedThisStage = 0;
+            patternId = 0;
+            losingStage = false;
+
+            // Start spawn stage mới
+            SpawnNextCreepBatch();
+
+            // Update reward/afk service nếu có
+            rewardSyncService?.SetCurrentStageData(stageRuntimeData);
+            offlineAfkRewardService?.SetCurrentAfkStage(CurrentStage);
+
+            // Báo lại UI progress
+            //stageSelectionController?.SetProgress(currentStage, highestUnlockedStage);
         }
 
         public Vector3 GetEndMapPoint()
@@ -359,21 +386,6 @@ namespace Battle
             ApplyControlledHeroSelectionToTeamController();
         }
 
-        private void BuildBossDataLookup()
-        {
-            bossDataMapper = new Dictionary<int, BossDataSO>();
-
-            if (bossData == null) return;
-
-            for (int i = 0; i < bossData.Length; i++)
-            {
-                var data = bossData[i];
-                if (data == null) continue;
-
-                bossDataMapper[data.Id] = data;
-            }
-        }
-
         public List<int> GetCurrentSwitchHeroIds()
         {
             return new List<int>(inBattleHeroIdList);
@@ -495,9 +507,9 @@ namespace Battle
             heroDeadCount = 0;
             result = BattleResult.None;
             SetState(BattleState.Initializing);
-            currentStage++;
-            pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(currentStage));
-            InitStage(currentStage);
+            CurrentStage++;
+            pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(CurrentStage));
+            InitStage(CurrentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
             isReadyBattle = true;
@@ -509,7 +521,7 @@ namespace Battle
             result = BattleResult.None;
             SetState(BattleState.Initializing);
 
-            InitStage(currentStage);
+            InitStage(CurrentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
             isReadyBattle = true;
@@ -548,54 +560,31 @@ namespace Battle
 
         private void CacheStageSpawnData(int stage)
         {
-            if (stageDataResolver != null)
+            stageRuntimeData = stageDataResolver.Resolve(stage);
+
+            if (stageRuntimeData == null || !stageRuntimeData.IsValid)
             {
-                stageRuntimeData = stageDataResolver.Resolve(stage);
-
-                if (stageRuntimeData == null || !stageRuntimeData.IsValid)
-                {
-                    Debug.LogError($"[PvE] StageRuntimeData invalid. stage={stage}");
-                    enemyIds = null;
-                    rates = null;
-                    return;
-                }
-                
-                RebuildStageStatCache();
-                rewardSyncService?.SetCurrentStageData(stageRuntimeData);
-                offlineAfkRewardService?.SetCurrentAfkStage(stageRuntimeData.GlobalStage);
-                patternId = 0;
-                enemyIds = stageRuntimeData.EnemyIds;
-                rates = stageRuntimeData.EnemyRates;
-
-                Debug.Log(
-                    $"[PvE] Resolve Stage={stageRuntimeData.GlobalStage}, " +
-                    $"Chapter={stageRuntimeData.ChapterName}, " +
-                    $"LocalStage={stageRuntimeData.LocalStage}, " +
-                    $"Element={stageRuntimeData.ChapterElement}, " +
-                    $"EnemyPattern={stageRuntimeData.EnemyPatternId}, " +
-                    $"BossId={stageRuntimeData.BossId}"
-                );
-
-                return;
-            }
-
-            // Fallback old logic
-            patternId = GetPatternIdByStageLoop(stage, stagesPerPattern);
-
-            enemyIds = creepSpawnPatternCollection.GetSpawnPatternBaseOnId(patternId);
-            if (enemyIds == null || enemyIds.Length < 2 || enemyIds.Length > 4)
-            {
-                Debug.LogError($"[PvE] Invalid enemyIds. stage={stage} patternId={patternId}");
+                Debug.LogError($"[PvE] StageRuntimeData invalid. stage={stage}");
                 enemyIds = null;
                 rates = null;
                 return;
             }
+                
+            RebuildStageStatCache();
+            rewardSyncService?.SetCurrentStageData(stageRuntimeData);
+            offlineAfkRewardService?.SetCurrentAfkStage(stageRuntimeData.GlobalStage);
+            patternId = 0;
+            enemyIds = stageRuntimeData.EnemyIds;
+            rates = stageRuntimeData.EnemyRates;
 
-            rates = GetRandomRates(patternId, enemyIds.Length);
-            if (rates == null)
-            {
-                Debug.LogError($"[PvE] No rates found. patternId={patternId}, len={enemyIds.Length}");
-            }
+            Debug.Log(
+                $"[PvE] Resolve Stage={stageRuntimeData.GlobalStage}, " +
+                $"Chapter={stageRuntimeData.ChapterName}, " +
+                $"LocalStage={stageRuntimeData.LocalStage}, " +
+                $"Element={stageRuntimeData.ChapterElement}, " +
+                $"EnemyPattern={stageRuntimeData.EnemyPatternId}, " +
+                $"BossId={stageRuntimeData.BossId}"
+            );
         }
 
         private bool TryGetChapterDataByStage(int stage, out ChapterStageSO chapterData, out int chapterIndex,
@@ -662,18 +651,15 @@ namespace Battle
         {
             bossSo = null;
 
-            if (bossDataMapper == null || bossDataMapper.Count == 0)
-                return false;
-
             if (stageRuntimeData != null && stageRuntimeData.BossId > 0)
             {
-                return bossDataMapper.TryGetValue(stageRuntimeData.BossId, out bossSo) && bossSo != null;
+                return MasterDataCache.Instance.TryGetBossData(stageRuntimeData.BossId, out bossSo) && bossSo != null;
             }
 
             if (!TryGetChapterDataByStage(stage, out var chapterData, out _, out _))
                 return false;
 
-            return bossDataMapper.TryGetValue(chapterData.BossId, out bossSo) && bossSo != null;
+            return MasterDataCache.Instance.TryGetBossData(chapterData.BossId, out bossSo) && bossSo != null;
         }
 
         private void SpawnNextCreepBatch()
@@ -695,7 +681,7 @@ namespace Battle
                 int enemyId = enemyIds[i];
                 int amount = counts[i];
 
-                if (!TryGetCreepPrefab(enemyId, out var creepData))
+                if (!MasterDataCache.Instance.TryGetCreepData(enemyId, out var creepData))
                 {
                     Debug.LogError($"[PvE] Missing CreepDataSo/Prefab for enemyId={enemyId}");
                     continue;
@@ -905,7 +891,7 @@ namespace Battle
                 if (cachedScaledCreepStats.ContainsKey(enemyId))
                     continue;
 
-                if (!creepDataMapper.TryGetValue(enemyId, out CreepDataSo data) || data == null)
+                if (!MasterDataCache.Instance.TryGetCreepData(enemyId, out CreepDataSo data) || data == null)
                 {
                     Debug.LogError($"[PvE] Cannot cache creep stat. Missing CreepDataSo. enemyId={enemyId}");
                     continue;
@@ -938,7 +924,7 @@ namespace Battle
 
             int bossId = stageRuntimeData.BossId;
 
-            if (!bossDataMapper.TryGetValue(bossId, out BossDataSO data) || data == null)
+            if (!MasterDataCache.Instance.TryGetBossData(bossId, out BossDataSO data) || data == null)
             {
                 Debug.LogError($"[PvE] Cannot cache boss stat. Missing BossDataSO. bossId={bossId}");
                 return;
@@ -962,9 +948,9 @@ namespace Battle
 
         private void SpawnBoss()
         {
-            if (!TryGetBossDataByStage(currentStage, out var bossSo))
+            if (!TryGetBossDataByStage(CurrentStage, out var bossSo))
             {
-                Debug.LogError($"[PvE] Cannot resolve boss data for stage={currentStage}");
+                Debug.LogError($"[PvE] Cannot resolve boss data for stage={CurrentStage}");
                 return;
             }
 
@@ -977,7 +963,7 @@ namespace Battle
             if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
                 return;
 
-            Debug.Log($"[PvE] Spawn Boss - Stage={currentStage}, BossId={bossSo.Id}, BossName={bossSo.Name}");
+            Debug.Log($"[PvE] Spawn Boss - Stage={CurrentStage}, BossId={bossSo.Id}, BossName={bossSo.Name}");
 
             var pos = GroupFlashController.Instance.GetPosByIdx(2);
             var spawnedBoss = PoolManager.Instance.Spawn(bossSo.bossPrefab, pos, Quaternion.identity);
@@ -1031,7 +1017,7 @@ namespace Battle
                 return;
             }
 
-            GameEventManager.Trigger(GameEvents.OnStageCleared, currentStage);
+            GameEventManager.Trigger(GameEvents.OnStageCleared, CurrentStage);
         }
 
         private void OnStageCleared(int _)
@@ -1569,34 +1555,7 @@ namespace Battle
             else
                 spawnPoss = spawnPoss.OrderBy(_ => Random.value).ToList(); // shuffle
         }
-
-
-        private void BuildCreepDataLookup()
-        {
-            creepDataMapper = new Dictionary<int, CreepDataSo>();
-
-            if (creepDataSo == null) return;
-
-            for (int i = 0; i < creepDataSo.Length; i++)
-            {
-                var data = creepDataSo[i];
-                if (data == null) continue;
-
-                creepDataMapper[data.Id] = data;
-            }
-        }
-
-        private bool TryGetCreepPrefab(int enemyId, out CreepDataSo creepData)
-        {
-            creepData = null;
-
-            if (creepDataMapper == null || creepDataMapper.Count == 0) return false;
-            if (!creepDataMapper.TryGetValue(enemyId, out var data) || data == null) return false;
-
-            creepData = data;
-
-            return creepData != null;
-        }
+        
 
         private async UniTask NextStageCallback()
         {

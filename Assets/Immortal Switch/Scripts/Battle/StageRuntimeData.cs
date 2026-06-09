@@ -11,6 +11,8 @@ namespace Immortal_Switch.Scripts.Level.Stage
         public int ChapterId;
         public string ChapterName;
         public int LocalStage;
+        public int ChapterStartStage;
+        public int ChapterEndStage;
         public Element ChapterElement;
 
         public string RewardRuleId;

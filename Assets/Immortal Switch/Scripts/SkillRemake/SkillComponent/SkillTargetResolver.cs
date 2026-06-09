@@ -97,7 +97,7 @@ namespace Immortal_Switch.Scripts.Skill
                     count++;
             }
             
-            List<EnemyActor> enemies = context.BattleController.MonsterList;
+            List<EnemyActor> enemies = context.BattleController.CreepList;
 
             if (enemies == null)
                 return 0;
@@ -129,7 +129,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             float radius = overrideRadius > 0f ? overrideRadius : areaData != null ? areaData.Radius : 0f;
             float sqrRadius = radius * radius;
-            List<EnemyActor> enemies = context.BattleController.MonsterList;
+            List<EnemyActor> enemies = context.BattleController.CreepList;
 
             if (enemies == null)
                 return;

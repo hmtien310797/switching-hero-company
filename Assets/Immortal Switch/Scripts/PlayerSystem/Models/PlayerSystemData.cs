@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.StatSystem;
 
@@ -29,6 +30,11 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Models
         /// avatar
         /// </summary>
         public string Avatar;
+
+        /// <summary>
+        /// lan cuoi dang nhap
+        /// </summary>
+        public DateTime? LastLogin;
 
         public void UpdateExp(int exp)
         {

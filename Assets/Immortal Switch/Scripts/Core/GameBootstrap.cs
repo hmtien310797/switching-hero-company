@@ -24,12 +24,11 @@ namespace Immortal_Switch.Scripts.Core
         {
             try
             {
+                await MasterDataCache.Instance.InitializeAsync();
                 await PlayerSystemManager.Instance.InitializeAsync();
                 await MissionSystemManager.Instance.InitializeAsync();
 
                 //await TransmutationSystemManager.Instance.InitializeAsync();
-
-                await MasterDataCache.Instance.InitializeAsync();
                 await UserDataCache.Instance.InitializeAsync();
                 await GrowthManager.Instance.InitializeAsync();
                 await PowerUpManager.Instance.InitializeAsync();

@@ -19,12 +19,12 @@ namespace Immortal_Switch.Scripts.Skill
     {
         public BigNumber GetSkillTicket()
         {
-            return CurrencyManager.Instance.Get(CurrencyType.SkillTicket);
+            return CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.SkillTicket);
         }
 
         public BigNumber GetGem()
         {
-            return CurrencyManager.Instance.Get(CurrencyType.diamond);
+            return CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.diamond);
         }
 
         public bool CanSpendSkillTicket(BigNumber amount)

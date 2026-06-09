@@ -21,7 +21,8 @@ namespace Immortal_Switch.Scripts.Core
             }
         }
 
-        protected virtual bool DontDestroyOnLoadEnabled => true;
+        [SerializeField]
+        protected bool DontDestroyOnLoadEnabled;
 
         protected virtual void Awake()
         {

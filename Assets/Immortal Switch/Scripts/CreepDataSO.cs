@@ -9,6 +9,7 @@ namespace Immortal_Switch.Scripts
     {
         [field: SerializeField] public int Id { get; set; }
         [field: SerializeField] public int Name { get; set; }
+        [field: SerializeField] public Sprite Icon { get; set; }
         [field: SerializeField] public Element Element { get; set; }
         [field: SerializeField] public float BaseHp { get; set; }
         [field: SerializeField] public float BaseAtk { get; set; }

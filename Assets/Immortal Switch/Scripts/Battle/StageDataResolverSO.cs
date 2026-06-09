@@ -44,7 +44,13 @@ namespace Immortal_Switch.Scripts.Level.Stage
         {
             globalStage = Mathf.Max(1, globalStage);
 
-            if (!TryResolveChapter(globalStage, out ChapterConfig chapter, out int chapterIndex, out int localStage))
+            if (!TryResolveChapter(
+                    globalStage,
+                    out ChapterConfig chapter,
+                    out int chapterIndex,
+                    out int localStage,
+                    out int chapterStartStage,
+                    out int chapterEndStage))
             {
                 Debug.LogError($"[StageResolver] Cannot resolve chapter. globalStage={globalStage}");
                 return null;
@@ -115,6 +121,9 @@ namespace Immortal_Switch.Scripts.Level.Stage
 
                 BaseRewards = ResolveBaseRewards(chapter, globalStage, localStage, chapterIndex),
                 ClearRewards = ResolveClearRewards(chapter, globalStage, localStage, chapterIndex),
+                
+                ChapterStartStage = chapterStartStage,
+                ChapterEndStage = chapterEndStage,
 
                 EnemyScale = StageScalingFormula.GetEnemyScale(globalStage),
                 BossScale = StageScalingFormula.GetBossScale(globalStage)
@@ -229,50 +238,46 @@ namespace Immortal_Switch.Scripts.Level.Stage
             int globalStage,
             out ChapterConfig chapter,
             out int chapterIndex,
-            out int localStage
+            out int localStage,
+            out int chapterStartStage,
+            out int chapterEndStage
         )
         {
             chapter = null;
             chapterIndex = -1;
-            localStage = -1;
+            localStage = 0;
+            chapterStartStage = 0;
+            chapterEndStage = 0;
 
-            if (chapterConfig == null || chapterConfig.Chapters == null || chapterConfig.Chapters.Length == 0)
+            if (chapterConfig == null || chapterConfig.Chapters == null)
                 return false;
 
-            int accumulatedStage = 0;
+            int startStage = 1;
 
             for (int i = 0; i < chapterConfig.Chapters.Length; i++)
             {
-                ChapterConfig data = chapterConfig.Chapters[i];
-                if (data == null || data.StageCount <= 0)
+                ChapterConfig current = chapterConfig.Chapters[i];
+
+                if (current == null)
                     continue;
 
-                int chapterStartStage = accumulatedStage + 1;
-                int chapterEndStage = accumulatedStage + data.StageCount;
+                int stageCount = Mathf.Max(1, current.StageCount);
+                int endStage = startStage + stageCount - 1;
 
-                if (globalStage >= chapterStartStage && globalStage <= chapterEndStage)
+                if (globalStage >= startStage && globalStage <= endStage)
                 {
-                    chapter = data;
+                    chapter = current;
                     chapterIndex = i;
-                    localStage = globalStage - accumulatedStage;
+                    localStage = globalStage - startStage + 1;
+                    chapterStartStage = startStage;
+                    chapterEndStage = endStage;
                     return true;
                 }
 
-                accumulatedStage = chapterEndStage;
+                startStage = endStage + 1;
             }
 
-            // Nếu stage vượt quá config hiện tại, dùng chapter cuối cùng làm loop/fallback.
-            ChapterConfig lastChapter = chapterConfig.Chapters[chapterConfig.Chapters.Length - 1];
-            if (lastChapter == null || lastChapter.StageCount <= 0)
-                return false;
-
-            chapter = lastChapter;
-            chapterIndex = chapterConfig.Chapters.Length - 1;
-
-            int overflowStage = globalStage - accumulatedStage;
-            localStage = ((overflowStage - 1) % lastChapter.StageCount) + 1;
-
-            return true;
+            return false;
         }
 
         private EnemyPatternRule FindEnemyRule(string ruleId)

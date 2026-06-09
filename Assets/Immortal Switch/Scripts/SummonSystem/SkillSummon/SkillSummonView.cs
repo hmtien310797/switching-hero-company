@@ -51,7 +51,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 SkillSummonManager.Instance.OnSummonDataChanged += RefreshView;
 
             if (CurrencyManager.Instance != null)
-                CurrencyManager.Instance.OnAnyCurrencyChanged += RefreshView;
+                CurrencyLedgerService.Instance.OnAnyLedgerChanged += RefreshView;
 
             BindButtonsIfNeeded();
             RefreshView();
@@ -63,7 +63,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 SkillSummonManager.Instance.OnSummonDataChanged -= RefreshView;
 
             if (CurrencyManager.Instance != null)
-                CurrencyManager.Instance.OnAnyCurrencyChanged -= RefreshView;
+                CurrencyLedgerService.Instance.OnAnyLedgerChanged -= RefreshView;
 
             HideAllPopups();
         }

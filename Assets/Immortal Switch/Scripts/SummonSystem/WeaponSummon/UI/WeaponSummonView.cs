@@ -92,7 +92,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 WeaponSummonManager.Instance.OnSummonDataChanged += RefreshView;
 
             if (CurrencyManager.Instance != null)
-                CurrencyManager.Instance.OnAnyCurrencyChanged += RefreshView;
+                CurrencyLedgerService.Instance.OnAnyLedgerChanged += RefreshView;
         }
 
         private void UnsubscribeEvents()
@@ -101,7 +101,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 WeaponSummonManager.Instance.OnSummonDataChanged -= RefreshView;
 
             if (CurrencyManager.Instance != null)
-                CurrencyManager.Instance.OnAnyCurrencyChanged -= RefreshView;
+                CurrencyLedgerService.Instance.OnAnyLedgerChanged -= RefreshView;
         }
 
         private void BindButtonsIfNeeded()

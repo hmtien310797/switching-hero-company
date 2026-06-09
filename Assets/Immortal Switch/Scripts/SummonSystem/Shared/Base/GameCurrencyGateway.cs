@@ -8,12 +8,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
     {
         public BigNumber GetHeroTicket()
         {
-            return CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
+            return CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.HeroTicket);
         }
 
         public BigNumber GetGem()
         {
-            return CurrencyManager.Instance.Get(CurrencyType.diamond);
+            return CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.diamond);
         }
 
         public bool CanSpendHeroTicket(BigNumber amount)

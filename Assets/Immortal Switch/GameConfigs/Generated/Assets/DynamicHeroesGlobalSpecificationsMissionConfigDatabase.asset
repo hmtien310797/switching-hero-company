@@ -301,7 +301,7 @@ MonoBehaviour:
   - missionId: MAIN_0020
     type: MAIN
     nextMission: MAIN_0021
-    title: "V\u01B0\u1EE3t Chapter 3 - Stage 60"
+    title: MAIN
     description: "Ch3, stage to\xE0n c\u1EE5c 60"
     eventKey: CLEAR_STAGE
     target: 60
@@ -8535,7 +8535,7 @@ MonoBehaviour:
     sortOrder: 6
   - missionId: ACH_WEEKLYDONE_T7
     type: ACHIEVEMENT
-    nextMission: 
+    nextMission: RPT_SUMMON_HERO_100
     title: "B\u1EC1n b\u1EC9: Ho\xE0n th\xE0nh 200 nhi\u1EC7m v\u1EE5 tu\u1EA7n"
     description: "Kh\xF4ng reset - c\u1ED9ng d\u1ED3n v\u0129nh vi\u1EC5n"
     eventKey: COMPLETE_WEEKLY
@@ -8548,3 +8548,451 @@ MonoBehaviour:
     tierGroup: ACH_WEEKLYDONE
     tierIndex: 7
     sortOrder: 7
+  - missionId: RPT_SUMMON_HERO_100
+    type: REPEAT
+    nextMission: 
+    title: "Tri\u1EC7u h\u1ED3i Anh h\xF9ng 100 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: HERO_SUMMON
+    target: 100
+    points: 0
+    rewards: diamond:100
+    unlockMinLevel: 0
+    unlockFeature: SUMMON
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 1
+  - missionId: RPT_SUMMON_HERO_500
+    type: REPEAT
+    nextMission: 
+    title: "Tri\u1EC7u h\u1ED3i Anh h\xF9ng 500 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: HERO_SUMMON
+    target: 500
+    points: 0
+    rewards: diamond:500;summon_ticket:2
+    unlockMinLevel: 0
+    unlockFeature: SUMMON
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 2
+  - missionId: RPT_SUMMON_WEAPON_100
+    type: REPEAT
+    nextMission: 
+    title: "Tri\u1EC7u h\u1ED3i V\u0169 kh\xED 100 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: HERO_SUMMON
+    target: 100
+    points: 0
+    rewards: diamond:100
+    unlockMinLevel: 0
+    unlockFeature: SUMMON
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 3
+  - missionId: RPT_SUMMON_WEAPON_500
+    type: REPEAT
+    nextMission: 
+    title: "Tri\u1EC7u h\u1ED3i V\u0169 kh\xED 500 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: HERO_SUMMON
+    target: 500
+    points: 0
+    rewards: diamond:500;summon_ticket:2
+    unlockMinLevel: 0
+    unlockFeature: SUMMON
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 4
+  - missionId: RPT_SUMMON_SKILL_100
+    type: REPEAT
+    nextMission: 
+    title: "Tri\u1EC7u h\u1ED3i K\u1EF9 n\u0103ng 100 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: SKILL_UPGRADE
+    target: 100
+    points: 0
+    rewards: diamond:100
+    unlockMinLevel: 0
+    unlockFeature: SKILL
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 5
+  - missionId: RPT_SUMMON_SKILL_500
+    type: REPEAT
+    nextMission: 
+    title: "Tri\u1EC7u h\u1ED3i K\u1EF9 n\u0103ng 500 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: SKILL_UPGRADE
+    target: 500
+    points: 0
+    rewards: diamond:500
+    unlockMinLevel: 0
+    unlockFeature: SKILL
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 6
+  - missionId: RPT_TRANSMUTE_1000
+    type: REPEAT
+    nextMission: 
+    title: "Transmute 1.000 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: TRANSMUTE_GEAR
+    target: 1000
+    points: 0
+    rewards: diamond:50
+    unlockMinLevel: 0
+    unlockFeature: ENHANCE
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 7
+  - missionId: RPT_TRANSMUTE_5000
+    type: REPEAT
+    nextMission: 
+    title: "Transmute 5.000 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: TRANSMUTE_GEAR
+    target: 5000
+    points: 0
+    rewards: diamond:250;forge_mat_hi:10
+    unlockMinLevel: 0
+    unlockFeature: ENHANCE
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 8
+  - missionId: RPT_DUNGEON_4
+    type: REPEAT
+    nextMission: 
+    title: "Ho\xE0n th\xE0nh Dungeon 4 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: DUNGEON_CLEAR
+    target: 4
+    points: 0
+    rewards: diamond:50
+    unlockMinLevel: 0
+    unlockFeature: DUNGEON
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 9
+  - missionId: RPT_DUNGEON_20
+    type: REPEAT
+    nextMission: 
+    title: "Ho\xE0n th\xE0nh Dungeon 20 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: DUNGEON_CLEAR
+    target: 20
+    points: 0
+    rewards: diamond:250;dungeon_key:5
+    unlockMinLevel: 0
+    unlockFeature: DUNGEON
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 10
+  - missionId: RPT_PLAY_30
+    type: REPEAT
+    nextMission: 
+    title: "Ch\u01A1i 30 ph\xFAt"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: PLAY_TIME
+    target: 30
+    points: 0
+    rewards: diamond:10
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 11
+  - missionId: RPT_PLAY_120
+    type: REPEAT
+    nextMission: 
+    title: "Ch\u01A1i 120 ph\xFAt"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: PLAY_TIME
+    target: 120
+    points: 0
+    rewards: diamond:50
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 12
+  - missionId: RPT_KILL_1000
+    type: REPEAT
+    nextMission: 
+    title: "Ti\xEAu di\u1EC7t 1.000 qu\xE1i"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: KILL_MONSTER
+    target: 1000
+    points: 0
+    rewards: diamond:30
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 13
+  - missionId: RPT_KILL_10000
+    type: REPEAT
+    nextMission: 
+    title: "Ti\xEAu di\u1EC7t 10.000 qu\xE1i"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: KILL_MONSTER
+    target: 10000
+    points: 0
+    rewards: diamond:150;chest_rare:1
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 14
+  - missionId: RPT_BOSS_50
+    type: REPEAT
+    nextMission: 
+    title: "H\u1EA1 50 boss"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: KILL_BOSS
+    target: 50
+    points: 0
+    rewards: diamond:50
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 15
+  - missionId: RPT_BOSS_200
+    type: REPEAT
+    nextMission: 
+    title: "H\u1EA1 200 boss"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: KILL_BOSS
+    target: 200
+    points: 0
+    rewards: diamond:200;hero_shard_rare:10
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 16
+  - missionId: RPT_ENHANCE_100
+    type: REPEAT
+    nextMission: 
+    title: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 100 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: ENHANCE_GEAR
+    target: 100
+    points: 0
+    rewards: diamond:50
+    unlockMinLevel: 0
+    unlockFeature: ENHANCE
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 17
+  - missionId: RPT_ENHANCE_500
+    type: REPEAT
+    nextMission: 
+    title: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 500 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: ENHANCE_GEAR
+    target: 500
+    points: 0
+    rewards: diamond:250;forge_mat_hi:10
+    unlockMinLevel: 0
+    unlockFeature: ENHANCE
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 18
+  - missionId: RPT_FORGE_100
+    type: REPEAT
+    nextMission: 
+    title: "R\xE8n trang b\u1ECB 100 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: FORGE_GEAR
+    target: 100
+    points: 0
+    rewards: diamond:50
+    unlockMinLevel: 0
+    unlockFeature: ENHANCE
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 19
+  - missionId: RPT_FORGE_500
+    type: REPEAT
+    nextMission: 
+    title: "R\xE8n trang b\u1ECB 500 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: FORGE_GEAR
+    target: 500
+    points: 0
+    rewards: diamond:250
+    unlockMinLevel: 0
+    unlockFeature: ENHANCE
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 20
+  - missionId: RPT_ARENA_30
+    type: REPEAT
+    nextMission: 
+    title: "Th\u1EAFng Arena 30 tr\u1EADn"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: ARENA_WIN
+    target: 30
+    points: 0
+    rewards: diamond:50;arena_badge:30
+    unlockMinLevel: 0
+    unlockFeature: ARENA
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 21
+  - missionId: RPT_ARENA_100
+    type: REPEAT
+    nextMission: 
+    title: "Th\u1EAFng Arena 100 tr\u1EADn"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: ARENA_WIN
+    target: 100
+    points: 0
+    rewards: diamond:200;arena_badge:100
+    unlockMinLevel: 0
+    unlockFeature: ARENA
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 22
+  - missionId: RPT_HEROLV_100
+    type: REPEAT
+    nextMission: 
+    title: "L\xEAn c\u1EA5p Anh h\xF9ng 100 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: HERO_LEVELUP
+    target: 100
+    points: 0
+    rewards: diamond:50
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 23
+  - missionId: RPT_HEROLV_500
+    type: REPEAT
+    nextMission: 
+    title: "L\xEAn c\u1EA5p Anh h\xF9ng 500 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: HERO_LEVELUP
+    target: 500
+    points: 0
+    rewards: diamond:250
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 24
+  - missionId: RPT_IDLE_20
+    type: REPEAT
+    nextMission: 
+    title: "Nh\u1EADn Idle Reward 20 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: CLAIM_IDLE
+    target: 20
+    points: 0
+    rewards: diamond:30
+    unlockMinLevel: 0
+    unlockFeature: IDLE_REWARD
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 25
+  - missionId: RPT_IDLE_100
+    type: REPEAT
+    nextMission: 
+    title: "Nh\u1EADn Idle Reward 100 l\u1EA7n"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: CLAIM_IDLE
+    target: 100
+    points: 0
+    rewards: diamond:150
+    unlockMinLevel: 0
+    unlockFeature: IDLE_REWARD
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 26
+  - missionId: RPT_USEGOLD_100K
+    type: REPEAT
+    nextMission: 
+    title: "Ti\xEAu 100.000 V\xE0ng"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: USE_GOLD
+    target: 100000
+    points: 0
+    rewards: diamond:30
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 27
+  - missionId: RPT_USEGOLD_1M
+    type: REPEAT
+    nextMission: 
+    title: "Ti\xEAu 1.000.000 V\xE0ng"
+    description: "L\u1EB7p v\xF4 h\u1EA1n - th\u01B0\u1EDFng c\u1ED1 \u0111\u1ECBnh
+      m\u1ED7i v\xF2ng"
+    eventKey: USE_GOLD
+    target: 1000000
+    points: 0
+    rewards: diamond:150
+    unlockMinLevel: 0
+    unlockFeature: 
+    unlockPrevMission: 
+    tierGroup: 
+    tierIndex: 0
+    sortOrder: 28

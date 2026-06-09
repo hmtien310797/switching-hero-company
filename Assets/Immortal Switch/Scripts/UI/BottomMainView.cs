@@ -1,8 +1,8 @@
 using System.Numerics;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
+using Immortal_Switch.Scripts.MissionSystem.Views;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.TransmutationSystem;
 using Sirenix.OdinInspector;
@@ -43,7 +43,7 @@ namespace Immortal_Switch.Scripts.UI
 
             ButtonShop.AddListener(() => OnToggleMain<SummonHubView>(ButtonShop).Forget());
             ButtonHero.AddListener(() => OnToggleMain<HeroCollectionView>(ButtonHero).Forget());
-
+            ButtonMission.AddListener(() => OnToggleMain<MissionSystemView>(ButtonMission).Forget());
             // ButtonGem.onClick.AddListener(() => OnToggleMain<TransmutationSystemView>().Forget());
 
             if (ButtonClose != null)
@@ -54,7 +54,8 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnTransmutationSystemEnergyChanged(BigInteger obj)
         {
-            txtEnergy.SetText(BigIntegerHelper.Format(obj));
+            //txtEnergy.SetText(BigIntegerHelper.Format(obj));
+            txtEnergy.SetText("0");
         }
 
         private void OnDestroy()

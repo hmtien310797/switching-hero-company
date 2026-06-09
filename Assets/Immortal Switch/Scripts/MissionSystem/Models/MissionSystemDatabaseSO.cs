@@ -7,9 +7,15 @@ namespace Immortal_Switch.Scripts.MissionSystem.Models
     public class MissionSystemDatabaseSO : ScriptableObject
     {
         /// <summary>
-        /// level transmutation
+        /// mission config
         /// </summary>
         [field: SerializeField]
         public DynamicHeroesGlobalSpecificationsMissionConfigDatabase MissionConfig { get; private set; }
+
+        /// <summary>
+        /// mission point milestone config
+        /// </summary>
+        [field: SerializeField]
+        public DynamicHeroesGlobalSpecificationsMissionPointMilesStoneDatabase MissionPointMilesStoneConfig { get; private set; }
     }
 }

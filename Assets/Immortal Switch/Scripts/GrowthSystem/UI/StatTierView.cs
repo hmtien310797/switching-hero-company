@@ -28,7 +28,8 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             if (statName != null) statName.text = viewData.Name;
             if (statProgress != null) statProgress.fillAmount = viewData.StatProgressPercent;
             if (statCurrentStackValue != null) statCurrentStackValue.text = $"{viewData.StatCurrentStack}/{viewData.StatMaxStack}";
-            if (statValuePay != null) statValuePay.text = viewData.ValuePay;
+            //if (statValuePay != null) statValuePay.text = viewData.ValuePay;
+            if (statValuePay != null) statValuePay.text = "0";
 
             if (maxImage != null)
             {

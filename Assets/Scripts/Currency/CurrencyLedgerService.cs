@@ -134,7 +134,7 @@ namespace Immortal_Switch.Scripts.Currency
             return GetDisplayBalance(currencyType) >= cost;
         }
 
-        public void AddIncome(
+        private void AddIncome(
             CurrencyType currencyType,
             BigNumber amount,
             CurrencyTransactionReason reason,
@@ -243,6 +243,21 @@ namespace Immortal_Switch.Scripts.Currency
 
             await UniTask.CompletedTask;
             return true;
+        }
+        
+        public List<CurrencyLedgerTransaction> GetPendingTransactionsSnapshot()
+        {
+            return new List<CurrencyLedgerTransaction>(pendingTransactions);
+        }
+        
+        public IReadOnlyList<CurrencyLedgerTransaction> GetPendingTransactions()
+        {
+            return pendingTransactions;
+        }
+
+        public int GetPendingTransactionCount()
+        {
+            return pendingTransactions.Count;
         }
 
         private CurrencyLedgerTransaction CreateTransaction(

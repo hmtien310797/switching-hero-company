@@ -346,7 +346,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         public int Upgrade(StatType stat, int desiredAmount)
         {
-            BigNumber currentGold = CurrencyManager.Instance.Get(CurrencyType.gold);
+            BigNumber currentGold = CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.gold);
             int buyAmount = GetAffordableUpgradeAmount(stat, desiredAmount, currentGold);
             if (buyAmount <= 0)
                 return 0;

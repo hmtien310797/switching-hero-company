@@ -9,6 +9,7 @@ namespace Immortal_Switch.Scripts.Boss
         public int Id;
         public string Name;
         public Element Element;
+        public Sprite Icon;
         public float BaseHP;
         public float BaseAtk;
         public float BaseDef;

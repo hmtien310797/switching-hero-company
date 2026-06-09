@@ -18,7 +18,17 @@ namespace Immortal_Switch.Scripts.MissionSystem.Interfaces
         /// load data
         /// </summary>
         void Load();
-        
+
+        /// <summary>
+        /// reset ds nhiem vu daily
+        /// </summary>
+        void ResetDaily();
+
+        /// <summary>
+        /// reset ds nhiem vu weekly
+        /// </summary>
+        void ResetWeekly();
+
         /// <summary>
         /// init data sau khi load.
         /// </summary>

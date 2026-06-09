@@ -198,6 +198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21bb7d60cc70493abf17c91baa6713fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   <BaseUrl>k__BackingField: http://171.244.44.71:8082
 --- !u!1 &79005614
 GameObject:
@@ -597,7 +598,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Register
+  m_text: "\u0110\u0103ng k\xFD"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -721,6 +722,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 443019d144d14509bcd2bb168d85503c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   logChanged: 1
 --- !u!1 &231819094
 GameObject:
@@ -981,6 +983,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3364c03a67647aabec239983c5d7d4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 1
   database: {fileID: 11400000, guid: 11c47938e7737fa4f9c87df6d311c221, type: 2}
 --- !u!1 &336706814
 GameObject:
@@ -1319,6 +1322,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UITapeAnimator
       objectReference: {fileID: 0}
+    - target: {fileID: 1590327443987772111, guid: 1728b8c8071321140a72bf3213ca5cbd, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2647291538910922017, guid: 1728b8c8071321140a72bf3213ca5cbd, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1531,6 +1538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6784a44ee1b4245b23354cf0c06b531, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 1
   <Database>k__BackingField: {fileID: 11400000, guid: 64b674220a3601b47b0d498cc4d094cb, type: 2}
 --- !u!1 &490079143
 GameObject:
@@ -1922,6 +1930,50 @@ RectTransform:
   m_AnchoredPosition: {x: 567, y: -152}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &649044070
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 649044072}
+  - component: {fileID: 649044071}
+  m_Layer: 0
+  m_Name: TimerSystemManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &649044071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 649044070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a84087651ed4a4f8560223cb8210189, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &649044072
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 649044070}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &656300919
 GameObject:
   m_ObjectHideFlags: 0
@@ -1951,6 +2003,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2ca14dfd3c84306b4d0bf49ab6c2b6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 1
   database: {fileID: 11400000, guid: 3ed3986fde3536948ad8c180bc60c055, type: 2}
 --- !u!4 &656300921
 Transform:
@@ -2045,7 +2098,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Password
+  m_text: "M\u1EADt kh\u1EA9u"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2708,7 +2761,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Username...
+  m_text: "T\xEAn \u0111\u0103ng nh\u1EADp"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2922,7 +2975,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Back
+  m_text: "Quay l\u1EA1i"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4059,6 +4112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7bee903025e9842a88aeedefc16a9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 1
   backdropPrefab: {fileID: 7244221478175341517, guid: cf2120243e124a0478a7c3db44e4af03, type: 3}
   loadingSceneCanvasGroup: {fileID: 540939585}
   tapeAnimator: {fileID: 1958012450}
@@ -5615,7 +5669,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Password
+  m_text: "M\u1EADt kh\u1EA9u"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6064,7 +6118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1491363797
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7904,7 +7958,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Register
+  m_text: "\u0110\u0103ng k\xFD"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8062,7 +8116,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Password...
+  m_text: "M\u1EADt kh\u1EA9u"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8234,7 +8288,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Login
+  m_text: "\u0110\u0103ng nh\u1EADp"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8427,7 +8481,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Username
+  m_text: "T\xEAn \u0111\u0103ng nh\u1EADp"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8521,3 +8575,4 @@ SceneRoots:
   - {fileID: 479289015}
   - {fileID: 319457222}
   - {fileID: 656300921}
+  - {fileID: 649044072}

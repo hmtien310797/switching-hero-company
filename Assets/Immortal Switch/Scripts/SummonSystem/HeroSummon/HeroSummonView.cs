@@ -93,7 +93,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 HeroSummonManager.Instance.OnSummonDataChanged += RefreshView;
 
             if (CurrencyManager.Instance != null)
-                CurrencyManager.Instance.OnAnyCurrencyChanged += RefreshView;
+                CurrencyLedgerService.Instance.OnAnyLedgerChanged += RefreshView;
         }
 
         private void UnsubscribeEvents()
@@ -102,7 +102,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 HeroSummonManager.Instance.OnSummonDataChanged -= RefreshView;
 
             if (CurrencyManager.Instance != null)
-                CurrencyManager.Instance.OnAnyCurrencyChanged -= RefreshView;
+                CurrencyLedgerService.Instance.OnAnyLedgerChanged  -= RefreshView;
         }
 
         private void BindButtonsIfNeeded()
