@@ -318,8 +318,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             panel.ShowLevelUpAll = !isAtCurrentCap;
             panel.CanLevelUp = CanLevelUpStandard(def.WeaponId);
             panel.CanLevelUpAll = CalculateLevelUpAllCostStandard(def, state) > 0 &&
-                                  CurrencyManager.Instance != null &&
-                                  CurrencyManager.Instance.HasEnough(
+                                  CurrencyLedgerService.Instance != null &&
+                                  CurrencyLedgerService.Instance.HasEnoughDisplayBalance(
                                       CurrencyType.WeaponEnhancementStone,
                                       CalculateLevelUpAllCostStandard(def, state)
                                   );
@@ -379,8 +379,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             panel.ShowLevelUpAll = !isAtCurrentCap;
             panel.CanLevelUp = CanLevelUpExclusive(heroId);
             panel.CanLevelUpAll = CalculateLevelUpAllCostExclusive(def, state, heroId) > 0 &&
-                                  CurrencyManager.Instance != null &&
-                                  CurrencyManager.Instance.HasEnough(
+                                  CurrencyLedgerService.Instance != null &&
+                                  CurrencyLedgerService.Instance.HasEnoughDisplayBalance(
                                       CurrencyType.WeaponEnhancementStone,
                                       CalculateLevelUpAllCostExclusive(def, state, heroId)
                                   );
@@ -526,9 +526,9 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(state.Level + 1) : 0;
-            return CurrencyManager.Instance != null &&
+            return CurrencyLedgerService.Instance != null &&
                    cost > 0 &&
-                   CurrencyManager.Instance.HasEnough(CurrencyType.WeaponEnhancementStone, cost);
+                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.WeaponEnhancementStone, cost);
         }
 
         private bool CanLevelUpExclusive(int heroId)
@@ -549,9 +549,9 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(state.Level + 1) : 0;
-            return CurrencyManager.Instance != null &&
+            return CurrencyLedgerService.Instance != null &&
                    cost > 0 &&
-                   CurrencyManager.Instance.HasEnough(CurrencyType.WeaponEnhancementStone, cost);
+                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.WeaponEnhancementStone, cost);
         }
 
         private bool CanLimitBreakStandard(int weaponId)
@@ -572,8 +572,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             return state.Level >= entry.RequiredLevel &&
-                   CurrencyManager.Instance != null &&
-                   CurrencyManager.Instance.HasEnough(CurrencyType.WeaponBreakThroughStone,
+                   CurrencyLedgerService.Instance != null &&
+                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.WeaponBreakThroughStone,
                        entry.BreakThroughStoneCost);
         }
 
@@ -595,8 +595,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             return state.Level >= entry.RequiredLevel &&
-                   CurrencyManager.Instance != null &&
-                   CurrencyManager.Instance.HasEnough(CurrencyType.WeaponBreakThroughStone,
+                   CurrencyLedgerService.Instance != null &&
+                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.WeaponBreakThroughStone,
                        entry.BreakThroughStoneCost);
         }
 
@@ -621,7 +621,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 var currencyType = WeaponCurrencyHelper.GetClassStoneCurrency(def.ExclusivePoolClass);
                 if (def.ExclusiveClassStoneCost > 0 && CurrencyManager.Instance != null)
                 {
-                    return CurrencyManager.Instance.HasEnough(currencyType, def.ExclusiveClassStoneCost);
+                    return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(currencyType, def.ExclusiveClassStoneCost);
                 }
             }
 

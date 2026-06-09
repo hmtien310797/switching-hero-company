@@ -13,8 +13,6 @@ namespace Immortal_Switch.Scripts.Skill
 
         void SpendSkillTicket(BigNumber amount);
         void SpendGem(BigNumber amount);
-
-        void AddCurrency(CurrencyType currencyType, BigNumber amount);
     }
 
     public class GameSkillSummonCurrencyGateway : ISkillSummonCurrencyGateway
@@ -31,27 +29,22 @@ namespace Immortal_Switch.Scripts.Skill
 
         public bool CanSpendSkillTicket(BigNumber amount)
         {
-            return CurrencyManager.Instance.HasEnough(CurrencyType.SkillTicket, amount);
+            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.SkillTicket, amount);
         }
 
         public bool CanSpendGem(BigNumber amount)
         {
-            return CurrencyManager.Instance.HasEnough(CurrencyType.diamond, amount);
+            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.diamond, amount);
         }
 
         public void SpendSkillTicket(BigNumber amount)
         {
-            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.SkillTicket, amount);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.SkillTicket, amount, CurrencyTransactionReason.SummonSkill);
         }
 
         public void SpendGem(BigNumber amount)
         {
-            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.diamond, amount);
-        }
-
-        public void AddCurrency(CurrencyType currencyType, BigNumber amount)
-        {
-            CurrencyManager.Instance.AddLocalDemo(currencyType, amount);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.diamond, amount, CurrencyTransactionReason.SummonHero);
         }
     }
 }

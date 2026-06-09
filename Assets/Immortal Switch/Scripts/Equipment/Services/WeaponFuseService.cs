@@ -94,8 +94,11 @@ namespace Immortal_Switch.Scripts.Equipment.Services
                 return result;
 
             CurrencyType classStoneType = WeaponCurrencyHelper.GetClassStoneCurrency(sourceDef.ExclusivePoolClass);
-            if (!CurrencyManager.Instance.SpendLocalDemo(classStoneType, sourceDef.ExclusiveClassStoneCost))
+            if(!CurrencyLedgerService.Instance.TrySpend(classStoneType, sourceDef.ExclusiveClassStoneCost,
+                CurrencyTransactionReason.FuseWeapon))
+            {
                 return result;
+            }
 
             sourceState.CurrentShard -= sourceDef.FuseShardRequired;
 

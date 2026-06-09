@@ -142,7 +142,7 @@ namespace Immortal_Switch.Scripts.Reward
         {
             if (stageData == null)
                 return;
-            
+
             ClearStageRewardRequest request = new ClearStageRewardRequest
             {
                 stage = stageData.GlobalStage,
@@ -150,7 +150,7 @@ namespace Immortal_Switch.Scripts.Reward
                 localStage = stageData.LocalStage,
                 rewards = StageRewardConverter.ToRewardDtos(stageData.ClearRewards)
             };
-            ApplyRewardsToLedger(request.rewards, CurrencyTransactionReason.ClearStageReward);
+
             if (request.rewards == null || request.rewards.Count == 0)
             {
                 if (enableDebugLog)
@@ -159,14 +159,15 @@ namespace Immortal_Switch.Scripts.Reward
                 return;
             }
 
-            // TODO SERVER:
-            // Đây chỉ là cộng tạm dưới client để demo.
-            // Sau này thay bằng:
-            // var response = await serverApi.ClaimClearStageReward(request);
-            // CurrencyManager.Instance.ApplyServerBalances(response.balances);
-            ApplyRewardsLocallyForDemo(request.rewards, "ClearReward");
+            ApplyRewardsToLedger(
+                request.rewards,
+                CurrencyTransactionReason.ClearStageReward
+            );
 
-            await UniTask.CompletedTask;
+            // TODO SERVER:
+            // Hiện tại sync local demo thông qua CurrencyLedgerService.
+            // Sau này thay SyncPendingTransactions() bằng API sync server trong CurrencyLedgerService.
+            await CurrencyLedgerService.Instance.SyncPendingTransactions();
         }
         
 
@@ -189,37 +190,19 @@ namespace Immortal_Switch.Scripts.Reward
             if (request.rewards == null || request.rewards.Count == 0)
                 return;
 
+            ApplyRewardsToLedger(
+                request.rewards,
+                CurrencyTransactionReason.OfflineAfkReward
+            );
+
             // TODO SERVER:
-            // Đây chỉ là cộng tạm dưới client để demo.
-            // Sau này thay bằng:
-            // var response = await serverApi.ClaimOfflineAfkReward(request);
-            // CurrencyManager.Instance.ApplyServerBalances(response.balances);
-            ApplyRewardsLocallyForDemo(request.rewards, "OfflineAfkReward");
-
-            await UniTask.CompletedTask;
-        }
-
-        private void ApplyRewardsLocallyForDemo(List<RewardAmountDto> rewards, string reason)
-        {
-            if (rewards == null || rewards.Count == 0)
-                return;
-
-            if (enableDebugLog)
-                Debug.Log($"[RewardSync][DEMO LOCAL] Apply {reason}");
-
-            for (int i = 0; i < rewards.Count; i++)
+            // Hiện tại sync local demo thông qua CurrencyLedgerService.
+            // Sau này CurrencyLedgerService.SyncPendingTransactions()
+            // sẽ gọi server API, server trả balances, rồi client ApplyServerBalances.
+            if (CurrencyLedgerService.Instance != null)
             {
-                RewardAmountDto reward = rewards[i];
-
-                if (enableDebugLog)
-                    Debug.Log($"[RewardSync][DEMO LOCAL] {reward.currencyType} +{reward.amount}");
+                await CurrencyLedgerService.Instance.SyncPendingTransactions();
             }
-
-            // TODO SERVER:
-            // Chỗ này chỉ làm tạm thời để demo.
-            // Sau này không cộng trực tiếp dưới client nữa.
-            // Thay bằng apply balances từ server response.
-            CurrencyManager.Instance?.AddLocalDemoRewards(rewards);
         }
         
         private void ApplyRewardsToLedger(

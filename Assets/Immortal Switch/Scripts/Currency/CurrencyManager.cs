@@ -97,69 +97,7 @@ namespace Immortal_Switch.Scripts.Currency
             NotifyChanged(currencyType, oldAmount, newAmount);
             return true;
         }
-
-        /// <summary>
-        /// Source of truth từ server.
-        /// Server trả balances cuối cùng, client apply vào đây.
-        /// </summary>
-        public void ApplyServerBalances(List<RewardAmountDto> balances)
-        {
-            if (balances == null)
-                return;
-
-            for (int i = 0; i < balances.Count; i++)
-            {
-                RewardAmountDto dto = balances[i];
-
-                if (!TryParseCurrencyType(dto.currencyType, out CurrencyType currencyType))
-                    continue;
-
-                if (!TryParseAmount(dto.amount, out BigNumber amount))
-                    continue;
-
-                SetFromServer(currencyType, amount);
-            }
-        }
-
-        /// <summary>
-        /// Tạm dùng cho demo reward local trước khi tích hợp server.
-        /// Sau này không dùng hàm này cho reward thật nữa.
-        /// </summary>
-        public void AddLocalDemoRewards(List<RewardAmountDto> rewards)
-        {
-            if (rewards == null)
-                return;
-
-            for (int i = 0; i < rewards.Count; i++)
-            {
-                RewardAmountDto dto = rewards[i];
-
-                if (!TryParseCurrencyType(dto.currencyType, out CurrencyType currencyType))
-                    continue;
-
-                if (!TryParseAmount(dto.amount, out BigNumber amount))
-                    continue;
-
-                AddLocalDemo(currencyType, amount);
-            }
-        }
-
-        private void SetFromServer(CurrencyType currencyType, BigNumber amount)
-        {
-            if (amount < BigNumber.Zero)
-                amount = BigNumber.Zero;
-
-            CurrencyEntry entry = GetEntry(currencyType);
-            BigNumber oldAmount = entry.Amount;
-
-            if (oldAmount == amount)
-                return;
-
-            entry.Amount = amount;
-
-            NotifyChanged(currencyType, oldAmount, amount);
-        }
-
+        
         private CurrencyEntry GetEntry(CurrencyType currencyType)
         {
             CurrencyEntry entry = FindEntry(currencyType);

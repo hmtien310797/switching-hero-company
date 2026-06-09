@@ -312,8 +312,8 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             if (def.FuseMode == WeaponFuseMode.ToRandomExclusive)
             {
                 var currencyType = WeaponCurrencyHelper.GetClassStoneCurrency(def.ExclusivePoolClass);
-                if (CurrencyManager.Instance == null ||
-                    !CurrencyManager.Instance.HasEnough(currencyType, def.ExclusiveClassStoneCost))
+                if (CurrencyLedgerService.Instance == null ||
+                    !CurrencyLedgerService.Instance.HasEnoughDisplayBalance(currencyType, def.ExclusiveClassStoneCost))
                 {
                     return false;
                 }

@@ -16,12 +16,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
 
         public void SpendWeaponTicket(int amount)
         {
-            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponTicket, amount);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.WeaponTicket, amount, CurrencyTransactionReason.SummonWeapon);
         }
 
         public void SpendGem(int amount)
         {
-            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.diamond, amount);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.diamond, amount, CurrencyTransactionReason.SummonWeapon);
         }
     }
 }

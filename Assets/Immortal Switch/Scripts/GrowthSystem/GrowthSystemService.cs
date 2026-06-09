@@ -355,7 +355,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             if (totalCost <= 0 || currentGold < totalCost)
                 return 0;
 
-            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.gold, totalCost);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.gold, totalCost, CurrencyTransactionReason.GrowthUpgrade);
             saveData.AddStack(stat, buyAmount);
             return buyAmount;
         }

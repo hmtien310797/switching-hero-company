@@ -18,22 +18,22 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 
         public bool CanSpendHeroTicket(BigNumber amount)
         {
-            return CurrencyManager.Instance.HasEnough(CurrencyType.HeroTicket, amount);
+            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.HeroTicket, amount);
         }
 
         public bool CanSpendGem(int amount)
         {
-            return CurrencyManager.Instance.HasEnough(CurrencyType.diamond, amount);
+            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.diamond, amount);
         }
 
         public void SpendHeroTicket(BigNumber amount)
         {
-            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.HeroTicket, amount);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.HeroTicket, amount, CurrencyTransactionReason.SummonHero);
         }
 
         public void SpendGem(int amount)
         {
-            CurrencyManager.Instance.SpendLocalDemo(CurrencyType.diamond, amount);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.diamond, amount, CurrencyTransactionReason.SummonHero);
         }
     }
 }

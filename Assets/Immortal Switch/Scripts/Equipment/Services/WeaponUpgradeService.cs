@@ -52,9 +52,12 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             int nextLevel = state.Level + 1;
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(nextLevel) : 0;
             if (cost <= 0) return false;
-
-            if (!CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponEnhancementStone, cost))
+            
+            if(!CurrencyLedgerService.Instance.TrySpend(CurrencyType.WeaponEnhancementStone, cost,
+                   CurrencyTransactionReason.LevelUpStandardWeapon))
+            {
                 return false;
+            }
 
             state.Level = nextLevel;
             return true;
@@ -74,9 +77,12 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             int nextLevel = state.Level + 1;
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(nextLevel) : 0;
             if (cost <= 0) return false;
-
-            if (!CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponEnhancementStone, cost))
+            
+            if(!CurrencyLedgerService.Instance.TrySpend(CurrencyType.WeaponEnhancementStone, cost,
+                   CurrencyTransactionReason.LevelUpExclusiveWeapon))
+            {
                 return false;
+            }
 
             state.Level = nextLevel;
             return true;
@@ -99,9 +105,12 @@ namespace Immortal_Switch.Scripts.Equipment.Services
 
             if (state.Level < entry.RequiredLevel)
                 return WeaponLimitBreakResult.RequiredLevelNotReached;
-
-            if (!CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost))
+            
+            if(!CurrencyLedgerService.Instance.TrySpend(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost,
+                   CurrencyTransactionReason.LimitBreakStandardWeapon))
+            {
                 return WeaponLimitBreakResult.NotEnoughCurrency;
+            }
 
             if (Random.value <= entry.SuccessRate)
             {
@@ -129,9 +138,12 @@ namespace Immortal_Switch.Scripts.Equipment.Services
 
             if (state.Level < entry.RequiredLevel)
                 return WeaponLimitBreakResult.RequiredLevelNotReached;
-
-            if (!CurrencyManager.Instance.SpendLocalDemo(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost))
+            
+            if(!CurrencyLedgerService.Instance.TrySpend(CurrencyType.WeaponBreakThroughStone, entry.BreakThroughStoneCost,
+                   CurrencyTransactionReason.LimitBreakExclusiveWeapon))
+            {
                 return WeaponLimitBreakResult.NotEnoughCurrency;
+            }
 
             if (Random.value <= entry.SuccessRate)
             {

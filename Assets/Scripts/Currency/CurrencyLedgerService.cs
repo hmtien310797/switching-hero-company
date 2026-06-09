@@ -20,8 +20,8 @@ namespace Immortal_Switch.Scripts.Currency
 
         private float syncTimer;
         private bool isSyncing;
-
-        public event Action OnLedgerChanged;
+        public event Action<CurrencyLedgerChangedArgs> OnCurrencyLedgerChanged;
+        public event Action OnAnyLedgerChanged;
 
         private void Awake()
         {
@@ -87,8 +87,8 @@ namespace Immortal_Switch.Scripts.Currency
                 {
                     Debug.Log($"[CurrencyLedger] MergeIncome {currencyType} +{amount.ToInputString()} reason={reason}");
                 }
-
-                OnLedgerChanged?.Invoke();
+                
+                NotifyLedgerChanged(currencyType);
                 return;
             }
 
@@ -158,8 +158,8 @@ namespace Immortal_Switch.Scripts.Currency
             {
                 Debug.Log($"[CurrencyLedger] AddIncome {currencyType} +{amount.ToInputString()} reason={reason}");
             }
-
-            OnLedgerChanged?.Invoke();
+            
+            NotifyLedgerChanged(currencyType);
         }
 
         public bool TrySpend(
@@ -199,8 +199,8 @@ namespace Immortal_Switch.Scripts.Currency
             {
                 Debug.Log($"[CurrencyLedger] Spend {currencyType} -{cost.ToInputString()} reason={reason}");
             }
-
-            OnLedgerChanged?.Invoke();
+            
+            NotifyLedgerChanged(currencyType);
             return true;
         }
 
@@ -239,7 +239,7 @@ namespace Immortal_Switch.Scripts.Currency
             RemoveSyncedTransactions();
 
             isSyncing = false;
-            OnLedgerChanged?.Invoke();
+            NotifyLedgerChangedForTransactions(unsynced);
 
             await UniTask.CompletedTask;
             return true;
@@ -355,6 +355,34 @@ namespace Immortal_Switch.Scripts.Currency
         {
             return $"batch_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_{Guid.NewGuid():N}";
         }
+        
+        private void NotifyLedgerChanged(CurrencyType currencyType)
+        {
+            OnCurrencyLedgerChanged?.Invoke(new CurrencyLedgerChangedArgs
+            {
+                CurrencyType = currencyType,
+                ConfirmedBalance = GetConfirmedBalance(currencyType),
+                PendingDelta = GetPendingDelta(currencyType),
+                DisplayBalance = GetDisplayBalance(currencyType)
+            });
+
+            OnAnyLedgerChanged?.Invoke();
+        }
+        
+        private void NotifyLedgerChangedForTransactions(List<CurrencyLedgerTransaction> transactions)
+        {
+            HashSet<CurrencyType> changedTypes = new HashSet<CurrencyType>();
+
+            for (int i = 0; i < transactions.Count; i++)
+            {
+                changedTypes.Add(transactions[i].CurrencyType);
+            }
+
+            foreach (CurrencyType type in changedTypes)
+            {
+                NotifyLedgerChanged(type);
+            }
+        }
 
         private void OnApplicationPause(bool pause)
         {
@@ -366,5 +394,13 @@ namespace Immortal_Switch.Scripts.Currency
         {
             SyncPendingTransactions().Forget();
         }
+    }
+    
+    public class CurrencyLedgerChangedArgs
+    {
+        public CurrencyType CurrencyType;
+        public BigNumber ConfirmedBalance;
+        public BigNumber PendingDelta;
+        public BigNumber DisplayBalance;
     }
 }

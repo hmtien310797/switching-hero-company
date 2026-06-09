@@ -74,7 +74,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 
         private void GrantCurrency(SummonRewardItem rewardItem)
         {
-            CurrencyManager.Instance.AddLocalDemo(rewardItem.CurrencyType, rewardItem.Amount);
+            CurrencyLedgerService.Instance.AddOrMergeIncome(
+                rewardItem.CurrencyType,
+                rewardItem.Amount,
+                CurrencyTransactionReason.Summon
+            );
         }
 
         private void GrantRandomHero(SummonRewardItem rewardItem)

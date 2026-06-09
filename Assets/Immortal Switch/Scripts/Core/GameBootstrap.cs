@@ -24,7 +24,6 @@ namespace Immortal_Switch.Scripts.Core
         {
             try
             {
-                // init dau tien. có các manager khác sử dụng tới. tránh lỗi.
                 await PlayerSystemManager.Instance.InitializeAsync();
                 await MissionSystemManager.Instance.InitializeAsync();
 

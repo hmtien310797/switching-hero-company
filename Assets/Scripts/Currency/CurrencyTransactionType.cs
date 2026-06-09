@@ -13,12 +13,22 @@
         OnlineFarming = 10,
         ClearStageReward = 11,
         OfflineAfkReward = 12,
-
+        Gem,
+        Diamond,
+        Summon,
         ShopPurchase = 100,
         Upgrade = 101,
-        Summon = 102,
+
         WeaponUpgrade = 103,
         SkillUpgrade = 104,
-        GrowthUpgrade = 105
+        GrowthUpgrade = 105,
+        FuseWeapon,
+        SummonSkill,
+        SummonHero,
+        SummonWeapon,
+        LevelUpStandardWeapon,
+        LevelUpExclusiveWeapon,
+        LimitBreakStandardWeapon,
+        LimitBreakExclusiveWeapon
     }
 }
