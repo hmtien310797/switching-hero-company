@@ -9,16 +9,13 @@ namespace Immortal_Switch.Scripts.StageSelection
 {
     public class StageTowerRecyclableView : MonoBehaviour, IRSRDataSource
     {
-        [Header("RSR")]
-        [SerializeField] private RSR rsr;
+        [Header("RSR")] [SerializeField] private RSR rsr;
         [SerializeField] private GameObject itemPrototype;
 
-        [Header("Item Size")]
-        [SerializeField] private bool isItemSizeKnown = true;
+        [Header("Item Size")] [SerializeField] private bool isItemSizeKnown = true;
         [SerializeField] private float itemSize = 130f;
 
-        [Header("Scroll")]
-        [SerializeField] private bool scrollToSelectedOnBind = true;
+        [Header("Scroll")] [SerializeField] private bool scrollToSelectedOnBind = true;
         [SerializeField] private float scrollToSelectedTime = 0f;
         [SerializeField] private bool instantScrollToSelected = true;
 
@@ -27,11 +24,15 @@ namespace Immortal_Switch.Scripts.StageSelection
         private int highestUnlockedStage;
         private int chapterStartStage;
         private int chapterEndStage;
+        
+        private int lastChapterStartStage = -1;
+        private int lastChapterEndStage = -1;
 
         private Func<int, StageRuntimeData> resolveStageFunc;
         private Action<int> onStageClicked;
 
         private bool initialized;
+        private bool scrollToStageAfterBind;
 
         public int ItemsCount => Mathf.Max(0, chapterEndStage - chapterStartStage + 1);
 
@@ -54,9 +55,14 @@ namespace Immortal_Switch.Scripts.StageSelection
             int chapterStartStage,
             int chapterEndStage,
             Func<int, StageRuntimeData> resolveStageFunc,
-            Action<int> onStageClicked
+            Action<int> onStageClicked,
+            bool scrollToStageAfterBind
         )
         {
+            bool chapterChanged =
+                lastChapterStartStage != chapterStartStage ||
+                lastChapterEndStage != chapterEndStage;
+
             this.selectedStage = selectedStage;
             this.currentBattleStage = currentBattleStage;
             this.highestUnlockedStage = highestUnlockedStage;
@@ -64,6 +70,9 @@ namespace Immortal_Switch.Scripts.StageSelection
             this.chapterEndStage = chapterEndStage;
             this.resolveStageFunc = resolveStageFunc;
             this.onStageClicked = onStageClicked;
+
+            lastChapterStartStage = chapterStartStage;
+            lastChapterEndStage = chapterEndStage;
 
             if (rsr == null)
             {
@@ -77,18 +86,35 @@ namespace Immortal_Switch.Scripts.StageSelection
                 return;
             }
 
-            if (!initialized)
+            if (!initialized || !rsr.IsInitialized)
             {
                 rsr.Initialize(this);
                 initialized = true;
             }
             else
             {
-                rsr.ReloadData(true);
+                rsr.ReloadData(chapterChanged);
             }
 
-            if (scrollToSelectedOnBind)
-                ScrollToStage(selectedStage);
+            ForceRefreshVisibleItems();
+
+            if (scrollToStageAfterBind)
+            {
+                if (chapterChanged)
+                    ScrollToStage(chapterEndStage);
+                else
+                    ScrollToStage(selectedStage);
+            }
+        }
+        
+        private void ForceRefreshVisibleItems()
+        {
+            if (rsr == null || ItemsCount <= 0)
+                return;
+            for (int i = 0; i < ItemsCount; i++)
+            {
+                rsr.ReloadItem(i);
+            }
         }
 
         public void RefreshVisible()
@@ -127,7 +153,7 @@ namespace Immortal_Switch.Scripts.StageSelection
         {
             return Mathf.Clamp(chapterEndStage - stage, 0, ItemsCount - 1);
         }
-        
+
         private Sprite GetStageIcon(StageRuntimeData data)
         {
             if (data.BossId > 0)
@@ -137,6 +163,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 {
                     bossIcon = bossDataSo.Icon;
                 }
+
                 if (bossIcon != null)
                     return bossIcon;
             }
@@ -148,6 +175,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 {
                     creepIcon = creepData.Icon;
                 }
+
                 return creepIcon;
             }
 

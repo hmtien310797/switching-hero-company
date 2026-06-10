@@ -9,9 +9,6 @@ namespace Immortal_Switch.Scripts.StageSelection
     {
         [Header("Data")]
         [SerializeField] private StageDataResolverSO stageDataResolver;
-
-        [Header("Tower")]
-        [SerializeField] private StageTowerListView towerListView;
         
         [SerializeField] private StageTowerRecyclableView towerView;
 
@@ -19,10 +16,12 @@ namespace Immortal_Switch.Scripts.StageSelection
         private int viewCenterStage;
         private int highestUnlockedStage;
         private int currentBattleStage;
+        private int viewingChapterStage;
 
         private StageRuntimeData selectedStageData;
 
         public event Action<StageRuntimeData> OnSelectedStageChanged;
+        public event Action<StageRuntimeData> OnViewingChapterChanged;
 
         public int SelectedStage => selectedStage;
         public int ViewCenterStage => viewCenterStage;
@@ -36,10 +35,18 @@ namespace Immortal_Switch.Scripts.StageSelection
             highestUnlockedStage = Mathf.Max(1, highestStage);
 
             selectedStage = currentBattleStage;
-            viewCenterStage = selectedStage;
+            viewingChapterStage = selectedStage;
 
-            SelectStage(selectedStage, force: true);
-            RefreshTower();
+            StageRuntimeData runtimeData = ResolveStage(selectedStage);
+            if (runtimeData == null)
+                return;
+
+            selectedStageData = runtimeData;
+
+            RefreshTower(true);
+
+            OnSelectedStageChanged?.Invoke(runtimeData);
+            OnViewingChapterChanged?.Invoke(runtimeData);
         }
 
         public void SelectStage(int stage)
@@ -52,7 +59,11 @@ namespace Immortal_Switch.Scripts.StageSelection
             stage = Mathf.Max(1, stage);
 
             if (!force && selectedStage == stage)
+            {
+                OnSelectedStageChanged?.Invoke(selectedStageData);
+                RefreshTower(false);
                 return;
+            }
 
             StageRuntimeData runtimeData = ResolveStage(stage);
             if (runtimeData == null)
@@ -60,8 +71,9 @@ namespace Immortal_Switch.Scripts.StageSelection
 
             selectedStage = stage;
             selectedStageData = runtimeData;
+            viewingChapterStage = stage;
 
-            RefreshTower();
+            RefreshTower(false);
 
             OnSelectedStageChanged?.Invoke(runtimeData);
         }
@@ -69,49 +81,61 @@ namespace Immortal_Switch.Scripts.StageSelection
 
         public void MoveToHighestStage()
         {
-            SelectStage(highestUnlockedStage);
-            viewCenterStage = highestUnlockedStage;
-            RefreshTower();
+            selectedStage = highestUnlockedStage;
+            viewingChapterStage = selectedStage;
+
+            StageRuntimeData runtimeData = ResolveStage(selectedStage);
+            if (runtimeData == null)
+                return;
+
+            selectedStageData = runtimeData;
+
+            RefreshTower(true);
+
+            OnSelectedStageChanged?.Invoke(runtimeData);
+            OnViewingChapterChanged?.Invoke(runtimeData);
         }
 
         public void SelectPreviousChapter()
         {
-            StageRuntimeData data = ResolveStage(viewCenterStage);
-            if (data == null)
+            StageRuntimeData viewingData = ResolveStage(viewingChapterStage);
+            if (viewingData == null)
                 return;
 
-            int targetStage = data.ChapterStartStage - 1;
-            if (targetStage < 1)
+            int previousChapterLastStage = viewingData.ChapterStartStage - 1;
+
+            if (previousChapterLastStage < 1)
                 return;
 
-            StageRuntimeData targetData = ResolveStage(targetStage);
-            if (targetData == null)
+            StageRuntimeData previousChapterData = ResolveStage(previousChapterLastStage);
+            if (previousChapterData == null)
                 return;
 
-            viewCenterStage = Mathf.Clamp(
-                Mathf.Min(targetData.ChapterEndStage, highestUnlockedStage),
-                targetData.ChapterStartStage,
-                targetData.ChapterEndStage
-            );
+            viewingChapterStage = previousChapterData.ChapterStartStage;
 
-            RefreshTower();
+            RefreshTower(true);
+
+            // Chỉ update header chapter/range, không đổi selected detail.
+            OnViewingChapterChanged?.Invoke(previousChapterData);
         }
 
         public void SelectNextChapter()
         {
-            StageRuntimeData data = ResolveStage(viewCenterStage);
-            if (data == null)
+            StageRuntimeData viewingData = ResolveStage(viewingChapterStage);
+            if (viewingData == null)
                 return;
 
-            int targetStage = data.ChapterEndStage + 1;
+            int nextChapterFirstStage = viewingData.ChapterEndStage + 1;
 
-            StageRuntimeData targetData = ResolveStage(targetStage);
-            if (targetData == null)
+            StageRuntimeData nextChapterData = ResolveStage(nextChapterFirstStage);
+            if (nextChapterData == null)
                 return;
 
-            viewCenterStage = targetData.ChapterStartStage;
+            viewingChapterStage = nextChapterData.ChapterStartStage;
 
-            RefreshTower();
+            RefreshTower(true);
+            
+            OnViewingChapterChanged?.Invoke(nextChapterData);
         }
 
         public bool CanMoveToSelectedStage()
@@ -133,7 +157,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             // Sau này bắn event hoặc gọi service đổi stage thật.
             Debug.Log($"[StageSelection] Confirm move to stage {selectedStage}");
             GameEventManager.Trigger(GameEvents.OnMoveStageRequested, selectedStage);
-            RefreshTower();
+            RefreshTower(true);
         }
 
         private StageRuntimeData ResolveStage(int stage)
@@ -147,10 +171,10 @@ namespace Immortal_Switch.Scripts.StageSelection
             return stageDataResolver.Resolve(stage);
         }
 
-        private void RefreshTower()
+        private void RefreshTower(bool scrollToStageAfterBind)
         {
-            StageRuntimeData selectedData = ResolveStage(selectedStage);
-            if (selectedData == null)
+            StageRuntimeData viewingData = ResolveStage(viewingChapterStage);
+            if (viewingData == null)
                 return;
 
             if (towerView != null)
@@ -159,10 +183,11 @@ namespace Immortal_Switch.Scripts.StageSelection
                     selectedStage,
                     currentBattleStage,
                     highestUnlockedStage,
-                    selectedData.ChapterStartStage,
-                    selectedData.ChapterEndStage,
+                    viewingData.ChapterStartStage,
+                    viewingData.ChapterEndStage,
                     ResolveStage,
-                    SelectStage
+                    SelectStage,
+                    scrollToStageAfterBind
                 );
             }
         }

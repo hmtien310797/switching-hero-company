@@ -1,4 +1,5 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,6 +48,12 @@ namespace Immortal_Switch.Scripts.StageSelection
                 nextChapterButton.onClick.AddListener(HandleNextChapterClicked);
         }
 
+        private void Start()
+        {
+            controller.OnSelectedStageChanged += HandleSelectedStageChanged;
+            controller.OnViewingChapterChanged += HandleViewingChapterChanged;
+        }
+
         public void Bind(StageRuntimeData data)
         {
             if (data == null)
@@ -55,11 +62,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 return;
             }
 
-            if (chapterNameText != null)
-                chapterNameText.text = $"{data.ChapterId}. {data.ChapterName}";
-
-            if (chapterRangeText != null)
-                chapterRangeText.text = $"{data.ChapterStartStage}~{data.ChapterEndStage}";
+            BindChapterHeader(data);
 
             if (selectedStageText != null)
                 selectedStageText.text = $"Stage {data.GlobalStage}";
@@ -131,6 +134,23 @@ namespace Immortal_Switch.Scripts.StageSelection
             RefreshMoveStageState(false);
         }
         
+        private void HandleViewingChapterChanged(StageRuntimeData data)
+        {
+            BindChapterHeader(data);
+        }
+        
+        private void BindChapterHeader(StageRuntimeData data)
+        {
+            if (data == null)
+                return;
+
+            if (chapterNameText != null)
+                chapterNameText.text = $"{data.ChapterId}. {data.ChapterName}";
+
+            if (chapterRangeText != null)
+                chapterRangeText.text = $"{data.ChapterStartStage}~{data.ChapterEndStage}";
+        }
+        
         private void HandleMoveStageClicked()
         {
             controller?.ConfirmMoveStage();
@@ -165,6 +185,12 @@ namespace Immortal_Switch.Scripts.StageSelection
 
             if (nextChapterButton != null)
                 nextChapterButton.onClick.RemoveListener(HandleNextChapterClicked);
+        }
+        
+        private void HandleSelectedStageChanged(StageRuntimeData data)
+        {
+            Bind(data);
+            RefreshMoveStageState(controller != null && controller.CanMoveToSelectedStage());
         }
     }
     
