@@ -1,5 +1,7 @@
+using System;
 using System.Numerics;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.MissionSystem.Views;
@@ -52,6 +54,11 @@ namespace Immortal_Switch.Scripts.UI
             TransmutationSystemManager.Instance.OnEnergyChanged += OnTransmutationSystemEnergyChanged;
         }
 
+        private void Start()
+        {
+            GameEventManager.Subscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
+        }
+
         private void OnTransmutationSystemEnergyChanged(BigInteger obj)
         {
             //txtEnergy.SetText(BigIntegerHelper.Format(obj));
@@ -77,13 +84,7 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             _selectedBtn = selected;
-
-            // Toggle on Main layer:
-            // - If opening a PageExclusive => UIManager will close Storm stack + close current page (Rule B)
-            // - If closing current active => it will hide and then main backdrop off if none left
             await UIManager.Instance.TogglePopupAsync<T>();
-
-            RefreshCloseAndGem();
         }
 
         private void OnClickClose()
@@ -94,22 +95,20 @@ namespace Immortal_Switch.Scripts.UI
                 _selectedBtn = null;
             }
 
-            // Close top-most MAIN view:
-            // - closes Stackable first (Storm)
-            // - then closes PageExclusive (Dungeon/Equip/...)
             UIManager.Instance.CloseTopMain();
-            RefreshCloseAndGem();
+            TriggerButtonCloseAndGem(false);
         }
 
         private void RefreshCloseAndGem()
         {
             bool hasAnyMain = UIManager.Instance != null && UIManager.Instance.IsAnyMainVisible();
+            TriggerButtonCloseAndGem(hasAnyMain);
+        }
 
-            if (ButtonClose != null)
-                ButtonClose.gameObject.SetActive(hasAnyMain);
-
-            if (Gem != null)
-                Gem.SetActive(!hasAnyMain);
+        private void TriggerButtonCloseAndGem(bool value)
+        {
+            ButtonClose.gameObject.SetActive(value);
+            Gem.SetActive(!value);
         }
     }
 }

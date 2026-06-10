@@ -6,6 +6,7 @@ namespace Immortal_Switch.Scripts.Currency
 {
     public enum CurrencyType
     {
+        none = 0,
         gold,
         diamond,
         energy,

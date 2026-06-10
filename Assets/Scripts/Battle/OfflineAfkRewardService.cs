@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Level.Stage;
 using UnityEngine;
 
@@ -153,8 +154,8 @@ namespace Immortal_Switch.Scripts.Reward
                 StageReward reward = baseRewards[i];
 
                 result[i] = new StageReward(
-                    reward.ResourceType,
-                    Math.Floor(reward.Amount * minutes)
+                    reward.currencyType,
+                     (reward.Amount * minutes).FloorToIntSafe()
                 );
             }
 

@@ -11,6 +11,7 @@ using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.Reward;
+using Immortal_Switch.Scripts.StageSelection;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -56,8 +57,8 @@ namespace Battle
         [SerializeField] private int battleTime = 20;
         [SerializeField] private ChapterStageSO[] chapterStages;
 
-        [Header("Stage Resolver")] [SerializeField]
-        private StageDataResolverSO stageDataResolver;
+        [Header("Stage Resolver")] 
+        [SerializeField] private StageDataResolverSO stageDataResolver;
         
         [SerializeField] private RewardSyncService rewardSyncService;
         [SerializeField] private OfflineAfkRewardService offlineAfkRewardService;
@@ -92,6 +93,7 @@ namespace Battle
         private int[] enemyIds;
         private float[] rates;
         private int heroDeadCount;
+        private int totalMonstersKilledThisStage;
 
         private List<int> inBattleHeroIdList = new();
         private GameData gameData;
@@ -118,13 +120,14 @@ namespace Battle
         public RewardSyncService RewardSyncService => rewardSyncService;
         public List<EnemyActor> CreepList => creeps;
         public int HighestUnlockedStage => temporaryHighestUnlockedStage;
-        
+        //temp
+        private bool isIdleScreenActive;
 
         private void Start()
         {
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
-            GameEventManager.Subscribe(GameEvents.OnStageLost, () => OnStageFailed().Forget());
+            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
             GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
             gameCameraController = GameCameraController.Instance;
             PoolManager.Instance.Prewarm(coinPrefab, 10);
@@ -160,7 +163,6 @@ namespace Battle
         private async UniTask StartAsync()
         {
             SetState(BattleState.Initializing);
-
             CurrentStage = Mathf.Max(1, CurrentStage);
             pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(CurrentStage));
             InitSwitchableHeroIds();
@@ -179,37 +181,14 @@ namespace Battle
             MoveToStage(targetStage);
         }
         
-        public void MoveToStage(int targetStage)
-        {
-            targetStage = Mathf.Max(1, targetStage);
-
-            CurrentStage = targetStage;
-
-            // Clear creep/boss hiện tại nếu cần
-            //ClearCurrentBattleObjects();
-
-            // Resolve data stage mới
-            CacheStageSpawnData(CurrentStage);
-
-            // Reset stage state
-            totalCreepsSpawnedThisStage = 0;
-            patternId = 0;
-            losingStage = false;
-
-            // Start spawn stage mới
-            SpawnNextCreepBatch();
-
-            // Update reward/afk service nếu có
-            rewardSyncService?.SetCurrentStageData(stageRuntimeData);
-            offlineAfkRewardService?.SetCurrentAfkStage(CurrentStage);
-
-            // Báo lại UI progress
-            //stageSelectionController?.SetProgress(currentStage, highestUnlockedStage);
-        }
-
         public Vector3 GetEndMapPoint()
         {
             return pvEMapController.GetEndMapPosition();
+        }
+
+        public StageRuntimeData GetStageRuntimeData()
+        {
+            return stageRuntimeData;
         }
 
         private void OnChangeHero(int sourceHeroId, int targetHeroId)
@@ -290,7 +269,7 @@ namespace Battle
             }
         }
 
-        public void InitSwitchableHeroIds()
+        private void InitSwitchableHeroIds()
         {
             inBattleHeroIdList.Clear();
             inBattleHeroIdList = new List<int>() { 2, 4 };
@@ -354,6 +333,26 @@ namespace Battle
             RefreshEnemyHeroTargets();
 
             await UniTask.Delay(TimeSpan.FromSeconds(1f));
+        }
+
+        private void DespawnCreepAndBoss()
+        {
+            if (currentBoss != null)
+            {
+                PoolManager.Instance.Despawn(currentBoss);
+                currentBoss = null;
+            }
+
+            if (creeps.Count <= 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < creeps.Count; i++)
+            {
+                var currentCreep = creeps[i];
+                PoolManager.Instance.Despawn(currentCreep);
+            }
         }
 
         private Vector3 GetHeroSpawnPosition(int heroIndex)
@@ -508,6 +507,7 @@ namespace Battle
             result = BattleResult.None;
             SetState(BattleState.Initializing);
             CurrentStage++;
+            NotifyIdleScreenStageChanged();
             pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(CurrentStage));
             InitStage(CurrentStage);
             isReadyBattle = false;
@@ -520,12 +520,22 @@ namespace Battle
         {
             result = BattleResult.None;
             SetState(BattleState.Initializing);
-
             InitStage(CurrentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+        }
+        
+        private void MoveToStage(int targetStage)
+        {
+            targetStage = Mathf.Max(1, targetStage);
+            CurrentStage = targetStage;
+            heroDeadCount = 0;
+            SetState(BattleState.Ended);
+            result = BattleResult.None;
+            DespawnCreepAndBoss();
+            PlayCurrentStage().Forget();
         }
 
         private int GetResolvedChapterIndexByStage(int stage)
@@ -1016,7 +1026,7 @@ namespace Battle
             {
                 return;
             }
-
+            FarmingIdleScreenService.AddMonsterKill();
             GameEventManager.Trigger(GameEvents.OnStageCleared, CurrentStage);
         }
 
@@ -1030,15 +1040,14 @@ namespace Battle
             NextStageCallback().Forget();
         }
 
-        private async UniTask OnStageFailed()
+        private void OnStageFailed()
         {
-            SetState(BattleState.Ended);
-            await UniTask.Delay(1000);
             heroDeadCount = 0;
+            SetState(BattleState.Ended);
             result = BattleResult.Defeat;
-            PoolManager.Instance.Despawn(currentBoss);
-            currentBoss = null;
-            PlayCurrentStage().Forget();
+            losingStage = true;
+            DespawnCreepAndBoss();
+            PlayCurrentStage(1).Forget();
             losingStage = true;
         }
 
@@ -1048,19 +1057,19 @@ namespace Battle
             State = newState;
         }
 
-        //When normal monster die
+
         private void NotifyMonsterDeath(EnemyActor enemy)
         {
             if (enemy == null)
                 return;
 
-            //DropCoinAsync(enemy.transform.position);
             creeps.Remove(enemy);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
             deadCreepCount = losingStage
                 ? GameData.Instance.maxCreepsPerStage
                 : deadCreepCount + 1;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
+            FarmingIdleScreenService.AddMonsterKill();
             if (State != BattleState.FightingCreeps)
                 return;
             if (aliveCreepCount != 0)
@@ -1269,9 +1278,9 @@ namespace Battle
                 if (i > 0)
                     builder.Append(", ");
 
-                builder.Append(rewards[i].ResourceType);
+                builder.Append(rewards[i].currencyType);
                 builder.Append(":");
-                builder.Append(rewards[i].Amount.ToString("0"));
+                builder.Append(rewards[i].Amount.ToString());
             }
 
             return builder.ToString();
@@ -1581,8 +1590,12 @@ namespace Battle
             HandleNextStage();
         }
 
-        private async UniTask PlayCurrentStage()
+        private async UniTask PlayCurrentStage(float delay = 0f)
         {
+            if (delay > 0f)
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(delay));
+            }
             Debug.Log("[PvE] Play Current Stage");
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
             for (int i = 0; i < inBattleHeroes.Length; i++)
@@ -1609,6 +1622,21 @@ namespace Battle
         {
             if (heroId <= 0) return false;
             return inBattleHeroIdList.Contains(heroId);
+        }
+        
+        private void NotifyIdleScreenStageChanged()
+        {
+            if (!FarmingIdleScreenService.IsActive)
+                return;
+
+            if (stageDataResolver == null)
+                return;
+
+            StageRuntimeData stageData = stageDataResolver.Resolve(CurrentStage);
+            if (stageData == null)
+                return;
+
+            FarmingIdleScreenService.UpdateStageData(stageData);
         }
     }
 }

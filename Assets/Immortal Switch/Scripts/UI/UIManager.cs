@@ -230,10 +230,12 @@ namespace Immortal_Switch.Scripts.UI
             if (IsOpen<T>())
             {
                 Close<T>();
+                GameEventManager.Trigger(GameEvents.OnToggleMainView);
                 return false;
             }
 
             var view = await OpenPopupAsync<T>(args, withBackdrop);
+            GameEventManager.Trigger(GameEvents.OnToggleMainView);
             return view != null;
         }
 

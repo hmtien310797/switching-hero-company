@@ -20,13 +20,9 @@ namespace Immortal_Switch.Scripts.StageSelection
 
             if (amountText != null)
             {
-                amountText.text = FormatAmount(reward.Amount);
+                amountText.text = reward.Amount.ToString();
             }
         }
 
-        private string FormatAmount(double amount)
-        {
-            return System.Math.Floor(amount).ToString("0");
-        }
     }
 }

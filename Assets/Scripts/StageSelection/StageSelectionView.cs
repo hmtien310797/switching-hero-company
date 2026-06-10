@@ -155,6 +155,7 @@ namespace Immortal_Switch.Scripts.StageSelection
         {
             controller?.ConfirmMoveStage();
             RefreshMoveStageState(controller != null && controller.CanMoveToSelectedStage());
+            UIManager.Instance.CloseTopMain();
         }
 
         private void HandleHighestStageClicked()

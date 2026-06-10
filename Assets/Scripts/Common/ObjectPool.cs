@@ -129,7 +129,8 @@ namespace Common
             if (handle.IsInPool)
                 return;
 
-            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+            if(delay > 0f)
+                await UniTask.Delay(TimeSpan.FromSeconds(delay));
             
             poolable.OnDespawnedToPool();
 

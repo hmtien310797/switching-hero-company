@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using Battle;
 using Immortal_Switch.Scripts.Boss;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
+using Mono.Cecil;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Level.Stage
@@ -188,7 +191,7 @@ namespace Immortal_Switch.Scripts.Level.Stage
             {
                 RewardFormulaEntry entry = entries[i];
 
-                if (entry == null || string.IsNullOrWhiteSpace(entry.ResourceType))
+                if (entry == null || entry.ResourceType == CurrencyType.none)
                     continue;
 
                 double amount = StageFormulaEvaluator.EvaluateDouble(
@@ -203,8 +206,8 @@ namespace Immortal_Switch.Scripts.Level.Stage
                 amount = Math.Max(0d, amount);
 
                 StageReward reward = new StageReward(
-                    entry.ResourceType.Trim(),
-                    amount
+                    entry.ResourceType,
+                    BigNumber.FromDouble(amount)
                 );
 
                 if (reward.IsValid)

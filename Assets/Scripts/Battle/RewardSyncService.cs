@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
@@ -24,7 +25,7 @@ namespace Immortal_Switch.Scripts.Reward
         [ShowInInspector]
         private int onlineIdleElapsedSeconds;
         
-        public event System.Action OnOnlineIdlePreviewChanged;
+        public event Action OnOnlineIdlePreviewChanged;
 
         public void SetCurrentStageData(StageRuntimeData stageData)
         {
@@ -116,24 +117,23 @@ namespace Immortal_Switch.Scripts.Reward
                 if (!reward.IsValid)
                     continue;
 
-                if (!System.Enum.TryParse(reward.ResourceType, true, out CurrencyType currencyType))
+                if (reward.currencyType == CurrencyType.none)
                 {
-                    Debug.LogError($"[RewardSync] Unknown currency type: {reward.ResourceType}");
+                    Debug.LogError($"[RewardSync] Unknown currency type: {reward.currencyType}");
                     continue;
                 }
 
-                double amountDouble = reward.Amount * timeMultiplier;
+                BigNumber amountDouble = reward.Amount * timeMultiplier;
 
                 if (amountDouble <= 0)
                     continue;
 
-                BigNumber amount = BigNumber.FromDouble(amountDouble);
-
                 CurrencyLedgerService.Instance.AddOrMergeIncome(
-                    currencyType,
-                    amount,
+                    reward.currencyType,
+                    amountDouble,
                     CurrencyTransactionReason.OnlineFarming
                 );
+                FarmingIdleScreenService.AddEarnedReward(reward.currencyType, amountDouble);
             }
         }
         
@@ -206,7 +206,7 @@ namespace Immortal_Switch.Scripts.Reward
         }
         
         private void ApplyRewardsToLedger(
-            List<RewardAmountDto> rewards,
+            List<StageReward> rewards,
             CurrencyTransactionReason reason
         )
         {
@@ -221,23 +221,11 @@ namespace Immortal_Switch.Scripts.Reward
 
             for (int i = 0; i < rewards.Count; i++)
             {
-                RewardAmountDto reward = rewards[i];
-
-                if (!System.Enum.TryParse(reward.currencyType, true, out CurrencyType currencyType))
-                {
-                    Debug.LogError($"[RewardSync] Unknown currency type: {reward.currencyType}");
-                    continue;
-                }
-
-                if (!BigNumber.TryParseInputString(reward.amount, out BigNumber amount))
-                {
-                    Debug.LogError($"[RewardSync] Cannot parse reward amount: {reward.amount}");
-                    continue;
-                }
+                StageReward reward = rewards[i];
 
                 CurrencyLedgerService.Instance.AddOrMergeIncome(
-                    currencyType,
-                    amount,
+                    reward.currencyType,
+                    reward.Amount,
                     reason
                 );
             }

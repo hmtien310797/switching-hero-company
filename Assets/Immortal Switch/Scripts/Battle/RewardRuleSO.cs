@@ -1,4 +1,5 @@
 using System;
+using Immortal_Switch.Scripts.Currency;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Level.Stage
@@ -24,7 +25,7 @@ namespace Immortal_Switch.Scripts.Level.Stage
     [Serializable]
     public class RewardFormulaEntry
     {
-        public string ResourceType;
+        public CurrencyType ResourceType;
         public string Formula;
     }
 }

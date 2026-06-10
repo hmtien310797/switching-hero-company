@@ -49,7 +49,7 @@ namespace Common
             return pool.Spawn<T>(position, rotation, parent);
         }
 
-        public void Despawn<T>(T obj) where T : Component, IPoolable
+        public void Despawn<T>(T obj, float delay = 0f) where T : Component, IPoolable
         {
             if (obj == null)
                 return;
@@ -63,7 +63,7 @@ namespace Common
                 return;
             }
 
-            handle.OwnerPool.Despawn(obj.gameObject);
+            handle.OwnerPool.Despawn(obj.gameObject, delay).Forget();
         }
 
         public void ClearPool<T>(T prefab) where T : Component, IPoolable

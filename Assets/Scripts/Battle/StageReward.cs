@@ -1,19 +1,22 @@
 using System;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
+using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.Level.Stage
 {
     [Serializable]
-    public struct StageReward
+    public class StageReward
     {
-        public string ResourceType;
-        public double Amount;
+        [FormerlySerializedAs("ResourceType")] public CurrencyType currencyType;
+        public BigNumber Amount;
 
-        public StageReward(string resourceType, double amount)
+        public StageReward(CurrencyType currencyType, BigNumber amount)
         {
-            ResourceType = resourceType;
+            this.currencyType = currencyType;
             Amount = amount;
         }
 
-        public bool IsValid => !string.IsNullOrWhiteSpace(ResourceType) && Amount > 0;
+        public bool IsValid => currencyType != CurrencyType.none && Amount > 0;
     }
 }

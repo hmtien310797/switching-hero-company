@@ -9,6 +9,7 @@ using System.Text;
 using Battle;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Level.Stage;
 using UnityEditor;
 using UnityEngine;
@@ -486,9 +487,14 @@ public class StageConfigCsvImporterWindow : EditorWindow
                 ? row.GetString(formulaColumn)
                 : string.Empty;
 
+            if (!Enum.TryParse(type, out CurrencyType currencyType))
+            {
+                continue;
+            }
+
             entries.Add(new RewardFormulaEntry
             {
-                ResourceType = type,
+                ResourceType = currencyType,
                 Formula = formula
             });
         }

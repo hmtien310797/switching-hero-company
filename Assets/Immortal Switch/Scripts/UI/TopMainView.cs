@@ -5,8 +5,11 @@ using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.PlayerSystem.UI;
+using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.StageSelection;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,6 +48,19 @@ namespace Immortal_Switch.Scripts.UI
         private void OnClickProfile()
         {
             UIManager.Instance.OpenPopupAsync<UIProfileView>();
+        }
+
+        [Button]
+        private void OpenIdleFarmingScreen()
+        {
+            StageRuntimeData stageRuntimeData = PvEBattleController.Instance.GetStageRuntimeData();
+            FarmingIdleScreenService.Open(stageRuntimeData);
+        }
+        
+        [Button]
+        private void CloseIdleFarmingScreen()
+        {
+            FarmingIdleScreenService.Close();
         }
 
         private void Start()
