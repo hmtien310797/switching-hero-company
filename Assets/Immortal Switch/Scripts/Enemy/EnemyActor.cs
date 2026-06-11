@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using UI;
@@ -14,7 +15,7 @@ using Object = UnityEngine.Object;
 
 namespace Immortal_Switch.Scripts.Enemy
 {
-    public class EnemyActor : PoolableBehaviour, ICombatUnit
+    public class EnemyActor : AddressablePoolableBehaviour, ICombatUnit
     {
         public enum EnemyState
         {
@@ -467,8 +468,8 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private void OnDeadEvent()
         {
-            float dieAnimationTime = animationDriver.PlayDead();
-            DespawnSelf(dieAnimationTime);
+            animationDriver.PlayDead();
+            DespawnToPool();
         }
 
         private void Die()
@@ -493,6 +494,16 @@ namespace Immortal_Switch.Scripts.Enemy
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, this, 999999999);
             stats.HealthModule.TakeDamage(damageResult);
 
+        }
+
+        public override void OnSpawned(AddressablePoolHandle handle)
+        {
+            base.OnSpawned(handle);
+        }
+
+        public override void OnDespawned()
+        {
+            base.OnDespawned();
         }
     }
 }

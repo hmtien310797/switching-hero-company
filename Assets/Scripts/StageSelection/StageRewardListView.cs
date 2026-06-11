@@ -26,7 +26,7 @@ namespace Immortal_Switch.Scripts.StageSelection
 
                 RewardItemView item = Instantiate(itemPrefab, contentRoot);
                 Sprite icon = await ItemSystemManager.Instance.Database.GetCurrencyIcon(reward.currencyType.ToString());
-                item.Bind(reward, icon);
+                item.Bind(reward);
             }
         }
 

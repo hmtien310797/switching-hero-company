@@ -7,13 +7,14 @@ using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Boss
 {
-    public class BossActor : PoolableBehaviour, ICombatUnit
+    public class BossActor : AddressablePoolableBehaviour, ICombatUnit
     {
         public enum BossState
         {
@@ -585,7 +586,7 @@ namespace Immortal_Switch.Scripts.Boss
             ChangeState(BossState.Dead);
             locomotion?.Stop();
             OnDead?.Invoke(this);
-            DespawnSelf(destroyDelay);
+            DespawnToPool();
         }
     }
 }

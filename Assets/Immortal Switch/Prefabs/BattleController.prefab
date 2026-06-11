@@ -165,6 +165,8 @@ GameObject:
   m_Component:
   - component: {fileID: 683103550981019987}
   - component: {fileID: 441864012410880443}
+  - component: {fileID: 2003114714045976084}
+  - component: {fileID: 1063563827273938730}
   m_Layer: 0
   m_Name: BattleController
   m_TagString: Untagged
@@ -205,6 +207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdb95ea13516bad499e7a3c839f85aa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   enemySpawnerCollection: []
   pvEMapController: {fileID: 0}
   coinPrefab: {fileID: 363063430882557885, guid: 92f10e81234ce434cafd198157d37562, type: 3}
@@ -215,47 +218,15 @@ MonoBehaviour:
   - {fileID: 1762219061778257898}
   - {fileID: 4867256792770744037}
   - {fileID: 4397547725034403341}
-  creepDataSo:
-  - {fileID: 11400000, guid: b4561a02d52fc1c49a931ca2df94c03f, type: 2}
-  - {fileID: 11400000, guid: 6db39b5fc60459846875d5253cee9b05, type: 2}
-  - {fileID: 11400000, guid: 7e388f0b036f7fb4ca47221928acbee7, type: 2}
-  - {fileID: 11400000, guid: 8e98947d10e256b44bf469aab4798d19, type: 2}
-  - {fileID: 11400000, guid: b5f83ee31f1ebb94aa6bba6d10cdd9bd, type: 2}
-  - {fileID: 11400000, guid: 8b35ac73132e19847b7da7dfef841611, type: 2}
-  - {fileID: 11400000, guid: 11bd996f95f2d1b41a8363f3e333ec5b, type: 2}
-  - {fileID: 11400000, guid: e984b7edc7e2d824cae1c76acac9ba80, type: 2}
-  - {fileID: 11400000, guid: d1579077e87f1d647bb52591d7c71a72, type: 2}
-  - {fileID: 11400000, guid: 199869431071fee4b97bf5b16ae4d3cc, type: 2}
-  - {fileID: 11400000, guid: 8a5787b5844252248aee0246e66800d7, type: 2}
-  - {fileID: 11400000, guid: 435d13f6b321f7543ba9377122af8e88, type: 2}
-  - {fileID: 11400000, guid: 33dc2f3ccf45cde46bedcfac9d79b42e, type: 2}
-  - {fileID: 11400000, guid: b3dff5265f8f47f4db0dab841a4b8c5e, type: 2}
-  - {fileID: 11400000, guid: a147b0911010495448275c4ea8302ab5, type: 2}
-  - {fileID: 11400000, guid: 48e83418240057145a7580190bd12dae, type: 2}
-  - {fileID: 11400000, guid: 5632a2f686aeadb47a44c6e23baa5d75, type: 2}
-  - {fileID: 11400000, guid: 3b1a7b019d42b0f458c1bd40f5948e22, type: 2}
   creepSpawnPatternCollection: {fileID: 11400000, guid: ea9d660c8d5bfd64b9f71c8b33bbb162, type: 2}
   spawnRatePattern: {fileID: 11400000, guid: f934190536140614b8b04d680fe64b2a, type: 2}
-  bossData:
-  - {fileID: 11400000, guid: b2e145fc54d4b3547b1e1e4e5e4ba36d, type: 2}
-  - {fileID: 11400000, guid: e0bb9f562c6541b438ce1bf1a6d55764, type: 2}
-  - {fileID: 11400000, guid: 2043a68d34eb8554da09f9060ad64a33, type: 2}
-  - {fileID: 11400000, guid: bb5ccb7f14a782747b4c0b65afaef4b8, type: 2}
-  - {fileID: 11400000, guid: c0f0026b9a7cc88419b7045d4b09cdb6, type: 2}
-  - {fileID: 11400000, guid: 5375061ce7e417b47a04292eb4b737c4, type: 2}
-  - {fileID: 11400000, guid: 90d5e23a77d8a5f408e7ffcc6ad2a344, type: 2}
-  - {fileID: 11400000, guid: 3b1fd5edf1bd31a448de0d3c27e23b9a, type: 2}
-  - {fileID: 11400000, guid: a344c73f29181ff468471179fd12db79, type: 2}
-  - {fileID: 11400000, guid: ec6d5cab1367490469541de89ccb2be8, type: 2}
-  currentStage: 1
+  <CurrentStage>k__BackingField: 1
+  temporaryHighestUnlockedStage: 50
   stagesPerPattern: 10
   battleTime: 20
-  chapterStages:
-  - {fileID: 11400000, guid: 37457580d00d13d4daa0fb0fadf8dc71, type: 2}
-  - {fileID: 11400000, guid: 5c792c199bb140e40916d3e35ebc6fe1, type: 2}
-  - {fileID: 11400000, guid: 5ec56b80098a7cb4d91f97a4bd1df6b1, type: 2}
-  - {fileID: 11400000, guid: 97d800616394e964b814b528ab6ffac8, type: 2}
-  - {fileID: 11400000, guid: 5c54edd7834f27747be8a81914cf549c, type: 2}
+  stageDataResolver: {fileID: 11400000, guid: 6d9d4acc8f4b647b195eccc1c726ae13, type: 2}
+  rewardSyncService: {fileID: 2003114714045976084}
+  offlineAfkRewardService: {fileID: 0}
   heroTeamController: {fileID: 0}
   controlledHeroSlotIndex: 0
   spawnSpacingX: 3
@@ -267,6 +238,38 @@ MonoBehaviour:
   minSpawnGroupsPerBatch: 3
   maxSpawnGroupsPerBatch: 6
   maxCreepsPerGroup: 5
+--- !u!114 &2003114714045976084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4825102968830307166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb2e399d977c43acb3d042b0e790d33d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onlineIdleFlushIntervalSeconds: 60
+  baseRewardIsPerMinute: 0
+  enableDebugLog: 1
+--- !u!114 &1063563827273938730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4825102968830307166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4d0187ab2eb4a16a617ac7465f2f615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageDataResolver: {fileID: 11400000, guid: 6d9d4acc8f4b647b195eccc1c726ae13, type: 2}
+  rewardSyncService: {fileID: 2003114714045976084}
+  maxOfflineSeconds: 43200
+  minClaimSeconds: 60
+  enableDebugLog: 1
 --- !u!1 &5519678614158767877
 GameObject:
   m_ObjectHideFlags: 0

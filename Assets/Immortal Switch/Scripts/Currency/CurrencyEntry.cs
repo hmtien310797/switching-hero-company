@@ -14,7 +14,7 @@ namespace Immortal_Switch.Scripts.Currency
         guild_coin,
         event_token,
         crystal,
-        
+        hero_exp,
         HeroTicket,
         WeaponTicket,
         SkillTicket,
@@ -24,7 +24,6 @@ namespace Immortal_Switch.Scripts.Currency
         MageWeaponTranscendenceStone,
         WarriorWeaponTranscendenceStone,
         AssassinWeaponTranscendenceStone,
-        exp
     }
     
     [Serializable]

@@ -16,6 +16,6 @@ namespace Immortal_Switch.Scripts.Boss
         public float AtkSpeed;
         public float AttackRange;
         public float MoveSpeed;
-        public BossActor bossPrefab;
+        public string BossAddressKey;
     }
 }

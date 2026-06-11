@@ -25,17 +25,50 @@ namespace Immortal_Switch.Scripts.Reward
         [SerializeField] private int maxOfflineSeconds = 12 * 60 * 60;
         [SerializeField] private int defeatsPerMinute = 200;
 
+        [Header("Debug")]
+        [SerializeField] private bool enableDebugLog = true;
+
         private OfflineBattleRewardResult currentResult;
 
-        public bool HasReward => currentResult != null &&
-                                 currentResult.Rewards != null &&
-                                 currentResult.Rewards.Count > 0;
-
         public OfflineBattleRewardResult CurrentResult => currentResult;
+
+        public bool HasReward =>
+            currentResult != null &&
+            currentResult.Rewards != null &&
+            currentResult.Rewards.Count > 0;
 
         private void Awake()
         {
             Instance = this;
+        }
+
+        private void OnEnable()
+        {
+            GameEventManager.Subscribe(GameEvents.OnAppPaused, HandleAppPaused);
+            GameEventManager.Subscribe(GameEvents.OnAppQuit, HandleAppQuit);
+            GameEventManager.Subscribe(GameEvents.OnAppResumed, HandleAppResumed);
+        }
+
+        private void OnDisable()
+        {
+            GameEventManager.Unsubscribe(GameEvents.OnAppPaused, HandleAppPaused);
+            GameEventManager.Unsubscribe(GameEvents.OnAppQuit, HandleAppQuit);
+            GameEventManager.Unsubscribe(GameEvents.OnAppResumed, HandleAppResumed);
+        }
+
+        private void HandleAppPaused()
+        {
+            SaveExitState(CurrentStageService.CurrentStage);
+        }
+
+        private void HandleAppQuit()
+        {
+            SaveExitState(CurrentStageService.CurrentStage);
+        }
+
+        private void HandleAppResumed()
+        {
+            CalculateAndShowOnReturn();
         }
 
         public void SaveExitState(int currentStage)
@@ -48,7 +81,8 @@ namespace Immortal_Switch.Scripts.Reward
             PlayerPrefs.SetString(LastExitTimeKey, now.ToString());
             PlayerPrefs.Save();
 
-            Debug.Log($"[OfflineBattle] Save exit. Stage={currentStage}, Time={now}");
+            if (enableDebugLog)
+                Debug.Log($"[OfflineBattle] Save exit. Stage={currentStage}, Time={now}");
         }
 
         public void CalculateAndShowOnReturn()
@@ -62,7 +96,8 @@ namespace Immortal_Switch.Scripts.Reward
                 new OfflineBattleRewardOpenParam
                 {
                     Result = currentResult
-                }
+                },
+                false
             );
         }
 
@@ -110,6 +145,13 @@ namespace Immortal_Switch.Scripts.Reward
 
             CalculateRewards(stageData, elapsedSeconds, result);
 
+            if (enableDebugLog)
+            {
+                Debug.Log(
+                    $"[OfflineBattle] Calculated. Stage={stage}, Seconds={elapsedSeconds}, Rewards={result.Rewards.Count}"
+                );
+            }
+
             return result;
         }
 
@@ -128,27 +170,25 @@ namespace Immortal_Switch.Scripts.Reward
 
             for (int i = 0; i < stageData.BaseRewards.Length; i++)
             {
-                StageReward reward = stageData.BaseRewards[i];
+                StageReward baseReward = stageData.BaseRewards[i];
 
-                if (!reward.IsValid)
+                if (baseReward == null || !baseReward.IsValid)
                     continue;
 
-                if (reward.currencyType == CurrencyType.none)
-                {
-                    Debug.LogError($"[OfflineBattle] Unknown currency type: {reward.currencyType}");
-                    continue;
-                }
+                BigNumber amount = baseReward.Amount * timeMultiplier;
 
-                BigNumber amountDouble = reward.Amount * timeMultiplier;
-
-                if (amountDouble <= 0)
+                if (amount <= BigNumber.Zero)
                     continue;
 
-                AddOrMerge(result.Rewards, reward.currencyType, amountDouble);
+                AddOrMergeReward(
+                    result.Rewards,
+                    baseReward.currencyType,
+                    amount
+                );
             }
         }
 
-        private void AddOrMerge(
+        private void AddOrMergeReward(
             List<StageReward> rewards,
             CurrencyType currencyType,
             BigNumber amount
@@ -180,6 +220,9 @@ namespace Immortal_Switch.Scripts.Reward
             for (int i = 0; i < currentResult.Rewards.Count; i++)
             {
                 StageReward reward = currentResult.Rewards[i];
+
+                if (reward == null || !reward.IsValid)
+                    continue;
 
                 CurrencyLedgerService.Instance.AddOrMergeIncome(
                     reward.currencyType,

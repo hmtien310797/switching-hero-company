@@ -42,7 +42,6 @@ namespace Immortal_Switch.Scripts.UI
 
             if (bonusRewardButton != null)
                 bonusRewardButton.onClick.RemoveListener(HandleBonusRewardClicked);
-
         }
 
         public override void OnShow(object args)
@@ -57,6 +56,10 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             result = param.Result;
+
+            if (claimButton != null)
+                claimButton.interactable = true;
+
             Bind(result);
         }
 
@@ -108,7 +111,8 @@ namespace Immortal_Switch.Scripts.UI
             if (claimButton != null)
                 claimButton.interactable = false;
 
-            await OfflineBattleRewardService.Instance.ClaimCurrentReward();
+            if (OfflineBattleRewardService.Instance != null)
+                await OfflineBattleRewardService.Instance.ClaimCurrentReward();
 
             UIManager.Instance.TogglePopupAsync<OfflineBattleRewardPopupView>(false);
         }
@@ -116,7 +120,7 @@ namespace Immortal_Switch.Scripts.UI
         private void HandleBonusRewardClicked()
         {
             // TODO ADS:
-            // Xem quảng cáo x2 reward / bonus reward.
+            // Sau này xem ads để x2/x3 offline reward.
             Debug.Log("[OfflineBattleRewardPopupView] Bonus Reward clicked.");
         }
 

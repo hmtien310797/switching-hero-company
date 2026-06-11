@@ -1959,7 +1959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a84087651ed4a4f8560223cb8210189, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DontDestroyOnLoadEnabled: 0
+  DontDestroyOnLoadEnabled: 1
 --- !u!4 &649044072
 Transform:
   m_ObjectHideFlags: 0
@@ -4297,6 +4297,54 @@ RectTransform:
   m_AnchoredPosition: {x: -170, y: -116}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1075166405
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1075166407}
+  - component: {fileID: 1075166406}
+  m_Layer: 0
+  m_Name: GameLifeCycleController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1075166406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1075166405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52d54fec47714fdf8d7abb6daf52dafb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 1
+  triggerResumeOnStart: 1
+  resumeDelayOnStart: 0.5
+  enableDebugLog: 1
+--- !u!4 &1075166407
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1075166405}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 540.4112, y: 134.07063, z: -0.046357393}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1083040338
 GameObject:
   m_ObjectHideFlags: 0
@@ -8577,3 +8625,4 @@ SceneRoots:
   - {fileID: 319457222}
   - {fileID: 656300921}
   - {fileID: 649044072}
+  - {fileID: 1075166407}

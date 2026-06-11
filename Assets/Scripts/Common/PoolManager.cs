@@ -12,7 +12,6 @@ namespace Common
         private readonly Dictionary<GameObject, ObjectPool> pools = new();
         private readonly Dictionary<GameObject, Transform> poolParents = new();
         
-
         public void Prewarm<T>(T prefab, int count) where T : Component, IPoolable
         {
             if (prefab == null)

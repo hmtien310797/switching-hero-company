@@ -18,5 +18,10 @@
         public const string OnSpawnNextStage = "OnSpawnNextStage";
         public const string OnMoveStageRequested = "OnMoveStageRequested";
         public const string OnToggleMainView = "OnToggleMainView";
+        
+        public const string OnAppPaused = "OnAppPaused";
+        public const string OnAppResumed = "OnAppResumed";
+        public const string OnAppQuit = "OnAppQuit";
+        public const string OnPlayCompletedStage = "OnPlayCompletedStage";
     }
 }

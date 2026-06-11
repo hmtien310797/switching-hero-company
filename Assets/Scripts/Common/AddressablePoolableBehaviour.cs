@@ -16,7 +16,7 @@ namespace Immortal_Switch.Scripts.Pooling
             PoolHandle = null;
         }
 
-        public void Despawn()
+        public virtual void DespawnToPool()
         {
             PoolHandle?.Despawn();
         }

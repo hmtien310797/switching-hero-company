@@ -13,6 +13,7 @@ public class GameStatView : MonoBehaviour
     [SerializeField] private Button buttonMap;
     [SerializeField] private Button buttonGiveUp;
     [SerializeField] private Button buttonBoss;
+    [SerializeField] private GameObject shinyBossButton;
     [SerializeField] private GameObject monsterKill;
     
     [field:SerializeField]
@@ -28,10 +29,10 @@ public class GameStatView : MonoBehaviour
         GameEventManager.Subscribe(GameEvents.OnWaveStart, OnInitNewStage);
         GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
         GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
+        GameEventManager.Subscribe(GameEvents.OnPlayCompletedStage,(Action<bool, bool>) OnPlayCompletedStage);
         
         buttonBoss.onClick.AddListener(PvEBattleController.Instance.SpawnBossDirectly);
         buttonBoss.interactable = false;
-        //not available yet, so disactive
         buttonGiveUp.interactable = false;
     }
 
@@ -48,8 +49,6 @@ public class GameStatView : MonoBehaviour
         buttonMap.gameObject.SetActive(true);
         monsterKill.SetActive(true);
         battleTimerController.HideTimer();
-        buttonGiveUp.gameObject.SetActive(false);
-        buttonBoss.gameObject.SetActive(true);
     }
 
     private void OnStageCleared(int _)
@@ -62,6 +61,13 @@ public class GameStatView : MonoBehaviour
     {
         buttonBoss.interactable = true;
         battleTimerController.HideTimer();
+    }
+
+    private void OnPlayCompletedStage(bool playCompletedStage, bool isLosingStage)
+    {
+        buttonBoss.gameObject.SetActive(!playCompletedStage);
+        shinyBossButton.gameObject.SetActive(isLosingStage && !playCompletedStage);
+        buttonGiveUp.gameObject.SetActive(false);
     }
 
     public void InitTimer(float dur, Action Act)

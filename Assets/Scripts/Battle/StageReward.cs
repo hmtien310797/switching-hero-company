@@ -17,6 +17,6 @@ namespace Immortal_Switch.Scripts.Level.Stage
             Amount = amount;
         }
 
-        public bool IsValid => currencyType != CurrencyType.none && Amount > 0;
+        public bool IsValid => currencyType != CurrencyType.none && Amount > BigNumber.Zero;
     }
 }

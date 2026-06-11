@@ -18,6 +18,6 @@ namespace Immortal_Switch.Scripts
         [field: SerializeField] public float BaseRange { get; set; }
         [field: SerializeField] public float BaseMoveSpeed { get; set; }
         [field: SerializeField] public float BaseAccuracy{ get; set; }
-        [field: SerializeField] public EnemyActor CreepPrefab { get; set; }
+        public string CreepAddressKey;
     }
 }

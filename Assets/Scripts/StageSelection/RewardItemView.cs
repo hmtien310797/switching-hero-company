@@ -10,12 +10,12 @@ namespace Immortal_Switch.Scripts.StageSelection
         [SerializeField] private Image icon;
         [SerializeField] private TMP_Text amountText;
 
-        public void Bind(StageReward reward, Sprite rewardIcon = null)
+        public void Bind(StageReward reward)
         {
             if (icon != null)
             {
-                icon.sprite = rewardIcon;
-                icon.gameObject.SetActive(rewardIcon != null);
+                //icon.sprite = rewardIcon;
+                //icon.gameObject.SetActive(rewardIcon != null);
             }
 
             if (amountText != null)

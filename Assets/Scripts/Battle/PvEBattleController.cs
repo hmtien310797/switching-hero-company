@@ -10,6 +10,7 @@ using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.StageSelection;
 using Immortal_Switch.Scripts.UI;
@@ -55,7 +56,7 @@ namespace Battle
         [SerializeField] private int temporaryHighestUnlockedStage = 50;
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
-        [SerializeField] private ChapterStageSO[] chapterStages;
+        //[SerializeField] private ChapterStageSO[] chapterStages;
 
         [Header("Stage Resolver")] 
         [SerializeField] private StageDataResolverSO stageDataResolver;
@@ -101,6 +102,7 @@ namespace Battle
 
         private bool isReadyBattle = false;
         private bool losingStage = false;
+        private bool playCompletedStage = false;
 
         private readonly HeroActor[] inBattleHeroes = new HeroActor[2];
         private readonly Dictionary<int, HeroActor> inBattleHeroMapper = new();
@@ -121,16 +123,14 @@ namespace Battle
         public List<EnemyActor> CreepList => creeps;
         public int HighestUnlockedStage => temporaryHighestUnlockedStage;
         //temp
-        private bool isIdleScreenActive;
 
         private void Start()
         {
+            gameCameraController = GameCameraController.Instance;
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
             GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
-            gameCameraController = GameCameraController.Instance;
-            PoolManager.Instance.Prewarm(coinPrefab, 10);
             GameEventManager.Subscribe<int>(GameEvents.OnMoveStageRequested, HandleMoveStageRequested);
         }
 
@@ -174,6 +174,8 @@ namespace Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(GameEvents.OnWaveStart);
+            GameEventManager.Trigger(GameEvents.OnPlayCompletedStage, playCompletedStage, losingStage);
         }
         
         private void HandleMoveStageRequested(int targetStage)
@@ -192,6 +194,11 @@ namespace Battle
         }
 
         private void OnChangeHero(int sourceHeroId, int targetHeroId)
+        {
+            OnChangeHeroAsync(sourceHeroId, targetHeroId).Forget();
+        }
+
+        private async UniTask OnChangeHeroAsync(int sourceHeroId, int targetHeroId)
         {
             if (!CanSwitchHero(sourceHeroId, targetHeroId))
                 return;
@@ -222,7 +229,7 @@ namespace Battle
                 return;
             }
 
-            if (newHeroData.HeroPrefab == null)
+            if (string.IsNullOrEmpty(newHeroData.HeroAddressKey))
             {
                 Debug.LogError($"[PvE] Target hero prefab is null. targetHeroId={targetHeroId}");
                 return;
@@ -232,10 +239,11 @@ namespace Battle
 
             inBattleHeroMapper.Remove(sourceHeroId);
 
-            oldHero.gameObject.SetActive(false);
-
-            var newHero = Instantiate(newHeroData.HeroPrefab,
-                spawnPos, Quaternion.identity);
+            HeroActor newHero = await AddressableSpawnService.SpawnAsync<HeroActor>(
+                newHeroData.HeroAddressKey,
+                spawnPos,
+                Quaternion.identity
+            );
 
             if (newHero == null)
                 return;
@@ -257,6 +265,7 @@ namespace Battle
             {
                 gameCameraController.SetFollowHero(newHero.transform);
             }
+            AddressableSpawnService.Release(oldHero);
         }
 
         private void OnHeroDead(HeroActor hero)
@@ -304,7 +313,7 @@ namespace Battle
                 return;
             }
 
-            if (heroData.HeroPrefab == null)
+            if (string.IsNullOrEmpty(heroData.HeroAddressKey))
             {
                 Debug.LogError($"[PvE] HeroPrefab is null. heroId={heroData.Id}");
                 return;
@@ -312,8 +321,12 @@ namespace Battle
 
             Vector3 spawnPos = GetHeroSpawnPosition(heroIndex);
 
-            var hero = Instantiate(heroData.HeroPrefab,
-                spawnPos, Quaternion.identity);
+            var hero = await AddressableSpawnService.SpawnAsync<HeroActor>(
+                heroData.HeroAddressKey,
+                spawnPos,
+                Quaternion.identity
+            );
+            
             if (hero == null)
             {
                 Debug.LogError($"[PvE] Cannot spawn hero. heroId={heroData.Id}");
@@ -339,7 +352,7 @@ namespace Battle
         {
             if (currentBoss != null)
             {
-                PoolManager.Instance.Despawn(currentBoss);
+                currentBoss.DespawnToPool();
                 currentBoss = null;
             }
 
@@ -351,7 +364,7 @@ namespace Battle
             for (int i = 0; i < creeps.Count; i++)
             {
                 var currentCreep = creeps[i];
-                PoolManager.Instance.Despawn(currentCreep);
+                currentCreep.DespawnToPool();
             }
         }
 
@@ -514,6 +527,8 @@ namespace Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(GameEvents.OnWaveStart);
+            GameEventManager.Trigger(GameEvents.OnPlayCompletedStage, playCompletedStage, losingStage);
         }
 
         private void HandleCurrentStage()
@@ -525,6 +540,8 @@ namespace Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(GameEvents.OnWaveStart);
+            GameEventManager.Trigger(GameEvents.OnPlayCompletedStage, playCompletedStage, losingStage);
         }
         
         private void MoveToStage(int targetStage)
@@ -540,10 +557,7 @@ namespace Battle
 
         private int GetResolvedChapterIndexByStage(int stage)
         {
-            if (stageDataResolver != null)
-                return stageDataResolver.GetChapterIndexByStage(stage);
-
-            return GetChapterIdByStage(stage);
+            return stageDataResolver.GetChapterIndexByStage(stage);
         }
 
         // ======================
@@ -556,16 +570,16 @@ namespace Battle
             totalCreepsSpawnedThisStage = 0;
             deadCreepCount = losingStage ? gameData.maxCreepsPerStage : 0;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
-            GameEventManager.Trigger(GameEvents.OnWaveStart);
 
             isBossAlive = false;
             if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
             {
-                PoolManager.Instance.Despawn(currentBoss);
+                currentBoss.DespawnToPool();
                 currentBoss = null;
             }
-
+            CurrentStageService.SetCurrentStage(stage);
             CacheStageSpawnData(stage);
+            playCompletedStage = stage < HighestUnlockedStage;
         }
 
         private void CacheStageSpawnData(int stage)
@@ -596,80 +610,13 @@ namespace Battle
                 $"BossId={stageRuntimeData.BossId}"
             );
         }
-
-        private bool TryGetChapterDataByStage(int stage, out ChapterStageSO chapterData, out int chapterIndex,
-            out int localStage)
-        {
-            chapterData = null;
-            chapterIndex = -1;
-            localStage = -1;
-
-            if (chapterStages == null || chapterStages.Length == 0 || stage <= 0)
-                return false;
-
-            int accumulatedStage = 0;
-
-            for (int i = 0; i < chapterStages.Length; i++)
-            {
-                var data = chapterStages[i];
-                if (data == null || data.TotalStage <= 0) continue;
-
-                int startStage = accumulatedStage + 1;
-                int endStage = accumulatedStage + data.TotalStage;
-
-                if (stage >= startStage && stage <= endStage)
-                {
-                    chapterData = data;
-                    chapterIndex = i;
-                    localStage = stage - accumulatedStage;
-                    return true;
-                }
-
-                accumulatedStage = endStage;
-            }
-
-            return false;
-        }
-
-        private int GetChapterIdByStage(int stage)
-        {
-            if (chapterStages == null || chapterStages.Length == 0 || stage <= 0)
-                return 0;
-
-            int accumulatedStage = 0;
-
-            for (int i = 0; i < chapterStages.Length; i++)
-            {
-                var data = chapterStages[i];
-                if (data == null || data.TotalStage <= 0) continue;
-
-                int startStage = accumulatedStage;
-                int endStage = accumulatedStage + data.TotalStage;
-
-                if (stage > startStage && stage <= endStage)
-                {
-                    return i;
-                }
-
-                accumulatedStage = endStage;
-            }
-
-            return 0;
-        }
+        
 
         private bool TryGetBossDataByStage(int stage, out BossDataSO bossSo)
         {
             bossSo = null;
 
-            if (stageRuntimeData != null && stageRuntimeData.BossId > 0)
-            {
-                return MasterDataCache.Instance.TryGetBossData(stageRuntimeData.BossId, out bossSo) && bossSo != null;
-            }
-
-            if (!TryGetChapterDataByStage(stage, out var chapterData, out _, out _))
-                return false;
-
-            return MasterDataCache.Instance.TryGetBossData(chapterData.BossId, out bossSo) && bossSo != null;
+            return MasterDataCache.Instance.TryGetBossData(stageRuntimeData.BossId, out bossSo) && bossSo != null;
         }
 
         private void SpawnNextCreepBatch()
@@ -705,7 +652,11 @@ namespace Battle
 
                     spawnIndex++;
 
-                    var creep = PoolManager.Instance.Spawn(creepData.CreepPrefab, nPos, Quaternion.identity);
+                    EnemyActor creep = AddressablePoolService.Instance.Spawn<EnemyActor>(
+                        creepData.CreepAddressKey,
+                        nPos,
+                        Quaternion.identity
+                    );
                     creep.name += creep.transform.GetInstanceID();
                     creep.gameObject.SetActive(true);
 
@@ -956,7 +907,7 @@ namespace Battle
             cachedScaledBossStats[bossId] = stat;
         }
 
-        private void SpawnBoss()
+        private async UniTask SpawnBoss()
         {
             if (!TryGetBossDataByStage(CurrentStage, out var bossSo))
             {
@@ -964,7 +915,7 @@ namespace Battle
                 return;
             }
 
-            if (bossSo.bossPrefab == null)
+            if (string.IsNullOrEmpty(bossSo.BossAddressKey))
             {
                 Debug.LogError($"[PvE] Boss prefab missing for bossId={bossSo.Id}");
                 return;
@@ -976,7 +927,11 @@ namespace Battle
             Debug.Log($"[PvE] Spawn Boss - Stage={CurrentStage}, BossId={bossSo.Id}, BossName={bossSo.Name}");
 
             var pos = GroupFlashController.Instance.GetPosByIdx(2);
-            var spawnedBoss = PoolManager.Instance.Spawn(bossSo.bossPrefab, pos, Quaternion.identity);
+            BossActor spawnedBoss = await AddressableSpawnService.SpawnAsync<BossActor>(
+                bossSo.BossAddressKey,
+                pos,
+                Quaternion.identity
+            );
             currentBoss = spawnedBoss;
 
             if (cachedScaledBossStats.TryGetValue(bossSo.Id, out BaseStat cachedBossStat))
@@ -1074,7 +1029,7 @@ namespace Battle
                 return;
             if (aliveCreepCount != 0)
                 return;
-            if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage)
+            if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage || playCompletedStage)
             {
                 isReadyBattle = false;
                 SpawnNextCreepBatch();
@@ -1442,12 +1397,12 @@ namespace Battle
             for (int i = creeps.Count - 1; i >= 0; i--)
             {
                 EnemyActor creep = creeps[i];
-                PoolManager.Instance.Despawn(creep);
+                creep.DespawnToPool();
 
                 creeps.RemoveAt(i);
             }
 
-            SpawnBoss();
+            SpawnBoss().Forget();
             aliveCreepCount = 0;
         }
 
