@@ -164,12 +164,12 @@ namespace Battle
         {
             SetState(BattleState.Initializing);
             CurrentStage = Mathf.Max(1, CurrentStage);
+            InitStage(CurrentStage);
             pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(CurrentStage));
             InitSwitchableHeroIds();
             await InitPlayerHeroById();
             NotifyActiveLineupChanged();
             RefreshControlledHeroSkillUI();
-            InitStage(CurrentStage);
             offlineAfkRewardService?.Initialize(CurrentStage);
             SpawnNextCreepBatch();
             isReadyBattle = true;

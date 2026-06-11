@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Level.Stage;
-using Immortal_Switch.Scripts.StageSelection;
 
 namespace Immortal_Switch.Scripts.Reward
 {
