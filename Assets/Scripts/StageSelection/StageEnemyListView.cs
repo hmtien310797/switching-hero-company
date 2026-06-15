@@ -1,5 +1,7 @@
 ﻿using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Boss;
+using Immortal_Switch.Scripts.Common;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.StageSelection
@@ -9,7 +11,7 @@ namespace Immortal_Switch.Scripts.StageSelection
         [SerializeField] private Transform contentRoot;
         [SerializeField] private StageEnemyItemView itemPrefab;
         
-        public void Bind(int[] enemyIds, int bossId)
+        public async UniTask Bind(int[] enemyIds, int bossId)
         {
             Clear();
 
@@ -25,7 +27,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                     
                     if(MasterDataCache.Instance.TryGetCreepData(enemyId, out CreepDataSo creepData))
                     {
-                        icon = creepData.Icon;
+                        icon = await AddressableSpawnService.LoadSpriteAsync(creepData.IconKey);
                     }
 
                     item.Bind(enemyId, icon, isBoss: false);

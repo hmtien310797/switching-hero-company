@@ -1,6 +1,8 @@
 ﻿using System;
 using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Boss;
+using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Level.Stage;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,7 +27,7 @@ namespace Immortal_Switch.Scripts.StageSelection
         private Func<int, StageRuntimeData> resolveStageFunc;
         private Action<int> onStageClicked;
 
-        public void Bind(
+        public async UniTask Bind(
             int selectedStage,
             int currentBattleStage,
             int highestUnlockedStage,
@@ -59,7 +61,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 bool isCurrentStage = stage == currentBattleStage;
                 bool isLocked = stage > highestUnlockedStage;
 
-                Sprite icon = GetStageIcon(data);
+                Sprite icon = await GetStageIcon(data);
 
                 item.Bind(
                     stage,
@@ -95,7 +97,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 chapterEndStage,
                 resolveStageFunc,
                 onStageClicked
-            );
+            ).Forget();
         }
 
         private void HandleStageClicked(int stage)
@@ -103,7 +105,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             onStageClicked?.Invoke(stage);
         }
 
-        private Sprite GetStageIcon(StageRuntimeData data)
+        private async UniTask<Sprite> GetStageIcon(StageRuntimeData data)
         {
             if (data.BossId > 0)
             {
@@ -111,7 +113,7 @@ namespace Immortal_Switch.Scripts.StageSelection
 
                 if (MasterDataCache.Instance.TryGetBossData(data.BossId, out BossDataSO bossDataSo))
                 {
-                    bossIcon = bossDataSo.Icon;
+                    bossIcon = await AddressableSpawnService.LoadSpriteAsync(bossDataSo.IconKey);
                 }
                 
                 return bossIcon;
@@ -121,7 +123,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             {
                 if (MasterDataCache.Instance.TryGetCreepData(data.BossId, out CreepDataSo creepDataSo))
                 {
-                    return creepDataSo.Icon;
+                    return await AddressableSpawnService.LoadSpriteAsync(creepDataSo.IconKey);
                 }
             }
 

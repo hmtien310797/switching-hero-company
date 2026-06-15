@@ -49,7 +49,8 @@ namespace Common
             
             return bossData != null;
         }
-        
+
+        #region Hero
 
         public HeroDataSO GetHeroDataById(int id)
         {
@@ -57,6 +58,13 @@ namespace Common
 
             return heroDataDicts[id];
         }
+
+        public List<HeroDataSO> GetAllHeroData()
+        {
+            return heroDatas;
+        }
+
+        #endregion
 
         public SkillDataSO GetSkillDataById(int id)
         {

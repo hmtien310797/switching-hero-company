@@ -45,7 +45,6 @@ public class GameStatView : MonoBehaviour
     private void OnInitNewStage()
     {
         currentDeadMonsterQuantityText.text = string.Format(DeadMonsterQuantityKey, 0, GameData.Instance.maxCreepsPerStage);
-        progressSlide.fillAmount = 0f;
         buttonMap.gameObject.SetActive(true);
         monsterKill.SetActive(true);
         battleTimerController.HideTimer();

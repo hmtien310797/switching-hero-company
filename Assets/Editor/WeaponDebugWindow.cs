@@ -32,7 +32,7 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
         private int setExclusiveLimitBreak = 0;
         private int setExclusiveStar = 1;
 
-        [MenuItem("Tools/Equipment/Weapon Debug Window")]
+        [MenuItem("Tools/Debug Window/Equipment/Weapon Debug Window")]
         public static void Open()
         {
             GetWindow<WeaponDebugWindow>("Weapon Debug");

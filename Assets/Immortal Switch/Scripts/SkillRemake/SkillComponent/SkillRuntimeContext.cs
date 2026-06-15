@@ -34,6 +34,8 @@ namespace Immortal_Switch.Scripts.Skill
 
         public SkillRuntimeContext CloneForRuntimeObject(SkillRuntimeObject runtimeObject, Vector3 runtimePosition)
         {
+            var mainTarget = MainTarget;
+            bool hasValidTarget = mainTarget.IsUnityAlive();
             return new SkillRuntimeContext
             {
                 Caster = Caster,
@@ -41,7 +43,9 @@ namespace Immortal_Switch.Scripts.Skill
                 SkillData = SkillData,
                 SkillLevel = SkillLevel,
                 CastPosition = runtimePosition,
-                TargetPosition = MainTarget != null ? MainTarget.Position : TargetPosition,
+                TargetPosition = hasValidTarget
+                    ? mainTarget.Position
+                    : TargetPosition,
                 BattleController = BattleController,
                 SkillController = SkillController,
                 RuntimeObject = runtimeObject

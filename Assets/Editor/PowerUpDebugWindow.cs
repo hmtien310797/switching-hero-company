@@ -27,7 +27,7 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
         private bool showPlayerStats = true;
         private bool showStatModuleModifiers = true;
 
-        [MenuItem("Tools/PowerUp Debug Window")]
+        [MenuItem("Tools/Debug Window/PowerUp Debug Window")]
         public static void Open()
         {
             GetWindow<PowerUpDebugWindow>("PowerUp Debug");

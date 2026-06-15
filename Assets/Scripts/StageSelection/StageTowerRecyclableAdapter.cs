@@ -1,6 +1,8 @@
 ﻿using System;
 using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Boss;
+using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Level.Stage;
 using UnityEngine;
 
@@ -38,7 +40,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             this.onStageClicked = onStageClicked;
         }
 
-        public void BindCell(StageNodeItemView item, int index)
+        public async UniTask BindCell(StageNodeItemView item, int index)
         {
             if (item == null)
                 return;
@@ -58,7 +60,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             bool isCurrentStage = stage == currentBattleStage;
             bool isLocked = stage > highestUnlockedStage;
 
-            Sprite icon = GetStageIcon(data);
+            Sprite icon = await GetStageIcon(data);
 
             item.Bind(
                 stage,
@@ -80,7 +82,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             return chapterEndStage - index;
         }
 
-        private Sprite GetStageIcon(StageRuntimeData data)
+        private async UniTask<Sprite> GetStageIcon(StageRuntimeData data)
         {
             if (data.BossId > 0)
             {
@@ -98,7 +100,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             {
                 if (MasterDataCache.Instance.TryGetCreepData(data.BossId, out CreepDataSo creepDataSo))
                 {
-                    return creepDataSo.Icon;
+                    return await AddressableSpawnService.LoadSpriteAsync(creepDataSo.IconKey);
                 }
             }
 

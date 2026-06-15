@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.MissionSystem;
 using Immortal_Switch.Scripts.PlayerSystem;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.UI;
@@ -27,13 +28,12 @@ namespace Immortal_Switch.Scripts.Core
                 await MasterDataCache.Instance.InitializeAsync();
                 await PlayerSystemManager.Instance.InitializeAsync();
                 await MissionSystemManager.Instance.InitializeAsync();
-
-                //await TransmutationSystemManager.Instance.InitializeAsync();
                 await UserDataCache.Instance.InitializeAsync();
                 await GrowthManager.Instance.InitializeAsync();
                 await PowerUpManager.Instance.InitializeAsync();
-                await UIManager.Instance.InitializeAsync();
                 await SkillViewDataProvider.Instance.InitializeAsync();
+                await AddressablePoolService.Instance.InitializeAsync();
+                await UIManager.Instance.InitializeAsync();
                 await PvEBattleController.Instance.InitializeAsync();
 
                 Debug.Log("Bootstrap completed");

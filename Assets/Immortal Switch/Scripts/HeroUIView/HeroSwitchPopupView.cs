@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Battle;
+using Common;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Hero;
@@ -40,6 +41,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private float arrowMoveDuration = 0.55f;
 
         private readonly List<HeroCollectionItemUI> spawnedItems = new();
+        private List<HeroDataSO> allHeroData;
         private PvEBattleController battleController;
 
         private int selectedSourceHeroId = -1;
@@ -74,6 +76,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             if (slot2Arrow != null)
                 slot2ArrowAnchoredPos = slot2Arrow.anchoredPosition;
+
+            allHeroData = MasterDataCache.Instance.GetAllHeroData();
         }
 
         public void RefreshView()
@@ -121,9 +125,9 @@ namespace Immortal_Switch.Scripts.HeroUIView
             var service = HeroProgressionManager.Instance.Service;
             var allData = new List<HeroCollectionItemViewData>();
 
-            for (int i = 0; i < heroDatabase.Heroes.Count; i++)
+            for (int i = 0; i < allHeroData.Count; i++)
             {
-                var hero = heroDatabase.Heroes[i];
+                var hero = allHeroData[i];
                 if (hero == null) continue;
 
                 var data = HeroCollectionItemViewDataFactory.Build(

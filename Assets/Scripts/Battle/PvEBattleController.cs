@@ -5,6 +5,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Boss;
+using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
@@ -265,7 +266,7 @@ namespace Battle
             {
                 gameCameraController.SetFollowHero(newHero.transform);
             }
-            AddressableSpawnService.Release(oldHero);
+            AddressableSpawnService.ReleaseInstance(oldHero);
         }
 
         private void OnHeroDead(HeroActor hero)
@@ -281,7 +282,7 @@ namespace Battle
         private void InitSwitchableHeroIds()
         {
             inBattleHeroIdList.Clear();
-            inBattleHeroIdList = new List<int>() { 2, 4 };
+            inBattleHeroIdList = new List<int>() { 3, 4 };
         }
 
         public void OnSelectedHeroCastUltimateSkill()
@@ -352,7 +353,7 @@ namespace Battle
         {
             if (currentBoss != null)
             {
-                currentBoss.DespawnToPool();
+                AddressableSpawnService.ReleaseInstance(currentBoss);
                 currentBoss = null;
             }
 
@@ -566,20 +567,20 @@ namespace Battle
 
         private void InitStage(int stage)
         {
+            playCompletedStage = stage < HighestUnlockedStage;
             aliveCreepCount = 0;
             totalCreepsSpawnedThisStage = 0;
-            deadCreepCount = losingStage ? gameData.maxCreepsPerStage : 0;
+            deadCreepCount = losingStage || playCompletedStage ? gameData.maxCreepsPerStage : 0;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
 
             isBossAlive = false;
             if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
             {
-                currentBoss.DespawnToPool();
+                AddressableSpawnService.ReleaseInstance(currentBoss);
                 currentBoss = null;
             }
             CurrentStageService.SetCurrentStage(stage);
             CacheStageSpawnData(stage);
-            playCompletedStage = stage < HighestUnlockedStage;
         }
 
         private void CacheStageSpawnData(int stage)
@@ -624,9 +625,9 @@ namespace Battle
             if (enemyIds == null || rates == null) return;
 
             int remaining = gameData.maxCreepsPerStage - totalCreepsSpawnedThisStage;
-            if (remaining <= 0 && !losingStage) return;
+            //if (remaining <= 0 && !losingStage || !playCompletedStage) return;
 
-            int spawnNow = Mathf.Min(gameData.creepBatchSize, losingStage ? gameData.creepBatchSize : remaining);
+            int spawnNow = Mathf.Min(gameData.creepBatchSize, losingStage || playCompletedStage ? gameData.creepBatchSize : remaining);
 
             int[] counts = AllocateCounts(spawnNow, rates);
             if (counts == null) return;
@@ -1003,7 +1004,6 @@ namespace Battle
             losingStage = true;
             DespawnCreepAndBoss();
             PlayCurrentStage(1).Forget();
-            losingStage = true;
         }
 
         private void SetState(BattleState newState)
@@ -1020,7 +1020,7 @@ namespace Battle
 
             creeps.Remove(enemy);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
-            deadCreepCount = losingStage
+            deadCreepCount = losingStage || playCompletedStage
                 ? GameData.Instance.maxCreepsPerStage
                 : deadCreepCount + 1;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);

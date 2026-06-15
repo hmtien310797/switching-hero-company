@@ -20,7 +20,6 @@ namespace Immortal_Switch.Scripts.Hero
         public float CritChance;
         public float CritDamage;
         public float Accuracy;
-        
         public HeroClass HeroClass;
         public Element Element;
         
@@ -34,6 +33,8 @@ namespace Immortal_Switch.Scripts.Hero
         [Min(1)] 
         public int SummonWeight = 1;
         public string HeroAddressKey;
+        public string SpineAddressKey;
+        public string HeroIconKey;
     }
 
     public enum HeroClass

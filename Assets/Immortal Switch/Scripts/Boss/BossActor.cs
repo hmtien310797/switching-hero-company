@@ -4,6 +4,7 @@ using Battle;
 using Common;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Stage;
@@ -14,7 +15,7 @@ using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Boss
 {
-    public class BossActor : AddressablePoolableBehaviour, ICombatUnit
+    public class BossActor : MonoBehaviour, ICombatUnit
     {
         public enum BossState
         {
@@ -586,7 +587,7 @@ namespace Immortal_Switch.Scripts.Boss
             ChangeState(BossState.Dead);
             locomotion?.Stop();
             OnDead?.Invoke(this);
-            DespawnToPool();
+            AddressableSpawnService.ReleaseInstance(gameObject);
         }
     }
 }

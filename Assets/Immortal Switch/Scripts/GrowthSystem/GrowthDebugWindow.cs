@@ -17,7 +17,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
         private readonly Dictionary<StatType, bool> foldoutStates = new();
         private readonly List<PowerUpModifierData> exportedPowerUps = new();
 
-        [MenuItem("Tools/Growth Debug Window")]
+        [MenuItem("Tools/Debug Window/Growth Debug Window")]
         public static void Open()
         {
             GetWindow<GrowthDebugWindow>("Growth Debug");

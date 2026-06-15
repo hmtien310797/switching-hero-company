@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.UI;
@@ -39,6 +41,12 @@ namespace Immortal_Switch.Scripts.HeroUIView
         private HeroClassFilterMode currentHeroClassFilter = HeroClassFilterMode.All;
 
         private HeroCollectionItemUI currentSelectedItem;
+        private List<HeroDataSO> allHeroData;
+
+        private void Awake()
+        {
+            allHeroData = MasterDataCache.Instance.GetAllHeroData();
+        }
 
         private void Start()
         {
@@ -175,9 +183,9 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             var service = HeroProgressionManager.Instance.Service;
 
-            for (int i = 0; i < heroDatabase.Heroes.Count; i++)
+            for (int i = 0; i < allHeroData.Count; i++)
             {
-                var hero = heroDatabase.Heroes[i];
+                var hero = allHeroData[i];
                 if (hero == null) continue;
 
                 var data = HeroCollectionItemViewDataFactory.Build(

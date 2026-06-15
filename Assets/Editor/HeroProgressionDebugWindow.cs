@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Common;
 using Immortal_Switch.Scripts.Hero;
 using UnityEditor;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace Editor
         private readonly List<HeroDataSO> validHeroes = new();
         private string[] heroOptions = new string[0];
 
-        [MenuItem("Tools/Hero/Hero Progression Debug Window")]
+        [MenuItem("Tools/Debug Window/Hero/Hero Progression Debug Window")]
         public static void Open()
         {
             GetWindow<HeroProgressionDebugWindow>("Hero Progression Debug");
@@ -143,13 +144,13 @@ namespace Editor
         {
             validHeroes.Clear();
 
-            if (database == null || database.Heroes == null)
+            if (database == null || MasterDataCache.Instance.GetAllHeroData() == null)
             {
                 heroOptions = new string[0];
                 return;
             }
 
-            validHeroes.AddRange(database.Heroes.Where(x => x != null).OrderBy(x => x.Id));
+            validHeroes.AddRange(MasterDataCache.Instance.GetAllHeroData().Where(x => x != null).OrderBy(x => x.Id));
             heroOptions = validHeroes.Select(x => $"{x.Id} - {x.Name}").ToArray();
         }
 

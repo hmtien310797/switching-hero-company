@@ -1,6 +1,8 @@
 ﻿using System;
 using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Boss;
+using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Level.Stage;
 using RecyclableScrollRect;
 using UnityEngine;
@@ -154,7 +156,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             return Mathf.Clamp(chapterEndStage - stage, 0, ItemsCount - 1);
         }
 
-        private Sprite GetStageIcon(StageRuntimeData data)
+        private async UniTask<Sprite> GetStageIcon(StageRuntimeData data)
         {
             if (data.BossId > 0)
             {
@@ -173,7 +175,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 Sprite creepIcon = null;
                 if (MasterDataCache.Instance.TryGetCreepData(data.EnemyIds[0], out CreepDataSo creepData))
                 {
-                    creepIcon = creepData.Icon;
+                    creepIcon = await AddressableSpawnService.LoadSpriteAsync(creepData.IconKey);
                 }
 
                 return creepIcon;
@@ -194,6 +196,11 @@ namespace Immortal_Switch.Scripts.StageSelection
 
         public void SetItemData(IItem item, int itemIndex)
         {
+            SetItemDataAsync(item, itemIndex).Forget();
+        }
+
+        private async UniTask SetItemDataAsync(IItem item, int itemIndex)
+        {
             if (item is not StageNodeItemView view)
                 return;
 
@@ -207,7 +214,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             bool isCurrentStage = stage == currentBattleStage;
             bool isLocked = stage > highestUnlockedStage;
 
-            Sprite icon = GetStageIcon(data);
+            Sprite icon = await GetStageIcon(data);
 
             view.Bind(
                 stage,
