@@ -31,7 +31,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4785834991424550208}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2638068557192415481
+--- !u!1 &8316918683842627937
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -39,10 +39,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6782563190704612944}
-  - component: {fileID: 1596269261548865362}
-  - component: {fileID: 5048033105492815338}
-  - component: {fileID: 1005801911340450105}
+  - component: {fileID: 8037895765308269307}
+  - component: {fileID: 477072503654859673}
+  - component: {fileID: 1570005558505842884}
+  - component: {fileID: 5474442953209141937}
   m_Layer: 0
   m_Name: Spine GameObject (hero_1003202_moana)
   m_TagString: Untagged
@@ -50,13 +50,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6782563190704612944
+--- !u!4 &8037895765308269307
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2638068557192415481}
+  m_GameObject: {fileID: 8316918683842627937}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -65,21 +65,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4785834991424550208}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1596269261548865362
+--- !u!33 &477072503654859673
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2638068557192415481}
+  m_GameObject: {fileID: 8316918683842627937}
   m_Mesh: {fileID: 0}
---- !u!23 &5048033105492815338
+--- !u!23 &1570005558505842884
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2638068557192415481}
+  m_GameObject: {fileID: 8316918683842627937}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -119,13 +119,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1005801911340450105
+--- !u!114 &5474442953209141937
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2638068557192415481}
+  m_GameObject: {fileID: 8316918683842627937}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
@@ -159,6 +159,8 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
+  limitRuntimeUpdateRate: 0
+  targetRuntimeFps: 20
   _animationName: 
   loop: 1
   timeScale: 1
@@ -180,7 +182,7 @@ GameObject:
   - component: {fileID: 6172233964851025024}
   - component: {fileID: 1261478195413075374}
   m_Layer: 7
-  m_Name: hero_moana
+  m_Name: Hero_Moana
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -201,8 +203,8 @@ Transform:
   m_Children:
   - {fileID: 910151571242835769}
   - {fileID: 924180038648032528}
-  - {fileID: 6782563190704612944}
   - {fileID: 1612826029771827666}
+  - {fileID: 8037895765308269307}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7660850797683027546
@@ -246,7 +248,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40a35b591ae647b38b827e4ef9354a20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonAnimation: {fileID: 1005801911340450105}
+  skeletonAnimation: {fileID: 5474442953209141937}
   heroActor: {fileID: 7660850797683027546}
   ultimateAnimationInHero: 1
   spawnAnim: spawn

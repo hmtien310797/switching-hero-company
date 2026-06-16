@@ -4,9 +4,11 @@ using System.Linq;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
+using UnityEngine.U2D;
 
 namespace Immortal_Switch.Scripts.Skill.UI
 {
@@ -47,19 +49,22 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         [Header("Debug")]
         [SerializeField] private bool enableDebugLog = true;
-        [SerializeField] private List<SkillDataSO> allSkills = new();
 
         private Dictionary<int, SkillDataSO> skillCache;
         private Dictionary<HeroClass, List<SkillDataSO>> poolLookup;
+        private List<SkillDataSO> allSkills = new();
 
+        private SpriteAtlas heroSpriteAtlas;
+        private const string HeroSpriteAtlasKey = "hero_sprite_atlas";
         public event Action OnDataChanged;
 
-        public override UniTask InitializeAsync()
+        public override async UniTask InitializeAsync()
         {
+            allSkills = MasterDataCache.Instance.GetAllSkillData();
             battleController = PvEBattleController.Instance;
             BuildLookup();
             BuildCacheIfNeeded();
-            return UniTask.CompletedTask;
+            heroSpriteAtlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
         }
 
         private void OnEnable()
@@ -242,7 +247,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 {
                     HeroId = heroId,
                     HeroClass = hero.HeroClass,
-                    HeroIcon = hero.HeroIcon,
+                    HeroIcon = heroSpriteAtlas.GetSprite(hero.HeroData.HeroIconKey),
                     EquippedSkillIds = equipped,
                     RuntimeController = hero
                 });
@@ -279,7 +284,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             {
                 HeroId = heroId,
                 HeroClass = heroController.HeroClass,
-                HeroIcon = heroController.HeroIcon,
+                HeroIcon = heroSpriteAtlas.GetSprite(heroController.HeroData.HeroIconKey),
                 EquippedSkillIds = equipped,
                 RuntimeController = heroController
             };

@@ -3,6 +3,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.HeroUIView;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
@@ -23,6 +24,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         private List<int> availableLevels = new();
         private int currentIndex;
+        private SpriteAtlas heroSpriteAtlas;
 
         private void Awake()
         {
@@ -44,6 +46,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
             SetVisible(true);
             Refresh();
+        }
+
+        public void SetHeroSpriteAtlas(SpriteAtlas spriteAtlas)
+        {
+            heroSpriteAtlas = spriteAtlas;
         }
 
         private void BuildLevels()
@@ -75,7 +82,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             for (int i = 0; i < data.Sections.Count; i++)
             {
                 var section = sectionPool.Get(i);
-                section.Bind(data.Sections[i]);
+                section.Bind(data.Sections[i], heroSpriteAtlas);
             }
 
             sectionPool.ReleaseFrom(data.Sections.Count);

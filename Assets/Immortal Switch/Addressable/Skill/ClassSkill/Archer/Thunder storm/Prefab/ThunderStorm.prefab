@@ -84,7 +84,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 11
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &5721634513724433326
 MonoBehaviour:
@@ -104,7 +104,8 @@ MonoBehaviour:
   initialFlipX: 0
   initialFlipY: 0
   updateWhenInvisible: 3
-  separatorSlotNames: []
+  separatorSlotNames:
+  - round_0
   zSpacing: 0
   useClipping: 1
   immutableTriangles: 0
@@ -126,6 +127,8 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
+  limitRuntimeUpdateRate: 0
+  targetRuntimeFps: 20
   _animationName: animation
   loop: 1
   timeScale: 1
@@ -176,6 +179,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PoolSize>k__BackingField: 10
   <DeSpawnedOnStart>k__BackingField: 1
+  debugCountRuntimeEvent: 0
+  debugCountEventName: hit
+  debugLogRuntimeEventCount: 1
+  debugLogRuntimeEventTotalOnDespawn: 1
   skeletonAnimation: {fileID: 5721634513724433326}
   fallbackAnimationName: 
   fallbackLoop: 0

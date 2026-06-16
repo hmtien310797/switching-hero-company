@@ -53,12 +53,12 @@ namespace Immortal_Switch.Scripts.ItemSystem.Models
             return null;
         }
 
-        private DynamicHeroesGlobalSpecificationsItemConfigRow GetItem(int itemId)
+        public DynamicHeroesGlobalSpecificationsItemConfigRow GetItem(int itemId)
         {
             return ItemConfig.rows.FirstOrDefault(v => v.itemId == itemId);
         }
 
-        private DynamicHeroesGlobalSpecificationsItemConfigRow GetItem(string itemKey)
+        public DynamicHeroesGlobalSpecificationsItemConfigRow GetItem(string itemKey)
         {
             return ItemConfig.rows.FirstOrDefault(v => v.itemKey == itemKey);
         }

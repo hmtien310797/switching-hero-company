@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Addressable;
+using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
+using UnityEngine.U2D;
 
 namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 {
@@ -20,6 +24,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         [SerializeField] private bool useSliderHighlight = true;
 
         private BaseSummonPanelView currentPanel;
+        private SpriteAtlas heroSpriteAtlas;
+        private bool firstShow = true;
+        private const string HeroSpriteAtlasKey = "hero_sprite_atlas";
 
         private static readonly List<string> DefaultLabels = new()
         {
@@ -35,8 +42,19 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             HideAllPanelsImmediate();
         }
 
-        private void Start()
+        public override async UniTask PlayShowAsync(object args)
         {
+            if (heroSpriteAtlas == null)
+            {
+                heroSpriteAtlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
+            }
+            base.PlayShowAsync(args).Forget();
+        }
+
+        public override void OnShow(object args)
+        {
+            if (!firstShow)
+                return;
             if (segmentedControl != null)
             {
                 segmentedControl.SetSelected((int)defaultCategory, true);
@@ -45,6 +63,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             {
                 SwitchTo(defaultCategory);
             }
+
+            for (int i = 0; i < panels.Count; i++)
+            {
+                var baseSummonPanelView = panels[i];
+                if (baseSummonPanelView.TryGetComponent(out HeroSummonView heroSummonView))
+                {
+                    heroSummonView.SetHeroSpriteAtlas(heroSpriteAtlas);
+                }
+            }
+
+            firstShow = false;
+            base.OnShow(args);
         }
 
         private void BindSegmentedControl()

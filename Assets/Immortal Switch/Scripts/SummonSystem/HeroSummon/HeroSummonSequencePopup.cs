@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
@@ -54,8 +55,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         private bool isBusyReplacing;
 
         public bool IsShowing => root != null ? root.activeSelf : gameObject.activeSelf;
-
         public event Action OnRevealCompleted;
+
+        private SpriteAtlas heroSpriteAtlas;
 
         private void Awake()
         {
@@ -198,6 +200,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 var card = GetCardFromPool();
                 card.Bind(
                     entry,
+                    heroSpriteAtlas,
                     visual != null ? visual.Icon : null,
                     visual != null ? visual.TopColor : Color.white,
                     visual != null ? visual.BottomColor : Color.white,
@@ -389,6 +392,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         private void ClearCards()
         {
             ReleaseAllSpawnedCardsToPool();
+        }
+
+        public void SetHeroSpriteAtlas(SpriteAtlas spriteAtlas)
+        {
+            heroSpriteAtlas = spriteAtlas;
         }
     }
 }

@@ -4,6 +4,7 @@ using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
@@ -47,6 +48,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         public void Bind(
             HeroSummonGroupedResultEntry entry,
+            SpriteAtlas heroSpriteAtlas,
             Sprite raritySprite,
             Color topColor,
             Color bottomColor,
@@ -58,7 +60,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             isLastCard = lastCard;
 
             if (portraitImage != null)
-                portraitImage.sprite = hero != null ? hero.PortraitIcon : null;
+                portraitImage.sprite = hero != null ? heroSpriteAtlas.GetSprite(hero.HeroIconKey) : null;
 
             if (rarityIcon != null)
                 rarityIcon.sprite = raritySprite;

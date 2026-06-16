@@ -66,11 +66,19 @@ namespace Common
 
         #endregion
 
+        #region Skill
         public SkillDataSO GetSkillDataById(int id)
         {
-            if (!skillDataDicts.ContainsKey(id)) return null;
-            return skillDataDicts[id];
+            return skillDataDicts.GetValueOrDefault(id);
         }
+
+        public List<SkillDataSO> GetAllSkillData()
+        {
+            return skillDatas;
+        }
+        
+
+        #endregion
         
         #region Init Data
         private void InitSkillData()

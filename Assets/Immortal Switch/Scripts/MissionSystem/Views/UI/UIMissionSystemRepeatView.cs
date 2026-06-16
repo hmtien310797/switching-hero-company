@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Helper;
+using Immortal_Switch.Scripts.ItemSystem;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -91,11 +95,14 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             // check btn claim trang thai
             var anyCompleted = MissionSystemManager.Instance.AnyCompleted(_missionType);
             RefreshBtnClaimAll(anyCompleted);
-            _CreateMissions(rows, tasks, missionType, onJump);
+            CreateMissions(rows, tasks, missionType, onJump).Forget();
         }
 
-        private void _CreateMissions(List<DynamicHeroesGlobalSpecificationsMissionConfigRow> rows, MissionSystemEntry[] tasks,
-            string missionType, Func<string, UniTask> onJump)
+        private async UniTask CreateMissions(
+            List<DynamicHeroesGlobalSpecificationsMissionConfigRow> rows,
+            MissionSystemEntry[] tasks,
+            string missionType,
+            Func<string, UniTask> onJump)
         {
             for (var i = 0; i < rows.Count; i++)
             {
@@ -107,10 +114,21 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                     continue;
                 }
 
+                var rewards = RewardHelper.ParseRewards(rows[i].rewards);
+                Sprite sprite = null;
+                var quantityFormat = string.Empty;
+
+                if (rewards.Count > 0)
+                {
+                    var reward = rewards[0];
+                    sprite = await ItemSystemManager.Instance.Database.GetCurrencyIcon(reward.itemKey);
+                    quantityFormat = BigIntegerHelper.Format(reward.quantity);
+                }
+
                 if (_taskObjects.Count > i)
                 {
                     _taskObjects[i].gameObject.SetActive(true);
-                    _taskObjects[i].Bind(rows[i], currentTask.Progress, onJump);
+                    _taskObjects[i].Bind(rows[i], currentTask.Progress, sprite, quantityFormat, onJump);
 
                     if (currentTask.IsClaimed)
                     {
@@ -121,7 +139,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                 {
                     var clone = Instantiate(taskPrefab, taskContainer);
                     clone.gameObject.SetActive(true);
-                    clone.Bind(rows[i], currentTask.Progress, onJump);
+                    clone.Bind(rows[i], currentTask.Progress, sprite, quantityFormat, onJump);
 
                     if (currentTask.IsClaimed)
                     {

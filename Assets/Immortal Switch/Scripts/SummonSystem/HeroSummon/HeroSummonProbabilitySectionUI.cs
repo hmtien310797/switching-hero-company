@@ -2,6 +2,7 @@
 using Immortal_Switch.Scripts.HeroUIView;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
@@ -23,7 +24,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             itemPool = new SimpleUIPool<HeroSummonProbabilityHeroItemUI>(itemPrefab, itemRoot);
         }
 
-        public void Bind(HeroSummonProbabilitySectionData data)
+        public void Bind(HeroSummonProbabilitySectionData data, SpriteAtlas heroSpriteAtlas)
         {
             var spr = heroSummonRarityVisualConfig.GetIcon(data.Rarity);
 
@@ -44,7 +45,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             for (int i = 0; i < data.Heroes.Count; i++)
             {
                 var item = itemPool.Get(i);
-                item.Bind(data.Heroes[i]);
+                item.Bind(data.Heroes[i], heroSpriteAtlas);
             }
 
             itemPool.ReleaseFrom(data.Heroes.Count);

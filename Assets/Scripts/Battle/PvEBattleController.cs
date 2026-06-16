@@ -282,7 +282,7 @@ namespace Battle
         private void InitSwitchableHeroIds()
         {
             inBattleHeroIdList.Clear();
-            inBattleHeroIdList = new List<int>() { 3, 4 };
+            inBattleHeroIdList = new List<int>() { 11, 4 };
         }
 
         public void OnSelectedHeroCastUltimateSkill()

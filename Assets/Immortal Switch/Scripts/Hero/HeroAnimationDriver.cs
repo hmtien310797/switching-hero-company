@@ -62,6 +62,13 @@ namespace Immortal_Switch.Scripts.Hero
             skeletonAnimation.AnimationState.Complete += OnSpineComplete;
         }
 
+        #if UNITY_EDITOR
+        private void OnValidate()
+        {
+            skeletonAnimation = gameObject.GetComponentInChildren<SkeletonAnimation>();
+        }
+        #endif
+
         private void Start()
         {
             heroActor = GetComponent<HeroActor>();

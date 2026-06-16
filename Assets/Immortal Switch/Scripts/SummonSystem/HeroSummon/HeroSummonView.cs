@@ -5,6 +5,7 @@ using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
@@ -41,7 +42,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [Header("Option Id")]
         [SerializeField] private string optionAId = "summon_10";
         [SerializeField] private string optionBId = "summon_50";
-
+        
+        private SpriteAtlas heroSpriteAtlas;
         private bool isBound;
 
         private void OnEnable()
@@ -55,6 +57,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         {
             UnsubscribeEvents();
             HideAllPopups();
+        }
+
+        public void SetHeroSpriteAtlas(SpriteAtlas spriteAtlas)
+        {
+            heroSpriteAtlas = spriteAtlas;
+            probabilityPopup.SetHeroSpriteAtlas(spriteAtlas);
+            sequencePopup.SetHeroSpriteAtlas(spriteAtlas);
         }
 
         public override bool HasNotification()

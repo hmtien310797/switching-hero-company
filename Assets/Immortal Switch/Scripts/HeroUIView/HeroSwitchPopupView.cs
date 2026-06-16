@@ -1,16 +1,19 @@
 ﻿using System.Collections.Generic;
 using Battle;
 using Common;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.HeroUIView
 {
-    public class HeroSwitchPopupView : BaseUIPopup
+    public class HeroSwitchPopupView : AnimatedUIView
     {
         [Header("Data")]
         [SerializeField] private HeroProgressionDatabaseSO heroDatabase;
@@ -39,9 +42,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private RectTransform slot2Arrow;
         [SerializeField] private float arrowMoveDistance = 18f;
         [SerializeField] private float arrowMoveDuration = 0.55f;
+        
+        [Header("Root")] [SerializeField] private Button btnClose;
 
         private readonly List<HeroCollectionItemUI> spawnedItems = new();
-        private List<HeroDataSO> allHeroData;
         private PvEBattleController battleController;
 
         private int selectedSourceHeroId = -1;
@@ -52,15 +56,19 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private Vector2 slot1ArrowAnchoredPos;
         private Vector2 slot2ArrowAnchoredPos;
-
-        private void OnEnable()
+        private SpriteAtlas heroSpriteAtlas;
+        
+        public override void OnShow(object args)
         {
+            heroSpriteAtlas = args as SpriteAtlas;
             RefreshView();
+            base.OnShow(args);
         }
 
-        private void OnDisable()
+        public override void OnHide()
         {
             StopSourceArrowHint();
+            base.OnHide();
         }
 
         private void OnDestroy()
@@ -70,14 +78,18 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void Awake()
         {
+            btnClose.onClick.AddListener(OnClickClose);
             battleController = PvEBattleController.Instance;
             if (slot1Arrow != null)
                 slot1ArrowAnchoredPos = slot1Arrow.anchoredPosition;
 
             if (slot2Arrow != null)
                 slot2ArrowAnchoredPos = slot2Arrow.anchoredPosition;
-
-            allHeroData = MasterDataCache.Instance.GetAllHeroData();
+        }
+        
+        private void OnClickClose()
+        {
+            UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
         }
 
         public void RefreshView()
@@ -95,7 +107,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
             selectedSourceHeroId = -1;
             selectedTargetHeroId = -1;
 
-            BindButtons();
             BindTopSlots(activeIds);
             RebuildCandidateList(activeIds);
             RefreshSelectionVisualState();
@@ -109,10 +120,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
             var hero2 = heroDatabase.GetHero(activeIds[1]);
 
             var data1 = HeroCollectionItemViewDataFactory.Build(
-                hero1, heroDatabase, service, heroRarityVisualConfig, heroUIIconConfig);
+                hero1, heroDatabase, service, heroRarityVisualConfig, heroUIIconConfig, heroSpriteAtlas);
 
             var data2 = HeroCollectionItemViewDataFactory.Build(
-                hero2, heroDatabase, service, heroRarityVisualConfig, heroUIIconConfig);
+                hero2, heroDatabase, service, heroRarityVisualConfig, heroUIIconConfig, heroSpriteAtlas);
 
             slot1UI?.Bind(1, data1, OnClickSourceSlot);
             slot2UI?.Bind(2, data2, OnClickSourceSlot);
@@ -122,12 +133,13 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             ClearItems();
 
+            var allHeroes = MasterDataCache.Instance.GetAllHeroData();
             var service = HeroProgressionManager.Instance.Service;
             var allData = new List<HeroCollectionItemViewData>();
 
-            for (int i = 0; i < allHeroData.Count; i++)
+            for (int i = 0; i < allHeroes.Count; i++)
             {
-                var hero = allHeroData[i];
+                var hero = allHeroes[i];
                 if (hero == null) continue;
 
                 var data = HeroCollectionItemViewDataFactory.Build(
@@ -135,7 +147,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                     heroDatabase,
                     service,
                     heroRarityVisualConfig,
-                    heroUIIconConfig);
+                    heroUIIconConfig, heroSpriteAtlas);
 
                 if (data == null) continue;
                 if (!data.IsAcquired) continue;
@@ -314,8 +326,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 return;
 
             battleController.RequestSwitchHero(selectedSourceHeroId, selectedTargetHeroId);
-            gameObject.SetActive(false);
-            // UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
+            UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
         }
 
         private void ClearItems()

@@ -51,8 +51,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a184109bb254cc089f932e7b4db0b19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PoolSize>k__BackingField: 0
-  <DeSpawnedOnStart>k__BackingField: 1
   stats: {fileID: 6147910350317824579}
   healthBarController: {fileID: 7601024436941284725}
   animationDriver: {fileID: 4760040034150877837}
@@ -249,7 +247,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &93480560878679480
 MonoBehaviour:
@@ -291,6 +289,8 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
+  limitRuntimeUpdateRate: 0
+  targetRuntimeFps: 20
   _animationName: spawn
   loop: 1
   timeScale: 1

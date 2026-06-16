@@ -1,6 +1,9 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Helper;
+using Immortal_Switch.Scripts.ItemSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +24,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         private TextMeshProUGUI txtTitle;
 
         [SerializeField] private TextMeshProUGUI txtProgress;
+        [SerializeField] private Image imgRewardIcon;
         [SerializeField] private TextMeshProUGUI txtQuantityReward;
         [SerializeField] private Image imgProgress;
 
@@ -90,14 +94,20 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             Debug.Log("OnClickChallenge");
         }
 
-        public void Bind(DynamicHeroesGlobalSpecificationsMissionConfigRow row, int currentProgress, Func<string, UniTask> onJump)
+        public void Bind(DynamicHeroesGlobalSpecificationsMissionConfigRow row, int currentProgress, Sprite sprite,
+            string quantityFormat, Func<string, UniTask> onJump)
         {
             Row = row;
             _target = row.target;
             _onJump = onJump;
 
             txtTitle.text = row.title;
-            txtQuantityReward.text = row.points.ToString();
+            txtQuantityReward.text = quantityFormat;
+
+            if (sprite != null)
+            {
+                imgRewardIcon.sprite = sprite;
+            }
 
             SetProgress(currentProgress);
             RefreshVisual();

@@ -1,5 +1,6 @@
 ﻿using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
+using UnityEngine.U2D;
 
 namespace Immortal_Switch.Scripts.HeroUIView
 {
@@ -10,7 +11,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             HeroProgressionDatabaseSO heroDatabase,
             HeroProgressionService service,
             HeroRarityVisualConfigSO heroRarityVisualConfig,
-            HeroUIIconConfigSO heroUIIconConfig)
+            HeroUIIconConfigSO heroUIIconConfig, SpriteAtlas heroSpriteAtlas)
         {
             if (hero == null || heroDatabase == null || service == null)
                 return null;
@@ -34,7 +35,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             {
                 HeroId = hero.Id,
                 HeroName = hero.Name,
-                PortraitIcon = hero.PortraitIcon,
+                PortraitIcon = heroSpriteAtlas.GetSprite(hero.HeroIconKey),
                 ShardIcon = hero.ShardIcon,
                 RarityIcon = heroRarityVisualConfig != null ? heroRarityVisualConfig.GetIcon(displayTier) : null,
                 ElementIcon = heroUIIconConfig != null ? heroUIIconConfig.GetElementIcon(hero.Element) : null,

@@ -2,6 +2,7 @@
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
@@ -21,13 +22,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         [SerializeField] private UIGradient gradient;
 
-        public void Bind(HeroSummonProbabilityHeroData data)
+        public void Bind(HeroSummonProbabilityHeroData data, SpriteAtlas heroSpriteAtlas)
         {
             if (data == null || data.Hero == null)
                 return;
 
             if (portraitImage != null)
-                portraitImage.sprite = data.Hero.PortraitIcon;
+                portraitImage.sprite = heroSpriteAtlas.GetSprite(data.Hero.HeroIconKey);
 
             if (heroNameText != null)
                 heroNameText.text = data.Hero.Name;

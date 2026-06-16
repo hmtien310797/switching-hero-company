@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.HeroUIView
@@ -20,7 +22,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private Transform contentRoot;
         [SerializeField] private HeroCollectionItemUI itemPrefab;
         [SerializeField] private Button combatFormationButton;
-        [SerializeField] private HeroSwitchPopupView heroSwitchPopupView;
 
         [Header("Element Filters")] [SerializeField]
         private HeroCollectionFilterButton allElementButton;
@@ -42,49 +43,55 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private HeroCollectionItemUI currentSelectedItem;
         private List<HeroDataSO> allHeroData;
+        private SpriteAtlas heroSpriteAlas;
+        private const string HeroSpriteAtlasKey = "hero_sprite_atlas";
 
         private void Awake()
         {
             allHeroData = MasterDataCache.Instance.GetAllHeroData();
         }
-
+        
         private void Start()
         {
             InitFilters();
-            RefreshAll();
             combatFormationButton.onClick.AddListener(() =>
             {
-                heroSwitchPopupView.gameObject.SetActive(true);
-                //UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>();
+                UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>(heroSpriteAlas).Forget();
             });
         }
 
-        public void RefreshAll()
+        private void RefreshAll()
         {
             BuildAllData();
             ApplyFiltersAndRebuild();
         }
         
-        private void OnEnable()
+        public override async UniTask PlayShowAsync(object args)
+        {
+            if (heroSpriteAlas == null)
+            {
+                heroSpriteAlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
+            }
+            
+            base.PlayShowAsync(args).Forget();
+        }
+
+        public override void OnShow(object args)
         {
             if (HeroProgressionManager.Instance != null)
                 HeroProgressionManager.Instance.OnHeroCollectionChanged += HandleHeroCollectionChanged;
 
-            RefreshVisual();
             RefreshAll();
+            base.OnShow(args);
         }
 
-        private void OnDisable()
+        public override void OnHide()
         {
             if (HeroProgressionManager.Instance != null)
                 HeroProgressionManager.Instance.OnHeroCollectionChanged -= HandleHeroCollectionChanged;
+            base.OnHide();
         }
-
-        private void RefreshVisual()
-        {
-            heroSwitchPopupView.gameObject.SetActive(false);
-        }
-
+        
         private void HandleHeroCollectionChanged(HeroCollectionChangedArgs args)
         {
             RefreshAll();
@@ -193,7 +200,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                     heroDatabase,
                     service,
                     heroRarityVisualConfig,
-                    heroUIIconConfig);
+                    heroUIIconConfig, heroSpriteAlas);
 
                 if (data != null)
                     allItemsData.Add(data);

@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.ItemSystem.Models;
 using UnityEngine;
