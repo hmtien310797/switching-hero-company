@@ -1,51 +1,66 @@
 using System;
-using System.Collections;
-using Common;
-using Google.Protobuf;
+using System.Text;
+using Google;
+using AppleAuth;
+using AppleAuth.Enums;
+using AppleAuth.Interfaces;
+using AppleAuth.Native;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI;
+using Nakama;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 using UniTask = Cysharp.Threading.Tasks.UniTask;
 
+[DefaultExecutionOrder(-100)]
 public class LoginScene : MonoBehaviour
 {
     // login
     [SerializeField] private TMP_InputField ipUsername;
     [SerializeField] private TMP_InputField ipPassword;
-    [SerializeField] private Button btnLogin;
+    [SerializeField] private Button btnLogin; // login user pass
     [SerializeField] private Button btnLoginRegister;
     [SerializeField] private Button btnAppleLogin;
     [SerializeField] private Button btnGoogleLogin;
+    [SerializeField] private Button btnLoginBD;
+    [SerializeField] private Button btnLoginGuest;
     // Register
     [SerializeField] private TMP_InputField ipUsernameRegister;
     [SerializeField] private TMP_InputField ipPasswordRegister;
     [SerializeField] private TMP_InputField ipPasswordConfirmRegister;
     [SerializeField] private Button btnRegister;
     [SerializeField] private Button btnBackToLogin;
-    
+
     // Object controller
     [SerializeField] private GameObject loginPanel;
     [SerializeField] private GameObject registerPanel;
+    [SerializeField] private GameObject buttonLayout;
 
     [SerializeField] private GameObject goLoadingHorizontal;
     [SerializeField] private GameObject goLoadingVertical;
-    
-    private const string LoginEndpoint = "v1/auth/login";
-    private const string RegisterEngpoint = "v1/auth/register";
+
+    [Header("Google Sign-In")]
+    [SerializeField] private string googleWebClientId = "";
+
+    private AppleAuthManager _appleAuthManager;
 
     private void Awake()
     {
-        ScreenOrientationTracker.Instance.OnOrientationChanged += OnScreenOrientationChanged;
         loginPanel.SetActive(false);
         registerPanel.SetActive(false);
+        ScreenOrientationTracker.Instance.OnOrientationChanged += OnScreenOrientationChanged;
         btnLogin?.onClick.AddListener(OnClickLogin);
         btnLoginRegister?.onClick.AddListener(OnClickRegister);
         btnBackToLogin?.onClick.AddListener(OnClickBackToLogin);
         btnRegister?.onClick.AddListener(OnClickSubmitRegister);
+        btnLoginBD?.onClick.AddListener(OnClickLoginBD);
+        btnLoginGuest?.onClick.AddListener(OnClickLoginGuest);
+        btnGoogleLogin?.onClick.AddListener(OnClickGoogleLogin);
+        btnAppleLogin?.onClick.AddListener(OnClickAppleLogin);
+        
     }
 
     private void OnScreenOrientationChanged(ScreenOrientationTracker.ScreenViewMode obj)
@@ -65,11 +80,25 @@ public class LoginScene : MonoBehaviour
     private void OnDestroy()
     {
         ScreenOrientationTracker.Instance.OnOrientationChanged -= OnScreenOrientationChanged;
+        buttonLayout.SetActive(false);
     }
 
     void Start()
     {
         OnScreenOrientationChanged(ScreenOrientationTracker.Instance.CurrentMode);
+        if (AppleAuthManager.IsCurrentPlatformSupported)
+            _appleAuthManager = new AppleAuthManager(new PayloadDeserializer());
+        GoogleSignIn.Configuration = new GoogleSignInConfiguration
+        {
+            WebClientId = googleWebClientId,
+            RequestIdToken = true,
+            UseGameSignIn = false
+        };
+    }
+
+    private void Update()
+    {
+        _appleAuthManager?.Update();
     }
 
     private void OnClickLogin()
@@ -83,119 +112,159 @@ public class LoginScene : MonoBehaviour
         registerPanel.SetActive(true);
     }
 
+    private void OnClickLoginBD()
+    {
+        Debug.Log("[LoginScene] Login with BD");
+        loginPanel.SetActive(true);
+        btnLoginBD.gameObject.SetActive(false);
+        btnLoginGuest.gameObject.SetActive(false);
+        btnAppleLogin.gameObject.SetActive(false);
+        btnGoogleLogin.gameObject.SetActive(false);
+    }
+
     private void OnClickSubmitRegister()
     {
-        StartCoroutine(DoRegister(ipUsernameRegister.text, ipPasswordRegister.text, ipPasswordConfirmRegister.text));
+        DoRegister(ipUsernameRegister.text, ipPasswordRegister.text, ipPasswordConfirmRegister.text).Forget();
     }
 
     private void OnClickBackToLogin()
     {
         registerPanel.SetActive(false);
-        loginPanel.SetActive(true);
+        loginPanel.SetActive(false);
     }
 
     private async UniTask DoLogin(string username, string password)
     {
-        loginPanel.gameObject.SetActive(false);
-        await SceneManager.LoadSceneAsync("MainBattleScene");
-        await GameBootstrap.Instance.RunAsync();
-        return;
-        
-        var request = new Login.LoginRequest
+        try
         {
-            Meta = new Common.RequestMeta
-            {
-                RequestId = Guid.NewGuid().ToString(),
-                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-            },
-            Username = username,
-            Password = password
-        };
-
-        byte[] bodyRaw = request.ToByteArray();
-
-        string url = $"{NetworkManager.Instance.BaseUrl}/{LoginEndpoint}";
-        using var webRequest = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-        webRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        webRequest.downloadHandler = new DownloadHandlerBuffer();
-        webRequest.SetRequestHeader("Content-Type", "application/x-protobuf");
-
-        await webRequest.SendWebRequest();
-
-        if (webRequest.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogError($"[LoginScene] Request failed: {webRequest.error}");
-            return;
+            btnLogin.interactable = false;
+            await NakamaClient.Instance.LoginAsync(username, password);
+            loginPanel.gameObject.SetActive(false);
+            await SceneManager.LoadSceneAsync("MainBattleScene");
+            await GameBootstrap.Instance.RunAsync();
         }
-
-        var response = Login.LoginResponse.Parser.ParseFrom(webRequest.downloadHandler.data);
-        
-        Debug.Log($"[LoginScene] Login success. UserId={response.UserId}");
-        PlayerPrefs.SetString("auth_token", response.Token);
-        PlayerPrefs.SetString("player_id", response.UserId);
-        PlayerPrefs.Save();
-        if (response.Meta.Code != 200)
+        catch (ApiResponseException e)
         {
-            Debug.LogError($"[LoginScene] Login error {response.Meta.Code}: {response.Meta.Message}");
-            return;
+            Debug.LogError($"[LoginScene] Login failed ({e.StatusCode}): {e.Message}");
         }
-        // TODO: chuyển scene
-        loginPanel.gameObject.SetActive(false);
-        // await SceneManager.LoadSceneAsync("MainBattleScene");
-        // await GameBootstrap.Instance.RunAsync();
-        await SceneManager.LoadSceneAsync("MainBattleScene");
-        await GameBootstrap.Instance.RunAsync();
+        finally
+        {
+            btnLogin.interactable = true;
+        }
     }
 
-    private IEnumerator DoRegister(string username, string password, string confirmPassword)
+    private async UniTask DoRegister(string username, string password, string confirmPassword)
     {
         if (password != confirmPassword)
         {
             Debug.LogError("[LoginScene] Password and confirm password do not match");
-            yield break;
+            return;
         }
 
-        var request = new Login.RegisterRequest
+        try
         {
-            Meta = new Common.RequestMeta
-            {
-                RequestId = Guid.NewGuid().ToString(),
-                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-            },
-            Username = username,
-            Password = password
-        };
-
-        byte[] bodyRaw = request.ToByteArray();
-
-        string url = $"{NetworkManager.Instance.BaseUrl}/{RegisterEngpoint}";
-        using var webRequest = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-        webRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        webRequest.downloadHandler = new DownloadHandlerBuffer();
-        webRequest.SetRequestHeader("Content-Type", "application/x-protobuf");
-
-        yield return webRequest.SendWebRequest();
-
-        if (webRequest.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogError($"[LoginScene] Register request failed: {webRequest.error}");
-            yield break;
-        }
-
-        var response = Login.RegisterRespone.Parser.ParseFrom(webRequest.downloadHandler.data);
-
-        if (response.Meta.Code != 0)
-        {
-            Debug.LogError($"[LoginScene] Register error {response.Meta.Code}: {response.Meta.Message}");
-            yield break;
-        }
-
-        Debug.Log($"[LoginScene] Register success. Status={response.Status}");
-        if (response.Status == 1) // TODO: chuyển về login panel
-        {
+            btnRegister.interactable = false;
+            await NakamaClient.Instance.RegisterAsync(username, password);
+            await NakamaClient.Instance.LoginAsync(username, password);
             registerPanel.SetActive(false);
-            loginPanel.SetActive(true);
-        } // success 
-        
+            await SceneManager.LoadSceneAsync("MainBattleScene");
+            await GameBootstrap.Instance.RunAsync();
+        }
+        catch (ApiResponseException e)
+        {
+            Debug.LogError($"[LoginScene] Register failed ({e.StatusCode}): {e.Message}");
+        }
+        finally
+        {
+            btnRegister.interactable = true;
+        }
+    }
+
+    private void OnClickLoginGuest()
+    {
+        DoLoginGuest().Forget();
+    }
+
+    private async UniTask DoLoginGuest()
+    {
+        try
+        {
+            await NakamaClient.Instance.AuthenticateDeviceAsync();
+            Debug.Log($"[LoginScene] Guest login success. UserId={NakamaClient.Instance.Session.UserId}");
+            await SceneManager.LoadSceneAsync("MainBattleScene");
+            await GameBootstrap.Instance.RunAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[LoginScene] Guest login failed: {e.Message}");
+        }
+    }
+
+    private void OnClickGoogleLogin()
+    {
+        DoLoginGoogle().Forget();
+    }
+
+    private async UniTask DoLoginGoogle()
+    {
+        try
+        {
+            var user = await GoogleSignIn.DefaultInstance.SignIn();
+            Debug.Log($"[LoginScene] Google sign-in success. Email={user.Email}");
+
+            await NakamaClient.Instance.AuthenticateGoogleAsync(user.IdToken);
+            Debug.Log($"[LoginScene] Google Nakama auth success. UserId={NakamaClient.Instance.Session.UserId}");
+            await SceneManager.LoadSceneAsync("MainBattleScene");
+            await GameBootstrap.Instance.RunAsync();
+        }
+        catch (GoogleSignIn.SignInException e)
+        {
+            Debug.LogError($"[LoginScene] Google login failed. Status={e.Status} Message={e.Message}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[LoginScene] Google login failed: {e.GetType().Name} {e.Message}");
+        }
+    }
+
+    private void OnClickAppleLogin()
+    {
+        DoLoginApple().Forget();
+    }
+
+    private async UniTask DoLoginApple()
+    {
+        if (_appleAuthManager == null)
+        {
+            Debug.LogError("[LoginScene] Apple Sign-In is not supported on this platform");
+            return;
+        }
+
+        try
+        {
+            var tcs = new UniTaskCompletionSource<string>();
+
+            _appleAuthManager.LoginWithAppleId(
+                LoginOptions.IncludeEmail | LoginOptions.IncludeFullName,
+                credential =>
+                {
+                    if (credential is IAppleIDCredential appleCredential)
+                        tcs.TrySetResult(Encoding.UTF8.GetString(appleCredential.IdentityToken));
+                    else
+                        tcs.TrySetException(new Exception("Invalid Apple credential type"));
+                },
+                error => tcs.TrySetException(new Exception($"Apple Sign-In error: {error.LocalizedDescription}"))
+            );
+
+            var identityToken = await tcs.Task;
+            await NakamaClient.Instance.AuthenticateAppleAsync(identityToken);
+            Debug.Log($"[LoginScene] Apple Nakama auth success. UserId={NakamaClient.Instance.Session.UserId}");
+            await SceneManager.LoadSceneAsync("MainBattleScene");
+            await GameBootstrap.Instance.RunAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[LoginScene] Apple login failed: {e.Message}");
+        }
     }
 }

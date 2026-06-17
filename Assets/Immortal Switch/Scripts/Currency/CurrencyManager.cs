@@ -60,6 +60,22 @@ namespace Immortal_Switch.Scripts.Currency
         }
 
         /// <summary>
+        /// Gán trực tiếp số dư từ dữ liệu server (player data, summon result, ...).
+        /// </summary>
+        public void Set(CurrencyType currencyType, BigNumber amount)
+        {
+            CurrencyEntry entry = GetEntry(currencyType);
+            BigNumber oldAmount = entry.Amount;
+
+            if (oldAmount == amount)
+                return;
+
+            entry.Amount = amount;
+
+            NotifyChanged(currencyType, oldAmount, amount);
+        }
+
+        /// <summary>
         /// Dùng cho debug/local demo. Server mode không nên gọi trực tiếp cho giao dịch thật.
         /// </summary>
         public void AddLocalDemo(CurrencyType currencyType, BigNumber amount)

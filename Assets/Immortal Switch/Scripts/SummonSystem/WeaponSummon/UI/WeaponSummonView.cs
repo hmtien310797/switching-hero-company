@@ -1,4 +1,9 @@
-﻿using Immortal_Switch.Scripts.Currency;
+﻿using System;
+using System.Collections.Generic;
+using Common;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
@@ -38,10 +43,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         [SerializeField] private Button probabilityInfoButton;
 
         [Header("Option Id")]
-        [SerializeField] private string optionAId = "summon_10";
+        [SerializeField] private string optionAId = "summon_30";
         [SerializeField] private string optionBId = "summon_50";
 
         private bool isBound;
+        private bool isSummoning;
 
         private void OnEnable()
         {
@@ -109,8 +115,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (isBound)
                 return;
 
-            summonButtonA?.Init(optionAId, TrySummon);
-            summonButtonB?.Init(optionBId, TrySummon);
+            summonButtonA?.Init(optionAId, TrySummon, SummonCategory.Weapon);
+            summonButtonB?.Init(optionBId, TrySummon, SummonCategory.Weapon);
 
             if (probabilityInfoButton != null)
             {
@@ -160,12 +166,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         
         private void TrySummon(string optionId)
         {
-            if (WeaponSummonManager.Instance == null)
+            if (isSummoning)
                 return;
+
+            if (WeaponSummonManager.Instance == null)
+            {
+                Debug.Log("[WeaponSummon] WeaponSummonManager has no instance");
+                return;
+            }
 
             if (!WeaponSummonManager.Instance.CanSummon(optionId, out var paymentType, out var paidAmount))
             {
-                Debug.Log("Not enough resource");
+                Debug.Log("[WeaponSummon] Not enough resource");
                 return;
             }
 
@@ -174,7 +186,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 bool skipConfirm = WeaponSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
                 if (skipConfirm)
                 {
-                    ExecuteSummon(optionId, paymentType);
+                    ExecuteSummonAsync(optionId).Forget();
                     return;
                 }
 
@@ -182,40 +194,107 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 return;
             }
 
-            ExecuteSummon(optionId, paymentType);
+            ExecuteSummonAsync(optionId).Forget();
         }
 
         private void ShowGemConfirm(string optionId, int gemCost)
         {
             if (confirmPopup == null)
             {
-                ExecuteSummon(optionId, WeaponSummonPaymentType.Gem);
+                ExecuteSummonAsync(optionId).Forget();
                 return;
             }
 
-            confirmPopup.Show(gemCost, () => ExecuteSummon(optionId, WeaponSummonPaymentType.Gem));
+            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());
         }
 
-        private void ExecuteSummon(string optionId, WeaponSummonPaymentType paymentType)
+        private async UniTaskVoid ExecuteSummonAsync(string optionId)
         {
-            sequencePopup?.SetBusyReplacing(true);
-
-            var result = WeaponSummonManager.Instance.ExecuteSummon(optionId, paymentType);
-
-            sequencePopup?.SetBusyReplacing(false);
-
-            if (result == null)
+            if (isSummoning)
                 return;
 
-            if (sequencePopup != null)
+            if (!NakamaClient.Instance.IsLoggedIn)
             {
-                if (sequencePopup.IsShowing)
-                    sequencePopup.ReplaceResult(result);
-                else
-                    sequencePopup.ShowFirstResult(result, TrySummonFromPopup, optionId);
+                Debug.LogWarning("[WeaponSummon] No active session — not logged in.");
+                return;
             }
 
-            RefreshView();
+            isSummoning = true;
+            summonButtonA?.SetInteractable(false);
+            summonButtonB?.SetInteractable(false);
+
+            try
+            {
+                var response = await NakamaClient.Instance.SummonWeaponAsync(optionId);
+
+                if (!response.Success)
+                {
+                    Debug.LogWarning($"[WeaponSummon] summon/execute failed: {response.Error}");
+                    return;
+                }
+
+                // Cập nhật currency HUD từ server
+                CurrencyManager.Instance.Set(CurrencyType.diamond, response.CurrencyBalances.Diamond);
+
+                // Sync local save data
+                WeaponSummonManager.Instance.ApplyServerResponse(response);
+
+                // Map server entries → WeaponSummonResult để drive animation
+                var result = new WeaponSummonResult
+                {
+                    PaidAmount                = response.PaidAmount,
+                    OldTotalRoll              = response.OldTotalRoll,
+                    NewTotalRoll              = response.NewTotalRoll,
+                    OldSummonLevel            = response.OldSummonLevel,
+                    NewSummonLevel            = response.NewSummonLevel,
+                    NewlyUnlockedRewardLevels = response.NewlyUnlockedRewardLevels != null
+                        ? new List<int>(response.NewlyUnlockedRewardLevels)
+                        : new List<int>()
+                };
+
+                Enum.TryParse<WeaponSummonPaymentType>(response.PaymentType, true, out var parsedPayment);
+                result.PaymentType = parsedPayment;
+
+                foreach (var entry in response.Entries)
+                {
+                    Enum.TryParse<WeaponTier>(entry.Grade, true, out var tier);
+                    var weaponDef = WeaponSummonManager.Instance.Config.GetWeapon(entry.WeaponId, entry.WeaponName);
+
+                    result.Entries.Add(new WeaponSummonResultEntry
+                    {
+                        RollIndex    = entry.RollIndex,
+                        Weapon       = weaponDef,
+                        WeaponId     = entry.WeaponId,
+                        WeaponName   = entry.WeaponName,
+                        Icon         = weaponDef != null ? weaponDef.Icon : null,
+                        Tier         = tier,
+                        Star         = entry.Star,
+                        IsNewWeapon  = entry.IsNew,
+                        ShardGained  = entry.ShardGained,
+                        TotalShardAfter = 0
+                    });
+                }
+
+                if (sequencePopup != null)
+                {
+                    if (sequencePopup.IsShowing)
+                        sequencePopup.ReplaceResult(result);
+                    else
+                        sequencePopup.ShowFirstResult(result, TrySummonFromPopup, optionId);
+                }
+
+                RefreshView();
+            }
+            catch (Nakama.ApiResponseException ex)
+            {
+                Debug.LogError($"[WeaponSummon] summon/execute error {ex.StatusCode}: {ex.Message}");
+            }
+            finally
+            {
+                isSummoning = false;
+                summonButtonA?.SetInteractable(true);
+                summonButtonB?.SetInteractable(true);
+            }
         }
 
         private void TrySummonFromPopup(string optionId)

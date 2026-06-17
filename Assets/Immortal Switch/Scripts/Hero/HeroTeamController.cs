@@ -1,7 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
 public class HeroTeamController : Singleton<HeroTeamController>
@@ -187,7 +186,7 @@ public class HeroTeamController : Singleton<HeroTeamController>
         HeroActor controlledHero = GetControlledHero();
         HeroActor followerHero = GetFollowerHero();
 
-        if (controlledHero == null || followerHero == null)
+        if (controlledHero == null)
             return;
 
         bool isManualMoving =
@@ -204,7 +203,8 @@ public class HeroTeamController : Singleton<HeroTeamController>
             else
             {
                 controlledHero.StopTeamControl();
-                followerHero.StopTeamControl();
+                if(followerHero)
+                    followerHero.StopTeamControl();
                 ResetFollowerVelocity();
                 Debug.Log("Manual move End");
             }
@@ -253,7 +253,8 @@ public class HeroTeamController : Singleton<HeroTeamController>
         if (constrainedMove.sqrMagnitude <= 0.000001f)
         {
             controlledHero.StopTeamControl();
-            followerHero.StopTeamControl();
+            if(followerHero)
+                followerHero.StopTeamControl();
             ResetFollowerVelocity();
             return;
         }
@@ -287,13 +288,14 @@ public class HeroTeamController : Singleton<HeroTeamController>
         if (constrainFollowerTarget)
             smoothedFollowerTarget = ClampPositionToMovementLimit(smoothedFollowerTarget);
 
-        followerHero.FollowByTeam(
-            smoothedFollowerTarget,
-            teamMoveSpeed * followerSpeedMultiplier,
-            followerStopDistance,
-            followerMoveSmoothTime,
-            ref followerMoveVelocity
-        );
+        if(followerHero)
+            followerHero.FollowByTeam(
+                smoothedFollowerTarget,
+                teamMoveSpeed * followerSpeedMultiplier,
+                followerStopDistance,
+                followerMoveSmoothTime,
+                ref followerMoveVelocity
+            );
     }
 
     private Vector3 GetBehindFormationPosition(Vector3 leaderPosition, Vector3 moveDirection)

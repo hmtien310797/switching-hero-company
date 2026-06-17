@@ -1,6 +1,7 @@
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace UI.LoginScene
@@ -21,8 +22,10 @@ namespace UI.LoginScene
         [SerializeField] private StarPathPoint[] pathPoints;
         [SerializeField] private TMP_Text txtProgress;
 
-        [SerializeField] private GameObject goLoginObj;
         [SerializeField] private GameObject goProgressObj;
+
+        [Header("Events")]
+        public UnityEvent onLoadComplete;
 
         [Header("Tween")] [SerializeField] private float duration = 2f;
         [SerializeField] private Ease ease = Ease.Linear;
@@ -80,8 +83,8 @@ namespace UI.LoginScene
                 {
                     if (Mathf.Approximately(_currentProgress, 1f))
                     {
-                        goLoginObj.SetActive(true);
                         goProgressObj.SetActive(false);
+                        onLoadComplete?.Invoke();
                     }
                 });
         }

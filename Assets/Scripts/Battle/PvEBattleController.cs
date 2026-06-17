@@ -96,8 +96,7 @@ namespace Battle
         private float[] rates;
         private int heroDeadCount;
         private int totalMonstersKilledThisStage;
-
-        private List<int> inBattleHeroIdList = new();
+        
         private GameData gameData;
         private BossActor currentBoss;
 
@@ -167,7 +166,6 @@ namespace Battle
             CurrentStage = Mathf.Max(1, CurrentStage);
             InitStage(CurrentStage);
             pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(CurrentStage));
-            InitSwitchableHeroIds();
             await InitPlayerHeroById();
             NotifyActiveLineupChanged();
             RefreshControlledHeroSkillUI();
@@ -204,7 +202,7 @@ namespace Battle
             if (!CanSwitchHero(sourceHeroId, targetHeroId))
                 return;
 
-            int slotIndex = inBattleHeroIdList.IndexOf(sourceHeroId);
+            int slotIndex = UserDataCache.Instance.InBattleHeroIdList.IndexOf(sourceHeroId);
 
             if (slotIndex < 0 || slotIndex >= inBattleHeroes.Length)
             {
@@ -236,7 +234,7 @@ namespace Battle
                 return;
             }
 
-            inBattleHeroIdList[slotIndex] = targetHeroId;
+            UserDataCache.Instance.InBattleHeroIdList[slotIndex] = targetHeroId;
 
             inBattleHeroMapper.Remove(sourceHeroId);
 
@@ -279,12 +277,6 @@ namespace Battle
             }
         }
 
-        private void InitSwitchableHeroIds()
-        {
-            inBattleHeroIdList.Clear();
-            inBattleHeroIdList = new List<int>() { 11, 4 };
-        }
-
         public void OnSelectedHeroCastUltimateSkill()
         {
             gameCameraController.ZoomToHero().Forget();
@@ -292,9 +284,11 @@ namespace Battle
 
         private async UniTask InitPlayerHeroById(bool isSwitch = false)
         {
-            for (int heroIndex = 0; heroIndex < inBattleHeroIdList.Count; heroIndex++)
+            for (int heroIndex = 0; heroIndex < UserDataCache.Instance.InBattleHeroIdList.Count; heroIndex++)
             {
-                var id = inBattleHeroIdList[heroIndex];
+                var id = UserDataCache.Instance.InBattleHeroIdList[heroIndex];
+                if(id <= 0)
+                    continue;
                 var heroDt = MasterDataCache.Instance.GetHeroDataById(id);
                 await SpawnHero(heroDt, heroIndex);
                 if (heroIndex == 0)
@@ -399,11 +393,6 @@ namespace Battle
             ApplyControlledHeroSelectionToTeamController();
         }
 
-        public List<int> GetCurrentSwitchHeroIds()
-        {
-            return new List<int>(inBattleHeroIdList);
-        }
-
         public bool CanSwitchHero(int sourceHeroId, int targetHeroId)
         {
             if (sourceHeroId <= 0 || targetHeroId <= 0)
@@ -412,10 +401,10 @@ namespace Battle
             if (sourceHeroId == targetHeroId)
                 return false;
 
-            if (!inBattleHeroIdList.Contains(sourceHeroId))
+            if (!UserDataCache.Instance.InBattleHeroIdList.Contains(sourceHeroId))
                 return false;
 
-            return !inBattleHeroIdList.Contains(targetHeroId);
+            return !UserDataCache.Instance.InBattleHeroIdList.Contains(targetHeroId);
         }
 
         public void RequestSwitchHero(int sourceHeroId, int targetHeroId)
@@ -1576,7 +1565,7 @@ namespace Battle
         public bool IsHeroCurrentlyActive(int heroId)
         {
             if (heroId <= 0) return false;
-            return inBattleHeroIdList.Contains(heroId);
+            return UserDataCache.Instance.InBattleHeroIdList.Contains(heroId);
         }
         
         private void NotifyIdleScreenStageChanged()

@@ -1,6 +1,9 @@
-﻿using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
+using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
+using Immortal_Switch.Scripts.SummonSystem.WeaponSummon;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -17,6 +20,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         [Header("Icons")]
         [PreviewField][SerializeField] private Sprite heroTicketIcon;
+        [PreviewField][SerializeField] private Sprite skillTicketIcon;
+        [PreviewField][SerializeField] private Sprite weaponTicketIcon;
         [PreviewField][SerializeField] private Sprite diamondIcon;
 
         [Header("Visual")]
@@ -25,8 +30,17 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         [SerializeField] private Color notEnoughColor = Color.red;
         [SerializeField] private CanvasGroup canvasGroup;
 
+        [Header("Category")]
+        [SerializeField] private SummonCategory summonCategory = SummonCategory.Hero;
+
         private string optionId;
         private System.Action<string> clickAction;
+
+        public void Init(string summonOptionId, System.Action<string> onClick, SummonCategory category)
+        {
+            summonCategory = category;
+            Init(summonOptionId, onClick);
+        }
 
         public void Init(string summonOptionId, System.Action<string> onClick)
         {
@@ -44,6 +58,16 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         public void Refresh()
         {
+            if (summonCategory == SummonCategory.Skill)
+                RefreshSkill();
+            else if (summonCategory == SummonCategory.Weapon)
+                RefreshWeapon();
+            else
+                RefreshHero();
+        }
+
+        private void RefreshHero()
+        {
             if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
                 return;
 
@@ -52,47 +76,74 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
 
             if (rollCountText != null)
-                //rollCountText.text = option.RollCount.ToString();
-                rollCountText.text = "0";
+                rollCountText.text = option.RollCount.ToString();
 
-            BigNumber ticket = CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.HeroTicket);
-            BigNumber gem = CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.diamond);
+            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
+            BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
 
             bool hasEnoughTicket = ticket >= option.TicketCost;
-            bool hasEnoughGem = gem >= option.GemCost;
+            bool hasEnoughGem    = gem    >= option.GemCost;
 
-        
             if (hasEnoughTicket)
-            {
-                SetUI(
-                    amount: option.TicketCost,
-                    icon: heroTicketIcon,
-                    showRedDot: true,
-                    color: normalColor
-                );
-            }
-     
+                SetUI(option.TicketCost, heroTicketIcon, true, normalColor);
             else if (hasEnoughGem)
-            {
-                SetUI(
-                    amount: option.GemCost,
-                    icon: diamondIcon,
-                    showRedDot: false,
-                    color: normalColor
-                );
-            }
-  
+                SetUI(option.GemCost, diamondIcon, false, normalColor);
             else
-            {
-                SetUI(
-                    amount: option.GemCost,
-                    icon: diamondIcon,
-                    showRedDot: false,
-                    color: notEnoughColor
-                );
-            }
+                SetUI(option.GemCost, diamondIcon, false, notEnoughColor);
         }
-        
+
+        private void RefreshWeapon()
+        {
+            if (WeaponSummonManager.Instance == null || WeaponSummonManager.Instance.Service == null)
+                return;
+
+            var option = WeaponSummonManager.Instance.Service.GetOption(optionId);
+            if (option == null)
+                return;
+
+            if (rollCountText != null)
+                rollCountText.text = option.RollCount.ToString();
+
+            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.WeaponTicket);
+            BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
+
+            bool hasEnoughTicket = ticket >= option.TicketCost;
+            bool hasEnoughGem    = gem    >= option.GemCost;
+
+            if (hasEnoughTicket)
+                SetUI(option.TicketCost, weaponTicketIcon, true, normalColor);
+            else if (hasEnoughGem)
+                SetUI(option.GemCost, diamondIcon, false, normalColor);
+            else
+                SetUI(option.GemCost, diamondIcon, false, notEnoughColor);
+        }
+
+        private void RefreshSkill()
+        {
+            if (SkillSummonManager.Instance == null || SkillSummonManager.Instance.Service == null)
+                return;
+
+            var option = SkillSummonManager.Instance.Service.GetOption(optionId);
+            if (option == null)
+                return;
+
+            if (rollCountText != null)
+                rollCountText.text = option.RollCount.ToString();
+
+            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.SkillTicket);
+            BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
+
+            bool hasEnoughTicket = ticket >= option.TicketCost;
+            bool hasEnoughGem    = gem    >= option.GemCost;
+
+            if (hasEnoughTicket)
+                SetUI(option.TicketCost, skillTicketIcon, true, normalColor);
+            else if (hasEnoughGem)
+                SetUI(option.GemCost, diamondIcon, false, normalColor);
+            else
+                SetUI(option.GemCost, diamondIcon, false, notEnoughColor);
+        }
+
         public void SetInteractable(bool value)
         {
             if (button != null)
@@ -100,9 +151,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
             if (canvasGroup != null)
             {
-                canvasGroup.interactable = value;
+                canvasGroup.interactable  = value;
                 canvasGroup.blocksRaycasts = value;
-                canvasGroup.alpha = value ? 1f : 0.5f;
+                canvasGroup.alpha          = value ? 1f : 0.5f;
             }
         }
 
@@ -110,8 +161,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         {
             if (amountText != null)
             {
-                //amountText.text = amount.ToString();
-                amountText.text = "0";
+                amountText.text  = amount.ToString();
                 amountText.color = color;
             }
 
@@ -124,8 +174,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         private void HandleClick()
         {
-            // IMPORTANT: vẫn cho click kể cả không đủ resource
-            // Logic check sẽ nằm ở HeroSummonView
             clickAction?.Invoke(optionId);
         }
     }

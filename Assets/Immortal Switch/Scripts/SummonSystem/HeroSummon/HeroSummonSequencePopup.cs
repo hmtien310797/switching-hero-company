@@ -25,7 +25,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [Header("Bottom Summon Buttons")]
         [SerializeField] private SummonButtonUI summonButtonA;
         [SerializeField] private SummonButtonUI summonButtonB;
-        [SerializeField] private string optionAId = "summon_10";
+        [SerializeField] private string optionAId = "summon_30";
         [SerializeField] private string optionBId = "summon_50";
 
         [Header("Auto / Skip")]
@@ -162,10 +162,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         private void BindSummonButtons()
         {
             if (summonButtonA != null)
-                summonButtonA.Init(optionAId, HandleSummonButtonClick);
+                summonButtonA.Init(optionAId, HandleSummonButtonClick, SummonCategory.Hero);
 
             if (summonButtonB != null)
-                summonButtonB.Init(optionBId, HandleSummonButtonClick);
+                summonButtonB.Init(optionBId, HandleSummonButtonClick, SummonCategory.Hero);
         }
 
         private void RefreshSummonButtons()

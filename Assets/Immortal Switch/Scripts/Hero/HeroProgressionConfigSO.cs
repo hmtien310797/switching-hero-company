@@ -7,7 +7,7 @@ namespace Immortal_Switch.Scripts.Hero
     [CreateAssetMenu(fileName = "HeroProgressionConfig", menuName = "ScriptableObjects/Heroes/HeroProgressionConfig")]
     public class HeroProgressionConfigSO : ScriptableObject
     {
-        public HeroDataSO Hero;
+        public int HeroId;
         public HeroProgressTier StartingTier = HeroProgressTier.Common;
         [Min(0)] public int StartingStarInTier = 0;
 

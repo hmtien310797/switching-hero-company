@@ -16,7 +16,7 @@ namespace Immortal_Switch.Scripts.Hero
 
         public HeroProgressionConfigSO GetProgressionConfig(int heroId)
         {
-            return ProgressionConfigs.Find(x => x != null && x.Hero != null && x.Hero.Id == heroId);
+            return ProgressionConfigs.Find(x => x != null && x.HeroId == heroId);
         }
     }
 }

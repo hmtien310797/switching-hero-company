@@ -15,7 +15,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             for (int i = 0; i < result.Entries.Count; i++)
             {
                 var entry = result.Entries[i];
-                if (entry == null || entry.Weapon == null)
+                if (entry == null)
                     continue;
 
                 string key = BuildKey(entry);

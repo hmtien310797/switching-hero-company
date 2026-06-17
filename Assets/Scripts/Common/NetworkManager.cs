@@ -6,7 +6,7 @@ namespace Common
 {
     public class NetworkManager : Singleton<NetworkManager>
     {
-        [field: SerializeField] public string BaseUrl { get; private set; } = "http://171.244.44.71:8082";
+        [field: SerializeField] public string BaseUrl { get; private set; } = "http://192.168.8.82:7350";
 
         public override UniTask InitializeAsync()
         {

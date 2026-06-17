@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,7 +23,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         [Header("Bottom Summon Buttons")]
         [SerializeField] private SummonButtonUI summonButtonA;
         [SerializeField] private SummonButtonUI summonButtonB;
-        [SerializeField] private string optionAId = "summon_10";
+        [SerializeField] private string optionAId = "summon_30";
         [SerializeField] private string optionBId = "summon_50";
 
         [Header("Auto / Skip")]
@@ -158,10 +159,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         private void BindSummonButtons()
         {
             if (summonButtonA != null)
-                summonButtonA.Init(optionAId, HandleSummonButtonClick);
+                summonButtonA.Init(optionAId, HandleSummonButtonClick, SummonCategory.Skill);
 
             if (summonButtonB != null)
-                summonButtonB.Init(optionBId, HandleSummonButtonClick);
+                summonButtonB.Init(optionBId, HandleSummonButtonClick, SummonCategory.Skill);
         }
 
         private void RefreshSummonButtons()

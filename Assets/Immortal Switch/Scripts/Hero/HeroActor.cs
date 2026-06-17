@@ -206,7 +206,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         PowerUpManager.Instance.BindPlayer(Stats);
         HealthBarController.ResetHealth();
         IsActionLocked = false;
-        IsUnderPlayerControl = false;
+        IsUnderPlayerControl = false;{}
         MoveMode = HeroMoveMode.Auto;
         currentTarget = null;
         attackComboIndex = 0;
@@ -253,6 +253,31 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         };
 
         stats.Initialize(baseStat);
+    }
+
+    /// <summary>
+    /// Ghi đè base stats bằng giá trị server trả về (hp, atk, def, ...).
+    /// Gọi sau Init() khi có HeroInstance từ UserDataCache.
+    /// </summary>
+    public void ApplyInstanceStats(HeroInstance instance)
+    {
+        if (stats == null || instance == null || heroData == null) return;
+
+        var baseStat = new BaseStat
+        {
+            Health      = instance.Hp          > 0 ? instance.Hp          : heroData.Health,
+            Attack      = instance.Atk         > 0 ? instance.Atk         : heroData.Attack,
+            Defense     = instance.Def         > 0 ? instance.Def         : heroData.Defense,
+            AttackRange = instance.AttackRange > 0 ? instance.AttackRange : heroData.AttackRange,
+            AttackSpeed = instance.AtkSpd      > 0 ? instance.AtkSpd      : heroData.AttackSpeed,
+            CritChance  = instance.CritChance  > 0 ? instance.CritChance  : heroData.CritChance,
+            CritDamage  = instance.CritDamage  > 0 ? instance.CritDamage  : heroData.CritDamage,
+            Accuracy    = heroData.Accuracy,
+            Element     = heroData.Element,
+        };
+
+        stats.Initialize(baseStat);
+        HealthBarController.ResetHealth();
     }
 
     private void BindDeathEvent()

@@ -100,7 +100,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (HeroProgressionManager.Instance == null || HeroProgressionManager.Instance.Service == null)
                 return;
 
-            var activeIds = battleController.GetCurrentSwitchHeroIds();
+            var activeIds = UserDataCache.Instance.InBattleHeroIdList;
             if (activeIds == null || activeIds.Count < 2)
                 return;
 

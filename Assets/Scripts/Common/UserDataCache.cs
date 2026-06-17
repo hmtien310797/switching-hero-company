@@ -12,12 +12,6 @@ using UnityEngine;
 namespace Common
 {
     [Serializable]
-    public class HeroDataOwn
-    {
-        public List<int> OwnedHeroIds = new();
-    }
-
-    [Serializable]
     public class SelectedHero
     {
         public int MainHeroId;
@@ -39,21 +33,27 @@ namespace Common
     public class UserDataCache : Singleton<UserDataCache>
     {
         [Header("Init Config")]
-        [SerializeField] private ClassSkillUnlockInitSO classSkillUnlockInitSO;
-        [SerializeField] private HeroSkillLoadoutInitSO heroSkillLoadoutInitSO;
         [SerializeField] private UserLevelConfigSO userLevelConfigSO;
 
         [Header("Debug")]
         [SerializeField] private bool enableLog = true;
-
-        public HeroDataOwn OwnedHeroData = new();
-        public SelectedHero SelectedHeros = new();
+        
         public ClassSkillUnlockData ClassSkillUnlock = new();
         public HeroSkillLoadoutData HeroSkillLoadout = new();
 
-        public int initialGold = 1000;
-        public int initialDiamond = 1000;
-        public int initialHeroTicket = 1000;
+        /// <summary>Hero inventory từ server — set bởi GameBootstrap từ player/me (owned + lineup + shards).</summary>
+        public HeroInventory HeroList { get; set; }
+
+        /// <summary>Summon state từ server — set bởi GameBootstrap sau login.</summary>
+        public SummonStateResponse SummonState { get; set; }
+
+        /// <summary>Skill list từ server — set bởi GameBootstrap sau login.</summary>
+        public SkillListResponse SkillList { get; set; }
+
+        /// <summary>Weapon list từ server — set bởi GameBootstrap sau login.</summary>
+        public WeaponListResponse WeaponList { get; set; }
+
+        public List<int> InBattleHeroIdList { get;  set; } = new();
 
         public event Action<int> OnHeroSkillChanged;
 
@@ -63,68 +63,48 @@ namespace Common
             return UniTask.CompletedTask;
         }
 
-        #region LOG
-
-        void Log(string msg)
-        {
-            if (enableLog) Debug.Log($"[UserData] {msg}", this);
-        }
-
-        void LogError(string msg)
-        {
-            Debug.LogError($"[UserData] {msg}", this);
-        }
-
-        #endregion
-
         #region INIT
 
         void EnsureInitialized()
         {
-            if (SelectedHeros.MainHeroId <= 0) SelectedHeros.MainHeroId = 1;
-            if (SelectedHeros.SubHeroId <= 0) SelectedHeros.SubHeroId = 3;
-
-            AddOwnedHero(SelectedHeros.MainHeroId);
-            AddOwnedHero(SelectedHeros.SubHeroId);
-
-            // Class unlock
-            if (classSkillUnlockInitSO != null && classSkillUnlockInitSO.ClassEntries != null)
-            {
-                foreach (var e in classSkillUnlockInitSO.ClassEntries)
-                {
-                    if (e == null)
-                        continue;
-
-                    SetUnlockedSkillsForClass(e.HeroClass, e.UnlockedSkillIds);
-                }
-            }
-
-            // Sync inventory unlock theo logic hiện tại của skill system
             EnsureInitialSkillInventoryForUnlockedClassSkills();
+        }
 
-            // Hero loadout
-            if (heroSkillLoadoutInitSO != null && heroSkillLoadoutInitSO.HeroEntries != null)
+        public void GetPlayerDataFromServer(HeroInventory heroInventory, SkillListResponse skillListResponse, WeaponListResponse weaponListResponse)
+        {
+            InBattleHeroIdList = new List<int> { -1, -1 };
+            try
             {
-                foreach (var e in heroSkillLoadoutInitSO.HeroEntries)
-                {
-                    if (e == null)
-                        continue;
+                HeroList = heroInventory;
+                SkillList = skillListResponse;
+                WeaponList = weaponListResponse;
 
-                    AddOwnedHero(e.HeroId);
-                    SetEquippedSkillsForHero(e.HeroId, e.EquippedSkillIds, false);
+                int heroIndex = 0;
+                for (int i = 0; i < HeroList.Lineup.Length; i++)
+                {
+                    string currentHeroInLineUp = HeroList.Lineup[i];
+                    for (int j = 0; j < HeroList.Owned.Length; j++)
+                    {
+                        var currentHeroOwned = HeroList.Owned[j];
+                        if (string.Equals(currentHeroInLineUp, currentHeroOwned.Uid))
+                        {
+                            InBattleHeroIdList[heroIndex] = currentHeroOwned.HeroId;
+                            heroIndex++;
+                            break;
+                        }
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                Debug.LogError(e.Message);
+            }
+            
         }
 
         #endregion
 
         #region HERO
-
-        public void AddOwnedHero(int heroId)
-        {
-            if (!OwnedHeroData.OwnedHeroIds.Contains(heroId))
-                OwnedHeroData.OwnedHeroIds.Add(heroId);
-        }
 
         public List<int> GetEquippedSkills(int heroId)
         {
@@ -138,7 +118,7 @@ namespace Common
 
         #region CLASS UNLOCK
 
-        public void SetUnlockedSkillsForClass(HeroClass heroClass, List<int> ids)
+        private void SetUnlockedSkillsForClass(HeroClass heroClass, List<int> ids)
         {
             ClassSkillUnlock.UnlockedSkillIdsByClass[heroClass] = Normalize(ids);
         }
@@ -153,37 +133,37 @@ namespace Common
         
         private void EnsureInitialSkillInventoryForUnlockedClassSkills()
         {
-            if (classSkillUnlockInitSO == null || classSkillUnlockInitSO.ClassEntries == null)
-                return;
-
-            foreach (var e in classSkillUnlockInitSO.ClassEntries)
-            {
-                if (e == null || e.UnlockedSkillIds == null)
-                    continue;
-
-                foreach (int skillId in e.UnlockedSkillIds)
-                {
-                    if (skillId <= 0)
-                        continue;
-
-                    var data = Immortal_Switch.Scripts.Skill.UI.SkillInventorySaveService.GetOrCreate(skillId);
-
-                    // Rule: skill unlock for game must be owned in inventory 
-                    if (!data.IsOwned)
-                        data.IsOwned = true;
-
-                    if (data.Level <= 0)
-                        data.Level = 1;
-
-                    if (data.CurrentShard < 0)
-                        data.CurrentShard = 0;
-                }
-            }
-
-            Immortal_Switch.Scripts.Skill.UI.SkillInventorySaveService.Save();
+            // if (classSkillUnlockInitSO == null || classSkillUnlockInitSO.ClassEntries == null)
+            //     return;
+            //
+            // foreach (var e in classSkillUnlockInitSO.ClassEntries)
+            // {
+            //     if (e == null || e.UnlockedSkillIds == null)
+            //         continue;
+            //
+            //     foreach (int skillId in e.UnlockedSkillIds)
+            //     {
+            //         if (skillId <= 0)
+            //             continue;
+            //
+            //         var data = Immortal_Switch.Scripts.Skill.UI.SkillInventorySaveService.GetOrCreate(skillId);
+            //
+            //         // Rule: skill unlock for game must be owned in inventory 
+            //         if (!data.IsOwned)
+            //             data.IsOwned = true;
+            //
+            //         if (data.Level <= 0)
+            //             data.Level = 1;
+            //
+            //         if (data.CurrentShard < 0)
+            //             data.CurrentShard = 0;
+            //     }
+            // }
+            //
+            // Immortal_Switch.Scripts.Skill.UI.SkillInventorySaveService.Save();
         }
 
-        public bool IsUnlocked(HeroClass heroClass, int skillId)
+        private bool IsUnlocked(HeroClass heroClass, int skillId)
         {
             return GetUnlockedSkills(heroClass).Contains(skillId);
         }
@@ -197,7 +177,7 @@ namespace Common
             var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
             if (hero == null)
             {
-                LogError($"Hero null {heroId}");
+                LogError($"Hero null {heroId} ");
                 return;
             }
 
@@ -269,6 +249,20 @@ namespace Common
         List<int> Normalize(List<int> ids)
         {
             return ids?.Where(x => x > 0).Distinct().ToList() ?? new List<int>();
+        }
+
+        #endregion
+        
+        #region LOG
+
+        void Log(string msg)
+        {
+            if (enableLog) Debug.Log($"[UserData] {msg}", this);
+        }
+
+        void LogError(string msg)
+        {
+            Debug.LogError($"[UserData] {msg}", this);
         }
 
         #endregion

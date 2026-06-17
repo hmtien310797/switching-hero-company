@@ -36,6 +36,28 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
         {
             return LevelRewards.FirstOrDefault(x => x != null && x.SummonLevel == level);
         }
+
+        public StandardWeaponDefinitionSO GetWeaponById(int weaponId)
+        {
+            return WeaponPool.FirstOrDefault(x => x != null && x.WeaponId == weaponId);
+        }
+
+        public StandardWeaponDefinitionSO GetWeaponByName(string weaponName)
+        {
+            return WeaponPool.FirstOrDefault(x => x != null && x.WeaponName == weaponName);
+        }
+
+        public StandardWeaponDefinitionSO GetWeapon(int weaponId, string weaponName = null)
+        {
+            var byId = GetWeaponById(weaponId);
+            if (byId != null) return byId;
+            if (!string.IsNullOrEmpty(weaponName))
+            {
+                var byName = GetWeaponByName(weaponName);
+                if (byName != null) { Debug.LogWarning($"[WeaponSummonConfig] Weapon id={weaponId} not found, fell back to name='{weaponName}'"); return byName; }
+            }
+            return null;
+        }
     }
 
     [Serializable]

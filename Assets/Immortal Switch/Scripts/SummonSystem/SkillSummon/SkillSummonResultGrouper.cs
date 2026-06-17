@@ -17,16 +17,14 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             {
                 var entry = result.Entries[i];
                 var skill = entry.SkillAsset;
+                int groupKey = entry.SkillId;
 
-                if (skill == null)
-                    continue;
-
-                if (!groupedMap.TryGetValue(skill.SkillId, out var grouped))
+                if (!groupedMap.TryGetValue(groupKey, out var grouped))
                 {
                     grouped = new SkillSummonGroupedResultEntry
                     {
                         SkillAsset = skill,
-                        Icon = skill.SkillIcon,
+                        Icon = skill != null ? skill.SkillIcon : null,
                         SkillName = entry.SkillName,
                         Count = 0,
                         IsNewSkill = false,
@@ -34,7 +32,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                         Grade = entry.Grade
                     };
 
-                    groupedMap.Add(skill.SkillId, grouped);
+                    groupedMap.Add(groupKey, grouped);
                     orderedResult.Add(grouped);
                 }
 

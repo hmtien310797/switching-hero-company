@@ -1,9 +1,12 @@
-﻿using Immortal_Switch.Scripts.Currency;
+using System;
+using System.Collections.Generic;
+using Common;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
-using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,19 +34,20 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         [SerializeField] private SummonConfirmPopup confirmPopup;
         [SerializeField] private SkillSummonSequencePopup sequencePopup;
         [SerializeField] private SkillSummonProbabilityPopup probabilityPopup;
-        
+
         [Header("Achievement")]
         [SerializeField] private Button summonAchievementButton;
         [SerializeField] private SummonAchievementRewardView summonAchievementRewardView;
-        
+
         [Header("Probability")]
         [SerializeField] private Button probabilityInfoButton;
 
         [Header("Option Id")]
-        [SerializeField] private string optionAId = "summon_10";
+        [SerializeField] private string optionAId = "summon_30";
         [SerializeField] private string optionBId = "summon_50";
 
         private bool isBound;
+        private bool isSummoning;
 
         private void OnEnable()
         {
@@ -92,13 +96,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
             if (summonButtonB != null)
                 summonButtonB.Init(optionBId, TrySummon);
-            
+
             if (summonAchievementButton != null)
             {
                 summonAchievementButton.onClick.RemoveAllListeners();
                 summonAchievementButton.onClick.AddListener(OpenAchievementPopup);
             }
-            
+
             if (probabilityInfoButton != null)
             {
                 probabilityInfoButton.onClick.RemoveAllListeners();
@@ -107,7 +111,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
             isBound = true;
         }
-        
+
         private void OpenProbabilityPopup()
         {
             if (probabilityPopup == null || SkillSummonManager.Instance == null)
@@ -118,9 +122,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
         private void HideAllPopups()
         {
-
         }
-        
+
         private void OpenAchievementPopup()
         {
             summonAchievementRewardView?.Show(SummonAchievementTab.Skill);
@@ -156,30 +159,20 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             }
         }
 
-        // public void OpenProbabilityPopup()
-        // {
-        //     if (probabilityPopup == null || SkillSummonManager.Instance == null)
-        //         return;
-        //
-        //     probabilityPopup.Show(SkillSummonManager.Instance.GetCurrentSummonLevel());
-        // }
-        //
-        // public void OpenAchievementPopup()
-        // {
-        //     summonAchievementRewardView?.Show(SummonAchievementTab.Skill);
-        // }
-
         private void TrySummon(string optionId)
         {
+            if (isSummoning)
+                return;
+
             if (SkillSummonManager.Instance == null)
             {
-                Debug.Log("skill summon dont have instance");
+                Debug.Log("[SkillSummon] SkillSummonManager has no instance");
                 return;
             }
 
             if (!SkillSummonManager.Instance.CanSummon(optionId, out var paymentType, out var paidAmount))
             {
-                Debug.Log("Not enough resource");
+                Debug.Log("[SkillSummon] Not enough resource");
                 return;
             }
 
@@ -188,7 +181,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 bool skipConfirm = SkillSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
                 if (skipConfirm)
                 {
-                    ExecuteSummon(optionId, paymentType);
+                    ExecuteSummonAsync(optionId).Forget();
                     return;
                 }
 
@@ -196,42 +189,104 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 return;
             }
 
-            ExecuteSummon(optionId, paymentType);
+            ExecuteSummonAsync(optionId).Forget();
         }
 
         private void ShowGemConfirm(string optionId, int gemCost)
         {
             if (confirmPopup == null)
             {
-                ExecuteSummon(optionId, SummonPaymentType.Gem);
+                ExecuteSummonAsync(optionId).Forget();
                 return;
             }
 
-            confirmPopup.Show(gemCost, () => ExecuteSummon(optionId, SummonPaymentType.Gem));
+            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());
         }
 
-        private void ExecuteSummon(string optionId, SummonPaymentType paymentType)
+        private async UniTaskVoid ExecuteSummonAsync(string optionId)
         {
-            sequencePopup?.SetBusyReplacing(true);
-
-            Debug.Log($"OptionId: {optionId}");
-            var result = SkillSummonManager.Instance.ExecuteSummon(optionId, paymentType);
-
-            sequencePopup?.SetBusyReplacing(false);
-
-            if (result == null)
+            if (isSummoning)
                 return;
 
-            Debug.Log($"Result: {JsonConvert.SerializeObject(result)} - {sequencePopup?.IsShowing}");
-            if (sequencePopup != null)
+            if (!NakamaClient.Instance.IsLoggedIn)
             {
-                if (sequencePopup.IsShowing)
-                    sequencePopup.ReplaceResult(result);
-                else
-                    sequencePopup.ShowFirstResult(result, TrySummonFromPopup, optionId);
+                Debug.LogWarning("[SkillSummon] No active session — not logged in.");
+                return;
             }
 
-            RefreshView();
+            isSummoning = true;
+            summonButtonA?.SetInteractable(false);
+            summonButtonB?.SetInteractable(false);
+
+            try
+            {
+                var response = await NakamaClient.Instance.SummonSkillAsync(optionId);
+
+                if (!response.Success)
+                {
+                    Debug.LogWarning($"[SkillSummon] summon/execute failed: {response.Error}");
+                    return;
+                }
+
+                // Cập nhật currency HUD từ server
+                CurrencyManager.Instance.Set(CurrencyType.SkillTicket, response.CurrencyBalances.SkillTicket);
+                CurrencyManager.Instance.Set(CurrencyType.diamond, response.CurrencyBalances.Diamond);
+
+                // Sync local save data
+                SkillSummonManager.Instance.ApplyServerResponse(response);
+
+                // Map server entries → SkillSummonResult để drive animation
+                Enum.TryParse<SummonPaymentType>(response.PaymentType, true, out var parsedPayment);
+                var result = new SkillSummonResult
+                {
+                    PaymentType               = parsedPayment,
+                    PaidAmount                = response.PaidAmount,
+                    OldTotalRoll              = response.OldTotalRoll,
+                    NewTotalRoll              = response.NewTotalRoll,
+                    OldSummonLevel            = response.OldSummonLevel,
+                    NewSummonLevel            = response.NewSummonLevel,
+                    NewlyUnlockedRewardLevels = response.NewlyUnlockedRewardLevels != null
+                        ? new List<int>(response.NewlyUnlockedRewardLevels)
+                        : new List<int>()
+                };
+
+                foreach (var entry in response.Entries)
+                {
+                    var skillData = MasterDataCache.Instance.GetSkillDataById(entry.SkillId);
+                    Enum.TryParse<SkillSummonGrade>(entry.Grade, true, out var grade);
+
+                    result.Entries.Add(new SkillSummonResultEntry
+                    {
+                        RollIndex   = entry.RollIndex,
+                        SkillAsset  = skillData,
+                        SkillId     = entry.SkillId,
+                        SkillName   = entry.SkillName,
+                        Grade       = grade,
+                        IsNewSkill  = entry.IsNew,
+                        ShardGained = entry.ShardGained
+                    });
+                }
+
+                if (sequencePopup != null)
+                {
+                    if (sequencePopup.IsShowing)
+                        sequencePopup.ReplaceResult(result);
+                    else
+                        sequencePopup.ShowFirstResult(result, TrySummonFromPopup, optionId);
+                }
+
+                RefreshView();
+            }
+            catch (Nakama.ApiResponseException ex)
+            {
+                Debug.LogError($"[SkillSummon] summon/execute error {ex.StatusCode}: {ex.Message}");
+            }
+            finally
+            {
+                isSummoning = false;
+                summonButtonA?.SetInteractable(true);
+                summonButtonB?.SetInteractable(true);
+            }
         }
 
         private void TrySummonFromPopup(string optionId)

@@ -121,6 +121,27 @@ namespace Immortal_Switch.Scripts.Skill
             return result;
         }
 
+        /// <summary>
+        /// Cập nhật local save data từ response của server sau mỗi lần summon.
+        /// </summary>
+        public void ApplyServerResponse(SummonExecuteResponse response)
+        {
+            saveData.TotalRoll = response.NewTotalRoll;
+            Save();
+            NotifyChanged();
+        }
+
+        /// <summary>Đồng bộ toàn bộ summon state từ server (gọi sau login).</summary>
+        public void ApplySummonState(BasicSummonState state)
+        {
+            if (state == null) return;
+            saveData.TotalRoll = state.TotalRoll;
+            if (state.ClaimedRewardLevels != null)
+                saveData.ClaimedRewardLevels = new System.Collections.Generic.List<int>(state.ClaimedRewardLevels);
+            Save();
+            NotifyChanged();
+        }
+
         public void ResetSummonData()
         {
             saveData = new SkillSummonSaveData();

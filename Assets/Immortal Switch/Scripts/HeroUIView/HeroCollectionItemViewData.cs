@@ -31,5 +31,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         public float ProgressNormalized;
 
         public bool IsMaxNode;
+
+        public bool IsInLineup;
     }
 }

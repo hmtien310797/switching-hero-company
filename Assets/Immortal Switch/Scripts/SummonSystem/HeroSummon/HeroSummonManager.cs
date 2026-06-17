@@ -119,6 +119,29 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             return result;
         }
 
+        /// <summary>
+        /// Cập nhật local save data từ response của server sau mỗi lần summon.
+        /// Pity counter được đồng bộ riêng qua GetSummonStateAsync (sau login).
+        /// </summary>
+        public void ApplyServerResponse(SummonExecuteResponse response)
+        {
+            saveData.TotalRoll = response.NewTotalRoll;
+            Save();
+            NotifyChanged();
+        }
+
+        /// <summary>Đồng bộ toàn bộ summon state từ server (gọi sau login).</summary>
+        public void ApplySummonState(HeroSummonState state)
+        {
+            if (state == null) return;
+            saveData.TotalRoll        = state.TotalRoll;
+            saveData.PityMissCounter  = state.PityMissCounter;
+            if (state.ClaimedRewardLevels != null)
+                saveData.ClaimedRewardLevels = new System.Collections.Generic.List<int>(state.ClaimedRewardLevels);
+            Save();
+            NotifyChanged();
+        }
+
         public void ResetSummonData()
         {
             saveData = new HeroSummonSaveData();

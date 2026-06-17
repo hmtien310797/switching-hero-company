@@ -180,6 +180,7 @@ namespace Immortal_Switch.Scripts.Skill
         public int SkillId;
         public string SkillKey;
         public string SkillName;
+        public string IconSkillKey;
         public Sprite SkillIcon;
         [TextArea(3, 8)] public string DescriptionTemplate;
 

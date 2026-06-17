@@ -1,4 +1,9 @@
+using System;
+using System.Collections.Generic;
+using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
@@ -40,11 +45,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [SerializeField] private Button probabilityInfoButton;
 
         [Header("Option Id")]
-        [SerializeField] private string optionAId = "summon_10";
+        [SerializeField] private string optionAId = "summon_30";
         [SerializeField] private string optionBId = "summon_50";
         
         private SpriteAtlas heroSpriteAtlas;
         private bool isBound;
+        private bool isSummoning;
 
         private void OnEnable()
         {
@@ -175,12 +181,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         private void TrySummon(string optionId)
         {
-            if (HeroSummonManager.Instance == null)
+            if (isSummoning)
                 return;
+
+            if (HeroSummonManager.Instance == null)
+            {
+                Debug.Log("[HeroSummon] HeroSummonManager has no instance");
+                return;
+            }
 
             if (!HeroSummonManager.Instance.CanSummon(optionId, out var paymentType, out var paidAmount))
             {
-                Debug.Log("Not enough resource");
+                Debug.Log("[HeroSummon] Not enough resource");
                 return;
             }
 
@@ -189,7 +201,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 bool skipConfirm = HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
                 if (skipConfirm)
                 {
-                    ExecuteSummon(optionId, paymentType);
+                    ExecuteSummonAsync(optionId).Forget();
                     return;
                 }
 
@@ -197,40 +209,104 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 return;
             }
 
-            ExecuteSummon(optionId, paymentType);
+            ExecuteSummonAsync(optionId).Forget();
         }
 
         private void ShowGemConfirm(string optionId, int gemCost)
         {
             if (confirmPopup == null)
             {
-                ExecuteSummon(optionId, SummonPaymentType.Gem);
+                ExecuteSummonAsync(optionId).Forget();
                 return;
             }
 
-            confirmPopup.Show(gemCost, () => ExecuteSummon(optionId, SummonPaymentType.Gem));
+            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());
         }
 
-        private void ExecuteSummon(string optionId, SummonPaymentType paymentType)
+        private async UniTaskVoid ExecuteSummonAsync(string optionId)
         {
-            sequencePopup?.SetBusyReplacing(true);
-
-            var result = HeroSummonManager.Instance.ExecuteSummon(optionId, paymentType);
-
-            sequencePopup?.SetBusyReplacing(false);
-
-            if (result == null)
+            if (isSummoning)
                 return;
 
-            if (sequencePopup != null)
+            if (!NakamaClient.Instance.IsLoggedIn)
             {
-                if (sequencePopup.IsShowing)
-                    sequencePopup.ReplaceResult(result);
-                else
-                    sequencePopup.ShowFirstResult(result, TrySummonFromPopup, optionId);
+                Debug.LogWarning("[HeroSummon] No active session — not logged in.");
+                return;
             }
 
-            RefreshView();
+            isSummoning = true;
+            summonButtonA?.SetInteractable(false);
+            summonButtonB?.SetInteractable(false);
+
+            try
+            {
+                var response = await NakamaClient.Instance.SummonHeroAsync(optionId);
+
+                if (!response.Success)
+                {
+                    Debug.LogWarning($"[HeroSummon] summon/execute failed: {response.Error}");
+                    return;
+                }
+
+                // Cập nhật currency HUD từ server
+                CurrencyManager.Instance.Set(CurrencyType.HeroTicket, response.CurrencyBalances.HeroTicket);
+                CurrencyManager.Instance.Set(CurrencyType.diamond, response.CurrencyBalances.Diamond);
+
+                // Sync local save data
+                HeroSummonManager.Instance.ApplyServerResponse(response);
+
+                // Map server entries → HeroSummonResult để drive animation
+                Enum.TryParse<SummonPaymentType>(response.PaymentType, true, out var parsedPayment);
+                var result = new HeroSummonResult
+                {
+                    PaymentType              = parsedPayment,
+                    PaidAmount               = response.PaidAmount,
+                    OldTotalRoll             = response.OldTotalRoll,
+                    NewTotalRoll             = response.NewTotalRoll,
+                    OldSummonLevel           = response.OldSummonLevel,
+                    NewSummonLevel           = response.NewSummonLevel,
+                    NewlyUnlockedRewardLevels = response.NewlyUnlockedRewardLevels != null
+                        ? new List<int>(response.NewlyUnlockedRewardLevels)
+                        : new List<int>()
+                };
+
+                foreach (var entry in response.Entries)
+                {
+                    var heroData = MasterDataCache.Instance.GetHeroDataById(entry.HeroId);
+                    Enum.TryParse<SummonRarity>(entry.Rarity, true, out var rarity);
+
+                    result.Entries.Add(new HeroSummonResultEntry
+                    {
+                        RollIndex   = entry.RollIndex,
+                        HeroAsset   = heroData,
+                        HeroName    = entry.HeroName,
+                        IsNewHero   = entry.IsNew,
+                        ShardGained = entry.ShardGained,
+                        IsPityHit   = entry.IsPityHit,
+                        Rarity      = rarity
+                    });
+                }
+
+                if (sequencePopup != null)
+                {
+                    if (sequencePopup.IsShowing)
+                        sequencePopup.ReplaceResult(result);
+                    else
+                        sequencePopup.ShowFirstResult(result, TrySummonFromPopup, optionId);
+                }
+
+                RefreshView();
+            }
+            catch (Nakama.ApiResponseException ex)
+            {
+                Debug.LogError($"[HeroSummon] summon/execute error {ex.StatusCode}: {ex.Message}");
+            }
+            finally
+            {
+                isSummoning = false;
+                summonButtonA?.SetInteractable(true);
+                summonButtonB?.SetInteractable(true);
+            }
         }
 
         private void TrySummonFromPopup(string optionId)
