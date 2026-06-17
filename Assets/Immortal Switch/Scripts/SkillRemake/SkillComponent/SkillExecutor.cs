@@ -76,6 +76,21 @@ namespace Immortal_Switch.Scripts.Skill
             for (int i = 0; i < actions.Count; i++)
                 ExecuteAction(context, actions[i]);
         }
+        
+        private float GetScaledValue(
+            SkillRuntimeContext context,
+            float baseValue,
+            bool scaleWithClassSkillLevel)
+        {
+            if (context == null || context.SkillData == null)
+                return baseValue;
+
+            return context.SkillData.GetScaledClassSkillValue(
+                baseValue,
+                context.SkillLevel,
+                scaleWithClassSkillLevel
+            );
+        }
 
         private void ExecuteDamage(SkillRuntimeContext context, SkillActionData action, SkillTargetType targetType)
         {
@@ -84,11 +99,18 @@ namespace Immortal_Switch.Scripts.Skill
                 targetType,
                 action.Area
             );
+            
+            float effectiveSkillCoefficient = GetScaledValue(
+                context,
+                action.Damage.SkillDamageBonusPercent,
+                action.Damage.ScaleWithClassSkillLevel
+            );
+            
             for (int i = 0; i < targets.Count; i++)
             {
                 ICombatUnit target = targets[i];
                 DamageResult damageResult =
-                    DamageCalculator.CalculateDamage(context.Caster, target, action.Damage.SkillDamageBonusPercent);
+                    DamageCalculator.CalculateDamage(context.Caster, target, effectiveSkillCoefficient);
                 target.TakeDamage(damageResult);
                 SkillCombatEventReporter.ReportDamageDealt(
                     context.Caster,
@@ -103,6 +125,13 @@ namespace Immortal_Switch.Scripts.Skill
         private void ExecuteDot(SkillRuntimeContext context, SkillActionData action, SkillTargetType targetType)
         {
             List<ICombatUnit> targets = targetResolver.ResolveTargets(context, targetType);
+            
+            float effectiveDotCoefficient = GetScaledValue(
+                context,
+                action.Dot.TickDamageBonusPercent,
+                action.Dot.ScaleDamageWithClassSkillLevel
+            );
+            
             for (int i = 0; i < targets.Count; i++)
             {
                 ICombatUnit target = targets[i];
@@ -112,7 +141,7 @@ namespace Immortal_Switch.Scripts.Skill
                 DamageResult result = DamageCalculator.CalculateDamage(
                     context.Caster,
                     target,
-                    action.Dot.TickDamageBonusPercent
+                    effectiveDotCoefficient
                 );
 
                 target.Stats.DotModule.ApplyDotSnapshot(

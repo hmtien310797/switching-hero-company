@@ -128,6 +128,7 @@ namespace Immortal_Switch.Scripts.Skill
         public bool UseCastOverride;
         public bool UseRuntimeObjectOverride;
         public bool UsePassiveOverride;
+        public bool UsePhaseOverride;
         public bool HasBulletSpawner;
 
         [ShowIf("UseCastOverride")]
@@ -148,6 +149,7 @@ namespace Immortal_Switch.Scripts.Skill
         [ShowIf("HasBulletSpawner")]
         [Header("Bullet Spawner Config")]
         public BulletPatternConfig BulletSpawnerConfig = new();
+        [ShowIf("UsePhaseOverride")]
         public List<SkillPhaseData> Phases = new();
         public List<SkillDescriptionParam> DescriptionParams = new();
     }
@@ -172,6 +174,25 @@ namespace Immortal_Switch.Scripts.Skill
         [Min(1)] public int Level = 1;
         [Min(1)] public int RequiredShard = 2;
     }
+    
+    [Serializable]
+    public class ClassSkillLevelScalingConfig
+    {
+        [Tooltip("Mỗi level sau level 1 tăng thêm bao nhiêu % dựa trên giá trị base.")]
+        [Min(0f)]
+        public float GrowthPercentPerLevel = 6f;
+
+        public float GetMultiplier(int currentLevel)
+        {
+            int additionalLevel = Mathf.Max(0, currentLevel - 1);
+            return 1f + GrowthPercentPerLevel / 100f * additionalLevel;
+        }
+
+        public float Scale(float baseValue, int currentLevel)
+        {
+            return baseValue * GetMultiplier(currentLevel);
+        }
+    }
 
     [CreateAssetMenu(fileName = "Skill_", menuName = "ScriptableObjects/SkillDataSO")]
     public class SkillDataSO : ScriptableObject
@@ -182,6 +203,7 @@ namespace Immortal_Switch.Scripts.Skill
         public string SkillName;
         public string IconSkillKey;
         public Sprite SkillIcon;
+        public float GrowthPercentPerLevel;
         [TextArea(3, 8)] public string DescriptionTemplate;
 
         [Header("Type")]
@@ -195,6 +217,8 @@ namespace Immortal_Switch.Scripts.Skill
         [Header("Default Config")]
         public SkillCastConfig CastConfig = new();
         public SkillRuntimeObjectConfig RuntimeObjectConfig = new();
+        public List<SkillPhaseData> BasePhases;
+        public ClassSkillLevelScalingConfig ClassSkillScaling = new();
         [ShowIf("OwnerType", SkillOwnerType.PassiveSkill)]
         public SkillPassiveConfig PassiveConfig = new();
 
@@ -261,47 +285,107 @@ namespace Immortal_Switch.Scripts.Skill
             return GetPhaseByEvent(level, SkillPhaseTriggerType.SpineEvent, eventName);
         }
 
-        public SkillPhaseData GetPhaseByEvent(int level, SkillPhaseTriggerType triggerType, string eventName)
+        public SkillPhaseData GetPhaseByEvent(
+            int level,
+            SkillPhaseTriggerType triggerType,
+            string eventName)
         {
             if (string.IsNullOrEmpty(eventName))
                 return null;
 
-            SkillLevelData levelData = GetLevelData(level);
-            if (levelData == null || levelData.Phases == null)
+            IReadOnlyList<SkillPhaseData> phases = GetPhases(level);
+            if (phases == null)
                 return null;
 
-            for (int i = 0; i < levelData.Phases.Count; i++)
+            for (int i = 0; i < phases.Count; i++)
             {
-                SkillPhaseData phase = levelData.Phases[i];
+                SkillPhaseData phase = phases[i];
+
                 if (phase == null || phase.TriggerType != triggerType)
                     continue;
 
-                if (string.Equals(phase.EventName, eventName, StringComparison.Ordinal))
+                if (string.Equals(
+                        phase.EventName,
+                        eventName,
+                        StringComparison.Ordinal))
+                {
                     return phase;
+                }
             }
 
             return null;
         }
 
-        public void GetPhasesByEvent(int level, SkillPhaseTriggerType triggerType, string eventName, List<SkillPhaseData> results)
+        public void GetPhasesByEvent(
+            int level,
+            SkillPhaseTriggerType triggerType,
+            string eventName,
+            List<SkillPhaseData> results)
         {
             results?.Clear();
+
             if (results == null || string.IsNullOrEmpty(eventName))
                 return;
 
-            SkillLevelData levelData = GetLevelData(level);
-            if (levelData == null || levelData.Phases == null)
+            IReadOnlyList<SkillPhaseData> phases = GetPhases(level);
+            if (phases == null)
                 return;
 
-            for (int i = 0; i < levelData.Phases.Count; i++)
+            for (int i = 0; i < phases.Count; i++)
             {
-                SkillPhaseData phase = levelData.Phases[i];
+                SkillPhaseData phase = phases[i];
+
                 if (phase == null || phase.TriggerType != triggerType)
                     continue;
 
-                if (string.Equals(phase.EventName, eventName, StringComparison.Ordinal))
+                if (string.Equals(
+                        phase.EventName,
+                        eventName,
+                        StringComparison.Ordinal))
+                {
                     results.Add(phase);
+                }
             }
+        }
+        
+        public IReadOnlyList<SkillPhaseData> GetPhases(int level)
+        {
+            // Class skill có nhiều level:
+            // luôn dùng BasePhases và scale giá trị bằng công thức runtime.
+            if (OwnerType == SkillOwnerType.ClassSkill)
+                return BasePhases;
+
+            SkillLevelData levelData = GetLevelData(level);
+
+            if (levelData != null &&
+                levelData.UsePhaseOverride &&
+                levelData.Phases != null &&
+                levelData.Phases.Count > 0)
+            {
+                return levelData.Phases;
+            }
+
+            return BasePhases;
+        }
+        
+        public bool UsesAutomaticClassSkillScaling =>
+            OwnerType == SkillOwnerType.ClassSkill;
+
+        public float GetScaledClassSkillValue(
+            float baseValue,
+            int currentLevel,
+            bool scaleWithLevel)
+        {
+            if (!scaleWithLevel)
+                return baseValue;
+
+            if (!UsesAutomaticClassSkillScaling)
+                return baseValue;
+
+            if (ClassSkillScaling == null)
+                return baseValue;
+
+            return ClassSkillScaling.Scale(baseValue, currentLevel);
         }
 
         public int GetRequiredShardForLevel(int currentLevel)
@@ -472,6 +556,17 @@ namespace Immortal_Switch.Scripts.Skill
                 level.Phases = cloned.Phases;
                 level.DescriptionParams = cloned.DescriptionParams;
             }
+        }
+        
+        public float GetMultiplier(int currentLevel)
+        {
+            int additionalLevel = Mathf.Max(0, currentLevel - 1);
+            return 1f + GrowthPercentPerLevel / 100f * additionalLevel;
+        }
+
+        public float Scale(float baseValue, int currentLevel)
+        {
+            return baseValue * GetMultiplier(currentLevel);
         }
 
         [ContextMenu("Skill/Add Next Level - Copy From Last Level")]

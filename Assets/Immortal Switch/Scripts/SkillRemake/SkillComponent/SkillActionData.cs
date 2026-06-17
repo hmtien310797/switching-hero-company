@@ -27,6 +27,7 @@ namespace Immortal_Switch.Scripts.Skill
     {
         [Tooltip("Bonus percent. 0 = normal attack damage. 528 = normal + 528% ATK bonus.")]
         public float SkillDamageBonusPercent;
+        public bool ScaleWithClassSkillLevel = true;
         public bool CountAsSkillDamage = true;
     }
 
@@ -36,6 +37,7 @@ namespace Immortal_Switch.Scripts.Skill
         public string EffectId = "DOT";
         [Tooltip("Snapshot tick damage bonus percent. 0 = normal attack damage per tick.")]
         public float TickDamageBonusPercent;
+        public bool ScaleDamageWithClassSkillLevel = true;
         [Min(0.01f)] public float TickInterval = 1f;
         [Min(0.01f)] public float Duration = 5f;
         public DamageType DamageType = DamageType.Normal;
@@ -48,6 +50,7 @@ namespace Immortal_Switch.Scripts.Skill
         public string ModifierId;
         public StatType StatType;
         public float PercentValue;
+        public bool ScaleValueWithClassSkillLevel = true;
         public float Duration = 5f;
     }
 
