@@ -44,9 +44,9 @@ namespace Immortal_Switch.Scripts.Skill
 
         protected Coroutine spawnRoutine;
 
-        protected override void OnRuntimeInitialized()
+        protected override void OnRuntimeInitialized(object arg)
         {
-            base.OnRuntimeInitialized();
+            base.OnRuntimeInitialized(arg);
 
             if (childRuntimePrefab == null)
             {
@@ -135,7 +135,7 @@ namespace Immortal_Switch.Scripts.Skill
             return new SkillRuntimeObjectConfig
             {
                 RuntimeVisualType = SkillRuntimeVisualType.SpawnedSkillObject,
-                SpineRuntimePrefab = childRuntimePrefab,
+                SkillRuntimePrefab = childRuntimePrefab,
                 SpawnPositionType = SkillSpawnPositionType.CastPosition,
                 FollowType = SkillFollowType.None,
                 SpawnOffset = Vector3.zero,

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Immortal_Switch.Scripts.Skill;
@@ -14,65 +13,29 @@ using UnityEngine.Networking;
 
 public class SkillDataGoogleSheetImporterWindow : EditorWindow
 {
-    private const string DefaultOutputFolder =
-        "Assets/GameData/Skills/ClassSkills";
+    private const string GoogleSheetUrl =
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=1104382280&single=true&output=csv";
 
-    private const string DefaultDealDamageActionEnum = "DealDamage";
-    private const string DefaultDotDamageActionEnum = "ApplyDot";
+    private const string OutputFolder =
+        "Assets/Immortal Switch/Addressable/Skill/Data";
 
-    /// <summary>
-    /// Hỗ trợ:
-    /// phase_hit_1
-    /// phase_hit_2
-    /// phase_final_hit_1
-    /// phase_final_hit_99
-    /// </summary>
-    private static readonly Regex PhaseHeaderRegex = new(
-        @"^phase_(hit|final_hit)_(\d+)$",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    private static readonly Regex FlatDamageRegex = new(
-        @"^flat_damage\s*\(\s*(?<value>-?\d+(?:\.\d+)?)\s*\)$",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    private static readonly Regex DotDamageRegex = new(
-        @"^dot_damage\s*\(\s*(?<parameters>.*?)\s*\)$",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    [SerializeField]
-    private string googleSheetUrl;
-
-    [SerializeField]
-    private TextAsset fallbackCsvFile;
-
-    [SerializeField]
-    private string outputFolder = DefaultOutputFolder;
-
-    [SerializeField]
-    private bool updateExistingAssets = true;
-
-    [SerializeField]
-    private string dealDamageActionEnum =
-        DefaultDealDamageActionEnum;
-
-    [SerializeField]
-    private string dotDamageActionEnum =
-        DefaultDotDamageActionEnum;
+    [SerializeField] private TextAsset fallbackCsvFile;
+    [SerializeField] private bool updateExistingAssets = true;
 
     private Vector2 scrollPosition;
     private UnityWebRequest activeRequest;
     private bool isDownloading;
 
-    [MenuItem("Tools/Skill/Import Skill Data From Google Sheet")]
+    [MenuItem("Tools/Game Data/Import Skill Identity From Google Sheet")]
     private static void OpenWindow()
     {
         SkillDataGoogleSheetImporterWindow window =
             GetWindow<SkillDataGoogleSheetImporterWindow>();
 
         window.titleContent =
-            new GUIContent("Skill Sheet Importer");
+            new GUIContent("Skill Identity Importer");
 
-        window.minSize = new Vector2(570f, 500f);
+        window.minSize = new Vector2(560f, 360f);
         window.Show();
     }
 
@@ -84,18 +47,22 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         EditorGUILayout.Space(8);
 
         EditorGUILayout.LabelField(
-            "Skill Data Google Sheet Importer",
+            "Skill Identity Google Sheet Importer",
             EditorStyles.boldLabel);
 
         EditorGUILayout.Space(6);
 
-        EditorGUILayout.LabelField(
-            "Google Sheet Source",
-            EditorStyles.boldLabel);
-
-        googleSheetUrl = EditorGUILayout.TextField(
-            "Full Google Sheet URL",
-            googleSheetUrl);
+        EditorGUILayout.HelpBox(
+            "Tool chỉ cập nhật:\n" +
+            "• SkillId\n" +
+            "• SkillKey\n" +
+            "• SkillName\n" +
+            "• IconSkillKey\n" +
+            "• OwnerType = ClassSkill\n" +
+            "• SkillTier\n\n" +
+            "Tool không đọc hoặc sửa BasePhases, Levels, CastConfig, " +
+            "RuntimeObjectConfig, SkillIcon, DescriptionTemplate và MaxLevel.",
+            MessageType.Info);
 
         fallbackCsvFile =
             (TextAsset)EditorGUILayout.ObjectField(
@@ -104,23 +71,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                 typeof(TextAsset),
                 false);
 
-        EditorGUILayout.HelpBox(
-            "Dán full link Google Sheet của đúng tab cần import.\n\n" +
-            "Ví dụ:\n" +
-            "https://docs.google.com/spreadsheets/d/xxx/edit#gid=123456\n\n" +
-            "Google Sheet phải được share quyền Viewer cho người có link.",
-            MessageType.Info);
-
-        EditorGUILayout.Space(8);
-
-        EditorGUILayout.LabelField(
-            "Output",
-            EditorStyles.boldLabel);
-
-        outputFolder = EditorGUILayout.TextField(
-            "Output Folder",
-            outputFolder);
-
         updateExistingAssets = EditorGUILayout.Toggle(
             "Update Existing Assets",
             updateExistingAssets);
@@ -128,47 +78,27 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         EditorGUILayout.Space(8);
 
         EditorGUILayout.LabelField(
-            "Action Enum Mapping",
+            "Source",
             EditorStyles.boldLabel);
 
-        dealDamageActionEnum = EditorGUILayout.TextField(
-            "Deal Damage Enum",
-            dealDamageActionEnum);
+        EditorGUILayout.SelectableLabel(
+            GoogleSheetUrl,
+            EditorStyles.textField,
+            GUILayout.Height(38f));
 
-        dotDamageActionEnum = EditorGUILayout.TextField(
-            "DOT Damage Enum",
-            dotDamageActionEnum);
-
-        EditorGUILayout.HelpBox(
-            "Action hiện được hỗ trợ:\n" +
-            "flat_damage(324)\n" +
-            "dot_damage(DOT303/80/1/5/Burn)\n\n" +
-            "Tool tự tìm phase_hit_N và phase_final_hit_N, " +
-            "không giới hạn số N.",
-            MessageType.None);
+        EditorGUILayout.LabelField(
+            "Output Folder",
+            OutputFolder);
 
         EditorGUILayout.Space(12);
 
-        bool hasSource =
-            !string.IsNullOrWhiteSpace(googleSheetUrl) ||
-            fallbackCsvFile != null;
-
-        GUI.enabled = hasSource && !isDownloading;
+        GUI.enabled = !isDownloading;
 
         if (GUILayout.Button(
-                "Validate Sheet",
-                GUILayout.Height(34f)))
+                "Download, Validate And Import",
+                GUILayout.Height(44f)))
         {
-            LoadSourceCsv(ValidateCsvText);
-        }
-
-        EditorGUILayout.Space(4);
-
-        if (GUILayout.Button(
-                "Download And Import",
-                GUILayout.Height(42f)))
-        {
-            LoadSourceCsv(ImportCsvText);
+            LoadSourceCsv(ValidateAndImportCsvText);
         }
 
         GUI.enabled = true;
@@ -190,34 +120,10 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         DisposeActiveRequest();
     }
 
-    #region Source loading
-
     private void LoadSourceCsv(Action<string> onLoaded)
     {
         if (isDownloading)
             return;
-
-        if (!string.IsNullOrWhiteSpace(googleSheetUrl))
-        {
-            string csvUrl;
-
-            try
-            {
-                csvUrl = ConvertGoogleSheetUrlToCsvUrl(
-                    googleSheetUrl);
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError(
-                    $"[Skill Sheet] Google Sheet URL không hợp lệ.\n" +
-                    exception.Message);
-
-                return;
-            }
-
-            DownloadCsv(csvUrl, onLoaded);
-            return;
-        }
 
         if (fallbackCsvFile != null)
         {
@@ -225,8 +131,7 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
             return;
         }
 
-        Debug.LogError(
-            "[Skill Sheet] Chưa nhập Google Sheet URL hoặc CSV.");
+        DownloadCsv(GoogleSheetUrl, onLoaded);
     }
 
     private void DownloadCsv(
@@ -255,10 +160,10 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                     UnityWebRequest.Result.Success)
                 {
                     Debug.LogError(
-                        "[Skill Sheet] Không thể tải Google Sheet.\n" +
+                        "[Skill Identity Sheet] Không thể tải Google Sheet.\n" +
                         $"Error: {activeRequest.error}\n" +
                         $"Response Code: {activeRequest.responseCode}\n" +
-                        $"CSV URL: {csvUrl}");
+                        $"URL: {csvUrl}");
 
                     return;
                 }
@@ -269,7 +174,7 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                 if (string.IsNullOrWhiteSpace(content))
                 {
                     Debug.LogError(
-                        "[Skill Sheet] Google Sheet trả về nội dung trống.");
+                        "[Skill Identity Sheet] Google Sheet trả về nội dung trống.");
 
                     return;
                 }
@@ -277,9 +182,7 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                 if (LooksLikeHtml(content))
                 {
                     Debug.LogError(
-                        "[Skill Sheet] Google trả về HTML thay vì CSV.\n" +
-                        "Hãy kiểm tra quyền chia sẻ của Sheet. " +
-                        "Sheet cần được đặt Anyone with the link → Viewer.");
+                        "[Skill Identity Sheet] Google trả về HTML thay vì CSV.");
 
                     return;
                 }
@@ -289,7 +192,7 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
             catch (Exception exception)
             {
                 Debug.LogError(
-                    $"[Skill Sheet] Xử lý dữ liệu thất bại.\n{exception}");
+                    $"[Skill Identity Sheet] Xử lý dữ liệu thất bại.\n{exception}");
             }
             finally
             {
@@ -325,148 +228,28 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                    StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string ConvertGoogleSheetUrlToCsvUrl(
-        string fullUrl)
-    {
-        if (string.IsNullOrWhiteSpace(fullUrl))
-        {
-            throw new ArgumentException(
-                "Google Sheet URL đang trống.");
-        }
-
-        string trimmedUrl = fullUrl.Trim();
-
-        if (!Uri.TryCreate(
-                trimmedUrl,
-                UriKind.Absolute,
-                out Uri uri))
-        {
-            throw new ArgumentException(
-                $"URL không hợp lệ: {trimmedUrl}");
-        }
-
-        if (!string.Equals(
-                uri.Host,
-                "docs.google.com",
-                StringComparison.OrdinalIgnoreCase))
-        {
-            throw new ArgumentException(
-                "URL không thuộc docs.google.com.");
-        }
-
-        Match spreadsheetIdMatch = Regex.Match(
-            trimmedUrl,
-            @"/spreadsheets/d/(?<id>[^/?#]+)",
-            RegexOptions.IgnoreCase);
-
-        if (!spreadsheetIdMatch.Success)
-        {
-            throw new ArgumentException(
-                "Không tìm thấy Spreadsheet ID trong URL.");
-        }
-
-        string spreadsheetId =
-            spreadsheetIdMatch.Groups["id"].Value;
-
-        string gid = ExtractGid(trimmedUrl);
-
-        return
-            $"https://docs.google.com/spreadsheets/d/" +
-            $"{spreadsheetId}/export?format=csv&gid={gid}";
-    }
-
-    private static string ExtractGid(string fullUrl)
-    {
-        Match gidMatch = Regex.Match(
-            fullUrl,
-            @"(?:[?#&]gid=)(?<gid>\d+)",
-            RegexOptions.IgnoreCase);
-
-        return gidMatch.Success
-            ? gidMatch.Groups["gid"].Value
-            : "0";
-    }
-
-    #endregion
-
-    #region Validate and import
-
-    private void ValidateCsvText(string csvText)
-    {
-        try
-        {
-            SkillCsvDocument document =
-                ParseDocument(csvText);
-
-            int validSkillCount = 0;
-            int hitPhaseCount = 0;
-            int finalHitPhaseCount = 0;
-            int totalActionCount = 0;
-
-            foreach (SkillCsvRow row in document.Rows)
-            {
-                if (!TryParseSkillId(
-                        document,
-                        row,
-                        out int skillId))
-                {
-                    continue;
-                }
-
-                ValidateRequiredRowData(document, row);
-
-                List<ParsedPhase> phases =
-                    ParsePhases(
-                        document.Headers,
-                        row,
-                        skillId);
-
-                validSkillCount++;
-
-                foreach (ParsedPhase phase in phases)
-                {
-                    totalActionCount += phase.Actions.Count;
-
-                    if (phase.Group == PhaseGroup.Hit)
-                        hitPhaseCount++;
-                    else
-                        finalHitPhaseCount++;
-                }
-            }
-
-            Debug.Log(
-                "<color=green>[Skill Sheet Validation Success]</color>\n" +
-                $"Skills: {validSkillCount}\n" +
-                $"Hit Phases: {hitPhaseCount}\n" +
-                $"Final Hit Phases: {finalHitPhaseCount}\n" +
-                $"Actions: {totalActionCount}");
-        }
-        catch (Exception exception)
-        {
-            Debug.LogError(
-                $"[Skill Sheet] Validation thất bại.\n{exception}");
-        }
-    }
-
-    private void ImportCsvText(string csvText)
+    private void ValidateAndImportCsvText(string csvText)
     {
         SkillCsvDocument document;
 
         try
         {
             document = ParseDocument(csvText);
-            EnsureAssetFolderExists(outputFolder);
+            ValidateDocument(document);
+            EnsureAssetFolderExists(OutputFolder);
         }
         catch (Exception exception)
         {
             Debug.LogError(
-                $"[Skill Sheet] Không thể bắt đầu import.\n{exception}");
+                "[Skill Identity Sheet] Validation thất bại. " +
+                $"Chưa có asset nào bị sửa.\n{exception}");
 
             return;
         }
 
         int createdCount = 0;
         int updatedCount = 0;
+        int unchangedCount = 0;
         int skippedCount = 0;
         int failedCount = 0;
 
@@ -481,38 +264,43 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
             {
                 try
                 {
-                    if (!TryParseSkillId(
+                    if (!TryReadRow(
                             document,
                             row,
-                            out int skillId))
+                            out ParsedSkillRow parsedRow))
                     {
                         skippedCount++;
                         continue;
                     }
 
-                    bool imported = TryImportRow(
-                        document,
-                        row,
-                        skillId,
-                        out bool created);
+                    ImportResult result =
+                        ImportRow(parsedRow, row);
 
-                    if (!imported)
+                    switch (result)
                     {
-                        skippedCount++;
-                        continue;
-                    }
+                        case ImportResult.Created:
+                            createdCount++;
+                            break;
 
-                    if (created)
-                        createdCount++;
-                    else
-                        updatedCount++;
+                        case ImportResult.Updated:
+                            updatedCount++;
+                            break;
+
+                        case ImportResult.Unchanged:
+                            unchangedCount++;
+                            break;
+
+                        case ImportResult.Skipped:
+                            skippedCount++;
+                            break;
+                    }
                 }
                 catch (Exception exception)
                 {
                     failedCount++;
 
                     Debug.LogError(
-                        $"[Skill Sheet] Import lỗi tại dòng " +
+                        $"[Skill Identity Sheet] Lỗi tại dòng " +
                         $"{row.RowNumber}.\n{exception.Message}");
                 }
             }
@@ -527,22 +315,168 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         AssetDatabase.Refresh();
 
         Debug.Log(
-            "<color=green>[Skill Sheet Import Complete]</color>\n" +
+            "<color=green>[Skill Identity Import Complete]</color>\n" +
             $"Created: {createdCount}\n" +
             $"Updated: {updatedCount}\n" +
+            $"Unchanged: {unchangedCount}\n" +
             $"Skipped: {skippedCount}\n" +
             $"Failed: {failedCount}");
     }
 
-    private bool TryImportRow(
+    private static void ValidateDocument(
+        SkillCsvDocument document)
+    {
+        int validRowCount = 0;
+        HashSet<int> skillIds = new();
+
+        foreach (SkillCsvRow row in document.Rows)
+        {
+            if (!TryReadRow(
+                    document,
+                    row,
+                    out ParsedSkillRow parsedRow))
+            {
+                continue;
+            }
+
+            if (!skillIds.Add(parsedRow.SkillId))
+            {
+                throw CreateRowException(
+                    row,
+                    $"SkillId {parsedRow.SkillId} bị trùng trong Sheet.");
+            }
+
+            validRowCount++;
+        }
+
+        if (validRowCount == 0)
+        {
+            throw new InvalidOperationException(
+                "Không tìm thấy dòng skill hợp lệ.");
+        }
+
+        Debug.Log(
+            "<color=green>[Skill Identity Validation Success]</color>\n" +
+            $"Valid skills: {validRowCount}");
+    }
+
+    private ImportResult ImportRow(
+        ParsedSkillRow rowData,
+        SkillCsvRow sourceRow)
+    {
+        SkillDataSO skillData =
+            FindExistingSkill(rowData.SkillId);
+
+        bool created = false;
+
+        if (skillData == null)
+        {
+            string assetPath =
+                $"{OutputFolder}/{rowData.SkillKey}.asset";
+
+            SkillDataSO assetAtPath =
+                AssetDatabase.LoadAssetAtPath<SkillDataSO>(
+                    assetPath);
+
+            if (assetAtPath != null)
+            {
+                skillData = assetAtPath;
+
+                if (skillData.SkillId != rowData.SkillId)
+                {
+                    Debug.LogWarning(
+                        $"[Skill Identity Sheet] Asset '{assetPath}' " +
+                        $"đang có SkillId cũ = {skillData.SkillId}. " +
+                        $"Tool sẽ cập nhật thành SkillId mới = {rowData.SkillId}.");
+                }
+            }
+            else
+            {
+                skillData =
+                    CreateInstance<SkillDataSO>();
+
+                AssetDatabase.CreateAsset(
+                    skillData,
+                    assetPath);
+
+                created = true;
+            }
+        }
+        else if (!updateExistingAssets)
+        {
+            return ImportResult.Skipped;
+        }
+
+        bool changed =
+            skillData.SkillId != rowData.SkillId ||
+            !string.Equals(
+                skillData.SkillKey,
+                rowData.SkillKey,
+                StringComparison.Ordinal) ||
+            !string.Equals(
+                skillData.SkillName,
+                rowData.SkillName,
+                StringComparison.Ordinal) ||
+            !string.Equals(
+                skillData.IconSkillKey,
+                rowData.IconSkillKey,
+                StringComparison.Ordinal) ||
+            skillData.OwnerType != SkillOwnerType.ClassSkill ||
+            skillData.SkillTier != rowData.SkillTier;
+
+        if (!changed)
+            return created
+                ? ImportResult.Created
+                : ImportResult.Unchanged;
+
+        Undo.RecordObject(
+            skillData,
+            $"Import Skill Identity {rowData.SkillId}");
+
+        skillData.SkillId = rowData.SkillId;
+        skillData.SkillKey = rowData.SkillKey;
+        skillData.SkillName = rowData.SkillName;
+        skillData.IconSkillKey = rowData.IconSkillKey;
+        skillData.OwnerType = SkillOwnerType.ClassSkill;
+        skillData.SkillTier = rowData.SkillTier;
+
+        EditorUtility.SetDirty(skillData);
+
+        return created
+            ? ImportResult.Created
+            : ImportResult.Updated;
+    }
+
+    private static bool TryReadRow(
         SkillCsvDocument document,
         SkillCsvRow row,
-        int skillId,
-        out bool created)
+        out ParsedSkillRow result)
     {
-        created = false;
+        result = null;
 
-        ValidateRequiredRowData(document, row);
+        string rawSkillId =
+            GetCell(document, row, "skill_id");
+
+        if (string.IsNullOrWhiteSpace(rawSkillId))
+            return false;
+
+        if (!int.TryParse(
+                rawSkillId.Trim(),
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out int skillId))
+        {
+            throw CreateRowException(
+                row,
+                $"skill_id '{rawSkillId}' không hợp lệ.");
+        }
+
+        if (skillId <= 0)
+        {
+            throw CreateRowException(
+                row,
+                $"skill_id phải lớn hơn 0, hiện tại là {skillId}.");
+        }
 
         string className =
             GetRequiredCell(document, row, "class");
@@ -552,22 +486,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
 
         string tierText =
             GetRequiredCell(document, row, "tier");
-
-        float cooldown =
-            GetRequiredFloat(document, row, "cooldown(s)");
-
-        float growthPercentPerLevel =
-            GetRequiredFloat(document, row, "dmg_per_lv%");
-
-        string normalizedClass =
-            NormalizeKeyPart(className);
-
-        string skillKey =
-            $"skilldata_{normalizedClass}_{skillId}"
-                .ToLowerInvariant();
-
-        string iconSkillKey =
-            $"icon_{skillKey}".ToLowerInvariant();
 
         if (!Enum.TryParse(
                 tierText,
@@ -581,630 +499,32 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                 $"{string.Join(", ", Enum.GetNames(typeof(TierSkill)))}");
         }
 
-        List<ParsedPhase> parsedPhases =
-            ParsePhases(
-                document.Headers,
+        string normalizedClass =
+            NormalizeKeyPart(className);
+
+        if (string.IsNullOrWhiteSpace(normalizedClass))
+        {
+            throw CreateRowException(
                 row,
-                skillId);
-
-        SkillDataSO skillData =
-            FindExistingSkill(skillId);
-
-        if (skillData == null)
-        {
-            string assetPath =
-                $"{outputFolder}/{skillKey}.asset";
-
-            SkillDataSO assetAtExpectedPath =
-                AssetDatabase.LoadAssetAtPath<SkillDataSO>(
-                    assetPath);
-
-            if (assetAtExpectedPath != null)
-            {
-                skillData = assetAtExpectedPath;
-            }
-            else
-            {
-                skillData =
-                    CreateInstance<SkillDataSO>();
-
-                AssetDatabase.CreateAsset(
-                    skillData,
-                    AssetDatabase.GenerateUniqueAssetPath(
-                        assetPath));
-
-                created = true;
-            }
-        }
-        else if (!updateExistingAssets)
-        {
-            Debug.LogWarning(
-                $"[Skill Sheet] SkillId {skillId} đã tồn tại. " +
-                "Update Existing Assets đang tắt.");
-
-            return false;
+                $"Class '{className}' không thể dùng để tạo SkillKey.");
         }
 
-        Undo.RecordObject(
-            skillData,
-            $"Import Skill {skillId}");
+        string skillKey =
+            $"skilldata_{normalizedClass}_{skillId}"
+                .ToLowerInvariant();
 
-        ApplyGeneralData(
-            skillData,
-            skillId,
-            skillKey,
-            iconSkillKey,
-            skillName,
-            skillTier,
-            cooldown,
-            growthPercentPerLevel);
+        result = new ParsedSkillRow
+        {
+            SkillId = skillId,
+            SkillKey = skillKey,
+            SkillName = skillName,
+            IconSkillKey =
+                $"icon_{skillKey}".ToLowerInvariant(),
+            SkillTier = skillTier
+        };
 
-        ApplyParsedPhases(
-            skillData,
-            parsedPhases,
-            row);
-
-        EditorUtility.SetDirty(skillData);
         return true;
     }
-
-    private static void ValidateRequiredRowData(
-        SkillCsvDocument document,
-        SkillCsvRow row)
-    {
-        GetRequiredCell(document, row, "skill_id");
-        GetRequiredCell(document, row, "class");
-        GetRequiredCell(document, row, "name");
-        GetRequiredCell(document, row, "tier");
-        GetRequiredFloat(document, row, "cooldown(s)");
-        GetRequiredFloat(document, row, "dmg_per_lv%");
-    }
-
-    private static void ApplyGeneralData(
-        SkillDataSO skillData,
-        int skillId,
-        string skillKey,
-        string iconSkillKey,
-        string skillName,
-        TierSkill skillTier,
-        float cooldown,
-        float growthPercentPerLevel)
-    {
-        skillData.SkillId = skillId;
-        skillData.SkillKey = skillKey;
-        skillData.SkillName = skillName;
-        skillData.IconSkillKey = iconSkillKey;
-
-        skillData.OwnerType =
-            SkillOwnerType.ClassSkill;
-
-        skillData.SkillTier = skillTier;
-
-        skillData.CastConfig ??=
-            new SkillCastConfig();
-
-        skillData.CastConfig.Cooldown =
-            cooldown;
-
-        /*
-         * SkillDataSO hiện đang có cả:
-         * - GrowthPercentPerLevel
-         * - ClassSkillScaling.GrowthPercentPerLevel
-         *
-         * Runtime GetScaledClassSkillValue() dùng ClassSkillScaling,
-         * nên importer set đồng thời cả hai để data không bị lệch.
-         */
-        skillData.GrowthPercentPerLevel =
-            growthPercentPerLevel;
-
-        skillData.ClassSkillScaling ??=
-            new ClassSkillLevelScalingConfig();
-
-        skillData.ClassSkillScaling.GrowthPercentPerLevel =
-            growthPercentPerLevel;
-    }
-
-    #endregion
-
-    #region Phase parsing
-
-    private List<ParsedPhase> ParsePhases(
-        IReadOnlyList<string> headers,
-        SkillCsvRow row,
-        int skillId)
-    {
-        Dictionary<PhaseGroup, List<PhaseColumn>> phaseColumns =
-            CollectPhaseColumns(headers);
-
-        List<ParsedPhase> phases = new();
-
-        ParsedPhase hitPhase = ParseSinglePhase(
-            PhaseGroup.Hit,
-            phaseId: 1,
-            eventName: "hit",
-            phaseColumns[PhaseGroup.Hit],
-            row,
-            skillId);
-
-        if (hitPhase.Actions.Count > 0)
-            phases.Add(hitPhase);
-
-        ParsedPhase finalHitPhase = ParseSinglePhase(
-            PhaseGroup.FinalHit,
-            phaseId: 2,
-            eventName: "finalhit",
-            phaseColumns[PhaseGroup.FinalHit],
-            row,
-            skillId);
-
-        if (finalHitPhase.Actions.Count > 0)
-            phases.Add(finalHitPhase);
-
-        return phases;
-    }
-
-    private static Dictionary<PhaseGroup, List<PhaseColumn>>
-        CollectPhaseColumns(IReadOnlyList<string> headers)
-    {
-        Dictionary<PhaseGroup, List<PhaseColumn>> result = new()
-        {
-            { PhaseGroup.Hit, new List<PhaseColumn>() },
-            { PhaseGroup.FinalHit, new List<PhaseColumn>() }
-        };
-
-        for (int columnIndex = 0;
-             columnIndex < headers.Count;
-             columnIndex++)
-        {
-            string header =
-                NormalizeHeader(headers[columnIndex]);
-
-            Match match =
-                PhaseHeaderRegex.Match(header);
-
-            if (!match.Success)
-                continue;
-
-            string phaseName =
-                match.Groups[1].Value;
-
-            int actionOrder = int.Parse(
-                match.Groups[2].Value,
-                CultureInfo.InvariantCulture);
-
-            PhaseGroup group =
-                string.Equals(
-                    phaseName,
-                    "hit",
-                    StringComparison.OrdinalIgnoreCase)
-                    ? PhaseGroup.Hit
-                    : PhaseGroup.FinalHit;
-
-            result[group].Add(
-                new PhaseColumn
-                {
-                    ColumnIndex = columnIndex,
-                    ActionOrder = actionOrder,
-                    HeaderName = headers[columnIndex]
-                });
-        }
-
-        foreach (List<PhaseColumn> columns in result.Values)
-        {
-            columns.Sort(
-                (left, right) =>
-                    left.ActionOrder.CompareTo(
-                        right.ActionOrder));
-        }
-
-        return result;
-    }
-
-    private ParsedPhase ParseSinglePhase(
-        PhaseGroup group,
-        int phaseId,
-        string eventName,
-        IReadOnlyList<PhaseColumn> columns,
-        SkillCsvRow row,
-        int skillId)
-    {
-        ParsedPhase result = new()
-        {
-            Group = group,
-            PhaseId = phaseId,
-            EventName = eventName
-        };
-
-        foreach (PhaseColumn column in columns)
-        {
-            if (column.ColumnIndex < 0 ||
-                column.ColumnIndex >= row.Cells.Count)
-            {
-                continue;
-            }
-
-            string rawAction =
-                row.Cells[column.ColumnIndex]?.Trim();
-
-            /*
-             * Ô trống hoặc 0:
-             * không tạo action,
-             * không thêm null vào list.
-             */
-            if (string.IsNullOrWhiteSpace(rawAction) ||
-                string.Equals(
-                    rawAction,
-                    "0",
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            ParsedAction action;
-
-            try
-            {
-                action = ParseAction(
-                    rawAction,
-                    skillId);
-            }
-            catch (Exception exception)
-            {
-                throw CreateRowException(
-                    row,
-                    $"Cột '{column.HeaderName}' có action lỗi: " +
-                    $"'{rawAction}'. {exception.Message}");
-            }
-
-            action.Order = column.ActionOrder;
-            result.Actions.Add(action);
-        }
-
-        result.Actions.Sort(
-            (left, right) =>
-                left.Order.CompareTo(right.Order));
-
-        return result;
-    }
-
-    private static ParsedAction ParseAction(
-        string rawAction,
-        int skillId)
-    {
-        Match flatDamageMatch =
-            FlatDamageRegex.Match(rawAction);
-
-        if (flatDamageMatch.Success)
-        {
-            float damagePercent = ParseFloat(
-                flatDamageMatch.Groups["value"].Value);
-
-            return new ParsedAction
-            {
-                Kind = ParsedActionKind.FlatDamage,
-                DamagePercent = damagePercent
-            };
-        }
-
-        Match dotDamageMatch =
-            DotDamageRegex.Match(rawAction);
-
-        if (dotDamageMatch.Success)
-        {
-            string parameterText =
-                dotDamageMatch.Groups["parameters"].Value;
-
-            string[] parameters = parameterText
-                .Split('/')
-                .Select(parameter => parameter.Trim())
-                .ToArray();
-
-            if (parameters.Length != 5)
-            {
-                throw new FormatException(
-                    "dot_damage phải có đúng 5 tham số:\n" +
-                    "EffectId/TickDamageBonusPercent/" +
-                    "TickInterval/Duration/DamageType");
-            }
-
-            string effectId = parameters[0];
-
-            if (string.IsNullOrWhiteSpace(effectId))
-            {
-                throw new FormatException(
-                    "EffectId không được để trống.");
-            }
-
-            string expectedEffectId =
-                $"DOT{skillId}";
-
-            if (!string.Equals(
-                    effectId,
-                    expectedEffectId,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                Debug.LogWarning(
-                    $"[Skill Sheet] SkillId {skillId}: " +
-                    $"EffectId đang là '{effectId}', " +
-                    $"giá trị dự kiến là '{expectedEffectId}'.");
-            }
-
-            return new ParsedAction
-            {
-                Kind = ParsedActionKind.DotDamage,
-                EffectId = effectId,
-                TickDamageBonusPercent =
-                    ParseFloat(parameters[1]),
-                TickInterval =
-                    ParsePositiveFloat(
-                        parameters[2],
-                        "TickInterval"),
-                Duration =
-                    ParsePositiveFloat(
-                        parameters[3],
-                        "Duration"),
-                DamageType = parameters[4]
-            };
-        }
-
-        throw new FormatException(
-            $"Action chưa được hỗ trợ: '{rawAction}'.");
-    }
-
-    #endregion
-
-    #region Apply phases and actions
-
-    private void ApplyParsedPhases(
-        SkillDataSO skillData,
-        IReadOnlyList<ParsedPhase> parsedPhases,
-        SkillCsvRow row)
-    {
-        /*
-         * Import lại phải replace BasePhases,
-         * tránh cộng trùng action qua nhiều lần import.
-         */
-        List<SkillPhaseData> newPhases = new();
-
-        foreach (ParsedPhase parsedPhase in parsedPhases)
-        {
-            SkillPhaseData phase = new()
-            {
-                PhaseId = parsedPhase.PhaseId,
-
-                /*
-                 * Đây là event được runtime object/Spine phát ra.
-                 * SkillDataSO hiện hỗ trợ trigger theo event.
-                 */
-                TriggerType =
-                    SkillPhaseTriggerType.SpineEvent,
-
-                EventName =
-                    parsedPhase.EventName,
-
-                Delay = 0f,
-                NormalizedTime = 0f,
-                Actions = new List<SkillActionData>()
-            };
-
-            foreach (ParsedAction parsedAction in
-                     parsedPhase.Actions)
-            {
-                SkillActionData action =
-                    CreateSkillAction(
-                        parsedAction,
-                        row);
-
-                if (action != null)
-                    phase.Actions.Add(action);
-            }
-
-            if (phase.Actions.Count > 0)
-                newPhases.Add(phase);
-        }
-
-        skillData.BasePhases = newPhases;
-    }
-
-    private SkillActionData CreateSkillAction(
-        ParsedAction parsedAction,
-        SkillCsvRow row)
-    {
-        return parsedAction.Kind switch
-        {
-            ParsedActionKind.FlatDamage =>
-                CreateFlatDamageAction(
-                    parsedAction,
-                    row),
-
-            ParsedActionKind.DotDamage =>
-                CreateDotDamageAction(
-                    parsedAction,
-                    row),
-
-            _ => throw CreateRowException(
-                row,
-                $"Action type chưa được hỗ trợ: " +
-                $"{parsedAction.Kind}")
-        };
-    }
-
-    private SkillActionData CreateFlatDamageAction(
-        ParsedAction parsedAction,
-        SkillCsvRow row)
-    {
-        SkillActionData action = new();
-
-        SetEnumMemberByName(
-            action,
-            "ActionType",
-            dealDamageActionEnum,
-            row);
-
-        action.ChancePercent = 100f;
-
-        action.Damage ??=
-            new SkillDamageData();
-
-        action.Damage.SkillDamageBonusPercent =
-            parsedAction.DamagePercent;
-
-        action.Damage.CountAsSkillDamage = true;
-
-        return action;
-    }
-
-    private SkillActionData CreateDotDamageAction(
-        ParsedAction parsedAction,
-        SkillCsvRow row)
-    {
-        SkillActionData action = new();
-
-        SetEnumMemberByName(
-            action,
-            "ActionType",
-            dotDamageActionEnum,
-            row);
-
-        action.ChancePercent = 100f;
-
-        action.Dot ??=
-            new SkillDotData();
-
-        action.Dot.EffectId =
-            parsedAction.EffectId;
-
-        action.Dot.TickDamageBonusPercent =
-            parsedAction.TickDamageBonusPercent;
-
-        action.Dot.TickInterval =
-            parsedAction.TickInterval;
-
-        action.Dot.Duration =
-            parsedAction.Duration;
-
-        SetEnumMemberByName(
-            action.Dot,
-            "DamageType",
-            parsedAction.DamageType,
-            row);
-
-        return action;
-    }
-
-    /// <summary>
-    /// Dùng reflection cho enum để tool không bị phụ thuộc cứng
-    /// vào tên enum type cụ thể.
-    ///
-    /// Ví dụ:
-    /// SkillActionType.DealDamage
-    /// DamageType.Burn
-    /// </summary>
-    private static void SetEnumMemberByName(
-        object target,
-        string memberName,
-        string enumValueName,
-        SkillCsvRow row)
-    {
-        if (target == null)
-        {
-            throw CreateRowException(
-                row,
-                $"Target null khi set '{memberName}'.");
-        }
-
-        Type targetType = target.GetType();
-
-        FieldInfo field = targetType.GetField(
-            memberName,
-            BindingFlags.Instance |
-            BindingFlags.Public |
-            BindingFlags.NonPublic);
-
-        if (field != null)
-        {
-            object enumValue = ParseEnumValue(
-                field.FieldType,
-                enumValueName,
-                targetType.Name,
-                memberName,
-                row);
-
-            field.SetValue(target, enumValue);
-            return;
-        }
-
-        PropertyInfo property = targetType.GetProperty(
-            memberName,
-            BindingFlags.Instance |
-            BindingFlags.Public |
-            BindingFlags.NonPublic);
-
-        if (property != null && property.CanWrite)
-        {
-            object enumValue = ParseEnumValue(
-                property.PropertyType,
-                enumValueName,
-                targetType.Name,
-                memberName,
-                row);
-
-            property.SetValue(target, enumValue);
-            return;
-        }
-
-        throw CreateRowException(
-            row,
-            $"Không tìm thấy field/property " +
-            $"'{targetType.Name}.{memberName}'.");
-    }
-
-    private static object ParseEnumValue(
-        Type enumType,
-        string enumValueName,
-        string ownerTypeName,
-        string memberName,
-        SkillCsvRow row)
-    {
-        if (!enumType.IsEnum)
-        {
-            throw CreateRowException(
-                row,
-                $"{ownerTypeName}.{memberName} không phải enum.");
-        }
-
-        if (string.IsNullOrWhiteSpace(enumValueName))
-        {
-            throw CreateRowException(
-                row,
-                $"Tên enum cho {ownerTypeName}.{memberName} " +
-                "đang trống.");
-        }
-
-        try
-        {
-            return Enum.Parse(
-                enumType,
-                enumValueName.Trim(),
-                true);
-        }
-        catch
-        {
-            string validValues =
-                string.Join(
-                    ", ",
-                    Enum.GetNames(enumType));
-
-            throw CreateRowException(
-                row,
-                $"'{enumValueName}' không hợp lệ cho " +
-                $"{enumType.Name}. Giá trị hợp lệ: {validValues}");
-        }
-    }
-
-    #endregion
-
-    #region CSV parsing
 
     private static SkillCsvDocument ParseDocument(
         string csvText)
@@ -1241,17 +561,16 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
             string normalizedHeader =
                 NormalizeHeader(headers[i]);
 
-            /*
-             * Header phase được duyệt trực tiếp theo index.
-             * Dictionary này chỉ dùng cho field thông thường.
-             */
-            if (!document.FirstHeaderIndex.ContainsKey(
+            if (document.FirstHeaderIndex.ContainsKey(
                     normalizedHeader))
             {
-                document.FirstHeaderIndex.Add(
-                    normalizedHeader,
-                    i);
+                throw new InvalidOperationException(
+                    $"Header '{headers[i]}' bị trùng.");
             }
+
+            document.FirstHeaderIndex.Add(
+                normalizedHeader,
+                i);
         }
 
         for (int rowIndex = 1;
@@ -1264,9 +583,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
             if (cells.All(string.IsNullOrWhiteSpace))
                 continue;
 
-            /*
-             * Bổ sung ô trống nếu dòng thiếu cột cuối.
-             */
             while (cells.Count < headers.Count)
                 cells.Add(string.Empty);
 
@@ -1279,6 +595,33 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         }
 
         return document;
+    }
+
+    private static void ValidateHeaders(
+        IReadOnlyList<string> headers)
+    {
+        string[] requiredHeaders =
+        {
+            "skill_id",
+            "class",
+            "name",
+            "tier"
+        };
+
+        HashSet<string> normalizedHeaders =
+            headers
+                .Select(NormalizeHeader)
+                .ToHashSet();
+
+        foreach (string requiredHeader in requiredHeaders)
+        {
+            if (!normalizedHeaders.Contains(
+                    NormalizeHeader(requiredHeader)))
+            {
+                throw new InvalidOperationException(
+                    $"Thiếu cột bắt buộc '{requiredHeader}'.");
+            }
+        }
     }
 
     private static List<List<string>> ParseCsvRecords(
@@ -1334,10 +677,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                     break;
 
                 case '\r':
-                    /*
-                     * Bỏ qua CR.
-                     * LF sẽ kết thúc record.
-                     */
                     break;
 
                 case '\n':
@@ -1374,84 +713,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         return records;
     }
 
-    private static void ValidateHeaders(
-        IReadOnlyList<string> headers)
-    {
-        string[] requiredHeaders =
-        {
-            "skill_id",
-            "class",
-            "name",
-            "tier",
-            "cooldown(s)",
-            "dmg_per_lv%"
-        };
-
-        HashSet<string> normalizedHeaders =
-            headers
-                .Select(NormalizeHeader)
-                .ToHashSet();
-
-        foreach (string requiredHeader in requiredHeaders)
-        {
-            if (!normalizedHeaders.Contains(
-                    NormalizeHeader(requiredHeader)))
-            {
-                throw new InvalidOperationException(
-                    $"Thiếu cột bắt buộc: '{requiredHeader}'.");
-            }
-        }
-
-        bool hasAnyPhaseHeader = headers.Any(
-            header =>
-                PhaseHeaderRegex.IsMatch(
-                    NormalizeHeader(header)));
-
-        if (!hasAnyPhaseHeader)
-        {
-            throw new InvalidOperationException(
-                "Không tìm thấy cột phase nào. " +
-                "Header phải có dạng phase_hit_1 hoặc " +
-                "phase_final_hit_1.");
-        }
-    }
-
-    #endregion
-
-    #region CSV cell helpers
-
-    private static bool TryParseSkillId(
-        SkillCsvDocument document,
-        SkillCsvRow row,
-        out int skillId)
-    {
-        skillId = 0;
-
-        string rawValue =
-            GetCell(
-                document,
-                row,
-                "skill_id");
-
-        if (string.IsNullOrWhiteSpace(rawValue))
-            return false;
-
-        if (int.TryParse(
-                rawValue.Trim(),
-                NumberStyles.Integer,
-                CultureInfo.InvariantCulture,
-                out skillId))
-        {
-            return true;
-        }
-
-        Debug.LogError(
-            $"[Skill Sheet] Dòng {row.RowNumber}: " +
-            $"skill_id '{rawValue}' không hợp lệ.");
-
-        return false;
-    }
-
     private static string GetRequiredCell(
         SkillCsvDocument document,
         SkillCsvRow row,
@@ -1468,32 +729,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         }
 
         return value.Trim();
-    }
-
-    private static float GetRequiredFloat(
-        SkillCsvDocument document,
-        SkillCsvRow row,
-        string header)
-    {
-        string rawValue =
-            GetRequiredCell(
-                document,
-                row,
-                header);
-
-        if (!float.TryParse(
-                rawValue,
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture,
-                out float value))
-        {
-            throw CreateRowException(
-                row,
-                $"Cột '{header}' có số không hợp lệ: " +
-                $"'{rawValue}'.");
-        }
-
-        return value;
     }
 
     private static string GetCell(
@@ -1522,78 +757,13 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         return row.Cells[columnIndex];
     }
 
-    private static float ParseFloat(string rawValue)
-    {
-        if (!float.TryParse(
-                rawValue,
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture,
-                out float result))
-        {
-            throw new FormatException(
-                $"Giá trị số không hợp lệ: '{rawValue}'.");
-        }
-
-        return result;
-    }
-
-    private static float ParsePositiveFloat(
-        string rawValue,
-        string parameterName)
-    {
-        float result = ParseFloat(rawValue);
-
-        if (result <= 0f)
-        {
-            throw new FormatException(
-                $"{parameterName} phải lớn hơn 0, " +
-                $"nhưng đang là {result}.");
-        }
-
-        return result;
-    }
-
-    private static string NormalizeHeader(string value)
-    {
-        return RemoveBom(value ?? string.Empty)
-            .Trim()
-            .ToLowerInvariant();
-    }
-
-    private static string RemoveBom(string value)
-    {
-        return string.IsNullOrEmpty(value)
-            ? string.Empty
-            : value.TrimStart('\uFEFF');
-    }
-
-    private static string NormalizeKeyPart(string value)
-    {
-        string normalized = Regex.Replace(
-            value.Trim().ToLowerInvariant(),
-            @"[^a-z0-9]+",
-            "_");
-
-        return normalized.Trim('_');
-    }
-
-    private static Exception CreateRowException(
-        SkillCsvRow row,
-        string message)
-    {
-        return new InvalidOperationException(
-            $"CSV dòng {row.RowNumber}: {message}");
-    }
-
-    #endregion
-
-    #region Asset helpers
-
     private static SkillDataSO FindExistingSkill(
         int skillId)
     {
         string[] guids =
-            AssetDatabase.FindAssets("t:SkillDataSO");
+            AssetDatabase.FindAssets(
+                "t:SkillDataSO",
+                new[] { OutputFolder });
 
         foreach (string guid in guids)
         {
@@ -1663,49 +833,53 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         }
     }
 
-    #endregion
-
-    #region Internal data
-
-    private enum PhaseGroup
+    private static string NormalizeHeader(string value)
     {
-        Hit,
-        FinalHit
+        return RemoveBom(value ?? string.Empty)
+            .Trim()
+            .ToLowerInvariant();
     }
 
-    private enum ParsedActionKind
+    private static string RemoveBom(string value)
     {
-        FlatDamage,
-        DotDamage
+        return string.IsNullOrEmpty(value)
+            ? string.Empty
+            : value.TrimStart('\uFEFF');
     }
 
-    private sealed class PhaseColumn
+    private static string NormalizeKeyPart(string value)
     {
-        public int ColumnIndex;
-        public int ActionOrder;
-        public string HeaderName;
+        string normalized = Regex.Replace(
+            value.Trim().ToLowerInvariant(),
+            @"[^a-z0-9]+",
+            "_");
+
+        return normalized.Trim('_');
     }
 
-    private sealed class ParsedPhase
+    private static Exception CreateRowException(
+        SkillCsvRow row,
+        string message)
     {
-        public PhaseGroup Group;
-        public int PhaseId;
-        public string EventName;
-        public readonly List<ParsedAction> Actions = new();
+        return new InvalidOperationException(
+            $"CSV dòng {row.RowNumber}: {message}");
     }
 
-    private sealed class ParsedAction
+    private enum ImportResult
     {
-        public ParsedActionKind Kind;
-        public int Order;
+        Created,
+        Updated,
+        Unchanged,
+        Skipped
+    }
 
-        public float DamagePercent;
-
-        public string EffectId;
-        public float TickDamageBonusPercent;
-        public float TickInterval;
-        public float Duration;
-        public string DamageType;
+    private sealed class ParsedSkillRow
+    {
+        public int SkillId;
+        public string SkillKey;
+        public string SkillName;
+        public string IconSkillKey;
+        public TierSkill SkillTier;
     }
 
     private sealed class SkillCsvDocument
@@ -1723,8 +897,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         public int RowNumber;
         public List<string> Cells = new();
     }
-
-    #endregion
 }
 
 #endif

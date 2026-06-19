@@ -17,6 +17,7 @@ public class BulletProjectile : PoolableBehaviour
     private bool isInitialized;
     private float damage;
     private ICombatUnit sourceCombatUnit;
+    
 
     public void Setup(ICombatUnit source, Vector3 moveDirection, float bulletSpeed, float bulletLifeTime, float damage)
     {

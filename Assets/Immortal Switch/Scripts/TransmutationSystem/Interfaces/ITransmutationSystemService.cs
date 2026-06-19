@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Shared.Database;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
 {
@@ -25,7 +26,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
         /// <summary>
         /// roll ngau nhien ra item trong level hien tai.
         /// </summary>
-        string RollTier(DynamicHeroesGlobalSpecificationsTransmutationRateConfigRow row);
+        EEquipmentTier RollTier(DynamicHeroesGlobalSpecificationsTransmutationRateConfigRow row);
 
         /// <summary>
         /// tao modifier item tu row cfg

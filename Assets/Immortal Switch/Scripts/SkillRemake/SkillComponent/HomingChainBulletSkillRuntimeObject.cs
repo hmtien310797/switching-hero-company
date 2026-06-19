@@ -8,16 +8,20 @@ namespace Immortal_Switch.Scripts.SkillRemake
 {
     public class HomingChainBulletSkillRuntimeObject : SkillRuntimeObject
     {
-        [SerializeField]
-        [InlineEditor] private HomingChainBulletConfig debugConfig;
-        
         private HomingChainBulletConfig config;
         private Coroutine spawnCoroutine;
 
-        protected override void OnRuntimeInitialized()
+        protected override void OnRuntimeInitialized(object arg)
         {
-            base.OnRuntimeInitialized();
-            config = debugConfig;
+            base.OnRuntimeInitialized(arg);
+            if (Context.SkillData.OwnerType == SkillOwnerType.ClassSkill)
+            {
+                config = Context.SkillData.BasePhases[0].Actions[0].Projectile.HomingChainBulletConfig;
+            }
+            else
+            {
+                config = Context.SkillData.Levels[Context.SkillLevel].Phases[0].Actions[0].Projectile.HomingChainBulletConfig;
+            }
 
             TryFire();
         }

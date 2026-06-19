@@ -4,6 +4,7 @@ using System.Numerics;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.ItemSystem;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
 using UnityEngine;
@@ -38,19 +39,19 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             _storage.Save();
         }
 
-        public string RollTier(DynamicHeroesGlobalSpecificationsTransmutationRateConfigRow row)
+        public EEquipmentTier RollTier(DynamicHeroesGlobalSpecificationsTransmutationRateConfigRow row)
         {
-            var weights = new Dictionary<string, float>
+            var weights = new Dictionary<EEquipmentTier, float>
             {
-                { ItemSystemTierConstants.D, row.d },
-                { ItemSystemTierConstants.C, row.c },
-                { ItemSystemTierConstants.B, row.b },
-                { ItemSystemTierConstants.A, row.a },
-                { ItemSystemTierConstants.S, row.s },
-                { ItemSystemTierConstants.SS, row.sS },
-                { ItemSystemTierConstants.SSS, row.sSS },
-                { ItemSystemTierConstants.R, row.r },
-                { ItemSystemTierConstants.SR, row.sR },
+                { EEquipmentTier.D, row.d },
+                { EEquipmentTier.C, row.c },
+                { EEquipmentTier.B, row.b },
+                { EEquipmentTier.A, row.a },
+                { EEquipmentTier.S, row.s },
+                { EEquipmentTier.SS, row.sS },
+                { EEquipmentTier.SSS, row.sSS },
+                { EEquipmentTier.R, row.r },
+                { EEquipmentTier.SR, row.sR },
             };
 
             // loại bỏ các weight <= 0
@@ -60,7 +61,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
             if (validWeights.Count <= 0)
             {
-                return ItemSystemTierConstants.D;
+                return EEquipmentTier.D;
             }
 
             // tổng weight
@@ -125,6 +126,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 equip.Modifiers.Add(new StatModifier(mapping.StatType, mapping.Op, rate));
             }
 
+            _storage.Data.StuckEquip = equip;
+            _storage.Save();
             return equip;
         }
 
@@ -143,6 +146,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             if (!_storage.Data.Equips.TryAdd(newEquip.ItemType, newEquip))
             {
                 _storage.Data.Equips[newEquip.ItemType] = newEquip;
+                _storage.Data.StuckEquip = null;
             }
 
             _storage.Save();

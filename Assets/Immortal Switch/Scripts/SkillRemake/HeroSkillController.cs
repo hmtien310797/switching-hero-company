@@ -6,6 +6,7 @@ using Battle;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.SkillRemake;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 
@@ -573,15 +574,9 @@ namespace Immortal_Switch.Scripts.Skill
             switch (runtimeType)
             {
                 case SkillRuntimeVisualType.SpawnedSkillObject:
-                    result = SpawnRuntimeObjectSkill(context, runtimeConfig, isUltimate);
-                    break;
-                
-                case SkillRuntimeVisualType.SpawnProjectilePatternBehavior:
-                    result = SpawnProjectileSpawnerSkill(context, runtimeConfig, isUltimate);
-                    break;
-                
                 case SkillRuntimeVisualType.SpawnHomingProjectile:
-                    result = SpawnHomingProjectileSpawnerSkill(context, runtimeConfig, isUltimate);
+                case SkillRuntimeVisualType.SpawnProjectilePatternBehavior:    
+                    result = SpawnRuntimeObjectSkill(context, runtimeConfig, isUltimate);
                     break;
 
                 case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:
@@ -618,7 +613,7 @@ namespace Immortal_Switch.Scripts.Skill
             SkillRuntimeObjectConfig runtimeConfig,
             bool finishImmediatelyIfIndependent, bool isUltimate)
         {
-            if (runtimeConfig == null || runtimeConfig.SpineRuntimePrefab == null)
+            if (runtimeConfig == null || runtimeConfig.SkillRuntimePrefab == null)
             {
                 if (finishImmediatelyIfIndependent)
                 {
@@ -633,7 +628,23 @@ namespace Immortal_Switch.Scripts.Skill
                 owner.SetActionLocked(true);
 
             Vector3 spawnPosition = GetRuntimeObjectSpawnPosition(context, runtimeConfig);
-            SkillRuntimeObject runtimeObject = objectSpawner.Spawn(runtimeConfig.SpineRuntimePrefab, spawnPosition, Quaternion.identity);
+            SkillRuntimeObject runtimeObject = null;
+            switch (runtimeConfig.RuntimeVisualType)
+            {
+                case SkillRuntimeVisualType.SpawnedSkillObject:
+                    runtimeObject = objectSpawner.Spawn(runtimeConfig.SkillRuntimePrefab, spawnPosition, Quaternion.identity);
+                    break;
+                case SkillRuntimeVisualType.SpawnHomingProjectile:
+                    HomingChainBulletSkillRuntimeObject homingChainBulletSkillRuntimeObject =
+                        (HomingChainBulletSkillRuntimeObject)runtimeConfig.SkillRuntimePrefab;
+                    runtimeObject = objectSpawner.Spawn(homingChainBulletSkillRuntimeObject, spawnPosition, Quaternion.identity);
+                    break;
+                case SkillRuntimeVisualType.SpawnProjectilePatternBehavior:
+                    BulletSpawnerSkillRuntimeObject bulletSpawnerSkillRuntimeObject =
+                        (BulletSpawnerSkillRuntimeObject)runtimeConfig.SkillRuntimePrefab;
+                    runtimeObject = objectSpawner.Spawn(bulletSpawnerSkillRuntimeObject, spawnPosition, Quaternion.identity);
+                    break;
+            }
 
             if (runtimeObject == null)
             {
@@ -654,101 +665,6 @@ namespace Immortal_Switch.Scripts.Skill
             return runtimeObject;
         }
         
-        private bool SpawnProjectileSpawnerSkill(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
-        {
-            bool finishImmediatelyIfIndependent = true;
-            var result = SpawnProjectileSpawnerInternal(context, runtimeConfig, finishImmediatelyIfIndependent, isUltimate);
-            return result != null;
-        }
-        
-        private SkillRuntimeObject SpawnProjectileSpawnerInternal(
-            SkillRuntimeContext context,
-            SkillRuntimeObjectConfig runtimeConfig,
-            bool finishImmediatelyIfIndependent, bool isUltimate)
-        {
-            if (runtimeConfig == null || runtimeConfig.runtimeObjectProjectileSpawner == null)
-            {
-                if (finishImmediatelyIfIndependent)
-                {
-                    ExecuteManualPhases(context);
-                    FinishCurrentSkill(isUltimate);
-                }
-
-                return null;
-            }
-
-            if (runtimeConfig.LockCasterWhileAlive && owner != null)
-                owner.SetActionLocked(true);
-
-            Vector3 spawnPosition = GetRuntimeObjectSpawnPosition(context, runtimeConfig);
-            SkillRuntimeObject runtimeObject = objectSpawner.Spawn(runtimeConfig.runtimeObjectProjectileSpawner, spawnPosition, Quaternion.identity);
-
-            if (runtimeObject == null)
-            {
-                if (finishImmediatelyIfIndependent)
-                    FinishCurrentSkill(isUltimate);
-
-                return null;
-            }
-
-            SkillRuntimeContext runtimeContext = context.CloneForRuntimeObject(runtimeObject, spawnPosition);
-            runtimeObject.Init(runtimeContext, runtimeConfig, executor, targetResolver, objectSpawner);
-
-            // In phase 1, spawned skill objects are independent once created.
-            // Projectile/AOE/skill object will live until its own lifetime/animation end.
-            if (finishImmediatelyIfIndependent && !runtimeConfig.LockCasterWhileAlive)
-                FinishCurrentSkill(isUltimate);
-
-            return runtimeObject;
-        }
-        
-        private bool SpawnHomingProjectileSpawnerSkill(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
-        {
-            bool finishImmediatelyIfIndependent = true;
-            var result = SpawnHomingProjectileSpawnerInternal(context, runtimeConfig, finishImmediatelyIfIndependent, isUltimate);
-            return result != null;
-        }
-        
-        private SkillRuntimeObject SpawnHomingProjectileSpawnerInternal(
-            SkillRuntimeContext context,
-            SkillRuntimeObjectConfig runtimeConfig,
-            bool finishImmediatelyIfIndependent, bool isUltimate)
-        {
-            if (runtimeConfig == null || runtimeConfig.runtimeObjectProjectileSpawner == null)
-            {
-                if (finishImmediatelyIfIndependent)
-                {
-                    ExecuteManualPhases(context);
-                    FinishCurrentSkill(isUltimate);
-                }
-
-                return null;
-            }
-
-            if (runtimeConfig.LockCasterWhileAlive && owner != null)
-                owner.SetActionLocked(true);
-
-            Vector3 spawnPosition = GetRuntimeObjectSpawnPosition(context, runtimeConfig);
-            SkillRuntimeObject runtimeObject = objectSpawner.Spawn(runtimeConfig.homingChainBulletSpawner, spawnPosition, Quaternion.identity);
-
-            if (runtimeObject == null)
-            {
-                if (finishImmediatelyIfIndependent)
-                    FinishCurrentSkill(isUltimate);
-
-                return null;
-            }
-
-            SkillRuntimeContext runtimeContext = context.CloneForRuntimeObject(runtimeObject, spawnPosition);
-            runtimeObject.Init(runtimeContext, runtimeConfig, executor, targetResolver, objectSpawner);
-
-            // In phase 1, spawned skill objects are independent once created.
-            // Projectile/AOE/skill object will live until its own lifetime/animation end.
-            if (finishImmediatelyIfIndependent && !runtimeConfig.LockCasterWhileAlive)
-                FinishCurrentSkill(isUltimate);
-
-            return runtimeObject;
-        }
 
         private bool CastHeroSpineAndSpawnedSkillObject(
             SkillRuntimeContext context,
@@ -805,7 +721,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             // The spawned object is independent. Do not finish the skill here, because the hero
             // must stay locked until the hero ultimate animation completes.
-            SpawnProjectileSpawnerInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
+            SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
 
             bool lockCasterDuringHeroAnimation = runtimeConfig == null || runtimeConfig.LockCasterDuringHeroAnimation;
             if (lockCasterDuringHeroAnimation && owner != null)

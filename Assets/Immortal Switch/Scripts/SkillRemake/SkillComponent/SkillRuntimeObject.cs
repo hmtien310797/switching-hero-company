@@ -37,7 +37,7 @@ namespace Immortal_Switch.Scripts.Skill
             SkillRuntimeObjectConfig config,
             SkillExecutor executor,
             SkillTargetResolver targetResolver,
-            ISkillObjectSpawner spawner)
+            ISkillObjectSpawner spawner, object arg = null)
         {
             Context = context;
             Config = config;
@@ -53,10 +53,10 @@ namespace Immortal_Switch.Scripts.Skill
 
             debugRuntimeEventCount = 0;
 
-            OnRuntimeInitialized();
+            OnRuntimeInitialized(arg);
         }
 
-        protected virtual void OnRuntimeInitialized()
+        protected virtual void OnRuntimeInitialized(object arg)
         {
         }
 
@@ -117,7 +117,7 @@ namespace Immortal_Switch.Scripts.Skill
             SkillRuntimeContext runtimeContext = Context.CloneForRuntimeObject(this, transform.position);
             Context.SkillData.GetPhasesByEvent(
                 Context.SkillLevel,
-                SkillPhaseTriggerType.RuntimeObjectEvent,
+                SkillPhaseTriggerType.RuntimeObjectSpineEvent,
                 eventName,
                 PhaseBuffer
             );

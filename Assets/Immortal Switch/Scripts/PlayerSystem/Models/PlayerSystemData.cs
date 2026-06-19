@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.PlayerSystem.Models
@@ -73,5 +74,10 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Models
         /// ds modifier của equip
         /// </summary>
         public List<StatModifier> Modifiers = new();
+
+        /// <summary>
+        /// parsed tier string sang enum
+        /// </summary>
+        public EEquipmentTier ParsedTier => Enum.TryParse<EEquipmentTier>(Tier, true, out var result) ? result : EEquipmentTier.D;
     }
 }

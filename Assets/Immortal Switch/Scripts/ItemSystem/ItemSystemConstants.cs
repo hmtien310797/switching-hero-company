@@ -1,57 +1,6 @@
 namespace Immortal_Switch.Scripts.ItemSystem
 {
     /// <summary>
-    /// Định nghĩa các rank/grade/rarity của item.
-    /// </summary>
-    public class ItemSystemTierConstants
-    {
-        /// <summary>
-        /// Rank D.
-        /// </summary>
-        public const string D = "D";
-
-        /// <summary>
-        /// Rank C.
-        /// </summary>
-        public const string C = "C";
-
-        /// <summary>
-        /// Rank B.
-        /// </summary>
-        public const string B = "B";
-
-        /// <summary>
-        /// Rank A.
-        /// </summary>
-        public const string A = "A";
-
-        /// <summary>
-        /// Rank S.
-        /// </summary>
-        public const string S = "S";
-
-        /// <summary>
-        /// Rank SS.
-        /// </summary>
-        public const string SS = "SS";
-
-        /// <summary>
-        /// Rank SSS.
-        /// </summary>
-        public const string SSS = "SSS";
-
-        /// <summary>
-        /// Rare.
-        /// </summary>
-        public const string R = "R";
-
-        /// <summary>
-        /// Super Rare.
-        /// </summary>
-        public const string SR = "SR";
-    }
-
-    /// <summary>
     /// Định nghĩa các loại item/equipment trong game.
     /// </summary>
     public static class ItemSystemTypeConstants

@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Shared.Database;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Models
 {
@@ -35,19 +38,22 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         /// key: tier
         /// value: list item in tier
         /// </summary>
-        private readonly Dictionary<string, List<DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow>> _itemTiers = new();
+        private readonly Dictionary<EEquipmentTier, List<DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow>> _itemTiers =
+            new();
 
         public void Load()
         {
             foreach (var entry in ItemConfig.rows)
             {
-                if (_itemTiers.TryGetValue(entry.tier, out var rows))
+                var tier = Enum.TryParse<EEquipmentTier>(entry.tier, true, out var result) ? result : EEquipmentTier.D;
+
+                if (_itemTiers.TryGetValue(tier, out var rows))
                 {
                     rows.Add(entry);
                 }
                 else
                 {
-                    _itemTiers.Add(entry.tier, new List<DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow>
+                    _itemTiers.Add(tier, new List<DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow>
                     {
                         entry,
                     });
@@ -55,7 +61,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
             }
         }
 
-        public DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow RandomItem(string tier)
+        public DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow RandomItem(EEquipmentTier tier)
         {
             if (!_itemTiers.TryGetValue(tier, out var rows))
             {

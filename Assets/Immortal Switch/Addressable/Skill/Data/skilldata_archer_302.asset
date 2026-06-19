@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 727400d8e1c143a4b86a6ec1f07fe5a1, type: 3}
   m_Name: skilldata_archer_302
   m_EditorClassIdentifier: 
-  SkillId: 2
-  SkillKey: 
-  SkillName: Galtin Arrow
-  IconSkillKey: 
+  SkillId: 302
+  SkillKey: skilldata_archer_302
+  SkillName: LightningDragon
+  IconSkillKey: icon_skilldata_archer_302
   SkillIcon: {fileID: 21300000, guid: b0f5c98300e54a143b92c4742634e640, type: 3}
   DescriptionTemplate: 
   OwnerType: 0
   MaxLevel: 1
-  SkillTier: 0
+  SkillTier: 3
   CastConfig:
     RequireTarget: 1
     MoveToCastRange: 0
@@ -43,6 +43,123 @@ MonoBehaviour:
     LoopAnimation: 0
     LockCasterWhileAlive: 0
     LockCasterDuringHeroAnimation: 1
+  BasePhases:
+  - PhaseId: 0
+    TriggerType: 1
+    EventName: hit
+    Delay: 0
+    NormalizedTime: 0
+    Actions:
+    - ActionType: 0
+      ChancePercent: 100
+      TargetTypeOverride: 10
+      Damage:
+        SkillDamageBonusPercent: 535
+        ScaleWithClassSkillLevel: 1
+        CountAsSkillDamage: 1
+      Dot:
+        EffectId: DOT
+        TickDamageBonusPercent: 0
+        ScaleDamageWithClassSkillLevel: 1
+        TickInterval: 1
+        Duration: 5
+        DamageType: 0
+        StackRule: 0
+      StatModifier:
+        ModifierId: 
+        StatType: 0
+        PercentValue: 0
+        ScaleValueWithClassSkillLevel: 1
+        Duration: 5
+      Area:
+        AreaPrefab: {fileID: 0}
+        Shape: 0
+        PositionType: 1
+        Radius: 9
+        BoxSize: {x: 2, y: 2}
+        Duration: 0
+        TickInterval: 0
+        HitOncePerTarget: 0
+        OnHitActions: []
+      Projectile:
+        ProjectilePrefab: {fileID: 0}
+        MoveType: 1
+        HitDetectionType: 0
+        SpawnPositionType: 2
+        FollowType: 0
+        CustomSocketName: 
+        Count: 1
+        SpreadAngle: 0
+        DelayBetweenShots: 0
+        Speed: 8
+        LifeTime: 3
+        HitRadius: 0.25
+        Pierce: 0
+        PierceCount: 0
+        OnHitActions: []
+      Stack:
+        StackKey: 
+        Amount: 1
+      TriggerSkill: {fileID: 0}
+  - PhaseId: 0
+    TriggerType: 1
+    EventName: finalhit
+    Delay: 0
+    NormalizedTime: 0
+    Actions:
+    - ActionType: 0
+      ChancePercent: 100
+      TargetTypeOverride: 10
+      Damage:
+        SkillDamageBonusPercent: 980
+        ScaleWithClassSkillLevel: 1
+        CountAsSkillDamage: 1
+      Dot:
+        EffectId: DOT
+        TickDamageBonusPercent: 0
+        ScaleDamageWithClassSkillLevel: 1
+        TickInterval: 1
+        Duration: 5
+        DamageType: 0
+        StackRule: 0
+      StatModifier:
+        ModifierId: 
+        StatType: 0
+        PercentValue: 0
+        ScaleValueWithClassSkillLevel: 1
+        Duration: 5
+      Area:
+        AreaPrefab: {fileID: 0}
+        Shape: 0
+        PositionType: 1
+        Radius: 9
+        BoxSize: {x: 2, y: 2}
+        Duration: 0
+        TickInterval: 0
+        HitOncePerTarget: 0
+        OnHitActions: []
+      Projectile:
+        ProjectilePrefab: {fileID: 0}
+        MoveType: 1
+        HitDetectionType: 0
+        SpawnPositionType: 2
+        FollowType: 0
+        CustomSocketName: 
+        Count: 1
+        SpreadAngle: 0
+        DelayBetweenShots: 0
+        Speed: 8
+        LifeTime: 3
+        HitRadius: 0.25
+        Pierce: 0
+        PierceCount: 0
+        OnHitActions: []
+      Stack:
+        StackKey: 
+        Amount: 1
+      TriggerSkill: {fileID: 0}
+  ClassSkillScaling:
+    GrowthPercentPerLevel: 6
   PassiveConfig:
     StackKey: 
     RequiredStack: 3
@@ -56,166 +173,4 @@ MonoBehaviour:
       Range: 5
   CustomBehaviourPrefab: {fileID: 0}
   UpgradeShardCosts: []
-  Levels:
-  - Level: 1
-    UseCastOverride: 0
-    UseRuntimeObjectOverride: 0
-    UsePassiveOverride: 0
-    HasBulletSpawner: 0
-    CastOverride:
-      RequireTarget: 1
-      MoveToCastRange: 1
-      CastRange: 2
-      Cooldown: 1
-      TargetSelectType: 1
-      HeroAnimationName: 
-    RuntimeObjectOverride:
-      RuntimeVisualType: 2
-      SpineRuntimePrefab: {fileID: 0}
-      runtimeObjectProjectileSpawner: {fileID: 0}
-      homingChainBulletSpawner: {fileID: 0}
-      SpawnPositionType: 0
-      FollowType: 0
-      SpawnOffset: {x: 0, y: 0, z: 0}
-      LifeTime: 1
-      UseLifeTime: 1
-      DespawnOnAnimationComplete: 1
-      AnimationName: 
-      LoopAnimation: 0
-      LockCasterWhileAlive: 0
-      LockCasterDuringHeroAnimation: 1
-    PassiveOverride:
-      StackKey: 
-      RequiredStack: 3
-      MaxStack: 3
-      ResetStackOnTrigger: 1
-      ConsumeStackOnTrigger: 1
-      StackGainTriggers: []
-      EnemyCountCondition:
-        Enabled: 0
-        MinEnemyCount: 1
-        Range: 5
-    BulletSpawnerConfig:
-      patternType: 0
-      bulletPrefab: {fileID: 0}
-      bulletSpeed: 0
-      bulletLifeTime: 0
-      totalWaves: 0
-      timeBetweenWaves: 0
-      bulletsPerWave: 0
-      spreadAngle: 0
-      rotationSpeedPerWave: 0
-      bulletSpawnDelay: 0
-      alternateBulletOrderEachWave: 0
-      damage: 0
-      delayWhenStartFiring: 0
-    Phases:
-    - PhaseId: 0
-      TriggerType: 1
-      EventName: hit
-      Delay: 0
-      NormalizedTime: 0
-      Actions:
-      - ActionType: 0
-        ChancePercent: 100
-        TargetTypeOverride: 10
-        Damage:
-          SkillDamageBonusPercent: 535
-          CountAsSkillDamage: 1
-        Dot:
-          EffectId: DOT
-          TickDamageBonusPercent: 0
-          TickInterval: 1
-          Duration: 5
-          DamageType: 0
-          StackRule: 0
-        StatModifier:
-          ModifierId: 
-          StatType: 0
-          PercentValue: 0
-          Duration: 5
-        Area:
-          AreaPrefab: {fileID: 0}
-          Shape: 0
-          PositionType: 1
-          Radius: 9
-          BoxSize: {x: 2, y: 2}
-          Duration: 0
-          TickInterval: 0
-          HitOncePerTarget: 0
-          OnHitActions: []
-        Projectile:
-          ProjectilePrefab: {fileID: 0}
-          MoveType: 1
-          HitDetectionType: 0
-          SpawnPositionType: 2
-          FollowType: 0
-          CustomSocketName: 
-          Count: 1
-          SpreadAngle: 0
-          DelayBetweenShots: 0
-          Speed: 8
-          LifeTime: 3
-          HitRadius: 0.25
-          Pierce: 0
-          PierceCount: 0
-          OnHitActions: []
-        Stack:
-          StackKey: 
-          Amount: 1
-        TriggerSkill: {fileID: 0}
-    - PhaseId: 0
-      TriggerType: 1
-      EventName: finalhit
-      Delay: 0
-      NormalizedTime: 0
-      Actions:
-      - ActionType: 0
-        ChancePercent: 100
-        TargetTypeOverride: 10
-        Damage:
-          SkillDamageBonusPercent: 980
-          CountAsSkillDamage: 1
-        Dot:
-          EffectId: DOT
-          TickDamageBonusPercent: 0
-          TickInterval: 1
-          Duration: 5
-          DamageType: 0
-          StackRule: 0
-        StatModifier:
-          ModifierId: 
-          StatType: 0
-          PercentValue: 0
-          Duration: 5
-        Area:
-          AreaPrefab: {fileID: 0}
-          Shape: 0
-          PositionType: 1
-          Radius: 9
-          BoxSize: {x: 2, y: 2}
-          Duration: 0
-          TickInterval: 0
-          HitOncePerTarget: 0
-          OnHitActions: []
-        Projectile:
-          ProjectilePrefab: {fileID: 0}
-          MoveType: 1
-          HitDetectionType: 0
-          SpawnPositionType: 2
-          FollowType: 0
-          CustomSocketName: 
-          Count: 1
-          SpreadAngle: 0
-          DelayBetweenShots: 0
-          Speed: 8
-          LifeTime: 3
-          HitRadius: 0.25
-          Pierce: 0
-          PierceCount: 0
-          OnHitActions: []
-        Stack:
-          StackKey: 
-          Amount: 1
-        TriggerSkill: {fileID: 0}
-    DescriptionParams: []
+  Levels: []

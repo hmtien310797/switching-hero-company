@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
-using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Models
 {
@@ -13,6 +12,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         /// value: thong tin equip.
         /// </summary>
         public Dictionary<string, PlayerEquipItem> Equips = new();
+
+        /// <summary>
+        /// trang bị lay ra nhưng chưa dismantle. / equip 
+        /// </summary>
+        public PlayerEquipItem StuckEquip;
 
         /// <summary>
         /// exp
@@ -43,5 +47,31 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         {
             Level = level;
         }
+    }
+
+    public class TransmutationSystemTotalStatData
+    {
+        /// <summary>
+        /// du lieu entries
+        /// </summary>
+        public List<TransmutationSystemTotalStatEntry> Entries;
+    }
+
+    public struct TransmutationSystemTotalStatEntry
+    {
+        /// <summary>
+        /// ten cua stat
+        /// </summary>
+        public string Title;
+
+        /// <summary>
+        /// gia tri cua stat
+        /// </summary>
+        public BigInteger Value;
+
+        /// <summary>
+        /// co phai hieu ung dac biet khong
+        /// </summary>
+        public bool IsUnique;
     }
 }

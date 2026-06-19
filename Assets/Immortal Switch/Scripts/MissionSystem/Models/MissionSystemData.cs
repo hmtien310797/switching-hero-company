@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Immortal_Switch.Scripts.MissionSystem.Models
 {
     /// <summary>
@@ -24,7 +26,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Models
         /// <summary>
         /// ds nhiem vu lap lai
         /// </summary>
-        public MissionSystemEntry[] RepeatTask;
+        public List<MissionSystemEntry> RepeatTask;
     }
 
     public class MissionSystemTask
@@ -37,12 +39,12 @@ namespace Immortal_Switch.Scripts.MissionSystem.Models
         /// <summary>
         /// ds nhiem vu theo tuan
         /// </summary>
-        public MissionSystemEntry[] Tasks;
+        public List<MissionSystemEntry> Tasks;
 
         /// <summary>
         /// gia tri cua cac group da nhan thuong
         /// </summary>
-        public MissionSystemPoint[] PointsClaimed;
+        public List<MissionSystemPoint> PointsClaimed;
     }
 
     public class MissionSystemPoint

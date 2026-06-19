@@ -71,20 +71,8 @@ namespace Immortal_Switch.Scripts.Skill
     [Serializable]
     public class SkillProjectileData
     {
-        public SkillProjectileRuntime ProjectilePrefab;
-        public SkillProjectileMoveType MoveType = SkillProjectileMoveType.Homing;
-        public SkillProjectileHitDetectionType HitDetectionType = SkillProjectileHitDetectionType.DistanceToTarget;
-        public SkillSpawnPositionType SpawnPositionType = SkillSpawnPositionType.ProjectileSpawnPoint;
-        public SkillFollowType FollowType = SkillFollowType.None;
-        public string CustomSocketName;
-        [Min(1)] public int Count = 1;
-        public float SpreadAngle = 0f;
-        public float DelayBetweenShots = 0f;
-        public float Speed = 8f;
-        public float LifeTime = 3f;
-        public float HitRadius = 0.25f;
-        public bool Pierce;
-        public int PierceCount;
+        public BulletPatternConfig BulletPatternConfig;
+        public HomingChainBulletConfig HomingChainBulletConfig;
         public List<SkillActionData> OnHitActions = new();
     }
 

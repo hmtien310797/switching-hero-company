@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
@@ -47,9 +47,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
                         EventKey = v.eventKey,
                         IsClaimed = false,
                     })
-                    .ToArray(),
+                    .ToList(),
                 Point = 0,
-                PointsClaimed = Array.Empty<MissionSystemPoint>(),
+                PointsClaimed = new List<MissionSystemPoint>(),
             };
         }
 
@@ -66,9 +66,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
                         EventKey = v.eventKey,
                         IsClaimed = false,
                     })
-                    .ToArray(),
+                    .ToList(),
                 Point = 0,
-                PointsClaimed = Array.Empty<MissionSystemPoint>(),
+                PointsClaimed = new List<MissionSystemPoint>(),
             };
         }
 
@@ -83,7 +83,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     EventKey = v.eventKey,
                     IsClaimed = false,
                 })
-                .ToArray();
+                .ToList();
         }
 
         public void InitMain()

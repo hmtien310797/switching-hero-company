@@ -15,6 +15,7 @@ MonoBehaviour:
   SkillId: 2
   SkillKey: 
   SkillName: Galtin Arrow
+  IconSkillKey: 
   SkillIcon: {fileID: 21300000, guid: b0f5c98300e54a143b92c4742634e640, type: 3}
   DescriptionTemplate: 
   OwnerType: 0
@@ -29,9 +30,7 @@ MonoBehaviour:
     HeroAnimationName: animation
   RuntimeObjectConfig:
     RuntimeVisualType: 7
-    SpineRuntimePrefab: {fileID: 4163558728880364041, guid: d0accb2e82587134697a2ac23d200cd8, type: 3}
-    runtimeObjectProjectileSpawner: {fileID: 4163558728880364041, guid: d0accb2e82587134697a2ac23d200cd8, type: 3}
-    homingChainBulletSpawner: {fileID: -6870591753487343663, guid: f9ae213f9b8e27c4aa0b99540b771573, type: 3}
+    SkillRuntimePrefab: {fileID: 4163558728880364041, guid: d0accb2e82587134697a2ac23d200cd8, type: 3}
     SpawnPositionType: 0
     FollowType: 0
     SpawnOffset: {x: 0, y: 1, z: 0}
@@ -42,6 +41,9 @@ MonoBehaviour:
     LoopAnimation: 0
     LockCasterWhileAlive: 0
     LockCasterDuringHeroAnimation: 0
+  BasePhases: []
+  ClassSkillScaling:
+    GrowthPercentPerLevel: 6
   PassiveConfig:
     StackKey: 
     RequiredStack: 3
@@ -59,56 +61,6 @@ MonoBehaviour:
     RequiredShard: 2
   Levels:
   - Level: 1
-    UseCastOverride: 0
-    UseRuntimeObjectOverride: 0
-    UsePassiveOverride: 0
-    HasBulletSpawner: 0
-    CastOverride:
-      RequireTarget: 1
-      MoveToCastRange: 1
-      CastRange: 2
-      Cooldown: 1
-      TargetSelectType: 1
-      HeroAnimationName: 
-    RuntimeObjectOverride:
-      RuntimeVisualType: 2
-      SpineRuntimePrefab: {fileID: 0}
-      runtimeObjectProjectileSpawner: {fileID: 0}
-      homingChainBulletSpawner: {fileID: 0}
-      SpawnPositionType: 0
-      FollowType: 0
-      SpawnOffset: {x: 0, y: 0, z: 0}
-      LifeTime: 1
-      UseLifeTime: 1
-      DespawnOnAnimationComplete: 1
-      AnimationName: 
-      LoopAnimation: 0
-      LockCasterWhileAlive: 0
-      LockCasterDuringHeroAnimation: 1
-    PassiveOverride:
-      StackKey: 
-      RequiredStack: 3
-      MaxStack: 3
-      ResetStackOnTrigger: 1
-      ConsumeStackOnTrigger: 1
-      StackGainTriggers: []
-      EnemyCountCondition:
-        Enabled: 0
-        MinEnemyCount: 1
-        Range: 5
-    BulletSpawnerConfig:
-      patternType: 1
-      bulletPrefab: {fileID: 804791343669178177, guid: b66a75eb36632cc449817963a73f22f6, type: 3}
-      bulletSpeed: 50
-      bulletLifeTime: 0.5
-      totalWaves: 12
-      timeBetweenWaves: 0.1
-      bulletsPerWave: 5
-      spreadAngle: 30
-      rotationSpeedPerWave: 0
-      bulletSpawnDelay: 0
-      alternateBulletOrderEachWave: 0
-      damage: 150
     Phases:
     - PhaseId: 0
       TriggerType: 1
@@ -121,10 +73,12 @@ MonoBehaviour:
         TargetTypeOverride: 10
         Damage:
           SkillDamageBonusPercent: 535
+          ScaleWithClassSkillLevel: 1
           CountAsSkillDamage: 1
         Dot:
           EffectId: DOT
           TickDamageBonusPercent: 0
+          ScaleDamageWithClassSkillLevel: 1
           TickInterval: 1
           Duration: 5
           DamageType: 0
@@ -133,6 +87,7 @@ MonoBehaviour:
           ModifierId: 
           StatType: 0
           PercentValue: 0
+          ScaleValueWithClassSkillLevel: 1
           Duration: 5
         Area:
           AreaPrefab: {fileID: 0}
@@ -145,20 +100,37 @@ MonoBehaviour:
           HitOncePerTarget: 0
           OnHitActions: []
         Projectile:
-          ProjectilePrefab: {fileID: 0}
-          MoveType: 1
-          HitDetectionType: 0
-          SpawnPositionType: 2
-          FollowType: 0
-          CustomSocketName: 
-          Count: 1
-          SpreadAngle: 0
-          DelayBetweenShots: 0
-          Speed: 8
-          LifeTime: 3
-          HitRadius: 0.25
-          Pierce: 0
-          PierceCount: 0
+          BulletPatternConfig:
+            patternType: 0
+            bulletPrefab: {fileID: 0}
+            bulletSpeed: 0
+            bulletLifeTime: 0
+            totalWaves: 0
+            timeBetweenWaves: 0
+            bulletsPerWave: 0
+            spreadAngle: 0
+            rotationSpeedPerWave: 0
+            bulletSpawnDelay: 0
+            alternateBulletOrderEachWave: 0
+            damage: 0
+            delayWhenStartFiring: 0
+          HomingChainBulletConfig:
+            bulletPrefab: {fileID: 0}
+            bulletCount: 1
+            delayBetweenBullets: 0.05
+            enemyLayer:
+              serializedVersion: 2
+              m_Bits: 0
+            searchRadius: 20
+            maxTargetsPerBullet: 4
+            straightSpeed: 18
+            curveSpeed: 22
+            arriveDistance: 0.2
+            curveTangentLength: 3
+            damage: 100
+            drawDebugPath: 0
+            curveHeight: 4
+            alternateCurveSide: 1
           OnHitActions: []
         Stack:
           StackKey: 
@@ -175,10 +147,12 @@ MonoBehaviour:
         TargetTypeOverride: 10
         Damage:
           SkillDamageBonusPercent: 980
+          ScaleWithClassSkillLevel: 1
           CountAsSkillDamage: 1
         Dot:
           EffectId: DOT
           TickDamageBonusPercent: 0
+          ScaleDamageWithClassSkillLevel: 1
           TickInterval: 1
           Duration: 5
           DamageType: 0
@@ -187,6 +161,7 @@ MonoBehaviour:
           ModifierId: 
           StatType: 0
           PercentValue: 0
+          ScaleValueWithClassSkillLevel: 1
           Duration: 5
         Area:
           AreaPrefab: {fileID: 0}
@@ -199,20 +174,37 @@ MonoBehaviour:
           HitOncePerTarget: 0
           OnHitActions: []
         Projectile:
-          ProjectilePrefab: {fileID: 0}
-          MoveType: 1
-          HitDetectionType: 0
-          SpawnPositionType: 2
-          FollowType: 0
-          CustomSocketName: 
-          Count: 1
-          SpreadAngle: 0
-          DelayBetweenShots: 0
-          Speed: 8
-          LifeTime: 3
-          HitRadius: 0.25
-          Pierce: 0
-          PierceCount: 0
+          BulletPatternConfig:
+            patternType: 0
+            bulletPrefab: {fileID: 0}
+            bulletSpeed: 0
+            bulletLifeTime: 0
+            totalWaves: 0
+            timeBetweenWaves: 0
+            bulletsPerWave: 0
+            spreadAngle: 0
+            rotationSpeedPerWave: 0
+            bulletSpawnDelay: 0
+            alternateBulletOrderEachWave: 0
+            damage: 0
+            delayWhenStartFiring: 0
+          HomingChainBulletConfig:
+            bulletPrefab: {fileID: 0}
+            bulletCount: 1
+            delayBetweenBullets: 0.05
+            enemyLayer:
+              serializedVersion: 2
+              m_Bits: 0
+            searchRadius: 20
+            maxTargetsPerBullet: 4
+            straightSpeed: 18
+            curveSpeed: 22
+            arriveDistance: 0.2
+            curveTangentLength: 3
+            damage: 100
+            drawDebugPath: 0
+            curveHeight: 4
+            alternateCurveSide: 1
           OnHitActions: []
         Stack:
           StackKey: 

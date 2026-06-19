@@ -172,19 +172,19 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void ExecuteSpawnProjectile(SkillRuntimeContext context, SkillActionData action)
         {
-            if (action.Projectile == null || action.Projectile.ProjectilePrefab == null)
-                return;
-
-            int count = Mathf.Max(1, action.Projectile.Count);
-            for (int i = 0; i < count; i++)
-            {
-                Vector3 spawnPosition = GetProjectileSpawnPosition(context, action.Projectile);
-                SkillProjectileRuntime projectile = objectSpawner.Spawn(action.Projectile.ProjectilePrefab, spawnPosition, Quaternion.identity);
-                if (projectile == null)
-                    continue;
-
-                projectile.Init(context, action.Projectile, this, objectSpawner);
-            }
+            // if (action.Projectile == null || action.Projectile.ProjectilePrefab == null)
+            //     return;
+            //
+            // int count = Mathf.Max(1, action.Projectile.Count);
+            // for (int i = 0; i < count; i++)
+            // {
+            //     Vector3 spawnPosition = GetProjectileSpawnPosition(context, action.Projectile);
+            //     SkillProjectileRuntime projectile = objectSpawner.Spawn(action.Projectile.ProjectilePrefab, spawnPosition, Quaternion.identity);
+            //     if (projectile == null)
+            //         continue;
+            //
+            //     projectile.Init(context, action.Projectile, this, objectSpawner);
+            // }
         }
 
         private Vector3 GetAreaPosition(SkillRuntimeContext context, SkillAreaData areaData)
@@ -203,21 +203,6 @@ namespace Immortal_Switch.Scripts.Skill
                     return context.TargetPosition;
             }
         }
-
-        private Vector3 GetProjectileSpawnPosition(SkillRuntimeContext context, SkillProjectileData projectileData)
-        {
-            switch (projectileData.SpawnPositionType)
-            {
-                case SkillSpawnPositionType.Target:
-                    return context.MainTarget != null ? context.MainTarget.Position : context.TargetPosition;
-                case SkillSpawnPositionType.CastPosition:
-                    return context.CastPosition;
-                case SkillSpawnPositionType.Self:
-                case SkillSpawnPositionType.ProjectileSpawnPoint:
-                case SkillSpawnPositionType.CustomSocket:
-                default:
-                    return context.Caster != null ? context.Caster.Position + Vector3.up * 0.8f : context.CastPosition;
-            }
-        }
+        
     }
 }

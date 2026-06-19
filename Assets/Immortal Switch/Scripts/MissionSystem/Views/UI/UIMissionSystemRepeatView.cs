@@ -86,7 +86,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         public void Initialize(
             List<DynamicHeroesGlobalSpecificationsMissionConfigRow> rows,
-            MissionSystemEntry[] tasks,
+            List<MissionSystemEntry> tasks,
             string missionType,
             Func<string, UniTask> onJump)
         {
@@ -100,13 +100,13 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private async UniTask CreateMissions(
             List<DynamicHeroesGlobalSpecificationsMissionConfigRow> rows,
-            MissionSystemEntry[] tasks,
+            List<MissionSystemEntry> tasks,
             string missionType,
             Func<string, UniTask> onJump)
         {
             for (var i = 0; i < rows.Count; i++)
             {
-                var currentTask = Array.Find(tasks, v => v.Id == rows[i].missionId);
+                var currentTask = tasks.Find(v => v.Id == rows[i].missionId);
 
                 if (currentTask == null)
                 {

@@ -1,28 +1,33 @@
 using System;
 using System.Collections.Generic;
-using System.Numerics;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
 using Immortal_Switch.Scripts.TransmutationSystem.Models;
+using Newtonsoft.Json;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem
 {
     public class TransmutationSystemManager : Singleton<TransmutationSystemManager>
     {
-        [Header("Config")] [SerializeField] private TransmutationSystemDatabaseSO database;
+        [Header("Config")]
+        [field: SerializeField]
+        public TransmutationSystemDatabaseSO Database { get; private set; }
 
         private ITransmutationSystemService Service { get; set; }
-        private ITransmutationSystemStorage Storage { get; set; }
-        public TransmutationSystemData Data => Storage.Data;
+        public ITransmutationSystemStorage Storage { get; private set; }
 
         /// <summary>
-        /// event fire khi energy thay đổi
-        /// 1: energy
+        /// event fire khi co thay doi du lieu cua transmutation
+        /// 1: data changed
         /// </summary>
-        public event Action<BigInteger> OnEnergyChanged;
+        public event Action<TransmutationSystemChanged> OnChanged;
 
         /// <summary>
         /// event fire khi equip thay doi
@@ -33,13 +38,14 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
         protected override void OnSingletonAwake()
         {
-            //GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
+            Load();
+            GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            //GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
+            GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         }
 
         private void OnEnemyDead(int obj)
@@ -51,7 +57,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return;
             }
 
-            var cfg = database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
+            var cfg = Database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
 
             if (cfg == null)
             {
@@ -61,23 +67,26 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
             var quantity = obj + Storage.Data.Level + cfg.cost;
             Service.AddEnergy(quantity);
-            _DispatchEnergyChanged();
+            _DispatchChanged();
         }
 
         public override UniTask InitializeAsync()
         {
-            Load();
             return UniTask.CompletedTask;
         }
 
         private void Load()
         {
-            Storage = new TransmutationSystemStorage(database);
+            Storage = new TransmutationSystemStorage(Database);
             Service = new TransmutationSystemService(Storage);
 
-            database.Load();
+            Database.Load();
             Storage.Load();
-            _DispatchEnergyChanged();
+        }
+
+        public void NotifyReady()
+        {
+            _DispatchChanged();
         }
 
         public PlayerEquipItem GetEquip(string itemType)
@@ -90,9 +99,26 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return Service.GetEquips();
         }
 
-        public PlayerEquipItem Transmutation()
+        public List<KeyValuePair<StatType, float>> GetAllModifiers()
         {
-            var levelRangeCfg = database.LevelRangeConfig.rows.Find(v => v.transmutationLevel == Storage.Data.Level);
+            var modifiers = new Dictionary<StatType, float>();
+
+            foreach (var modifier in Storage.Data.Equips.SelectMany(pair => pair.Value.Modifiers))
+            {
+                modifiers[modifier.StatType] = modifiers.GetValueOrDefault(modifier.StatType) + modifier.Value;
+            }
+
+            return modifiers.ToList();
+        }
+
+        public PlayerEquipItem Fuse()
+        {
+            if (Storage.Data.StuckEquip != null)
+            {
+                return Storage.Data.StuckEquip;
+            }
+
+            var levelRangeCfg = Database.LevelRangeConfig.rows.Find(v => v.transmutationLevel == Storage.Data.Level);
 
             if (levelRangeCfg == null)
             {
@@ -100,7 +126,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return null;
             }
 
-            var cfg = database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
+            var cfg = Database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
 
             if (cfg == null ||
                 cfg.cost > Storage.Data.Energy)
@@ -110,7 +136,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             }
 
             var tier = Service.RollTier(cfg);
-            var itemCfg = database.RandomItem(tier);
+            var itemCfg = Database.RandomItem(tier);
 
             if (itemCfg == null)
             {
@@ -118,6 +144,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return null;
             }
 
+            Debug.Log($"Fuse: {tier}");
             return Service.BuildEquip(itemCfg, levelRangeCfg);
         }
 
@@ -129,7 +156,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
         public void Dismantle(PlayerEquipItem newEquip)
         {
-            var cfg = database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
+            // todo: remove stuck equip
+            var cfg = Database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
 
             if (cfg == null)
             {
@@ -139,12 +167,23 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
             var quantity = Storage.Data.Level + cfg.cost;
             Service.AddEnergy(quantity);
-            _DispatchEnergyChanged();
+            _DispatchChanged();
         }
 
-        private void _DispatchEnergyChanged()
+        private void _DispatchChanged()
         {
-            OnEnergyChanged?.Invoke(Storage.Data.Energy);
+            var cfg = Database.LevelConfig.rows.Find(v => v.level == Storage.Data.Level);
+            var targetExp = cfg?.requiredExp ?? 0;
+
+            var changed = new TransmutationSystemChanged
+            {
+                Data = Storage.Data,
+                Progress = targetExp > 0 ? 0 : Mathf.Clamp01((float)(Storage.Data.Exp / targetExp)),
+                TargetExp = targetExp,
+            };
+
+            Debug.Log($"Data changed: {JsonConvert.SerializeObject(changed)}");
+            OnChanged?.Invoke(changed);
         }
     }
 }

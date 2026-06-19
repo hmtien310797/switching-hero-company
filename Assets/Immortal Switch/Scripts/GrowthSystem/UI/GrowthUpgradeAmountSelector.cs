@@ -21,9 +21,9 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             btnX10.Bind(() => OnSegmentChanged(1));
             btnX100.Bind(() => OnSegmentChanged(2));
             
-            btnX1.SetSelected(currentAmount == 0);
-            btnX10.SetSelected(currentAmount == 1);
-            btnX100.SetSelected(currentAmount == 2);
+            btnX1.SetSelected(currentAmount == 1);
+            btnX10.SetSelected(currentAmount == 10);
+            btnX100.SetSelected(currentAmount == 100);
         }
 
         public void SetCurrentAmount(int amount, bool notify = false)

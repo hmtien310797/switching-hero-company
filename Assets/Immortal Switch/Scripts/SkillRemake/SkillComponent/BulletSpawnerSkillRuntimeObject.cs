@@ -9,19 +9,26 @@ namespace Immortal_Switch.Scripts.SkillRemake
     public class BulletSpawnerSkillRuntimeObject: SkillRuntimeObject
     {
         private BulletPatternConfig currentPattern;
-        private float damage;
         
         [Header("Debug")] [SerializeField] private bool fireBySpace = true;
 
         private bool isFiring;
 
-        protected override void OnRuntimeInitialized()
+        protected override void OnRuntimeInitialized(object arg)
         {
-            base.OnRuntimeInitialized();
-            currentPattern = Context.SkillData.Levels[Context.SkillLevel - 1].BulletSpawnerConfig;
+            base.OnRuntimeInitialized(arg);
+            
+            if (Context.SkillData.OwnerType == SkillOwnerType.ClassSkill)
+            {
+                currentPattern = Context.SkillData.BasePhases[0].Actions[0].Projectile.BulletPatternConfig;
+            }
+            else
+            {
+                currentPattern = Context.SkillData.Levels[Context.SkillLevel].Phases[0].Actions[0].Projectile.BulletPatternConfig;
+            }
+
             Vector3 direction = GetDirectionToTarget(Context.Caster.transform, Context.MainTarget.Transform);
             transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
-            damage = currentPattern.damage;
             TryFire();
         }
         
@@ -115,7 +122,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 Context.Caster,
                 direction,
                 currentPattern.bulletSpeed,
-                currentPattern.bulletLifeTime, damage
+                currentPattern.bulletLifeTime, currentPattern.damage
             );
         }
 

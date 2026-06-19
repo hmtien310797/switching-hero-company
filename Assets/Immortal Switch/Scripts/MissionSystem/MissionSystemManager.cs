@@ -47,7 +47,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
         /// 1: trang thai cac moc point
         /// 2: type nhiem vu
         /// </summary>
-        public event Action<MissionSystemPoint[], string> OnRewardGroupClaimed;
+        public event Action<List<MissionSystemPoint>, string> OnRewardGroupClaimed;
 
         // --- Private Field ---
 
@@ -123,7 +123,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             return 0;
         }
 
-        public MissionSystemEntry[] GetTasks(string missionType)
+        public List<MissionSystemEntry> GetTasks(string missionType)
         {
             switch (missionType)
             {
@@ -137,10 +137,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     return Storage.Data.RepeatTask;
             }
 
-            return Array.Empty<MissionSystemEntry>();
+            return new List<MissionSystemEntry>();
         }
 
-        public MissionSystemPoint[] GetStates(string missionType)
+        public List<MissionSystemPoint> GetStates(string missionType)
         {
             switch (missionType)
             {
@@ -151,7 +151,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     return Storage.Data.WeeklyTask.PointsClaimed;
             }
 
-            return Array.Empty<MissionSystemPoint>();
+            return new List<MissionSystemPoint>();
         }
 
         public List<DynamicHeroesGlobalSpecificationsMissionConfigRow> GetMissions(string missionType)

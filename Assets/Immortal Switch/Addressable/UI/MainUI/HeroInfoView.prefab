@@ -691,11 +691,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3818977510047576078}
+  m_Father: {fileID: 7119994240416480762}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.4821, y: -3.6356}
+  m_AnchoredPosition: {x: -0.4821, y: 16.43636}
   m_SizeDelta: {x: 983.0874, y: 1528.8586}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2936611978367145044
@@ -2603,7 +2603,6 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5156886867205348936}
-  - {fileID: 1452516881896918343}
   - {fileID: 7119994240416480762}
   - {fileID: 8744152834645572475}
   - {fileID: 2517135362606074902}
@@ -2666,7 +2665,6 @@ MonoBehaviour:
   btnFormation: {fileID: 1987255080311910192}
   btnNext: {fileID: 4142466762596246499}
   btnPrev: {fileID: 6862427134181383815}
-  heroDb: {fileID: 11400000, guid: 89ff8b391b9e64c82ac7356834aef25c, type: 2}
   heroUiDb: {fileID: 11400000, guid: 5f88e268420f92c459868bea697969c6, type: 2}
   imgShard: {fileID: 8110385819732485685}
   txtName: {fileID: 5098986190384628719}
@@ -3098,6 +3096,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7119994240416480762}
+  - component: {fileID: 3476182737890541366}
   m_Layer: 5
   m_Name: RootView
   m_TagString: Untagged
@@ -3117,6 +3116,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1452516881896918343}
   - {fileID: 5567815920955373904}
   - {fileID: 316554141745016704}
   - {fileID: 6736414058008485865}
@@ -3130,6 +3130,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -20.072}
   m_SizeDelta: {x: 862, y: 1561.7}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3476182737890541366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7997902805701918134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df38ebce50a9aee4ea257ee941d79c42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panelRoot: {fileID: 7119994240416480762}
+  fitMode: 2
+  useSafeArea: 1
+  minScale: 0.35
+  maxScale: 1
+  changePosY: 0
+  yPosPortrait: 1
+  yPosLandscape: 1
 --- !u!1 &8160361397677346833
 GameObject:
   m_ObjectHideFlags: 0

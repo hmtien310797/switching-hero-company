@@ -14,7 +14,7 @@ namespace Immortal_Switch.Scripts.Skill
         [SerializeField] private string fallbackAnimationName;
         [SerializeField] private bool fallbackLoop;
 
-        protected override void OnRuntimeInitialized()
+        protected override void OnRuntimeInitialized(object arg)
         {
             if (skeletonAnimation == null)
             {

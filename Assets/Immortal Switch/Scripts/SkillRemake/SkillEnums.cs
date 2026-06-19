@@ -20,15 +20,15 @@ namespace Immortal_Switch.Scripts.Skill
         SpawnProjectilePatternBehavior,
         SpawnHomingProjectile
     }
-
+    
     public enum SkillPhaseTriggerType
     {
         // Legacy name kept so existing data still compiles.
         SpineEvent,
 
         // New generic event fired by spawned skill objects.
-        RuntimeObjectEvent,
-
+        RuntimeObjectSpineEvent,
+        
         Delay,
         NormalizedTime,
         OnProjectileHit,

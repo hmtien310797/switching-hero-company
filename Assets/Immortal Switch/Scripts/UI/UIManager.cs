@@ -417,7 +417,7 @@ namespace Immortal_Switch.Scripts.UI
                     entry.cacheOnClose = true;
                     typed.CacheOnClose = true;
 
-                    await HandleMainOpenAsync(entry, args);
+                    await HandleMainOpenAsync(entry, args, withBackdrop);
 
                     // cache main
                     _cachedEntries[key] = entry;
@@ -467,7 +467,7 @@ namespace Immortal_Switch.Scripts.UI
             // main
             if (entry.layer == UILayer.Main)
             {
-                await HandleMainOpenAsync(entry, args);
+                await HandleMainOpenAsync(entry, args, withBackdrop);
                 _cachedEntries[entry.key] = entry; // keep cached
                 return;
             }
@@ -550,9 +550,12 @@ namespace Immortal_Switch.Scripts.UI
             }
         }
 
-        private async UniTask HandleMainOpenAsync(Entry entry, object args)
+        private async UniTask HandleMainOpenAsync(Entry entry, object args, bool withBackdrop)
         {
-            EnsureMainBackdrop();
+            if (withBackdrop)
+            {
+                EnsureMainBackdrop();
+            }
 
             // ensure under correct parent (in case cached instance)
             var mainRoot = GetLayerRoot(UILayer.Main);
@@ -571,7 +574,7 @@ namespace Immortal_Switch.Scripts.UI
                 _activeMainPage = entry;
 
                 // order: backdrop under page
-                if (_mainSharedBackdrop != null) _mainSharedBackdrop.transform.SetAsLastSibling();
+                if (withBackdrop) if (_mainSharedBackdrop != null) _mainSharedBackdrop.transform.SetAsLastSibling();
                 entry.view.transform.SetAsLastSibling();
             }
             else // Stackable
@@ -589,7 +592,11 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             await entry.view.PlayShowAsync(args);
-            RefreshMainBackdrop();
+            
+            if (withBackdrop)
+            {
+                RefreshMainBackdrop();
+            }
         }
 
         #endregion

@@ -6,7 +6,6 @@ using Immortal_Switch.Scripts.ItemSystem.Models;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using Newtonsoft.Json;
-using UnityEditor;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.MissionSystem
@@ -20,7 +19,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             _storage = storage;
         }
 
-        private MissionSystemEntry SetProgress(MissionSystemEntry[] tasks, bool needSetProgress, string eventKey, int value)
+        private MissionSystemEntry SetProgress(List<MissionSystemEntry> tasks, bool needSetProgress, string eventKey, int value)
         {
             foreach (var mission in tasks.Where(entry => entry.EventKey == eventKey))
             {
@@ -206,7 +205,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                         _storage.Data.DailyTask.PointsClaimed.All(v => v.Target != row.pointThreshold))
                     {
                         // todo: nhan thuong
-                        ArrayUtility.Add(ref _storage.Data.DailyTask.PointsClaimed, new MissionSystemPoint
+                        _storage.Data.DailyTask.PointsClaimed.Add(new MissionSystemPoint
                         {
                             Target = row.pointThreshold,
                             X2Claimed = false,
@@ -217,10 +216,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     }
                     else if (isAdsX2)
                     {
-                        var idx = ArrayUtility.FindIndex(
-                            _storage.Data.DailyTask.PointsClaimed,
-                            v => v.Target == row.pointThreshold
-                        );
+                        var idx = _storage.Data.DailyTask.PointsClaimed.FindIndex(v => v.Target == row.pointThreshold);
 
                         if (idx >= 0)
                         {
@@ -250,7 +246,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                         _storage.Data.WeeklyTask.PointsClaimed.All(v => v.Target != row.pointThreshold))
                     {
                         // todo: nhan thuong
-                        ArrayUtility.Add(ref _storage.Data.WeeklyTask.PointsClaimed, new MissionSystemPoint
+                        _storage.Data.WeeklyTask.PointsClaimed.Add(new MissionSystemPoint
                         {
                             Target = row.pointThreshold,
                             X2Claimed = false,
@@ -261,10 +257,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     }
                     else if (isAdsX2)
                     {
-                        var idx = ArrayUtility.FindIndex(
-                            _storage.Data.WeeklyTask.PointsClaimed,
-                            v => v.Target == row.pointThreshold
-                        );
+                        var idx = _storage.Data.WeeklyTask.PointsClaimed.FindIndex(v => v.Target == row.pointThreshold);
 
                         if (idx >= 0)
                         {

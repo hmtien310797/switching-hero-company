@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewHomingChainBulletConfig", menuName = "ScriptableObjects/HomingChainBulletConfig")]
-public class HomingChainBulletConfig : ScriptableObject
+[Serializable]
+public class HomingChainBulletConfig
 {
     [Header("Prefab")]
     public HomingChainBulletProjectile bulletPrefab;

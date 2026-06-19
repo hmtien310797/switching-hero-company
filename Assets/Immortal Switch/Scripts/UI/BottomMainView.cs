@@ -1,5 +1,3 @@
-using System;
-using System.Numerics;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
@@ -7,6 +5,9 @@ using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.MissionSystem.Views;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.TransmutationSystem;
+using Immortal_Switch.Scripts.TransmutationSystem.Models;
+using Immortal_Switch.Scripts.TransmutationSystem.Views;
+using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -46,12 +47,12 @@ namespace Immortal_Switch.Scripts.UI
             ButtonShop.AddListener(() => OnToggleMain<SummonHubView>(ButtonShop).Forget());
             ButtonHero.AddListener(() => OnToggleMain<HeroCollectionView>(ButtonHero).Forget());
             ButtonMission.AddListener(() => OnToggleMain<MissionSystemView>(ButtonMission).Forget());
-            // ButtonGem.onClick.AddListener(() => OnToggleMain<TransmutationSystemView>().Forget());
+            ButtonGem.onClick.AddListener(() => OnToggleMain<TransmutationSystemView>(null, false).Forget());
 
             if (ButtonClose != null)
                 ButtonClose.onClick.AddListener(OnClickClose);
 
-            TransmutationSystemManager.Instance.OnEnergyChanged += OnTransmutationSystemEnergyChanged;
+            TransmutationSystemManager.Instance.OnChanged += OnTransmutationSystemChanged;
         }
 
         private void Start()
@@ -59,15 +60,14 @@ namespace Immortal_Switch.Scripts.UI
             GameEventManager.Subscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
         }
 
-        private void OnTransmutationSystemEnergyChanged(BigInteger obj)
+        private void OnTransmutationSystemChanged(TransmutationSystemChanged obj)
         {
-            //txtEnergy.SetText(BigIntegerHelper.Format(obj));
-            txtEnergy.SetText("0");
+            txtEnergy.SetText(BigIntegerHelper.Format(obj.Data.Energy));
         }
 
         private void OnDestroy()
         {
-            TransmutationSystemManager.Instance.OnEnergyChanged -= OnTransmutationSystemEnergyChanged;
+            TransmutationSystemManager.Instance.OnChanged -= OnTransmutationSystemChanged;
         }
 
         private void OnEnable()
@@ -75,16 +75,22 @@ namespace Immortal_Switch.Scripts.UI
             RefreshCloseAndGem();
         }
 
-        private async UniTaskVoid OnToggleMain<T>(BottomMainButton selected) where T : UIView
+        private async UniTaskVoid OnToggleMain<T>([CanBeNull] BottomMainButton selected, bool withBackdrop = true)
+            where T : UIView
         {
-            if (_selectedBtn != null)
+            if (selected != null)
             {
-                _selectedBtn.SetStateByManager(NavState.Closed);
-                _selectedBtn = null;
+                if (_selectedBtn != null)
+                {
+                    _selectedBtn.SetStateByManager(NavState.Closed);
+                    _selectedBtn = null;
+                }
+
+                _selectedBtn = selected;
             }
 
-            _selectedBtn = selected;
-            await UIManager.Instance.TogglePopupAsync<T>();
+            Debug.Log($"Typeof: {typeof(T).Name}");
+            await UIManager.Instance.TogglePopupAsync<T>(withBackdrop: withBackdrop);
         }
 
         private void OnClickClose()

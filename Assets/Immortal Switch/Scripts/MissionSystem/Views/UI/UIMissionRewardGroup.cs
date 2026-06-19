@@ -44,11 +44,11 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             MissionSystemManager.Instance.OnChangePoint -= OnMissionSystemChangePoint;
         }
 
-        private void OnMissionSystemRewardGroupClaimed(MissionSystemPoint[] arg1, string arg2)
+        private void OnMissionSystemRewardGroupClaimed(List<MissionSystemPoint> arg1, string arg2)
         {
             foreach (var entry in rewardGroupEntries)
             {
-                var state = Array.Find(arg1, v => v.Target == entry.Row.pointThreshold);
+                var state = arg1.Find(v => v.Target == entry.Row.pointThreshold);
 
                 if (state != null)
                 {
@@ -61,7 +61,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             int point,
             string missionType,
             List<DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow> rows,
-            MissionSystemPoint[] states
+            List<MissionSystemPoint> states
         )
         {
             _missionType = missionType;
@@ -80,7 +80,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void RefreshRewardGroup(
             List<DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow> rows,
-            MissionSystemPoint[] states
+            List<MissionSystemPoint> states
         )
         {
             for (var idx = 0; idx < rows.Count; idx++)
@@ -92,7 +92,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
                 if (rewardGroupEntries.Count > idx)
                 {
-                    var state = Array.Find(states, v => v.Target == rows[idx].pointThreshold);
+                    var state = states.Find(v => v.Target == rows[idx].pointThreshold);
                     rewardGroupEntries[idx].BindState(state);
                     rewardGroupEntries[idx].Bind(rows[idx]);
                 }

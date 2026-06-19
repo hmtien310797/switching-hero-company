@@ -1,0 +1,1923 @@
+{
+"skeleton": {
+	"hash": "0VFvBpmXvGM",
+	"spine": "4.2.33",
+	"x": -38.77,
+	"y": -424.61,
+	"width": 2022.98,
+	"height": 804.68,
+	"images": "../Mage/Celestial Prism Storm/images/",
+	"audio": "C:\\Users\\17966\\Desktop\\技能\\E54129"
+},
+"bones": [
+	{ "name": "root", "x": -678, "y": -70, "scaleX": 2.2437, "scaleY": 2.2437 },
+	{ "name": "lingzhu", "parent": "root", "rotation": 18.56, "x": 1216.78, "y": -1310.66 },
+	{ "name": "zhuzi", "parent": "lingzhu", "x": -387.47, "y": 389.55 },
+	{ "name": "blue", "parent": "zhuzi", "x": -12.41, "y": 800.22, "scaleX": 3, "scaleY": 3 },
+	{ "name": "red", "parent": "zhuzi", "x": 399.69, "y": 925.18, "scaleX": 3, "scaleY": 3 },
+	{ "name": "green", "parent": "zhuzi", "x": 521.77, "y": 663.34, "scaleX": 3, "scaleY": 3 },
+	{ "name": "lujing", "parent": "lingzhu", "rotation": -18.84, "x": 31.3, "y": 1239.21 },
+	{ "name": "purple", "parent": "zhuzi", "x": 310.7, "y": 1044.61, "scaleX": 3, "scaleY": 3 },
+	{ "name": "yellow", "parent": "zhuzi", "x": 783.05, "y": 966.64, "scaleX": 3, "scaleY": 3 },
+	{ "name": "xuli", "parent": "lingzhu", "x": 7.43, "y": 1331.61, "scaleX": 3.0391, "scaleY": 3.0391 },
+	{ "name": "tuowei", "parent": "lingzhu", "x": 25.81, "y": 1339.95, "scaleX": 0.8742, "scaleY": 0.438 },
+	{ "name": "ro1", "parent": "tuowei", "scaleX": 6.7581, "scaleY": 6.7581 },
+	{ "name": "ro2", "parent": "tuowei", "scaleX": -6.7581, "scaleY": 6.7581 },
+	{ "name": "tuowei2", "parent": "lingzhu", "x": 25.81, "y": 1339.95, "scaleX": -0.5489, "scaleY": -0.275 },
+	{ "name": "ro3", "parent": "tuowei2", "rotation": 97.21, "scaleX": 6.7581, "scaleY": 6.7581 },
+	{ "name": "ro4", "parent": "tuowei2", "rotation": 91.49, "scaleX": -6.7581, "scaleY": 6.7581 },
+	{ "name": "huan1", "parent": "lingzhu", "x": 30.53, "y": 1350.19, "scaleX": 1.2302, "scaleY": 1.2302 },
+	{ "name": "bone", "parent": "xuli", "length": 235.93, "rotation": 27.55, "scaleX": 1.5713, "scaleY": 1.5713 },
+	{ "name": "bone2", "parent": "xuli", "length": 235.93, "rotation": -139.77, "scaleX": 1.5014, "scaleY": 1.5014 },
+	{ "name": "bone3", "parent": "xuli", "length": 235.93, "rotation": 175.38, "scaleX": 1.6643, "scaleY": 1.6643 },
+	{ "name": "bone4", "parent": "xuli", "length": 235.93, "rotation": -43.69, "scaleX": 1.9405, "scaleY": 1.9405 },
+	{ "name": "bone5", "parent": "xuli", "length": 235.93, "rotation": 95.45, "scaleX": 1.2195, "scaleY": 1.2195 },
+	{ "name": "ping2", "parent": "lingzhu", "x": 30.53, "y": 1350.19, "scaleX": 2.8704, "scaleY": 2.8704 },
+	{ "name": "line", "parent": "ping2", "scaleX": 1.2, "scaleY": 1.2 },
+	{ "name": "line2", "parent": "ping2", "rotation": -89.85, "scaleX": 1.2, "scaleY": 1.2 },
+	{ "name": "san", "parent": "ping2" },
+	{ "name": "glow", "parent": "ping2" },
+	{ "name": "lizi", "parent": "ping2" },
+	{ "name": "l1", "parent": "lizi" },
+	{ "name": "l2", "parent": "lizi", "rotation": 44.03 },
+	{ "name": "l3", "parent": "lizi", "rotation": -85.24 },
+	{ "name": "l4", "parent": "lizi", "rotation": -178.98 },
+	{ "name": "juji", "parent": "ping2", "scaleX": 1.2714, "scaleY": 1.2714 },
+	{ "name": "juji2", "parent": "ping2", "rotation": -22.06 },
+	{
+		"name": "huan2",
+		"parent": "lingzhu",
+		"rotation": -77.8,
+		"x": 30.53,
+		"y": 1350.19,
+		"scaleX": 0.934,
+		"scaleY": 2.1037
+	},
+	{ "name": "qi", "parent": "blue", "y": -30.34, "scaleX": 1.8636, "scaleY": 1.8636 },
+	{ "name": "g", "parent": "qi", "y": 24.72, "scaleX": 0.9511, "scaleY": 0.9511 },
+	{ "name": "qi2", "parent": "green", "x": 0.98, "y": -20.95, "scaleX": 1.8636, "scaleY": 1.8636 },
+	{ "name": "g2", "parent": "qi2", "y": 24.72, "scaleX": 0.9511, "scaleY": 0.9511 },
+	{ "name": "qi3", "parent": "purple", "y": -25.46, "scaleX": 1.8636, "scaleY": 1.8636 },
+	{ "name": "g3", "parent": "qi3", "y": 24.72, "scaleX": 0.9511, "scaleY": 0.9511 },
+	{ "name": "qi4", "parent": "yellow", "x": 1.08, "y": -27.42, "scaleX": 1.8636, "scaleY": 1.8636 },
+	{ "name": "g4", "parent": "qi4", "y": 24.72, "scaleX": 0.9511, "scaleY": 0.9511 },
+	{ "name": "qi5", "parent": "red", "x": 0.01, "y": -23.16, "scaleX": 1.8636, "scaleY": 1.8636 },
+	{ "name": "g5", "parent": "qi5", "x": 0.21, "y": 22.55, "scaleX": 0.7425, "scaleY": 0.7425 },
+	{ "name": "bone6", "parent": "xuli", "length": 235.93, "rotation": 27.55, "scaleX": 1.5713, "scaleY": 1.5713 },
+	{ "name": "bone7", "parent": "xuli", "length": 235.93, "rotation": -139.77, "scaleX": 1.5014, "scaleY": 1.5014 },
+	{ "name": "huan3", "parent": "lingzhu", "x": 30.53, "y": 1350.19, "scaleX": 1.2302, "scaleY": 0.7774 },
+	{
+		"name": "huan4",
+		"parent": "lingzhu",
+		"rotation": -88.17,
+		"x": 55.88,
+		"y": 1169.96,
+		"scaleX": 0.6625,
+		"scaleY": 1.4922
+	},
+	{ "name": "hit", "parent": "root", "x": 1328.73, "y": -1309.2, "scaleX": 1.2567, "scaleY": 1.2567 },
+	{ "name": "jiaodi", "parent": "hit", "scaleX": 1.2175, "scaleY": 0.6087 },
+	{ "name": "di", "parent": "jiaodi", "scaleX": 58.1252, "scaleY": 58.1252 },
+	{ "name": "di2", "parent": "jiaodi", "scaleX": 37.8023, "scaleY": 37.8023 },
+	{ "name": "k1", "parent": "jiaodi" },
+	{ "name": "k2", "parent": "jiaodi", "rotation": 57.51 },
+	{ "name": "k3", "parent": "jiaodi", "rotation": -70.86 },
+	{ "name": "k4", "parent": "jiaodi", "rotation": -123.34 },
+	{ "name": "k5", "parent": "jiaodi", "rotation": 129.12 },
+	{ "name": "lizi_ban", "parent": "hit", "length": 44.5, "rotation": 91.65, "x": 6.3, "y": -81.72 },
+	{ "name": "black", "parent": "jiaodi" },
+	{ "name": "line_glow", "parent": "hit", "y": -96.14 },
+	{ "name": "zhuziqi1", "parent": "hit", "y": -75.31, "scaleX": 1.8636, "scaleY": 1.8636 },
+	{ "name": "line_glow2", "parent": "hit", "y": -96.14 },
+	{ "name": "zhuziqi2", "parent": "hit", "y": -75.31, "scaleX": -1.6538, "scaleY": 1.2343 },
+	{ "name": "line_glow3", "parent": "hit", "y": -96.14 },
+	{ "name": "wave", "parent": "hit", "y": -22.19 },
+	{ "name": "di3", "parent": "jiaodi", "scaleX": 37.8023, "scaleY": 37.8023 },
+	{ "name": "lizi_red_blue", "parent": "hit" },
+	{ "name": "lizi_red_blue2", "parent": "lizi_red_blue", "rotation": 83.54, "x": 24.77, "y": -70.78, "color": "d5ff00ff" },
+	{
+		"name": "lizi_red_blue3",
+		"parent": "lizi_red_blue",
+		"rotation": 90.19,
+		"x": -146.94,
+		"y": 41.98,
+		"scaleX": 1.3802,
+		"scaleY": 1.3802,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue4",
+		"parent": "lizi_red_blue",
+		"rotation": 87.84,
+		"x": 166.58,
+		"y": 247.49,
+		"scaleX": 0.8852,
+		"scaleY": 0.8852,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue5",
+		"parent": "lizi_red_blue",
+		"rotation": 90.19,
+		"x": -57.93,
+		"y": 183.38,
+		"scaleX": 1.6184,
+		"scaleY": 1.6184,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue6",
+		"parent": "lizi_red_blue",
+		"rotation": 83.54,
+		"x": 77.67,
+		"y": 360.99,
+		"scaleX": 1.3169,
+		"scaleY": 1.3169,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue7",
+		"parent": "lizi_red_blue",
+		"rotation": 90.19,
+		"x": 62.69,
+		"y": 21.02,
+		"scaleX": 1.7032,
+		"scaleY": 1.7032,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue8",
+		"parent": "lizi_red_blue",
+		"rotation": 87.84,
+		"x": -242.26,
+		"y": 389.65,
+		"scaleX": 0.9883,
+		"scaleY": 0.9883,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue9",
+		"parent": "lizi_red_blue",
+		"rotation": 105.64,
+		"x": -27.2,
+		"y": -35.29,
+		"scaleX": 1.1083,
+		"scaleY": 1.1083,
+		"color": "d5ff00ff"
+	},
+	{ "name": "lizi_red_blue10", "parent": "lizi_red_blue", "rotation": 83.54, "x": 59.48, "y": 310.24, "color": "d5ff00ff" },
+	{
+		"name": "lizi_red_blue11",
+		"parent": "lizi_red_blue",
+		"rotation": 90.19,
+		"x": 174.71,
+		"y": 610.54,
+		"scaleX": 1.3802,
+		"scaleY": 1.3802,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue12",
+		"parent": "lizi_red_blue",
+		"rotation": 87.84,
+		"x": -53.96,
+		"y": 666.67,
+		"scaleX": 0.8852,
+		"scaleY": 0.8852,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue13",
+		"parent": "lizi_red_blue",
+		"rotation": 90.19,
+		"x": 47.44,
+		"y": 877.03,
+		"scaleX": 1.6184,
+		"scaleY": 1.6184,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue14",
+		"parent": "lizi_red_blue",
+		"rotation": 83.54,
+		"x": 184.01,
+		"y": 150.84,
+		"scaleX": 1.3169,
+		"scaleY": 1.3169,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue15",
+		"parent": "lizi_red_blue",
+		"rotation": 90.19,
+		"x": 78.02,
+		"y": 1081.92,
+		"scaleX": 1.7032,
+		"scaleY": 1.7032,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue16",
+		"parent": "lizi_red_blue",
+		"rotation": 87.84,
+		"x": -249.02,
+		"y": 537.76,
+		"scaleX": 0.9883,
+		"scaleY": 0.9883,
+		"color": "d5ff00ff"
+	},
+	{
+		"name": "lizi_red_blue17",
+		"parent": "lizi_red_blue",
+		"rotation": 90.19,
+		"x": -103.93,
+		"y": 266.55,
+		"scaleX": 0.6523,
+		"scaleY": 0.6523,
+		"color": "d5ff00ff"
+	},
+	{ "name": "hit2", "parent": "root", "x": 889.3, "y": -1790.25, "scaleX": 0.5, "scaleY": 0.5 },
+	{ "name": "jiaodi2", "parent": "hit2", "scaleX": 1.2175, "scaleY": 0.6087 },
+	{ "name": "di4", "parent": "jiaodi2", "scaleX": 58.1252, "scaleY": 58.1252 },
+	{ "name": "di5", "parent": "jiaodi2", "scaleX": 37.8023, "scaleY": 37.8023 },
+	{ "name": "k6", "parent": "jiaodi2" },
+	{ "name": "k7", "parent": "jiaodi2", "rotation": 57.51 },
+	{ "name": "k8", "parent": "jiaodi2", "rotation": -70.86 },
+	{ "name": "lizi_ban2", "parent": "hit2", "length": 44.5, "rotation": 91.65, "x": 6.3, "y": -81.72 },
+	{ "name": "lines", "parent": "hit2", "x": -82.16, "y": -93.49 },
+	{ "name": "line_glow4", "parent": "lines", "y": -2.65 },
+	{ "name": "zhuziqi3", "parent": "hit2", "y": -75.31, "scaleX": 1.8636, "scaleY": 1.8636 },
+	{ "name": "line_glow5", "parent": "lines", "y": -2.65 },
+	{ "name": "zhuziqi4", "parent": "hit2", "y": -75.31, "scaleX": -1.6538, "scaleY": 1.2343 },
+	{ "name": "line_glow6", "parent": "lines", "y": -2.65 },
+	{ "name": "hit3", "parent": "root", "x": 1794.67, "y": -1895.65, "scaleX": 0.5, "scaleY": 0.5 },
+	{ "name": "jiaodi3", "parent": "hit3", "scaleX": 1.2175, "scaleY": 0.6087 },
+	{ "name": "di6", "parent": "jiaodi3", "scaleX": 58.1252, "scaleY": 58.1252 },
+	{ "name": "di7", "parent": "jiaodi3", "scaleX": 37.8023, "scaleY": 37.8023 },
+	{ "name": "k9", "parent": "jiaodi3" },
+	{ "name": "k10", "parent": "jiaodi3", "rotation": 57.51 },
+	{ "name": "k11", "parent": "jiaodi3", "rotation": -70.86 },
+	{ "name": "lizi_ban3", "parent": "hit3", "length": 44.5, "rotation": 91.65, "x": 6.3, "y": -81.72 },
+	{ "name": "lines2", "parent": "hit3", "x": -82.16, "y": -93.49 },
+	{ "name": "line_glow7", "parent": "lines2", "y": -2.65 },
+	{ "name": "line_glow8", "parent": "lines2", "y": -2.65 },
+	{ "name": "line_glow9", "parent": "lines2", "y": -2.65 },
+	{ "name": "zhuziqi5", "parent": "hit3", "y": -75.31, "scaleX": 1.8636, "scaleY": 1.8636 },
+	{ "name": "zhuziqi6", "parent": "hit3", "y": -75.31, "scaleX": -1.6538, "scaleY": 1.2343 },
+	{
+		"name": "A_glowline10",
+		"parent": "root",
+		"length": 41.29,
+		"rotation": -179.94,
+		"x": -78.07,
+		"y": -198.86,
+		"scaleX": -1
+	},
+	{ "name": "A_glowline10b", "parent": "A_glowline10", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10c", "parent": "A_glowline10b", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10d", "parent": "A_glowline10c", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10e", "parent": "A_glowline10d", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10f", "parent": "A_glowline10e", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10g", "parent": "A_glowline10f", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10h", "parent": "A_glowline10g", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10i", "parent": "A_glowline10h", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10j", "parent": "A_glowline10i", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10k", "parent": "A_glowline10j", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10l", "parent": "A_glowline10k", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10m", "parent": "A_glowline10l", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10n", "parent": "A_glowline10m", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10o", "parent": "A_glowline10n", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10p", "parent": "A_glowline10o", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10q", "parent": "A_glowline10p", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10r", "parent": "A_glowline10q", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10s", "parent": "A_glowline10r", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10t", "parent": "A_glowline10s", "length": 41.29, "x": 41.29 },
+	{
+		"name": "A_glowline11",
+		"parent": "root",
+		"length": 41.29,
+		"rotation": -179.94,
+		"x": -78.07,
+		"y": -198.86,
+		"scaleX": -1
+	},
+	{ "name": "A_glowline10b2", "parent": "A_glowline11", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10c2", "parent": "A_glowline10b2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10d2", "parent": "A_glowline10c2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10e2", "parent": "A_glowline10d2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10f2", "parent": "A_glowline10e2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10g2", "parent": "A_glowline10f2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10h2", "parent": "A_glowline10g2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10i2", "parent": "A_glowline10h2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10j2", "parent": "A_glowline10i2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10k2", "parent": "A_glowline10j2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10l2", "parent": "A_glowline10k2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10m2", "parent": "A_glowline10l2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10n2", "parent": "A_glowline10m2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10o2", "parent": "A_glowline10n2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10p2", "parent": "A_glowline10o2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10q2", "parent": "A_glowline10p2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10r2", "parent": "A_glowline10q2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10s2", "parent": "A_glowline10r2", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10t2", "parent": "A_glowline10s2", "length": 41.29, "x": 41.29 },
+	{
+		"name": "A_glowline12",
+		"parent": "root",
+		"length": 41.29,
+		"rotation": -179.94,
+		"x": -78.07,
+		"y": -198.86,
+		"scaleX": -1
+	},
+	{ "name": "A_glowline10b3", "parent": "A_glowline12", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10c3", "parent": "A_glowline10b3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10d3", "parent": "A_glowline10c3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10e3", "parent": "A_glowline10d3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10f3", "parent": "A_glowline10e3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10g3", "parent": "A_glowline10f3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10h3", "parent": "A_glowline10g3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10i3", "parent": "A_glowline10h3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10j3", "parent": "A_glowline10i3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10k3", "parent": "A_glowline10j3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10l3", "parent": "A_glowline10k3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10m3", "parent": "A_glowline10l3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10n3", "parent": "A_glowline10m3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10o3", "parent": "A_glowline10n3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10p3", "parent": "A_glowline10o3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10q3", "parent": "A_glowline10p3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10r3", "parent": "A_glowline10q3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10s3", "parent": "A_glowline10r3", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10t3", "parent": "A_glowline10s3", "length": 41.29, "x": 41.29 },
+	{
+		"name": "A_glowline13",
+		"parent": "root",
+		"length": 41.29,
+		"rotation": -179.94,
+		"x": -78.07,
+		"y": -198.86,
+		"scaleX": -1
+	},
+	{ "name": "A_glowline10b4", "parent": "A_glowline13", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10c4", "parent": "A_glowline10b4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10d4", "parent": "A_glowline10c4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10e4", "parent": "A_glowline10d4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10f4", "parent": "A_glowline10e4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10g4", "parent": "A_glowline10f4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10h4", "parent": "A_glowline10g4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10i4", "parent": "A_glowline10h4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10j4", "parent": "A_glowline10i4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10k4", "parent": "A_glowline10j4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10l4", "parent": "A_glowline10k4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10m4", "parent": "A_glowline10l4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10n4", "parent": "A_glowline10m4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10o4", "parent": "A_glowline10n4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10p4", "parent": "A_glowline10o4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10q4", "parent": "A_glowline10p4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10r4", "parent": "A_glowline10q4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10s4", "parent": "A_glowline10r4", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10t4", "parent": "A_glowline10s4", "length": 41.29, "x": 41.29 },
+	{
+		"name": "A_glowline14",
+		"parent": "root",
+		"length": 41.29,
+		"rotation": -179.94,
+		"x": -78.07,
+		"y": -198.86,
+		"scaleX": -1
+	},
+	{ "name": "A_glowline10b5", "parent": "A_glowline14", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10c5", "parent": "A_glowline10b5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10d5", "parent": "A_glowline10c5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10e5", "parent": "A_glowline10d5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10f5", "parent": "A_glowline10e5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10g5", "parent": "A_glowline10f5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10h5", "parent": "A_glowline10g5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10i5", "parent": "A_glowline10h5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10j5", "parent": "A_glowline10i5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10k5", "parent": "A_glowline10j5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10l5", "parent": "A_glowline10k5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10m5", "parent": "A_glowline10l5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10n5", "parent": "A_glowline10m5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10o5", "parent": "A_glowline10n5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10p5", "parent": "A_glowline10o5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10q5", "parent": "A_glowline10p5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10r5", "parent": "A_glowline10q5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10s5", "parent": "A_glowline10r5", "length": 41.29, "x": 41.29 },
+	{ "name": "A_glowline10t5", "parent": "A_glowline10s5", "length": 41.29, "x": 41.29 }
+],
+"slots": [
+	{ "name": "A_glowline10", "bone": "A_glowline10", "attachment": "A_glowline", "blend": "additive" },
+	{ "name": "A_glowline11", "bone": "A_glowline11", "attachment": "A_glowline", "blend": "additive" },
+	{ "name": "A_glowline12", "bone": "A_glowline12", "attachment": "A_glowline", "blend": "additive" },
+	{ "name": "A_glowline13", "bone": "A_glowline13", "attachment": "A_glowline", "blend": "additive" },
+	{ "name": "A_glowline14", "bone": "A_glowline14", "attachment": "A_glowline", "blend": "additive" },
+	{ "name": "A_glow_di", "bone": "di", "color": "0032dca9" },
+	{ "name": "A_glow_di4", "bone": "di4", "color": "0032dca9" },
+	{ "name": "A_glow_di6", "bone": "di6", "color": "0032dca9" },
+	{ "name": "A_glow_di2", "bone": "di2", "color": "60dbffff", "blend": "additive" },
+	{ "name": "A_glow_di5", "bone": "di5", "color": "60dbffff", "blend": "additive" },
+	{ "name": "A_glow_di7", "bone": "di7", "color": "60dbffff", "blend": "additive" },
+	{ "name": "A_glow_di3", "bone": "di3", "color": "60dbffff", "blend": "additive" },
+	{ "name": "A_juji", "bone": "k1", "blend": "additive" },
+	{ "name": "A_juji6", "bone": "k6", "blend": "additive" },
+	{ "name": "A_juji9", "bone": "k9", "blend": "additive" },
+	{ "name": "A_juji5", "bone": "k5", "blend": "additive" },
+	{ "name": "A_juji3", "bone": "k3", "blend": "additive" },
+	{ "name": "A_juji8", "bone": "k8", "blend": "additive" },
+	{ "name": "A_juji11", "bone": "k11", "blend": "additive" },
+	{ "name": "A_juji2", "bone": "k2", "blend": "additive" },
+	{ "name": "A_juji7", "bone": "k7", "blend": "additive" },
+	{ "name": "A_juji10", "bone": "k10", "blend": "additive" },
+	{ "name": "A_juji4", "bone": "k4", "blend": "additive" },
+	{ "name": "ball_blue", "bone": "blue" },
+	{ "name": "ball_purple", "bone": "purple" },
+	{ "name": "ball_green", "bone": "green" },
+	{ "name": "ball", "bone": "lujing", "attachment": "ball" },
+	{ "name": "ball_yellow", "bone": "yellow" },
+	{ "name": "A_glow2", "bone": "g", "color": "128999ff", "blend": "additive" },
+	{ "name": "A_glow3", "bone": "g2", "color": "11996aff", "blend": "additive" },
+	{ "name": "A_glow4", "bone": "g3", "color": "9911bfff", "blend": "additive" },
+	{ "name": "A_glow5", "bone": "g4", "color": "d57a16ff", "blend": "additive" },
+	{ "name": "A_wenli_wave_00000", "bone": "qi", "color": "00c5ffff", "blend": "additive" },
+	{ "name": "A_wenli_wave_0", "bone": "qi2", "color": "11996aff", "blend": "additive" },
+	{ "name": "A_wenli_wave_1", "bone": "qi3", "color": "9911bfff", "blend": "additive" },
+	{ "name": "A_wenli_wave_2", "bone": "qi4", "color": "d57a16ff", "blend": "additive" },
+	{ "name": "ball_red", "bone": "red" },
+	{ "name": "A_glow6", "bone": "g5", "color": "ffa15eff", "blend": "additive" },
+	{ "name": "A_wenli_wave_3", "bone": "qi5", "color": "ff5600ff" },
+	{ "name": "A_xuli_qiu_00000", "bone": "ro1", "color": "ffffff7f", "blend": "additive" },
+	{ "name": "A_xuli_qiu_1", "bone": "ro3", "color": "ffffff7f", "blend": "additive" },
+	{ "name": "A_xuli_qiu_0", "bone": "ro2", "color": "ffffff7f", "blend": "additive" },
+	{ "name": "A_xuli_qiu_2", "bone": "ro4", "color": "ffffff7f", "blend": "additive" },
+	{ "name": "A_xuli_line_00000", "bone": "bone", "color": "00a3ffff", "blend": "additive" },
+	{ "name": "A_xuli_line_4", "bone": "bone6", "color": "00a3ffff", "blend": "additive" },
+	{ "name": "A_xuli_line_1", "bone": "bone3", "color": "00a3ffff", "blend": "additive" },
+	{ "name": "A_xuli_line_0", "bone": "bone2", "color": "cec300ff", "blend": "additive" },
+	{ "name": "A_xuli_line_5", "bone": "bone7", "color": "cec300ff", "blend": "additive" },
+	{ "name": "A_xuli_line_2", "bone": "bone4", "color": "cec300ff", "blend": "additive" },
+	{ "name": "A_xuli_line_3", "bone": "bone5", "color": "00a3ffff", "blend": "additive" },
+	{ "name": "A_huan_dis_blue0001", "bone": "huan1", "blend": "additive" },
+	{ "name": "A_huan_dis_blue2", "bone": "huan3", "blend": "additive" },
+	{ "name": "A_huan_dis_blue1", "bone": "huan2", "blend": "additive" },
+	{ "name": "A_huan_dis_blue3", "bone": "huan4", "blend": "additive" },
+	{ "name": "A_line2", "bone": "line", "blend": "additive" },
+	{ "name": "A_line3", "bone": "line2", "blend": "additive" },
+	{ "name": "A_fangshe_03_ctg", "bone": "san", "blend": "additive" },
+	{ "name": "A_glow", "bone": "glow", "color": "ffd000ff", "blend": "additive" },
+	{ "name": "A_liusha", "bone": "l1", "blend": "additive" },
+	{ "name": "A_liusha2", "bone": "l2", "blend": "additive" },
+	{ "name": "A_liusha3", "bone": "l3", "blend": "additive" },
+	{ "name": "A_liusha4", "bone": "l4", "blend": "additive" },
+	{ "name": "A_fangshe_04_csq", "bone": "juji", "color": "006d81ff", "blend": "additive" },
+	{ "name": "A_fangshe_04_csq2", "bone": "juji2", "color": "006d81ff", "blend": "additive" },
+	{ "name": "A_huoxing_00000", "bone": "lizi_ban", "blend": "additive" },
+	{ "name": "A_huoxing_0", "bone": "lizi_ban2", "blend": "additive" },
+	{ "name": "A_huoxing_1", "bone": "lizi_ban3", "blend": "additive" },
+	{ "name": "A_kuosan", "bone": "black" },
+	{ "name": "A_glowline3", "bone": "line_glow3", "color": "7dfffdff" },
+	{ "name": "A_glowline6", "bone": "line_glow6", "color": "7dfffdff" },
+	{ "name": "A_glowline9", "bone": "line_glow9", "color": "7dfffdff" },
+	{ "name": "A_glowline", "bone": "line_glow", "color": "7dfffdff", "blend": "additive" },
+	{ "name": "A_glowline4", "bone": "line_glow4", "color": "7dfffdff", "blend": "additive" },
+	{ "name": "A_glowline7", "bone": "line_glow7", "color": "7dfffdff", "blend": "additive" },
+	{ "name": "A_glowline2", "bone": "line_glow2", "color": "7dfffdff", "blend": "additive" },
+	{ "name": "A_glowline5", "bone": "line_glow5", "color": "7dfffdff", "blend": "additive" },
+	{ "name": "A_glowline8", "bone": "line_glow8", "color": "7dfffdff", "blend": "additive" },
+	{ "name": "A_wenli_wave_4", "bone": "zhuziqi1", "color": "009cffff" },
+	{ "name": "A_wenli_wave_6", "bone": "zhuziqi3", "color": "009cffff" },
+	{ "name": "A_wenli_wave_8", "bone": "zhuziqi5", "color": "009cffff" },
+	{ "name": "A_wenli_wave_5", "bone": "zhuziqi2", "color": "009cffff", "blend": "additive" },
+	{ "name": "A_wenli_wave_7", "bone": "zhuziqi4", "color": "009cffff", "blend": "additive" },
+	{ "name": "A_wenli_wave_9", "bone": "zhuziqi6", "color": "009cffff", "blend": "additive" },
+	{ "name": "A_heibai_uv_00000", "bone": "wave", "color": "ffe100ff", "blend": "additive" },
+	{ "name": "A_lizi_fire01", "bone": "lizi_red_blue2", "blend": "additive" },
+	{ "name": "A_lizi_fire8", "bone": "lizi_red_blue10", "blend": "additive" },
+	{ "name": "A_lizi_fire4", "bone": "lizi_red_blue6", "blend": "additive" },
+	{ "name": "A_lizi_fire12", "bone": "lizi_red_blue14", "blend": "additive" },
+	{ "name": "A_lizi_fire2", "bone": "lizi_red_blue4", "blend": "additive" },
+	{ "name": "A_lizi_fire10", "bone": "lizi_red_blue12", "blend": "additive" },
+	{ "name": "A_lizi_fire6", "bone": "lizi_red_blue8", "blend": "additive" },
+	{ "name": "A_lizi_fire14", "bone": "lizi_red_blue16", "blend": "additive" },
+	{ "name": "A_lizi_fire1", "bone": "lizi_red_blue3", "blend": "additive" },
+	{ "name": "A_lizi_fire9", "bone": "lizi_red_blue11", "blend": "additive" },
+	{ "name": "A_lizi_fire5", "bone": "lizi_red_blue7", "blend": "additive" },
+	{ "name": "A_lizi_fire13", "bone": "lizi_red_blue15", "blend": "additive" },
+	{ "name": "A_lizi_fire3", "bone": "lizi_red_blue5", "blend": "additive" },
+	{ "name": "A_lizi_fire11", "bone": "lizi_red_blue13", "blend": "additive" },
+	{ "name": "A_lizi_fire7", "bone": "lizi_red_blue9", "blend": "additive" },
+	{ "name": "A_lizi_fire15", "bone": "lizi_red_blue17", "blend": "additive" }
+],
+"path": [
+	{
+		"name": "ball",
+		"bones": [ "blue" ],
+		"target": "ball",
+		"position": -0.48,
+		"mixRotate": 0
+	},
+	{
+		"name": "ball2",
+		"order": 1,
+		"bones": [ "green" ],
+		"target": "ball",
+		"mixRotate": 0
+	},
+	{
+		"name": "ball3",
+		"order": 2,
+		"bones": [ "purple" ],
+		"target": "ball",
+		"mixRotate": 0
+	},
+	{
+		"name": "ball4",
+		"order": 3,
+		"bones": [ "yellow" ],
+		"target": "ball",
+		"mixRotate": 0
+	},
+	{
+		"name": "ball5",
+		"order": 4,
+		"bones": [ "red" ],
+		"target": "ball",
+		"mixRotate": 0
+	},
+	{
+		"name": "lineball",
+		"order": 5,
+		"bones": [ "A_glowline10", "A_glowline10b", "A_glowline10c", "A_glowline10d", "A_glowline10e", "A_glowline10f", "A_glowline10g", "A_glowline10h", "A_glowline10i", "A_glowline10j", "A_glowline10k", "A_glowline10l", "A_glowline10m", "A_glowline10n", "A_glowline10o", "A_glowline10p", "A_glowline10q", "A_glowline10r", "A_glowline10s", "A_glowline10t" ],
+		"target": "ball"
+	},
+	{
+		"name": "lineball2",
+		"order": 6,
+		"bones": [ "A_glowline11", "A_glowline10b2", "A_glowline10c2", "A_glowline10d2", "A_glowline10e2", "A_glowline10f2", "A_glowline10g2", "A_glowline10h2", "A_glowline10i2", "A_glowline10j2", "A_glowline10k2", "A_glowline10l2", "A_glowline10m2", "A_glowline10n2", "A_glowline10o2", "A_glowline10p2", "A_glowline10q2", "A_glowline10r2", "A_glowline10s2", "A_glowline10t2" ],
+		"target": "ball"
+	},
+	{
+		"name": "lineball3",
+		"order": 7,
+		"bones": [ "A_glowline12", "A_glowline10b3", "A_glowline10c3", "A_glowline10d3", "A_glowline10e3", "A_glowline10f3", "A_glowline10g3", "A_glowline10h3", "A_glowline10i3", "A_glowline10j3", "A_glowline10k3", "A_glowline10l3", "A_glowline10m3", "A_glowline10n3", "A_glowline10o3", "A_glowline10p3", "A_glowline10q3", "A_glowline10r3", "A_glowline10s3", "A_glowline10t3" ],
+		"target": "ball"
+	},
+	{
+		"name": "lineball4",
+		"order": 8,
+		"bones": [ "A_glowline13", "A_glowline10b4", "A_glowline10c4", "A_glowline10d4", "A_glowline10e4", "A_glowline10f4", "A_glowline10g4", "A_glowline10h4", "A_glowline10i4", "A_glowline10j4", "A_glowline10k4", "A_glowline10l4", "A_glowline10m4", "A_glowline10n4", "A_glowline10o4", "A_glowline10p4", "A_glowline10q4", "A_glowline10r4", "A_glowline10s4", "A_glowline10t4" ],
+		"target": "ball"
+	},
+	{
+		"name": "lineball5",
+		"order": 9,
+		"bones": [ "A_glowline14", "A_glowline10b5", "A_glowline10c5", "A_glowline10d5", "A_glowline10e5", "A_glowline10f5", "A_glowline10g5", "A_glowline10h5", "A_glowline10i5", "A_glowline10j5", "A_glowline10k5", "A_glowline10l5", "A_glowline10m5", "A_glowline10n5", "A_glowline10o5", "A_glowline10p5", "A_glowline10q5", "A_glowline10r5", "A_glowline10s5", "A_glowline10t5" ],
+		"target": "ball"
+	}
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"A_fangshe_03_ctg": {
+				"A_fangshe_03_ctg": { "width": 256, "height": 256 }
+			},
+			"A_fangshe_04_csq": {
+				"A_fangshe_04_csq": { "scaleX": 4.4846, "scaleY": 4.4846, "width": 128, "height": 128 }
+			},
+			"A_fangshe_04_csq2": {
+				"A_fangshe_04_csq": { "scaleX": 4.4846, "scaleY": 4.4846, "width": 128, "height": 128 }
+			},
+			"A_glow": {
+				"A_glow": { "width": 64, "height": 64 }
+			},
+			"A_glow2": {
+				"A_glow": { "scaleX": 1.7571, "scaleY": 1.7571, "width": 64, "height": 64 }
+			},
+			"A_glow3": {
+				"A_glow": { "scaleX": 1.7571, "scaleY": 1.7571, "width": 64, "height": 64 }
+			},
+			"A_glow4": {
+				"A_glow": { "scaleX": 1.7571, "scaleY": 1.7571, "width": 64, "height": 64 }
+			},
+			"A_glow5": {
+				"A_glow": { "scaleX": 1.7571, "scaleY": 1.7571, "width": 64, "height": 64 }
+			},
+			"A_glow6": {
+				"A_glow": { "scaleX": 1.7571, "scaleY": 1.7571, "width": 64, "height": 64 }
+			},
+			"A_glowline": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline2": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline3": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline4": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline5": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline6": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline7": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline8": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline9": {
+				"A_glowline": { "y": 96.14, "width": 128, "height": 256 }
+			},
+			"A_glowline10": {
+				"A_glowline": {
+					"type": "mesh",
+					"uvs": [ 1, 0.11299, 1, 0.15807, 1, 0.20396, 1, 0.24935, 1, 0.29627, 1, 0.34104, 1, 0.38735, 1, 0.43336, 1, 0.47845, 1, 0.52476, 1, 0.57137, 1, 0.61676, 1, 0.66246, 1, 0.70818, 1, 0.75449, 1, 0.80044, 1, 0.84583, 1, 0.89184, 1, 0.93784, 1, 0.98404, 0.5, 0.98404, 0, 0.98404, 0, 0.93784, 0, 0.89184, 0, 0.84583, 0, 0.80044, 0, 0.75449, 0, 0.70818, 0, 0.66246, 0, 0.61676, 0, 0.57137, 0, 0.52476, 0, 0.47845, 0, 0.43336, 0, 0.38735, 0, 0.34104, 0, 0.29627, 0, 0.24935, 0, 0.20396, 0, 0.15807, 0, 0.11299, 0, 0.07769, 0.5, 0.07769, 1, 0.07769, 0.5, 0.93784, 0.5, 0.89184, 0.5, 0.84583, 0.5, 0.80044, 0.5, 0.75449, 0.5, 0.70818, 0.5, 0.66246, 0.5, 0.61676, 0.5, 0.57137, 0.5, 0.52476, 0.5, 0.47845, 0.5, 0.43336, 0.5, 0.38735, 0.5, 0.34104, 0.5, 0.29627, 0.5, 0.24935, 0.5, 0.20396, 0.5, 0.15807, 0.5, 0.11299 ],
+					"triangles": [ 21, 22, 20, 44, 45, 17, 23, 45, 44, 44, 17, 18, 22, 23, 44, 20, 44, 18, 22, 44, 20, 20, 18, 19, 23, 24, 45, 45, 16, 17, 46, 47, 15, 24, 25, 46, 46, 15, 16, 45, 46, 16, 24, 46, 45, 25, 26, 47, 47, 14, 15, 25, 47, 46, 27, 49, 48, 26, 27, 48, 48, 13, 14, 47, 48, 14, 26, 48, 47, 28, 50, 49, 27, 28, 49, 49, 12, 13, 48, 49, 13, 28, 29, 50, 50, 11, 12, 49, 50, 12, 30, 52, 51, 51, 10, 11, 29, 30, 51, 50, 51, 11, 29, 51, 50, 52, 53, 9, 31, 53, 52, 52, 9, 10, 30, 31, 52, 51, 52, 10, 53, 31, 32, 53, 8, 9, 54, 7, 8, 32, 55, 54, 53, 54, 8, 53, 32, 54, 55, 56, 6, 33, 56, 55, 55, 6, 7, 54, 55, 7, 32, 33, 55, 34, 57, 56, 56, 5, 6, 33, 34, 56, 57, 58, 4, 35, 58, 57, 57, 4, 5, 34, 35, 57, 56, 57, 5, 37, 59, 58, 58, 3, 4, 36, 37, 58, 35, 36, 58, 59, 60, 2, 59, 2, 3, 37, 60, 59, 58, 59, 3, 38, 61, 60, 37, 38, 60, 1, 61, 62, 39, 62, 61, 38, 39, 61, 61, 1, 2, 60, 61, 2, 40, 41, 42, 62, 42, 43, 62, 43, 0, 40, 42, 62, 39, 40, 62, 1, 62, 0 ],
+					"vertices": [ 6, 112, 29.78, -124.71, 0.47502, 113, -11.51, -124.71, 0.4159, 114, -52.8, -124.71, 0.07049, 115, -94.1, -124.71, 0.03483, 116, -135.39, -124.71, 0.00214, 117, -176.68, -124.71, 0.00161, 7, 112, 70.36, -124.67, 0.29495, 113, 29.07, -124.67, 0.41068, 114, -12.22, -124.67, 0.15261, 115, -53.51, -124.67, 0.10801, 116, -94.8, -124.67, 0.01935, 117, -136.09, -124.67, 0.01418, 118, -177.38, -124.67, 2.2E-4, 8, 112, 111.68, -124.63, 0.12835, 113, 70.39, -124.63, 0.3036, 114, 29.09, -124.63, 0.2074, 115, -12.2, -124.63, 0.22408, 116, -53.49, -124.63, 0.0727, 117, -94.78, -124.63, 0.05561, 118, -136.07, -124.63, 0.00646, 119, -177.36, -124.63, 0.00181, 8, 112, 152.54, -124.59, 0.03914, 113, 111.25, -124.59, 0.16285, 114, 69.96, -124.59, 0.16178, 115, 28.67, -124.59, 0.28283, 116, -12.63, -124.59, 0.15844, 117, -53.92, -124.59, 0.14501, 118, -95.21, -124.59, 0.03506, 119, -136.5, -124.59, 0.01488, 10, 112, 194.78, -124.54, 0.00622, 113, 153.49, -124.54, 0.06469, 114, 112.2, -124.54, 0.07775, 115, 70.91, -124.54, 0.21411, 116, 29.62, -124.54, 0.19847, 117, -11.68, -124.54, 0.26423, 118, -52.97, -124.54, 0.11195, 119, -94.26, -124.54, 0.0594, 120, -135.55, -124.54, 0.00308, 121, -176.84, -124.54, 1.0E-4, 11, 112, 235.09, -124.5, 1.0E-4, 113, 193.8, -124.5, 0.0198, 114, 152.51, -124.5, 0.02635, 115, 111.22, -124.5, 0.1106, 116, 69.93, -124.5, 0.14349, 117, 28.64, -124.5, 0.30265, 118, -12.66, -124.5, 0.21838, 119, -53.95, -124.5, 0.15004, 120, -95.24, -124.5, 0.02288, 121, -136.53, -124.5, 0.0048, 122, -177.82, -124.5, 9.1E-4, 11, 113, 235.49, -124.46, 0.00333, 114, 194.2, -124.46, 0.00507, 115, 152.91, -124.46, 0.04064, 116, 111.62, -124.46, 0.06366, 117, 70.32, -124.46, 0.21675, 118, 29.03, -124.46, 0.26739, 119, -12.26, -124.46, 0.27812, 120, -53.55, -124.46, 0.08374, 121, -94.84, -124.46, 0.02977, 122, -136.13, -124.46, 0.01125, 123, -177.42, -124.46, 2.7E-4, 12, 113, 276.9, -124.42, 8.0E-5, 114, 235.61, -124.42, 2.4E-4, 115, 194.32, -124.42, 0.01053, 116, 153.03, -124.42, 0.01837, 117, 111.74, -124.42, 0.10399, 118, 70.45, -124.42, 0.19679, 119, 29.16, -124.42, 0.33457, 120, -12.14, -124.42, 0.18196, 121, -53.43, -124.42, 0.09658, 122, -94.72, -124.42, 0.04925, 123, -136.01, -124.42, 0.00714, 124, -177.3, -124.42, 4.8E-4, 11, 115, 234.92, -124.38, 0.00128, 116, 193.63, -124.38, 0.00269, 117, 152.34, -124.38, 0.0363, 118, 111.05, -124.38, 0.09745, 119, 69.75, -124.38, 0.25688, 120, 28.46, -124.38, 0.23014, 121, -12.83, -124.38, 0.19513, 122, -54.12, -124.38, 0.13442, 123, -95.41, -124.38, 0.0367, 124, -136.7, -124.38, 0.00834, 125, -177.99, -124.38, 6.9E-4, 11, 116, 235.32, -124.34, 1.0E-5, 117, 194.03, -124.34, 0.00782, 118, 152.74, -124.34, 0.03315, 119, 111.44, -124.34, 0.13382, 120, 70.15, -124.34, 0.16668, 121, 28.86, -124.34, 0.24172, 122, -12.43, -124.34, 0.2536, 123, -53.72, -124.34, 0.1125, 124, -95.01, -124.34, 0.04067, 125, -136.3, -124.34, 0.00988, 126, -177.6, -124.34, 1.6E-4, 11, 117, 235.99, -124.3, 5.1E-4, 118, 194.7, -124.3, 0.00691, 119, 153.41, -124.3, 0.05107, 120, 112.12, -124.3, 0.07363, 121, 70.83, -124.3, 0.17568, 122, 29.54, -124.3, 0.29836, 123, -11.75, -124.3, 0.22351, 124, -53.05, -124.3, 0.11887, 125, -94.34, -124.3, 0.04525, 126, -135.63, -124.3, 0.00616, 127, -176.92, -124.3, 5.0E-5, 11, 118, 235.56, -124.26, 4.8E-4, 119, 194.27, -124.26, 0.01465, 120, 152.98, -124.26, 0.02204, 121, 111.69, -124.26, 0.0841, 122, 70.4, -124.26, 0.21756, 123, 29.11, -124.26, 0.27075, 124, -12.18, -124.26, 0.226, 125, -53.48, -124.26, 0.12549, 126, -94.77, -124.26, 0.03361, 127, -136.06, -124.26, 0.00385, 128, -177.35, -124.26, 0.00148, 12, 119, 235.41, -124.21, 0.00231, 120, 194.12, -124.21, 0.00352, 121, 152.83, -124.21, 0.02813, 122, 111.54, -124.21, 0.10843, 123, 70.25, -124.21, 0.20491, 124, 28.95, -124.21, 0.2733, 125, -12.34, -124.21, 0.23717, 126, -53.63, -124.21, 0.10334, 127, -94.92, -124.21, 0.02533, 128, -136.21, -124.21, 0.01342, 129, -177.5, -124.21, 1.4E-4, 130, -218.79, -124.21, 2.0E-5, 12, 119, 276.57, -124.17, 2.0E-5, 120, 235.28, -124.17, 4.0E-5, 121, 193.99, -124.17, 0.00585, 122, 152.7, -124.17, 0.03981, 123, 111.41, -124.17, 0.10544, 124, 70.11, -124.17, 0.2052, 125, 28.82, -124.17, 0.28835, 126, -12.47, -124.17, 0.20858, 127, -53.76, -124.17, 0.08477, 128, -95.05, -124.17, 0.05332, 129, -136.34, -124.17, 0.0056, 130, -177.63, -124.17, 0.00302, 10, 121, 235.68, -124.13, 3.2E-4, 122, 194.39, -124.13, 0.00977, 123, 153.1, -124.13, 0.03896, 124, 111.8, -124.13, 0.1016, 125, 70.51, -124.13, 0.21382, 126, 29.22, -124.13, 0.25672, 127, -12.07, -124.13, 0.17764, 128, -53.36, -124.13, 0.14388, 129, -94.65, -124.13, 0.03363, 130, -135.94, -124.13, 0.02365, 9, 122, 235.76, -124.09, 9.8E-4, 123, 194.47, -124.09, 0.00976, 124, 153.18, -124.09, 0.03588, 125, 111.89, -124.09, 0.10367, 126, 70.6, -124.09, 0.18275, 127, 29.3, -124.09, 0.21291, 128, -11.99, -124.09, 0.26052, 129, -53.28, -124.09, 0.1058, 130, -94.57, -124.09, 0.08772, 9, 123, 235.33, -124.05, 0.00111, 124, 194.04, -124.05, 0.00852, 125, 152.75, -124.05, 0.03609, 126, 111.46, -124.05, 0.08326, 127, 70.17, -124.05, 0.14447, 128, 28.87, -124.05, 0.29435, 129, -12.42, -124.05, 0.20867, 130, -53.71, -124.05, 0.22349, 131, -95, -124.05, 4.0E-5, 8, 124, 235.45, -124.01, 7.7E-4, 125, 194.16, -124.01, 0.00816, 126, 152.87, -124.01, 0.02546, 127, 111.58, -124.01, 0.05931, 128, 70.29, -124.01, 0.2073, 129, 29, -124.01, 0.25944, 130, -12.29, -124.01, 0.42864, 131, -53.59, -124.01, 0.01093, 7, 125, 235.58, -123.97, 6.9E-4, 126, 194.29, -123.97, 0.00423, 127, 152.99, -123.97, 0.01363, 128, 111.7, -123.97, 0.10406, 129, 70.41, -123.97, 0.21699, 130, 29.12, -123.97, 0.60367, 131, -12.17, -123.97, 0.05673, 5, 127, 194.58, -123.92, 0.00121, 128, 153.29, -123.92, 0.06452, 129, 112, -123.92, 0.18052, 130, 70.71, -123.92, 0.66048, 131, 29.42, -123.92, 0.09328, 2, 130, 70.58, 1.95, 5.1E-4, 131, 29.29, 1.95, 0.99949, 5, 127, 194.33, 127.83, 0.00645, 128, 153.04, 127.83, 0.03435, 129, 111.75, 127.83, 0.13993, 130, 70.46, 127.83, 0.46877, 131, 29.17, 127.83, 0.3505, 6, 126, 194.03, 127.79, 0.00294, 127, 152.74, 127.79, 0.02592, 128, 111.45, 127.79, 0.0714, 129, 70.16, 127.79, 0.18655, 130, 28.87, 127.79, 0.43847, 131, -12.42, 127.79, 0.27472, 7, 125, 193.91, 127.75, 0.00206, 126, 152.62, 127.75, 0.02255, 127, 111.33, 127.75, 0.09122, 128, 70.04, 127.75, 0.1693, 129, 28.75, 127.75, 0.25457, 130, -12.55, 127.75, 0.32266, 131, -53.84, 127.75, 0.13765, 9, 123, 235.08, 127.71, 1.1E-4, 124, 193.79, 127.71, 0.00109, 125, 152.5, 127.71, 0.01787, 126, 111.21, 127.71, 0.08045, 127, 69.91, 127.71, 0.20029, 128, 28.62, 127.71, 0.25472, 129, -12.67, 127.71, 0.22933, 130, -53.96, 127.71, 0.16988, 131, -95.25, 127.71, 0.04625, 9, 123, 194.22, 127.67, 0.0047, 124, 152.93, 127.67, 0.01264, 125, 111.63, 127.67, 0.06613, 126, 70.34, 127.67, 0.18466, 127, 29.05, 127.67, 0.28704, 128, -12.24, 127.67, 0.23338, 129, -53.53, 127.67, 0.13607, 130, -94.82, 127.67, 0.06576, 131, -136.11, 127.67, 0.00962, 10, 122, 194.13, 127.63, 0.00239, 123, 152.84, 127.63, 0.02777, 124, 111.55, 127.63, 0.05339, 125, 70.26, 127.63, 0.15955, 126, 28.97, 127.63, 0.27984, 127, -12.32, 127.63, 0.26288, 128, -53.61, 127.63, 0.13891, 129, -94.9, 127.63, 0.0575, 130, -136.2, 127.63, 0.01725, 131, -177.49, 127.63, 5.3E-4, 11, 120, 235.03, 127.58, 3.4E-4, 121, 193.74, 127.58, 0.00202, 122, 152.44, 127.58, 0.01993, 123, 111.15, 127.58, 0.09221, 124, 69.86, 127.58, 0.13373, 125, 28.57, 127.58, 0.24816, 126, -12.72, 127.58, 0.2664, 127, -54.01, 127.58, 0.15954, 128, -95.3, 127.58, 0.0584, 129, -136.59, 127.58, 0.01723, 130, -177.89, 127.58, 0.00203, 10, 120, 193.87, 127.54, 0.00698, 121, 152.58, 127.54, 0.01784, 122, 111.28, 127.54, 0.07371, 123, 69.99, 127.54, 0.20343, 124, 28.7, 127.54, 0.20089, 125, -12.59, 127.54, 0.23796, 126, -53.88, 127.54, 0.16774, 127, -95.17, 127.54, 0.07072, 128, -136.46, 127.54, 0.01775, 129, -177.75, 127.54, 0.00297, 12, 118, 235.31, 127.5, 2.0E-5, 119, 194.02, 127.5, 4.5E-4, 120, 152.73, 127.5, 0.03397, 121, 111.44, 127.5, 0.06653, 122, 70.15, 127.5, 0.17269, 123, 28.86, 127.5, 0.29533, 124, -12.44, 127.5, 0.1779, 125, -53.73, 127.5, 0.14983, 126, -95.02, 127.5, 0.07706, 127, -136.31, 127.5, 0.02313, 128, -177.6, 127.5, 0.00304, 129, -218.89, 127.5, 6.0E-5, 11, 118, 194.45, 127.46, 0.00341, 119, 153.16, 127.46, 0.00909, 120, 111.87, 127.46, 0.10106, 121, 70.58, 127.46, 0.15635, 122, 29.28, 127.46, 0.2609, 123, -12.01, 127.46, 0.2705, 124, -53.3, 127.46, 0.09716, 125, -94.59, 127.46, 0.06948, 126, -135.88, 127.46, 0.02712, 127, -177.17, 127.46, 0.00484, 128, -218.46, 127.46, 7.0E-5, 12, 116, 235.07, 127.42, 4.0E-5, 117, 193.77, 127.42, 0.00256, 118, 152.48, 127.42, 0.0244, 119, 111.19, 127.42, 0.04648, 120, 69.9, 127.42, 0.21827, 121, 28.61, 127.42, 0.23551, 122, -12.68, 127.42, 0.24407, 123, -53.97, 127.42, 0.16373, 124, -95.26, 127.42, 0.03442, 125, -136.56, 127.42, 0.02401, 126, -177.85, 127.42, 0.00627, 127, -219.14, 127.42, 2.5E-4, 11, 116, 193.38, 127.38, 0.00362, 117, 152.08, 127.38, 0.01977, 118, 110.79, 127.38, 0.08419, 119, 69.5, 127.38, 0.12515, 120, 28.21, 127.38, 0.31596, 121, -13.08, 127.38, 0.21615, 122, -54.37, 127.38, 0.14932, 123, -95.66, 127.38, 0.07232, 124, -136.95, 127.38, 0.00738, 125, -178.25, 127.38, 0.00559, 126, -219.54, 127.38, 5.4E-4, 12, 114, 235.36, 127.34, 1.0E-4, 115, 194.07, 127.34, 0.00213, 116, 152.78, 127.34, 0.02261, 117, 111.49, 127.34, 0.07071, 118, 70.2, 127.34, 0.18878, 119, 28.9, 127.34, 0.19986, 120, -12.39, 127.34, 0.29388, 121, -53.68, 127.34, 0.12836, 122, -94.97, 127.34, 0.06776, 123, -136.26, 127.34, 0.02479, 124, -177.55, 127.34, 5.0E-4, 125, -218.84, 127.34, 5.2E-4, 10, 114, 193.95, 127.29, 0.00482, 115, 152.66, 127.29, 0.01827, 116, 111.36, 127.29, 0.07828, 117, 70.07, 127.29, 0.16841, 118, 28.78, 127.29, 0.28067, 119, -12.51, 127.29, 0.18778, 120, -53.8, 127.29, 0.18092, 121, -95.09, 127.29, 0.05274, 122, -136.38, 127.29, 0.02265, 123, -177.68, 127.29, 0.00545, 11, 113, 193.55, 127.25, 3.6E-4, 114, 152.26, 127.25, 0.0291, 115, 110.97, 127.25, 0.06847, 116, 69.67, 127.25, 0.18049, 117, 28.38, 127.25, 0.25667, 118, -12.91, 127.25, 0.257, 119, -54.2, 127.25, 0.10737, 120, -95.49, 127.25, 0.08057, 121, -136.78, 127.25, 0.01484, 122, -178.07, 127.25, 0.00477, 123, -219.36, 127.25, 3.7E-4, 11, 112, 194.53, 127.21, 2.9E-4, 113, 153.24, 127.21, 0.00957, 114, 111.95, 127.21, 0.09411, 115, 70.66, 127.21, 0.15657, 116, 29.36, 127.21, 0.26832, 117, -11.93, 127.21, 0.2407, 118, -53.22, 127.21, 0.15697, 119, -94.51, 127.21, 0.04279, 120, -135.8, 127.21, 0.02809, 121, -177.09, 127.21, 0.00229, 122, -218.38, 127.21, 3.1E-4, 10, 112, 152.29, 127.17, 0.01232, 113, 111, 127.17, 0.05288, 114, 69.7, 127.17, 0.21864, 115, 28.41, 127.17, 0.23256, 116, -12.88, 127.17, 0.25247, 117, -54.17, 127.17, 0.14566, 118, -95.46, 127.17, 0.0684, 119, -136.75, 127.17, 0.01081, 120, -178.04, 127.17, 0.00626, 121, -219.33, 127.17, 0, 9, 112, 111.42, 127.13, 0.06519, 113, 70.13, 127.13, 0.14643, 114, 28.84, 127.13, 0.33331, 115, -12.45, 127.13, 0.20969, 116, -53.74, 127.13, 0.15764, 117, -95.03, 127.13, 0.06372, 118, -136.32, 127.13, 0.02237, 119, -177.61, 127.13, 0.00117, 120, -218.91, 127.13, 4.9E-4, 7, 112, 70.11, 127.09, 0.19374, 113, 28.82, 127.09, 0.25732, 114, -12.47, 127.09, 0.33896, 115, -53.76, 127.09, 0.11652, 116, -95.05, 127.09, 0.06962, 117, -136.34, 127.09, 0.01944, 118, -177.64, 127.09, 0.00441, 7, 112, 29.53, 127.05, 0.35266, 113, -11.77, 127.05, 0.30312, 114, -53.06, 127.05, 0.27071, 115, -94.35, 127.05, 0.04666, 116, -135.64, 127.05, 0.02363, 117, -176.93, 127.05, 0.00298, 118, -218.22, 127.05, 2.3E-4, 5, 112, -2.25, 127.02, 0.40723, 113, -43.54, 127.02, 0.30648, 114, -84.83, 127.02, 0.24427, 115, -126.12, 127.02, 0.02893, 116, -167.41, 127.02, 0.01309, 3, 112, -2.12, 1.14, 0.99945, 113, -43.41, 1.14, 2.7E-4, 114, -84.7, 1.14, 2.9E-4, 4, 112, -2, -124.74, 0.53249, 113, -43.29, -124.74, 0.40295, 114, -84.58, -124.74, 0.04627, 115, -125.87, -124.74, 0.01829, 1, 130, 28.99, 1.91, 1, 3, 127, 111.45, 1.87, 6.0E-5, 129, 28.87, 1.87, 0.99987, 131, -53.71, 1.87, 7.0E-5, 2, 128, 28.75, 1.83, 0.9997, 130, -53.83, 1.83, 3.0E-4, 3, 127, 29.18, 1.79, 0.99932, 129, -53.4, 1.79, 6.8E-4, 130, -94.7, 1.79, 0, 3, 126, 29.1, 1.75, 0.99952, 128, -53.49, 1.75, 3.5E-4, 129, -94.78, 1.75, 1.2E-4, 5, 124, 69.99, 1.71, 1.0E-5, 125, 28.7, 1.71, 0.99923, 127, -53.89, 1.71, 6.7E-4, 128, -95.18, 1.71, 9.0E-5, 129, -136.47, 1.71, 1.0E-5, 4, 124, 28.83, 1.66, 0.99907, 126, -53.75, 1.66, 7.8E-4, 127, -95.05, 1.66, 1.4E-4, 128, -136.34, 1.66, 1.0E-5, 5, 120, 152.85, 1.62, 1.0E-5, 123, 28.98, 1.62, 0.99873, 125, -53.6, 1.62, 0.00102, 126, -94.89, 1.62, 2.2E-4, 127, -136.18, 1.62, 3.0E-5, 5, 120, 111.99, 1.58, 7.0E-5, 122, 29.41, 1.58, 0.99963, 124, -53.17, 1.58, 6.0E-5, 125, -94.46, 1.58, 2.0E-4, 126, -135.75, 1.58, 4.0E-5, 5, 120, 70.03, 1.54, 3.8E-4, 121, 28.74, 1.54, 0.99912, 123, -53.85, 1.54, 4.6E-4, 125, -136.43, 1.54, 3.0E-5, 126, -177.72, 1.54, 0, 4, 120, 28.34, 1.5, 0.99917, 122, -54.25, 1.5, 6.8E-4, 123, -95.54, 1.5, 1.5E-4, 125, -178.12, 1.5, 0, 4, 119, 29.03, 1.46, 0.99923, 121, -53.55, 1.46, 5.3E-4, 122, -94.84, 1.46, 2.0E-4, 123, -136.14, 1.46, 4.0E-5, 4, 118, 28.91, 1.42, 0.99949, 120, -53.67, 1.42, 4.5E-4, 121, -94.97, 1.42, 5.0E-5, 122, -136.26, 1.42, 2.0E-5, 4, 117, 28.51, 1.37, 0.9997, 119, -54.07, 1.37, 1.7E-4, 120, -95.37, 1.37, 1.3E-4, 121, -136.66, 1.37, 0, 5, 115, 70.78, 1.33, 4.8E-4, 116, 29.49, 1.33, 0.99872, 118, -53.09, 1.33, 7.6E-4, 119, -94.38, 1.33, 1.0E-5, 120, -135.67, 1.33, 4.0E-5, 3, 115, 28.54, 1.29, 0.99976, 117, -54.04, 1.29, 1.8E-4, 118, -95.33, 1.29, 6.0E-5, 4, 114, 28.97, 1.25, 0.99947, 116, -53.61, 1.25, 4.6E-4, 117, -94.91, 1.25, 6.0E-5, 118, -136.2, 1.25, 1.0E-5, 4, 113, 28.95, 1.21, 0.9998, 115, -53.64, 1.21, 1.3E-4, 116, -94.93, 1.21, 7.0E-5, 117, -136.22, 1.21, 1.0E-5, 4, 112, 29.65, 1.17, 0.99903, 114, -52.93, 1.17, 9.5E-4, 115, -94.22, 1.17, 1.0E-5, 116, -135.51, 1.17, 1.0E-5 ],
+					"hull": 44,
+					"edges": [ 38, 40, 40, 42, 82, 84, 84, 86, 40, 88, 90, 88, 92, 90, 94, 92, 96, 94, 98, 96, 100, 98, 102, 100, 104, 102, 106, 104, 108, 106, 110, 108, 112, 110, 114, 112, 116, 114, 118, 116, 120, 118, 122, 120, 84, 124, 124, 122, 0, 86, 124, 0, 80, 82, 124, 80, 78, 80, 122, 78, 0, 2, 122, 2, 76, 78, 120, 76, 2, 4, 120, 4, 74, 76, 118, 74, 4, 6, 118, 6, 72, 74, 116, 72, 6, 8, 116, 8, 70, 72, 114, 70, 8, 10, 114, 10, 68, 70, 112, 68, 10, 12, 112, 12, 66, 68, 110, 66, 12, 14, 110, 14, 64, 66, 108, 64, 14, 16, 108, 16, 62, 64, 106, 62, 16, 18, 106, 18, 60, 62, 104, 60, 18, 20, 104, 20, 20, 22, 102, 22, 58, 60, 102, 58, 22, 24, 100, 24, 56, 58, 100, 56, 24, 26, 98, 26, 54, 56, 98, 54, 26, 28, 96, 28, 52, 54, 96, 52, 28, 30, 94, 30, 50, 52, 94, 50, 30, 32, 92, 32, 48, 50, 92, 48, 32, 34, 90, 34, 46, 48, 90, 46, 34, 36, 36, 38, 88, 36, 42, 44, 44, 46, 88, 44 ],
+					"width": 128,
+					"height": 256
+				}
+			},
+			"A_glowline11": {
+				"A_glowline": {
+					"type": "mesh",
+					"uvs": [ 1, 0.11299, 1, 0.15807, 1, 0.20396, 1, 0.24935, 1, 0.29627, 1, 0.34104, 1, 0.38735, 1, 0.43336, 1, 0.47845, 1, 0.52476, 1, 0.57137, 1, 0.61676, 1, 0.66246, 1, 0.70818, 1, 0.75449, 1, 0.80044, 1, 0.84583, 1, 0.89184, 1, 0.93784, 1, 0.98404, 0.5, 0.98404, 0, 0.98404, 0, 0.93784, 0, 0.89184, 0, 0.84583, 0, 0.80044, 0, 0.75449, 0, 0.70818, 0, 0.66246, 0, 0.61676, 0, 0.57137, 0, 0.52476, 0, 0.47845, 0, 0.43336, 0, 0.38735, 0, 0.34104, 0, 0.29627, 0, 0.24935, 0, 0.20396, 0, 0.15807, 0, 0.11299, 0, 0.07769, 0.5, 0.07769, 1, 0.07769, 0.5, 0.93784, 0.5, 0.89184, 0.5, 0.84583, 0.5, 0.80044, 0.5, 0.75449, 0.5, 0.70818, 0.5, 0.66246, 0.5, 0.61676, 0.5, 0.57137, 0.5, 0.52476, 0.5, 0.47845, 0.5, 0.43336, 0.5, 0.38735, 0.5, 0.34104, 0.5, 0.29627, 0.5, 0.24935, 0.5, 0.20396, 0.5, 0.15807, 0.5, 0.11299 ],
+					"triangles": [ 21, 22, 20, 44, 45, 17, 23, 45, 44, 44, 17, 18, 22, 23, 44, 20, 44, 18, 22, 44, 20, 20, 18, 19, 23, 24, 45, 45, 16, 17, 46, 47, 15, 24, 25, 46, 46, 15, 16, 45, 46, 16, 24, 46, 45, 25, 26, 47, 47, 14, 15, 25, 47, 46, 27, 49, 48, 26, 27, 48, 48, 13, 14, 47, 48, 14, 26, 48, 47, 28, 50, 49, 27, 28, 49, 49, 12, 13, 48, 49, 13, 28, 29, 50, 50, 11, 12, 49, 50, 12, 30, 52, 51, 51, 10, 11, 29, 30, 51, 50, 51, 11, 29, 51, 50, 52, 53, 9, 31, 53, 52, 52, 9, 10, 30, 31, 52, 51, 52, 10, 53, 31, 32, 53, 8, 9, 54, 7, 8, 32, 55, 54, 53, 54, 8, 53, 32, 54, 55, 56, 6, 33, 56, 55, 55, 6, 7, 54, 55, 7, 32, 33, 55, 34, 57, 56, 56, 5, 6, 33, 34, 56, 57, 58, 4, 35, 58, 57, 57, 4, 5, 34, 35, 57, 56, 57, 5, 37, 59, 58, 58, 3, 4, 36, 37, 58, 35, 36, 58, 59, 60, 2, 59, 2, 3, 37, 60, 59, 58, 59, 3, 38, 61, 60, 37, 38, 60, 1, 61, 62, 39, 62, 61, 38, 39, 61, 61, 1, 2, 60, 61, 2, 40, 41, 42, 62, 42, 43, 62, 43, 0, 40, 42, 62, 39, 40, 62, 1, 62, 0 ],
+					"vertices": [ 6, 132, 29.78, -124.71, 0.47502, 133, -11.51, -124.71, 0.4159, 134, -52.8, -124.71, 0.07049, 135, -94.1, -124.71, 0.03483, 136, -135.39, -124.71, 0.00214, 137, -176.68, -124.71, 0.00161, 7, 132, 70.36, -124.67, 0.29495, 133, 29.07, -124.67, 0.41068, 134, -12.22, -124.67, 0.15261, 135, -53.51, -124.67, 0.10801, 136, -94.8, -124.67, 0.01935, 137, -136.09, -124.67, 0.01418, 138, -177.38, -124.67, 2.2E-4, 8, 132, 111.68, -124.63, 0.12835, 133, 70.39, -124.63, 0.3036, 134, 29.09, -124.63, 0.2074, 135, -12.2, -124.63, 0.22408, 136, -53.49, -124.63, 0.0727, 137, -94.78, -124.63, 0.05561, 138, -136.07, -124.63, 0.00646, 139, -177.36, -124.63, 0.00181, 8, 132, 152.54, -124.59, 0.03914, 133, 111.25, -124.59, 0.16285, 134, 69.96, -124.59, 0.16178, 135, 28.67, -124.59, 0.28283, 136, -12.63, -124.59, 0.15844, 137, -53.92, -124.59, 0.14501, 138, -95.21, -124.59, 0.03506, 139, -136.5, -124.59, 0.01488, 10, 132, 194.78, -124.54, 0.00622, 133, 153.49, -124.54, 0.06469, 134, 112.2, -124.54, 0.07775, 135, 70.91, -124.54, 0.21411, 136, 29.62, -124.54, 0.19847, 137, -11.68, -124.54, 0.26423, 138, -52.97, -124.54, 0.11195, 139, -94.26, -124.54, 0.0594, 140, -135.55, -124.54, 0.00308, 141, -176.84, -124.54, 1.0E-4, 11, 132, 235.09, -124.5, 1.0E-4, 133, 193.8, -124.5, 0.0198, 134, 152.51, -124.5, 0.02635, 135, 111.22, -124.5, 0.1106, 136, 69.93, -124.5, 0.14349, 137, 28.64, -124.5, 0.30265, 138, -12.66, -124.5, 0.21838, 139, -53.95, -124.5, 0.15004, 140, -95.24, -124.5, 0.02288, 141, -136.53, -124.5, 0.0048, 142, -177.82, -124.5, 9.1E-4, 11, 133, 235.49, -124.46, 0.00333, 134, 194.2, -124.46, 0.00507, 135, 152.91, -124.46, 0.04064, 136, 111.62, -124.46, 0.06366, 137, 70.32, -124.46, 0.21675, 138, 29.03, -124.46, 0.26739, 139, -12.26, -124.46, 0.27812, 140, -53.55, -124.46, 0.08374, 141, -94.84, -124.46, 0.02977, 142, -136.13, -124.46, 0.01125, 143, -177.42, -124.46, 2.7E-4, 12, 133, 276.9, -124.42, 8.0E-5, 134, 235.61, -124.42, 2.4E-4, 135, 194.32, -124.42, 0.01053, 136, 153.03, -124.42, 0.01837, 137, 111.74, -124.42, 0.10399, 138, 70.45, -124.42, 0.19679, 139, 29.16, -124.42, 0.33457, 140, -12.14, -124.42, 0.18196, 141, -53.43, -124.42, 0.09658, 142, -94.72, -124.42, 0.04925, 143, -136.01, -124.42, 0.00714, 144, -177.3, -124.42, 4.8E-4, 11, 135, 234.92, -124.38, 0.00128, 136, 193.63, -124.38, 0.00269, 137, 152.34, -124.38, 0.0363, 138, 111.05, -124.38, 0.09745, 139, 69.75, -124.38, 0.25688, 140, 28.46, -124.38, 0.23014, 141, -12.83, -124.38, 0.19513, 142, -54.12, -124.38, 0.13442, 143, -95.41, -124.38, 0.0367, 144, -136.7, -124.38, 0.00834, 145, -177.99, -124.38, 6.9E-4, 11, 136, 235.32, -124.34, 1.0E-5, 137, 194.03, -124.34, 0.00782, 138, 152.74, -124.34, 0.03315, 139, 111.44, -124.34, 0.13382, 140, 70.15, -124.34, 0.16668, 141, 28.86, -124.34, 0.24172, 142, -12.43, -124.34, 0.2536, 143, -53.72, -124.34, 0.1125, 144, -95.01, -124.34, 0.04067, 145, -136.3, -124.34, 0.00988, 146, -177.6, -124.34, 1.6E-4, 11, 137, 235.99, -124.3, 5.1E-4, 138, 194.7, -124.3, 0.00691, 139, 153.41, -124.3, 0.05107, 140, 112.12, -124.3, 0.07363, 141, 70.83, -124.3, 0.17568, 142, 29.54, -124.3, 0.29836, 143, -11.75, -124.3, 0.22351, 144, -53.05, -124.3, 0.11887, 145, -94.34, -124.3, 0.04525, 146, -135.63, -124.3, 0.00616, 147, -176.92, -124.3, 5.0E-5, 11, 138, 235.56, -124.26, 4.8E-4, 139, 194.27, -124.26, 0.01465, 140, 152.98, -124.26, 0.02204, 141, 111.69, -124.26, 0.0841, 142, 70.4, -124.26, 0.21756, 143, 29.11, -124.26, 0.27075, 144, -12.18, -124.26, 0.226, 145, -53.48, -124.26, 0.12549, 146, -94.77, -124.26, 0.03361, 147, -136.06, -124.26, 0.00385, 148, -177.35, -124.26, 0.00148, 12, 139, 235.41, -124.21, 0.00231, 140, 194.12, -124.21, 0.00352, 141, 152.83, -124.21, 0.02813, 142, 111.54, -124.21, 0.10843, 143, 70.25, -124.21, 0.20491, 144, 28.95, -124.21, 0.2733, 145, -12.34, -124.21, 0.23717, 146, -53.63, -124.21, 0.10334, 147, -94.92, -124.21, 0.02533, 148, -136.21, -124.21, 0.01342, 149, -177.5, -124.21, 1.4E-4, 150, -218.79, -124.21, 2.0E-5, 12, 139, 276.57, -124.17, 2.0E-5, 140, 235.28, -124.17, 4.0E-5, 141, 193.99, -124.17, 0.00585, 142, 152.7, -124.17, 0.03981, 143, 111.41, -124.17, 0.10544, 144, 70.11, -124.17, 0.2052, 145, 28.82, -124.17, 0.28835, 146, -12.47, -124.17, 0.20858, 147, -53.76, -124.17, 0.08477, 148, -95.05, -124.17, 0.05332, 149, -136.34, -124.17, 0.0056, 150, -177.63, -124.17, 0.00302, 10, 141, 235.68, -124.13, 3.2E-4, 142, 194.39, -124.13, 0.00977, 143, 153.1, -124.13, 0.03896, 144, 111.8, -124.13, 0.1016, 145, 70.51, -124.13, 0.21382, 146, 29.22, -124.13, 0.25672, 147, -12.07, -124.13, 0.17764, 148, -53.36, -124.13, 0.14388, 149, -94.65, -124.13, 0.03363, 150, -135.94, -124.13, 0.02365, 9, 142, 235.76, -124.09, 9.8E-4, 143, 194.47, -124.09, 0.00976, 144, 153.18, -124.09, 0.03588, 145, 111.89, -124.09, 0.10367, 146, 70.6, -124.09, 0.18275, 147, 29.3, -124.09, 0.21291, 148, -11.99, -124.09, 0.26052, 149, -53.28, -124.09, 0.1058, 150, -94.57, -124.09, 0.08772, 9, 143, 235.33, -124.05, 0.00111, 144, 194.04, -124.05, 0.00852, 145, 152.75, -124.05, 0.03609, 146, 111.46, -124.05, 0.08326, 147, 70.17, -124.05, 0.14447, 148, 28.87, -124.05, 0.29435, 149, -12.42, -124.05, 0.20867, 150, -53.71, -124.05, 0.22349, 151, -95, -124.05, 4.0E-5, 8, 144, 235.45, -124.01, 7.7E-4, 145, 194.16, -124.01, 0.00816, 146, 152.87, -124.01, 0.02546, 147, 111.58, -124.01, 0.05931, 148, 70.29, -124.01, 0.2073, 149, 29, -124.01, 0.25944, 150, -12.29, -124.01, 0.42864, 151, -53.59, -124.01, 0.01093, 7, 145, 235.58, -123.97, 6.9E-4, 146, 194.29, -123.97, 0.00423, 147, 152.99, -123.97, 0.01363, 148, 111.7, -123.97, 0.10406, 149, 70.41, -123.97, 0.21699, 150, 29.12, -123.97, 0.60367, 151, -12.17, -123.97, 0.05673, 5, 147, 194.58, -123.92, 0.00121, 148, 153.29, -123.92, 0.06452, 149, 112, -123.92, 0.18052, 150, 70.71, -123.92, 0.66048, 151, 29.42, -123.92, 0.09328, 2, 150, 70.58, 1.95, 5.1E-4, 151, 29.29, 1.95, 0.99949, 5, 147, 194.33, 127.83, 0.00645, 148, 153.04, 127.83, 0.03435, 149, 111.75, 127.83, 0.13993, 150, 70.46, 127.83, 0.46877, 151, 29.17, 127.83, 0.3505, 6, 146, 194.03, 127.79, 0.00294, 147, 152.74, 127.79, 0.02592, 148, 111.45, 127.79, 0.0714, 149, 70.16, 127.79, 0.18655, 150, 28.87, 127.79, 0.43847, 151, -12.42, 127.79, 0.27472, 7, 145, 193.91, 127.75, 0.00206, 146, 152.62, 127.75, 0.02255, 147, 111.33, 127.75, 0.09122, 148, 70.04, 127.75, 0.1693, 149, 28.75, 127.75, 0.25457, 150, -12.55, 127.75, 0.32266, 151, -53.84, 127.75, 0.13765, 9, 143, 235.08, 127.71, 1.1E-4, 144, 193.79, 127.71, 0.00109, 145, 152.5, 127.71, 0.01787, 146, 111.21, 127.71, 0.08045, 147, 69.91, 127.71, 0.20029, 148, 28.62, 127.71, 0.25472, 149, -12.67, 127.71, 0.22933, 150, -53.96, 127.71, 0.16988, 151, -95.25, 127.71, 0.04625, 9, 143, 194.22, 127.67, 0.0047, 144, 152.93, 127.67, 0.01264, 145, 111.63, 127.67, 0.06613, 146, 70.34, 127.67, 0.18466, 147, 29.05, 127.67, 0.28704, 148, -12.24, 127.67, 0.23338, 149, -53.53, 127.67, 0.13607, 150, -94.82, 127.67, 0.06576, 151, -136.11, 127.67, 0.00962, 10, 142, 194.13, 127.63, 0.00239, 143, 152.84, 127.63, 0.02777, 144, 111.55, 127.63, 0.05339, 145, 70.26, 127.63, 0.15955, 146, 28.97, 127.63, 0.27984, 147, -12.32, 127.63, 0.26288, 148, -53.61, 127.63, 0.13891, 149, -94.9, 127.63, 0.0575, 150, -136.2, 127.63, 0.01725, 151, -177.49, 127.63, 5.3E-4, 11, 140, 235.03, 127.58, 3.4E-4, 141, 193.74, 127.58, 0.00202, 142, 152.44, 127.58, 0.01993, 143, 111.15, 127.58, 0.09221, 144, 69.86, 127.58, 0.13373, 145, 28.57, 127.58, 0.24816, 146, -12.72, 127.58, 0.2664, 147, -54.01, 127.58, 0.15954, 148, -95.3, 127.58, 0.0584, 149, -136.59, 127.58, 0.01723, 150, -177.89, 127.58, 0.00203, 10, 140, 193.87, 127.54, 0.00698, 141, 152.58, 127.54, 0.01784, 142, 111.28, 127.54, 0.07371, 143, 69.99, 127.54, 0.20343, 144, 28.7, 127.54, 0.20089, 145, -12.59, 127.54, 0.23796, 146, -53.88, 127.54, 0.16774, 147, -95.17, 127.54, 0.07072, 148, -136.46, 127.54, 0.01775, 149, -177.75, 127.54, 0.00297, 12, 138, 235.31, 127.5, 2.0E-5, 139, 194.02, 127.5, 4.5E-4, 140, 152.73, 127.5, 0.03397, 141, 111.44, 127.5, 0.06653, 142, 70.15, 127.5, 0.17269, 143, 28.86, 127.5, 0.29533, 144, -12.44, 127.5, 0.1779, 145, -53.73, 127.5, 0.14983, 146, -95.02, 127.5, 0.07706, 147, -136.31, 127.5, 0.02313, 148, -177.6, 127.5, 0.00304, 149, -218.89, 127.5, 6.0E-5, 11, 138, 194.45, 127.46, 0.00341, 139, 153.16, 127.46, 0.00909, 140, 111.87, 127.46, 0.10106, 141, 70.58, 127.46, 0.15635, 142, 29.28, 127.46, 0.2609, 143, -12.01, 127.46, 0.2705, 144, -53.3, 127.46, 0.09716, 145, -94.59, 127.46, 0.06948, 146, -135.88, 127.46, 0.02712, 147, -177.17, 127.46, 0.00484, 148, -218.46, 127.46, 7.0E-5, 12, 136, 235.07, 127.42, 4.0E-5, 137, 193.77, 127.42, 0.00256, 138, 152.48, 127.42, 0.0244, 139, 111.19, 127.42, 0.04648, 140, 69.9, 127.42, 0.21827, 141, 28.61, 127.42, 0.23551, 142, -12.68, 127.42, 0.24407, 143, -53.97, 127.42, 0.16373, 144, -95.26, 127.42, 0.03442, 145, -136.56, 127.42, 0.02401, 146, -177.85, 127.42, 0.00627, 147, -219.14, 127.42, 2.5E-4, 11, 136, 193.38, 127.38, 0.00362, 137, 152.08, 127.38, 0.01977, 138, 110.79, 127.38, 0.08419, 139, 69.5, 127.38, 0.12515, 140, 28.21, 127.38, 0.31596, 141, -13.08, 127.38, 0.21615, 142, -54.37, 127.38, 0.14932, 143, -95.66, 127.38, 0.07232, 144, -136.95, 127.38, 0.00738, 145, -178.25, 127.38, 0.00559, 146, -219.54, 127.38, 5.4E-4, 12, 134, 235.36, 127.34, 1.0E-4, 135, 194.07, 127.34, 0.00213, 136, 152.78, 127.34, 0.02261, 137, 111.49, 127.34, 0.07071, 138, 70.2, 127.34, 0.18878, 139, 28.9, 127.34, 0.19986, 140, -12.39, 127.34, 0.29388, 141, -53.68, 127.34, 0.12836, 142, -94.97, 127.34, 0.06776, 143, -136.26, 127.34, 0.02479, 144, -177.55, 127.34, 5.0E-4, 145, -218.84, 127.34, 5.2E-4, 10, 134, 193.95, 127.29, 0.00482, 135, 152.66, 127.29, 0.01827, 136, 111.36, 127.29, 0.07828, 137, 70.07, 127.29, 0.16841, 138, 28.78, 127.29, 0.28067, 139, -12.51, 127.29, 0.18778, 140, -53.8, 127.29, 0.18092, 141, -95.09, 127.29, 0.05274, 142, -136.38, 127.29, 0.02265, 143, -177.68, 127.29, 0.00545, 11, 133, 193.55, 127.25, 3.6E-4, 134, 152.26, 127.25, 0.0291, 135, 110.97, 127.25, 0.06847, 136, 69.67, 127.25, 0.18049, 137, 28.38, 127.25, 0.25667, 138, -12.91, 127.25, 0.257, 139, -54.2, 127.25, 0.10737, 140, -95.49, 127.25, 0.08057, 141, -136.78, 127.25, 0.01484, 142, -178.07, 127.25, 0.00477, 143, -219.36, 127.25, 3.7E-4, 11, 132, 194.53, 127.21, 2.9E-4, 133, 153.24, 127.21, 0.00957, 134, 111.95, 127.21, 0.09411, 135, 70.66, 127.21, 0.15657, 136, 29.36, 127.21, 0.26832, 137, -11.93, 127.21, 0.2407, 138, -53.22, 127.21, 0.15697, 139, -94.51, 127.21, 0.04279, 140, -135.8, 127.21, 0.02809, 141, -177.09, 127.21, 0.00229, 142, -218.38, 127.21, 3.1E-4, 10, 132, 152.29, 127.17, 0.01232, 133, 111, 127.17, 0.05288, 134, 69.7, 127.17, 0.21864, 135, 28.41, 127.17, 0.23256, 136, -12.88, 127.17, 0.25247, 137, -54.17, 127.17, 0.14566, 138, -95.46, 127.17, 0.0684, 139, -136.75, 127.17, 0.01081, 140, -178.04, 127.17, 0.00626, 141, -219.33, 127.17, 0, 9, 132, 111.42, 127.13, 0.06519, 133, 70.13, 127.13, 0.14643, 134, 28.84, 127.13, 0.33331, 135, -12.45, 127.13, 0.20969, 136, -53.74, 127.13, 0.15764, 137, -95.03, 127.13, 0.06372, 138, -136.32, 127.13, 0.02237, 139, -177.61, 127.13, 0.00117, 140, -218.91, 127.13, 4.9E-4, 7, 132, 70.11, 127.09, 0.19374, 133, 28.82, 127.09, 0.25732, 134, -12.47, 127.09, 0.33896, 135, -53.76, 127.09, 0.11652, 136, -95.05, 127.09, 0.06962, 137, -136.34, 127.09, 0.01944, 138, -177.64, 127.09, 0.00441, 7, 132, 29.53, 127.05, 0.35266, 133, -11.77, 127.05, 0.30312, 134, -53.06, 127.05, 0.27071, 135, -94.35, 127.05, 0.04666, 136, -135.64, 127.05, 0.02363, 137, -176.93, 127.05, 0.00298, 138, -218.22, 127.05, 2.3E-4, 5, 132, -2.25, 127.02, 0.40723, 133, -43.54, 127.02, 0.30648, 134, -84.83, 127.02, 0.24427, 135, -126.12, 127.02, 0.02893, 136, -167.41, 127.02, 0.01309, 3, 132, -2.12, 1.14, 0.99945, 133, -43.41, 1.14, 2.7E-4, 134, -84.7, 1.14, 2.9E-4, 4, 132, -2, -124.74, 0.53249, 133, -43.29, -124.74, 0.40295, 134, -84.58, -124.74, 0.04627, 135, -125.87, -124.74, 0.01829, 1, 150, 28.99, 1.91, 1, 3, 147, 111.45, 1.87, 6.0E-5, 149, 28.87, 1.87, 0.99987, 151, -53.71, 1.87, 7.0E-5, 2, 148, 28.75, 1.83, 0.9997, 150, -53.83, 1.83, 3.0E-4, 3, 147, 29.18, 1.79, 0.99932, 149, -53.4, 1.79, 6.8E-4, 150, -94.7, 1.79, 0, 3, 146, 29.1, 1.75, 0.99952, 148, -53.49, 1.75, 3.5E-4, 149, -94.78, 1.75, 1.2E-4, 5, 144, 69.99, 1.71, 1.0E-5, 145, 28.7, 1.71, 0.99923, 147, -53.89, 1.71, 6.7E-4, 148, -95.18, 1.71, 9.0E-5, 149, -136.47, 1.71, 1.0E-5, 4, 144, 28.83, 1.66, 0.99907, 146, -53.75, 1.66, 7.8E-4, 147, -95.05, 1.66, 1.4E-4, 148, -136.34, 1.66, 1.0E-5, 5, 140, 152.85, 1.62, 1.0E-5, 143, 28.98, 1.62, 0.99873, 145, -53.6, 1.62, 0.00102, 146, -94.89, 1.62, 2.2E-4, 147, -136.18, 1.62, 3.0E-5, 5, 140, 111.99, 1.58, 7.0E-5, 142, 29.41, 1.58, 0.99963, 144, -53.17, 1.58, 6.0E-5, 145, -94.46, 1.58, 2.0E-4, 146, -135.75, 1.58, 4.0E-5, 5, 140, 70.03, 1.54, 3.8E-4, 141, 28.74, 1.54, 0.99912, 143, -53.85, 1.54, 4.6E-4, 145, -136.43, 1.54, 3.0E-5, 146, -177.72, 1.54, 0, 4, 140, 28.34, 1.5, 0.99917, 142, -54.25, 1.5, 6.8E-4, 143, -95.54, 1.5, 1.5E-4, 145, -178.12, 1.5, 0, 4, 139, 29.03, 1.46, 0.99923, 141, -53.55, 1.46, 5.3E-4, 142, -94.84, 1.46, 2.0E-4, 143, -136.14, 1.46, 4.0E-5, 4, 138, 28.91, 1.42, 0.99949, 140, -53.67, 1.42, 4.5E-4, 141, -94.97, 1.42, 5.0E-5, 142, -136.26, 1.42, 2.0E-5, 4, 137, 28.51, 1.37, 0.9997, 139, -54.07, 1.37, 1.7E-4, 140, -95.37, 1.37, 1.3E-4, 141, -136.66, 1.37, 0, 5, 135, 70.78, 1.33, 4.8E-4, 136, 29.49, 1.33, 0.99872, 138, -53.09, 1.33, 7.6E-4, 139, -94.38, 1.33, 1.0E-5, 140, -135.67, 1.33, 4.0E-5, 3, 135, 28.54, 1.29, 0.99976, 137, -54.04, 1.29, 1.8E-4, 138, -95.33, 1.29, 6.0E-5, 4, 134, 28.97, 1.25, 0.99947, 136, -53.61, 1.25, 4.6E-4, 137, -94.91, 1.25, 6.0E-5, 138, -136.2, 1.25, 1.0E-5, 4, 133, 28.95, 1.21, 0.9998, 135, -53.64, 1.21, 1.3E-4, 136, -94.93, 1.21, 7.0E-5, 137, -136.22, 1.21, 1.0E-5, 4, 132, 29.65, 1.17, 0.99903, 134, -52.93, 1.17, 9.5E-4, 135, -94.22, 1.17, 1.0E-5, 136, -135.51, 1.17, 1.0E-5 ],
+					"hull": 44,
+					"edges": [ 38, 40, 40, 42, 82, 84, 84, 86, 40, 88, 90, 88, 92, 90, 94, 92, 96, 94, 98, 96, 100, 98, 102, 100, 104, 102, 106, 104, 108, 106, 110, 108, 112, 110, 114, 112, 116, 114, 118, 116, 120, 118, 122, 120, 84, 124, 124, 122, 0, 86, 124, 0, 80, 82, 124, 80, 78, 80, 122, 78, 0, 2, 122, 2, 76, 78, 120, 76, 2, 4, 120, 4, 74, 76, 118, 74, 4, 6, 118, 6, 72, 74, 116, 72, 6, 8, 116, 8, 70, 72, 114, 70, 8, 10, 114, 10, 68, 70, 112, 68, 10, 12, 112, 12, 66, 68, 110, 66, 12, 14, 110, 14, 64, 66, 108, 64, 14, 16, 108, 16, 62, 64, 106, 62, 16, 18, 106, 18, 60, 62, 104, 60, 18, 20, 104, 20, 20, 22, 102, 22, 58, 60, 102, 58, 22, 24, 100, 24, 56, 58, 100, 56, 24, 26, 98, 26, 54, 56, 98, 54, 26, 28, 96, 28, 52, 54, 96, 52, 28, 30, 94, 30, 50, 52, 94, 50, 30, 32, 92, 32, 48, 50, 92, 48, 32, 34, 90, 34, 46, 48, 90, 46, 34, 36, 36, 38, 88, 36, 42, 44, 44, 46, 88, 44 ],
+					"width": 128,
+					"height": 256
+				}
+			},
+			"A_glowline12": {
+				"A_glowline": {
+					"type": "mesh",
+					"uvs": [ 1, 0.11299, 1, 0.15807, 1, 0.20396, 1, 0.24935, 1, 0.29627, 1, 0.34104, 1, 0.38735, 1, 0.43336, 1, 0.47845, 1, 0.52476, 1, 0.57137, 1, 0.61676, 1, 0.66246, 1, 0.70818, 1, 0.75449, 1, 0.80044, 1, 0.84583, 1, 0.89184, 1, 0.93784, 1, 0.98404, 0.5, 0.98404, 0, 0.98404, 0, 0.93784, 0, 0.89184, 0, 0.84583, 0, 0.80044, 0, 0.75449, 0, 0.70818, 0, 0.66246, 0, 0.61676, 0, 0.57137, 0, 0.52476, 0, 0.47845, 0, 0.43336, 0, 0.38735, 0, 0.34104, 0, 0.29627, 0, 0.24935, 0, 0.20396, 0, 0.15807, 0, 0.11299, 0, 0.07769, 0.5, 0.07769, 1, 0.07769, 0.5, 0.93784, 0.5, 0.89184, 0.5, 0.84583, 0.5, 0.80044, 0.5, 0.75449, 0.5, 0.70818, 0.5, 0.66246, 0.5, 0.61676, 0.5, 0.57137, 0.5, 0.52476, 0.5, 0.47845, 0.5, 0.43336, 0.5, 0.38735, 0.5, 0.34104, 0.5, 0.29627, 0.5, 0.24935, 0.5, 0.20396, 0.5, 0.15807, 0.5, 0.11299 ],
+					"triangles": [ 21, 22, 20, 44, 45, 17, 23, 45, 44, 44, 17, 18, 22, 23, 44, 20, 44, 18, 22, 44, 20, 20, 18, 19, 23, 24, 45, 45, 16, 17, 46, 47, 15, 24, 25, 46, 46, 15, 16, 45, 46, 16, 24, 46, 45, 25, 26, 47, 47, 14, 15, 25, 47, 46, 27, 49, 48, 26, 27, 48, 48, 13, 14, 47, 48, 14, 26, 48, 47, 28, 50, 49, 27, 28, 49, 49, 12, 13, 48, 49, 13, 28, 29, 50, 50, 11, 12, 49, 50, 12, 30, 52, 51, 51, 10, 11, 29, 30, 51, 50, 51, 11, 29, 51, 50, 52, 53, 9, 31, 53, 52, 52, 9, 10, 30, 31, 52, 51, 52, 10, 53, 31, 32, 53, 8, 9, 54, 7, 8, 32, 55, 54, 53, 54, 8, 53, 32, 54, 55, 56, 6, 33, 56, 55, 55, 6, 7, 54, 55, 7, 32, 33, 55, 34, 57, 56, 56, 5, 6, 33, 34, 56, 57, 58, 4, 35, 58, 57, 57, 4, 5, 34, 35, 57, 56, 57, 5, 37, 59, 58, 58, 3, 4, 36, 37, 58, 35, 36, 58, 59, 60, 2, 59, 2, 3, 37, 60, 59, 58, 59, 3, 38, 61, 60, 37, 38, 60, 1, 61, 62, 39, 62, 61, 38, 39, 61, 61, 1, 2, 60, 61, 2, 40, 41, 42, 62, 42, 43, 62, 43, 0, 40, 42, 62, 39, 40, 62, 1, 62, 0 ],
+					"vertices": [ 6, 152, 29.78, -124.71, 0.47502, 153, -11.51, -124.71, 0.4159, 154, -52.8, -124.71, 0.07049, 155, -94.1, -124.71, 0.03483, 156, -135.39, -124.71, 0.00214, 157, -176.68, -124.71, 0.00161, 7, 152, 70.36, -124.67, 0.29495, 153, 29.07, -124.67, 0.41068, 154, -12.22, -124.67, 0.15261, 155, -53.51, -124.67, 0.10801, 156, -94.8, -124.67, 0.01935, 157, -136.09, -124.67, 0.01418, 158, -177.38, -124.67, 2.2E-4, 8, 152, 111.68, -124.63, 0.12835, 153, 70.39, -124.63, 0.3036, 154, 29.09, -124.63, 0.2074, 155, -12.2, -124.63, 0.22408, 156, -53.49, -124.63, 0.0727, 157, -94.78, -124.63, 0.05561, 158, -136.07, -124.63, 0.00646, 159, -177.36, -124.63, 0.00181, 8, 152, 152.54, -124.59, 0.03914, 153, 111.25, -124.59, 0.16285, 154, 69.96, -124.59, 0.16178, 155, 28.67, -124.59, 0.28283, 156, -12.63, -124.59, 0.15844, 157, -53.92, -124.59, 0.14501, 158, -95.21, -124.59, 0.03506, 159, -136.5, -124.59, 0.01488, 10, 152, 194.78, -124.54, 0.00622, 153, 153.49, -124.54, 0.06469, 154, 112.2, -124.54, 0.07775, 155, 70.91, -124.54, 0.21411, 156, 29.62, -124.54, 0.19847, 157, -11.68, -124.54, 0.26423, 158, -52.97, -124.54, 0.11195, 159, -94.26, -124.54, 0.0594, 160, -135.55, -124.54, 0.00308, 161, -176.84, -124.54, 1.0E-4, 11, 152, 235.09, -124.5, 1.0E-4, 153, 193.8, -124.5, 0.0198, 154, 152.51, -124.5, 0.02635, 155, 111.22, -124.5, 0.1106, 156, 69.93, -124.5, 0.14349, 157, 28.64, -124.5, 0.30265, 158, -12.66, -124.5, 0.21838, 159, -53.95, -124.5, 0.15004, 160, -95.24, -124.5, 0.02288, 161, -136.53, -124.5, 0.0048, 162, -177.82, -124.5, 9.1E-4, 11, 153, 235.49, -124.46, 0.00333, 154, 194.2, -124.46, 0.00507, 155, 152.91, -124.46, 0.04064, 156, 111.62, -124.46, 0.06366, 157, 70.32, -124.46, 0.21675, 158, 29.03, -124.46, 0.26739, 159, -12.26, -124.46, 0.27812, 160, -53.55, -124.46, 0.08374, 161, -94.84, -124.46, 0.02977, 162, -136.13, -124.46, 0.01125, 163, -177.42, -124.46, 2.7E-4, 12, 153, 276.9, -124.42, 8.0E-5, 154, 235.61, -124.42, 2.4E-4, 155, 194.32, -124.42, 0.01053, 156, 153.03, -124.42, 0.01837, 157, 111.74, -124.42, 0.10399, 158, 70.45, -124.42, 0.19679, 159, 29.16, -124.42, 0.33457, 160, -12.14, -124.42, 0.18196, 161, -53.43, -124.42, 0.09658, 162, -94.72, -124.42, 0.04925, 163, -136.01, -124.42, 0.00714, 164, -177.3, -124.42, 4.8E-4, 11, 155, 234.92, -124.38, 0.00128, 156, 193.63, -124.38, 0.00269, 157, 152.34, -124.38, 0.0363, 158, 111.05, -124.38, 0.09745, 159, 69.75, -124.38, 0.25688, 160, 28.46, -124.38, 0.23014, 161, -12.83, -124.38, 0.19513, 162, -54.12, -124.38, 0.13442, 163, -95.41, -124.38, 0.0367, 164, -136.7, -124.38, 0.00834, 165, -177.99, -124.38, 6.9E-4, 11, 156, 235.32, -124.34, 1.0E-5, 157, 194.03, -124.34, 0.00782, 158, 152.74, -124.34, 0.03315, 159, 111.44, -124.34, 0.13382, 160, 70.15, -124.34, 0.16668, 161, 28.86, -124.34, 0.24172, 162, -12.43, -124.34, 0.2536, 163, -53.72, -124.34, 0.1125, 164, -95.01, -124.34, 0.04067, 165, -136.3, -124.34, 0.00988, 166, -177.6, -124.34, 1.6E-4, 11, 157, 235.99, -124.3, 5.1E-4, 158, 194.7, -124.3, 0.00691, 159, 153.41, -124.3, 0.05107, 160, 112.12, -124.3, 0.07363, 161, 70.83, -124.3, 0.17568, 162, 29.54, -124.3, 0.29836, 163, -11.75, -124.3, 0.22351, 164, -53.05, -124.3, 0.11887, 165, -94.34, -124.3, 0.04525, 166, -135.63, -124.3, 0.00616, 167, -176.92, -124.3, 5.0E-5, 11, 158, 235.56, -124.26, 4.8E-4, 159, 194.27, -124.26, 0.01465, 160, 152.98, -124.26, 0.02204, 161, 111.69, -124.26, 0.0841, 162, 70.4, -124.26, 0.21756, 163, 29.11, -124.26, 0.27075, 164, -12.18, -124.26, 0.226, 165, -53.48, -124.26, 0.12549, 166, -94.77, -124.26, 0.03361, 167, -136.06, -124.26, 0.00385, 168, -177.35, -124.26, 0.00148, 12, 159, 235.41, -124.21, 0.00231, 160, 194.12, -124.21, 0.00352, 161, 152.83, -124.21, 0.02813, 162, 111.54, -124.21, 0.10843, 163, 70.25, -124.21, 0.20491, 164, 28.95, -124.21, 0.2733, 165, -12.34, -124.21, 0.23717, 166, -53.63, -124.21, 0.10334, 167, -94.92, -124.21, 0.02533, 168, -136.21, -124.21, 0.01342, 169, -177.5, -124.21, 1.4E-4, 170, -218.79, -124.21, 2.0E-5, 12, 159, 276.57, -124.17, 2.0E-5, 160, 235.28, -124.17, 4.0E-5, 161, 193.99, -124.17, 0.00585, 162, 152.7, -124.17, 0.03981, 163, 111.41, -124.17, 0.10544, 164, 70.11, -124.17, 0.2052, 165, 28.82, -124.17, 0.28835, 166, -12.47, -124.17, 0.20858, 167, -53.76, -124.17, 0.08477, 168, -95.05, -124.17, 0.05332, 169, -136.34, -124.17, 0.0056, 170, -177.63, -124.17, 0.00302, 10, 161, 235.68, -124.13, 3.2E-4, 162, 194.39, -124.13, 0.00977, 163, 153.1, -124.13, 0.03896, 164, 111.8, -124.13, 0.1016, 165, 70.51, -124.13, 0.21382, 166, 29.22, -124.13, 0.25672, 167, -12.07, -124.13, 0.17764, 168, -53.36, -124.13, 0.14388, 169, -94.65, -124.13, 0.03363, 170, -135.94, -124.13, 0.02365, 9, 162, 235.76, -124.09, 9.8E-4, 163, 194.47, -124.09, 0.00976, 164, 153.18, -124.09, 0.03588, 165, 111.89, -124.09, 0.10367, 166, 70.6, -124.09, 0.18275, 167, 29.3, -124.09, 0.21291, 168, -11.99, -124.09, 0.26052, 169, -53.28, -124.09, 0.1058, 170, -94.57, -124.09, 0.08772, 9, 163, 235.33, -124.05, 0.00111, 164, 194.04, -124.05, 0.00852, 165, 152.75, -124.05, 0.03609, 166, 111.46, -124.05, 0.08326, 167, 70.17, -124.05, 0.14447, 168, 28.87, -124.05, 0.29435, 169, -12.42, -124.05, 0.20867, 170, -53.71, -124.05, 0.22349, 171, -95, -124.05, 4.0E-5, 8, 164, 235.45, -124.01, 7.7E-4, 165, 194.16, -124.01, 0.00816, 166, 152.87, -124.01, 0.02546, 167, 111.58, -124.01, 0.05931, 168, 70.29, -124.01, 0.2073, 169, 29, -124.01, 0.25944, 170, -12.29, -124.01, 0.42864, 171, -53.59, -124.01, 0.01093, 7, 165, 235.58, -123.97, 6.9E-4, 166, 194.29, -123.97, 0.00423, 167, 152.99, -123.97, 0.01363, 168, 111.7, -123.97, 0.10406, 169, 70.41, -123.97, 0.21699, 170, 29.12, -123.97, 0.60367, 171, -12.17, -123.97, 0.05673, 5, 167, 194.58, -123.92, 0.00121, 168, 153.29, -123.92, 0.06452, 169, 112, -123.92, 0.18052, 170, 70.71, -123.92, 0.66048, 171, 29.42, -123.92, 0.09328, 2, 170, 70.58, 1.95, 5.1E-4, 171, 29.29, 1.95, 0.99949, 5, 167, 194.33, 127.83, 0.00645, 168, 153.04, 127.83, 0.03435, 169, 111.75, 127.83, 0.13993, 170, 70.46, 127.83, 0.46877, 171, 29.17, 127.83, 0.3505, 6, 166, 194.03, 127.79, 0.00294, 167, 152.74, 127.79, 0.02592, 168, 111.45, 127.79, 0.0714, 169, 70.16, 127.79, 0.18655, 170, 28.87, 127.79, 0.43847, 171, -12.42, 127.79, 0.27472, 7, 165, 193.91, 127.75, 0.00206, 166, 152.62, 127.75, 0.02255, 167, 111.33, 127.75, 0.09122, 168, 70.04, 127.75, 0.1693, 169, 28.75, 127.75, 0.25457, 170, -12.55, 127.75, 0.32266, 171, -53.84, 127.75, 0.13765, 9, 163, 235.08, 127.71, 1.1E-4, 164, 193.79, 127.71, 0.00109, 165, 152.5, 127.71, 0.01787, 166, 111.21, 127.71, 0.08045, 167, 69.91, 127.71, 0.20029, 168, 28.62, 127.71, 0.25472, 169, -12.67, 127.71, 0.22933, 170, -53.96, 127.71, 0.16988, 171, -95.25, 127.71, 0.04625, 9, 163, 194.22, 127.67, 0.0047, 164, 152.93, 127.67, 0.01264, 165, 111.63, 127.67, 0.06613, 166, 70.34, 127.67, 0.18466, 167, 29.05, 127.67, 0.28704, 168, -12.24, 127.67, 0.23338, 169, -53.53, 127.67, 0.13607, 170, -94.82, 127.67, 0.06576, 171, -136.11, 127.67, 0.00962, 10, 162, 194.13, 127.63, 0.00239, 163, 152.84, 127.63, 0.02777, 164, 111.55, 127.63, 0.05339, 165, 70.26, 127.63, 0.15955, 166, 28.97, 127.63, 0.27984, 167, -12.32, 127.63, 0.26288, 168, -53.61, 127.63, 0.13891, 169, -94.9, 127.63, 0.0575, 170, -136.2, 127.63, 0.01725, 171, -177.49, 127.63, 5.3E-4, 11, 160, 235.03, 127.58, 3.4E-4, 161, 193.74, 127.58, 0.00202, 162, 152.44, 127.58, 0.01993, 163, 111.15, 127.58, 0.09221, 164, 69.86, 127.58, 0.13373, 165, 28.57, 127.58, 0.24816, 166, -12.72, 127.58, 0.2664, 167, -54.01, 127.58, 0.15954, 168, -95.3, 127.58, 0.0584, 169, -136.59, 127.58, 0.01723, 170, -177.89, 127.58, 0.00203, 10, 160, 193.87, 127.54, 0.00698, 161, 152.58, 127.54, 0.01784, 162, 111.28, 127.54, 0.07371, 163, 69.99, 127.54, 0.20343, 164, 28.7, 127.54, 0.20089, 165, -12.59, 127.54, 0.23796, 166, -53.88, 127.54, 0.16774, 167, -95.17, 127.54, 0.07072, 168, -136.46, 127.54, 0.01775, 169, -177.75, 127.54, 0.00297, 12, 158, 235.31, 127.5, 2.0E-5, 159, 194.02, 127.5, 4.5E-4, 160, 152.73, 127.5, 0.03397, 161, 111.44, 127.5, 0.06653, 162, 70.15, 127.5, 0.17269, 163, 28.86, 127.5, 0.29533, 164, -12.44, 127.5, 0.1779, 165, -53.73, 127.5, 0.14983, 166, -95.02, 127.5, 0.07706, 167, -136.31, 127.5, 0.02313, 168, -177.6, 127.5, 0.00304, 169, -218.89, 127.5, 6.0E-5, 11, 158, 194.45, 127.46, 0.00341, 159, 153.16, 127.46, 0.00909, 160, 111.87, 127.46, 0.10106, 161, 70.58, 127.46, 0.15635, 162, 29.28, 127.46, 0.2609, 163, -12.01, 127.46, 0.2705, 164, -53.3, 127.46, 0.09716, 165, -94.59, 127.46, 0.06948, 166, -135.88, 127.46, 0.02712, 167, -177.17, 127.46, 0.00484, 168, -218.46, 127.46, 7.0E-5, 12, 156, 235.07, 127.42, 4.0E-5, 157, 193.77, 127.42, 0.00256, 158, 152.48, 127.42, 0.0244, 159, 111.19, 127.42, 0.04648, 160, 69.9, 127.42, 0.21827, 161, 28.61, 127.42, 0.23551, 162, -12.68, 127.42, 0.24407, 163, -53.97, 127.42, 0.16373, 164, -95.26, 127.42, 0.03442, 165, -136.56, 127.42, 0.02401, 166, -177.85, 127.42, 0.00627, 167, -219.14, 127.42, 2.5E-4, 11, 156, 193.38, 127.38, 0.00362, 157, 152.08, 127.38, 0.01977, 158, 110.79, 127.38, 0.08419, 159, 69.5, 127.38, 0.12515, 160, 28.21, 127.38, 0.31596, 161, -13.08, 127.38, 0.21615, 162, -54.37, 127.38, 0.14932, 163, -95.66, 127.38, 0.07232, 164, -136.95, 127.38, 0.00738, 165, -178.25, 127.38, 0.00559, 166, -219.54, 127.38, 5.4E-4, 12, 154, 235.36, 127.34, 1.0E-4, 155, 194.07, 127.34, 0.00213, 156, 152.78, 127.34, 0.02261, 157, 111.49, 127.34, 0.07071, 158, 70.2, 127.34, 0.18878, 159, 28.9, 127.34, 0.19986, 160, -12.39, 127.34, 0.29388, 161, -53.68, 127.34, 0.12836, 162, -94.97, 127.34, 0.06776, 163, -136.26, 127.34, 0.02479, 164, -177.55, 127.34, 5.0E-4, 165, -218.84, 127.34, 5.2E-4, 10, 154, 193.95, 127.29, 0.00482, 155, 152.66, 127.29, 0.01827, 156, 111.36, 127.29, 0.07828, 157, 70.07, 127.29, 0.16841, 158, 28.78, 127.29, 0.28067, 159, -12.51, 127.29, 0.18778, 160, -53.8, 127.29, 0.18092, 161, -95.09, 127.29, 0.05274, 162, -136.38, 127.29, 0.02265, 163, -177.68, 127.29, 0.00545, 11, 153, 193.55, 127.25, 3.6E-4, 154, 152.26, 127.25, 0.0291, 155, 110.97, 127.25, 0.06847, 156, 69.67, 127.25, 0.18049, 157, 28.38, 127.25, 0.25667, 158, -12.91, 127.25, 0.257, 159, -54.2, 127.25, 0.10737, 160, -95.49, 127.25, 0.08057, 161, -136.78, 127.25, 0.01484, 162, -178.07, 127.25, 0.00477, 163, -219.36, 127.25, 3.7E-4, 11, 152, 194.53, 127.21, 2.9E-4, 153, 153.24, 127.21, 0.00957, 154, 111.95, 127.21, 0.09411, 155, 70.66, 127.21, 0.15657, 156, 29.36, 127.21, 0.26832, 157, -11.93, 127.21, 0.2407, 158, -53.22, 127.21, 0.15697, 159, -94.51, 127.21, 0.04279, 160, -135.8, 127.21, 0.02809, 161, -177.09, 127.21, 0.00229, 162, -218.38, 127.21, 3.1E-4, 10, 152, 152.29, 127.17, 0.01232, 153, 111, 127.17, 0.05288, 154, 69.7, 127.17, 0.21864, 155, 28.41, 127.17, 0.23256, 156, -12.88, 127.17, 0.25247, 157, -54.17, 127.17, 0.14566, 158, -95.46, 127.17, 0.0684, 159, -136.75, 127.17, 0.01081, 160, -178.04, 127.17, 0.00626, 161, -219.33, 127.17, 0, 9, 152, 111.42, 127.13, 0.06519, 153, 70.13, 127.13, 0.14643, 154, 28.84, 127.13, 0.33331, 155, -12.45, 127.13, 0.20969, 156, -53.74, 127.13, 0.15764, 157, -95.03, 127.13, 0.06372, 158, -136.32, 127.13, 0.02237, 159, -177.61, 127.13, 0.00117, 160, -218.91, 127.13, 4.9E-4, 7, 152, 70.11, 127.09, 0.19374, 153, 28.82, 127.09, 0.25732, 154, -12.47, 127.09, 0.33896, 155, -53.76, 127.09, 0.11652, 156, -95.05, 127.09, 0.06962, 157, -136.34, 127.09, 0.01944, 158, -177.64, 127.09, 0.00441, 7, 152, 29.53, 127.05, 0.35266, 153, -11.77, 127.05, 0.30312, 154, -53.06, 127.05, 0.27071, 155, -94.35, 127.05, 0.04666, 156, -135.64, 127.05, 0.02363, 157, -176.93, 127.05, 0.00298, 158, -218.22, 127.05, 2.3E-4, 5, 152, -2.25, 127.02, 0.40723, 153, -43.54, 127.02, 0.30648, 154, -84.83, 127.02, 0.24427, 155, -126.12, 127.02, 0.02893, 156, -167.41, 127.02, 0.01309, 3, 152, -2.12, 1.14, 0.99945, 153, -43.41, 1.14, 2.7E-4, 154, -84.7, 1.14, 2.9E-4, 4, 152, -2, -124.74, 0.53249, 153, -43.29, -124.74, 0.40295, 154, -84.58, -124.74, 0.04627, 155, -125.87, -124.74, 0.01829, 1, 170, 28.99, 1.91, 1, 3, 167, 111.45, 1.87, 6.0E-5, 169, 28.87, 1.87, 0.99987, 171, -53.71, 1.87, 7.0E-5, 2, 168, 28.75, 1.83, 0.9997, 170, -53.83, 1.83, 3.0E-4, 3, 167, 29.18, 1.79, 0.99932, 169, -53.4, 1.79, 6.8E-4, 170, -94.7, 1.79, 0, 3, 166, 29.1, 1.75, 0.99952, 168, -53.49, 1.75, 3.5E-4, 169, -94.78, 1.75, 1.2E-4, 5, 164, 69.99, 1.71, 1.0E-5, 165, 28.7, 1.71, 0.99923, 167, -53.89, 1.71, 6.7E-4, 168, -95.18, 1.71, 9.0E-5, 169, -136.47, 1.71, 1.0E-5, 4, 164, 28.83, 1.66, 0.99907, 166, -53.75, 1.66, 7.8E-4, 167, -95.05, 1.66, 1.4E-4, 168, -136.34, 1.66, 1.0E-5, 5, 160, 152.85, 1.62, 1.0E-5, 163, 28.98, 1.62, 0.99873, 165, -53.6, 1.62, 0.00102, 166, -94.89, 1.62, 2.2E-4, 167, -136.18, 1.62, 3.0E-5, 5, 160, 111.99, 1.58, 7.0E-5, 162, 29.41, 1.58, 0.99963, 164, -53.17, 1.58, 6.0E-5, 165, -94.46, 1.58, 2.0E-4, 166, -135.75, 1.58, 4.0E-5, 5, 160, 70.03, 1.54, 3.8E-4, 161, 28.74, 1.54, 0.99912, 163, -53.85, 1.54, 4.6E-4, 165, -136.43, 1.54, 3.0E-5, 166, -177.72, 1.54, 0, 4, 160, 28.34, 1.5, 0.99917, 162, -54.25, 1.5, 6.8E-4, 163, -95.54, 1.5, 1.5E-4, 165, -178.12, 1.5, 0, 4, 159, 29.03, 1.46, 0.99923, 161, -53.55, 1.46, 5.3E-4, 162, -94.84, 1.46, 2.0E-4, 163, -136.14, 1.46, 4.0E-5, 4, 158, 28.91, 1.42, 0.99949, 160, -53.67, 1.42, 4.5E-4, 161, -94.97, 1.42, 5.0E-5, 162, -136.26, 1.42, 2.0E-5, 4, 157, 28.51, 1.37, 0.9997, 159, -54.07, 1.37, 1.7E-4, 160, -95.37, 1.37, 1.3E-4, 161, -136.66, 1.37, 0, 5, 155, 70.78, 1.33, 4.8E-4, 156, 29.49, 1.33, 0.99872, 158, -53.09, 1.33, 7.6E-4, 159, -94.38, 1.33, 1.0E-5, 160, -135.67, 1.33, 4.0E-5, 3, 155, 28.54, 1.29, 0.99976, 157, -54.04, 1.29, 1.8E-4, 158, -95.33, 1.29, 6.0E-5, 4, 154, 28.97, 1.25, 0.99947, 156, -53.61, 1.25, 4.6E-4, 157, -94.91, 1.25, 6.0E-5, 158, -136.2, 1.25, 1.0E-5, 4, 153, 28.95, 1.21, 0.9998, 155, -53.64, 1.21, 1.3E-4, 156, -94.93, 1.21, 7.0E-5, 157, -136.22, 1.21, 1.0E-5, 4, 152, 29.65, 1.17, 0.99903, 154, -52.93, 1.17, 9.5E-4, 155, -94.22, 1.17, 1.0E-5, 156, -135.51, 1.17, 1.0E-5 ],
+					"hull": 44,
+					"edges": [ 38, 40, 40, 42, 82, 84, 84, 86, 40, 88, 90, 88, 92, 90, 94, 92, 96, 94, 98, 96, 100, 98, 102, 100, 104, 102, 106, 104, 108, 106, 110, 108, 112, 110, 114, 112, 116, 114, 118, 116, 120, 118, 122, 120, 84, 124, 124, 122, 0, 86, 124, 0, 80, 82, 124, 80, 78, 80, 122, 78, 0, 2, 122, 2, 76, 78, 120, 76, 2, 4, 120, 4, 74, 76, 118, 74, 4, 6, 118, 6, 72, 74, 116, 72, 6, 8, 116, 8, 70, 72, 114, 70, 8, 10, 114, 10, 68, 70, 112, 68, 10, 12, 112, 12, 66, 68, 110, 66, 12, 14, 110, 14, 64, 66, 108, 64, 14, 16, 108, 16, 62, 64, 106, 62, 16, 18, 106, 18, 60, 62, 104, 60, 18, 20, 104, 20, 20, 22, 102, 22, 58, 60, 102, 58, 22, 24, 100, 24, 56, 58, 100, 56, 24, 26, 98, 26, 54, 56, 98, 54, 26, 28, 96, 28, 52, 54, 96, 52, 28, 30, 94, 30, 50, 52, 94, 50, 30, 32, 92, 32, 48, 50, 92, 48, 32, 34, 90, 34, 46, 48, 90, 46, 34, 36, 36, 38, 88, 36, 42, 44, 44, 46, 88, 44 ],
+					"width": 128,
+					"height": 256
+				}
+			},
+			"A_glowline13": {
+				"A_glowline": {
+					"type": "mesh",
+					"uvs": [ 1, 0.11299, 1, 0.15807, 1, 0.20396, 1, 0.24935, 1, 0.29627, 1, 0.34104, 1, 0.38735, 1, 0.43336, 1, 0.47845, 1, 0.52476, 1, 0.57137, 1, 0.61676, 1, 0.66246, 1, 0.70818, 1, 0.75449, 1, 0.80044, 1, 0.84583, 1, 0.89184, 1, 0.93784, 1, 0.98404, 0.5, 0.98404, 0, 0.98404, 0, 0.93784, 0, 0.89184, 0, 0.84583, 0, 0.80044, 0, 0.75449, 0, 0.70818, 0, 0.66246, 0, 0.61676, 0, 0.57137, 0, 0.52476, 0, 0.47845, 0, 0.43336, 0, 0.38735, 0, 0.34104, 0, 0.29627, 0, 0.24935, 0, 0.20396, 0, 0.15807, 0, 0.11299, 0, 0.07769, 0.5, 0.07769, 1, 0.07769, 0.5, 0.93784, 0.5, 0.89184, 0.5, 0.84583, 0.5, 0.80044, 0.5, 0.75449, 0.5, 0.70818, 0.5, 0.66246, 0.5, 0.61676, 0.5, 0.57137, 0.5, 0.52476, 0.5, 0.47845, 0.5, 0.43336, 0.5, 0.38735, 0.5, 0.34104, 0.5, 0.29627, 0.5, 0.24935, 0.5, 0.20396, 0.5, 0.15807, 0.5, 0.11299 ],
+					"triangles": [ 21, 22, 20, 44, 45, 17, 23, 45, 44, 44, 17, 18, 22, 23, 44, 20, 44, 18, 22, 44, 20, 20, 18, 19, 23, 24, 45, 45, 16, 17, 46, 47, 15, 24, 25, 46, 46, 15, 16, 45, 46, 16, 24, 46, 45, 25, 26, 47, 47, 14, 15, 25, 47, 46, 27, 49, 48, 26, 27, 48, 48, 13, 14, 47, 48, 14, 26, 48, 47, 28, 50, 49, 27, 28, 49, 49, 12, 13, 48, 49, 13, 28, 29, 50, 50, 11, 12, 49, 50, 12, 30, 52, 51, 51, 10, 11, 29, 30, 51, 50, 51, 11, 29, 51, 50, 52, 53, 9, 31, 53, 52, 52, 9, 10, 30, 31, 52, 51, 52, 10, 53, 31, 32, 53, 8, 9, 54, 7, 8, 32, 55, 54, 53, 54, 8, 53, 32, 54, 55, 56, 6, 33, 56, 55, 55, 6, 7, 54, 55, 7, 32, 33, 55, 34, 57, 56, 56, 5, 6, 33, 34, 56, 57, 58, 4, 35, 58, 57, 57, 4, 5, 34, 35, 57, 56, 57, 5, 37, 59, 58, 58, 3, 4, 36, 37, 58, 35, 36, 58, 59, 60, 2, 59, 2, 3, 37, 60, 59, 58, 59, 3, 38, 61, 60, 37, 38, 60, 1, 61, 62, 39, 62, 61, 38, 39, 61, 61, 1, 2, 60, 61, 2, 40, 41, 42, 62, 42, 43, 62, 43, 0, 40, 42, 62, 39, 40, 62, 1, 62, 0 ],
+					"vertices": [ 6, 172, 29.78, -124.71, 0.47502, 173, -11.51, -124.71, 0.4159, 174, -52.8, -124.71, 0.07049, 175, -94.1, -124.71, 0.03483, 176, -135.39, -124.71, 0.00214, 177, -176.68, -124.71, 0.00161, 7, 172, 70.36, -124.67, 0.29495, 173, 29.07, -124.67, 0.41068, 174, -12.22, -124.67, 0.15261, 175, -53.51, -124.67, 0.10801, 176, -94.8, -124.67, 0.01935, 177, -136.09, -124.67, 0.01418, 178, -177.38, -124.67, 2.2E-4, 8, 172, 111.68, -124.63, 0.12835, 173, 70.39, -124.63, 0.3036, 174, 29.09, -124.63, 0.2074, 175, -12.2, -124.63, 0.22408, 176, -53.49, -124.63, 0.0727, 177, -94.78, -124.63, 0.05561, 178, -136.07, -124.63, 0.00646, 179, -177.36, -124.63, 0.00181, 8, 172, 152.54, -124.59, 0.03914, 173, 111.25, -124.59, 0.16285, 174, 69.96, -124.59, 0.16178, 175, 28.67, -124.59, 0.28283, 176, -12.63, -124.59, 0.15844, 177, -53.92, -124.59, 0.14501, 178, -95.21, -124.59, 0.03506, 179, -136.5, -124.59, 0.01488, 10, 172, 194.78, -124.54, 0.00622, 173, 153.49, -124.54, 0.06469, 174, 112.2, -124.54, 0.07775, 175, 70.91, -124.54, 0.21411, 176, 29.62, -124.54, 0.19847, 177, -11.68, -124.54, 0.26423, 178, -52.97, -124.54, 0.11195, 179, -94.26, -124.54, 0.0594, 180, -135.55, -124.54, 0.00308, 181, -176.84, -124.54, 1.0E-4, 11, 172, 235.09, -124.5, 1.0E-4, 173, 193.8, -124.5, 0.0198, 174, 152.51, -124.5, 0.02635, 175, 111.22, -124.5, 0.1106, 176, 69.93, -124.5, 0.14349, 177, 28.64, -124.5, 0.30265, 178, -12.66, -124.5, 0.21838, 179, -53.95, -124.5, 0.15004, 180, -95.24, -124.5, 0.02288, 181, -136.53, -124.5, 0.0048, 182, -177.82, -124.5, 9.1E-4, 11, 173, 235.49, -124.46, 0.00333, 174, 194.2, -124.46, 0.00507, 175, 152.91, -124.46, 0.04064, 176, 111.62, -124.46, 0.06366, 177, 70.32, -124.46, 0.21675, 178, 29.03, -124.46, 0.26739, 179, -12.26, -124.46, 0.27812, 180, -53.55, -124.46, 0.08374, 181, -94.84, -124.46, 0.02977, 182, -136.13, -124.46, 0.01125, 183, -177.42, -124.46, 2.7E-4, 12, 173, 276.9, -124.42, 8.0E-5, 174, 235.61, -124.42, 2.4E-4, 175, 194.32, -124.42, 0.01053, 176, 153.03, -124.42, 0.01837, 177, 111.74, -124.42, 0.10399, 178, 70.45, -124.42, 0.19679, 179, 29.16, -124.42, 0.33457, 180, -12.14, -124.42, 0.18196, 181, -53.43, -124.42, 0.09658, 182, -94.72, -124.42, 0.04925, 183, -136.01, -124.42, 0.00714, 184, -177.3, -124.42, 4.8E-4, 11, 175, 234.92, -124.38, 0.00128, 176, 193.63, -124.38, 0.00269, 177, 152.34, -124.38, 0.0363, 178, 111.05, -124.38, 0.09745, 179, 69.75, -124.38, 0.25688, 180, 28.46, -124.38, 0.23014, 181, -12.83, -124.38, 0.19513, 182, -54.12, -124.38, 0.13442, 183, -95.41, -124.38, 0.0367, 184, -136.7, -124.38, 0.00834, 185, -177.99, -124.38, 6.9E-4, 11, 176, 235.32, -124.34, 1.0E-5, 177, 194.03, -124.34, 0.00782, 178, 152.74, -124.34, 0.03315, 179, 111.44, -124.34, 0.13382, 180, 70.15, -124.34, 0.16668, 181, 28.86, -124.34, 0.24172, 182, -12.43, -124.34, 0.2536, 183, -53.72, -124.34, 0.1125, 184, -95.01, -124.34, 0.04067, 185, -136.3, -124.34, 0.00988, 186, -177.6, -124.34, 1.6E-4, 11, 177, 235.99, -124.3, 5.1E-4, 178, 194.7, -124.3, 0.00691, 179, 153.41, -124.3, 0.05107, 180, 112.12, -124.3, 0.07363, 181, 70.83, -124.3, 0.17568, 182, 29.54, -124.3, 0.29836, 183, -11.75, -124.3, 0.22351, 184, -53.05, -124.3, 0.11887, 185, -94.34, -124.3, 0.04525, 186, -135.63, -124.3, 0.00616, 187, -176.92, -124.3, 5.0E-5, 11, 178, 235.56, -124.26, 4.8E-4, 179, 194.27, -124.26, 0.01465, 180, 152.98, -124.26, 0.02204, 181, 111.69, -124.26, 0.0841, 182, 70.4, -124.26, 0.21756, 183, 29.11, -124.26, 0.27075, 184, -12.18, -124.26, 0.226, 185, -53.48, -124.26, 0.12549, 186, -94.77, -124.26, 0.03361, 187, -136.06, -124.26, 0.00385, 188, -177.35, -124.26, 0.00148, 12, 179, 235.41, -124.21, 0.00231, 180, 194.12, -124.21, 0.00352, 181, 152.83, -124.21, 0.02813, 182, 111.54, -124.21, 0.10843, 183, 70.25, -124.21, 0.20491, 184, 28.95, -124.21, 0.2733, 185, -12.34, -124.21, 0.23717, 186, -53.63, -124.21, 0.10334, 187, -94.92, -124.21, 0.02533, 188, -136.21, -124.21, 0.01342, 189, -177.5, -124.21, 1.4E-4, 190, -218.79, -124.21, 2.0E-5, 12, 179, 276.57, -124.17, 2.0E-5, 180, 235.28, -124.17, 4.0E-5, 181, 193.99, -124.17, 0.00585, 182, 152.7, -124.17, 0.03981, 183, 111.41, -124.17, 0.10544, 184, 70.11, -124.17, 0.2052, 185, 28.82, -124.17, 0.28835, 186, -12.47, -124.17, 0.20858, 187, -53.76, -124.17, 0.08477, 188, -95.05, -124.17, 0.05332, 189, -136.34, -124.17, 0.0056, 190, -177.63, -124.17, 0.00302, 10, 181, 235.68, -124.13, 3.2E-4, 182, 194.39, -124.13, 0.00977, 183, 153.1, -124.13, 0.03896, 184, 111.8, -124.13, 0.1016, 185, 70.51, -124.13, 0.21382, 186, 29.22, -124.13, 0.25672, 187, -12.07, -124.13, 0.17764, 188, -53.36, -124.13, 0.14388, 189, -94.65, -124.13, 0.03363, 190, -135.94, -124.13, 0.02365, 9, 182, 235.76, -124.09, 9.8E-4, 183, 194.47, -124.09, 0.00976, 184, 153.18, -124.09, 0.03588, 185, 111.89, -124.09, 0.10367, 186, 70.6, -124.09, 0.18275, 187, 29.3, -124.09, 0.21291, 188, -11.99, -124.09, 0.26052, 189, -53.28, -124.09, 0.1058, 190, -94.57, -124.09, 0.08772, 9, 183, 235.33, -124.05, 0.00111, 184, 194.04, -124.05, 0.00852, 185, 152.75, -124.05, 0.03609, 186, 111.46, -124.05, 0.08326, 187, 70.17, -124.05, 0.14447, 188, 28.87, -124.05, 0.29435, 189, -12.42, -124.05, 0.20867, 190, -53.71, -124.05, 0.22349, 191, -95, -124.05, 4.0E-5, 8, 184, 235.45, -124.01, 7.7E-4, 185, 194.16, -124.01, 0.00816, 186, 152.87, -124.01, 0.02546, 187, 111.58, -124.01, 0.05931, 188, 70.29, -124.01, 0.2073, 189, 29, -124.01, 0.25944, 190, -12.29, -124.01, 0.42864, 191, -53.59, -124.01, 0.01093, 7, 185, 235.58, -123.97, 6.9E-4, 186, 194.29, -123.97, 0.00423, 187, 152.99, -123.97, 0.01363, 188, 111.7, -123.97, 0.10406, 189, 70.41, -123.97, 0.21699, 190, 29.12, -123.97, 0.60367, 191, -12.17, -123.97, 0.05673, 5, 187, 194.58, -123.92, 0.00121, 188, 153.29, -123.92, 0.06452, 189, 112, -123.92, 0.18052, 190, 70.71, -123.92, 0.66048, 191, 29.42, -123.92, 0.09328, 2, 190, 70.58, 1.95, 5.1E-4, 191, 29.29, 1.95, 0.99949, 5, 187, 194.33, 127.83, 0.00645, 188, 153.04, 127.83, 0.03435, 189, 111.75, 127.83, 0.13993, 190, 70.46, 127.83, 0.46877, 191, 29.17, 127.83, 0.3505, 6, 186, 194.03, 127.79, 0.00294, 187, 152.74, 127.79, 0.02592, 188, 111.45, 127.79, 0.0714, 189, 70.16, 127.79, 0.18655, 190, 28.87, 127.79, 0.43847, 191, -12.42, 127.79, 0.27472, 7, 185, 193.91, 127.75, 0.00206, 186, 152.62, 127.75, 0.02255, 187, 111.33, 127.75, 0.09122, 188, 70.04, 127.75, 0.1693, 189, 28.75, 127.75, 0.25457, 190, -12.55, 127.75, 0.32266, 191, -53.84, 127.75, 0.13765, 9, 183, 235.08, 127.71, 1.1E-4, 184, 193.79, 127.71, 0.00109, 185, 152.5, 127.71, 0.01787, 186, 111.21, 127.71, 0.08045, 187, 69.91, 127.71, 0.20029, 188, 28.62, 127.71, 0.25472, 189, -12.67, 127.71, 0.22933, 190, -53.96, 127.71, 0.16988, 191, -95.25, 127.71, 0.04625, 9, 183, 194.22, 127.67, 0.0047, 184, 152.93, 127.67, 0.01264, 185, 111.63, 127.67, 0.06613, 186, 70.34, 127.67, 0.18466, 187, 29.05, 127.67, 0.28704, 188, -12.24, 127.67, 0.23338, 189, -53.53, 127.67, 0.13607, 190, -94.82, 127.67, 0.06576, 191, -136.11, 127.67, 0.00962, 10, 182, 194.13, 127.63, 0.00239, 183, 152.84, 127.63, 0.02777, 184, 111.55, 127.63, 0.05339, 185, 70.26, 127.63, 0.15955, 186, 28.97, 127.63, 0.27984, 187, -12.32, 127.63, 0.26288, 188, -53.61, 127.63, 0.13891, 189, -94.9, 127.63, 0.0575, 190, -136.2, 127.63, 0.01725, 191, -177.49, 127.63, 5.3E-4, 11, 180, 235.03, 127.58, 3.4E-4, 181, 193.74, 127.58, 0.00202, 182, 152.44, 127.58, 0.01993, 183, 111.15, 127.58, 0.09221, 184, 69.86, 127.58, 0.13373, 185, 28.57, 127.58, 0.24816, 186, -12.72, 127.58, 0.2664, 187, -54.01, 127.58, 0.15954, 188, -95.3, 127.58, 0.0584, 189, -136.59, 127.58, 0.01723, 190, -177.89, 127.58, 0.00203, 10, 180, 193.87, 127.54, 0.00698, 181, 152.58, 127.54, 0.01784, 182, 111.28, 127.54, 0.07371, 183, 69.99, 127.54, 0.20343, 184, 28.7, 127.54, 0.20089, 185, -12.59, 127.54, 0.23796, 186, -53.88, 127.54, 0.16774, 187, -95.17, 127.54, 0.07072, 188, -136.46, 127.54, 0.01775, 189, -177.75, 127.54, 0.00297, 12, 178, 235.31, 127.5, 2.0E-5, 179, 194.02, 127.5, 4.5E-4, 180, 152.73, 127.5, 0.03397, 181, 111.44, 127.5, 0.06653, 182, 70.15, 127.5, 0.17269, 183, 28.86, 127.5, 0.29533, 184, -12.44, 127.5, 0.1779, 185, -53.73, 127.5, 0.14983, 186, -95.02, 127.5, 0.07706, 187, -136.31, 127.5, 0.02313, 188, -177.6, 127.5, 0.00304, 189, -218.89, 127.5, 6.0E-5, 11, 178, 194.45, 127.46, 0.00341, 179, 153.16, 127.46, 0.00909, 180, 111.87, 127.46, 0.10106, 181, 70.58, 127.46, 0.15635, 182, 29.28, 127.46, 0.2609, 183, -12.01, 127.46, 0.2705, 184, -53.3, 127.46, 0.09716, 185, -94.59, 127.46, 0.06948, 186, -135.88, 127.46, 0.02712, 187, -177.17, 127.46, 0.00484, 188, -218.46, 127.46, 7.0E-5, 12, 176, 235.07, 127.42, 4.0E-5, 177, 193.77, 127.42, 0.00256, 178, 152.48, 127.42, 0.0244, 179, 111.19, 127.42, 0.04648, 180, 69.9, 127.42, 0.21827, 181, 28.61, 127.42, 0.23551, 182, -12.68, 127.42, 0.24407, 183, -53.97, 127.42, 0.16373, 184, -95.26, 127.42, 0.03442, 185, -136.56, 127.42, 0.02401, 186, -177.85, 127.42, 0.00627, 187, -219.14, 127.42, 2.5E-4, 11, 176, 193.38, 127.38, 0.00362, 177, 152.08, 127.38, 0.01977, 178, 110.79, 127.38, 0.08419, 179, 69.5, 127.38, 0.12515, 180, 28.21, 127.38, 0.31596, 181, -13.08, 127.38, 0.21615, 182, -54.37, 127.38, 0.14932, 183, -95.66, 127.38, 0.07232, 184, -136.95, 127.38, 0.00738, 185, -178.25, 127.38, 0.00559, 186, -219.54, 127.38, 5.4E-4, 12, 174, 235.36, 127.34, 1.0E-4, 175, 194.07, 127.34, 0.00213, 176, 152.78, 127.34, 0.02261, 177, 111.49, 127.34, 0.07071, 178, 70.2, 127.34, 0.18878, 179, 28.9, 127.34, 0.19986, 180, -12.39, 127.34, 0.29388, 181, -53.68, 127.34, 0.12836, 182, -94.97, 127.34, 0.06776, 183, -136.26, 127.34, 0.02479, 184, -177.55, 127.34, 5.0E-4, 185, -218.84, 127.34, 5.2E-4, 10, 174, 193.95, 127.29, 0.00482, 175, 152.66, 127.29, 0.01827, 176, 111.36, 127.29, 0.07828, 177, 70.07, 127.29, 0.16841, 178, 28.78, 127.29, 0.28067, 179, -12.51, 127.29, 0.18778, 180, -53.8, 127.29, 0.18092, 181, -95.09, 127.29, 0.05274, 182, -136.38, 127.29, 0.02265, 183, -177.68, 127.29, 0.00545, 11, 173, 193.55, 127.25, 3.6E-4, 174, 152.26, 127.25, 0.0291, 175, 110.97, 127.25, 0.06847, 176, 69.67, 127.25, 0.18049, 177, 28.38, 127.25, 0.25667, 178, -12.91, 127.25, 0.257, 179, -54.2, 127.25, 0.10737, 180, -95.49, 127.25, 0.08057, 181, -136.78, 127.25, 0.01484, 182, -178.07, 127.25, 0.00477, 183, -219.36, 127.25, 3.7E-4, 11, 172, 194.53, 127.21, 2.9E-4, 173, 153.24, 127.21, 0.00957, 174, 111.95, 127.21, 0.09411, 175, 70.66, 127.21, 0.15657, 176, 29.36, 127.21, 0.26832, 177, -11.93, 127.21, 0.2407, 178, -53.22, 127.21, 0.15697, 179, -94.51, 127.21, 0.04279, 180, -135.8, 127.21, 0.02809, 181, -177.09, 127.21, 0.00229, 182, -218.38, 127.21, 3.1E-4, 10, 172, 152.29, 127.17, 0.01232, 173, 111, 127.17, 0.05288, 174, 69.7, 127.17, 0.21864, 175, 28.41, 127.17, 0.23256, 176, -12.88, 127.17, 0.25247, 177, -54.17, 127.17, 0.14566, 178, -95.46, 127.17, 0.0684, 179, -136.75, 127.17, 0.01081, 180, -178.04, 127.17, 0.00626, 181, -219.33, 127.17, 0, 9, 172, 111.42, 127.13, 0.06519, 173, 70.13, 127.13, 0.14643, 174, 28.84, 127.13, 0.33331, 175, -12.45, 127.13, 0.20969, 176, -53.74, 127.13, 0.15764, 177, -95.03, 127.13, 0.06372, 178, -136.32, 127.13, 0.02237, 179, -177.61, 127.13, 0.00117, 180, -218.91, 127.13, 4.9E-4, 7, 172, 70.11, 127.09, 0.19374, 173, 28.82, 127.09, 0.25732, 174, -12.47, 127.09, 0.33896, 175, -53.76, 127.09, 0.11652, 176, -95.05, 127.09, 0.06962, 177, -136.34, 127.09, 0.01944, 178, -177.64, 127.09, 0.00441, 7, 172, 29.53, 127.05, 0.35266, 173, -11.77, 127.05, 0.30312, 174, -53.06, 127.05, 0.27071, 175, -94.35, 127.05, 0.04666, 176, -135.64, 127.05, 0.02363, 177, -176.93, 127.05, 0.00298, 178, -218.22, 127.05, 2.3E-4, 5, 172, -2.25, 127.02, 0.40723, 173, -43.54, 127.02, 0.30648, 174, -84.83, 127.02, 0.24427, 175, -126.12, 127.02, 0.02893, 176, -167.41, 127.02, 0.01309, 3, 172, -2.12, 1.14, 0.99945, 173, -43.41, 1.14, 2.7E-4, 174, -84.7, 1.14, 2.9E-4, 4, 172, -2, -124.74, 0.53249, 173, -43.29, -124.74, 0.40295, 174, -84.58, -124.74, 0.04627, 175, -125.87, -124.74, 0.01829, 1, 190, 28.99, 1.91, 1, 3, 187, 111.45, 1.87, 6.0E-5, 189, 28.87, 1.87, 0.99987, 191, -53.71, 1.87, 7.0E-5, 2, 188, 28.75, 1.83, 0.9997, 190, -53.83, 1.83, 3.0E-4, 3, 187, 29.18, 1.79, 0.99932, 189, -53.4, 1.79, 6.8E-4, 190, -94.7, 1.79, 0, 3, 186, 29.1, 1.75, 0.99952, 188, -53.49, 1.75, 3.5E-4, 189, -94.78, 1.75, 1.2E-4, 5, 184, 69.99, 1.71, 1.0E-5, 185, 28.7, 1.71, 0.99923, 187, -53.89, 1.71, 6.7E-4, 188, -95.18, 1.71, 9.0E-5, 189, -136.47, 1.71, 1.0E-5, 4, 184, 28.83, 1.66, 0.99907, 186, -53.75, 1.66, 7.8E-4, 187, -95.05, 1.66, 1.4E-4, 188, -136.34, 1.66, 1.0E-5, 5, 180, 152.85, 1.62, 1.0E-5, 183, 28.98, 1.62, 0.99873, 185, -53.6, 1.62, 0.00102, 186, -94.89, 1.62, 2.2E-4, 187, -136.18, 1.62, 3.0E-5, 5, 180, 111.99, 1.58, 7.0E-5, 182, 29.41, 1.58, 0.99963, 184, -53.17, 1.58, 6.0E-5, 185, -94.46, 1.58, 2.0E-4, 186, -135.75, 1.58, 4.0E-5, 5, 180, 70.03, 1.54, 3.8E-4, 181, 28.74, 1.54, 0.99912, 183, -53.85, 1.54, 4.6E-4, 185, -136.43, 1.54, 3.0E-5, 186, -177.72, 1.54, 0, 4, 180, 28.34, 1.5, 0.99917, 182, -54.25, 1.5, 6.8E-4, 183, -95.54, 1.5, 1.5E-4, 185, -178.12, 1.5, 0, 4, 179, 29.03, 1.46, 0.99923, 181, -53.55, 1.46, 5.3E-4, 182, -94.84, 1.46, 2.0E-4, 183, -136.14, 1.46, 4.0E-5, 4, 178, 28.91, 1.42, 0.99949, 180, -53.67, 1.42, 4.5E-4, 181, -94.97, 1.42, 5.0E-5, 182, -136.26, 1.42, 2.0E-5, 4, 177, 28.51, 1.37, 0.9997, 179, -54.07, 1.37, 1.7E-4, 180, -95.37, 1.37, 1.3E-4, 181, -136.66, 1.37, 0, 5, 175, 70.78, 1.33, 4.8E-4, 176, 29.49, 1.33, 0.99872, 178, -53.09, 1.33, 7.6E-4, 179, -94.38, 1.33, 1.0E-5, 180, -135.67, 1.33, 4.0E-5, 3, 175, 28.54, 1.29, 0.99976, 177, -54.04, 1.29, 1.8E-4, 178, -95.33, 1.29, 6.0E-5, 4, 174, 28.97, 1.25, 0.99947, 176, -53.61, 1.25, 4.6E-4, 177, -94.91, 1.25, 6.0E-5, 178, -136.2, 1.25, 1.0E-5, 4, 173, 28.95, 1.21, 0.9998, 175, -53.64, 1.21, 1.3E-4, 176, -94.93, 1.21, 7.0E-5, 177, -136.22, 1.21, 1.0E-5, 4, 172, 29.65, 1.17, 0.99903, 174, -52.93, 1.17, 9.5E-4, 175, -94.22, 1.17, 1.0E-5, 176, -135.51, 1.17, 1.0E-5 ],
+					"hull": 44,
+					"edges": [ 38, 40, 40, 42, 82, 84, 84, 86, 40, 88, 90, 88, 92, 90, 94, 92, 96, 94, 98, 96, 100, 98, 102, 100, 104, 102, 106, 104, 108, 106, 110, 108, 112, 110, 114, 112, 116, 114, 118, 116, 120, 118, 122, 120, 84, 124, 124, 122, 0, 86, 124, 0, 80, 82, 124, 80, 78, 80, 122, 78, 0, 2, 122, 2, 76, 78, 120, 76, 2, 4, 120, 4, 74, 76, 118, 74, 4, 6, 118, 6, 72, 74, 116, 72, 6, 8, 116, 8, 70, 72, 114, 70, 8, 10, 114, 10, 68, 70, 112, 68, 10, 12, 112, 12, 66, 68, 110, 66, 12, 14, 110, 14, 64, 66, 108, 64, 14, 16, 108, 16, 62, 64, 106, 62, 16, 18, 106, 18, 60, 62, 104, 60, 18, 20, 104, 20, 20, 22, 102, 22, 58, 60, 102, 58, 22, 24, 100, 24, 56, 58, 100, 56, 24, 26, 98, 26, 54, 56, 98, 54, 26, 28, 96, 28, 52, 54, 96, 52, 28, 30, 94, 30, 50, 52, 94, 50, 30, 32, 92, 32, 48, 50, 92, 48, 32, 34, 90, 34, 46, 48, 90, 46, 34, 36, 36, 38, 88, 36, 42, 44, 44, 46, 88, 44 ],
+					"width": 128,
+					"height": 256
+				}
+			},
+			"A_glowline14": {
+				"A_glowline": {
+					"type": "mesh",
+					"uvs": [ 1, 0.11299, 1, 0.15807, 1, 0.20396, 1, 0.24935, 1, 0.29627, 1, 0.34104, 1, 0.38735, 1, 0.43336, 1, 0.47845, 1, 0.52476, 1, 0.57137, 1, 0.61676, 1, 0.66246, 1, 0.70818, 1, 0.75449, 1, 0.80044, 1, 0.84583, 1, 0.89184, 1, 0.93784, 1, 0.98404, 0.5, 0.98404, 0, 0.98404, 0, 0.93784, 0, 0.89184, 0, 0.84583, 0, 0.80044, 0, 0.75449, 0, 0.70818, 0, 0.66246, 0, 0.61676, 0, 0.57137, 0, 0.52476, 0, 0.47845, 0, 0.43336, 0, 0.38735, 0, 0.34104, 0, 0.29627, 0, 0.24935, 0, 0.20396, 0, 0.15807, 0, 0.11299, 0, 0.07769, 0.5, 0.07769, 1, 0.07769, 0.5, 0.93784, 0.5, 0.89184, 0.5, 0.84583, 0.5, 0.80044, 0.5, 0.75449, 0.5, 0.70818, 0.5, 0.66246, 0.5, 0.61676, 0.5, 0.57137, 0.5, 0.52476, 0.5, 0.47845, 0.5, 0.43336, 0.5, 0.38735, 0.5, 0.34104, 0.5, 0.29627, 0.5, 0.24935, 0.5, 0.20396, 0.5, 0.15807, 0.5, 0.11299 ],
+					"triangles": [ 21, 22, 20, 44, 45, 17, 23, 45, 44, 44, 17, 18, 22, 23, 44, 20, 44, 18, 22, 44, 20, 20, 18, 19, 23, 24, 45, 45, 16, 17, 46, 47, 15, 24, 25, 46, 46, 15, 16, 45, 46, 16, 24, 46, 45, 25, 26, 47, 47, 14, 15, 25, 47, 46, 27, 49, 48, 26, 27, 48, 48, 13, 14, 47, 48, 14, 26, 48, 47, 28, 50, 49, 27, 28, 49, 49, 12, 13, 48, 49, 13, 28, 29, 50, 50, 11, 12, 49, 50, 12, 30, 52, 51, 51, 10, 11, 29, 30, 51, 50, 51, 11, 29, 51, 50, 52, 53, 9, 31, 53, 52, 52, 9, 10, 30, 31, 52, 51, 52, 10, 53, 31, 32, 53, 8, 9, 54, 7, 8, 32, 55, 54, 53, 54, 8, 53, 32, 54, 55, 56, 6, 33, 56, 55, 55, 6, 7, 54, 55, 7, 32, 33, 55, 34, 57, 56, 56, 5, 6, 33, 34, 56, 57, 58, 4, 35, 58, 57, 57, 4, 5, 34, 35, 57, 56, 57, 5, 37, 59, 58, 58, 3, 4, 36, 37, 58, 35, 36, 58, 59, 60, 2, 59, 2, 3, 37, 60, 59, 58, 59, 3, 38, 61, 60, 37, 38, 60, 1, 61, 62, 39, 62, 61, 38, 39, 61, 61, 1, 2, 60, 61, 2, 40, 41, 42, 62, 42, 43, 62, 43, 0, 40, 42, 62, 39, 40, 62, 1, 62, 0 ],
+					"vertices": [ 6, 192, 29.78, -124.71, 0.47502, 193, -11.51, -124.71, 0.4159, 194, -52.8, -124.71, 0.07049, 195, -94.1, -124.71, 0.03483, 196, -135.39, -124.71, 0.00214, 197, -176.68, -124.71, 0.00161, 7, 192, 70.36, -124.67, 0.29495, 193, 29.07, -124.67, 0.41068, 194, -12.22, -124.67, 0.15261, 195, -53.51, -124.67, 0.10801, 196, -94.8, -124.67, 0.01935, 197, -136.09, -124.67, 0.01418, 198, -177.38, -124.67, 2.2E-4, 8, 192, 111.68, -124.63, 0.12835, 193, 70.39, -124.63, 0.3036, 194, 29.09, -124.63, 0.2074, 195, -12.2, -124.63, 0.22408, 196, -53.49, -124.63, 0.0727, 197, -94.78, -124.63, 0.05561, 198, -136.07, -124.63, 0.00646, 199, -177.36, -124.63, 0.00181, 8, 192, 152.54, -124.59, 0.03914, 193, 111.25, -124.59, 0.16285, 194, 69.96, -124.59, 0.16178, 195, 28.67, -124.59, 0.28283, 196, -12.63, -124.59, 0.15844, 197, -53.92, -124.59, 0.14501, 198, -95.21, -124.59, 0.03506, 199, -136.5, -124.59, 0.01488, 10, 192, 194.78, -124.54, 0.00622, 193, 153.49, -124.54, 0.06469, 194, 112.2, -124.54, 0.07775, 195, 70.91, -124.54, 0.21411, 196, 29.62, -124.54, 0.19847, 197, -11.68, -124.54, 0.26423, 198, -52.97, -124.54, 0.11195, 199, -94.26, -124.54, 0.0594, 200, -135.55, -124.54, 0.00308, 201, -176.84, -124.54, 1.0E-4, 11, 192, 235.09, -124.5, 1.0E-4, 193, 193.8, -124.5, 0.0198, 194, 152.51, -124.5, 0.02635, 195, 111.22, -124.5, 0.1106, 196, 69.93, -124.5, 0.14349, 197, 28.64, -124.5, 0.30265, 198, -12.66, -124.5, 0.21838, 199, -53.95, -124.5, 0.15004, 200, -95.24, -124.5, 0.02288, 201, -136.53, -124.5, 0.0048, 202, -177.82, -124.5, 9.1E-4, 11, 193, 235.49, -124.46, 0.00333, 194, 194.2, -124.46, 0.00507, 195, 152.91, -124.46, 0.04064, 196, 111.62, -124.46, 0.06366, 197, 70.32, -124.46, 0.21675, 198, 29.03, -124.46, 0.26739, 199, -12.26, -124.46, 0.27812, 200, -53.55, -124.46, 0.08374, 201, -94.84, -124.46, 0.02977, 202, -136.13, -124.46, 0.01125, 203, -177.42, -124.46, 2.7E-4, 12, 193, 276.9, -124.42, 8.0E-5, 194, 235.61, -124.42, 2.4E-4, 195, 194.32, -124.42, 0.01053, 196, 153.03, -124.42, 0.01837, 197, 111.74, -124.42, 0.10399, 198, 70.45, -124.42, 0.19679, 199, 29.16, -124.42, 0.33457, 200, -12.14, -124.42, 0.18196, 201, -53.43, -124.42, 0.09658, 202, -94.72, -124.42, 0.04925, 203, -136.01, -124.42, 0.00714, 204, -177.3, -124.42, 4.8E-4, 11, 195, 234.92, -124.38, 0.00128, 196, 193.63, -124.38, 0.00269, 197, 152.34, -124.38, 0.0363, 198, 111.05, -124.38, 0.09745, 199, 69.75, -124.38, 0.25688, 200, 28.46, -124.38, 0.23014, 201, -12.83, -124.38, 0.19513, 202, -54.12, -124.38, 0.13442, 203, -95.41, -124.38, 0.0367, 204, -136.7, -124.38, 0.00834, 205, -177.99, -124.38, 6.9E-4, 11, 196, 235.32, -124.34, 1.0E-5, 197, 194.03, -124.34, 0.00782, 198, 152.74, -124.34, 0.03315, 199, 111.44, -124.34, 0.13382, 200, 70.15, -124.34, 0.16668, 201, 28.86, -124.34, 0.24172, 202, -12.43, -124.34, 0.2536, 203, -53.72, -124.34, 0.1125, 204, -95.01, -124.34, 0.04067, 205, -136.3, -124.34, 0.00988, 206, -177.6, -124.34, 1.6E-4, 11, 197, 235.99, -124.3, 5.1E-4, 198, 194.7, -124.3, 0.00691, 199, 153.41, -124.3, 0.05107, 200, 112.12, -124.3, 0.07363, 201, 70.83, -124.3, 0.17568, 202, 29.54, -124.3, 0.29836, 203, -11.75, -124.3, 0.22351, 204, -53.05, -124.3, 0.11887, 205, -94.34, -124.3, 0.04525, 206, -135.63, -124.3, 0.00616, 207, -176.92, -124.3, 5.0E-5, 11, 198, 235.56, -124.26, 4.8E-4, 199, 194.27, -124.26, 0.01465, 200, 152.98, -124.26, 0.02204, 201, 111.69, -124.26, 0.0841, 202, 70.4, -124.26, 0.21756, 203, 29.11, -124.26, 0.27075, 204, -12.18, -124.26, 0.226, 205, -53.48, -124.26, 0.12549, 206, -94.77, -124.26, 0.03361, 207, -136.06, -124.26, 0.00385, 208, -177.35, -124.26, 0.00148, 12, 199, 235.41, -124.21, 0.00231, 200, 194.12, -124.21, 0.00352, 201, 152.83, -124.21, 0.02813, 202, 111.54, -124.21, 0.10843, 203, 70.25, -124.21, 0.20491, 204, 28.95, -124.21, 0.2733, 205, -12.34, -124.21, 0.23717, 206, -53.63, -124.21, 0.10334, 207, -94.92, -124.21, 0.02533, 208, -136.21, -124.21, 0.01342, 209, -177.5, -124.21, 1.4E-4, 210, -218.79, -124.21, 2.0E-5, 12, 199, 276.57, -124.17, 2.0E-5, 200, 235.28, -124.17, 4.0E-5, 201, 193.99, -124.17, 0.00585, 202, 152.7, -124.17, 0.03981, 203, 111.41, -124.17, 0.10544, 204, 70.11, -124.17, 0.2052, 205, 28.82, -124.17, 0.28835, 206, -12.47, -124.17, 0.20858, 207, -53.76, -124.17, 0.08477, 208, -95.05, -124.17, 0.05332, 209, -136.34, -124.17, 0.0056, 210, -177.63, -124.17, 0.00302, 10, 201, 235.68, -124.13, 3.2E-4, 202, 194.39, -124.13, 0.00977, 203, 153.1, -124.13, 0.03896, 204, 111.8, -124.13, 0.1016, 205, 70.51, -124.13, 0.21382, 206, 29.22, -124.13, 0.25672, 207, -12.07, -124.13, 0.17764, 208, -53.36, -124.13, 0.14388, 209, -94.65, -124.13, 0.03363, 210, -135.94, -124.13, 0.02365, 9, 202, 235.76, -124.09, 9.8E-4, 203, 194.47, -124.09, 0.00976, 204, 153.18, -124.09, 0.03588, 205, 111.89, -124.09, 0.10367, 206, 70.6, -124.09, 0.18275, 207, 29.3, -124.09, 0.21291, 208, -11.99, -124.09, 0.26052, 209, -53.28, -124.09, 0.1058, 210, -94.57, -124.09, 0.08772, 9, 203, 235.33, -124.05, 0.00111, 204, 194.04, -124.05, 0.00852, 205, 152.75, -124.05, 0.03609, 206, 111.46, -124.05, 0.08326, 207, 70.17, -124.05, 0.14447, 208, 28.87, -124.05, 0.29435, 209, -12.42, -124.05, 0.20867, 210, -53.71, -124.05, 0.22349, 211, -95, -124.05, 4.0E-5, 8, 204, 235.45, -124.01, 7.7E-4, 205, 194.16, -124.01, 0.00816, 206, 152.87, -124.01, 0.02546, 207, 111.58, -124.01, 0.05931, 208, 70.29, -124.01, 0.2073, 209, 29, -124.01, 0.25944, 210, -12.29, -124.01, 0.42864, 211, -53.59, -124.01, 0.01093, 7, 205, 235.58, -123.97, 6.9E-4, 206, 194.29, -123.97, 0.00423, 207, 152.99, -123.97, 0.01363, 208, 111.7, -123.97, 0.10406, 209, 70.41, -123.97, 0.21699, 210, 29.12, -123.97, 0.60367, 211, -12.17, -123.97, 0.05673, 5, 207, 194.58, -123.92, 0.00121, 208, 153.29, -123.92, 0.06452, 209, 112, -123.92, 0.18052, 210, 70.71, -123.92, 0.66048, 211, 29.42, -123.92, 0.09328, 2, 210, 70.58, 1.95, 5.1E-4, 211, 29.29, 1.95, 0.99949, 5, 207, 194.33, 127.83, 0.00645, 208, 153.04, 127.83, 0.03435, 209, 111.75, 127.83, 0.13993, 210, 70.46, 127.83, 0.46877, 211, 29.17, 127.83, 0.3505, 6, 206, 194.03, 127.79, 0.00294, 207, 152.74, 127.79, 0.02592, 208, 111.45, 127.79, 0.0714, 209, 70.16, 127.79, 0.18655, 210, 28.87, 127.79, 0.43847, 211, -12.42, 127.79, 0.27472, 7, 205, 193.91, 127.75, 0.00206, 206, 152.62, 127.75, 0.02255, 207, 111.33, 127.75, 0.09122, 208, 70.04, 127.75, 0.1693, 209, 28.75, 127.75, 0.25457, 210, -12.55, 127.75, 0.32266, 211, -53.84, 127.75, 0.13765, 9, 203, 235.08, 127.71, 1.1E-4, 204, 193.79, 127.71, 0.00109, 205, 152.5, 127.71, 0.01787, 206, 111.21, 127.71, 0.08045, 207, 69.91, 127.71, 0.20029, 208, 28.62, 127.71, 0.25472, 209, -12.67, 127.71, 0.22933, 210, -53.96, 127.71, 0.16988, 211, -95.25, 127.71, 0.04625, 9, 203, 194.22, 127.67, 0.0047, 204, 152.93, 127.67, 0.01264, 205, 111.63, 127.67, 0.06613, 206, 70.34, 127.67, 0.18466, 207, 29.05, 127.67, 0.28704, 208, -12.24, 127.67, 0.23338, 209, -53.53, 127.67, 0.13607, 210, -94.82, 127.67, 0.06576, 211, -136.11, 127.67, 0.00962, 10, 202, 194.13, 127.63, 0.00239, 203, 152.84, 127.63, 0.02777, 204, 111.55, 127.63, 0.05339, 205, 70.26, 127.63, 0.15955, 206, 28.97, 127.63, 0.27984, 207, -12.32, 127.63, 0.26288, 208, -53.61, 127.63, 0.13891, 209, -94.9, 127.63, 0.0575, 210, -136.2, 127.63, 0.01725, 211, -177.49, 127.63, 5.3E-4, 11, 200, 235.03, 127.58, 3.4E-4, 201, 193.74, 127.58, 0.00202, 202, 152.44, 127.58, 0.01993, 203, 111.15, 127.58, 0.09221, 204, 69.86, 127.58, 0.13373, 205, 28.57, 127.58, 0.24816, 206, -12.72, 127.58, 0.2664, 207, -54.01, 127.58, 0.15954, 208, -95.3, 127.58, 0.0584, 209, -136.59, 127.58, 0.01723, 210, -177.89, 127.58, 0.00203, 10, 200, 193.87, 127.54, 0.00698, 201, 152.58, 127.54, 0.01784, 202, 111.28, 127.54, 0.07371, 203, 69.99, 127.54, 0.20343, 204, 28.7, 127.54, 0.20089, 205, -12.59, 127.54, 0.23796, 206, -53.88, 127.54, 0.16774, 207, -95.17, 127.54, 0.07072, 208, -136.46, 127.54, 0.01775, 209, -177.75, 127.54, 0.00297, 12, 198, 235.31, 127.5, 2.0E-5, 199, 194.02, 127.5, 4.5E-4, 200, 152.73, 127.5, 0.03397, 201, 111.44, 127.5, 0.06653, 202, 70.15, 127.5, 0.17269, 203, 28.86, 127.5, 0.29533, 204, -12.44, 127.5, 0.1779, 205, -53.73, 127.5, 0.14983, 206, -95.02, 127.5, 0.07706, 207, -136.31, 127.5, 0.02313, 208, -177.6, 127.5, 0.00304, 209, -218.89, 127.5, 6.0E-5, 11, 198, 194.45, 127.46, 0.00341, 199, 153.16, 127.46, 0.00909, 200, 111.87, 127.46, 0.10106, 201, 70.58, 127.46, 0.15635, 202, 29.28, 127.46, 0.2609, 203, -12.01, 127.46, 0.2705, 204, -53.3, 127.46, 0.09716, 205, -94.59, 127.46, 0.06948, 206, -135.88, 127.46, 0.02712, 207, -177.17, 127.46, 0.00484, 208, -218.46, 127.46, 7.0E-5, 12, 196, 235.07, 127.42, 4.0E-5, 197, 193.77, 127.42, 0.00256, 198, 152.48, 127.42, 0.0244, 199, 111.19, 127.42, 0.04648, 200, 69.9, 127.42, 0.21827, 201, 28.61, 127.42, 0.23551, 202, -12.68, 127.42, 0.24407, 203, -53.97, 127.42, 0.16373, 204, -95.26, 127.42, 0.03442, 205, -136.56, 127.42, 0.02401, 206, -177.85, 127.42, 0.00627, 207, -219.14, 127.42, 2.5E-4, 11, 196, 193.38, 127.38, 0.00362, 197, 152.08, 127.38, 0.01977, 198, 110.79, 127.38, 0.08419, 199, 69.5, 127.38, 0.12515, 200, 28.21, 127.38, 0.31596, 201, -13.08, 127.38, 0.21615, 202, -54.37, 127.38, 0.14932, 203, -95.66, 127.38, 0.07232, 204, -136.95, 127.38, 0.00738, 205, -178.25, 127.38, 0.00559, 206, -219.54, 127.38, 5.4E-4, 12, 194, 235.36, 127.34, 1.0E-4, 195, 194.07, 127.34, 0.00213, 196, 152.78, 127.34, 0.02261, 197, 111.49, 127.34, 0.07071, 198, 70.2, 127.34, 0.18878, 199, 28.9, 127.34, 0.19986, 200, -12.39, 127.34, 0.29388, 201, -53.68, 127.34, 0.12836, 202, -94.97, 127.34, 0.06776, 203, -136.26, 127.34, 0.02479, 204, -177.55, 127.34, 5.0E-4, 205, -218.84, 127.34, 5.2E-4, 10, 194, 193.95, 127.29, 0.00482, 195, 152.66, 127.29, 0.01827, 196, 111.36, 127.29, 0.07828, 197, 70.07, 127.29, 0.16841, 198, 28.78, 127.29, 0.28067, 199, -12.51, 127.29, 0.18778, 200, -53.8, 127.29, 0.18092, 201, -95.09, 127.29, 0.05274, 202, -136.38, 127.29, 0.02265, 203, -177.68, 127.29, 0.00545, 11, 193, 193.55, 127.25, 3.6E-4, 194, 152.26, 127.25, 0.0291, 195, 110.97, 127.25, 0.06847, 196, 69.67, 127.25, 0.18049, 197, 28.38, 127.25, 0.25667, 198, -12.91, 127.25, 0.257, 199, -54.2, 127.25, 0.10737, 200, -95.49, 127.25, 0.08057, 201, -136.78, 127.25, 0.01484, 202, -178.07, 127.25, 0.00477, 203, -219.36, 127.25, 3.7E-4, 11, 192, 194.53, 127.21, 2.9E-4, 193, 153.24, 127.21, 0.00957, 194, 111.95, 127.21, 0.09411, 195, 70.66, 127.21, 0.15657, 196, 29.36, 127.21, 0.26832, 197, -11.93, 127.21, 0.2407, 198, -53.22, 127.21, 0.15697, 199, -94.51, 127.21, 0.04279, 200, -135.8, 127.21, 0.02809, 201, -177.09, 127.21, 0.00229, 202, -218.38, 127.21, 3.1E-4, 10, 192, 152.29, 127.17, 0.01232, 193, 111, 127.17, 0.05288, 194, 69.7, 127.17, 0.21864, 195, 28.41, 127.17, 0.23256, 196, -12.88, 127.17, 0.25247, 197, -54.17, 127.17, 0.14566, 198, -95.46, 127.17, 0.0684, 199, -136.75, 127.17, 0.01081, 200, -178.04, 127.17, 0.00626, 201, -219.33, 127.17, 0, 9, 192, 111.42, 127.13, 0.06519, 193, 70.13, 127.13, 0.14643, 194, 28.84, 127.13, 0.33331, 195, -12.45, 127.13, 0.20969, 196, -53.74, 127.13, 0.15764, 197, -95.03, 127.13, 0.06372, 198, -136.32, 127.13, 0.02237, 199, -177.61, 127.13, 0.00117, 200, -218.91, 127.13, 4.9E-4, 7, 192, 70.11, 127.09, 0.19374, 193, 28.82, 127.09, 0.25732, 194, -12.47, 127.09, 0.33896, 195, -53.76, 127.09, 0.11652, 196, -95.05, 127.09, 0.06962, 197, -136.34, 127.09, 0.01944, 198, -177.64, 127.09, 0.00441, 7, 192, 29.53, 127.05, 0.35266, 193, -11.77, 127.05, 0.30312, 194, -53.06, 127.05, 0.27071, 195, -94.35, 127.05, 0.04666, 196, -135.64, 127.05, 0.02363, 197, -176.93, 127.05, 0.00298, 198, -218.22, 127.05, 2.3E-4, 5, 192, -2.25, 127.02, 0.40723, 193, -43.54, 127.02, 0.30648, 194, -84.83, 127.02, 0.24427, 195, -126.12, 127.02, 0.02893, 196, -167.41, 127.02, 0.01309, 3, 192, -2.12, 1.14, 0.99945, 193, -43.41, 1.14, 2.7E-4, 194, -84.7, 1.14, 2.9E-4, 4, 192, -2, -124.74, 0.53249, 193, -43.29, -124.74, 0.40295, 194, -84.58, -124.74, 0.04627, 195, -125.87, -124.74, 0.01829, 1, 210, 28.99, 1.91, 1, 3, 207, 111.45, 1.87, 6.0E-5, 209, 28.87, 1.87, 0.99987, 211, -53.71, 1.87, 7.0E-5, 2, 208, 28.75, 1.83, 0.9997, 210, -53.83, 1.83, 3.0E-4, 3, 207, 29.18, 1.79, 0.99932, 209, -53.4, 1.79, 6.8E-4, 210, -94.7, 1.79, 0, 3, 206, 29.1, 1.75, 0.99952, 208, -53.49, 1.75, 3.5E-4, 209, -94.78, 1.75, 1.2E-4, 5, 204, 69.99, 1.71, 1.0E-5, 205, 28.7, 1.71, 0.99923, 207, -53.89, 1.71, 6.7E-4, 208, -95.18, 1.71, 9.0E-5, 209, -136.47, 1.71, 1.0E-5, 4, 204, 28.83, 1.66, 0.99907, 206, -53.75, 1.66, 7.8E-4, 207, -95.05, 1.66, 1.4E-4, 208, -136.34, 1.66, 1.0E-5, 5, 200, 152.85, 1.62, 1.0E-5, 203, 28.98, 1.62, 0.99873, 205, -53.6, 1.62, 0.00102, 206, -94.89, 1.62, 2.2E-4, 207, -136.18, 1.62, 3.0E-5, 5, 200, 111.99, 1.58, 7.0E-5, 202, 29.41, 1.58, 0.99963, 204, -53.17, 1.58, 6.0E-5, 205, -94.46, 1.58, 2.0E-4, 206, -135.75, 1.58, 4.0E-5, 5, 200, 70.03, 1.54, 3.8E-4, 201, 28.74, 1.54, 0.99912, 203, -53.85, 1.54, 4.6E-4, 205, -136.43, 1.54, 3.0E-5, 206, -177.72, 1.54, 0, 4, 200, 28.34, 1.5, 0.99917, 202, -54.25, 1.5, 6.8E-4, 203, -95.54, 1.5, 1.5E-4, 205, -178.12, 1.5, 0, 4, 199, 29.03, 1.46, 0.99923, 201, -53.55, 1.46, 5.3E-4, 202, -94.84, 1.46, 2.0E-4, 203, -136.14, 1.46, 4.0E-5, 4, 198, 28.91, 1.42, 0.99949, 200, -53.67, 1.42, 4.5E-4, 201, -94.97, 1.42, 5.0E-5, 202, -136.26, 1.42, 2.0E-5, 4, 197, 28.51, 1.37, 0.9997, 199, -54.07, 1.37, 1.7E-4, 200, -95.37, 1.37, 1.3E-4, 201, -136.66, 1.37, 0, 5, 195, 70.78, 1.33, 4.8E-4, 196, 29.49, 1.33, 0.99872, 198, -53.09, 1.33, 7.6E-4, 199, -94.38, 1.33, 1.0E-5, 200, -135.67, 1.33, 4.0E-5, 3, 195, 28.54, 1.29, 0.99976, 197, -54.04, 1.29, 1.8E-4, 198, -95.33, 1.29, 6.0E-5, 4, 194, 28.97, 1.25, 0.99947, 196, -53.61, 1.25, 4.6E-4, 197, -94.91, 1.25, 6.0E-5, 198, -136.2, 1.25, 1.0E-5, 4, 193, 28.95, 1.21, 0.9998, 195, -53.64, 1.21, 1.3E-4, 196, -94.93, 1.21, 7.0E-5, 197, -136.22, 1.21, 1.0E-5, 4, 192, 29.65, 1.17, 0.99903, 194, -52.93, 1.17, 9.5E-4, 195, -94.22, 1.17, 1.0E-5, 196, -135.51, 1.17, 1.0E-5 ],
+					"hull": 44,
+					"edges": [ 38, 40, 40, 42, 82, 84, 84, 86, 40, 88, 90, 88, 92, 90, 94, 92, 96, 94, 98, 96, 100, 98, 102, 100, 104, 102, 106, 104, 108, 106, 110, 108, 112, 110, 114, 112, 116, 114, 118, 116, 120, 118, 122, 120, 84, 124, 124, 122, 0, 86, 124, 0, 80, 82, 124, 80, 78, 80, 122, 78, 0, 2, 122, 2, 76, 78, 120, 76, 2, 4, 120, 4, 74, 76, 118, 74, 4, 6, 118, 6, 72, 74, 116, 72, 6, 8, 116, 8, 70, 72, 114, 70, 8, 10, 114, 10, 68, 70, 112, 68, 10, 12, 112, 12, 66, 68, 110, 66, 12, 14, 110, 14, 64, 66, 108, 64, 14, 16, 108, 16, 62, 64, 106, 62, 16, 18, 106, 18, 60, 62, 104, 60, 18, 20, 104, 20, 20, 22, 102, 22, 58, 60, 102, 58, 22, 24, 100, 24, 56, 58, 100, 56, 24, 26, 98, 26, 54, 56, 98, 54, 26, 28, 96, 28, 52, 54, 96, 52, 28, 30, 94, 30, 50, 52, 94, 50, 30, 32, 92, 32, 48, 50, 92, 48, 32, 34, 90, 34, 46, 48, 90, 46, 34, 36, 36, 38, 88, 36, 42, 44, 44, 46, 88, 44 ],
+					"width": 128,
+					"height": 256
+				}
+			},
+			"A_glow_di": {
+				"A_glow": { "width": 64, "height": 64 }
+			},
+			"A_glow_di2": {
+				"A_glow": { "scaleX": 1.0018, "scaleY": 1.0018, "width": 64, "height": 64 }
+			},
+			"A_glow_di3": {
+				"A_glow": { "scaleX": 1.0018, "scaleY": 1.0018, "width": 64, "height": 64 }
+			},
+			"A_glow_di4": {
+				"A_glow": { "width": 64, "height": 64 }
+			},
+			"A_glow_di5": {
+				"A_glow": { "scaleX": 1.0018, "scaleY": 1.0018, "width": 64, "height": 64 }
+			},
+			"A_glow_di6": {
+				"A_glow": { "width": 64, "height": 64 }
+			},
+			"A_glow_di7": {
+				"A_glow": { "scaleX": 1.0018, "scaleY": 1.0018, "width": 64, "height": 64 }
+			},
+			"A_heibai_uv_00000": {
+				"A_heibai_uv_00000": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00001": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00002": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00003": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00004": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00005": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00006": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00007": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00008": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00009": { "y": 22.19, "width": 85, "height": 55 },
+				"A_heibai_uv_00010": { "y": 22.19, "width": 85, "height": 55 }
+			},
+			"A_huan_dis_blue1": {
+				"A_huan_dis0001": { "x": 0.5, "y": 0.5, "width": 155, "height": 155 },
+				"A_huan_dis0002": { "x": 0.5, "y": 0.5, "width": 155, "height": 155 },
+				"A_huan_dis0003": { "x": 0.5, "y": 0.5, "width": 155, "height": 155 },
+				"A_huan_dis0004": { "x": 0.5, "y": 0.5, "width": 155, "height": 155 }
+			},
+			"A_huan_dis_blue0001": {
+				"A_huan_dis_blue0001": { "width": 155, "height": 155 },
+				"A_huan_dis_blue0002": { "width": 155, "height": 155 },
+				"A_huan_dis_blue0003": { "width": 155, "height": 155 },
+				"A_huan_dis_blue0004": { "width": 155, "height": 155 }
+			},
+			"A_huan_dis_blue2": {
+				"A_huan_dis_blue0001": { "width": 155, "height": 155 },
+				"A_huan_dis_blue0002": { "width": 155, "height": 155 },
+				"A_huan_dis_blue0003": { "width": 155, "height": 155 },
+				"A_huan_dis_blue0004": { "width": 155, "height": 155 }
+			},
+			"A_huan_dis_blue3": {
+				"A_huan_dis0001": { "x": 0.5, "y": 0.5, "width": 155, "height": 155 },
+				"A_huan_dis0002": { "x": 0.5, "y": 0.5, "width": 155, "height": 155 },
+				"A_huan_dis0003": { "x": 0.5, "y": 0.5, "width": 155, "height": 155 },
+				"A_huan_dis0004": { "x": 0.5, "y": 0.5, "width": 155, "height": 155 }
+			},
+			"A_huoxing_0": {
+				"A_huoxing_00000": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00001": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00002": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00003": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00004": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00005": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00006": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00007": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00008": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 }
+			},
+			"A_huoxing_00000": {
+				"A_huoxing_00000": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00001": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00002": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00003": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00004": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00005": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00006": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00007": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00008": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 }
+			},
+			"A_huoxing_1": {
+				"A_huoxing_00000": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00001": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00002": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00003": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00004": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00005": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00006": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00007": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 },
+				"A_huoxing_00008": { "x": 58.62, "y": 3.95, "rotation": -91.65, "width": 256, "height": 128 }
+			},
+			"A_juji": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji2": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji3": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji4": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji5": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji6": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji7": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji8": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji9": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji10": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_juji11": {
+				"A_juji": { "width": 256, "height": 256 }
+			},
+			"A_kuosan": {
+				"A_kuosan": { "width": 256, "height": 256 }
+			},
+			"A_line2": {
+				"A_line2": { "width": 128, "height": 64 }
+			},
+			"A_line3": {
+				"A_line2": { "width": 128, "height": 64 }
+			},
+			"A_liusha": {
+				"A_liusha": { "x": 0.17, "scaleX": 2.0479, "scaleY": 2.0479, "width": 223, "height": 218 }
+			},
+			"A_liusha2": {
+				"A_liusha": { "x": 0.17, "scaleX": 2.0479, "scaleY": 2.0479, "width": 223, "height": 218 }
+			},
+			"A_liusha3": {
+				"A_liusha": { "x": 0.17, "scaleX": 2.0479, "scaleY": 2.0479, "width": 223, "height": 218 }
+			},
+			"A_liusha4": {
+				"A_liusha": { "x": 0.17, "scaleX": 2.0479, "scaleY": 2.0479, "width": 223, "height": 218 }
+			},
+			"A_lizi_fire1": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire01": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire2": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire3": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire4": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire5": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire6": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire7": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire8": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire9": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire10": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire11": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire12": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire13": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire14": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_lizi_fire15": {
+				"A_lizi_fire01": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire02": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_fire03": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00000": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00001": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 },
+				"A_lizi_water_00002": { "x": 118.6, "y": 12.87, "rotation": -39.45, "width": 256, "height": 256 }
+			},
+			"A_wenli_wave_0": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_00000": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_1": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_2": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_3": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_4": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_5": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_6": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_7": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_8": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_wenli_wave_9": {
+				"A_wenli_wave_00000": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00001": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00002": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00003": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00004": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00005": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00006": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00007": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00008": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00009": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00010": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00011": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00012": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00013": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00014": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00015": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00016": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00017": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00018": { "y": 30.34, "width": 64, "height": 64 },
+				"A_wenli_wave_00019": { "y": 30.34, "width": 64, "height": 64 }
+			},
+			"A_xuli_line_0": {
+				"A_xuli_line_00000": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00001": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00002": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00003": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00004": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00005": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00006": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00007": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 }
+			},
+			"A_xuli_line_00000": {
+				"A_xuli_line_00000": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00001": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00002": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00003": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00004": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00005": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00006": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00007": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 }
+			},
+			"A_xuli_line_1": {
+				"A_xuli_line_00000": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00001": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00002": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00003": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00004": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00005": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00006": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00007": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 }
+			},
+			"A_xuli_line_2": {
+				"A_xuli_line_00000": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00001": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00002": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00003": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00004": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00005": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00006": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00007": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 }
+			},
+			"A_xuli_line_3": {
+				"A_xuli_line_00000": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00001": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00002": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00003": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00004": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00005": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00006": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00007": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 }
+			},
+			"A_xuli_line_4": {
+				"A_xuli_line_00000": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00001": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00002": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00003": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00004": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00005": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00006": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00007": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 }
+			},
+			"A_xuli_line_5": {
+				"A_xuli_line_00000": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00001": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00002": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00003": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00004": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00005": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00006": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 },
+				"A_xuli_line_00007": { "x": 82.54, "y": 20.28, "rotation": -0.85, "width": 300, "height": 120 }
+			},
+			"A_xuli_qiu_0": {
+				"A_xuli_qiu_00000": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00001": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00002": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00003": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00004": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00005": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00006": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00007": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00008": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00009": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00010": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00011": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00012": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00013": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00014": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00015": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00016": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00017": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00018": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00019": { "width": 144, "height": 144 }
+			},
+			"A_xuli_qiu_00000": {
+				"A_xuli_qiu_00000": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00001": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00002": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00003": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00004": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00005": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00006": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00007": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00008": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00009": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00010": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00011": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00012": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00013": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00014": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00015": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00016": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00017": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00018": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00019": { "width": 144, "height": 144 }
+			},
+			"A_xuli_qiu_1": {
+				"A_xuli_qiu_00000": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00001": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00002": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00003": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00004": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00005": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00006": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00007": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00008": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00009": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00010": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00011": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00012": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00013": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00014": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00015": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00016": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00017": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00018": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00019": { "width": 144, "height": 144 }
+			},
+			"A_xuli_qiu_2": {
+				"A_xuli_qiu_00000": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00001": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00002": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00003": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00004": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00005": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00006": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00007": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00008": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00009": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00010": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00011": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00012": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00013": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00014": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00015": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00016": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00017": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00018": { "width": 144, "height": 144 },
+				"A_xuli_qiu_00019": { "width": 144, "height": 144 }
+			},
+			"ball": {
+				"ball": {
+					"type": "path",
+					"closed": true,
+					"lengths": [ 2267.51, 4535.04 ],
+					"vertexCount": 6,
+					"vertices": [ -440.68, -262.12, -443.04, 0, -445.39, 262.12, 428.35, 269.97, 430.71, 7.85, 433.06, -254.28 ]
+				}
+			},
+			"ball_blue": {
+				"ball_blue": { "x": 0.5, "width": 73, "height": 72 }
+			},
+			"ball_green": {
+				"ball_green": { "x": 0.5, "width": 73, "height": 72 }
+			},
+			"ball_purple": {
+				"ball_purple": { "width": 73, "height": 72 }
+			},
+			"ball_red": {
+				"ball_red": { "x": 0.5, "width": 73, "height": 72 }
+			},
+			"ball_yellow": {
+				"ball_yellow": { "width": 73, "height": 72 }
+			}
+		}
+	}
+],
+"events": {
+	"hit": {}
+},
+"animations": {
+	"animation": {
+		"slots": {
+			"A_glow2": {
+				"attachment": [
+					{ "name": "A_glow" }
+				]
+			},
+			"A_glow3": {
+				"attachment": [
+					{ "name": "A_glow" }
+				]
+			},
+			"A_glow4": {
+				"attachment": [
+					{ "name": "A_glow" }
+				]
+			},
+			"A_glow5": {
+				"attachment": [
+					{ "name": "A_glow" }
+				]
+			},
+			"A_glow6": {
+				"attachment": [
+					{ "name": "A_glow" }
+				]
+			},
+			"A_glowline10": {
+				"rgba": [
+					{ "color": "93fff1ff" }
+				]
+			},
+			"A_glowline11": {
+				"rgba": [
+					{ "color": "9bff86ff" }
+				]
+			},
+			"A_glowline12": {
+				"rgba": [
+					{ "color": "ff87e7ff" }
+				]
+			},
+			"A_glowline13": {
+				"rgba": [
+					{ "color": "ffea71ff" }
+				]
+			},
+			"A_glowline14": {
+				"rgba": [
+					{ "color": "ff979bff" }
+				]
+			},
+			"A_wenli_wave_0": {
+				"attachment": [
+					{ "name": "A_wenli_wave_00000" },
+					{ "time": 0.0333, "name": "A_wenli_wave_00001" },
+					{ "time": 0.0667, "name": "A_wenli_wave_00002" },
+					{ "time": 0.1, "name": "A_wenli_wave_00003" },
+					{ "time": 0.1333, "name": "A_wenli_wave_00004" },
+					{ "time": 0.1667, "name": "A_wenli_wave_00005" },
+					{ "time": 0.2, "name": "A_wenli_wave_00006" },
+					{ "time": 0.2333, "name": "A_wenli_wave_00007" },
+					{ "time": 0.2667, "name": "A_wenli_wave_00008" },
+					{ "time": 0.3, "name": "A_wenli_wave_00009" },
+					{ "time": 0.3333, "name": "A_wenli_wave_00010" },
+					{ "time": 0.3667, "name": "A_wenli_wave_00011" },
+					{ "time": 0.4, "name": "A_wenli_wave_00012" },
+					{ "time": 0.4333, "name": "A_wenli_wave_00013" },
+					{ "time": 0.4667, "name": "A_wenli_wave_00014" },
+					{ "time": 0.5, "name": "A_wenli_wave_00015" },
+					{ "time": 0.5333, "name": "A_wenli_wave_00016" },
+					{ "time": 0.5667, "name": "A_wenli_wave_00017" },
+					{ "time": 0.6, "name": "A_wenli_wave_00018" },
+					{ "time": 0.6333, "name": "A_wenli_wave_00019" },
+					{ "time": 0.6667, "name": "A_wenli_wave_00000" },
+					{ "time": 0.7, "name": "A_wenli_wave_00001" },
+					{ "time": 0.7333, "name": "A_wenli_wave_00002" },
+					{ "time": 0.7667, "name": "A_wenli_wave_00003" },
+					{ "time": 0.8, "name": "A_wenli_wave_00004" },
+					{ "time": 0.8333, "name": "A_wenli_wave_00005" },
+					{ "time": 0.8667, "name": "A_wenli_wave_00006" },
+					{ "time": 0.9, "name": "A_wenli_wave_00007" },
+					{ "time": 0.9333, "name": "A_wenli_wave_00008" },
+					{ "time": 0.9667, "name": "A_wenli_wave_00009" },
+					{ "time": 1, "name": "A_wenli_wave_00010" },
+					{ "time": 1.0333, "name": "A_wenli_wave_00011" },
+					{ "time": 1.0667, "name": "A_wenli_wave_00012" },
+					{ "time": 1.1, "name": "A_wenli_wave_00013" },
+					{ "time": 1.1333, "name": "A_wenli_wave_00014" },
+					{ "time": 1.1667, "name": "A_wenli_wave_00015" },
+					{ "time": 1.2, "name": "A_wenli_wave_00016" },
+					{ "time": 1.2333, "name": "A_wenli_wave_00017" },
+					{ "time": 1.2667, "name": "A_wenli_wave_00018" },
+					{ "time": 1.3, "name": "A_wenli_wave_00019" },
+					{ "time": 1.3333, "name": "A_wenli_wave_00000" },
+					{ "time": 1.3667, "name": "A_wenli_wave_00001" },
+					{ "time": 1.4, "name": "A_wenli_wave_00002" },
+					{ "time": 1.4333, "name": "A_wenli_wave_00003" },
+					{ "time": 1.4667, "name": "A_wenli_wave_00004" },
+					{ "time": 1.5, "name": "A_wenli_wave_00005" },
+					{ "time": 1.5333, "name": "A_wenli_wave_00006" },
+					{ "time": 1.5667, "name": "A_wenli_wave_00007" },
+					{ "time": 1.6, "name": "A_wenli_wave_00008" },
+					{ "time": 1.6333, "name": "A_wenli_wave_00009" },
+					{ "time": 1.6667, "name": "A_wenli_wave_00010" },
+					{ "time": 1.7, "name": "A_wenli_wave_00011" },
+					{ "time": 1.7333, "name": "A_wenli_wave_00012" },
+					{ "time": 1.7667, "name": "A_wenli_wave_00013" },
+					{ "time": 1.8, "name": "A_wenli_wave_00014" },
+					{ "time": 1.8333, "name": "A_wenli_wave_00015" },
+					{ "time": 1.8667, "name": "A_wenli_wave_00016" },
+					{ "time": 1.9, "name": "A_wenli_wave_00017" },
+					{ "time": 1.9333, "name": "A_wenli_wave_00018" },
+					{ "time": 1.9667, "name": "A_wenli_wave_00019" }
+				]
+			},
+			"A_wenli_wave_00000": {
+				"attachment": [
+					{ "name": "A_wenli_wave_00000" },
+					{ "time": 0.0333, "name": "A_wenli_wave_00001" },
+					{ "time": 0.0667, "name": "A_wenli_wave_00002" },
+					{ "time": 0.1, "name": "A_wenli_wave_00003" },
+					{ "time": 0.1333, "name": "A_wenli_wave_00004" },
+					{ "time": 0.1667, "name": "A_wenli_wave_00005" },
+					{ "time": 0.2, "name": "A_wenli_wave_00006" },
+					{ "time": 0.2333, "name": "A_wenli_wave_00007" },
+					{ "time": 0.2667, "name": "A_wenli_wave_00008" },
+					{ "time": 0.3, "name": "A_wenli_wave_00009" },
+					{ "time": 0.3333, "name": "A_wenli_wave_00010" },
+					{ "time": 0.3667, "name": "A_wenli_wave_00011" },
+					{ "time": 0.4, "name": "A_wenli_wave_00012" },
+					{ "time": 0.4333, "name": "A_wenli_wave_00013" },
+					{ "time": 0.4667, "name": "A_wenli_wave_00014" },
+					{ "time": 0.5, "name": "A_wenli_wave_00015" },
+					{ "time": 0.5333, "name": "A_wenli_wave_00016" },
+					{ "time": 0.5667, "name": "A_wenli_wave_00017" },
+					{ "time": 0.6, "name": "A_wenli_wave_00018" },
+					{ "time": 0.6333, "name": "A_wenli_wave_00019" },
+					{ "time": 0.6667, "name": "A_wenli_wave_00000" },
+					{ "time": 0.7, "name": "A_wenli_wave_00001" },
+					{ "time": 0.7333, "name": "A_wenli_wave_00002" },
+					{ "time": 0.7667, "name": "A_wenli_wave_00003" },
+					{ "time": 0.8, "name": "A_wenli_wave_00004" },
+					{ "time": 0.8333, "name": "A_wenli_wave_00005" },
+					{ "time": 0.8667, "name": "A_wenli_wave_00006" },
+					{ "time": 0.9, "name": "A_wenli_wave_00007" },
+					{ "time": 0.9333, "name": "A_wenli_wave_00008" },
+					{ "time": 0.9667, "name": "A_wenli_wave_00009" },
+					{ "time": 1, "name": "A_wenli_wave_00010" },
+					{ "time": 1.0333, "name": "A_wenli_wave_00011" },
+					{ "time": 1.0667, "name": "A_wenli_wave_00012" },
+					{ "time": 1.1, "name": "A_wenli_wave_00013" },
+					{ "time": 1.1333, "name": "A_wenli_wave_00014" },
+					{ "time": 1.1667, "name": "A_wenli_wave_00015" },
+					{ "time": 1.2, "name": "A_wenli_wave_00016" },
+					{ "time": 1.2333, "name": "A_wenli_wave_00017" },
+					{ "time": 1.2667, "name": "A_wenli_wave_00018" },
+					{ "time": 1.3, "name": "A_wenli_wave_00019" },
+					{ "time": 1.3333, "name": "A_wenli_wave_00000" },
+					{ "time": 1.3667, "name": "A_wenli_wave_00001" },
+					{ "time": 1.4, "name": "A_wenli_wave_00002" },
+					{ "time": 1.4333, "name": "A_wenli_wave_00003" },
+					{ "time": 1.4667, "name": "A_wenli_wave_00004" },
+					{ "time": 1.5, "name": "A_wenli_wave_00005" },
+					{ "time": 1.5333, "name": "A_wenli_wave_00006" },
+					{ "time": 1.5667, "name": "A_wenli_wave_00007" },
+					{ "time": 1.6, "name": "A_wenli_wave_00008" },
+					{ "time": 1.6333, "name": "A_wenli_wave_00009" },
+					{ "time": 1.6667, "name": "A_wenli_wave_00010" },
+					{ "time": 1.7, "name": "A_wenli_wave_00011" },
+					{ "time": 1.7333, "name": "A_wenli_wave_00012" },
+					{ "time": 1.7667, "name": "A_wenli_wave_00013" },
+					{ "time": 1.8, "name": "A_wenli_wave_00014" },
+					{ "time": 1.8333, "name": "A_wenli_wave_00015" },
+					{ "time": 1.8667, "name": "A_wenli_wave_00016" },
+					{ "time": 1.9, "name": "A_wenli_wave_00017" },
+					{ "time": 1.9333, "name": "A_wenli_wave_00018" },
+					{ "time": 1.9667, "name": "A_wenli_wave_00019" }
+				]
+			},
+			"A_wenli_wave_1": {
+				"attachment": [
+					{ "name": "A_wenli_wave_00000" },
+					{ "time": 0.0333, "name": "A_wenli_wave_00001" },
+					{ "time": 0.0667, "name": "A_wenli_wave_00002" },
+					{ "time": 0.1, "name": "A_wenli_wave_00003" },
+					{ "time": 0.1333, "name": "A_wenli_wave_00004" },
+					{ "time": 0.1667, "name": "A_wenli_wave_00005" },
+					{ "time": 0.2, "name": "A_wenli_wave_00006" },
+					{ "time": 0.2333, "name": "A_wenli_wave_00007" },
+					{ "time": 0.2667, "name": "A_wenli_wave_00008" },
+					{ "time": 0.3, "name": "A_wenli_wave_00009" },
+					{ "time": 0.3333, "name": "A_wenli_wave_00010" },
+					{ "time": 0.3667, "name": "A_wenli_wave_00011" },
+					{ "time": 0.4, "name": "A_wenli_wave_00012" },
+					{ "time": 0.4333, "name": "A_wenli_wave_00013" },
+					{ "time": 0.4667, "name": "A_wenli_wave_00014" },
+					{ "time": 0.5, "name": "A_wenli_wave_00015" },
+					{ "time": 0.5333, "name": "A_wenli_wave_00016" },
+					{ "time": 0.5667, "name": "A_wenli_wave_00017" },
+					{ "time": 0.6, "name": "A_wenli_wave_00018" },
+					{ "time": 0.6333, "name": "A_wenli_wave_00019" },
+					{ "time": 0.6667, "name": "A_wenli_wave_00000" },
+					{ "time": 0.7, "name": "A_wenli_wave_00001" },
+					{ "time": 0.7333, "name": "A_wenli_wave_00002" },
+					{ "time": 0.7667, "name": "A_wenli_wave_00003" },
+					{ "time": 0.8, "name": "A_wenli_wave_00004" },
+					{ "time": 0.8333, "name": "A_wenli_wave_00005" },
+					{ "time": 0.8667, "name": "A_wenli_wave_00006" },
+					{ "time": 0.9, "name": "A_wenli_wave_00007" },
+					{ "time": 0.9333, "name": "A_wenli_wave_00008" },
+					{ "time": 0.9667, "name": "A_wenli_wave_00009" },
+					{ "time": 1, "name": "A_wenli_wave_00010" },
+					{ "time": 1.0333, "name": "A_wenli_wave_00011" },
+					{ "time": 1.0667, "name": "A_wenli_wave_00012" },
+					{ "time": 1.1, "name": "A_wenli_wave_00013" },
+					{ "time": 1.1333, "name": "A_wenli_wave_00014" },
+					{ "time": 1.1667, "name": "A_wenli_wave_00015" },
+					{ "time": 1.2, "name": "A_wenli_wave_00016" },
+					{ "time": 1.2333, "name": "A_wenli_wave_00017" },
+					{ "time": 1.2667, "name": "A_wenli_wave_00018" },
+					{ "time": 1.3, "name": "A_wenli_wave_00019" },
+					{ "time": 1.3333, "name": "A_wenli_wave_00000" },
+					{ "time": 1.3667, "name": "A_wenli_wave_00001" },
+					{ "time": 1.4, "name": "A_wenli_wave_00002" },
+					{ "time": 1.4333, "name": "A_wenli_wave_00003" },
+					{ "time": 1.4667, "name": "A_wenli_wave_00004" },
+					{ "time": 1.5, "name": "A_wenli_wave_00005" },
+					{ "time": 1.5333, "name": "A_wenli_wave_00006" },
+					{ "time": 1.5667, "name": "A_wenli_wave_00007" },
+					{ "time": 1.6, "name": "A_wenli_wave_00008" },
+					{ "time": 1.6333, "name": "A_wenli_wave_00009" },
+					{ "time": 1.6667, "name": "A_wenli_wave_00010" },
+					{ "time": 1.7, "name": "A_wenli_wave_00011" },
+					{ "time": 1.7333, "name": "A_wenli_wave_00012" },
+					{ "time": 1.7667, "name": "A_wenli_wave_00013" },
+					{ "time": 1.8, "name": "A_wenli_wave_00014" },
+					{ "time": 1.8333, "name": "A_wenli_wave_00015" },
+					{ "time": 1.8667, "name": "A_wenli_wave_00016" },
+					{ "time": 1.9, "name": "A_wenli_wave_00017" },
+					{ "time": 1.9333, "name": "A_wenli_wave_00018" },
+					{ "time": 1.9667, "name": "A_wenli_wave_00019" }
+				]
+			},
+			"A_wenli_wave_2": {
+				"attachment": [
+					{ "name": "A_wenli_wave_00000" },
+					{ "time": 0.0333, "name": "A_wenli_wave_00001" },
+					{ "time": 0.0667, "name": "A_wenli_wave_00002" },
+					{ "time": 0.1, "name": "A_wenli_wave_00003" },
+					{ "time": 0.1333, "name": "A_wenli_wave_00004" },
+					{ "time": 0.1667, "name": "A_wenli_wave_00005" },
+					{ "time": 0.2, "name": "A_wenli_wave_00006" },
+					{ "time": 0.2333, "name": "A_wenli_wave_00007" },
+					{ "time": 0.2667, "name": "A_wenli_wave_00008" },
+					{ "time": 0.3, "name": "A_wenli_wave_00009" },
+					{ "time": 0.3333, "name": "A_wenli_wave_00010" },
+					{ "time": 0.3667, "name": "A_wenli_wave_00011" },
+					{ "time": 0.4, "name": "A_wenli_wave_00012" },
+					{ "time": 0.4333, "name": "A_wenli_wave_00013" },
+					{ "time": 0.4667, "name": "A_wenli_wave_00014" },
+					{ "time": 0.5, "name": "A_wenli_wave_00015" },
+					{ "time": 0.5333, "name": "A_wenli_wave_00016" },
+					{ "time": 0.5667, "name": "A_wenli_wave_00017" },
+					{ "time": 0.6, "name": "A_wenli_wave_00018" },
+					{ "time": 0.6333, "name": "A_wenli_wave_00019" },
+					{ "time": 0.6667, "name": "A_wenli_wave_00000" },
+					{ "time": 0.7, "name": "A_wenli_wave_00001" },
+					{ "time": 0.7333, "name": "A_wenli_wave_00002" },
+					{ "time": 0.7667, "name": "A_wenli_wave_00003" },
+					{ "time": 0.8, "name": "A_wenli_wave_00004" },
+					{ "time": 0.8333, "name": "A_wenli_wave_00005" },
+					{ "time": 0.8667, "name": "A_wenli_wave_00006" },
+					{ "time": 0.9, "name": "A_wenli_wave_00007" },
+					{ "time": 0.9333, "name": "A_wenli_wave_00008" },
+					{ "time": 0.9667, "name": "A_wenli_wave_00009" },
+					{ "time": 1, "name": "A_wenli_wave_00010" },
+					{ "time": 1.0333, "name": "A_wenli_wave_00011" },
+					{ "time": 1.0667, "name": "A_wenli_wave_00012" },
+					{ "time": 1.1, "name": "A_wenli_wave_00013" },
+					{ "time": 1.1333, "name": "A_wenli_wave_00014" },
+					{ "time": 1.1667, "name": "A_wenli_wave_00015" },
+					{ "time": 1.2, "name": "A_wenli_wave_00016" },
+					{ "time": 1.2333, "name": "A_wenli_wave_00017" },
+					{ "time": 1.2667, "name": "A_wenli_wave_00018" },
+					{ "time": 1.3, "name": "A_wenli_wave_00019" },
+					{ "time": 1.3333, "name": "A_wenli_wave_00000" },
+					{ "time": 1.3667, "name": "A_wenli_wave_00001" },
+					{ "time": 1.4, "name": "A_wenli_wave_00002" },
+					{ "time": 1.4333, "name": "A_wenli_wave_00003" },
+					{ "time": 1.4667, "name": "A_wenli_wave_00004" },
+					{ "time": 1.5, "name": "A_wenli_wave_00005" },
+					{ "time": 1.5333, "name": "A_wenli_wave_00006" },
+					{ "time": 1.5667, "name": "A_wenli_wave_00007" },
+					{ "time": 1.6, "name": "A_wenli_wave_00008" },
+					{ "time": 1.6333, "name": "A_wenli_wave_00009" },
+					{ "time": 1.6667, "name": "A_wenli_wave_00010" },
+					{ "time": 1.7, "name": "A_wenli_wave_00011" },
+					{ "time": 1.7333, "name": "A_wenli_wave_00012" },
+					{ "time": 1.7667, "name": "A_wenli_wave_00013" },
+					{ "time": 1.8, "name": "A_wenli_wave_00014" },
+					{ "time": 1.8333, "name": "A_wenli_wave_00015" },
+					{ "time": 1.8667, "name": "A_wenli_wave_00016" },
+					{ "time": 1.9, "name": "A_wenli_wave_00017" },
+					{ "time": 1.9333, "name": "A_wenli_wave_00018" },
+					{ "time": 1.9667, "name": "A_wenli_wave_00019" }
+				]
+			},
+			"A_wenli_wave_3": {
+				"attachment": [
+					{ "name": "A_wenli_wave_00000" },
+					{ "time": 0.0333, "name": "A_wenli_wave_00001" },
+					{ "time": 0.0667, "name": "A_wenli_wave_00002" },
+					{ "time": 0.1, "name": "A_wenli_wave_00003" },
+					{ "time": 0.1333, "name": "A_wenli_wave_00004" },
+					{ "time": 0.1667, "name": "A_wenli_wave_00005" },
+					{ "time": 0.2, "name": "A_wenli_wave_00006" },
+					{ "time": 0.2333, "name": "A_wenli_wave_00007" },
+					{ "time": 0.2667, "name": "A_wenli_wave_00008" },
+					{ "time": 0.3, "name": "A_wenli_wave_00009" },
+					{ "time": 0.3333, "name": "A_wenli_wave_00010" },
+					{ "time": 0.3667, "name": "A_wenli_wave_00011" },
+					{ "time": 0.4, "name": "A_wenli_wave_00012" },
+					{ "time": 0.4333, "name": "A_wenli_wave_00013" },
+					{ "time": 0.4667, "name": "A_wenli_wave_00014" },
+					{ "time": 0.5, "name": "A_wenli_wave_00015" },
+					{ "time": 0.5333, "name": "A_wenli_wave_00016" },
+					{ "time": 0.5667, "name": "A_wenli_wave_00017" },
+					{ "time": 0.6, "name": "A_wenli_wave_00018" },
+					{ "time": 0.6333, "name": "A_wenli_wave_00019" },
+					{ "time": 0.6667, "name": "A_wenli_wave_00000" },
+					{ "time": 0.7, "name": "A_wenli_wave_00001" },
+					{ "time": 0.7333, "name": "A_wenli_wave_00002" },
+					{ "time": 0.7667, "name": "A_wenli_wave_00003" },
+					{ "time": 0.8, "name": "A_wenli_wave_00004" },
+					{ "time": 0.8333, "name": "A_wenli_wave_00005" },
+					{ "time": 0.8667, "name": "A_wenli_wave_00006" },
+					{ "time": 0.9, "name": "A_wenli_wave_00007" },
+					{ "time": 0.9333, "name": "A_wenli_wave_00008" },
+					{ "time": 0.9667, "name": "A_wenli_wave_00009" },
+					{ "time": 1, "name": "A_wenli_wave_00010" },
+					{ "time": 1.0333, "name": "A_wenli_wave_00011" },
+					{ "time": 1.0667, "name": "A_wenli_wave_00012" },
+					{ "time": 1.1, "name": "A_wenli_wave_00013" },
+					{ "time": 1.1333, "name": "A_wenli_wave_00014" },
+					{ "time": 1.1667, "name": "A_wenli_wave_00015" },
+					{ "time": 1.2, "name": "A_wenli_wave_00016" },
+					{ "time": 1.2333, "name": "A_wenli_wave_00017" },
+					{ "time": 1.2667, "name": "A_wenli_wave_00018" },
+					{ "time": 1.3, "name": "A_wenli_wave_00019" },
+					{ "time": 1.3333, "name": "A_wenli_wave_00000" },
+					{ "time": 1.3667, "name": "A_wenli_wave_00001" },
+					{ "time": 1.4, "name": "A_wenli_wave_00002" },
+					{ "time": 1.4333, "name": "A_wenli_wave_00003" },
+					{ "time": 1.4667, "name": "A_wenli_wave_00004" },
+					{ "time": 1.5, "name": "A_wenli_wave_00005" },
+					{ "time": 1.5333, "name": "A_wenli_wave_00006" },
+					{ "time": 1.5667, "name": "A_wenli_wave_00007" },
+					{ "time": 1.6, "name": "A_wenli_wave_00008" },
+					{ "time": 1.6333, "name": "A_wenli_wave_00009" },
+					{ "time": 1.6667, "name": "A_wenli_wave_00010" },
+					{ "time": 1.7, "name": "A_wenli_wave_00011" },
+					{ "time": 1.7333, "name": "A_wenli_wave_00012" },
+					{ "time": 1.7667, "name": "A_wenli_wave_00013" },
+					{ "time": 1.8, "name": "A_wenli_wave_00014" },
+					{ "time": 1.8333, "name": "A_wenli_wave_00015" },
+					{ "time": 1.8667, "name": "A_wenli_wave_00016" },
+					{ "time": 1.9, "name": "A_wenli_wave_00017" },
+					{ "time": 1.9333, "name": "A_wenli_wave_00018" },
+					{ "time": 1.9667, "name": "A_wenli_wave_00019" }
+				]
+			},
+			"ball_blue": {
+				"attachment": [
+					{ "name": "ball_blue" }
+				]
+			},
+			"ball_green": {
+				"attachment": [
+					{ "name": "ball_green" }
+				]
+			},
+			"ball_purple": {
+				"attachment": [
+					{ "name": "ball_purple" }
+				]
+			},
+			"ball_red": {
+				"attachment": [
+					{ "name": "ball_red" }
+				]
+			},
+			"ball_yellow": {
+				"attachment": [
+					{ "name": "ball_yellow" }
+				]
+			}
+		},
+		"bones": {
+			"lujing": {
+				"translate": [
+					{ "x": -17.74, "y": 29.56 }
+				],
+				"scale": [
+					{ "x": 1.627, "y": 1.627 }
+				]
+			},
+			"lingzhu": {
+				"scale": [
+					{ "x": 1.269, "y": 1.269 }
+				]
+			},
+			"root": {
+				"translate": [
+					{ "x": 42, "y": -54 }
+				],
+				"scale": [
+					{ "x": 0.4, "y": 0.4 }
+				]
+			},
+			"red": {
+				"scale": [
+					{ "x": 1.004, "y": 1.004 }
+				]
+			},
+			"A_glowline10": {
+				"scale": [
+					{ "x": 0.734, "y": 1.161 }
+				]
+			},
+			"A_glowline11": {
+				"scale": [
+					{ "x": 0.734, "y": 1.161 }
+				]
+			},
+			"A_glowline12": {
+				"scale": [
+					{ "x": 0.734, "y": 1.161 }
+				]
+			},
+			"A_glowline13": {
+				"scale": [
+					{ "x": 0.734, "y": 1.161 }
+				]
+			},
+			"A_glowline14": {
+				"scale": [
+					{ "x": 0.734, "y": 1.161 }
+				]
+			}
+		},
+		"path": {
+			"ball": {
+				"position": [
+					{},
+					{ "time": 2, "value": 1 }
+				]
+			},
+			"ball2": {
+				"position": [
+					{ "value": 0.2 },
+					{ "time": 2, "value": 1.2 }
+				]
+			},
+			"ball3": {
+				"position": [
+					{ "value": 0.4 },
+					{ "time": 2, "value": 1.4 }
+				]
+			},
+			"ball4": {
+				"position": [
+					{ "value": 0.6 },
+					{ "time": 2, "value": 1.6 }
+				]
+			},
+			"ball5": {
+				"position": [
+					{ "value": 0.8 },
+					{ "time": 2, "value": 1.8 }
+				]
+			},
+			"lineball": {
+				"position": [
+					{ "value": -0.13 },
+					{ "time": 2, "value": 0.87 }
+				]
+			},
+			"lineball2": {
+				"position": [
+					{ "value": 0.07 },
+					{ "time": 2, "value": 1.07 }
+				]
+			},
+			"lineball3": {
+				"position": [
+					{ "value": 0.27 },
+					{ "time": 2, "value": 1.27 }
+				]
+			},
+			"lineball4": {
+				"position": [
+					{ "value": 0.47 },
+					{ "time": 2, "value": 1.47 }
+				]
+			},
+			"lineball5": {
+				"position": [
+					{ "value": 0.67 },
+					{ "time": 2, "value": 1.67 }
+				]
+			}
+		},
+		"events": [
+			{ "name": "hit" },
+			{ "time": 0.3333, "name": "hit" },
+			{ "time": 0.6667, "name": "hit" },
+			{ "time": 1, "name": "hit" },
+			{ "time": 1.3333, "name": "hit" },
+			{ "time": 1.6667, "name": "hit" },
+			{ "time": 2, "name": "hit" }
+		]
+	}
+}
+}
