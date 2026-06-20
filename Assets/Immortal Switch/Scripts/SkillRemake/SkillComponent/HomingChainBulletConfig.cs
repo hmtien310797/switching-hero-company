@@ -1,4 +1,5 @@
 ﻿using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 [Serializable]
@@ -31,5 +32,29 @@ public class HomingChainBulletConfig
     [Header("Curve")]
     public float curveHeight = 4f;
     public bool alternateCurveSide = true;
+    
+    [Header("Vertical Arc")]
+    public bool useVerticalArc = true;
+
+    [Tooltip("Các lượt chain sẽ luân phiên: vồng lên rồi bay phẳng.")]
+    public bool alternateVerticalArc = true;
+
+    [Tooltip("Lượt chain đầu tiên có bay vồng lên hay không.")]
+    public bool verticalArcOnFirstChainMove = true;
+
+    public Vector2 verticalArcHeightRange = new Vector2(0.5f, 3f);
+    
+    [Header("Short Distance Detour")]
+    public bool UseShortDistanceDetour = true;
+    
+    [Min(0f)]
+    public float minDetourDistance = 5f;
+
+    public Vector2 virtualPointXRange = new Vector2(8f, 12f);
+    public Vector2 virtualPointZRange = new Vector2(5f, 9f);
+    public Vector2 virtualPointYRange = new Vector2(2f, 3f);
+
+    [Min(1)]
+    public int virtualPointFindAttempts = 12;
     
 }

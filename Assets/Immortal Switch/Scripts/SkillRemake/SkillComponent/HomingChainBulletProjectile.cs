@@ -20,6 +20,9 @@ public class HomingChainBulletProjectile : PoolableBehaviour
     private Vector3 lastMoveDirection;
     private int hitTargetCount;
     private bool isInitialized;
+    private bool isMovingToVirtualPoint;
+
+    private Transform pendingTarget;
 
     public void Setup(
         ICombatUnit owner,
@@ -105,13 +108,44 @@ public class HomingChainBulletProjectile : PoolableBehaviour
 
         Vector3 start = transform.position;
 
-        // Snapshot vị trí target đúng 1 lần.
         Vector3 end = currentTarget.Transform.position;
         end.y = start.y;
 
-        Vector3[] path = BuildCurvePath(start, end);
+        float flatDistanceSqr = GetFlatSqrDistance(start, end);
+        float minDistance = config.minDetourDistance;
+        float minDistanceSqr = minDistance * minDistance;
+
+        if (config.UseShortDistanceDetour &&
+            flatDistanceSqr < minDistanceSqr)
+        {
+            StartMoveToVirtualPoint();
+            return;
+        }
+
+        StartMoveToCurrentTarget();
+    }
+
+    private void StartMoveToVirtualPoint()
+    {
+        if (currentTarget == null)
+        {
+            DespawnSelf();
+            return;
+        }
+
+        Vector3 start = transform.position;
+        Vector3 targetPosition = currentTarget.Transform.position;
+
+        Vector3 virtualPoint = FindVirtualPoint(
+            start,
+            targetPosition);
+
+        Vector3[] path = BuildCurvePath(
+            start,
+            virtualPoint);
 
         float distance = EstimatePathDistance(path);
+
         float duration = config.curveSpeed <= 0f
             ? 0.01f
             : distance / config.curveSpeed;
@@ -119,7 +153,132 @@ public class HomingChainBulletProjectile : PoolableBehaviour
         KillMoveTween();
 
         moveTween = transform
-            .DOPath(path, duration, PathType.CatmullRom, PathMode.Full3D, 12)
+            .DOPath(
+                path,
+                duration,
+                PathType.CatmullRom,
+                PathMode.Full3D,
+                12)
+            .SetEase(Ease.Linear)
+            .OnUpdate(UpdateFacingByVelocity)
+            .OnComplete(StartMoveToCurrentTarget);
+    }
+
+    private Vector3 FindVirtualPoint(
+        Vector3 currentPosition,
+        Vector3 targetPosition)
+    {
+        float minDistance =
+            Mathf.Max(0.01f, config.minDetourDistance);
+
+        float minDistanceSqr =
+            minDistance * minDistance;
+
+        int attempts =
+            Mathf.Max(1, config.virtualPointFindAttempts);
+
+        for (int i = 0; i < attempts; i++)
+        {
+            float xOffset = UnityEngine.Random.Range(
+                config.virtualPointXRange.x,
+                config.virtualPointXRange.y);
+
+            float zOffset = UnityEngine.Random.Range(
+                config.virtualPointZRange.x,
+                config.virtualPointZRange.y);
+
+            float yOffset = UnityEngine.Random.Range(
+                config.virtualPointYRange.x,
+                config.virtualPointYRange.y);
+
+            float xSign =
+                UnityEngine.Random.value < 0.5f ? -1f : 1f;
+
+            float zSign =
+                UnityEngine.Random.value < 0.5f ? -1f : 1f;
+
+            Vector3 candidate =
+                currentPosition +
+                new Vector3(
+                    xOffset * xSign,
+                    yOffset,
+                    zOffset * zSign);
+
+            if (GetFlatSqrDistance(
+                    candidate,
+                    targetPosition) >= minDistanceSqr)
+            {
+                return candidate;
+            }
+        }
+
+        Vector3 fallbackDirection =
+            currentPosition - targetPosition;
+
+        fallbackDirection.y = 0f;
+
+        if (fallbackDirection.sqrMagnitude <= 0.0001f)
+        {
+            fallbackDirection =
+                Quaternion.Euler(
+                    0f,
+                    UnityEngine.Random.Range(0f, 360f),
+                    0f) *
+                Vector3.forward;
+        }
+
+        fallbackDirection.Normalize();
+
+        float fallbackDistance =
+            minDistance +
+            Mathf.Max(
+                config.virtualPointXRange.y,
+                config.virtualPointZRange.y);
+
+        Vector3 fallbackPoint =
+            targetPosition +
+            fallbackDirection * fallbackDistance;
+
+        fallbackPoint.y =
+            currentPosition.y +
+            UnityEngine.Random.Range(
+                config.virtualPointYRange.x,
+                config.virtualPointYRange.y);
+
+        return fallbackPoint;
+    }
+
+    private void StartMoveToCurrentTarget()
+    {
+        if (currentTarget == null)
+        {
+            DespawnSelf();
+            return;
+        }
+
+        Vector3 start = transform.position;
+
+        // Lấy lại vị trí mới nhất của target sau khi đi qua virtual point.
+        Vector3 end = currentTarget.Transform.position;
+        end.y = start.y;
+
+        Vector3[] path = BuildCurvePath(start, end);
+
+        float distance = EstimatePathDistance(path);
+
+        float duration = config.curveSpeed <= 0f
+            ? 0.01f
+            : distance / config.curveSpeed;
+
+        KillMoveTween();
+
+        moveTween = transform
+            .DOPath(
+                path,
+                duration,
+                PathType.CatmullRom,
+                PathMode.Full3D,
+                12)
             .SetEase(Ease.Linear)
             .OnUpdate(UpdateFacingByVelocity)
             .OnComplete(() =>
@@ -129,37 +288,84 @@ public class HomingChainBulletProjectile : PoolableBehaviour
             });
     }
 
-    private Vector3[] BuildCurvePath(Vector3 start, Vector3 end)
+    private Vector3[] BuildCurvePath(
+        Vector3 start,
+        Vector3 end)
     {
-        // Giữ bullet nằm trên cùng mặt phẳng XZ
+        // Target vẫn nằm ở cùng mặt phẳng gốc với bullet.
         end.y = start.y;
 
         Vector3 toEnd = end - start;
         toEnd.y = 0f;
 
-        Vector3 dir = toEnd.sqrMagnitude > 0.0001f
+        Vector3 direction = toEnd.sqrMagnitude > 0.0001f
             ? toEnd.normalized
             : lastMoveDirection;
 
-        dir.y = 0f;
-        dir.Normalize();
-        
-        Vector3 side = Vector3.Cross(Vector3.up, dir).normalized;
+        direction.y = 0f;
 
-        float distance = Vector3.Distance(start, end);
+        if (direction.sqrMagnitude <= 0.0001f)
+        {
+            direction = Vector3.forward;
+        }
+
+        direction.Normalize();
+
+        Vector3 side =
+            Vector3.Cross(Vector3.up, direction).normalized;
+
+        float flatDistance =
+            Vector3.Distance(
+                new Vector3(start.x, 0f, start.z),
+                new Vector3(end.x, 0f, end.z));
+
         float sideSign = 1f;
 
         if (config.alternateCurveSide)
         {
-            sideSign = hitTargetCount % 2 == 0 ? 1f : -1f;
+            sideSign =
+                hitTargetCount % 2 == 0
+                    ? 1f
+                    : -1f;
         }
 
-        float curveOffset = Mathf.Max(config.curveHeight, distance * 0.35f);
+        float horizontalCurveOffset =
+            Mathf.Max(
+                config.curveHeight,
+                flatDistance * 0.35f);
 
-        Vector3 middle = (start + end) * 0.5f;
+        Vector3 middle =
+            Vector3.Lerp(start, end, 0.5f);
 
-        Vector3 control = middle + side * curveOffset * sideSign;
-        control.y = start.y;
+        Vector3 control =
+            middle +
+            side * horizontalCurveOffset * sideSign;
+
+        if (ShouldUseVerticalArc())
+        {
+            float minHeight =
+                Mathf.Min(
+                    config.verticalArcHeightRange.x,
+                    config.verticalArcHeightRange.y);
+
+            float maxHeight =
+                Mathf.Max(
+                    config.verticalArcHeightRange.x,
+                    config.verticalArcHeightRange.y);
+
+            float randomVerticalHeight =
+                UnityEngine.Random.Range(
+                    minHeight,
+                    maxHeight);
+
+            control.y =
+                start.y + randomVerticalHeight;
+        }
+        else
+        {
+            // Lượt này chỉ cong trên mặt phẳng XZ như logic cũ.
+            control.y = start.y;
+        }
 
         return new[]
         {
@@ -181,9 +387,40 @@ public class HomingChainBulletProjectile : PoolableBehaviour
         Debug.Log($"[HomingChainBullet] Hit target: {currentTarget.Transform.name}, damage: {config.damage}");
     }
 
+    private bool ShouldUseVerticalArc()
+    {
+        if (config == null ||
+            !config.useVerticalArc)
+        {
+            return false;
+        }
+
+        if (!config.alternateVerticalArc)
+        {
+            return true;
+        }
+
+        /*
+         * Sau khi trúng target đầu tiên:
+         * hitTargetCount = 1.
+         *
+         * StartNextTarget() được gọi và tạo chain segment đầu tiên.
+         * Vì vậy chainMoveIndex đầu tiên phải là 0.
+         */
+        int chainMoveIndex =
+            Mathf.Max(0, hitTargetCount - 1);
+
+        bool isEvenMove =
+            chainMoveIndex % 2 == 0;
+
+        return config.verticalArcOnFirstChainMove
+            ? isEvenMove
+            : !isEvenMove;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.TryGetComponent(out ICombatUnit combatUnit)) 
+        if (!other.TryGetComponent(out ICombatUnit combatUnit))
             return;
         HitEffectManager.Instance.Play(combatUnit);
         DamageResult damageResult = DamageCalculator.CalculateDamage(caster, combatUnit, config.damage);
@@ -214,14 +451,20 @@ public class HomingChainBulletProjectile : PoolableBehaviour
 
     private void UpdateFacingByVelocity()
     {
-        Vector3 currentPosition = transform.position;
-        Vector3 direction = currentPosition - previousPosition;
-        direction.y = 0f;
+        Vector3 currentPosition =
+            transform.position;
+
+        Vector3 direction =
+            currentPosition - previousPosition;
 
         if (direction.sqrMagnitude > 0.0001f)
         {
             lastMoveDirection = direction.normalized;
-            FaceDirection(lastMoveDirection);
+
+            transform.rotation =
+                Quaternion.LookRotation(
+                    direction.normalized,
+                    Vector3.up);
         }
 
         previousPosition = currentPosition;
