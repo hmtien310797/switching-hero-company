@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.SkillRemake;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -161,6 +162,7 @@ namespace Immortal_Switch.Scripts.Skill
         [Header("Identity")]
         public int SkillId;
         public string SkillKey;
+        public HeroClass SkillClass;
         public string SkillName;
         public string IconSkillKey;
         public Sprite SkillIcon;

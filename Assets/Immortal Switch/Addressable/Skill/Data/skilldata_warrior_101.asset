@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkillId: 101
   SkillKey: skilldata_warrior_101
+  SkillClass: 0
   SkillName: Holy Blade Pierce
   IconSkillKey: icon_skilldata_warrior_101
   SkillIcon: {fileID: 21300000, guid: b0f5c98300e54a143b92c4742634e640, type: 3}
@@ -30,9 +31,7 @@ MonoBehaviour:
     HeroAnimationName: animation
   RuntimeObjectConfig:
     RuntimeVisualType: 2
-    SpineRuntimePrefab: {fileID: 8878045412679214158, guid: 270aec1490d213d419f9c5501a1025cc, type: 3}
-    runtimeObjectProjectileSpawner: {fileID: 0}
-    homingChainBulletSpawner: {fileID: 0}
+    SkillRuntimePrefab: {fileID: 8878045412679214158, guid: 270aec1490d213d419f9c5501a1025cc, type: 3}
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -82,20 +81,47 @@ MonoBehaviour:
         HitOncePerTarget: 0
         OnHitActions: []
       Projectile:
-        ProjectilePrefab: {fileID: 0}
-        MoveType: 1
-        HitDetectionType: 0
-        SpawnPositionType: 2
-        FollowType: 0
-        CustomSocketName: 
-        Count: 1
-        SpreadAngle: 0
-        DelayBetweenShots: 0
-        Speed: 8
-        LifeTime: 3
-        HitRadius: 0.25
-        Pierce: 0
-        PierceCount: 0
+        BulletPatternConfig:
+          patternType: 0
+          bulletPrefab: {fileID: 0}
+          bulletSpeed: 0
+          bulletLifeTime: 0
+          totalWaves: 0
+          timeBetweenWaves: 0
+          bulletsPerWave: 0
+          spreadAngle: 0
+          rotationSpeedPerWave: 0
+          bulletSpawnDelay: 0
+          alternateBulletOrderEachWave: 0
+          damage: 0
+          delayWhenStartFiring: 0
+        HomingChainBulletConfig:
+          bulletPrefab: {fileID: 0}
+          bulletCount: 1
+          delayBetweenBullets: 0.05
+          enemyLayer:
+            serializedVersion: 2
+            m_Bits: 0
+          searchRadius: 20
+          maxTargetsPerBullet: 4
+          straightSpeed: 18
+          curveSpeed: 22
+          arriveDistance: 0.2
+          curveTangentLength: 3
+          damage: 100
+          drawDebugPath: 0
+          curveHeight: 4
+          alternateCurveSide: 1
+          useVerticalArc: 1
+          alternateVerticalArc: 1
+          verticalArcOnFirstChainMove: 1
+          verticalArcHeightRange: {x: 0.5, y: 3}
+          UseShortDistanceDetour: 1
+          minDetourDistance: 5
+          virtualPointXRange: {x: 8, y: 12}
+          virtualPointZRange: {x: 5, y: 9}
+          virtualPointYRange: {x: 2, y: 3}
+          virtualPointFindAttempts: 12
         OnHitActions: []
       Stack:
         StackKey: 
@@ -139,20 +165,47 @@ MonoBehaviour:
         HitOncePerTarget: 0
         OnHitActions: []
       Projectile:
-        ProjectilePrefab: {fileID: 0}
-        MoveType: 1
-        HitDetectionType: 0
-        SpawnPositionType: 2
-        FollowType: 0
-        CustomSocketName: 
-        Count: 1
-        SpreadAngle: 0
-        DelayBetweenShots: 0
-        Speed: 8
-        LifeTime: 3
-        HitRadius: 0.25
-        Pierce: 0
-        PierceCount: 0
+        BulletPatternConfig:
+          patternType: 0
+          bulletPrefab: {fileID: 0}
+          bulletSpeed: 0
+          bulletLifeTime: 0
+          totalWaves: 0
+          timeBetweenWaves: 0
+          bulletsPerWave: 0
+          spreadAngle: 0
+          rotationSpeedPerWave: 0
+          bulletSpawnDelay: 0
+          alternateBulletOrderEachWave: 0
+          damage: 0
+          delayWhenStartFiring: 0
+        HomingChainBulletConfig:
+          bulletPrefab: {fileID: 0}
+          bulletCount: 1
+          delayBetweenBullets: 0.05
+          enemyLayer:
+            serializedVersion: 2
+            m_Bits: 0
+          searchRadius: 20
+          maxTargetsPerBullet: 4
+          straightSpeed: 18
+          curveSpeed: 22
+          arriveDistance: 0.2
+          curveTangentLength: 3
+          damage: 100
+          drawDebugPath: 0
+          curveHeight: 4
+          alternateCurveSide: 1
+          useVerticalArc: 1
+          alternateVerticalArc: 1
+          verticalArcOnFirstChainMove: 1
+          verticalArcHeightRange: {x: 0.5, y: 3}
+          UseShortDistanceDetour: 1
+          minDetourDistance: 5
+          virtualPointXRange: {x: 8, y: 12}
+          virtualPointZRange: {x: 5, y: 9}
+          virtualPointYRange: {x: 2, y: 3}
+          virtualPointFindAttempts: 12
         OnHitActions: []
       Stack:
         StackKey: 
@@ -196,20 +249,47 @@ MonoBehaviour:
         HitOncePerTarget: 0
         OnHitActions: []
       Projectile:
-        ProjectilePrefab: {fileID: 0}
-        MoveType: 1
-        HitDetectionType: 0
-        SpawnPositionType: 2
-        FollowType: 0
-        CustomSocketName: 
-        Count: 1
-        SpreadAngle: 0
-        DelayBetweenShots: 0
-        Speed: 8
-        LifeTime: 3
-        HitRadius: 0.25
-        Pierce: 0
-        PierceCount: 0
+        BulletPatternConfig:
+          patternType: 0
+          bulletPrefab: {fileID: 0}
+          bulletSpeed: 0
+          bulletLifeTime: 0
+          totalWaves: 0
+          timeBetweenWaves: 0
+          bulletsPerWave: 0
+          spreadAngle: 0
+          rotationSpeedPerWave: 0
+          bulletSpawnDelay: 0
+          alternateBulletOrderEachWave: 0
+          damage: 0
+          delayWhenStartFiring: 0
+        HomingChainBulletConfig:
+          bulletPrefab: {fileID: 0}
+          bulletCount: 1
+          delayBetweenBullets: 0.05
+          enemyLayer:
+            serializedVersion: 2
+            m_Bits: 0
+          searchRadius: 20
+          maxTargetsPerBullet: 4
+          straightSpeed: 18
+          curveSpeed: 22
+          arriveDistance: 0.2
+          curveTangentLength: 3
+          damage: 100
+          drawDebugPath: 0
+          curveHeight: 4
+          alternateCurveSide: 1
+          useVerticalArc: 1
+          alternateVerticalArc: 1
+          verticalArcOnFirstChainMove: 1
+          verticalArcHeightRange: {x: 0.5, y: 3}
+          UseShortDistanceDetour: 1
+          minDetourDistance: 5
+          virtualPointXRange: {x: 8, y: 12}
+          virtualPointZRange: {x: 5, y: 9}
+          virtualPointYRange: {x: 2, y: 3}
+          virtualPointFindAttempts: 12
         OnHitActions: []
       Stack:
         StackKey: 

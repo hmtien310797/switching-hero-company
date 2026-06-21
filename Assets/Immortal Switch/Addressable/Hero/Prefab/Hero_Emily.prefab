@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5053535161099537236}
   - component: {fileID: 4775131440128012023}
   - component: {fileID: 8382149384867813313}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Spine GameObject (hero_1001306_emily)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,6 +128,8 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
+  limitRuntimeUpdateRate: 0
+  targetRuntimeFps: 20
   _animationName: 
   loop: 1
   timeScale: 1
@@ -149,7 +151,7 @@ GameObject:
   - component: {fileID: 7029057739495643735}
   - component: {fileID: 7307328446167154966}
   m_Layer: 7
-  m_Name: hero_emily
+  m_Name: Hero_Emily
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

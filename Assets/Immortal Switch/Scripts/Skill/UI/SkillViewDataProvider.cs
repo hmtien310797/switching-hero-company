@@ -12,13 +12,6 @@ using UnityEngine.U2D;
 
 namespace Immortal_Switch.Scripts.Skill.UI
 {
-    [Serializable]
-    public class HeroClassSkillPoolEntry
-    {
-        public HeroClass HeroClass;
-        public List<SkillDataSO> Skills = new();
-    }
-
     public class SkillViewHeroContext
     {
         public int HeroId;
@@ -42,16 +35,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
     public class SkillViewDataProvider : Singleton<SkillViewDataProvider>
     {
-        private PvEBattleController battleController;
-
-        [Header("Skill Pools By Class")]
-        [SerializeField] private List<HeroClassSkillPoolEntry> classPools = new();
-
         [Header("Debug")]
         [SerializeField] private bool enableDebugLog = true;
 
         private Dictionary<int, SkillDataSO> skillCache;
-        private Dictionary<HeroClass, List<SkillDataSO>> poolLookup;
+        private Dictionary<HeroClass, List<SkillDataSO>> poolLookup = new();
         private List<SkillDataSO> allSkills = new();
 
         private SpriteAtlas heroSpriteAtlas;
@@ -61,16 +49,14 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public override async UniTask InitializeAsync()
         {
             allSkills = MasterDataCache.Instance.GetAllSkillData();
-            battleController = PvEBattleController.Instance;
-            BuildLookup();
+            BuildPoolLookup();
             BuildCacheIfNeeded();
             heroSpriteAtlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
         }
 
         private void OnEnable()
         {
-            if (battleController != null)
-                battleController.OnActiveLineupChanged += HandleBattleLineupChanged;
+            GameEventManager.Subscribe(GameEvents.OnActiveLineupChanged, HandleBattleLineupChanged);
 
             if (UserDataCache.Instance != null)
                 UserDataCache.Instance.OnHeroSkillChanged += HandleHeroSkillChanged;
@@ -78,8 +64,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         private void OnDisable()
         {
-            if (battleController != null)
-                battleController.OnActiveLineupChanged -= HandleBattleLineupChanged;
+            GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, HandleBattleLineupChanged);
 
             if (UserDataCache.Instance != null)
                 UserDataCache.Instance.OnHeroSkillChanged -= HandleHeroSkillChanged;
@@ -119,30 +104,32 @@ namespace Immortal_Switch.Scripts.Skill.UI
             OnDataChanged?.Invoke();
         }
 
-        private void BuildLookup()
+        private void BuildPoolLookup()
         {
-            poolLookup = new Dictionary<HeroClass, List<SkillDataSO>>();
+            poolLookup.Clear();
 
-            if (classPools == null)
-            {
-                LogError("classPools is null.");
+            if (allSkills == null || allSkills.Count == 0)
                 return;
-            }
 
-            foreach (var entry in classPools)
+            for (int i = 0; i < allSkills.Count; i++)
             {
-                if (entry == null) 
+                SkillDataSO skill = allSkills[i];
+
+                if (skill == null)
+                    continue;
+                
+                if (skill.OwnerType != SkillOwnerType.ClassSkill)
                     continue;
 
-                var list = entry.Skills?
-                    .Where(x => x != null)
-                    .Distinct()
-                    .OrderBy(x => x.SkillId)
-                    .ToList() ?? new List<SkillDataSO>();
+                HeroClass heroClass = skill.SkillClass;
 
-                poolLookup[entry.HeroClass] = list;
+                if (!poolLookup.TryGetValue(heroClass, out List<SkillDataSO> skillPool))
+                {
+                    skillPool = new List<SkillDataSO>();
+                    poolLookup.Add(heroClass, skillPool);
+                }
 
-                Log($"BuildLookup -> class={entry.HeroClass}, count={list.Count}");
+                skillPool.Add(skill);
             }
         }
 
@@ -206,13 +193,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         public bool HasAssignedHero(HeroClass heroClass)
         {
-            if (battleController == null)
-            {
-                LogError("HasAssignedHero failed because battleController is null.");
-                return false;
-            }
-
-            bool result = battleController.HasActiveHeroOfClass(heroClass);
+            bool result = PvEBattleController.Instance.HasActiveHeroOfClass(heroClass);
             Log($"HasAssignedHero -> class={heroClass}, result={result}");
             return result;
         }
@@ -221,13 +202,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             var result = new List<SkillViewHeroContext>();
 
-            if (battleController == null)
-            {
-                LogError("GetAssignedHeroes failed because battleController is null.");
-                return result;
-            }
-
-            var activeHeroes = battleController.GetActiveHeroControllers();
+            var activeHeroes = PvEBattleController.Instance.GetActiveHeroControllers();
             Log($"GetAssignedHeroes -> active count={activeHeroes.Count}");
 
             foreach (var hero in activeHeroes)
@@ -260,13 +235,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         public SkillViewHeroContext GetAssignedHeroByClass(HeroClass heroClass)
         {
-            if (battleController == null)
-            {
-                LogError("GetAssignedHeroByClass failed because battleController is null.");
-                return null;
-            }
-
-            HeroActor heroController = battleController.TryGetActiveHeroByClass(heroClass);
+            HeroActor heroController = PvEBattleController.Instance.TryGetActiveHeroByClass(heroClass);
             if (heroController == null)
             {
                 LogWarning($"GetAssignedHeroByClass -> no active hero for class={heroClass}");
@@ -293,7 +262,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public List<SkillDataSO> GetClassPool(HeroClass heroClass)
         {
             if (poolLookup == null)
-                BuildLookup();
+                BuildPoolLookup();
 
             if (poolLookup == null)
             {

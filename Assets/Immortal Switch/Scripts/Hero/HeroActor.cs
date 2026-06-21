@@ -130,8 +130,6 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     public float PassiveHitNormalizedTime => passiveHitNormalizedTime;
 
     public int GetHeroId() => heroData.Id;
-
-    public Sprite HeroIcon => heroData.PortraitIcon;
     
     public HeroStateMachine StateMachine => stateMachine;
 
@@ -213,10 +211,10 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         nextTargetSearchTime = 0f;
         stateMachine.ChangeState(HeroStateId.Spawn);
         BindDeathEvent();
-        // progressionBridge.Setup(heroData, this);
-        // progressionBridge.RefreshFromProgression();
-        // equipmentBridge.Setup(this);
-        // equipmentBridge.RefreshFromEquipment();
+        progressionBridge.Setup(heroData, this);
+        progressionBridge.RefreshFromProgression();
+        equipmentBridge.Setup(this);
+        equipmentBridge.RefreshFromEquipment();
     }
     
     public void ResetSpawnPosition(Vector3 position)

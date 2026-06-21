@@ -134,16 +134,9 @@ namespace Immortal_Switch.Scripts.Core
 
             if (player.heroes != null)
             {
-                UserDataCache.Instance.HeroList = player.heroes;
                 SyncHeroListToProgression(player.heroes);
             }
-
-            if (player.skills != null)
-                UserDataCache.Instance.SkillList = player.skills;
-
-            if (player.weapons != null)
-                UserDataCache.Instance.WeaponList = player.weapons;
-
+            
             UserDataCache.Instance.GetPlayerDataFromServer(player.heroes, player.skills, player.weapons);
 
             Debug.Log($"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, Energy={player.energy}");

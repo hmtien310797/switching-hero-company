@@ -5,18 +5,10 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
-using Immortal_Switch.Scripts.Skill;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Common
 {
-    [Serializable]
-    public class SelectedHero
-    {
-        public int MainHeroId;
-        public int SubHeroId;
-    }
 
     [Serializable]
     public class ClassSkillUnlockData

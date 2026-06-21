@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 
 namespace Battle
 {
     public partial class PvEBattleController
     {
-        public event Action OnActiveLineupChanged;
-
         public IReadOnlyList<HeroActor> GetActiveHeroControllers()
         {
             return inBattleHeroes;
@@ -36,7 +35,7 @@ namespace Battle
 
         private void NotifyActiveLineupChanged()
         {
-            OnActiveLineupChanged?.Invoke();
+            GameEventManager.Trigger(GameEvents.OnActiveLineupChanged);
         }
     }
 }

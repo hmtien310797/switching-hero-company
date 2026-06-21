@@ -1,4 +1,6 @@
 using System;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
@@ -7,7 +9,7 @@ using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 {
-    public class HeroSummonManager : MonoBehaviour
+    public class HeroSummonManager : Singleton<HeroSummonManager>
     {
         public static HeroSummonManager Instance { get; private set; }
 
@@ -25,18 +27,15 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         public event Action OnSummonDataChanged;
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
+            base.Awake();
             Load();
+        }
+
+        public override UniTask InitializeAsync()
+        {
+            return UniTask.CompletedTask;
         }
 
         private void Start()

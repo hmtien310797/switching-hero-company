@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 909cf9e41f394d09bb44407c382491bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   heroA: {fileID: 0}
   heroB: {fileID: 0}
   selectedHero: 0
@@ -55,8 +56,15 @@ MonoBehaviour:
   formationTargetSmoothTime: 0.08
   followerStopDistance: 0.08
   followerMoveSmoothTime: 0.09
+  moveInputSource: 2
   inputSmoothTime: 0.06
   moveInputThreshold: 0.05
+  externalMoveDirection: {x: 0, y: 0, z: 0}
+  hasExternalInput: 0
   rawMoveDirection: {x: 0, y: 0, z: 0}
   smoothMoveDirection: {x: 0, y: 0, z: 0}
   lastMoveDirection: {x: 0, y: 0, z: 1}
+  useMovementConstraint: 1
+  minLimit: {x: -25, y: -26.4}
+  maxLimit: {x: 35, y: 40}
+  constrainFollowerTarget: 1

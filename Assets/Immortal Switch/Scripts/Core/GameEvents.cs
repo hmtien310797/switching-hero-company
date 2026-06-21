@@ -23,5 +23,6 @@
         public const string OnAppResumed = "OnAppResumed";
         public const string OnAppQuit = "OnAppQuit";
         public const string OnPlayCompletedStage = "OnPlayCompletedStage";
+        public const string OnActiveLineupChanged = "OnActiveLineupChanged";
     }
 }

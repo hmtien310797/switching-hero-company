@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Hero
 {
-    public class HeroProgressionManager : MonoBehaviour
+    public class HeroProgressionManager : Singleton<HeroProgressionManager>
     {
-        public static HeroProgressionManager Instance { get; private set; }
-
         [SerializeField] private HeroProgressionDatabaseSO database;
         private const string saveKey = "hero_progression_save";
 
@@ -19,19 +19,17 @@ namespace Immortal_Switch.Scripts.Hero
         public event Action<HeroCollectionChangedArgs> OnHeroCollectionChanged;
         private readonly Dictionary<int, List<HeroProgressionRuntimeBridge>> heroBridges = new();
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            base.Awake();
 
             Load();
             service = new HeroProgressionService(database, saveData);
+        }
+
+        public override UniTask InitializeAsync()
+        {
+            return UniTask.CompletedTask;
         }
 
         public void Save()

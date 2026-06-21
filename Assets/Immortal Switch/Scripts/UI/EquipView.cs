@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Battle;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Skill.UI;
@@ -133,7 +134,7 @@ namespace Immortal_Switch.Scripts.UI
             if (PvEBattleController.Instance == null)
                 return;
 
-            PvEBattleController.Instance.OnActiveLineupChanged += HandleActiveLineupChanged;
+            GameEventManager.Subscribe(GameEvents.OnActiveLineupChanged, HandleActiveLineupChanged);
             subscribedBattleLineup = true;
         }
 
@@ -142,8 +143,7 @@ namespace Immortal_Switch.Scripts.UI
             if (!subscribedBattleLineup)
                 return;
 
-            if (PvEBattleController.Instance != null)
-                PvEBattleController.Instance.OnActiveLineupChanged -= HandleActiveLineupChanged;
+            GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, HandleActiveLineupChanged);
 
             subscribedBattleLineup = false;
         }
