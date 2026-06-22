@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Common;
 using Immortal_Switch.Scripts.Skill;
 using Sirenix.OdinInspector;
@@ -9,10 +10,20 @@ namespace Immortal_Switch.Scripts.SkillRemake
     public class BulletSpawnerSkillRuntimeObject: SkillRuntimeObject
     {
         private BulletPatternConfig currentPattern;
+        public BulletPatternConfig debugPattern;
+        public bool Debug;
         
         [Header("Debug")] [SerializeField] private bool fireBySpace = true;
 
         private bool isFiring;
+
+        private void Awake()
+        {
+            if (Debug)
+            {
+                currentPattern = debugPattern;
+            }
+        }
 
         protected override void OnRuntimeInitialized(object arg)
         {
@@ -24,9 +35,9 @@ namespace Immortal_Switch.Scripts.SkillRemake
             }
             else
             {
-                currentPattern = Context.SkillData.Levels[Context.SkillLevel].Phases[0].Actions[0].Projectile.BulletPatternConfig;
+                currentPattern = Context.SkillData.Levels[Context.SkillLevel - 1].Phases[0].Actions[0].Projectile.BulletPatternConfig;
             }
-
+            
             Vector3 direction = GetDirectionToTarget(Context.Caster.transform, Context.MainTarget.Transform);
             transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             TryFire();
@@ -46,6 +57,10 @@ namespace Immortal_Switch.Scripts.SkillRemake
         [Button]
         private void TryFire()
         {
+            if (Debug)
+            {
+                currentPattern =  debugPattern;
+            }
             StartCoroutine(ExecutePatternRoutine());
         }
 
@@ -73,8 +88,11 @@ namespace Immortal_Switch.Scripts.SkillRemake
                     yield return new WaitForSeconds(currentPattern.timeBetweenWaves);
                 }
             }
-            
-            DespawnSelf();
+
+            if (!Debug)
+            {
+                DespawnSelf();
+            }
         }
 
         private void SpawnCurrentWaveInstant(int waveIndex)
@@ -117,7 +135,18 @@ namespace Immortal_Switch.Scripts.SkillRemake
 
             if (bullet == null)
                 return;
-
+            
+            if (Debug)
+            {
+                bullet.Setup(
+                    null,
+                    direction,
+                    currentPattern.bulletSpeed,
+                    currentPattern.bulletLifeTime, currentPattern.damage
+                );
+                return;
+            }
+            
             bullet.Setup(
                 Context.Caster,
                 direction,

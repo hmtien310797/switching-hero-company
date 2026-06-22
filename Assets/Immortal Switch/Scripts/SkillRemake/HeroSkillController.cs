@@ -632,6 +632,8 @@ namespace Immortal_Switch.Scripts.Skill
             switch (runtimeConfig.RuntimeVisualType)
             {
                 case SkillRuntimeVisualType.SpawnedSkillObject:
+                case SkillRuntimeVisualType.HeroSpineObjectAndProjectile:    
+                case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:    
                     runtimeObject = objectSpawner.Spawn(runtimeConfig.SkillRuntimePrefab, spawnPosition, Quaternion.identity);
                     break;
                 case SkillRuntimeVisualType.SpawnHomingProjectile:

@@ -1,13 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Game.Configs.Generated;
-using Immortal_Switch.Scripts.ItemSystem;
+using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem
 {
@@ -85,11 +87,19 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return validWeights.Last().Key;
         }
 
-        public PlayerEquipItem BuildEquip(DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow itemCfg,
-            DynamicHeroesGlobalSpecificationsTransmutationRandomLevelRangeConfigRow levelRangeCfg)
+        public PlayerEquipItem BuildEquip(
+            DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow itemCfg,
+            DynamicHeroesGlobalSpecificationsTransmutationRandomLevelRangeConfigRow levelRangeCfg,
+            List<StatModifier> uniqueModifiers
+        )
         {
             var rndLevel = Random.Range(levelRangeCfg.randomRangeMin, levelRangeCfg.randomRangeMax + 1);
-            var level = levelRangeCfg.averageArtifactLevel + rndLevel;
+
+            var level = Math.Clamp(
+                levelRangeCfg.averageArtifactLevel + rndLevel,
+                levelRangeCfg.finalLevelMin,
+                levelRangeCfg.finalLevelMax
+            );
 
             var equip = new PlayerEquipItem
             {
@@ -111,20 +121,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             equip.Modifiers.Add(new StatModifier(mapping1.StatType, mapping1.Op, stat1Rate));
             equip.Modifiers.Add(new StatModifier(mapping2.StatType, mapping2.Op, stat2Rate));
             equip.Modifiers.Add(new StatModifier(mapping3.StatType, mapping3.Op, stat3Rate));
-
-            var uniqueOptions = new List<string>
-            {
-                itemCfg.uniqueOptionPool1,
-                itemCfg.uniqueOptionPool2,
-                itemCfg.uniqueOptionPool3,
-            };
-
-            foreach (var entry in uniqueOptions)
-            {
-                var rate = Random.Range(itemCfg.uniqueOptionCountMin, itemCfg.uniqueOptionCountMax);
-                var mapping = TransmutationSystemHelper.ToStatMapping(entry);
-                equip.Modifiers.Add(new StatModifier(mapping.StatType, mapping.Op, rate));
-            }
+            equip.Modifiers.AddRange(uniqueModifiers);
 
             _storage.Data.StuckEquip = equip;
             _storage.Save();
@@ -150,6 +147,58 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             }
 
             _storage.Save();
+        }
+
+        public void SetWaitingMaterial(bool value)
+        {
+            _storage.Data.Setting.IsWaiting = value;
+            _storage.Save();
+        }
+
+        public bool ToggleWaitingMaterial()
+        {
+            _storage.Data.Setting.IsWaiting = !_storage.Data.Setting.IsWaiting;
+            _storage.Save();
+            return _storage.Data.Setting.IsWaiting;
+        }
+
+        public void SaveSetting(List<List<string>> uniqueOptions, int count, EEquipmentTier tier, bool enabled)
+        {
+            _storage.Data.Setting.Enabled = enabled;
+            _storage.Data.Setting.Count = count;
+            _storage.Data.Setting.Tier = tier;
+            _storage.Data.Setting.UniqueOptions = new List<List<string>>(uniqueOptions);
+            _storage.Save();
+        }
+
+        public List<StatModifier> BuildUniqueModifiers(
+            IReadOnlyList<DynamicHeroesGlobalSpecificationsTransmutationItemUniqueRow> rows,
+            int count
+        )
+        {
+            var result = new List<StatModifier>();
+
+            if (rows.Count < 1)
+            {
+                return result;
+            }
+
+            for (var i = 0; i < count; i++)
+            {
+                var cfg = RandomHelper.RandomByWeight(rows, v => v.dropWeight);
+
+                if (cfg == null)
+                {
+                    Debug.LogError($"BuildUniqueModifiers failed at index {i}");
+                    continue;
+                }
+
+                var rndPct = Random.Range(cfg.rollMinPct, cfg.rollMaxPct);
+                var mapping = TransmutationSystemHelper.ToStatMapping(cfg.statId);
+                result.Add(new StatModifier(mapping.StatType, mapping.Op, rndPct));
+            }
+
+            return result;
         }
     }
 }

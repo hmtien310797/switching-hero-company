@@ -91,10 +91,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
             else
             {
                 if (progressText != null)
-                    progressText.text = string.Empty;
+                    progressText.text = $"{data.CurrentShard}/{data.RequiredShardToNext}";
 
                 if (progressFill != null)
-                    progressFill.fillAmount = 0f;
+                    progressFill.fillAmount = data.ProgressNormalized;
 
                 RefreshStars(0, 0);
 

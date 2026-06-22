@@ -13,7 +13,6 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = System.Random;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 {
@@ -105,16 +104,20 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private async UniTask OnClickTotalStat()
         {
-            var rnd = new Random();
             var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationTotalStatPanel>();
             var modifiers = TransmutationSystemManager.Instance.GetAllModifiers();
 
             var entries = modifiers
-                .Select(pair => new TransmutationSystemTotalStatEntry
+                .Select(pair =>
                 {
-                    Value = Convert.ToInt64(pair.Value),
-                    IsUnique = rnd.Next(0, 10) > 5,
-                    Title = pair.Key.ToString(),
+                    var uniqueCfg = TransmutationSystemManager.Instance.GetUniqueCfg(pair.Key, pair.Value.op);
+
+                    return new TransmutationSystemTotalStatEntry
+                    {
+                        Value = Convert.ToInt64(pair.Value.pct),
+                        IsUnique = pair.Value.isUnique,
+                        Title = uniqueCfg?.statName ?? pair.Key.ToString(),
+                    };
                 })
                 .OrderBy(v => v.IsUnique)
                 .ToList();

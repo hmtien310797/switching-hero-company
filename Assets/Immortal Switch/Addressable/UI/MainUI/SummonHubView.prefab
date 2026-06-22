@@ -2166,11 +2166,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 6129193492411001314}
   rollCountText: {fileID: 4272710053949191507}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 5965902752550321887}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1 &1087972545959812491
 GameObject:
   m_ObjectHideFlags: 0
@@ -3359,9 +3362,9 @@ RectTransform:
   - {fileID: 4882412537804416557}
   m_Father: {fileID: 1082590734872430913}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 609.13477, y: -44.6975}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 263.315, y: 92.047}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6359694873456397303
@@ -3581,7 +3584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &5064884423370387308
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4967,9 +4970,9 @@ RectTransform:
   - {fileID: 6455048865961800069}
   m_Father: {fileID: 1082590734872430913}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 131.6575, y: -44.6975}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 263.315, y: 92.047}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5815789581415193824
@@ -5161,7 +5164,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5451389907438917662}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999975
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8332,11 +8335,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 6203609968310837940}
   rollCountText: {fileID: 8785480720673775756}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 5260791825641126379}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1 &3180494153210060969
 GameObject:
   m_ObjectHideFlags: 0
@@ -8803,11 +8809,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 1625389136268171257}
   rollCountText: {fileID: 8898261176254588529}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 1872272769478533898}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1 &3311816403526993225
 GameObject:
   m_ObjectHideFlags: 0
@@ -10583,11 +10592,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 5327443726185850384}
   rollCountText: {fileID: 8208542548794265940}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 5338448486870453146}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1 &3808336291581599375
 GameObject:
   m_ObjectHideFlags: 0
@@ -10621,7 +10633,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00013584126}
+  m_AnchoredPosition: {x: 0, y: 0.00012191805}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &8035577810889443748
@@ -11974,7 +11986,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2881856544512044409}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999973
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12206,11 +12218,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 6278312555220283894}
   rollCountText: {fileID: 53613605407160536}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 3605965806170461593}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1 &4549195801965795827
 GameObject:
   m_ObjectHideFlags: 0
@@ -13771,9 +13786,9 @@ RectTransform:
   - {fileID: 6258411658318983955}
   m_Father: {fileID: 1082590734872430913}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 370.39615, y: -44.6975}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 214.1623, y: 92.047}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &200530186699116623
@@ -17777,11 +17792,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 2215113380973566215}
   rollCountText: {fileID: 586148461076486424}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 2299824661707654346}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1 &6568341247980908019
 GameObject:
   m_ObjectHideFlags: 0
@@ -18735,11 +18753,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 1351997755487695867}
   rollCountText: {fileID: 120949386417957532}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 77152504308009798}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1 &6916250504303314593
 GameObject:
   m_ObjectHideFlags: 0
@@ -18756,7 +18777,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &390303734904614038
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20681,7 +20702,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 16}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &5526508894883367924
 MonoBehaviour:
@@ -21001,11 +21022,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 2809333315909642387}
   rollCountText: {fileID: 7603534934534159599}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 8783562213342772972}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1 &7749669183227927574
 GameObject:
   m_ObjectHideFlags: 0
@@ -22668,7 +22692,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00004762591}
+  m_AnchoredPosition: {x: 0, y: 0.000031817166}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &7629231534423138161
@@ -24153,11 +24177,14 @@ MonoBehaviour:
   currencyIcon: {fileID: 5424006593420052918}
   rollCountText: {fileID: 5290338697023591500}
   heroTicketIcon: {fileID: 21300000, guid: 6746b506236e5734c84db0b914870e2c, type: 3}
+  skillTicketIcon: {fileID: 0}
+  weaponTicketIcon: {fileID: 0}
   diamondIcon: {fileID: 21300000, guid: c4b248d38326a2e49ba6e0a4d26fab4c, type: 3}
   redDot: {fileID: 1887107344441229123}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   notEnoughColor: {r: 1, g: 0, b: 0, a: 1}
   canvasGroup: {fileID: 0}
+  summonCategory: 0
 --- !u!1001 &10183719269597208
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24972,35 +24999,35 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 899106182431056459, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 899106182431056459, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 899106182431056459, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 71.87265
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 899106182431056459, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -7.636055
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1879396519648657162, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1879396519648657162, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1879396519648657162, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 50
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1879396519648657162, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -7.636055
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2757455484616970623, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_Name
@@ -25012,19 +25039,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7783483251373176491, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7783483251373176491, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7783483251373176491, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 28.12735
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7783483251373176491, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -7.636055
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8284134434989851198, guid: 0f2728fdcfe8c8648a2abd54d42d538f, type: 3}
       propertyPath: m_Pivot.x

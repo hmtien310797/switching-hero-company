@@ -65,6 +65,22 @@ namespace Immortal_Switch.Scripts.Hero
             owned.CurrentShard += amount;
         }
 
+        /// <summary>Set absolute shard count — dùng để sync từ server (nguồn sự thật), khác với AddShard (cộng dồn local).</summary>
+        public void SetShard(int heroId, int amount)
+        {
+            var owned = GetOrCreateOwnedHero(heroId);
+            owned.CurrentShard = Mathf.Max(0, amount);
+        }
+
+        /// <summary>Set tier + star tuyệt đối — dùng để sync rarity/star từ server (HeroInstance.Rarity/Star).</summary>
+        public void SetProgress(int heroId, HeroProgressTier tier, int starInTier)
+        {
+            var owned = GetOrCreateOwnedHero(heroId);
+            owned.IsUnlocked = true;
+            owned.CurrentTier = tier;
+            owned.CurrentStarInTier = Mathf.Max(0, starInTier);
+        }
+
         public int GetShard(int heroId) => GetOrCreateOwnedHero(heroId).CurrentShard;
 
         public HeroProgressionNode GetCurrentNode(int heroId)

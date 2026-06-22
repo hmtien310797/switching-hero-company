@@ -53,11 +53,20 @@ namespace Immortal_Switch.Scripts.HeroUIView
                     ? progressionConfig.GetMaxStarInTier(displayTier)
                     : 0;
 
+                // Hero chưa unlock vẫn có thể đã tích shard (server) hướng tới mốc đầu tiên.
+                var startingNode = progressionConfig != null
+                    ? progressionConfig.GetNode(progressionConfig.StartingTier, progressionConfig.StartingStarInTier)
+                    : null;
+                int currentShard = service.GetOrCreateOwnedHero(hero.Id).CurrentShard;
+                int requiredShard = startingNode != null ? startingNode.ShardCostToNext : 0;
+
                 viewData.CurrentStarInTier = 0;
                 viewData.MaxStarInTier = maxStarAtStartingTier;
-                viewData.CurrentShard = 0;
-                viewData.RequiredShardToNext = 0;
-                viewData.ProgressNormalized = 0f;
+                viewData.CurrentShard = currentShard;
+                viewData.RequiredShardToNext = requiredShard;
+                viewData.ProgressNormalized = requiredShard <= 0
+                    ? 0f
+                    : Mathf.Clamp01((float)currentShard / requiredShard);
                 viewData.IsMaxNode = false;
 
                 return viewData;

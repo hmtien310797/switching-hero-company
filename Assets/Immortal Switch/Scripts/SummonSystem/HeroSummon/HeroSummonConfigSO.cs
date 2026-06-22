@@ -21,9 +21,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [Min(0)] public int HardPity = 70;
         [Min(0f)] public float SoftBonusPercentPerMiss = 1f;
 
-        [Header("Hero Pool")]
-        public List<HeroDataSO> HeroPool = new();
-
         public HeroSummonOptionEntry GetOption(string optionId)
         {
             return SummonOptions.Find(x => x != null && x.OptionId == optionId);

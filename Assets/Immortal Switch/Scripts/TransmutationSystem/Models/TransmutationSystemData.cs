@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Shared.Database;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Models
 {
@@ -12,6 +13,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         /// value: thong tin equip.
         /// </summary>
         public Dictionary<string, PlayerEquipItem> Equips = new();
+
+        /// <summary>
+        /// cau hinh cai dat setting
+        /// </summary>
+        public TransmutationSystemAutoSettingData Setting = new();
 
         /// <summary>
         /// trang bị lay ra nhưng chưa dismantle. / equip 
@@ -47,6 +53,34 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         {
             Level = level;
         }
+    }
+
+    public class TransmutationSystemAutoSettingData
+    {
+        /// <summary>
+        /// luu cau hinh unique
+        /// </summary>
+        public List<List<string>> UniqueOptions = new();
+
+        /// <summary>
+        /// tier da chon
+        /// </summary>
+        public EEquipmentTier Tier;
+
+        /// <summary>
+        /// sl chon
+        /// </summary>
+        public int Count;
+
+        /// <summary>
+        /// cho nguyen lieu
+        /// </summary>
+        public bool IsWaiting;
+
+        /// <summary>
+        /// co bat cai dạt hay ko
+        /// </summary>
+        public bool Enabled;
     }
 
     public class TransmutationSystemTotalStatData

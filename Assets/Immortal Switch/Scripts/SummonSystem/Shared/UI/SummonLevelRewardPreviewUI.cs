@@ -72,8 +72,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             }
 
             if (amountText != null)
-                //amountText.text = data.RewardItem.Amount.ToString();
-                amountText.text = "0";
+                amountText.text = data.RewardItem.Amount.ToString();
 
             if (rewardIcon != null)
             {

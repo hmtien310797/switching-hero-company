@@ -13,20 +13,6 @@ public sealed class HealthBarController : MonoBehaviour
 
     private Vector2 fillOriginalSize;
 
-    private void Awake()
-    {
-        if (fillRenderer != null)
-        {
-            fillOriginalSize = fillRenderer.size;
-
-            if (maxWidth <= 0f)
-                maxWidth = fillOriginalSize.x;
-        }
-        
-        float yPos = transform.localPosition.y;
-        transform.localPosition = new Vector3(-(maxWidth / 2f), yPos, 0);
-    }
-
     public void SetHealthNormalized(float normalizedHealth)
     {
         normalizedHealth = Mathf.Clamp01(normalizedHealth);
@@ -55,6 +41,16 @@ public sealed class HealthBarController : MonoBehaviour
     public void ResetHealth()
     {
         SetHealthNormalized(1f);
+        if (fillRenderer != null)
+        {
+            fillOriginalSize = fillRenderer.size;
+
+            if (maxWidth <= 0f)
+                maxWidth = fillOriginalSize.x;
+        }
+        
+        float yPos = transform.localPosition.y;
+        transform.localPosition = new Vector3(-(maxWidth / 2f), yPos, 0);
     }
 
     public void Show()

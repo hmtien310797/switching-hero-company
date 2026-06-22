@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Pooling
 {
@@ -16,8 +18,12 @@ namespace Immortal_Switch.Scripts.Pooling
             PoolHandle = null;
         }
 
-        public virtual void DespawnToPool()
+        public virtual async UniTask DespawnToPool(float delaySpawn)
         {
+            if (delaySpawn >= 0)
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(delaySpawn));
+            }
             PoolHandle?.Despawn();
         }
     }

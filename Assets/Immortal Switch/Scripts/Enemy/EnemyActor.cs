@@ -10,6 +10,7 @@ using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using UI;
+using Unity.VisualScripting;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -25,27 +26,26 @@ namespace Immortal_Switch.Scripts.Enemy
             Attack,
             Dead
         }
-        
-        [Header("Components")]
-        [SerializeField] private StatsController stats;
+
+        [Header("Components")] [SerializeField]
+        private StatsController stats;
+
         [SerializeField] private HealthBarController healthBarController;
         [SerializeField] private HeroAnimationDriver animationDriver;
         [SerializeField] private HeroLocomotion locomotion;
         [SerializeField] private GameObject spineAnimation;
 
-        [Header("Death")]
-        [SerializeField] private bool destroyOnDead = true;
+        [Header("Death")] [SerializeField] private bool destroyOnDead = true;
         [SerializeField] private float destroyDelay = 1.2f;
-        
+
         [Header("Properties")]
-        [field: SerializeField] public ActorType ActorType { get; private set;}
+        [field: SerializeField]
+        public ActorType ActorType { get; private set; }
 
         private readonly List<ICombatUnit> heroTargets = new();
 
-        [ShowInInspector, ReadOnly]
-        private ICombatUnit currentTarget;
-        [ShowInInspector, ReadOnly]
-        private EnemyState currentState;
+        [ShowInInspector, ReadOnly] private ICombatUnit currentTarget;
+        [ShowInInspector, ReadOnly] private EnemyState currentState;
 
         private CreepDataSo creepData;
         private float attackTimer;
@@ -56,12 +56,21 @@ namespace Immortal_Switch.Scripts.Enemy
         private float attackSpeed = 1f;
         private float moveSpeed = 3f;
 
+        [Header("External Movement")] [ShowInInspector, ReadOnly]
+        private bool isExternallyControlled;
+
+        private Object externalMovementOwner;
+        private Vector3 externalTargetPosition;
+        private float externalMoveSpeed;
+        private float externalStopDistance;
+        private bool faceExternalMovement;
+
         public StatsController Stats => stats;
         public Element Element => creepData.Element;
         public HealthBarController HealthBarController => healthBarController;
         public Transform Transform => transform;
         public Vector3 Position => transform.position;
-        
+
         public bool IsDead => stats != null &&
                               stats.HealthModule != null &&
                               stats.HealthModule.IsDead;
@@ -73,13 +82,19 @@ namespace Immortal_Switch.Scripts.Enemy
         public float MaxHp => stats != null && stats.HealthModule != null
             ? stats.HealthModule.MaxHP
             : 0f;
-        
+
         public event Action<EnemyActor> OnDead;
 
         private void Update()
         {
             if (IsDead)
                 return;
+
+            if (isExternallyControlled)
+            {
+                TickExternalMovement();
+                return;
+            }
 
             TickState(Time.deltaTime);
         }
@@ -105,7 +120,7 @@ namespace Immortal_Switch.Scripts.Enemy
 
             ChangeState(EnemyState.Spawn);
         }
-        
+
         public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB, BaseStat cachedBaseStat)
         {
             creepData = data;
@@ -150,7 +165,7 @@ namespace Immortal_Switch.Scripts.Enemy
         {
             spineAnimation.transform.localScale = new Vector3(scale, scale, scale);
         }
-        
+
         private void ApplyData(CreepDataSo data, StageStatScale scale)
         {
             if (data == null)
@@ -273,7 +288,13 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private void TickRun()
         {
-            if (currentTarget == null || currentTarget.IsDead)
+            if (!currentTarget.IsUnityAlive())
+            {
+                ChangeState(EnemyState.Idle);
+                return;
+            }
+
+            if (currentTarget.IsDead)
             {
                 ChangeState(EnemyState.Idle);
                 return;
@@ -300,7 +321,13 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private void TickAttack(float deltaTime)
         {
-            if (currentTarget == null || currentTarget.IsDead)
+            if (!currentTarget.IsUnityAlive())
+            {
+                ChangeState(EnemyState.Idle);
+                return;
+            }
+
+            if (currentTarget.IsDead)
             {
                 ChangeState(EnemyState.Idle);
                 return;
@@ -325,7 +352,12 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private void StartAttack()
         {
-            if (currentTarget == null || currentTarget.IsDead)
+            if (!currentTarget.IsUnityAlive())
+            {
+                return;
+            }
+
+            if (currentTarget.IsDead)
                 return;
 
             attackTimer = 0f;
@@ -340,15 +372,21 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private void OnSpineEvent(string eventName)
         {
+            if (isExternallyControlled)
+                return;
+            
             if (currentState != EnemyState.Attack)
                 return;
 
             if (hasHitThisAttack)
                 return;
-            
+
             hasHitThisAttack = true;
 
-            if (currentTarget == null || currentTarget.IsDead)
+            if (!currentTarget.IsUnityAlive())
+                return;
+
+            if (currentTarget.IsDead)
                 return;
 
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
@@ -421,7 +459,10 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private bool IsTargetInAttackRange()
         {
-            if (currentTarget == null || currentTarget.IsDead)
+            if (!currentTarget.IsUnityAlive())
+                return false;
+
+            if (currentTarget.IsDead)
                 return false;
 
             Vector3 self = transform.position;
@@ -468,8 +509,8 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private void OnDeadEvent()
         {
-            animationDriver.PlayDead();
-            DespawnToPool();
+            float deadAnimTime = animationDriver.PlayDead();
+            DespawnToPool(deadAnimTime).Forget();
         }
 
         private void Die()
@@ -477,11 +518,13 @@ namespace Immortal_Switch.Scripts.Enemy
             if (currentState == EnemyState.Dead)
                 return;
             
+            ForceEndExternalMovement();
+
             ChangeState(EnemyState.Dead);
             OnDead?.Invoke(this);
             locomotion?.Stop();
         }
-        
+
         public void KillImmediately()
         {
             if (IsDead)
@@ -491,9 +534,111 @@ namespace Immortal_Switch.Scripts.Enemy
                 Die();
                 return;
             }
+
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, this, 999999999);
             stats.HealthModule.TakeDamage(damageResult);
+        }
 
+        public bool IsExternallyControlled =>
+            isExternallyControlled;
+
+        public void BeginExternalMovement(
+            Object owner,
+            Vector3 targetPosition,
+            float moveSpeed,
+            float stopDistance = 0.1f,
+            bool faceMovementDirection = true)
+        {
+            if (owner == null || IsDead)
+                return;
+
+            externalMovementOwner = owner;
+            externalTargetPosition = targetPosition;
+            externalMoveSpeed = Mathf.Max(0f, moveSpeed);
+            externalStopDistance =
+                Mathf.Max(0f, stopDistance);
+
+            faceExternalMovement =
+                faceMovementDirection;
+
+            isExternallyControlled = true;
+
+            locomotion?.Stop();
+        }
+
+        public void UpdateExternalMovement(
+            Object owner,
+            Vector3 targetPosition,
+            float moveSpeed)
+        {
+            if (!isExternallyControlled)
+                return;
+
+            if (externalMovementOwner != owner)
+                return;
+
+            externalTargetPosition = targetPosition;
+            externalMoveSpeed = Mathf.Max(0f, moveSpeed);
+        }
+
+        public void EndExternalMovement(Object owner)
+        {
+            if (!isExternallyControlled)
+                return;
+
+            if (externalMovementOwner != owner)
+                return;
+
+            ClearExternalMovement();
+        }
+
+        public void ForceEndExternalMovement()
+        {
+            ClearExternalMovement();
+        }
+
+        private void TickExternalMovement()
+        {
+            if (externalMovementOwner == null)
+            {
+                ClearExternalMovement();
+                return;
+            }
+
+            if (stats != null && !stats.CanMove())
+            {
+                locomotion?.Stop();
+                return;
+            }
+
+            if (locomotion == null)
+                return;
+
+            locomotion.MoveTowardsPosition(
+                externalTargetPosition,
+                externalMoveSpeed,
+                externalStopDistance
+            );
+
+            if (faceExternalMovement &&
+                locomotion.IsMoving &&
+                animationDriver != null)
+            {
+                animationDriver.FaceDirection(
+                    locomotion.LastVelocity);
+            }
+        }
+
+        private void ClearExternalMovement()
+        {
+            isExternallyControlled = false;
+            externalMovementOwner = null;
+            externalTargetPosition = Vector3.zero;
+            externalMoveSpeed = 0f;
+            externalStopDistance = 0f;
+            faceExternalMovement = false;
+
+            locomotion?.Stop();
         }
 
         public override void OnSpawned(AddressablePoolHandle handle)
@@ -503,6 +648,9 @@ namespace Immortal_Switch.Scripts.Enemy
 
         public override void OnDespawned()
         {
+            ForceEndExternalMovement();
+            currentTarget = null;
+            heroTargets.Clear();
             base.OnDespawned();
         }
     }

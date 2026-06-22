@@ -14,10 +14,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (txtName != null)
                 txtName.text = vm.DisplayName;
 
-            /*if (txtValue != null)
-                txtValue.text = vm.DisplayValue;*/
             if (txtValue != null)
-                txtValue.text="0";
+                txtValue.text = vm.DisplayValue;
         }
     }
 }

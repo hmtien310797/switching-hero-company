@@ -1,6 +1,7 @@
 ﻿using Immortal_Switch.Scripts.Core;
 using System;
 using Battle;
+using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -9,6 +10,7 @@ using UnityEngine.UI;
 public class GameStatView : MonoBehaviour
 {
     [SerializeField] private TMP_Text currentDeadMonsterQuantityText;
+    [SerializeField] private TMP_Text currentChapterStageText;
     [SerializeField] private Image progressSlide;
     [SerializeField] private Button buttonMap;
     [SerializeField] private Button buttonGiveUp;
@@ -21,6 +23,7 @@ public class GameStatView : MonoBehaviour
     public static GameStatView Instance { get; private set; }
     
     private const string DeadMonsterQuantityKey = "{0}/{1}";
+    private const string ChapterStageKey = "{0}.{1} - Ải {2}";
 
     void Awake()
     {
@@ -29,7 +32,7 @@ public class GameStatView : MonoBehaviour
         GameEventManager.Subscribe(GameEvents.OnWaveStart, OnInitNewStage);
         GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
         GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
-        GameEventManager.Subscribe(GameEvents.OnPlayCompletedStage,(Action<bool, bool>) OnPlayCompletedStage);
+        GameEventManager.Subscribe(GameEvents.OnInitNewStage,(Action<bool, bool, StageRuntimeData>) OnInitNewStage);
         
         buttonBoss.onClick.AddListener(PvEBattleController.Instance.SpawnBossDirectly);
         buttonBoss.interactable = false;
@@ -44,7 +47,6 @@ public class GameStatView : MonoBehaviour
 
     private void OnInitNewStage()
     {
-        currentDeadMonsterQuantityText.text = string.Format(DeadMonsterQuantityKey, 0, GameData.Instance.maxCreepsPerStage);
         buttonMap.gameObject.SetActive(true);
         monsterKill.SetActive(true);
         battleTimerController.HideTimer();
@@ -62,8 +64,9 @@ public class GameStatView : MonoBehaviour
         battleTimerController.HideTimer();
     }
 
-    private void OnPlayCompletedStage(bool playCompletedStage, bool isLosingStage)
+    private void OnInitNewStage(bool playCompletedStage, bool isLosingStage, StageRuntimeData stageRuntimeData)
     {
+        currentChapterStageText.text = string.Format(ChapterStageKey, stageRuntimeData.ChapterIndex + 1, stageRuntimeData.ChapterName, stageRuntimeData.GlobalStage);
         buttonBoss.gameObject.SetActive(!playCompletedStage);
         shinyBossButton.gameObject.SetActive(isLosingStage && !playCompletedStage);
         buttonGiveUp.gameObject.SetActive(false);

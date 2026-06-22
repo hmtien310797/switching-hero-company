@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.UI;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.U2D;
 using UnityEngine.UI;
@@ -36,6 +37,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [Header("Optional")] [SerializeField] private bool showOnlyAcquired = false;
 
         public List<HeroCollectionItemUI> spawnedItems = new();
+        [ShowInInspector]
         public List<HeroCollectionItemViewData> allItemsData = new();
 
         private ElementFilterMode currentElementFilter = ElementFilterMode.All;
@@ -45,6 +47,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         private List<HeroDataSO> allHeroData;
         private SpriteAtlas heroSpriteAlas;
         private const string HeroSpriteAtlasKey = "hero_sprite_atlas";
+        private readonly HashSet<int> lineupHeroIds = new();
 
         private void Awake()
         {
@@ -72,8 +75,51 @@ namespace Immortal_Switch.Scripts.HeroUIView
             {
                 heroSpriteAlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
             }
-            
+
+            await RefreshFromServerAsync();
+
             base.PlayShowAsync(args).Forget();
+        }
+
+        /// <summary>
+        /// Gọi hero/list lấy data mới nhất (owned + lineup + shards) cho tài khoản hiện tại,
+        /// rồi sync vào HeroProgressionManager — tránh hiển thị data cũ leak từ tài khoản/session khác.
+        /// </summary>
+        private async UniTask RefreshFromServerAsync()
+        {
+            HeroListResponse response = null;
+
+            try
+            {
+                response = await NakamaClient.Instance.GetHeroListAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[HeroCollectionView] Failed to fetch hero/list: {ex.Message}");
+                return;
+            }
+
+            if (response == null || HeroProgressionManager.Instance == null) return;
+
+            HeroProgressionManager.Instance.SyncFromServer(response.Owned, response.Shards);
+
+            lineupHeroIds.Clear();
+            if (response.Lineup != null && response.Owned != null)
+            {
+                foreach (var uid in response.Lineup)
+                {
+                    if (string.IsNullOrEmpty(uid)) continue;
+
+                    foreach (var heroInstance in response.Owned)
+                    {
+                        if (heroInstance.Uid == uid)
+                        {
+                            lineupHeroIds.Add(heroInstance.HeroId);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         public override void OnShow(object args)
@@ -203,7 +249,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
                     heroUIIconConfig, heroSpriteAlas);
 
                 if (data != null)
+                {
+                    data.IsInLineup = lineupHeroIds.Contains(hero.Id);
                     allItemsData.Add(data);
+                }
             }
 
             allItemsData.Sort(HeroCollectionItemViewDataFactory.Sort);

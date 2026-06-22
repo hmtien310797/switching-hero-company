@@ -12,9 +12,11 @@ public class NakamaClient : MonoBehaviour
 
     [Header("Server Config")]
     [SerializeField] private string scheme = "http";
-    [SerializeField] private string host = "192.168.8.82";
+    //[SerializeField] private string host = "171.244.44.71"; // dev env
+    [SerializeField] private string host = "192.168.8.82"; // local env
     [SerializeField] private int port = 7350;
     [SerializeField] private string serverKey = "switchinghero-server-key";
+    [SerializeField] private string httpKey = "switchinghero-http-key";
 
     private static NakamaClient _instance;
 
@@ -194,7 +196,7 @@ public class NakamaClient : MonoBehaviour
             Username = username,
             Password = password
         });
-        var result = await Client.RpcAsync((ISession)null, "auth/register", payload);
+        var result = await Client.RpcAsync(httpKey, "auth/register", payload);
         return JsonConvert.DeserializeObject<RegisterResponse>(result.Payload);
     }
 

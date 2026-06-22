@@ -25,6 +25,11 @@ namespace Game.Configs.Generated
         public string itemName;
 
         /// <summary>
+        /// CSV Column: itemIcon
+        /// </summary>
+        public string itemIcon;
+
+        /// <summary>
         /// CSV Column: tier
         /// </summary>
         public string tier;
@@ -78,31 +83,6 @@ namespace Game.Configs.Generated
         /// CSV Column: baseStat3Valuemax
         /// </summary>
         public int baseStat3Valuemax;
-
-        /// <summary>
-        /// CSV Column: uniqueOptionPool1
-        /// </summary>
-        public string uniqueOptionPool1;
-
-        /// <summary>
-        /// CSV Column: uniqueOptionPool2
-        /// </summary>
-        public string uniqueOptionPool2;
-
-        /// <summary>
-        /// CSV Column: uniqueOptionPool3
-        /// </summary>
-        public string uniqueOptionPool3;
-
-        /// <summary>
-        /// CSV Column: uniqueOptionCountMin
-        /// </summary>
-        public int uniqueOptionCountMin;
-
-        /// <summary>
-        /// CSV Column: uniqueOptionCountMax
-        /// </summary>
-        public int uniqueOptionCountMax;
 
     }
 }

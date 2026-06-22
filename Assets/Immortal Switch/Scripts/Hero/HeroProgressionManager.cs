@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using UnityEngine;
@@ -61,10 +62,83 @@ namespace Immortal_Switch.Scripts.Hero
             return result;
         }
 
-        public void AddShard(int heroId, int amount)
+        /// <summary>Sync shard count tuyệt đối từ server (hero/list, player/me).</summary>
+        public void SetShard(int heroId, int amount)
         {
-            service.AddShard(heroId, amount);
+            if (service == null) return;
+
+            service.SetShard(heroId, amount);
             Save();
+            NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.ShardAdded);
+            RefreshHeroRuntime(heroId);
+        }
+
+        /// <summary>Sync tier + star tuyệt đối từ server (hero/list, player/me — HeroInstance.Rarity/Star).</summary>
+        public void SetProgress(int heroId, HeroProgressTier tier, int starInTier)
+        {
+            if (service == null) return;
+
+            service.SetProgress(heroId, tier, starInTier);
+            Save();
+            NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroUpgraded);
+            RefreshHeroRuntime(heroId);
+        }
+
+        /// <summary>
+        /// Sync toàn bộ collection từ server (hero/list, player/me) — nguồn sự thật.
+        /// Acquire/update các hero đang sở hữu, đồng thời reset các hero không còn trong danh sách server
+        /// (tránh leak dữ liệu hero cũ từ tài khoản/thiết bị khác còn sót trong save local).
+        /// </summary>
+        public void SyncFromServer(HeroInstance[] ownedHeroes, Dictionary<string, int> shards)
+        {
+            if (service == null) return;
+
+            var ownedHeroIds = new List<int>();
+
+            if (ownedHeroes != null)
+            {
+                foreach (var heroInstance in ownedHeroes)
+                {
+                    ownedHeroIds.Add(heroInstance.HeroId);
+
+                    var heroData = MasterDataCache.Instance.GetHeroDataById(heroInstance.HeroId);
+                    if (heroData == null) continue;
+
+                    AcquireHeroIfNeeded(heroData);
+
+                    if (Enum.TryParse<HeroProgressTier>(heroInstance.Rarity, true, out var tier))
+                        SetProgress(heroInstance.HeroId, tier, heroInstance.Star);
+                    else
+                        Debug.LogWarning($"[HeroProgressionManager] Unknown hero rarity '{heroInstance.Rarity}' for hero_id={heroInstance.HeroId}");
+                }
+            }
+
+            ReconcileOwnedHeroes(ownedHeroIds);
+
+            if (shards != null)
+            {
+                foreach (var kv in shards)
+                {
+                    if (int.TryParse(kv.Key, out int heroId))
+                        SetShard(heroId, kv.Value);
+                }
+            }
+        }
+
+        /// <summary>Reset (lock lại) các hero đang unlocked ở local nhưng không còn trong danh sách owned của server.</summary>
+        private void ReconcileOwnedHeroes(List<int> serverOwnedHeroIds)
+        {
+            var ownedSet = new HashSet<int>(serverOwnedHeroIds);
+
+            var staleHeroIds = new List<int>();
+            foreach (var owned in saveData.OwnedHeroes)
+            {
+                if (owned.IsUnlocked && !ownedSet.Contains(owned.HeroId))
+                    staleHeroIds.Add(owned.HeroId);
+            }
+
+            foreach (var heroId in staleHeroIds)
+                ResetHero(heroId);
         }
 
         public bool UpgradeHero(int heroId)

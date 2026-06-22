@@ -43,7 +43,7 @@ public class LoginScene : MonoBehaviour
     [SerializeField] private GameObject goLoadingVertical;
 
     [Header("Google Sign-In")]
-    [SerializeField] private string googleWebClientId = "";
+    [SerializeField] private string googleWebClientId = "546099158752-8bgak6biutovg9ke6qavt2aktstihbdk.apps.googleusercontent.com";
 
     private AppleAuthManager _appleAuthManager;
 
@@ -58,6 +58,7 @@ public class LoginScene : MonoBehaviour
         btnRegister?.onClick.AddListener(OnClickSubmitRegister);
         btnLoginBD?.onClick.AddListener(OnClickLoginBD);
         btnLoginGuest?.onClick.AddListener(OnClickLoginGuest);
+        Debug.Log($"[LoginScene] btnGoogleLogin={btnGoogleLogin}, btnAppleLogin={btnAppleLogin}");
         btnGoogleLogin?.onClick.AddListener(OnClickGoogleLogin);
         btnAppleLogin?.onClick.AddListener(OnClickAppleLogin);
         
@@ -103,7 +104,7 @@ public class LoginScene : MonoBehaviour
 
     private void OnClickLogin()
     {
-        DoLogin(ipUsername.text, ipPassword.text);
+        DoLogin(ipUsername.text, ipPassword.text).Forget();
     }
 
     private void OnClickRegister()
@@ -200,8 +201,9 @@ public class LoginScene : MonoBehaviour
         }
     }
 
-    private void OnClickGoogleLogin()
+    public void OnClickGoogleLogin()
     {
+        Debug.Log("[LoginScene] Login with Google");
         DoLoginGoogle().Forget();
     }
 
@@ -227,8 +229,9 @@ public class LoginScene : MonoBehaviour
         }
     }
 
-    private void OnClickAppleLogin()
+    public void OnClickAppleLogin()
     {
+        Debug.Log("[LoginScene] Login with Apple");
         DoLoginApple().Forget();
     }
 

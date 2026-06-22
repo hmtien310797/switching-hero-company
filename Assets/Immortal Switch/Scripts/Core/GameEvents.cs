@@ -11,6 +11,7 @@
         public const string OnStageLost = "OnStageLost";
         public const string OnBossSpawnAnimationComplete = "OnBossSpawnAnimationComplete";
         public const string OnBossDead = "OnBossDead";
+        public const string OnInitNewStage = "OnInitNewStage";
         // Change hero event
         public const string OnChangeHero = "OnChangeHero";
         // Change skill event
@@ -22,7 +23,6 @@
         public const string OnAppPaused = "OnAppPaused";
         public const string OnAppResumed = "OnAppResumed";
         public const string OnAppQuit = "OnAppQuit";
-        public const string OnPlayCompletedStage = "OnPlayCompletedStage";
         public const string OnActiveLineupChanged = "OnActiveLineupChanged";
     }
 }

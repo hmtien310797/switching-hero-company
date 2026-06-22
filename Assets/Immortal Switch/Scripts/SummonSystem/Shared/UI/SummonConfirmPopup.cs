@@ -29,7 +29,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             }
 
             // hide chay sau khi bam button.
-            //Hide();
+            Hide();
         }
 
         public void Show(int gemCost, Action onConfirm)

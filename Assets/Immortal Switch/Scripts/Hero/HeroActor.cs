@@ -204,7 +204,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         PowerUpManager.Instance.BindPlayer(Stats);
         HealthBarController.ResetHealth();
         IsActionLocked = false;
-        IsUnderPlayerControl = false;{}
+        IsUnderPlayerControl = false;
         MoveMode = HeroMoveMode.Auto;
         currentTarget = null;
         attackComboIndex = 0;

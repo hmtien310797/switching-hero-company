@@ -1,3 +1,4 @@
+using UnityEngine;
 public static class UnityObjectExtensions
 {
     public static bool IsUnityAlive(this object target)
@@ -5,7 +6,7 @@ public static class UnityObjectExtensions
         if (target == null)
             return false;
 
-        if (target is UnityEngine.Object unityObject)
+        if (target is Object unityObject)
             return unityObject != null;
 
         return true;

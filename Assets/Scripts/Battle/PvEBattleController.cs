@@ -165,7 +165,7 @@ namespace Battle
             SetState(BattleState.Initializing);
             CurrentStage = Mathf.Max(1, CurrentStage);
             InitStage(CurrentStage);
-            pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(CurrentStage));
+            await pvEMapController.InitMapByChapterAsync(GetResolvedChapterIndexByStage(CurrentStage));
             await InitPlayerHeroById();
             NotifyActiveLineupChanged();
             RefreshControlledHeroSkillUI();
@@ -174,7 +174,6 @@ namespace Battle
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
             GameEventManager.Trigger(GameEvents.OnWaveStart);
-            GameEventManager.Trigger(GameEvents.OnPlayCompletedStage, playCompletedStage, losingStage);
         }
         
         private void HandleMoveStageRequested(int targetStage)
@@ -238,7 +237,7 @@ namespace Battle
 
             inBattleHeroMapper.Remove(sourceHeroId);
 
-            HeroActor newHero = await AddressableSpawnService.SpawnAsync<HeroActor>(
+            HeroActor newHero = await AddressableSpawnService.SpawnAsync<HeroActor>(string.Empty,
                 newHeroData.HeroAddressKey,
                 spawnPos,
                 Quaternion.identity
@@ -316,7 +315,7 @@ namespace Battle
 
             Vector3 spawnPos = GetHeroSpawnPosition(heroIndex);
 
-            var hero = await AddressableSpawnService.SpawnAsync<HeroActor>(
+            var hero = await AddressableSpawnService.SpawnAsync<HeroActor>(string.Empty,
                 heroData.HeroAddressKey,
                 spawnPos,
                 Quaternion.identity
@@ -359,7 +358,7 @@ namespace Battle
             for (int i = 0; i < creeps.Count; i++)
             {
                 var currentCreep = creeps[i];
-                currentCreep.DespawnToPool();
+                currentCreep.DespawnToPool(0f).Forget();
             }
         }
 
@@ -511,14 +510,13 @@ namespace Battle
             SetState(BattleState.Initializing);
             CurrentStage++;
             NotifyIdleScreenStageChanged();
-            pvEMapController.InitMapByChapter(GetResolvedChapterIndexByStage(CurrentStage));
+            pvEMapController.InitMapByChapterAsync(GetResolvedChapterIndexByStage(CurrentStage));
             InitStage(CurrentStage);
             isReadyBattle = false;
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
             GameEventManager.Trigger(GameEvents.OnWaveStart);
-            GameEventManager.Trigger(GameEvents.OnPlayCompletedStage, playCompletedStage, losingStage);
         }
 
         private void HandleCurrentStage()
@@ -531,7 +529,6 @@ namespace Battle
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
             GameEventManager.Trigger(GameEvents.OnWaveStart);
-            GameEventManager.Trigger(GameEvents.OnPlayCompletedStage, playCompletedStage, losingStage);
         }
         
         private void MoveToStage(int targetStage)
@@ -560,7 +557,10 @@ namespace Battle
             aliveCreepCount = 0;
             totalCreepsSpawnedThisStage = 0;
             deadCreepCount = losingStage || playCompletedStage ? gameData.maxCreepsPerStage : 0;
+            CacheStageSpawnData(stage);
+            
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
+            GameEventManager.Trigger(GameEvents.OnInitNewStage, playCompletedStage, losingStage, stageRuntimeData);
 
             isBossAlive = false;
             if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
@@ -569,7 +569,6 @@ namespace Battle
                 currentBoss = null;
             }
             CurrentStageService.SetCurrentStage(stage);
-            CacheStageSpawnData(stage);
         }
 
         private void CacheStageSpawnData(int stage)
@@ -647,16 +646,11 @@ namespace Battle
                         nPos,
                         Quaternion.identity
                     );
-                    creep.name += creep.transform.GetInstanceID();
-                    creep.gameObject.SetActive(true);
+                    creep.name = $"Creep_{creepData.Id}_{creep.transform.GetInstanceID()}";
 
                     creep.SetScale(k % 5 == 0
                         ? 1.5f
                         : 1f);
-
-                    creep.HealthBarController.SetOffsetPosition(k % 5 == 0
-                        ? 0.5f
-                        : 0f, 0f);
 
                     if (cachedScaledCreepStats.TryGetValue(enemyId, out BaseStat cachedStat))
                     {
@@ -680,6 +674,10 @@ namespace Battle
                             enemyScale
                         );
                     }
+                    
+                    creep.HealthBarController.SetOffsetPosition(k % 5 == 0
+                        ? 0.5f
+                        : 0f, 0f);
 
                     creep.OnDead -= NotifyMonsterDeath;
                     creep.OnDead += NotifyMonsterDeath;
@@ -917,7 +915,7 @@ namespace Battle
             Debug.Log($"[PvE] Spawn Boss - Stage={CurrentStage}, BossId={bossSo.Id}, BossName={bossSo.Name}");
 
             var pos = GroupFlashController.Instance.GetPosByIdx(2);
-            BossActor spawnedBoss = await AddressableSpawnService.SpawnAsync<BossActor>(
+            BossActor spawnedBoss = await AddressableSpawnService.SpawnAsync<BossActor>(string.Empty,
                 bossSo.BossAddressKey,
                 pos,
                 Quaternion.identity
@@ -1386,7 +1384,7 @@ namespace Battle
             for (int i = creeps.Count - 1; i >= 0; i--)
             {
                 EnemyActor creep = creeps[i];
-                creep.DespawnToPool();
+                creep.DespawnToPool(0f).Forget();
 
                 creeps.RemoveAt(i);
             }

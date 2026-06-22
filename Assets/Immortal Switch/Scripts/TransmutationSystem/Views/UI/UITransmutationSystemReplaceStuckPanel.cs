@@ -26,7 +26,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             btnDismantle.onClick.AddListener(OnClickDismantle);
         }
 
-        public void Setup(PlayerEquipItem newEquip, PlayerEquipItem oldEquip)
+        public void Setup(PlayerEquipViewData newEquip, PlayerEquipViewData oldEquip)
         {
             _newEquip = newEquip;
             _oldEquip = oldEquip;

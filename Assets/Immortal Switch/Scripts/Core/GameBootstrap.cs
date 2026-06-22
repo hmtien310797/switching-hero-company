@@ -152,15 +152,10 @@ namespace Immortal_Switch.Scripts.Core
 
         private void SyncHeroListToProgression(HeroInventory heroList)
         {
-            if (heroList?.Owned == null) return;
+            if (heroList == null) return;
             if (HeroProgressionManager.Instance == null) return;
 
-            foreach (var heroInstance in heroList.Owned)
-            {
-                var heroData = MasterDataCache.Instance.GetHeroDataById(heroInstance.HeroId);
-                if (heroData != null)
-                    HeroProgressionManager.Instance.AcquireHeroIfNeeded(heroData);
-            }
+            HeroProgressionManager.Instance.SyncFromServer(heroList.Owned, heroList.Shards);
         }
 
         public override UniTask InitializeAsync()

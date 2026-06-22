@@ -16,12 +16,15 @@ namespace Immortal_Switch.Scripts.Common
         /// Instance phải được release bằng ReleaseInstance().
         /// </summary>
         public static async UniTask<GameObject> SpawnAsync(
+            string prefix,
             string key,
             Vector3 position,
             Quaternion rotation,
             Transform parent = null)
         {
-            if (string.IsNullOrWhiteSpace(key))
+            string completeKey = string.IsNullOrEmpty(prefix) ? key : $"{prefix}/{key}";
+            
+            if (string.IsNullOrWhiteSpace(completeKey))
             {
                 Debug.LogError(
                     "[AddressableSpawnService] Spawn failed: key is null or empty."
@@ -35,7 +38,7 @@ namespace Immortal_Switch.Scripts.Common
             try
             {
                 handle = Addressables.InstantiateAsync(
-                    key,
+                    completeKey,
                     position,
                     rotation,
                     parent
@@ -47,7 +50,7 @@ namespace Immortal_Switch.Scripts.Common
                     handle.Result == null)
                 {
                     Debug.LogError(
-                        $"[AddressableSpawnService] Instantiate failed. Key={key}"
+                        $"[AddressableSpawnService] Instantiate failed. Key={completeKey}"
                     );
 
                     ReleaseFailedOperation(handle);
@@ -67,7 +70,7 @@ namespace Immortal_Switch.Scripts.Common
             catch (Exception exception)
             {
                 Debug.LogError(
-                    $"[AddressableSpawnService] Exception while spawning. Key={key}"
+                    $"[AddressableSpawnService] Exception while spawning. Key={completeKey}"
                 );
 
                 Debug.LogException(exception);
@@ -81,6 +84,7 @@ namespace Immortal_Switch.Scripts.Common
         /// Spawn GameObject và lấy component T trên root object.
         /// </summary>
         public static async UniTask<T> SpawnAsync<T>(
+            string prefix,
             string key,
             Vector3 position,
             Quaternion rotation,
@@ -88,7 +92,7 @@ namespace Immortal_Switch.Scripts.Common
             where T : Component
         {
             GameObject instance = await SpawnAsync(
-                key,
+                prefix, key,
                 position,
                 rotation,
                 parent
@@ -115,6 +119,7 @@ namespace Immortal_Switch.Scripts.Common
         /// Chỉ dùng khi component không nằm trên root.
         /// </summary>
         public static async UniTask<T> SpawnInChildrenAsync<T>(
+            string prefix,
             string key,
             Vector3 position,
             Quaternion rotation,
@@ -122,7 +127,7 @@ namespace Immortal_Switch.Scripts.Common
             bool includeInactive = true)
             where T : Component
         {
-            GameObject instance = await SpawnAsync(
+            GameObject instance = await SpawnAsync(prefix,
                 key,
                 position,
                 rotation,

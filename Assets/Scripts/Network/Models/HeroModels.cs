@@ -23,13 +23,15 @@ public class HeroInstance
     [JsonProperty("attack_range")] public float  AttackRange;
 }
 
-/// <summary>Response từ hero/list — owned + lineup (không có shards).</summary>
+/// <summary>Response từ hero/list — owned + lineup + shards.</summary>
 [Serializable]
 public class HeroListResponse
 {
-    [JsonProperty("owned")]  public HeroInstance[] Owned;
+    [JsonProperty("owned")]  public HeroInstance[]          Owned;
     /// <summary>Mảng 2 phần tử — uid hoặc null (slot trống).</summary>
-    [JsonProperty("lineup")] public string[]       Lineup;
+    [JsonProperty("lineup")] public string[]                Lineup;
+    /// <summary>hero_id (string) → số shard. VD: { "1": 2 }</summary>
+    [JsonProperty("shards")] public Dictionary<string, int>  Shards;
 }
 
 /// <summary>Embedded trong player/me — owned + lineup + shards.</summary>

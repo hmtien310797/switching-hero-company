@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
 using Immortal_Switch.Scripts.TransmutationSystem.Models;
+using Immortal_Switch.Scripts.TransmutationSystem.Views.UI;
+using Immortal_Switch.Scripts.UI;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem
@@ -19,6 +24,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         [Header("Config")]
         [field: SerializeField]
         public TransmutationSystemDatabaseSO Database { get; private set; }
+
+        /// <summary>
+        /// thoi gian fuse tu dong neu bat.
+        /// </summary>
+        [SerializeField] private float autoFuseInterval = 2f;
 
         private ITransmutationSystemService Service { get; set; }
         public ITransmutationSystemStorage Storage { get; private set; }
@@ -36,8 +46,14 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         /// </summary>
         public event Action<PlayerEquipItem, PlayerEquipItem> OnEquipChanged;
 
+        // --- Private Fields ---
+        private float _lastAutoFuseTime;
+
         protected override void OnSingletonAwake()
         {
+            var now = Time.unscaledTime;
+            _lastAutoFuseTime = now + autoFuseInterval;
+
             Load();
             GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         }
@@ -84,14 +100,68 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             Storage.Load();
         }
 
+        public void LateUpdate()
+        {
+            if (Time.unscaledTime < _lastAutoFuseTime)
+            {
+                return;
+            }
+
+            _lastAutoFuseTime = Time.unscaledTime + autoFuseInterval;
+            AutoFuse();
+        }
+
+        public void AutoFuse()
+        {
+            Debug.Log($"Transmutation: AutoFuse: {Storage.Data.Level}");
+
+            if (!Storage.Data.Setting.Enabled)
+            {
+                return;
+            }
+
+            TwiceFuse(Storage.Data.Setting.Count, Storage.Data.Setting.IsWaiting, Storage.Data.Setting.Tier).Forget();
+        }
+
         public void NotifyReady()
         {
             _DispatchChanged();
         }
 
-        public PlayerEquipItem GetEquip(string itemType)
+        [CanBeNull]
+        public PlayerEquipViewData GetEquip(string itemType)
         {
-            return Service.GetEquip(itemType);
+            var equip = Service.GetEquip(itemType);
+
+            if (equip == null)
+            {
+                return null;
+            }
+
+            var cfg = Database.ItemConfig.rows.Find(v => v.configId == equip.CfgId);
+
+            return new PlayerEquipViewData
+            {
+                Title = cfg.itemName,
+                CfgId = cfg.configId,
+                ItemType = cfg.itemType,
+                Level = equip.Level,
+                Modifiers = equip.Modifiers,
+                Tier = equip.Tier,
+            };
+        }
+
+        public ETabPresetStatus IsUnlockGradeOption(EEquipmentTier tier)
+        {
+            var firstCfg = Database.GradeConfig.rows.Find(v => v.highestUnlockedGrade == tier.ToString());
+
+            // ko co cfg thi unlock false.
+            if (firstCfg == null)
+            {
+                return ETabPresetStatus.Lock;
+            }
+
+            return Storage.Data.Level >= firstCfg.level ? ETabPresetStatus.Normal : ETabPresetStatus.Lock;
         }
 
         public IEnumerable<PlayerEquipItem> GetEquips()
@@ -99,23 +169,145 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return Service.GetEquips();
         }
 
-        public List<KeyValuePair<StatType, float>> GetAllModifiers()
+        public void SaveSetting(List<List<string>> uniqueOptions, int count, EEquipmentTier tier, bool isEnabled)
         {
-            var modifiers = new Dictionary<StatType, float>();
+            Service.SaveSetting(uniqueOptions, count, tier, isEnabled);
+        }
+
+        public void SetWaitingMaterial(bool value)
+        {
+            Service.SetWaitingMaterial(value);
+        }
+
+        public bool ToggleWaitingMaterial()
+        {
+            return Service.ToggleWaitingMaterial();
+        }
+
+        public bool CurrentWaitingMaterial()
+        {
+            return Storage.Data.Setting.IsWaiting;
+        }
+
+        public Dictionary<int, ETabPresetStatus> GetCounts()
+        {
+            // key: so lan thuc hien
+            // value: trang thai cua tab
+            var result = new Dictionary<int, ETabPresetStatus>
+            {
+                { 1, ETabPresetStatus.Selected },
+                { 2, ETabPresetStatus.Normal },
+            };
+
+            foreach (var row in Database.CountConfig.rows
+
+                         // neu ko chua key
+                         .Where(row => !result.ContainsKey(row.maxAutoCount))
+
+                         // check level cua config dau tien
+                         .Where(row => Storage.Data.Level >= row.maxAutoCount))
+            {
+                result.TryAdd(row.maxAutoCount, ETabPresetStatus.Normal);
+            }
+
+            return result;
+        }
+
+        public DynamicHeroesGlobalSpecificationsTransmuationUniqueRow GetUniqueCfg(StatType stat, ModifierOp op)
+        {
+            var mapping = TransmutationSystemHelper.ToModifier(stat, op);
+            return Database.UniqueConfig.rows.Find(v => v.uniqueId == mapping);
+        }
+
+        public List<KeyValuePair<StatType, (float pct, bool isUnique, ModifierOp op)>> GetAllModifiers()
+        {
+            var modifiers = new Dictionary<StatType, (float pct, bool isUnique, ModifierOp op)>();
 
             foreach (var modifier in Storage.Data.Equips.SelectMany(pair => pair.Value.Modifiers))
             {
-                modifiers[modifier.StatType] = modifiers.GetValueOrDefault(modifier.StatType) + modifier.Value;
+                modifiers[modifier.StatType] = (
+                    modifiers.GetValueOrDefault(modifier.StatType).Item1 + modifier.Value,
+                    modifier.IsUnique,
+                    modifier.Operation
+                );
             }
 
             return modifiers.ToList();
         }
 
-        public PlayerEquipItem Fuse()
+        public async UniTask TwiceFuse(int count, bool isWaitingMaterial, EEquipmentTier tier)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                var newEquip = Fuse();
+
+                if (newEquip != null)
+                {
+                    // trùng tier
+                    if (newEquip.ParsedTier == tier)
+                    {
+                        var oldEquip = GetEquip(newEquip.ItemType);
+
+                        if (oldEquip != null)
+                        {
+                            var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationSystemReplaceStuckPanel>();
+                            ui.Setup(newEquip, oldEquip);
+                        }
+                        else
+                        {
+                            Equip(newEquip, null);
+                        }
+
+                        if (TryStopFuse(newEquip))
+                        {
+                            StopFuse();
+                        }
+                    }
+                    else
+                    {
+                        Dismantle(newEquip);
+                    }
+                }
+                else if (!isWaitingMaterial)
+                {
+                    // todo: show toast hết tiền rồi dừng luôn
+                    StopFuse();
+                }
+            }
+        }
+
+        private void StopFuse()
+        {
+            // dung cau hinh tu dong.
+            SaveSetting(new List<List<string>>(), 0, EEquipmentTier.D, false);
+        }
+
+        private bool TryStopFuse(PlayerEquipViewData view)
+        {
+            return view.Modifiers.Any(modifier =>
+                Storage.Data.Setting.UniqueOptions.Any(entries => entries.Contains(modifier.StatType.ToString())));
+        }
+
+        public PlayerEquipViewData Fuse()
         {
             if (Storage.Data.StuckEquip != null)
             {
-                return Storage.Data.StuckEquip;
+                var stuckCfg = Database.ItemConfig.rows.Find(v => v.configId == Storage.Data.StuckEquip.CfgId);
+
+                if (stuckCfg != null)
+                {
+                    return new PlayerEquipViewData
+                    {
+                        Title = stuckCfg.itemName,
+                        CfgId = stuckCfg.configId,
+                        ItemType = stuckCfg.itemType,
+                        Level = Storage.Data.StuckEquip.Level,
+                        Modifiers = Storage.Data.StuckEquip.Modifiers,
+                        Tier = Storage.Data.StuckEquip.Tier,
+                    };
+                }
+
+                Debug.LogError($"Stuck config not found: {Storage.Data.StuckEquip.CfgId}");
             }
 
             var levelRangeCfg = Database.LevelRangeConfig.rows.Find(v => v.transmutationLevel == Storage.Data.Level);
@@ -144,8 +336,19 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return null;
             }
 
-            Debug.Log($"Fuse: {tier}");
-            return Service.BuildEquip(itemCfg, levelRangeCfg);
+            var modifiersOption = Database.ItemUniqueConfig.rows.Where(v => v.tier == itemCfg.tier).ToList();
+            var uniqueModifiers = Service.BuildUniqueModifiers(modifiersOption, 2);
+            var equip = Service.BuildEquip(itemCfg, levelRangeCfg, uniqueModifiers);
+
+            return new PlayerEquipViewData
+            {
+                Title = itemCfg.itemName,
+                CfgId = itemCfg.configId,
+                ItemType = itemCfg.itemType,
+                Level = equip.Level,
+                Modifiers = equip.Modifiers,
+                Tier = equip.Tier,
+            };
         }
 
         public void Equip(PlayerEquipItem newEquip, PlayerEquipItem oldEquip)

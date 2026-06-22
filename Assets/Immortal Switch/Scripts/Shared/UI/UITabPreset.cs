@@ -44,7 +44,6 @@ namespace Immortal_Switch.Scripts.Shared.UI
         private void Awake()
         {
             btn.onClick.AddListener(OnClick);
-            SetStatus(ETabPresetStatus.Normal);
         }
 
         private void OnClick()
@@ -56,6 +55,7 @@ namespace Immortal_Switch.Scripts.Shared.UI
         {
             _idx = idx;
             _onClick = onClick;
+
             SetLabel(txt);
         }
 

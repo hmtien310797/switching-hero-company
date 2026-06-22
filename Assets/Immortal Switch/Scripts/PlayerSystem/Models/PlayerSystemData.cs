@@ -80,4 +80,12 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Models
         /// </summary>
         public EEquipmentTier ParsedTier => Enum.TryParse<EEquipmentTier>(Tier, true, out var result) ? result : EEquipmentTier.D;
     }
+
+    public class PlayerEquipViewData : PlayerEquipItem
+    {
+        /// <summary>
+        /// ten equip
+        /// </summary>
+        public string Title;
+    }
 }

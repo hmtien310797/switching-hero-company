@@ -184,12 +184,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             if (isSummoning)
                 return;
 
-            if (HeroSummonManager.Instance == null)
-            {
-                Debug.Log("[HeroSummon] HeroSummonManager has no instance");
-                return;
-            }
-
             if (!HeroSummonManager.Instance.CanSummon(optionId, out var paymentType, out var paidAmount))
             {
                 Debug.Log("[HeroSummon] Not enough resource");

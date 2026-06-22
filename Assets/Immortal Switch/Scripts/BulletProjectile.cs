@@ -27,12 +27,18 @@ public class BulletProjectile : PoolableBehaviour
         timer = 0f;
         isInitialized = true;
         this.damage = damage;
-        sourceCombatUnit = source;
-
+        
         if (direction.sqrMagnitude > 0.0001f)
         {
             transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
         }
+        
+        if (source == null)
+        {
+            return;
+        }
+        
+        sourceCombatUnit = source;
     }
 
     public override void OnSpawnedFromPool()

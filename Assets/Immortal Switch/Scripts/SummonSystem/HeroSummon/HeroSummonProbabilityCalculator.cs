@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Common;
 using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 if (rarityRate <= 0f)
                     continue;
 
-                var heroes = config.HeroPool
+                var heroes = MasterDataCache.Instance.GetAllHeroData()
                     .Where(x => x != null && x.IsAvailableInSummon && x.SummonRarity == rarity)
                     .ToList();
 

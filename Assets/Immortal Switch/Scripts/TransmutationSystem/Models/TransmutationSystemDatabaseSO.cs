@@ -35,6 +35,30 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         public DynamicHeroesGlobalSpecificationsTransmuationItemConfigDatabase ItemConfig { get; private set; }
 
         /// <summary>
+        /// item unique transmutation
+        /// </summary>
+        [field: SerializeField]
+        public DynamicHeroesGlobalSpecificationsTransmutationItemUniqueDatabase ItemUniqueConfig { get; private set; }
+
+        /// <summary>
+        /// unique transmutation
+        /// </summary>
+        [field: SerializeField]
+        public DynamicHeroesGlobalSpecificationsTransmuationUniqueDatabase UniqueConfig { get; private set; }
+
+        /// <summary>
+        /// grade transmutation
+        /// </summary>
+        [field: SerializeField]
+        public DynamicHeroesGlobalSpecificationsTransmuationGradeSettingDatabase GradeConfig { get; private set; }
+
+        /// <summary>
+        /// count transmutation
+        /// </summary>
+        [field: SerializeField]
+        public DynamicHeroesGlobalSpecificationsTransmutationCountSettingDatabase CountConfig { get; private set; }
+
+        /// <summary>
         /// key: tier
         /// value: list item in tier
         /// </summary>

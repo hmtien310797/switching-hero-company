@@ -11,8 +11,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 {
     public class HeroSummonManager : Singleton<HeroSummonManager>
     {
-        public static HeroSummonManager Instance { get; private set; }
-
         [SerializeField] private HeroSummonConfigSO summonConfig;
         [SerializeField] private string saveKey = "hero_summon_save";
 

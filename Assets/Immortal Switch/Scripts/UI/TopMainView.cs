@@ -41,7 +41,7 @@ namespace Immortal_Switch.Scripts.UI
             if (switchMainSubHeroButton != null)
                 switchMainSubHeroButton.onClick.AddListener(OnSwitchMainSubHeroButtonClicked);
 
-            //profileBtn.onClick.AddListener(OnClickProfile);
+            profileBtn.onClick.AddListener(OnClickProfile);
             HideAbleObjects();
         }
 

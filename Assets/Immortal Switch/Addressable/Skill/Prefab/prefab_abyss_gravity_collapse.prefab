@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8518546297078509023}
   - component: {fileID: 2438607016388904774}
   - component: {fileID: 8609033209989140146}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Spine GameObject (AbyssGravityCollapse)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,7 +158,9 @@ GameObject:
   m_Component:
   - component: {fileID: 727673301915380496}
   - component: {fileID: 5656488028350485374}
-  m_Layer: 7
+  - component: {fileID: 7531289278636881461}
+  - component: {fileID: -4657188860372239255}
+  m_Layer: 9
   m_Name: prefab_abyss_gravity_collapse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,3 +204,41 @@ MonoBehaviour:
   skeletonAnimation: {fileID: 8609033209989140146}
   fallbackAnimationName: 
   fallbackLoop: 0
+--- !u!135 &7531289278636881461
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8935876869485887155}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 12
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-4657188860372239255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8935876869485887155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ecdae371b044a47910d7ce2ce8f547e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attractSpeed: 8
+  centerStopDistance: 0.15
+  faceMovementDirection: 1
+  attractCenter: {fileID: 727673301915380496}
+  automaticallyReleaseOnDisable: 1
