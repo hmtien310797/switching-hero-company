@@ -15,138 +15,239 @@ namespace Immortal_Switch.Scripts.Skill
     /// </summary>
     public class SkillMultiSpawnRuntimeObject : SkillRuntimeObject
     {
-        [Header("Child Runtime Object")]
-        [SerializeField] protected SkillRuntimeObject childRuntimePrefab;
-        [SerializeField] protected string childAnimationName;
-        [SerializeField] protected bool childLoopAnimation;
-        [SerializeField] protected bool childUseLifeTime = true;
-        [SerializeField] protected float childLifeTime = 1.5f;
-        [SerializeField] protected bool childDespawnOnAnimationComplete = true;
-
-        [Header("Spawn Pattern")]
-        [SerializeField, Min(1)] protected int spawnCount = 10;
-        [SerializeField, Min(0f)] protected float startDelay = 0f;
-        [SerializeField, Min(0f)] protected float spawnInterval = 0.15f;
-        [SerializeField, Min(0f)] protected float spawnRadius = 2.5f;
-        [SerializeField] protected bool randomInsideCircle = true;
-        [SerializeField] protected bool includeCenterAsFirstSpawn = true;
-
-        [Header("Position Offset")]
-        [SerializeField] protected Vector3 childSpawnOffset;
-        [SerializeField] protected bool randomizeYRotation;
-
-        [Header("Controller Lifetime")]
-        [SerializeField] protected bool despawnControllerAfterSpawn = true;
-        [SerializeField, Min(0f)] protected float despawnDelayAfterLastSpawn = 0.25f;
-
-        [Header("Debug")]
-        [SerializeField] protected bool debugDrawSpawnRadius;
-
+        protected SkillMultiSpawnConfig MultiSpawnConfig
+        {
+            get
+            {
+                return Config != null
+                    ? Config.MultiSpawnConfig
+                    : null;
+            }
+        }
         protected Coroutine spawnRoutine;
 
         protected override void OnRuntimeInitialized(object arg)
         {
             base.OnRuntimeInitialized(arg);
 
-            if (childRuntimePrefab == null)
+            SkillMultiSpawnConfig multiSpawnConfig = MultiSpawnConfig;
+
+            if (multiSpawnConfig == null)
             {
-                Debug.LogWarning($"[{nameof(SkillMultiSpawnRuntimeObject)}] Missing childRuntimePrefab on {name}.");
+                Debug.LogWarning(
+                    $"[{nameof(SkillMultiSpawnRuntimeObject)}] Missing MultiSpawnConfig on skill data.",
+                    this
+                );
+
+                return;
+            }
+
+            if (multiSpawnConfig.ChildRuntimePrefab == null)
+            {
+                Debug.LogWarning(
+                    $"[{nameof(SkillMultiSpawnRuntimeObject)}] Missing ChildRuntimePrefab in MultiSpawnConfig.",
+                    this
+                );
+
                 return;
             }
 
             if (spawnRoutine != null)
+            {
                 StopCoroutine(spawnRoutine);
+                spawnRoutine = null;
+            }
 
             spawnRoutine = StartCoroutine(SpawnChildrenRoutine());
         }
 
         private IEnumerator SpawnChildrenRoutine()
         {
-            if (startDelay > 0f)
-                yield return new WaitForSeconds(startDelay);
+            SkillMultiSpawnConfig multiSpawnConfig = MultiSpawnConfig;
+
+            if (multiSpawnConfig == null)
+            {
+                spawnRoutine = null;
+                yield break;
+            }
+
+            if (multiSpawnConfig.StartDelay > 0f)
+            {
+                yield return new WaitForSeconds(
+                    multiSpawnConfig.StartDelay
+                );
+            }
+
+            int spawnCount = Mathf.Max(
+                1,
+                multiSpawnConfig.SpawnCount
+            );
 
             for (int i = 0; i < spawnCount; i++)
             {
-                SpawnChild(i);
+                SpawnChild(i).Forget();
 
-                if (spawnInterval > 0f && i < spawnCount - 1)
-                    yield return new WaitForSeconds(spawnInterval);
+                if (multiSpawnConfig.SpawnInterval > 0f &&
+                    i < spawnCount - 1)
+                {
+                    yield return new WaitForSeconds(
+                        multiSpawnConfig.SpawnInterval
+                    );
+                }
             }
 
             spawnRoutine = null;
 
-            if (despawnControllerAfterSpawn)
-            {
-                if (despawnDelayAfterLastSpawn > 0f)
-                    yield return new WaitForSeconds(despawnDelayAfterLastSpawn);
+            if (!multiSpawnConfig.DespawnControllerAfterSpawn)
+                yield break;
 
-                ForceDespawn();
+            if (multiSpawnConfig.DespawnDelayAfterLastSpawn > 0f)
+            {
+                yield return new WaitForSeconds(
+                    multiSpawnConfig.DespawnDelayAfterLastSpawn
+                );
             }
+
+            ForceDespawn();
         }
 
         protected virtual async UniTask SpawnChild(int index)
         {
-            if (Context == null || Spawner == null || childRuntimePrefab == null)
+            SkillMultiSpawnConfig multiSpawnConfig = MultiSpawnConfig;
+
+            if (Context == null ||
+                Spawner == null ||
+                multiSpawnConfig == null ||
+                multiSpawnConfig.ChildRuntimePrefab == null)
+            {
                 return;
+            }
 
             Vector3 spawnPosition = GetChildSpawnPosition(index);
-            Quaternion rotation = randomizeYRotation
-                ? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)
+
+            Quaternion rotation = multiSpawnConfig.RandomizeYRotation
+                ? Quaternion.Euler(
+                    0f,
+                    Random.Range(0f, 360f),
+                    0f
+                )
                 : Quaternion.identity;
 
-            SkillRuntimeObject child = Spawner.Spawn(childRuntimePrefab, spawnPosition, rotation);
+            SkillRuntimeObject child = Spawner.Spawn(
+                multiSpawnConfig.ChildRuntimePrefab,
+                spawnPosition,
+                rotation
+            );
+
             if (child == null)
                 return;
 
-            SkillRuntimeObjectConfig childConfig = BuildChildConfig();
-            SkillRuntimeContext childContext = Context.CloneForRuntimeObject(child, spawnPosition);
+            SkillRuntimeObjectConfig childConfig =
+                BuildChildConfig(multiSpawnConfig);
 
-            child.Init(childContext, childConfig, Executor, TargetResolver, Spawner);
+            SkillRuntimeContext childContext =
+                Context.CloneForRuntimeObject(
+                    child,
+                    spawnPosition
+                );
+
+            child.Init(
+                childContext,
+                childConfig,
+                Executor,
+                TargetResolver,
+                Spawner
+            );
+
+            await UniTask.CompletedTask;
         }
 
         protected Vector3 GetChildSpawnPosition(int index)
         {
+            SkillMultiSpawnConfig multiSpawnConfig = MultiSpawnConfig;
+
+            if (multiSpawnConfig == null)
+                return transform.position;
+
             Vector3 center = transform.position;
 
-            if (includeCenterAsFirstSpawn && index == 0)
-                return center + childSpawnOffset;
+            if (multiSpawnConfig.IncludeCenterAsFirstSpawn &&
+                index == 0)
+            {
+                return center +
+                       multiSpawnConfig.ChildSpawnOffset;
+            }
 
             Vector2 offset2D;
 
-            if (randomInsideCircle)
+            if (multiSpawnConfig.RandomInsideCircle)
             {
-                offset2D = Random.insideUnitCircle * spawnRadius;
+                offset2D =
+                    Random.insideUnitCircle *
+                    multiSpawnConfig.SpawnRadius;
             }
             else
             {
-                float angle = Random.Range(0f, Mathf.PI * 2f);
-                offset2D = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * spawnRadius;
+                float angle = Random.Range(
+                    0f,
+                    Mathf.PI * 2f
+                );
+
+                offset2D = new Vector2(
+                    Mathf.Cos(angle),
+                    Mathf.Sin(angle)
+                ) * multiSpawnConfig.SpawnRadius;
             }
 
-            // Game plane is XZ.
-            Vector3 offset = new Vector3(offset2D.x, 0f, offset2D.y);
-            return center + offset + childSpawnOffset;
+            // Mặt phẳng gameplay là XZ.
+            Vector3 offset = new Vector3(
+                offset2D.x,
+                0f,
+                offset2D.y
+            );
+
+            return center +
+                   offset +
+                   multiSpawnConfig.ChildSpawnOffset;
         }
 
-        protected SkillRuntimeObjectConfig BuildChildConfig()
+        protected SkillRuntimeObjectConfig BuildChildConfig(
+            SkillMultiSpawnConfig multiSpawnConfig)
         {
-            // Child object reuses the same skill context/data, but has its own visual/lifetime config.
-            // Its Spine events will execute phases from Context.SkillData.
+            if (multiSpawnConfig == null)
+                return null;
+
             return new SkillRuntimeObjectConfig
             {
-                RuntimeVisualType = SkillRuntimeVisualType.SpawnedSkillObject,
-                SkillRuntimePrefab = childRuntimePrefab,
-                SpawnPositionType = SkillSpawnPositionType.CastPosition,
+                RuntimeVisualType =
+                    SkillRuntimeVisualType.SpawnedSkillObject,
+
+                SkillRuntimePrefab =
+                    multiSpawnConfig.ChildRuntimePrefab,
+
+                SpawnPositionType =
+                    SkillSpawnPositionType.CastPosition,
+
                 FollowType = SkillFollowType.None,
                 SpawnOffset = Vector3.zero,
 
-                UseLifeTime = childUseLifeTime,
-                LifeTime = childLifeTime,
-                DespawnOnAnimationComplete = childDespawnOnAnimationComplete,
+                UseLifeTime =
+                    multiSpawnConfig.ChildUseLifeTime,
 
-                AnimationName = childAnimationName,
-                LoopAnimation = childLoopAnimation,
-                LockCasterWhileAlive = false
+                LifeTime =
+                    multiSpawnConfig.ChildLifeTime,
+
+                DespawnOnAnimationComplete =
+                    multiSpawnConfig.ChildDespawnOnAnimationComplete,
+
+                AnimationName =
+                    multiSpawnConfig.ChildAnimationName,
+
+                LoopAnimation =
+                    multiSpawnConfig.ChildLoopAnimation,
+
+                LockCasterWhileAlive = false,
+                LockCasterDuringHeroAnimation = false
             };
         }
 
@@ -174,23 +275,46 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void OnDrawGizmosSelected()
         {
-            if (!debugDrawSpawnRadius)
+            SkillMultiSpawnConfig multiSpawnConfig =
+                MultiSpawnConfig;
+
+            if (multiSpawnConfig == null ||
+                !multiSpawnConfig.DebugDrawSpawnRadius)
+            {
                 return;
+            }
 
             Gizmos.color = Color.yellow;
 
             Vector3 center = transform.position;
             const int segments = 64;
-            Vector3 previous = center + new Vector3(spawnRadius, 0f, 0f);
+
+            float spawnRadius =
+                multiSpawnConfig.SpawnRadius;
+
+            Vector3 previous =
+                center +
+                new Vector3(
+                    spawnRadius,
+                    0f,
+                    0f
+                );
 
             for (int i = 1; i <= segments; i++)
             {
-                float angle = (float)i / segments * Mathf.PI * 2f;
-                Vector3 next = center + new Vector3(
-                    Mathf.Cos(angle) * spawnRadius,
-                    0f,
-                    Mathf.Sin(angle) * spawnRadius
-                );
+                float angle =
+                    (float)i /
+                    segments *
+                    Mathf.PI *
+                    2f;
+
+                Vector3 next =
+                    center +
+                    new Vector3(
+                        Mathf.Cos(angle) * spawnRadius,
+                        0f,
+                        Mathf.Sin(angle) * spawnRadius
+                    );
 
                 Gizmos.DrawLine(previous, next);
                 previous = next;

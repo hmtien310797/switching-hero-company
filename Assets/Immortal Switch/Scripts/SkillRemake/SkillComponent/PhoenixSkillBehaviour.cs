@@ -13,29 +13,79 @@ namespace Immortal_Switch.Scripts.SkillRemake
         [SerializeField] private SkillRuntimeObjectConfig skillConfig;
         protected override async UniTask SpawnChild(int index)
         {
-            if (Context == null || Spawner == null || childRuntimePrefab == null)
+            SkillMultiSpawnConfig multiSpawnConfig =
+                MultiSpawnConfig;
+
+            if (Context == null ||
+                Spawner == null ||
+                multiSpawnConfig == null ||
+                multiSpawnConfig.ChildRuntimePrefab == null)
+            {
                 return;
+            }
 
-            Vector3 spawnPosition = GetChildSpawnPosition(index);
-            Quaternion rotation = randomizeYRotation
-                ? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)
-                : Quaternion.identity;
+            Vector3 spawnPosition =
+                GetChildSpawnPosition(index);
 
-            SkillRuntimeObject child = Spawner.Spawn(childRuntimePrefab, spawnPosition, rotation);
+            Quaternion rotation =
+                multiSpawnConfig.RandomizeYRotation
+                    ? Quaternion.Euler(
+                        0f,
+                        Random.Range(0f, 360f),
+                        0f
+                    )
+                    : Quaternion.identity;
+
+            SkillRuntimeObject child = Spawner.Spawn(
+                multiSpawnConfig.ChildRuntimePrefab,
+                spawnPosition,
+                rotation
+            );
+
             if (child == null)
                 return;
-            
-            SkillRuntimeContext childContext = Context.CloneForRuntimeObject(child, spawnPosition);
 
-            child.Init(childContext, skillConfig, Executor, TargetResolver, Spawner);
+            SkillRuntimeObjectConfig childConfig =
+                BuildChildConfig(multiSpawnConfig);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(1.7f));
+            SkillRuntimeContext childContext =
+                Context.CloneForRuntimeObject(
+                    child,
+                    spawnPosition
+                );
 
-            var currentTarget = PvEBattleController.Instance.GetRandomEnemyAlive();
+            child.Init(
+                childContext,
+                childConfig,
+                Executor,
+                TargetResolver,
+                Spawner
+            );
+
+            await UniTask.Delay(
+                TimeSpan.FromSeconds(1.7f)
+            );
+
+            if (Context == null ||
+                Context.Caster == null ||
+                child == null)
+            {
+                return;
+            }
+
+            var currentTarget =
+                PvEBattleController.Instance
+                    .GetRandomEnemyAlive();
+
+            if (currentTarget == null ||
+                currentTarget.IsDead)
+            {
+                return;
+            }
+
             Context.Caster.SetTarget(currentTarget);
-            
-            child.transform.position = currentTarget.Position;
-            
+            child.transform.position =
+                currentTarget.Position;
         }
     }
 }

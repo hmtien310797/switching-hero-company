@@ -26,6 +26,40 @@ namespace Immortal_Switch.Scripts.Skill
         [FormerlySerializedAs("AnimationName")]
         public string HeroAnimationName;
     }
+    
+    [Serializable]
+    public class SkillMultiSpawnConfig
+    {
+        [Header("Child Runtime Object")]
+        public SkillRuntimeObject ChildRuntimePrefab;
+        public string ChildAnimationName;
+        public bool ChildLoopAnimation;
+        [Header("Child Lifetime")]
+        public bool ChildUseLifeTime = true;
+        [Min(0f)]
+        public float ChildLifeTime = 1.5f;
+        public bool ChildDespawnOnAnimationComplete = true;
+        [Header("Spawn Pattern")]
+        [Min(1)]
+        public int SpawnCount = 10;
+        [Min(0f)]
+        public float StartDelay;
+        [Min(0f)]
+        public float SpawnInterval = 0.15f;
+        [Min(0f)]
+        public float SpawnRadius = 2.5f;
+        public bool RandomInsideCircle = true;
+        public bool IncludeCenterAsFirstSpawn = true;
+        [Header("Position")]
+        public Vector3 ChildSpawnOffset;
+        public bool RandomizeYRotation;
+        [Header("Controller Lifetime")]
+        public bool DespawnControllerAfterSpawn = true;
+        [Min(0f)]
+        public float DespawnDelayAfterLastSpawn = 0.25f;
+        [Header("Debug")]
+        public bool DebugDrawSpawnRadius;
+    }
 
     [Serializable]
     public class SkillRuntimeObjectConfig
@@ -59,6 +93,10 @@ namespace Immortal_Switch.Scripts.Skill
         public bool LockCasterWhileAlive;
         
         public bool LockCasterDuringHeroAnimation = true;
+        
+        [Header("Multi Spawn")]
+        [Tooltip("Chỉ sử dụng khi SkillRuntimePrefab kế thừa SkillMultiSpawnRuntimeObject.")]
+        public SkillMultiSpawnConfig MultiSpawnConfig = new();
 
         private bool IsUsingSkillRuntimePrefab()
         {
