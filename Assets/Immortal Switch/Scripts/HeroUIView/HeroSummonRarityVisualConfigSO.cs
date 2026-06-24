@@ -23,18 +23,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
             var entry = Get(rarity);
             return entry != null ? entry.Icon : null;
         }
-
-        public Color GetTopColor(SummonRarity rarity)
-        {
-            var entry = Get(rarity);
-            return entry != null ? entry.TopColor : Color.white;
-        }
-
-        public Color GetBottomColor(SummonRarity rarity)
-        {
-            var entry = Get(rarity);
-            return entry != null ? entry.BottomColor : Color.white;
-        }
     }
 
     [Serializable]
@@ -44,9 +32,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         [Header("Icon")]
         [PreviewField] public Sprite Icon;
-
-        [Header("Gradient")]
-        public Color TopColor = Color.white;
-        public Color BottomColor = Color.white;
+        [PreviewField] public Sprite Frame;
+        [PreviewField] public Sprite Background;
     }
 }

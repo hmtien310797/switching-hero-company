@@ -229,6 +229,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                 }
 
                 case MissionSystemTypes.REPEAT:
+                case MissionSystemTypes.ACHIEVEMENT:
                 {
                     var isClaimed = Service.SetIsClaimed(cfg.missionId, cfg.type, true);
 
@@ -239,10 +240,6 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                     break;
                 }
-
-                case MissionSystemTypes.ACHIEVEMENT:
-                    Service.SetIsClaimed(cfg.missionId, cfg.type, true);
-                    break;
             }
 
             var rewards = RewardHelper.ParseRewards(cfg.rewards);
@@ -257,6 +254,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             {
                 case MissionSystemTypes.DAILY:
                 case MissionSystemTypes.WEEKLY:
+                {
                     var missions = GetMissions(missionType);
 
                     foreach (var cfg in missions)
@@ -272,6 +270,19 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     }
 
                     break;
+                }
+
+                case MissionSystemTypes.REPEAT:
+                {
+                    var missions = GetMissions(missionType);
+
+                    foreach (var cfg in missions)
+                    {
+                        rewards.AddRange(MissionClaim(cfg));
+                    }
+
+                    break;
+                }
             }
 
             // todo: show ui rewards

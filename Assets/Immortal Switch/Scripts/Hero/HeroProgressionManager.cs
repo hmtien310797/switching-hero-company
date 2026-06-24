@@ -35,15 +35,16 @@ namespace Immortal_Switch.Scripts.Hero
 
         public void Save()
         {
-            ES3.Save(saveKey, saveData);
+            //ES3.Save(saveKey, saveData);
         }
 
         public void Load()
         {
-            if (ES3.KeyExists(saveKey))
-                saveData = ES3.Load<HeroCollectionSaveData>(saveKey);
-            else
-                saveData = new HeroCollectionSaveData();
+            saveData = new HeroCollectionSaveData();
+            // if (ES3.KeyExists(saveKey))
+            //     saveData = ES3.Load<HeroCollectionSaveData>(saveKey);
+            // else
+            //     saveData = new HeroCollectionSaveData();
         }
 
         public void ResetData()
@@ -141,18 +142,77 @@ namespace Immortal_Switch.Scripts.Hero
                 ResetHero(heroId);
         }
 
-        public bool UpgradeHero(int heroId)
+        /// <summary>Nâng sao 1 hero — fire-and-forget wrapper cho UI (Button.onClick). Dùng <see cref="UpgradeHeroAsync"/> nếu cần biết kết quả.</summary>
+        public void UpgradeHero(int heroId)
+        {
+            UpgradeHeroAsync(heroId).Forget();
+        }
+
+        /// <summary>
+        /// Nâng sao 1 hero qua RPC hero/upgrade. Server là nguồn sự thật — trừ shard + set rarity/star,
+        /// client chỉ apply lại kết quả trả về (xem Docs/be-hero-upgrade-rpc-spec.md).
+        /// </summary>
+        public async UniTask<bool> UpgradeHeroAsync(int heroId)
         {
             if (service == null) return false;
 
-            bool result = service.UpgradeHero(heroId);
-            if (!result) return false;
+            HeroUpgradeResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.UpgradeHeroAsync(heroId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[HeroProgressionManager] hero/upgrade RPC failed for heroId={heroId}: {e.Message}");
+                return false;
+            }
+
+            if (response == null || !response.Success)
+            {
+                if (response != null)
+                    Debug.LogWarning($"[HeroProgressionManager] hero/upgrade rejected for heroId={heroId}: {response.Error}");
+                return false;
+            }
+
+            ApplyUpgradeResult(response);
+            return true;
+        }
+
+        private void ApplyUpgradeResult(HeroUpgradeResponse response)
+        {
+            if (!Enum.TryParse<HeroProgressTier>(response.NewTier, true, out var tier))
+            {
+                Debug.LogWarning($"[HeroProgressionManager] Unknown tier '{response.NewTier}' for heroId={response.HeroId}");
+                return;
+            }
+
+            service.SetProgress(response.HeroId, tier, response.NewStar);
+            service.SetShard(response.HeroId, response.ShardBalance);
 
             Save();
-            NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroUpgraded);
-            RefreshHeroRuntime(heroId);
+            NotifyHeroCollectionChanged(response.HeroId, HeroCollectionChangeType.HeroUpgraded);
+            RefreshHeroRuntime(response.HeroId);
+        }
 
-            return true;
+        /// <summary>Nâng sao toàn bộ hero đang sở hữu — fire-and-forget wrapper cho UI (Button.onClick).</summary>
+        public void UpgradeAllHeroes()
+        {
+            UpgradeAllHeroesAsync().Forget();
+        }
+
+        /// <summary>Gọi hero/upgrade tuần tự cho mỗi hero đang sở hữu (1 lần nâng/hero/lần bấm). Hero chưa sở hữu hoặc chưa đủ shard sẽ bị server từ chối và bỏ qua.</summary>
+        public async UniTask UpgradeAllHeroesAsync()
+        {
+            if (service == null) return;
+
+            List<HeroDataSO> allHeroData = MasterDataCache.Instance.GetAllHeroData();
+            for (int i = 0; i < allHeroData.Count; i++)
+            {
+                int currentHeroId = allHeroData[i].Id;
+                if (!service.HasHero(currentHeroId)) continue;
+
+                await UpgradeHeroAsync(currentHeroId);
+            }
         }
         
         public void ResetHero(int heroId)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
@@ -201,16 +202,12 @@ namespace Immortal_Switch.Scripts.UI.Skill
                 return;
             }
 
-            bool success = currentSkillController.TryCastClassSkillAt(slotIndex);
-            if (logClickResult)
-                Debug.Log($"[HeroSkillBarUI] Cast class skill slot {slotIndex + 1}: {(success ? "OK" : "FAILED")}", this);
+            currentSkillController.TryCastClassSkillAtAsync(slotIndex).Forget();
         }
 
         private void HandleUltimateSlotClicked()
         {
-            bool success = currentSkillController.TryCastUltimate();
-            if (logClickResult)
-                Debug.Log($"[HeroSkillBarUI] Cast ultimate: {(success ? "OK" : "FAILED")}", this);
+            currentSkillController.TryCastUltimateAsync().Forget();
         }
 
         private void BindControllerEvent()

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Numerics;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
@@ -14,7 +14,6 @@ using Immortal_Switch.Scripts.TransmutationSystem.Models;
 using Immortal_Switch.Scripts.TransmutationSystem.Views.UI;
 using Immortal_Switch.Scripts.UI;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem
@@ -45,6 +44,12 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         /// 2: item added
         /// </summary>
         public event Action<PlayerEquipItem, PlayerEquipItem> OnEquipChanged;
+
+        /// <summary>
+        /// event fire khi setting changed
+        /// 1: setting data
+        /// </summary>
+        public event Action<TransmutationSystemAutoSettingData> OnSettingChanged;
 
         // --- Private Fields ---
         private float _lastAutoFuseTime;
@@ -82,7 +87,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             }
 
             var quantity = obj + Storage.Data.Level + cfg.cost;
-            Service.AddEnergy(quantity);
+            Service.UpdateEnergy(quantity);
             _DispatchChanged();
         }
 
@@ -113,19 +118,26 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
         public void AutoFuse()
         {
-            Debug.Log($"Transmutation: AutoFuse: {Storage.Data.Level}");
-
             if (!Storage.Data.Setting.Enabled)
             {
+                Debug.Log("Transmutation: AutoFuse: Stop by disabled");
+                return;
+            }
+
+            if (Storage.Data.StuckEquip != null)
+            {
+                Debug.Log("Transmutation: AutoFuse: Stop by stuck 1");
                 return;
             }
 
             TwiceFuse(Storage.Data.Setting.Count, Storage.Data.Setting.IsWaiting, Storage.Data.Setting.Tier).Forget();
+            _DispatchChanged();
         }
 
         public void NotifyReady()
         {
             _DispatchChanged();
+            OnSettingChanged?.Invoke(Storage.Data.Setting);
         }
 
         [CanBeNull]
@@ -172,21 +184,12 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public void SaveSetting(List<List<string>> uniqueOptions, int count, EEquipmentTier tier, bool isEnabled)
         {
             Service.SaveSetting(uniqueOptions, count, tier, isEnabled);
+            OnSettingChanged?.Invoke(Storage.Data.Setting);
         }
 
         public void SetWaitingMaterial(bool value)
         {
             Service.SetWaitingMaterial(value);
-        }
-
-        public bool ToggleWaitingMaterial()
-        {
-            return Service.ToggleWaitingMaterial();
-        }
-
-        public bool CurrentWaitingMaterial()
-        {
-            return Storage.Data.Setting.IsWaiting;
         }
 
         public Dictionary<int, ETabPresetStatus> GetCounts()
@@ -239,12 +242,20 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         {
             for (var i = 0; i < count; i++)
             {
+                if (Storage.Data.StuckEquip != null)
+                {
+                    Debug.Log("Transmutation: AutoFuse: Stop by stuck");
+                    return;
+                }
+
                 var newEquip = Fuse();
 
                 if (newEquip != null)
                 {
+                    Debug.Log($"TwiceFuse {i} _ {newEquip.ParsedTier} _ {tier}");
+
                     // trùng tier
-                    if (newEquip.ParsedTier == tier)
+                    if (newEquip.ParsedTier >= tier)
                     {
                         var oldEquip = GetEquip(newEquip.ItemType);
 
@@ -258,6 +269,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                             Equip(newEquip, null);
                         }
 
+                        // check dieu kien dung
                         if (TryStopFuse(newEquip))
                         {
                             StopFuse();
@@ -265,7 +277,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                     }
                     else
                     {
-                        Dismantle(newEquip);
+                        Dismantle();
                     }
                 }
                 else if (!isWaitingMaterial)
@@ -285,10 +297,18 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         private bool TryStopFuse(PlayerEquipViewData view)
         {
             return view.Modifiers.Any(modifier =>
-                Storage.Data.Setting.UniqueOptions.Any(entries => entries.Contains(modifier.StatType.ToString())));
+            {
+                var unique = TransmutationSystemHelper.ToModifier(modifier.StatType, modifier.Operation);
+                return Storage.Data.Setting.UniqueOptions.Any(entries => entries.Contains(unique));
+            });
         }
 
-        public PlayerEquipViewData Fuse()
+        public PlayerEquipViewData FuseIfPossible()
+        {
+            return Storage.Data.Setting.Enabled ? GetStuckIfPossible() : Fuse();
+        }
+
+        private PlayerEquipViewData GetStuckIfPossible()
         {
             if (Storage.Data.StuckEquip != null)
             {
@@ -308,6 +328,18 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
 
                 Debug.LogError($"Stuck config not found: {Storage.Data.StuckEquip.CfgId}");
+            }
+
+            return null;
+        }
+
+        private PlayerEquipViewData Fuse()
+        {
+            var stuckEquip = GetStuckIfPossible();
+
+            if (stuckEquip != null)
+            {
+                return stuckEquip;
             }
 
             var levelRangeCfg = Database.LevelRangeConfig.rows.Find(v => v.transmutationLevel == Storage.Data.Level);
@@ -357,35 +389,42 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             OnEquipChanged?.Invoke(oldEquip, newEquip);
         }
 
-        public void Dismantle(PlayerEquipItem newEquip)
+        public void Dismantle()
         {
-            // todo: remove stuck equip
-            var cfg = Database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
+            Service.Dismantle();
+        }
 
-            if (cfg == null)
+        public void AddExp(BigInteger quantity)
+        {
+            var cfg = Database.LevelConfig.rows.Find(v => v.level == Storage.Data.Level);
+            var targetExp = cfg?.totalExp ?? 0;
+            var currentExp = Storage.Data.Exp + quantity;
+            var currentLevel = Storage.Data.Level;
+
+            if (currentExp >= targetExp)
             {
-                Debug.LogError($"Energy dont config: {Storage.Data.Level}");
-                return;
+                // tăng cấp
+                var maxLevel = Database.LevelConfig.rows.Last().level;
+                currentLevel = Math.Min(currentLevel + 1, maxLevel);
             }
 
-            var quantity = Storage.Data.Level + cfg.cost;
-            Service.AddEnergy(quantity);
+            Service.UpdateExp(currentExp);
+            Service.UpdateLevel(currentLevel);
             _DispatchChanged();
         }
 
         private void _DispatchChanged()
         {
             var cfg = Database.LevelConfig.rows.Find(v => v.level == Storage.Data.Level);
-            var targetExp = cfg?.requiredExp ?? 0;
+            var targetExp = cfg?.totalExp ?? 0;
 
             var changed = new TransmutationSystemChanged
             {
                 Data = Storage.Data,
-                Progress = targetExp > 0 ? 0 : Mathf.Clamp01((float)(Storage.Data.Exp / targetExp)),
+                Progress = BigIntegerHelper.ClampProgress01(Storage.Data.Exp, targetExp),
                 TargetExp = targetExp,
             };
 
-            Debug.Log($"Data changed: {JsonConvert.SerializeObject(changed)}");
             OnChanged?.Invoke(changed);
         }
     }

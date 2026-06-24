@@ -1,3 +1,6 @@
+using Common;
+using Cysharp.Threading.Tasks;
+using Nakama;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +20,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private SkillViewDataProvider dataProvider;
         private SkillEnhanceAllService enhanceAllService;
         private SkillInventoryEnhanceRepository repository;
+        private bool isEnhancing;
 
         private void Awake()
         {
@@ -68,20 +72,74 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         private void OnClickEnhanceAll()
         {
-            if (enhanceAllService == null)
+            EnhanceAllAsync().Forget();
+        }
+
+        // Gọi RPC skill/enhance_all — server tính + trừ shard + tăng level cho mọi skill đủ
+        // điều kiện trong 1 lần gọi. Thay hoàn toàn cho enhanceAllService.EnhanceAll() local cũ.
+        private async UniTaskVoid EnhanceAllAsync()
+        {
+            if (isEnhancing)
+                return;
+
+            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn)
             {
-                LogWarning("OnClickEnhanceAll failed because enhanceAllService is null.");
+                LogWarning("OnClickEnhanceAll skipped because NakamaClient is not logged in.");
                 return;
             }
 
-            SkillEnhanceAllResult result = enhanceAllService.EnhanceAll();
-            ApplySummary(result);
+            isEnhancing = true;
+            if (enhanceAllButton != null)
+                enhanceAllButton.interactable = false;
+
+            try
+            {
+                SkillEnhanceAllResponse response = await NakamaClient.Instance.EnhanceAllSkillsAsync();
+                ApplyResponse(response);
+            }
+            catch (ApiResponseException ex) when (ex.StatusCode == 16)
+            {
+                LogWarning($"OnClickEnhanceAll failed: session invalid (UNAUTHENTICATED). {ex.Message}");
+            }
+            catch (ApiResponseException ex)
+            {
+                LogError($"OnClickEnhanceAll failed: {ex.StatusCode} {ex.Message}");
+            }
+            finally
+            {
+                isEnhancing = false;
+                RefreshInteractable();
+            }
+        }
+
+        private void ApplyResponse(SkillEnhanceAllResponse response)
+        {
+            if (response == null || !response.Success)
+            {
+                LogWarning("OnClickEnhanceAll failed: server returned no/unsuccessful response.");
+                return;
+            }
+
+            if (response.Entries != null)
+            {
+                foreach (SkillEnhanceEntry entry in response.Entries)
+                {
+                    SkillInventorySaveService.SetOwned(entry.SkillId, true);
+                    SkillInventorySaveService.SetLevel(entry.SkillId, entry.NewLevel);
+                    SkillInventorySaveService.SetCurrentShard(entry.SkillId, entry.NewShard);
+                }
+
+                SkillInventorySaveService.Save();
+                UserDataCache.Instance?.ApplySkillEnhanceEntries(response.Entries);
+            }
+
+            ApplySummary(response);
 
             Log(
-                $"EnhanceAll -> processed={result.ProcessedSkillCount}, " +
-                $"upgradedSkills={result.UpgradedSkillCount}, " +
-                $"totalLevelGained={result.TotalLevelGained}, " +
-                $"totalShardSpent={result.TotalShardSpent}"
+                $"EnhanceAll -> processed={response.ProcessedSkillCount}, " +
+                $"upgradedSkills={response.UpgradedSkillCount}, " +
+                $"totalLevelGained={response.TotalLevelGained}, " +
+                $"totalShardSpent={response.TotalShardSpent}"
             );
 
             if (uiSkillView != null)
@@ -91,24 +149,22 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             if (dataProvider != null)
                 dataProvider.NotifyDataChanged();
-
-            RefreshInteractable();
         }
 
-        private void ApplySummary(SkillEnhanceAllResult result)
+        private void ApplySummary(SkillEnhanceAllResponse response)
         {
             if (summaryText == null)
                 return;
 
-            if (result == null || result.TotalLevelGained <= 0)
+            if (response.Entries == null || response.Entries.Length == 0)
             {
                 summaryText.text = "No skill can be enhanced.";
                 return;
             }
 
             summaryText.text =
-                $"Enhanced {result.UpgradedSkillCount} skills, " +
-                $"+{result.TotalLevelGained} levels, spent {result.TotalShardSpent} shards.";
+                $"Enhanced {response.UpgradedSkillCount} skills, " +
+                $"+{response.TotalLevelGained} levels, spent {response.TotalShardSpent} shards.";
         }
 
         private void Log(string message)
@@ -125,6 +181,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 return;
 
             Debug.LogWarning($"[UISkillViewEnhanceAllController] {message}", this);
+        }
+
+        private void LogError(string message)
+        {
+            Debug.LogError($"[UISkillViewEnhanceAllController] {message}", this);
         }
     }
 }

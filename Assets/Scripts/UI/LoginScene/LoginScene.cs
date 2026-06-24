@@ -104,6 +104,14 @@ public class LoginScene : MonoBehaviour
 
     private void OnClickLogin()
     {
+        var hasBadwordUsername = IllegalWordDetection.Check(ipUsername.text);
+
+        if (hasBadwordUsername)
+        {
+            Debug.LogError("Username chứa ký tự đặc biệt");
+            return;
+        }
+        
         DoLogin(ipUsername.text, ipPassword.text).Forget();
     }
 

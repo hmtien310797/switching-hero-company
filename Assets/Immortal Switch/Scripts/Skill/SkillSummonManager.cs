@@ -1,4 +1,6 @@
 ﻿using System;
+using Common;
+using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.SkillSummon;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
@@ -127,6 +129,27 @@ namespace Immortal_Switch.Scripts.Skill
         public void ApplyServerResponse(SummonExecuteResponse response)
         {
             saveData.TotalRoll = response.NewTotalRoll;
+
+            if (response.Entries != null)
+            {
+                foreach (var entry in response.Entries)
+                {
+                    if (entry.SkillId <= 0) continue;
+
+                    if (entry.IsNew)
+                    {
+                        SkillInventorySaveService.SetOwned(entry.SkillId, true);
+                        SkillInventorySaveService.SetLevel(entry.SkillId, 1);
+                    }
+
+                    if (entry.ShardGained > 0)
+                        SkillInventorySaveService.AddShard(entry.SkillId, entry.ShardGained);
+                }
+
+                SkillInventorySaveService.Save();
+                UserDataCache.Instance?.ApplySkillSummonEntries(response.Entries);
+            }
+
             Save();
             NotifyChanged();
         }

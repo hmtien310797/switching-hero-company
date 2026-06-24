@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.UI;
@@ -45,7 +46,6 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
             OnClickTabPreset(0);
             OnClickTabTiers(0);
-            RefreshToggleWaitingMaterial();
         }
 
         private void OnClickStart()
@@ -60,17 +60,13 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
                 _selectedTabTiers.Tier,
                 true
             );
+
+            UIManager.Instance.TogglePopupAsync<TransmutationSystemAutoSettingView>().Forget();
         }
 
         private void ToggleWaitingMaterialChanged(bool newValue)
         {
             TransmutationSystemManager.Instance.SetWaitingMaterial(newValue);
-        }
-
-        private void RefreshToggleWaitingMaterial()
-        {
-            var currentValue = TransmutationSystemManager.Instance.CurrentWaitingMaterial();
-            toggleWaitingMaterial.SetIsOnWithoutNotify(currentValue);
         }
 
         private void InitTabPreset()

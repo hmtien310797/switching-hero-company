@@ -8,6 +8,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
     {
         public static HeroCollectionItemViewData Build(
             HeroDataSO hero,
+            HeroSummonRarityVisualConfigSO heroSummonRarityVisualConfig,
             HeroProgressionDatabaseSO heroDatabase,
             HeroProgressionService service,
             HeroRarityVisualConfigSO heroRarityVisualConfig,
@@ -31,6 +32,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 displayTier = progressionConfig.StartingTier;
             }
 
+            var cfg = heroSummonRarityVisualConfig?.Get(hero.SummonRarity);
             var viewData = new HeroCollectionItemViewData
             {
                 HeroId = hero.Id,
@@ -40,6 +42,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 RarityIcon = heroRarityVisualConfig != null ? heroRarityVisualConfig.GetIcon(displayTier) : null,
                 ElementIcon = heroUIIconConfig != null ? heroUIIconConfig.GetElementIcon(hero.Element) : null,
                 HeroClassIcon = heroUIIconConfig != null ? heroUIIconConfig.GetHeroClassIcon(hero.HeroClass) : null,
+                BgIcon = cfg?.Background,
+                FrameIcon = cfg?.Frame,
                 IsAcquired = isAcquired,
                 SummonRarity = hero.SummonRarity,
                 Element = hero.Element,

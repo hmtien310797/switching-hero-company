@@ -42,10 +42,12 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
             }
 
-            if (multiSpawnConfig.ChildRuntimePrefab == null)
+            if (string.IsNullOrWhiteSpace(
+                    multiSpawnConfig.ChildRuntimeAddressableKey))
             {
                 Debug.LogWarning(
-                    $"[{nameof(SkillMultiSpawnRuntimeObject)}] Missing ChildRuntimePrefab in MultiSpawnConfig.",
+                    $"[{nameof(SkillMultiSpawnRuntimeObject)}] " +
+                    $"Missing ChildRuntimeAddressableKey in MultiSpawnConfig.",
                     this
                 );
 
@@ -85,7 +87,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             for (int i = 0; i < spawnCount; i++)
             {
-                SpawnChild(i).Forget();
+                yield return SpawnChild(i).ToCoroutine();
 
                 if (multiSpawnConfig.SpawnInterval > 0f &&
                     i < spawnCount - 1)
@@ -113,37 +115,55 @@ namespace Immortal_Switch.Scripts.Skill
 
         protected virtual async UniTask SpawnChild(int index)
         {
-            SkillMultiSpawnConfig multiSpawnConfig = MultiSpawnConfig;
+            SkillMultiSpawnConfig multiSpawnConfig =
+                MultiSpawnConfig;
 
             if (Context == null ||
                 Spawner == null ||
                 multiSpawnConfig == null ||
-                multiSpawnConfig.ChildRuntimePrefab == null)
+                string.IsNullOrWhiteSpace(
+                    multiSpawnConfig.ChildRuntimeAddressableKey))
             {
                 return;
             }
 
-            Vector3 spawnPosition = GetChildSpawnPosition(index);
+            Vector3 spawnPosition =
+                GetChildSpawnPosition(index);
 
-            Quaternion rotation = multiSpawnConfig.RandomizeYRotation
-                ? Quaternion.Euler(
-                    0f,
-                    Random.Range(0f, 360f),
-                    0f
-                )
-                : Quaternion.identity;
+            Quaternion rotation =
+                multiSpawnConfig.RandomizeYRotation
+                    ? Quaternion.Euler(
+                        0f,
+                        Random.Range(0f, 360f),
+                        0f
+                    )
+                    : Quaternion.identity;
 
-            SkillRuntimeObject child = Spawner.Spawn(
-                multiSpawnConfig.ChildRuntimePrefab,
-                spawnPosition,
-                rotation
-            );
+            SkillRuntimeObjectConfig childConfig =
+                BuildChildConfig(multiSpawnConfig);
+
+            if (childConfig == null)
+                return;
+
+            SkillRuntimeObject child =
+                await Spawner.SpawnRuntimeAsync(
+                    childConfig,
+                    spawnPosition,
+                    rotation
+                );
 
             if (child == null)
                 return;
 
-            SkillRuntimeObjectConfig childConfig =
-                BuildChildConfig(multiSpawnConfig);
+            // Sau await phải kiểm tra lại controller.
+            if (Context == null ||
+                Executor == null ||
+                TargetResolver == null ||
+                Spawner == null)
+            {
+                child.ForceDespawn();
+                return;
+            }
 
             SkillRuntimeContext childContext =
                 Context.CloneForRuntimeObject(
@@ -158,8 +178,6 @@ namespace Immortal_Switch.Scripts.Skill
                 TargetResolver,
                 Spawner
             );
-
-            await UniTask.CompletedTask;
         }
 
         protected Vector3 GetChildSpawnPosition(int index)
@@ -222,14 +240,20 @@ namespace Immortal_Switch.Scripts.Skill
                 RuntimeVisualType =
                     SkillRuntimeVisualType.SpawnedSkillObject,
 
-                SkillRuntimePrefab =
-                    multiSpawnConfig.ChildRuntimePrefab,
+                SpawnMode =
+                    multiSpawnConfig.ChildSpawnMode,
+
+                RuntimeAddressableKey =
+                    multiSpawnConfig.ChildRuntimeAddressableKey,
 
                 SpawnPositionType =
                     SkillSpawnPositionType.CastPosition,
 
-                FollowType = SkillFollowType.None,
-                SpawnOffset = Vector3.zero,
+                FollowType =
+                    SkillFollowType.None,
+
+                SpawnOffset =
+                    Vector3.zero,
 
                 UseLifeTime =
                     multiSpawnConfig.ChildUseLifeTime,
@@ -246,8 +270,11 @@ namespace Immortal_Switch.Scripts.Skill
                 LoopAnimation =
                     multiSpawnConfig.ChildLoopAnimation,
 
-                LockCasterWhileAlive = false,
-                LockCasterDuringHeroAnimation = false
+                LockCasterWhileAlive =
+                    false,
+
+                LockCasterDuringHeroAnimation =
+                    false
             };
         }
 

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Common;
+using Immortal_Switch.Scripts.Common;
+using Immortal_Switch.Scripts.Pooling;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -31,6 +33,12 @@ namespace Immortal_Switch.Scripts.Skill
 
         private float lifeTimer;
         private bool initialized;
+        private SkillRuntimeSpawnMode runtimeSpawnMode;
+        
+        private AddressablePoolHandle addressablePoolHandle;
+        private bool hasAddressableInstanceHandle;
+
+        private bool isDespawning;
 
         public virtual void Init(
             SkillRuntimeContext context,
@@ -52,8 +60,28 @@ namespace Immortal_Switch.Scripts.Skill
             initialized = true;
 
             debugRuntimeEventCount = 0;
+            isDespawning = false;
 
             OnRuntimeInitialized(arg);
+        }
+        
+        public void BindAddressableInstanceSpawn()
+        {
+            runtimeSpawnMode =
+                SkillRuntimeSpawnMode.AddressableInstance;
+
+            addressablePoolHandle = null;
+            isDespawning = false;
+        }
+
+        public void BindAddressablePoolSpawn(
+            AddressablePoolHandle handle)
+        {
+            runtimeSpawnMode =
+                SkillRuntimeSpawnMode.AddressablePool;
+
+            addressablePoolHandle = handle;
+            isDespawning = false;
         }
 
         protected virtual void OnRuntimeInitialized(object arg)
@@ -128,10 +156,84 @@ namespace Immortal_Switch.Scripts.Skill
 
         public virtual void ForceDespawn()
         {
-            DespawnSelf();
+            if (isDespawning)
+                return;
+
+            isDespawning = true;
+
+            switch (runtimeSpawnMode)
+            {
+                case SkillRuntimeSpawnMode.AddressablePool:
+                    DespawnAddressablePool();
+                    break;
+
+                case SkillRuntimeSpawnMode.AddressableInstance:
+                    DespawnAddressableInstance();
+                    break;
+
+                default:
+                    Debug.LogError(
+                        $"[{nameof(SkillRuntimeObject)}] " +
+                        $"Invalid SpawnMode on object={name}",
+                        this
+                    );
+
+                    gameObject.SetActive(false);
+                    break;
+            }
+        }
+        
+        public void NotifyAddressablePoolDespawned()
+        {
+            ClearRuntimeState();
+
+            addressablePoolHandle = null;
+            isDespawning = false;
+        }
+        
+        private void DespawnAddressablePool()
+        {
+            AddressablePoolHandle handle =
+                addressablePoolHandle;
+
+            addressablePoolHandle = null;
+
+            if (handle == null)
+            {
+                Debug.LogError(
+                    $"[{nameof(SkillRuntimeObject)}] " +
+                    $"Missing AddressablePoolHandle. Object={name}",
+                    this
+                );
+
+                ClearRuntimeState();
+                gameObject.SetActive(false);
+                return;
+            }
+
+            // AddressablePoolService.ReturnInternal()
+            // sẽ gọi IAddressablePoolable.OnDespawned().
+            handle.Despawn();
         }
 
-        public override void OnDespawnedToPool()
+        private void DespawnAddressableInstance()
+        {
+            ClearRuntimeState();
+
+            bool released =
+                AddressableSpawnService.ReleaseInstance(gameObject);
+
+            if (!released)
+            {
+                Debug.LogError(
+                    $"[{nameof(SkillRuntimeObject)}] " +
+                    $"Failed to release Addressable instance. Object={name}",
+                    this
+                );
+            }
+        }
+        
+        private void ClearRuntimeState()
         {
             DebugLogRuntimeEventTotal();
 
@@ -139,13 +241,29 @@ namespace Immortal_Switch.Scripts.Skill
             Despawned = null;
 
             initialized = false;
+
+            if (Context != null &&
+                Context.RuntimeObject == this)
+            {
+                Context.RuntimeObject = null;
+            }
+
             Context = null;
             Config = null;
             Executor = null;
             TargetResolver = null;
             Spawner = null;
 
+            lifeTimer = 0f;
             debugRuntimeEventCount = 0;
+        }
+
+        public override void OnDespawnedToPool()
+        {
+            ClearRuntimeState();
+
+            addressablePoolHandle = null;
+            isDespawning = false;
         }
 
         [System.Diagnostics.Conditional("UNITY_EDITOR")]
@@ -211,5 +329,7 @@ namespace Immortal_Switch.Scripts.Skill
                 this
             );
         }
+        
     }
+    
 }

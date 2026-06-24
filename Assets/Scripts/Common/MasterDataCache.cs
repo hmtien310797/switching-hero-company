@@ -84,6 +84,11 @@ namespace Common
         private void InitSkillData()
         {
             skillDataDicts.Clear();
+            for (int i = 0; i < skillDatas.Count; i++)
+            {
+                SkillDataSO currentSkillData = skillDatas[i];
+                skillDataDicts.Add(currentSkillData.SkillId, currentSkillData);
+            }
         }
         
         private void InitHeroData()

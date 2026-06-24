@@ -120,6 +120,11 @@ namespace Immortal_Switch.Scripts.UI
         private GameObject _mainSharedBackdrop; // shared backdrop for main
         private bool _suppressMainBackdropRefresh;
 
+        private void Start()
+        {
+            GameEventManager.Subscribe(GameEvents.OnInitSceneDataComplete, OnInitSceneDataComplete);
+        }
+
         public override async UniTask InitializeAsync()
         {
             CreateLayerRootsFromEnum();
@@ -701,7 +706,10 @@ namespace Immortal_Switch.Scripts.UI
             );
 
             tapeAnimator.transform.parent = GetLayerRoot(UILayer.Main);
-            
+        }
+
+        private void OnInitSceneDataComplete()
+        {
             loadingSceneCanvasGroup.DOFade(0f, 0.5f).SetEase(Ease.OutCubic);
             loadingSceneCanvasGroup.blocksRaycasts = false;
             loadingSceneCanvasGroup.interactable = false;

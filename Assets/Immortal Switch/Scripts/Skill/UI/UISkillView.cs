@@ -434,6 +434,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 var item = Instantiate(skillItemPrefab, gridRoot);
                 bool isSelected = selectedSkill != null && skillData != null &&
                                   selectedSkill.SkillId == skillData.SkillId;
+                item.name = $"skill_{skillData.SkillClass}_{skillData.SkillId}";
                 item.Setup(state, isSelected, OnClickGridSkill);
                 spawnedGridItems.Add(item);
             }

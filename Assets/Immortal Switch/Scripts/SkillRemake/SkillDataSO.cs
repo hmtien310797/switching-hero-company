@@ -27,36 +27,68 @@ namespace Immortal_Switch.Scripts.Skill
         public string HeroAnimationName;
     }
     
+    public enum SkillRuntimeSpawnMode
+    {
+        /// <summary>
+        /// Addressable instance độc lập.
+        /// Dùng cho controller, spawner hoặc runtime object ít được tạo.
+        /// </summary>
+        AddressableInstance,
+
+        /// <summary>
+        /// Addressable pooled instance.
+        /// Dùng cho Spine VFX, projectile, ground effect...
+        /// </summary>
+        AddressablePool
+    }
+    
     [Serializable]
     public class SkillMultiSpawnConfig
     {
         [Header("Child Runtime Object")]
-        public SkillRuntimeObject ChildRuntimePrefab;
+        public SkillRuntimeSpawnMode ChildSpawnMode =
+            SkillRuntimeSpawnMode.AddressablePool;
+
+        [Tooltip("Full Addressable key của child runtime prefab.")]
+        public string ChildRuntimeAddressableKey;
+
         public string ChildAnimationName;
         public bool ChildLoopAnimation;
+
         [Header("Child Lifetime")]
         public bool ChildUseLifeTime = true;
+
         [Min(0f)]
         public float ChildLifeTime = 1.5f;
+
         public bool ChildDespawnOnAnimationComplete = true;
+
         [Header("Spawn Pattern")]
         [Min(1)]
         public int SpawnCount = 10;
+
         [Min(0f)]
         public float StartDelay;
+
         [Min(0f)]
         public float SpawnInterval = 0.15f;
+
         [Min(0f)]
         public float SpawnRadius = 2.5f;
+
         public bool RandomInsideCircle = true;
         public bool IncludeCenterAsFirstSpawn = true;
+
         [Header("Position")]
         public Vector3 ChildSpawnOffset;
         public bool RandomizeYRotation;
+
         [Header("Controller Lifetime")]
         public bool DespawnControllerAfterSpawn = true;
+
         [Min(0f)]
         public float DespawnDelayAfterLastSpawn = 0.25f;
+
         [Header("Debug")]
         public bool DebugDrawSpawnRadius;
     }
@@ -66,10 +98,14 @@ namespace Immortal_Switch.Scripts.Skill
     {
         public SkillRuntimeVisualType RuntimeVisualType = SkillRuntimeVisualType.SpawnedSkillObject;
         
-        [FormerlySerializedAs("SpineRuntimePrefab")]
-        [ShowIf(nameof(IsUsingSkillRuntimePrefab))]
         [Header("Spawned Skill Object")]
-        public SkillRuntimeObject SkillRuntimePrefab;
+        [ShowIf(nameof(IsUsingSkillRuntimePrefab))]
+        public SkillRuntimeSpawnMode SpawnMode =
+            SkillRuntimeSpawnMode.AddressablePool;
+
+        [ShowIf(nameof(IsUsingSkillRuntimePrefab))]
+        [Tooltip("Full Addressable key của SkillRuntimeObject prefab.")]
+        public string RuntimeAddressableKey;
         
         public SkillSpawnPositionType SpawnPositionType = SkillSpawnPositionType.Self;
         public SkillFollowType FollowType = SkillFollowType.None;

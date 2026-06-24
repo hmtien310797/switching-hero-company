@@ -15,6 +15,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
         public Sprite RarityIcon;
         public Sprite ElementIcon;
         public Sprite HeroClassIcon;
+        public Sprite BgIcon;
+        public Sprite FrameIcon;
 
         public bool IsAcquired;
 
@@ -33,5 +35,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
         public bool IsMaxNode;
 
         public bool IsInLineup;
+        public int LineupIdx;
     }
 }

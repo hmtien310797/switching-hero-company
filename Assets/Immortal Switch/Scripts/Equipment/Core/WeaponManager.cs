@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Battle;
-using Immortal_Switch.Scripts.Currency;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
 using Immortal_Switch.Scripts.Equipment.Runtime;
@@ -240,88 +239,67 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             return true;
         }
         
-        public WeaponFuseAllResult TryFuseAllStandardWeapons(bool autoSave = true)
+        /// <summary>
+        /// Fuse toàn bộ vũ khí standard đang sở hữu — mỗi vũ khí đi tiếp theo chuỗi (qua RPC weapon/fuse,
+        /// xem TryFuseStandardAsync) cho tới khi không đủ shard hoặc gặp max node.
+        /// </summary>
+        public async UniTask<WeaponFuseAllResult> TryFuseAllStandardWeaponsAsync()
         {
             var result = new WeaponFuseAllResult();
 
-            if (database == null || inventory == null)
+            if (database == null || inventory == null || database.StandardWeapons == null)
                 return result;
 
+            var ownedWeaponIds = new List<int>();
+            foreach (var def in database.StandardWeapons)
+            {
+                if (def == null) continue;
+
+                var state = inventory.GetOrCreateStandardState(def.WeaponId);
+                if (state != null && state.IsUnlocked)
+                    ownedWeaponIds.Add(def.WeaponId);
+            }
+
             bool changedAny = false;
-            bool changedInPass;
 
-            do
+            foreach (var startWeaponId in ownedWeaponIds)
             {
-                changedInPass = false;
+                int currentWeaponId = startWeaponId;
 
-                // snapshot definition list để tránh lỗi khi state đổi trong lúc loop
-                var allStandards = database.StandardWeapons != null
-                    ? database.StandardWeapons.OrderBy(x => (int)x.Tier).ThenBy(x => x.Star).ToList()
-                    : new List<Definitions.StandardWeaponDefinitionSO>();
-
-                for (int i = 0; i < allStandards.Count; i++)
+                while (true)
                 {
-                    var def = allStandards[i];
-                    if (def == null)
-                        continue;
+                    var fuseResult = await TryFuseStandardAsync(currentWeaponId, false);
+                    if (!fuseResult.Success)
+                        break;
 
-                    var state = inventory.GetOrCreateStandardState(def.WeaponId);
-                    if (state == null || !state.IsUnlocked)
-                        continue;
+                    changedAny = true;
 
-                    while (CanFuseOnceForFuseAll(def))
+                    if (fuseResult.TargetStandardWeaponId > 0)
                     {
-                        var fuseResult = TryFuseStandard(def.WeaponId, false);
-                        if (!fuseResult.Success)
-                            break;
-
-                        changedAny = true;
-                        changedInPass = true;
-
-                        if (fuseResult.TargetStandardWeaponId > 0)
-                            AddStandardReward(result, fuseResult.TargetStandardWeaponId, 1);
-
-                        if (fuseResult.TargetExclusiveWeaponId > 0)
-                            AddExclusiveReward(result, fuseResult.TargetExclusiveWeaponId, 1);
+                        AddStandardReward(result, fuseResult.TargetStandardWeaponId, 1);
+                        currentWeaponId = fuseResult.TargetStandardWeaponId;
                     }
-                }
-
-            } while (changedInPass);
-
-            if (changedAny && autoSave)
-                Save();
-
-            if (changedAny)
-                NotifyAllRelevantWeaponChangesAfterFuseAll(result);
-
-            return result;
-        }
-        
-        private bool CanFuseOnceForFuseAll(Definitions.StandardWeaponDefinitionSO def)
-        {
-            if (def == null)
-                return false;
-
-            var state = inventory.GetOrCreateStandardState(def.WeaponId);
-            if (state == null || !state.IsUnlocked)
-                return false;
-
-            if (state.CurrentShard < def.FuseShardRequired)
-                return false;
-
-            if (def.FuseMode == WeaponFuseMode.ToRandomExclusive)
-            {
-                var currencyType = WeaponCurrencyHelper.GetClassStoneCurrency(def.ExclusivePoolClass);
-                if (CurrencyLedgerService.Instance == null ||
-                    !CurrencyLedgerService.Instance.HasEnoughDisplayBalance(currencyType, def.ExclusiveClassStoneCost))
-                {
-                    return false;
+                    else if (fuseResult.TargetExclusiveWeaponId > 0)
+                    {
+                        AddExclusiveReward(result, fuseResult.TargetExclusiveWeaponId, 1);
+                        break;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
 
-            return true;
+            if (changedAny)
+            {
+                Save();
+                NotifyAllRelevantWeaponChangesAfterFuseAll(result);
+            }
+
+            return result;
         }
-        
+
         private void AddStandardReward(WeaponFuseAllResult result, int weaponId, int amount)
         {
             if (result == null || weaponId <= 0 || amount <= 0)
@@ -419,40 +397,45 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             }
         }
         
-        public WeaponFuseAllResult TryFusionForSelectedWeapon(int weaponId, bool autoSave = true)
-        {
-            var result = TryFusionForSelectedWeapon(weaponId, 1);
-            if (result.HasAnyReward && autoSave)
-                Save();
-
-            return result;
-        }
-        
-        public WeaponFuseAllResult TryFusionForSelectedWeapon(int weaponId, int count)
+        /// <summary>
+        /// Fuse liên tiếp tối đa <paramref name="count"/> lần qua RPC weapon/fuse. Mỗi lần thành công
+        /// server đổi identity sang weapon_id kế tiếp, nên lần fuse sau sẽ tiếp tục từ id mới đó.
+        /// </summary>
+        public async UniTask<WeaponFuseAllResult> TryFusionForSelectedWeaponAsync(int weaponId, int count)
         {
             var uiResult = new WeaponFuseAllResult();
 
             if (weaponId <= 0 || count <= 0)
                 return uiResult;
 
+            int currentWeaponId = weaponId;
             for (int i = 0; i < count; i++)
             {
-                var result = TryFuseStandard(weaponId, false);
+                var result = await TryFuseStandardAsync(currentWeaponId, false);
                 if (!result.Success)
                     break;
 
                 if (result.TargetStandardWeaponId > 0)
+                {
                     AddStandardReward(uiResult, result.TargetStandardWeaponId, 1);
-
-                if (result.TargetExclusiveWeaponId > 0)
+                    currentWeaponId = result.TargetStandardWeaponId;
+                }
+                else if (result.TargetExclusiveWeaponId > 0)
+                {
                     AddExclusiveReward(uiResult, result.TargetExclusiveWeaponId, 1);
+                    break;
+                }
+                else
+                {
+                    break;
+                }
             }
 
             if (uiResult.HasAnyReward)
+            {
                 Save();
-
-            if (uiResult.HasAnyReward)
                 NotifyAllRelevantWeaponChangesAfterFuseAll(uiResult);
+            }
 
             return uiResult;
         }
@@ -521,6 +504,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             return result;
         }
 
+        /// <summary>Fuse local-only (không gọi server) — dùng cho Editor debug và nhánh ToRandomExclusive (spec server chưa cover).</summary>
         public WeaponFuseResult TryFuseStandard(int weaponId, bool autoSave = true)
         {
             var result = fuse.TryFuseStandard(weaponId);
@@ -544,6 +528,68 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Fuse 1 lần qua RPC weapon/fuse (nhánh ToNextStandard) — server là nguồn sự thật, trừ shard
+        /// + đổi weapon_id/grade/star, client chỉ apply lại kết quả (xem Docs/be-weapon-fuse-rpc-spec.md).
+        /// Nhánh ToRandomExclusive vẫn rơi về <see cref="TryFuseStandard"/> local vì spec server chưa cover
+        /// (server trả MAX_NODE_REACHED cho nhánh này).
+        /// </summary>
+        public async UniTask<WeaponFuseResult> TryFuseStandardAsync(int weaponId, bool autoSave = true)
+        {
+            var def = database.GetStandard(weaponId);
+            if (def == null)
+                return new WeaponFuseResult { SourceWeaponId = weaponId, Success = false };
+
+            if (def.FuseMode == WeaponFuseMode.ToRandomExclusive)
+                return TryFuseStandard(weaponId, autoSave);
+
+            var result = new WeaponFuseResult { SourceWeaponId = weaponId, Success = false };
+
+            WeaponFuseResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.FuseWeaponAsync(weaponId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[WeaponManager] weapon/fuse RPC failed for weaponId={weaponId}: {e.Message}");
+                return result;
+            }
+
+            if (response == null || !response.Success)
+            {
+                if (response != null)
+                    Debug.LogWarning($"[WeaponManager] weapon/fuse rejected for weaponId={weaponId}: {response.Error}");
+                return result;
+            }
+
+            ApplyFuseResult(response);
+
+            if (autoSave)
+                Save();
+
+            NotifyStandardWeaponChanged(response.OldWeaponId);
+            NotifyStandardWeaponChanged(response.NewWeaponId);
+
+            result.Success = true;
+            result.TargetStandardWeaponId = response.NewWeaponId;
+            return result;
+        }
+
+        private void ApplyFuseResult(WeaponFuseResponse response)
+        {
+            var oldState = inventory.GetOrCreateStandardState(response.OldWeaponId);
+            oldState.CurrentShard = Mathf.Max(0, response.ShardBalance);
+
+            var newState = inventory.GetOrCreateStandardState(response.NewWeaponId);
+            if (!newState.IsUnlocked)
+            {
+                newState.IsUnlocked = true;
+                newState.Level = Mathf.Max(1, oldState.Level);
+                newState.LimitBreakStage = 0;
+            }
         }
 
         public void NotifyHeroWeaponChanged(int heroId)

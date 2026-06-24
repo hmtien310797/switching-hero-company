@@ -183,6 +183,7 @@ namespace Battle
                 return;
             }
             
+            GameEventManager.Trigger(GameEvents.OnInitSceneDataComplete);
             await InitPlayerHeroById();
             NotifyActiveLineupChanged();
             RefreshControlledHeroSkillUI();
@@ -263,6 +264,8 @@ namespace Battle
             if (newHero == null)
                 return;
 
+            TopMainView.Instance.SetHeroSkeletonAnimationGraphic(newHeroData);
+
             newHero.gameObject.SetActive(true);
             newHero.Init(newHeroData, this, heroTeamController);
             oldHero.OnDead -= OnHeroDead;
@@ -297,13 +300,15 @@ namespace Battle
         public void OnSelectedHeroCastUltimateSkill()
         {
             gameCameraController.ZoomToHero().Forget();
+            TopMainView.Instance.PlayHeroSkeletonAnimation();
         }
 
         private async UniTask InitPlayerHeroById(bool isSwitch = false)
         {
-            for (int heroIndex = 0; heroIndex < UserDataCache.Instance.InBattleHeroIdList.Count; heroIndex++)
+            List<int> heroIds = new List<int>(){2,4};
+            for (int heroIndex = 0; heroIndex < heroIds.Count; heroIndex++)
             {
-                var id = UserDataCache.Instance.InBattleHeroIdList[heroIndex];
+                var id = heroIds[heroIndex];
                 if (id <= 0)
                     continue;
                 var heroDt = MasterDataCache.Instance.GetHeroDataById(id);
@@ -311,6 +316,7 @@ namespace Battle
                 if (heroIndex == 0)
                 {
                     gameCameraController.SetFollowHero(inBattleHeroes[heroIndex].transform);
+                    TopMainView.Instance.SetHeroSkeletonAnimationGraphic(heroDt);
                 }
             }
 
@@ -451,30 +457,31 @@ namespace Battle
             return controlledHeroSlotIndex;
         }
 
-        public void SelectControlledHeroSlot(int slotIndex)
+        public HeroDataSO SelectControlledHeroSlot(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= inBattleHeroes.Length)
             {
                 Debug.LogWarning($"[PvE] Invalid controlled hero slot index: {slotIndex}");
-                return;
+                return null;
             }
 
             if (inBattleHeroes[slotIndex] == null)
             {
                 Debug.LogWarning($"[PvE] Cannot select empty hero slot: {slotIndex}");
-                return;
+                return null;
             }
 
             controlledHeroSlotIndex = slotIndex;
             ApplyControlledHeroSelectionToTeamController();
             RefreshControlledHeroSkillUI();
             gameCameraController.SetFollowHero(inBattleHeroes[slotIndex].transform);
+            return inBattleHeroes[slotIndex].HeroData;
         }
 
-        public void SwitchControlledHero()
+        public HeroDataSO SwitchControlledHero()
         {
             int nextSlotIndex = controlledHeroSlotIndex == 0 ? 1 : 0;
-            SelectControlledHeroSlot(nextSlotIndex);
+            return SelectControlledHeroSlot(nextSlotIndex);
         }
 
         public BossActor GetActiveBossActor()
@@ -482,9 +489,9 @@ namespace Battle
             return currentBoss;
         }
 
-        public void OnSwitchMainSubHeroButtonClicked()
+        public HeroDataSO OnSwitchMainSubHeroButtonClicked()
         {
-            SwitchControlledHero();
+            return SwitchControlledHero();
         }
 
         private void ApplyControlledHeroSelectionToTeamController()

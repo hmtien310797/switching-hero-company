@@ -24,8 +24,8 @@ MonoBehaviour:
   SkillTier: 1
   CastConfig:
     RequireTarget: 1
-    MoveToCastRange: 0
-    CastRange: 10
+    MoveToCastRange: 1
+    CastRange: 8
     Cooldown: 15
     TargetSelectType: 1
     HeroAnimationName: ulti
@@ -42,6 +42,24 @@ MonoBehaviour:
     LoopAnimation: 0
     LockCasterWhileAlive: 0
     LockCasterDuringHeroAnimation: 1
+    MultiSpawnConfig:
+      ChildRuntimePrefab: {fileID: 0}
+      ChildAnimationName: 
+      ChildLoopAnimation: 0
+      ChildUseLifeTime: 1
+      ChildLifeTime: 1.5
+      ChildDespawnOnAnimationComplete: 1
+      SpawnCount: 10
+      StartDelay: 0
+      SpawnInterval: 0.15
+      SpawnRadius: 2.5
+      RandomInsideCircle: 1
+      IncludeCenterAsFirstSpawn: 1
+      ChildSpawnOffset: {x: 0, y: 0, z: 0}
+      RandomizeYRotation: 0
+      DespawnControllerAfterSpawn: 1
+      DespawnDelayAfterLastSpawn: 0.25
+      DebugDrawSpawnRadius: 0
   BasePhases: []
   ClassSkillScaling:
     GrowthPercentPerLevel: 6
@@ -92,7 +110,7 @@ MonoBehaviour:
           AreaPrefab: {fileID: 0}
           Shape: 0
           PositionType: 1
-          Radius: 7
+          Radius: 11
           BoxSize: {x: 2, y: 2}
           Duration: 0
           TickInterval: 0
@@ -176,7 +194,7 @@ MonoBehaviour:
           AreaPrefab: {fileID: 0}
           Shape: 0
           PositionType: 1
-          Radius: 7
+          Radius: 11
           BoxSize: {x: 2, y: 2}
           Duration: 0
           TickInterval: 0

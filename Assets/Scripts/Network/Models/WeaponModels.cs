@@ -63,3 +63,37 @@ public class WeaponUnequipResponse
     [JsonProperty("reason")]   public string                      Reason;
     [JsonProperty("equipped")] public Dictionary<string, string>  Equipped;
 }
+
+// ── weapon/fuse ───────────────────────────────────────────────────────────────
+
+[Serializable]
+public class WeaponFuseRequest
+{
+    /// <summary>weapon_id (master data) hiện tại — không phải weapon_uid.</summary>
+    [JsonProperty("weapon_id")] public int WeaponId;
+}
+
+/// <summary>Response từ weapon/fuse. Khi Success = false, chỉ Error có giá trị.</summary>
+[Serializable]
+public class WeaponFuseResponse
+{
+    [JsonProperty("success")] public bool   Success;
+    /// <summary>"INVALID_WEAPON_ID" | "WEAPON_NOT_OWNED" | "MAX_NODE_REACHED" | "CONFIG_NOT_FOUND" | "TARGET_ALREADY_OWNED" | "NOT_ENOUGH_SHARD"</summary>
+    [JsonProperty("error")]   public string Error;
+
+    [JsonProperty("old_weapon_id")] public int    OldWeaponId;
+    [JsonProperty("old_name")]      public string OldName;
+    [JsonProperty("old_grade")]     public string OldGrade;
+    [JsonProperty("old_star")]      public int    OldStar;
+
+    [JsonProperty("new_weapon_id")] public int    NewWeaponId;
+    [JsonProperty("new_name")]      public string NewName;
+    [JsonProperty("new_grade")]     public string NewGrade;
+    [JsonProperty("new_star")]      public int    NewStar;
+
+    [JsonProperty("shard_spent")]   public int    ShardSpent;
+    /// <summary>Shard còn lại của weapon_id cũ — luôn là 0 sau khi fuse thành công.</summary>
+    [JsonProperty("shard_balance")] public int    ShardBalance;
+    /// <summary>true nếu node mới (sau khi fuse) không thể fuse tiếp.</summary>
+    [JsonProperty("is_max_node")]   public bool   IsMaxNode;
+}

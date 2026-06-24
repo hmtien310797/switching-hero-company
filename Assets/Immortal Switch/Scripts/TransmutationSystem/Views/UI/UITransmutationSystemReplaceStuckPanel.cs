@@ -59,19 +59,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 
         private void OnClickDismantle()
         {
-            if (_newEquip != null &&
-                _oldEquip != null)
-            {
-                TransmutationSystemManager.Instance.Dismantle(_newEquip);
-                OnClickClose();
+            TransmutationSystemManager.Instance.Dismantle();
+            OnClickClose();
 
-                _newEquip = null;
-                _oldEquip = null;
-            }
-            else
-            {
-                Debug.LogError("Must have newEquip and oldEquip");
-            }
+            _newEquip = null;
+            _oldEquip = null;
         }
     }
 }

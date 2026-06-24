@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
+using Newtonsoft.Json;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -22,22 +23,32 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             _storage = storage;
         }
 
-        public void AddExp(BigInteger quantity)
+        public void UpdateExp(BigInteger quantity)
         {
-            _storage.Data.UpdateExp(_storage.Data.Exp + quantity);
+            _storage.Data.UpdateExp(quantity);
             _storage.Save();
         }
 
-        public void AddEnergy(BigInteger quantity)
+        public void UpdateEnergy(BigInteger quantity)
         {
-            _storage.Data.UpdateEnergy(_storage.Data.Energy + quantity);
+            _storage.Data.UpdateEnergy(quantity);
             _storage.Save();
         }
 
-        public void LevelUp(int totalLevel)
+        public void UpdateLevel(int level)
         {
-            var nextLevel = Mathf.Min(_storage.Data.Level + 1, totalLevel);
-            _storage.Data.UpdateLevel(nextLevel);
+            _storage.Data.UpdateLevel(level);
+            _storage.Save();
+        }
+
+        public void Dismantle()
+        {
+            if (_storage.Data.StuckEquip == null)
+            {
+                return;
+            }
+
+            _storage.Data.StuckEquip = null;
             _storage.Save();
         }
 
@@ -195,7 +206,15 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
                 var rndPct = Random.Range(cfg.rollMinPct, cfg.rollMaxPct);
                 var mapping = TransmutationSystemHelper.ToStatMapping(cfg.statId);
-                result.Add(new StatModifier(mapping.StatType, mapping.Op, rndPct));
+
+                if (mapping != null)
+                {
+                    result.Add(new StatModifier(mapping.StatType, mapping.Op, rndPct, string.Empty, true));
+                }
+                else
+                {
+                    Debug.LogError($"BuildUniqueModifiers failed at index {i} with stat {cfg.statId}");
+                }
             }
 
             return result;

@@ -153,9 +153,9 @@ namespace Immortal_Switch.Scripts.Skill
             return GetCooldownDuration(ultimateSkill);
         }
 
-        public bool TryCastClassSkillAt(int slotIndex)
+        public async UniTask<bool> TryCastClassSkillAtAsync(int slotIndex)
         {
-            return TryCastClassSkill(slotIndex);
+             return await TryCastClassSkillAsync(slotIndex);
         }
 
         private void Awake()
@@ -173,9 +173,6 @@ namespace Immortal_Switch.Scripts.Skill
         private void Update()
         {
             TickCooldowns(Time.deltaTime);
-
-            if (enableDebugHotkeys)
-                HandleDebugHotkeys();
 
             RefreshCooldownDebugView();
         }
@@ -253,20 +250,20 @@ namespace Immortal_Switch.Scripts.Skill
                 classSkills.RemoveRange(ClassSkillSlotCount, classSkills.Count - ClassSkillSlotCount);
         }
 
-        public bool TryCastClassSkill(int index)
+        public async UniTask <bool> TryCastClassSkillAsync(int index)
         {
             EnsureClassSkillSlotCapacity();
 
             if (index < 0 || index >= ClassSkillSlotCount)
                 return false;
 
-            return TryCastSkill(classSkills[index]);
+            return await TryCastSkillAsync(classSkills[index]);
         }
 
         // ultimate skill cast first input
-        public bool TryCastUltimate()
+        public async UniTask<bool> TryCastUltimateAsync()
         {
-            bool result = TryCastSkill(ultimateSkill, true);
+            bool result = await TryCastSkillAsync(ultimateSkill, true);
             if (result)
             {
                 owner.CastingUltimate(true);
@@ -274,7 +271,7 @@ namespace Immortal_Switch.Scripts.Skill
             return result;
         }
 
-        public bool TryCastSkill(SkillDataSO skillData, bool isUltimate = false)
+        public async UniTask<bool> TryCastSkillAsync(SkillDataSO skillData, bool isUltimate = false)
         {
             if (owner.StateMachine.CurrentStateId == HeroStateId.BossSpawn)
                 return false;
@@ -303,7 +300,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return false;
             }
 
-            bool result = CastSkillInternal(skillData, level, target, interrupt: true, isUltimate);
+            bool result = await CastSkillInternalAsync(skillData, level, target, interrupt: true, isUltimate);
             if (owner.IsChosen && result && isUltimate)
             {
                 PvEBattleController.Instance.OnSelectedHeroCastUltimateSkill();
@@ -324,7 +321,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             SkillCastConfig castConfig = skillData.GetCastConfig(level);
             ICombatUnit target = targetResolver.ResolveMainTarget(CreateContext(skillData, level, null), castConfig.TargetSelectType);
-            CastSkillInternal(skillData, level, target, interrupt: true, isUltimate);
+            CastSkillInternalAsync(skillData, level, target, interrupt: true, isUltimate);
         }
 
         public void CastPassiveTriggeredSkill(SkillDataSO triggeredPassiveSkill)
@@ -344,7 +341,7 @@ namespace Immortal_Switch.Scripts.Skill
                     ? battleController.GetNearestEnemy(owner.Position)
                     : null;
 
-            CastSkillInternal(skillToCast, level, target, interrupt: true, false);
+            CastSkillInternalAsync(skillToCast, level, target, interrupt: true, false);
         }
 
         public int CountEnemiesInRange(float range)
@@ -356,44 +353,24 @@ namespace Immortal_Switch.Scripts.Skill
             return targetResolver.CountEnemiesInRange(CreateContext(currentSkill, currentSkillLevel, target), owner.Position, range);
         }
 
-        public bool TryDebugCastClassSkill(int oneBasedIndex)
+        public async UniTask<bool> TryDebugCastClassSkillAsync(int oneBasedIndex)
         {
-            return TryCastClassSkill(oneBasedIndex - 1);
+            return await TryCastClassSkillAsync(oneBasedIndex - 1);
         }
 
-        public bool TryDebugCastUltimate()
+        public async UniTask<bool> TryDebugCastUltimate()
         {
-            return TryCastUltimate();
+            return await TryCastUltimateAsync();
         }
 
-        public bool TryDebugCastPassive()
+        public async UniTask<bool> TryDebugCastPassive()
         {
             if (passiveSkill == null)
                 return false;
 
-            return TryCastSkill(passiveSkill);
+            return await TryCastSkillAsync(passiveSkill);
         }
 
-        [ContextMenu("Debug Cast/Class Skill 1")]
-        private void ContextDebugCastClassSkill1() => DebugCastAndLog("Class Skill 1", () => TryDebugCastClassSkill(1));
-
-        [ContextMenu("Debug Cast/Class Skill 2")]
-        private void ContextDebugCastClassSkill2() => DebugCastAndLog("Class Skill 2", () => TryDebugCastClassSkill(2));
-
-        [ContextMenu("Debug Cast/Class Skill 3")]
-        private void ContextDebugCastClassSkill3() => DebugCastAndLog("Class Skill 3", () => TryDebugCastClassSkill(3));
-
-        [ContextMenu("Debug Cast/Class Skill 4")]
-        private void ContextDebugCastClassSkill4() => DebugCastAndLog("Class Skill 4", () => TryDebugCastClassSkill(4));
-
-        [ContextMenu("Debug Cast/Class Skill 5")]
-        private void ContextDebugCastClassSkill5() => DebugCastAndLog("Class Skill 5", () => TryDebugCastClassSkill(5));
-
-        [ContextMenu("Debug Cast/Ultimate")]
-        private void ContextDebugCastUltimate() => DebugCastAndLog("Ultimate", TryDebugCastUltimate);
-
-        [ContextMenu("Debug Cast/Passive")]
-        private void ContextDebugCastPassive() => DebugCastAndLog("Passive", TryDebugCastPassive);
 
         private void Start()
         {
@@ -467,25 +444,7 @@ namespace Immortal_Switch.Scripts.Skill
         }
 
         private readonly List<SkillDataSO> tempCooldownKeys = new();
-
-        private void HandleDebugHotkeys()
-        {
-            if (Input.GetKeyDown(classSkill1Key))
-                DebugCastAndLog("Class Skill 1", () => TryDebugCastClassSkill(1));
-            if (Input.GetKeyDown(classSkill2Key))
-                DebugCastAndLog("Class Skill 2", () => TryDebugCastClassSkill(2));
-            if (Input.GetKeyDown(classSkill3Key))
-                DebugCastAndLog("Class Skill 3", () => TryDebugCastClassSkill(3));
-            if (Input.GetKeyDown(classSkill4Key))
-                DebugCastAndLog("Class Skill 4", () => TryDebugCastClassSkill(4));
-            if (Input.GetKeyDown(classSkill5Key))
-                DebugCastAndLog("Class Skill 5", () => TryDebugCastClassSkill(5));
-            if (Input.GetKeyDown(ultimateKey))
-                DebugCastAndLog("Ultimate", TryDebugCastUltimate);
-            if (Input.GetKeyDown(passiveKey))
-                DebugCastAndLog("Passive", TryDebugCastPassive);
-        }
-
+        
         private void DebugCastAndLog(string label, Func<bool> castFunc)
         {
             bool success = castFunc != null && castFunc.Invoke();
@@ -529,7 +488,7 @@ namespace Immortal_Switch.Scripts.Skill
             });
         }
 
-        private bool CastSkillInternal(SkillDataSO skillData, int level, ICombatUnit target, bool interrupt, bool isUltimate)
+        private async UniTask<bool> CastSkillInternalAsync(SkillDataSO skillData, int level, ICombatUnit target, bool interrupt, bool isUltimate)
         {
             if (interrupt)
                 CancelCurrentSkill();
@@ -576,15 +535,15 @@ namespace Immortal_Switch.Scripts.Skill
                 case SkillRuntimeVisualType.SpawnedSkillObject:
                 case SkillRuntimeVisualType.SpawnHomingProjectile:
                 case SkillRuntimeVisualType.SpawnProjectilePatternBehavior:    
-                    result = SpawnRuntimeObjectSkill(context, runtimeConfig, isUltimate);
+                    result = await SpawnRuntimeObjectSkill(context, runtimeConfig, isUltimate);
                     break;
 
                 case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:
-                    result = CastHeroSpineAndSpawnedSkillObject(context, castConfig, runtimeConfig, isUltimate);
+                    result = await CastHeroSpineAndSpawnedSkillObject(context, castConfig, runtimeConfig, isUltimate);
                     break;
                 
                 case SkillRuntimeVisualType.HeroSpineObjectAndProjectile:
-                    result = CastHeroSpineAndSpawnedProjectile(context, castConfig, runtimeConfig, isUltimate);
+                    result = await CastHeroSpineAndSpawnedProjectile(context, castConfig, runtimeConfig, isUltimate);
                     break;
 
                 case SkillRuntimeVisualType.ProjectileOnly:
@@ -601,19 +560,19 @@ namespace Immortal_Switch.Scripts.Skill
             return result;
         }
 
-        private bool SpawnRuntimeObjectSkill(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
+        private async UniTask<bool> SpawnRuntimeObjectSkill(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
         {
             bool finishImmediatelyIfIndependent = true;
-            var result = SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent, isUltimate);
+            var result = await SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent, isUltimate);
             return result != null;
         }
 
-        private SkillRuntimeObject SpawnRuntimeObjectInternal(
+        private async UniTask<SkillRuntimeObject> SpawnRuntimeObjectInternal(
             SkillRuntimeContext context,
             SkillRuntimeObjectConfig runtimeConfig,
             bool finishImmediatelyIfIndependent, bool isUltimate)
         {
-            if (runtimeConfig == null || runtimeConfig.SkillRuntimePrefab == null)
+            if (runtimeConfig == null)
             {
                 if (finishImmediatelyIfIndependent)
                 {
@@ -628,26 +587,8 @@ namespace Immortal_Switch.Scripts.Skill
                 owner.SetActionLocked(true);
 
             Vector3 spawnPosition = GetRuntimeObjectSpawnPosition(context, runtimeConfig);
-            SkillRuntimeObject runtimeObject = null;
-            switch (runtimeConfig.RuntimeVisualType)
-            {
-                case SkillRuntimeVisualType.SpawnedSkillObject:
-                case SkillRuntimeVisualType.HeroSpineObjectAndProjectile:    
-                case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:    
-                    runtimeObject = objectSpawner.Spawn(runtimeConfig.SkillRuntimePrefab, spawnPosition, Quaternion.identity);
-                    break;
-                case SkillRuntimeVisualType.SpawnHomingProjectile:
-                    HomingChainBulletSkillRuntimeObject homingChainBulletSkillRuntimeObject =
-                        (HomingChainBulletSkillRuntimeObject)runtimeConfig.SkillRuntimePrefab;
-                    runtimeObject = objectSpawner.Spawn(homingChainBulletSkillRuntimeObject, spawnPosition, Quaternion.identity);
-                    break;
-                case SkillRuntimeVisualType.SpawnProjectilePatternBehavior:
-                    BulletSpawnerSkillRuntimeObject bulletSpawnerSkillRuntimeObject =
-                        (BulletSpawnerSkillRuntimeObject)runtimeConfig.SkillRuntimePrefab;
-                    runtimeObject = objectSpawner.Spawn(bulletSpawnerSkillRuntimeObject, spawnPosition, Quaternion.identity);
-                    break;
-            }
 
+            SkillRuntimeObject runtimeObject = await objectSpawner.SpawnRuntimeAsync(runtimeConfig, spawnPosition, Quaternion.identity);
             if (runtimeObject == null)
             {
                 if (finishImmediatelyIfIndependent)
@@ -668,7 +609,7 @@ namespace Immortal_Switch.Scripts.Skill
         }
         
 
-        private bool CastHeroSpineAndSpawnedSkillObject(
+        private async UniTask<bool> CastHeroSpineAndSpawnedSkillObject(
             SkillRuntimeContext context,
             SkillCastConfig castConfig,
             SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
@@ -681,7 +622,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             // The spawned object is independent. Do not finish the skill here, because the hero
             // must stay locked until the hero ultimate animation completes.
-            SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
+            await SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
 
             bool lockCasterDuringHeroAnimation = runtimeConfig == null || runtimeConfig.LockCasterDuringHeroAnimation;
             if (lockCasterDuringHeroAnimation && owner != null)
@@ -710,7 +651,7 @@ namespace Immortal_Switch.Scripts.Skill
             FinishCurrentSkill(isUltimate);
         }
         
-        private bool CastHeroSpineAndSpawnedProjectile(
+        private async UniTask<bool> CastHeroSpineAndSpawnedProjectile(
             SkillRuntimeContext context,
             SkillCastConfig castConfig,
             SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
@@ -723,7 +664,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             // The spawned object is independent. Do not finish the skill here, because the hero
             // must stay locked until the hero ultimate animation completes.
-            SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
+            await SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
 
             bool lockCasterDuringHeroAnimation = runtimeConfig == null || runtimeConfig.LockCasterDuringHeroAnimation;
             if (lockCasterDuringHeroAnimation && owner != null)

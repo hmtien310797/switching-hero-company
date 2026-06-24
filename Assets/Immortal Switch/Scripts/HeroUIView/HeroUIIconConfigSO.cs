@@ -12,6 +12,14 @@ namespace Immortal_Switch.Scripts.HeroUIView
         public List<ElementIconEntry> ElementIcons = new();
         public List<HeroClassIconEntry> HeroClassIcons = new();
 
+        public ElementIconEntry GetElement(Element element)
+        {
+            return ElementIcons.Find(x => x.Element == element);
+        }
+        public HeroClassIconEntry GetHeroClass(HeroClass heroClass)
+        {
+            return HeroClassIcons.Find(x => x.HeroClass == heroClass);
+        }
         public Sprite GetElementIcon(Element element)
         {
             var entry = ElementIcons.Find(x => x.Element == element);
@@ -30,6 +38,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
     {
         public Element Element;
         [PreviewField] public Sprite Icon;
+        public string ElementName;
     }
 
     [Serializable]
@@ -37,5 +46,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
     {
         public HeroClass HeroClass;
         [PreviewField] public Sprite Icon;
+        public string ClassName;
     }
 }

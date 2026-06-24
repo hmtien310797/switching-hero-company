@@ -138,6 +138,17 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     }
 
                     break;
+
+                case MissionSystemTypes.REPEAT:
+                case MissionSystemTypes.ACHIEVEMENT:
+                    foreach (var entry in _storage.Data.RepeatTask.Where(entry => entry.Id == missionId))
+                    {
+                        entry.IsClaimed = isClaimed;
+                        flag = true;
+                        break;
+                    }
+
+                    break;
             }
 
             if (flag)
@@ -184,6 +195,14 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                 case MissionSystemTypes.WEEKLY:
                     foreach (var entry in _storage.Data.WeeklyTask.Tasks.Where(entry => entry.Id == cfg.missionId))
+                    {
+                        return entry.Progress >= cfg.target && !entry.IsClaimed;
+                    }
+
+                    break;
+
+                case MissionSystemTypes.REPEAT:
+                    foreach (var entry in _storage.Data.RepeatTask.Where(entry => entry.Id == cfg.missionId))
                     {
                         return entry.Progress >= cfg.target && !entry.IsClaimed;
                     }

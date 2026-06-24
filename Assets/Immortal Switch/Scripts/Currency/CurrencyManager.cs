@@ -93,6 +93,27 @@ namespace Immortal_Switch.Scripts.Currency
         }
 
         /// <summary>
+        /// Ghi đè balance tuyệt đối từ response server (battle/end, ...). gold/diamond/energy theo
+        /// field riêng vì tên JSON không khớp tên CurrencyType ("diamonds" vs "diamond"); còn lại
+        /// (items) parse theo tên CurrencyType — bỏ qua key không khớp enum nào (vd. item_id số).
+        /// </summary>
+        public void ApplyServerBalances(long gold, long diamonds, int energy, IReadOnlyDictionary<string, double> items = null)
+        {
+            Set(CurrencyType.gold, BigNumber.FromDouble(gold));
+            Set(CurrencyType.diamond, BigNumber.FromDouble(diamonds));
+            Set(CurrencyType.energy, BigNumber.FromDouble(energy));
+
+            if (items == null)
+                return;
+
+            foreach (var kv in items)
+            {
+                if (TryParseCurrencyType(kv.Key, out CurrencyType type))
+                    Set(type, BigNumber.FromDouble(kv.Value));
+            }
+        }
+
+        /// <summary>
         /// Dùng cho debug/local demo. Server mode không nên gọi trực tiếp cho giao dịch thật.
         /// </summary>
         public bool SpendLocalDemo(CurrencyType currencyType, BigNumber amount)

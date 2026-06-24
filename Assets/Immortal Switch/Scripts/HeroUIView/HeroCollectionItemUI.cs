@@ -8,40 +8,34 @@ namespace Immortal_Switch.Scripts.HeroUIView
 {
     public class HeroCollectionItemUI : MonoBehaviour
     {
-        [Header("Icons")]
-        [SerializeField] private Image portraitIcon;
+        [Header("Icons")] [SerializeField] private Image portraitIcon;
         [SerializeField] private Image shardIcon;
         [SerializeField] private Image rarityIcon;
         [SerializeField] private Image elementIcon;
         [SerializeField] private Image heroClassIcon;
+        [SerializeField] private Image bgImg;
+        [SerializeField] private Image frameImg;
 
-        [Header("Texts")]
-        [SerializeField] private TMP_Text progressText;
+        [Header("Texts")] [SerializeField] private TMP_Text progressText;
+        [SerializeField] private TMP_Text txtSlot;
 
-        [Header("Progress")]
-        [SerializeField] private Image progressFill;
+        [Header("Progress")] [SerializeField] private Image progressFill;
 
-        [Header("States")]
-        [SerializeField] private GameObject acquiredGroup;
+        [Header("States")] [SerializeField] private GameObject acquiredGroup;
         [SerializeField] private GameObject notAcquiredGroup;
         [SerializeField] private GameObject grayscaleOverlay;
+        [SerializeField] private GameObject goSlotPanel;
 
-        [Tooltip("Viền chọn tĩnh")]
-        [SerializeField] private GameObject selectedObject;
+        [Tooltip("Viền chọn tĩnh")] [SerializeField]
+        private GameObject selectedObject;
 
-        [Tooltip("Glow sáng nhẹ / pulse khi đã chọn đủ source + target")]
-        [SerializeField] private GameObject readyHighlightObject;
+        [Tooltip("Glow sáng nhẹ / pulse khi đã chọn đủ source + target")] [SerializeField]
+        private GameObject readyHighlightObject;
 
-        [Header("Interaction")]
-        [SerializeField] private Button button;
-        [SerializeField] private CanvasGroup canvasGroup;
+        [Header("Interaction")] [SerializeField]
+        private Button button;
 
-        [Header("Tier Background")]
-        [SerializeField] private Image backgroundImage;
-        [SerializeField] private HeroTierVisualConfigSO tierVisualConfig;
-
-        [Header("Star")]
-        [SerializeField] private Transform starRoot;
+        [Header("Star")] [SerializeField] private Transform starRoot;
         [SerializeField] private GameObject starPrefab;
         [SerializeField] private GameObject emptyStarPrefab;
 
@@ -54,17 +48,34 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             currentData = data;
 
-            if (portraitIcon != null) portraitIcon.sprite = data.PortraitIcon;
-            if (shardIcon != null) shardIcon.sprite = data.ShardIcon;
-            if (rarityIcon != null) rarityIcon.sprite = data.RarityIcon;
-            if (elementIcon != null) elementIcon.sprite = data.ElementIcon;
-            if (heroClassIcon != null) heroClassIcon.sprite = data.HeroClassIcon;
+            if (portraitIcon != null)
+                portraitIcon.sprite = data.PortraitIcon;
+
+            if (shardIcon != null)
+                shardIcon.sprite = data.ShardIcon;
+
+            if (rarityIcon != null)
+                rarityIcon.sprite = data.RarityIcon;
+
+            if (elementIcon != null)
+                elementIcon.sprite = data.ElementIcon;
+
+            if (heroClassIcon != null)
+                heroClassIcon.sprite = data.HeroClassIcon;
+
+            bgImg.sprite = data.BgIcon;
+            frameImg.sprite = data.FrameIcon;
 
             bool isAcquired = data.IsAcquired;
 
-            if (acquiredGroup != null) acquiredGroup.SetActive(isAcquired);
-            if (notAcquiredGroup != null) notAcquiredGroup.SetActive(!isAcquired);
-            if (grayscaleOverlay != null) grayscaleOverlay.SetActive(!isAcquired);
+            if (acquiredGroup != null)
+                acquiredGroup.SetActive(isAcquired);
+
+            if (notAcquiredGroup != null)
+                notAcquiredGroup.SetActive(!isAcquired);
+
+            if (grayscaleOverlay != null)
+                grayscaleOverlay.SetActive(!isAcquired);
 
             if (isAcquired)
             {
@@ -98,10 +109,20 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
                 RefreshStars(0, 0);
 
-                if (backgroundImage != null)
+                /*if (backgroundImage != null)
                 {
                     backgroundImage.sprite = null;
                     backgroundImage.color = new Color(0.3f, 0.3f, 0.3f);
+                }*/
+            }
+
+            if (goSlotPanel != null)
+            {
+                goSlotPanel.SetActive(data.IsInLineup);
+
+                if (data.IsInLineup)
+                {
+                    txtSlot.text = $"Slot {data.LineupIdx + 1}";
                 }
             }
 
@@ -152,22 +173,22 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (button != null)
                 button.interactable = interactable;
 
-            if (canvasGroup != null)
+            /*if (canvasGroup != null)
             {
                 canvasGroup.interactable = interactable;
                 canvasGroup.blocksRaycasts = interactable;
-            }
+            }*/
         }
 
         public void SetDimmed(bool dimmed)
         {
-            if (canvasGroup != null)
-                canvasGroup.alpha = dimmed ? 0.45f : 1f;
+            /*if (canvasGroup != null)
+                canvasGroup.alpha = dimmed ? 0.45f : 1f;*/
         }
 
         private void ApplyTierVisual(HeroCollectionItemViewData data)
         {
-            if (tierVisualConfig == null || backgroundImage == null)
+            /*if (tierVisualConfig == null || backgroundImage == null)
                 return;
 
             var entry = tierVisualConfig.Get(data.DisplayTier);
@@ -180,12 +201,13 @@ namespace Immortal_Switch.Scripts.HeroUIView
             else
             {
                 backgroundImage.sprite = entry.BackgroundSprite;
-            }
+            }*/
         }
 
         private void RefreshStars(int current, int max)
         {
-            if (starRoot == null) return;
+            if (starRoot == null)
+                return;
 
             foreach (Transform child in starRoot)
                 Destroy(child.gameObject);
@@ -193,6 +215,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             for (int i = 0; i < max; i++)
             {
                 var prefab = i < current ? starPrefab : emptyStarPrefab;
+
                 if (prefab != null)
                     Instantiate(prefab, starRoot);
             }

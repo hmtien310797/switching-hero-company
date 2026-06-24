@@ -20,7 +20,7 @@ MonoBehaviour:
   SkillIcon: {fileID: 21300000, guid: 5bdeeab694a8feb42a193987d56827f8, type: 3}
   DescriptionTemplate: 
   OwnerType: 0
-  MaxLevel: 1
+  MaxLevel: 10
   SkillTier: 1
   CastConfig:
     RequireTarget: 1
@@ -31,7 +31,8 @@ MonoBehaviour:
     HeroAnimationName: animation
   RuntimeObjectConfig:
     RuntimeVisualType: 2
-    SkillRuntimePrefab: {fileID: 4933747040172012281, guid: e107a4ff434ae0645a7a0be291a789f1, type: 3}
+    SpawnMode: 1
+    RuntimeAddressableKey: prefab_tempest_arrow
     SpawnPositionType: 0
     FollowType: 1
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -42,6 +43,25 @@ MonoBehaviour:
     LoopAnimation: 0
     LockCasterWhileAlive: 0
     LockCasterDuringHeroAnimation: 1
+    MultiSpawnConfig:
+      ChildSpawnMode: 1
+      ChildRuntimeAddressableKey: 
+      ChildAnimationName: 
+      ChildLoopAnimation: 0
+      ChildUseLifeTime: 1
+      ChildLifeTime: 1.5
+      ChildDespawnOnAnimationComplete: 1
+      SpawnCount: 10
+      StartDelay: 0
+      SpawnInterval: 0.15
+      SpawnRadius: 2.5
+      RandomInsideCircle: 1
+      IncludeCenterAsFirstSpawn: 1
+      ChildSpawnOffset: {x: 0, y: 0, z: 0}
+      RandomizeYRotation: 0
+      DespawnControllerAfterSpawn: 1
+      DespawnDelayAfterLastSpawn: 0.25
+      DebugDrawSpawnRadius: 0
   BasePhases:
   - PhaseId: 0
     TriggerType: 1
@@ -141,5 +161,23 @@ MonoBehaviour:
       MinEnemyCount: 1
       Range: 5
   CustomBehaviourPrefab: {fileID: 0}
-  UpgradeShardCosts: []
+  UpgradeShardCosts:
+  - Level: 1
+    RequiredShard: 2
+  - Level: 2
+    RequiredShard: 2
+  - Level: 3
+    RequiredShard: 2
+  - Level: 4
+    RequiredShard: 2
+  - Level: 5
+    RequiredShard: 2
+  - Level: 6
+    RequiredShard: 2
+  - Level: 7
+    RequiredShard: 2
+  - Level: 8
+    RequiredShard: 2
+  - Level: 9
+    RequiredShard: 2
   Levels: []

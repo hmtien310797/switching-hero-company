@@ -2662,10 +2662,14 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   btnClose: {fileID: 5087510326958181871}
+  btnUpgrade: {fileID: 1645706063970877360}
   btnFormation: {fileID: 1987255080311910192}
   btnNext: {fileID: 4142466762596246499}
   btnPrev: {fileID: 6862427134181383815}
   heroUiDb: {fileID: 11400000, guid: 5f88e268420f92c459868bea697969c6, type: 2}
+  heroRarityVisualConfig: {fileID: 11400000, guid: 393c7325f388e7f43a3d7d63f09f62e0, type: 2}
+  heroSummonRarityVisualConfigSo: {fileID: 11400000, guid: d3049491bfac04d41a37c53d44ad2fc2, type: 2}
+  heroDatabase: {fileID: 11400000, guid: 89ff8b391b9e64c82ac7356834aef25c, type: 2}
   imgShard: {fileID: 8110385819732485685}
   txtName: {fileID: 5098986190384628719}
   txtShard: {fileID: 710490120812388168}
@@ -2675,6 +2679,8 @@ MonoBehaviour:
   txtRace: {fileID: 2666257964965128617}
   imgRace: {fileID: 7137181543538309197}
   txtElement: {fileID: 2734033786402086372}
+  txtClass: {fileID: 2666257964965128617}
+  txtHeroName: {fileID: 5098986190384628719}
   imgElement: {fileID: 5827957023869663691}
   statAtk: {fileID: 1015989531309279813}
   statHp: {fileID: 190214869452308214}
@@ -2863,8 +2869,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 56.3, y: 59.899994}
-  m_SizeDelta: {x: -85.3312, y: -156.8063}
+  m_AnchoredPosition: {x: 78.43629, y: 59.899994}
+  m_SizeDelta: {x: -41.0586, y: -156.8063}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8190867712685453619
 CanvasRenderer:
@@ -3127,7 +3133,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -20.072}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 862, y: 1561.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3476182737890541366
@@ -3145,7 +3151,7 @@ MonoBehaviour:
   panelRoot: {fileID: 7119994240416480762}
   fitMode: 2
   useSafeArea: 1
-  minScale: 0.35
+  minScale: 0.65
   maxScale: 1
   changePosY: 0
   yPosPortrait: 1

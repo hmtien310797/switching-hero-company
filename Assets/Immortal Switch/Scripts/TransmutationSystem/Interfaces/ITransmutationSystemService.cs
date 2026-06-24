@@ -12,17 +12,22 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
         /// <summary>
         /// add exp to transmulate
         /// </summary>
-        void AddExp(BigInteger quantity);
+        void UpdateExp(BigInteger quantity);
 
         /// <summary>
         /// add energy to transmulate
         /// </summary>
-        void AddEnergy(BigInteger quantity);
+        void UpdateEnergy(BigInteger quantity);
 
         /// <summary>
         /// tang cap
         /// </summary>
-        void LevelUp(int totalLevel);
+        void UpdateLevel(int level);
+
+        /// <summary>
+        /// dismantle item
+        /// </summary>
+        void Dismantle();
 
         /// <summary>
         /// roll ngau nhien ra item trong level hien tai.

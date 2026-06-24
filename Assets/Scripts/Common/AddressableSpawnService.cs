@@ -22,9 +22,7 @@ namespace Immortal_Switch.Scripts.Common
             Quaternion rotation,
             Transform parent = null)
         {
-            string completeKey = string.IsNullOrEmpty(prefix) ? key : $"{prefix}/{key}";
-            
-            if (string.IsNullOrWhiteSpace(completeKey))
+            if (string.IsNullOrWhiteSpace(key))
             {
                 Debug.LogError(
                     "[AddressableSpawnService] Spawn failed: key is null or empty."
@@ -32,6 +30,11 @@ namespace Immortal_Switch.Scripts.Common
 
                 return null;
             }
+            
+            string completeKey =
+                string.IsNullOrWhiteSpace(prefix)
+                    ? key.Trim()
+                    : $"{prefix.TrimEnd('/')}/{key.TrimStart('/')}";
 
             AsyncOperationHandle<GameObject> handle = default;
 

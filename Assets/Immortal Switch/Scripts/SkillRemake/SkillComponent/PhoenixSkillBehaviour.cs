@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using Battle;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Skill;
@@ -8,9 +7,8 @@ using Random = UnityEngine.Random;
 
 namespace Immortal_Switch.Scripts.SkillRemake
 {
-    public class PhoenixSkillBehaviour: SkillMultiSpawnRuntimeObject
+    public class PhoenixSkillBehaviour : SkillMultiSpawnRuntimeObject
     {
-        [SerializeField] private SkillRuntimeObjectConfig skillConfig;
         protected override async UniTask SpawnChild(int index)
         {
             SkillMultiSpawnConfig multiSpawnConfig =
@@ -19,7 +17,8 @@ namespace Immortal_Switch.Scripts.SkillRemake
             if (Context == null ||
                 Spawner == null ||
                 multiSpawnConfig == null ||
-                multiSpawnConfig.ChildRuntimePrefab == null)
+                string.IsNullOrWhiteSpace(
+                    multiSpawnConfig.ChildRuntimeAddressableKey))
             {
                 return;
             }
@@ -36,17 +35,35 @@ namespace Immortal_Switch.Scripts.SkillRemake
                     )
                     : Quaternion.identity;
 
-            SkillRuntimeObject child = Spawner.Spawn(
-                multiSpawnConfig.ChildRuntimePrefab,
-                spawnPosition,
-                rotation
-            );
+            SkillRuntimeObjectConfig childConfig =
+                BuildChildConfig(multiSpawnConfig);
+
+            if (childConfig == null)
+                return;
+
+            SkillRuntimeObject child =
+                await Spawner.SpawnRuntimeAsync(
+                    childConfig,
+                    spawnPosition,
+                    rotation
+                );
 
             if (child == null)
                 return;
 
-            SkillRuntimeObjectConfig childConfig =
-                BuildChildConfig(multiSpawnConfig);
+            /*
+             * Trong lúc Addressable load, Phoenix controller có thể đã
+             * bị cancel hoặc release. Khi đó child vừa load phải được trả
+             * lại đúng nguồn spawn, không được tiếp tục Init.
+             */
+            if (Context == null ||
+                Executor == null ||
+                TargetResolver == null ||
+                Spawner == null)
+            {
+                child.ForceDespawn();
+                return;
+            }
 
             SkillRuntimeContext childContext =
                 Context.CloneForRuntimeObject(
@@ -66,16 +83,27 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 TimeSpan.FromSeconds(1.7f)
             );
 
-            if (Context == null ||
+            /*
+             * Sau thời gian bay lên, child hoặc controller đều có thể
+             * đã kết thúc. Unity object đã destroy/despawn sẽ trả về null
+             * qua operator ==.
+             */
+            if (child == null ||
+                Context == null ||
                 Context.Caster == null ||
-                child == null)
+                Context.Caster.IsDead)
             {
                 return;
             }
 
+            PvEBattleController battleController =
+                PvEBattleController.Instance;
+
+            if (battleController == null)
+                return;
+
             var currentTarget =
-                PvEBattleController.Instance
-                    .GetRandomEnemyAlive();
+                battleController.GetRandomEnemyAlive();
 
             if (currentTarget == null ||
                 currentTarget.IsDead)
@@ -84,6 +112,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
             }
 
             Context.Caster.SetTarget(currentTarget);
+
             child.transform.position =
                 currentTarget.Position;
         }

@@ -13,14 +13,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
     {
         [SerializeField] private Image portraitImage;
         [SerializeField] private Image rarityIcon;
+        [SerializeField] private Image bgImg;
         [SerializeField] private TMP_Text amountText;
         [SerializeField] private TMP_Text heroNameText;
         [SerializeField] private GameObject newTag;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private RectTransform rectTransform;
-
-        [Header("Background")]
-        [SerializeField] private UIGradient backgroundGradient;
 
         [Header("Glow")]
         [SerializeField] private GameObject glowRoot;
@@ -50,8 +48,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             HeroSummonGroupedResultEntry entry,
             SpriteAtlas heroSpriteAtlas,
             Sprite raritySprite,
-            Color topColor,
-            Color bottomColor,
+            Sprite bgSprite,
             bool lastCard = false)
         {
             var hero = entry.HeroAsset as HeroDataSO;
@@ -74,12 +71,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             if (newTag != null)
                 newTag.SetActive(entry.IsNewHero);
 
-            if (backgroundGradient != null)
-            {
-                backgroundGradient.Refresh(topColor, bottomColor);
-            }
-
-            ApplyGlowByRarity(entry.Rarity, topColor, bottomColor);
+            //bgImg.sprite = bgSprite;
+            //ApplyGlowByRarity(entry.Rarity, topColor, bottomColor);
             SetHiddenImmediate();
         }
 

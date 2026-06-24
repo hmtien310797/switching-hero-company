@@ -272,6 +272,14 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<HeroSetLineupResponse>(response.Payload);
     }
 
+    /// <summary>Nâng sao hero bằng shard. Server là nguồn sự thật — trừ shard + set rarity/star, client không tự tính.</summary>
+    public async Task<HeroUpgradeResponse> UpgradeHeroAsync(int heroId)
+    {
+        var payload = JsonConvert.SerializeObject(new HeroUpgradeRequest { HeroId = heroId });
+        var response = await Client.RpcAsync(Session, "hero/upgrade", payload);
+        return JsonConvert.DeserializeObject<HeroUpgradeResponse>(response.Payload);
+    }
+
     // ── Bag ───────────────────────────────────────────────────────────────────
 
     public async Task<BagResponse> GetBagAsync()
@@ -380,6 +388,14 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<SkillUnequipResponse>(response.Payload);
     }
 
+    /// <summary>Nâng level toàn bộ skill bằng shard sẵn có — server tính + trừ shard + tăng
+    /// level cho mọi skill đủ điều kiện trong 1 lần gọi.</summary>
+    public async Task<SkillEnhanceAllResponse> EnhanceAllSkillsAsync()
+    {
+        var response = await Client.RpcAsync(Session, "skill/enhance_all", "{}");
+        return JsonConvert.DeserializeObject<SkillEnhanceAllResponse>(response.Payload);
+    }
+
     // ── Weapon Management ─────────────────────────────────────────────────────
 
     public async Task<WeaponListResponse> GetWeaponListAsync()
@@ -402,6 +418,31 @@ public class NakamaClient : MonoBehaviour
         var payload  = JsonConvert.SerializeObject(new WeaponUnequipRequest { WeaponUid = weaponUid });
         var response = await Client.RpcAsync(Session, "weapon/unequip", payload);
         return JsonConvert.DeserializeObject<WeaponUnequipResponse>(response.Payload);
+    }
+
+    /// <summary>Fuse vũ khí lên node kế tiếp bằng shard. Server đổi weapon_id/name/grade/star + trừ shard — client không tự tính.</summary>
+    public async Task<WeaponFuseResponse> FuseWeaponAsync(int weaponId)
+    {
+        var payload  = JsonConvert.SerializeObject(new WeaponFuseRequest { WeaponId = weaponId });
+        var response = await Client.RpcAsync(Session, "weapon/fuse", payload);
+        return JsonConvert.DeserializeObject<WeaponFuseResponse>(response.Payload);
+    }
+
+    // ── Battle ────────────────────────────────────────────────────────────────
+
+    /// <summary>Progression thật từ server (current_stage/current_chapter/highest_stage_cleared). Gọi sau login trước khi vào màn chọn stage.</summary>
+    public async Task<BattleProgression> GetBattleProgressionAsync()
+    {
+        var response = await Client.RpcAsync(Session, "battle/progression");
+        return JsonConvert.DeserializeObject<BattleProgression>(response.Payload);
+    }
+
+    /// <summary>Báo kết quả 1 trận PvE. Server tính reward + advance stage — client không tự cộng thưởng/tăng stage trước khi có response.</summary>
+    public async Task<BattleEndResponse> BattleEndAsync(BattleEndRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await Client.RpcAsync(Session, "battle/end", payload);
+        return JsonConvert.DeserializeObject<BattleEndResponse>(response.Payload);
     }
 
     private async void OnApplicationQuit()

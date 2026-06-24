@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.StatSystem;
+﻿using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -95,26 +96,30 @@ namespace Immortal_Switch.Scripts.Skill
         }
 
         [ContextMenu("Debug Auto Cast Now")]
-        public bool TryAutoCastNow()
+        public async UniTask<bool> TryAutoCastNow()
         {
             if (!CanAutoCastNow())
                 return false;
 
+            bool result;
+
             if (autoCastUltimate && ultimateHasPriority)
             {
-                if (TryCastUltimate())
+                result = await TryCastUltimateAsync();
+                if (result)
                     return true;
             }
 
             if (autoCastClassSkills)
             {
-                if (TryCastClassSkill())
+                result = await TryCastClassSkill();
                     return true;
             }
 
             if (autoCastUltimate && !ultimateHasPriority)
             {
-                if (TryCastUltimate())
+                result = await TryCastUltimateAsync();
+                if(result)
                     return true;
             }
 
@@ -132,12 +137,12 @@ namespace Immortal_Switch.Scripts.Skill
             return owner.StateMachine.CurrentStateId != HeroStateId.Ultimate;
         }
 
-        private bool TryCastUltimate()
+        private async UniTask<bool> TryCastUltimateAsync()
         {
             if (!skillController.CanCastUltimate())
                 return false;
 
-            bool success = skillController.TryCastUltimate();
+            bool success = await skillController.TryCastUltimateAsync();
 
             if (debugLog)
             {
@@ -150,23 +155,23 @@ namespace Immortal_Switch.Scripts.Skill
             return success;
         }
 
-        private bool TryCastClassSkill()
+        private async UniTask<bool> TryCastClassSkill()
         {
             return classSkillOrder switch
             {
-                AutoClassSkillOrder.RoundRobin => TryCastClassSkillRoundRobin(),
-                _ => TryCastClassSkillSlotOrder()
+                AutoClassSkillOrder.RoundRobin => await TryCastClassSkillRoundRobin(),
+                _ => await TryCastClassSkillSlotOrder()
             };
         }
 
-        private bool TryCastClassSkillSlotOrder()
+        private async UniTask<bool> TryCastClassSkillSlotOrder()
         {
             for (int i = 0; i < HeroSkillController.ClassSkillSlotCount; i++)
             {
                 if (!skillController.CanCastClassSkillAt(i))
                     continue;
 
-                bool success = skillController.TryCastClassSkillAt(i);
+                bool success = await skillController.TryCastClassSkillAtAsync(i);
 
                 if (debugLog)
                 {
@@ -186,7 +191,7 @@ namespace Immortal_Switch.Scripts.Skill
             return false;
         }
 
-        private bool TryCastClassSkillRoundRobin()
+        private async UniTask<bool> TryCastClassSkillRoundRobin()
         {
             for (int offset = 0; offset < HeroSkillController.ClassSkillSlotCount; offset++)
             {
@@ -195,7 +200,7 @@ namespace Immortal_Switch.Scripts.Skill
                 if (!skillController.CanCastClassSkillAt(index))
                     continue;
 
-                bool success = skillController.TryCastClassSkillAt(index);
+                bool success = await skillController.TryCastClassSkillAtAsync(index);
 
                 if (debugLog)
                 {

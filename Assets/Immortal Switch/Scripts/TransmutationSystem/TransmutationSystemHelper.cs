@@ -149,9 +149,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         /// </summary>
         public static ModifierStatMapping ToStatMapping(string modifier)
         {
-            return ModifierToStatTypeMap.TryGetValue(modifier, out var mapping)
-                ? mapping
-                : throw new Exception($"Unsupported modifier: {modifier}");
+            return ModifierToStatTypeMap.GetValueOrDefault(modifier);
         }
 
         /// <summary>

@@ -19,10 +19,12 @@ namespace Immortal_Switch.Scripts.HeroUIView
         private HeroProgressionDatabaseSO heroDatabase;
 
         [SerializeField] private HeroRarityVisualConfigSO heroRarityVisualConfig;
+        [SerializeField] private HeroSummonRarityVisualConfigSO heroSummonRarityVisualConfigSo;
         [SerializeField] private HeroUIIconConfigSO heroUIIconConfig;
         [SerializeField] private Transform contentRoot;
         [SerializeField] private HeroCollectionItemUI itemPrefab;
         [SerializeField] private Button combatFormationButton;
+        [SerializeField] private Button upgradeAllHeroButton;
 
         [Header("Element Filters")] [SerializeField]
         private HeroCollectionFilterButton allElementButton;
@@ -61,6 +63,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             {
                 UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>(heroSpriteAlas).Forget();
             });
+            upgradeAllHeroButton.onClick.AddListener(HeroProgressionManager.Instance.UpgradeAllHeroes);
         }
 
         private void RefreshAll()
@@ -235,6 +238,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             }
 
             var service = HeroProgressionManager.Instance.Service;
+            var lineups = new List<int>(lineupHeroIds);
 
             for (int i = 0; i < allHeroData.Count; i++)
             {
@@ -243,6 +247,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
                 var data = HeroCollectionItemViewDataFactory.Build(
                     hero,
+                    heroSummonRarityVisualConfigSo,
                     heroDatabase,
                     service,
                     heroRarityVisualConfig,
@@ -251,6 +256,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 if (data != null)
                 {
                     data.IsInLineup = lineupHeroIds.Contains(hero.Id);
+                    data.LineupIdx = lineups.FindIndex(v => v == hero.Id);
                     allItemsData.Add(data);
                 }
             }

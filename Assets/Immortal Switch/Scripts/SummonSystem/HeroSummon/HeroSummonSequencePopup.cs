@@ -202,8 +202,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                     entry,
                     heroSpriteAtlas,
                     visual != null ? visual.Icon : null,
-                    visual != null ? visual.TopColor : Color.white,
-                    visual != null ? visual.BottomColor : Color.white,
+                    visual != null ? visual.Background : null,
                     i == currentGroupedEntries.Count - 1
                 );
 

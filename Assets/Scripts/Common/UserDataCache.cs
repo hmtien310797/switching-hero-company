@@ -5,11 +5,11 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Common
 {
-
     [Serializable]
     public class ClassSkillUnlockData
     {
@@ -40,6 +40,7 @@ namespace Common
         public SummonStateResponse SummonState { get; set; }
 
         /// <summary>Skill list từ server — set bởi GameBootstrap sau login.</summary>
+        [ShowInInspector]
         public SkillListResponse SkillList { get; set; }
 
         /// <summary>Weapon list từ server — set bởi GameBootstrap sau login.</summary>
@@ -60,6 +61,58 @@ namespace Common
         void EnsureInitialized()
         {
             EnsureInitialSkillInventoryForUnlockedClassSkills();
+        }
+
+        public void ApplySkillEnhanceEntries(SkillEnhanceEntry[] entries)
+        {
+            if (SkillList == null || entries == null) return;
+
+            foreach (var entry in entries)
+            {
+                if (SkillList.Owned != null)
+                {
+                    foreach (var inst in SkillList.Owned)
+                    {
+                        if (inst.SkillId == entry.SkillId)
+                        {
+                            inst.Level = entry.NewLevel;
+                            break;
+                        }
+                    }
+                }
+
+                if (SkillList.Shards == null)
+                    SkillList.Shards = new Dictionary<string, int>();
+                SkillList.Shards[entry.SkillId.ToString()] = entry.NewShard;
+            }
+        }
+
+        public void ApplySkillSummonEntries(SummonEntry[] entries)
+        {
+            if (entries == null) return;
+            if (SkillList == null) SkillList = new SkillListResponse();
+
+            foreach (var entry in entries)
+            {
+                if (entry.SkillId <= 0) continue;
+
+                if (entry.IsNew)
+                {
+                    var list = SkillList.Owned != null
+                        ? new List<SkillInstance>(SkillList.Owned)
+                        : new List<SkillInstance>();
+                    list.Add(new SkillInstance { SkillId = entry.SkillId, Level = 1 });
+                    SkillList.Owned = list.ToArray();
+                }
+
+                if (entry.ShardGained > 0)
+                {
+                    if (SkillList.Shards == null)
+                        SkillList.Shards = new Dictionary<string, int>();
+                    string key = entry.SkillId.ToString();
+                    SkillList.Shards[key] = (SkillList.Shards.TryGetValue(key, out int cur) ? cur : 0) + entry.ShardGained;
+                }
+            }
         }
 
         public void GetPlayerDataFromServer(HeroInventory heroInventory, SkillListResponse skillListResponse, WeaponListResponse weaponListResponse)
@@ -157,7 +210,27 @@ namespace Common
 
         private bool IsUnlocked(HeroClass heroClass, int skillId)
         {
-            return GetUnlockedSkills(heroClass).Contains(skillId);
+            // Source of truth: server-owned skill list (UnlockedSkillIdsByClass is never populated)
+            if (SkillList?.Owned != null)
+                foreach (var inst in SkillList.Owned)
+                    if (inst.SkillId == skillId) return true;
+            return false;
+        }
+
+        public string GetHeroUid(int heroId)
+        {
+            if (HeroList?.Owned == null) return null;
+            foreach (var h in HeroList.Owned)
+                if (h.HeroId == heroId) return h.Uid;
+            return null;
+        }
+
+        public string GetSkillUid(int skillId)
+        {
+            if (SkillList?.Owned == null) return null;
+            foreach (var s in SkillList.Owned)
+                if (s.SkillId == skillId) return s.Uid;
+            return null;
         }
 
         #endregion
@@ -188,7 +261,7 @@ namespace Common
             }
         }
 
-        public bool Equip(int heroId, int skillId)
+        public bool EquipSkill(int heroId, int skillId)
         {
             var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
             if (hero == null)
@@ -207,7 +280,7 @@ namespace Common
             return true;
         }
 
-        public bool Unequip(int heroId, int skillId)
+        public bool UnequipSkill(int heroId, int skillId)
         {
             var list = GetEquippedSkills(heroId);
             if (!list.Remove(skillId)) return false;
@@ -216,7 +289,7 @@ namespace Common
             return true;
         }
 
-        public bool Replace(int heroId, int slot, int skillId)
+        public bool ReplaceSkill(int heroId, int slot, int skillId)
         {
             var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
             if (!IsUnlocked(hero.HeroClass, skillId)) return false;

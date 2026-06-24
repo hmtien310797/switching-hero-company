@@ -244,12 +244,12 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             RefreshUI();
         }
 
-        private void OnClickFusion()
+        private async void OnClickFusion()
         {
             if (WeaponManager.Instance == null || currentVm == null || currentCount <= 0)
                 return;
 
-            var result = WeaponManager.Instance.TryFusionForSelectedWeapon(currentVm.WeaponId, currentCount);
+            var result = await WeaponManager.Instance.TryFusionForSelectedWeaponAsync(currentVm.WeaponId, currentCount);
 
             if (result != null && result.HasAnyReward && resultPopup != null)
                 resultPopup.Show(result);

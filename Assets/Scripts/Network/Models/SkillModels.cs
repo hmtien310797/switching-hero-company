@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Sirenix.OdinInspector;
 
 // ── Skill Instance ────────────────────────────────────────────────────────────
 
@@ -24,9 +25,11 @@ public class SkillListResponse
 {
     [JsonProperty("owned")]    public SkillInstance[]              Owned;
     /// <summary>skill_id (string) → số lượng shard. VD: { "1": 3 }</summary>
-    [JsonProperty("shards")]   public Dictionary<string, int>      Shards;
+    [JsonProperty("shards")] 
+    public Dictionary<string, int>      Shards;
     /// <summary>hero_uid → [skill_uid slot0, skill_uid slot1]. null = slot trống.</summary>
-    [JsonProperty("equipped")] public Dictionary<string, string[]> Equipped;
+    [JsonProperty("equipped")] 
+    public Dictionary<string, string[]> Equipped;
 }
 
 // ── skill/equip ───────────────────────────────────────────────────────────────
@@ -62,4 +65,28 @@ public class SkillUnequipResponse
     [JsonProperty("updated")]  public bool                          Updated;
     [JsonProperty("reason")]   public string                        Reason;
     [JsonProperty("equipped")] public Dictionary<string, string[]> Equipped;
+}
+
+// ── skill/enhance_all ────────────────────────────────────────────────────────
+
+[Serializable]
+public class SkillEnhanceAllResponse
+{
+    [JsonProperty("success")]               public bool                Success;
+    [JsonProperty("processed_skill_count")] public int                 ProcessedSkillCount;
+    [JsonProperty("upgraded_skill_count")]  public int                 UpgradedSkillCount;
+    [JsonProperty("total_level_gained")]    public int                 TotalLevelGained;
+    [JsonProperty("total_shard_spent")]     public int                 TotalShardSpent;
+    [JsonProperty("entries")]               public SkillEnhanceEntry[] Entries;
+}
+
+[Serializable]
+public class SkillEnhanceEntry
+{
+    [JsonProperty("skill_id")]    public int SkillId;
+    [JsonProperty("old_level")]   public int OldLevel;
+    [JsonProperty("new_level")]   public int NewLevel;
+    [JsonProperty("old_shard")]   public int OldShard;
+    [JsonProperty("new_shard")]   public int NewShard;
+    [JsonProperty("shard_spent")] public int ShardSpent;
 }

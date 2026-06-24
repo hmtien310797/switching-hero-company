@@ -1,7 +1,9 @@
 using System;
+using System.IO;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.Hero;
@@ -9,6 +11,7 @@ using Immortal_Switch.Scripts.MissionSystem;
 using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.PowerUpSystem;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
@@ -35,7 +38,7 @@ namespace Immortal_Switch.Scripts.Core
                     await NakamaClient.Instance.AuthenticateDeviceAsync();
 
                 // init dau tien. có các manager khác sử dụng tới. tránh lỗi.
- 
+                await DatabaseManager.Instance.InitializeAsync();
                 await MasterDataCache.Instance.InitializeAsync();
                 await PlayerSystemManager.Instance.InitializeAsync();
                 await MissionSystemManager.Instance.InitializeAsync();
@@ -51,6 +54,22 @@ namespace Immortal_Switch.Scripts.Core
                     Debug.LogWarning($"[Bootstrap] Failed to fetch player/me: {ex.Message}");
                 }
 
+                // Fetch complete skill data: owned + shards + equipped.
+                // player/me có thể thiếu shards — skill/list là source of truth đầy đủ.
+                try
+                {
+                    var skillList = await NakamaClient.Instance.GetSkillListAsync();
+                    if (skillList != null)
+                    {
+                        UserDataCache.Instance.SkillList = skillList;
+                        SyncSkillListToInventory(skillList);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[Bootstrap] Failed to fetch skill/list: {ex.Message}");
+                }
+
                 // Đồng bộ summon state (total_roll, pity, summon_level, claimed milestones)
                 try
                 {
@@ -62,12 +81,14 @@ namespace Immortal_Switch.Scripts.Core
                 {
                     Debug.LogWarning($"[Bootstrap] Failed to fetch summon state: {ex.Message}");
                 }
+
                 await UserDataCache.Instance.InitializeAsync();
                 await GrowthManager.Instance.InitializeAsync();
                 await PowerUpManager.Instance.InitializeAsync();
                 await SkillViewDataProvider.Instance.InitializeAsync();
                 await AddressablePoolService.Instance.InitializeAsync();
                 await UIManager.Instance.InitializeAsync();
+                await HeroImageService.InitializeAsync();
                 await PvEBattleController.Instance.InitializeAsync();
 
                 Debug.Log("Bootstrap completed");
@@ -136,15 +157,18 @@ namespace Immortal_Switch.Scripts.Core
             {
                 SyncHeroListToProgression(player.heroes);
             }
-            
+
             UserDataCache.Instance.GetPlayerDataFromServer(player.heroes, player.skills, player.weapons);
 
-            Debug.Log($"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, Energy={player.energy}");
+            Debug.Log(
+                $"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, Energy={player.energy}");
         }
 
         private void ApplySummonState(SummonStateResponse state)
         {
-            if (state == null) return;
+            if (state == null)
+                return;
+
             HeroSummonManager.Instance?.ApplySummonState(state.Hero);
             SkillSummonManager.Instance?.ApplySummonState(state.Skill);
             WeaponSummonManager.Instance?.ApplySummonState(state.Weapon);
@@ -152,10 +176,37 @@ namespace Immortal_Switch.Scripts.Core
 
         private void SyncHeroListToProgression(HeroInventory heroList)
         {
-            if (heroList == null) return;
-            if (HeroProgressionManager.Instance == null) return;
+            if (heroList == null)
+                return;
+
+            if (HeroProgressionManager.Instance == null)
+                return;
 
             HeroProgressionManager.Instance.SyncFromServer(heroList.Owned, heroList.Shards);
+        }
+
+        private void SyncSkillListToInventory(SkillListResponse skills)
+        {
+            if (skills.Owned != null)
+            {
+                foreach (var skill in skills.Owned)
+                {
+                    if (skill.SkillId <= 0) continue;
+                    SkillInventorySaveService.SetOwned(skill.SkillId, true);
+                    SkillInventorySaveService.SetLevel(skill.SkillId, skill.Level > 0 ? skill.Level : 1);
+                }
+            }
+
+            if (skills.Shards != null)
+            {
+                foreach (var kv in skills.Shards)
+                {
+                    if (int.TryParse(kv.Key, out int skillId) && skillId > 0)
+                        SkillInventorySaveService.SetCurrentShard(skillId, kv.Value);
+                }
+            }
+
+            SkillInventorySaveService.Save();
         }
 
         public override UniTask InitializeAsync()

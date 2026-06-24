@@ -20,9 +20,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [SerializeField] private HeroUIIconConfigSO iconConfig;
         [SerializeField] private HeroSummonRarityVisualConfigSO tierConfig;
 
-        [SerializeField] private UIGradient gradient;
-
-        public void Bind(HeroSummonProbabilityHeroData data, SpriteAtlas heroSpriteAtlas)
+        public void Bind(HeroSummonProbabilityHeroData data, SpriteAtlas heroSpriteAtlas, ElementIconEntry element, HeroClassIconEntry heroClass)
         {
             if (data == null || data.Hero == null)
                 return;
@@ -36,14 +34,14 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             if (probabilityText != null)
                 probabilityText.text = $"{data.ProbabilityPercent:0.####}%";
 
+            elementIcon.sprite = element.Icon;
+            classIcon.sprite = heroClass.Icon;
+
             if (tierConfig != null)
             {
                 var visual = tierConfig.Get(data.Hero.SummonRarity);
 
                 if (visual == null) return;
-                if (gradient == null) return;
-                gradient.enabled = true;
-                gradient.Refresh(visual.TopColor, visual.BottomColor);
             }
         }
     }

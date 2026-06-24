@@ -1,6 +1,7 @@
 ﻿using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Hero;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Equipment.Definitions
@@ -16,7 +17,7 @@ namespace Immortal_Switch.Scripts.Equipment.Definitions
         [Range(1, 5)] public int Star = 1;
 
         [Header("Visual")]
-        public Sprite Icon;
+        [PreviewField] public Sprite Icon;
 
         [Header("Equip Stats")]
         public WeaponStatBlock[] EquipStats;

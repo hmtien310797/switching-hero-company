@@ -48,7 +48,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             for (var idx = 0; idx < equipment.Modifiers.Count; idx++)
             {
                 var modifier = equipment.Modifiers[idx];
-                var isUp = hideUp ? null : IsUp(equipment, oldEquip, modifier.StatType);
+                var isUp = hideUp ? null : IsUp(equipment, oldEquip, modifier.StatType, modifier.IsUnique);
 
                 if (modifier.IsUnique &&
                     !anyUnique)
@@ -69,15 +69,15 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             return anyUnique;
         }
 
-        private bool? IsUp(PlayerEquipItem equipment, PlayerEquipItem oldEquip, StatType type)
+        private bool? IsUp(PlayerEquipItem equipment, PlayerEquipItem oldEquip, StatType type, bool isUnique)
         {
             if (oldEquip == null)
             {
                 return true;
             }
 
-            var oldModifier = oldEquip.Modifiers.Find(v => v.StatType == type);
-            var newModifier = equipment.Modifiers.Find(v => v.StatType == type);
+            var oldModifier = oldEquip.Modifiers.Find(v => v.StatType == type && v.IsUnique == isUnique);
+            var newModifier = equipment.Modifiers.Find(v => v.StatType == type && v.IsUnique == isUnique);
 
             if (oldModifier != null &&
                 newModifier != null)

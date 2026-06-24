@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
+using Nakama;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -286,9 +287,9 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             var equippedIds = heroContext != null ? heroContext.EquippedSkillIds : new List<int>();
 
-            int level = SkillInventorySaveService.GetLevel(skillData.SkillId);
-            int currentShard = SkillInventorySaveService.GetCurrentShard(skillData.SkillId);
-            bool isOwned = SkillInventorySaveService.IsOwned(skillData.SkillId) || currentShard > 0;
+            int level = GetServerSkillLevel(skillData.SkillId);
+            int currentShard = GetServerSkillShard(skillData.SkillId);
+            bool isOwned = IsServerSkillOwned(skillData.SkillId) || currentShard > 0;
 
             int requiredShard = 0;
             if (!skillData.IsMaxLevel(level))
@@ -308,6 +309,31 @@ namespace Immortal_Switch.Scripts.Skill.UI
             state.IsEquipped = state.EquippedSlotIndex >= 0;
 
             return state;
+        }
+
+        private int GetServerSkillLevel(int skillId)
+        {
+            var skillList = UserDataCache.Instance?.SkillList;
+            if (skillList?.Owned == null) return 0;
+            foreach (var s in skillList.Owned)
+                if (s.SkillId == skillId) return s.Level > 0 ? s.Level : 1;
+            return 0;
+        }
+
+        private int GetServerSkillShard(int skillId)
+        {
+            var skillList = UserDataCache.Instance?.SkillList;
+            if (skillList?.Shards == null) return 0;
+            return skillList.Shards.TryGetValue(skillId.ToString(), out int v) ? v : 0;
+        }
+
+        private bool IsServerSkillOwned(int skillId)
+        {
+            var skillList = UserDataCache.Instance?.SkillList;
+            if (skillList?.Owned == null) return false;
+            foreach (var s in skillList.Owned)
+                if (s.SkillId == skillId) return true;
+            return false;
         }
 
         public List<SkillDataSO> GetSortedPoolForHero(SkillViewHeroContext heroContext)
@@ -355,18 +381,20 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             Log($"TryEquipSkillToHero -> heroId={heroContext.HeroId}, skillId={skillId}");
 
-            bool success = UserDataCache.Instance.Equip(heroContext.HeroId, skillId);
+            int slotIndex = heroContext.EquippedSkillIds?.Count ?? 0;
+            bool success = UserDataCache.Instance.EquipSkill(heroContext.HeroId, skillId);
             if (!success)
             {
                 LogWarning($"TryEquipSkillToHero failed -> heroId={heroContext.HeroId}, skillId={skillId}");
                 return false;
             }
 
-            //thay doi skill vao 1 slot 
             heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
 
-            Log($"TryEquipSkillToHero success -> heroId={heroContext.HeroId}, skillId={skillId}");
+            SyncEquipAsync(heroContext.HeroId, skillId, slotIndex).Forget();
+
+            Log($"TryEquipSkillToHero success -> heroId={heroContext.HeroId}, skillId={skillId}, slotIndex={slotIndex}");
             return true;
         }
 
@@ -386,7 +414,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             Log($"TryUnequipSkillFromHero -> heroId={heroContext.HeroId}, skillId={skillId}");
 
-            bool success = UserDataCache.Instance.Unequip(heroContext.HeroId, skillId);
+            bool success = UserDataCache.Instance.UnequipSkill(heroContext.HeroId, skillId);
             if (!success)
             {
                 LogWarning($"TryUnequipSkillFromHero failed -> heroId={heroContext.HeroId}, skillId={skillId}");
@@ -395,6 +423,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
+
+            SyncUnequipAsync(skillId).Forget();
 
             Log($"TryUnequipSkillFromHero success -> heroId={heroContext.HeroId}, skillId={skillId}");
             return true;
@@ -416,7 +446,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             Log($"TryReplaceSkillOnHero -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
 
-            bool success = UserDataCache.Instance.Replace(heroContext.HeroId, slotIndex, newSkillId);
+            bool success = UserDataCache.Instance.ReplaceSkill(heroContext.HeroId, slotIndex, newSkillId);
             if (!success)
             {
                 LogWarning($"TryReplaceSkillOnHero failed -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
@@ -426,8 +456,63 @@ namespace Immortal_Switch.Scripts.Skill.UI
             heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
 
+            SyncEquipAsync(heroContext.HeroId, newSkillId, slotIndex).Forget();
+
             Log($"TryReplaceSkillOnHero success -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
             return true;
+        }
+
+        private async UniTaskVoid SyncEquipAsync(int heroId, int skillId, int slotIndex)
+        {
+            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+
+            string heroUid  = UserDataCache.Instance?.GetHeroUid(heroId);
+            string skillUid = UserDataCache.Instance?.GetSkillUid(skillId);
+            if (heroUid == null || skillUid == null)
+            {
+                LogError($"SyncEquipAsync aborted — heroUid or skillUid not found. heroId={heroId}, skillId={skillId}");
+                return;
+            }
+
+            try
+            {
+                await NakamaClient.Instance.SkillEquipAsync(heroUid, slotIndex, skillUid);
+                Log($"SyncEquipAsync done — heroUid={heroUid}, skillUid={skillUid}, slot={slotIndex}");
+            }
+            catch (ApiResponseException ex) when (ex.StatusCode == 16)
+            {
+                LogWarning($"SyncEquipAsync session expired (UNAUTHENTICATED).");
+            }
+            catch (ApiResponseException ex)
+            {
+                LogError($"SyncEquipAsync failed: {ex.StatusCode} {ex.Message}");
+            }
+        }
+
+        private async UniTaskVoid SyncUnequipAsync(int skillId)
+        {
+            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+
+            string skillUid = UserDataCache.Instance?.GetSkillUid(skillId);
+            if (skillUid == null)
+            {
+                LogError($"SyncUnequipAsync aborted — skillUid not found. skillId={skillId}");
+                return;
+            }
+
+            try
+            {
+                await NakamaClient.Instance.SkillUnequipAsync(skillUid);
+                Log($"SyncUnequipAsync done — skillUid={skillUid}");
+            }
+            catch (ApiResponseException ex) when (ex.StatusCode == 16)
+            {
+                LogWarning($"SyncUnequipAsync session expired (UNAUTHENTICATED).");
+            }
+            catch (ApiResponseException ex)
+            {
+                LogError($"SyncUnequipAsync failed: {ex.StatusCode} {ex.Message}");
+            }
         }
     }
 }

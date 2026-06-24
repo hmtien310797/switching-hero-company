@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6952575733382371784
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4647026523766447880}
+  - component: {fileID: 8383406229663479178}
+  m_Layer: 7
+  m_Name: prefab_phoenix_controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4647026523766447880
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6952575733382371784}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8383406229663479178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6952575733382371784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0417a42fc5554913ad4181cd38179e7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <PoolSize>k__BackingField: 2
+  <DeSpawnedOnStart>k__BackingField: 1
+  debugCountRuntimeEvent: 0
+  debugCountEventName: hit
+  debugLogRuntimeEventCount: 1
+  debugLogRuntimeEventTotalOnDespawn: 1
+  childRuntimePrefab: {fileID: 674253945504306269, guid: ce231956a7cef15488c364f1bf93d49d, type: 3}
+  childAnimationName: 
+  childLoopAnimation: 0
+  childUseLifeTime: 0
+  childLifeTime: 1.5
+  childDespawnOnAnimationComplete: 1
+  spawnCount: 10
+  startDelay: 0
+  spawnInterval: 0.5
+  spawnRadius: 2.5
+  randomInsideCircle: 0
+  includeCenterAsFirstSpawn: 0
+  childSpawnOffset: {x: 0, y: 0, z: 0}
+  randomizeYRotation: 0
+  despawnControllerAfterSpawn: 1
+  despawnDelayAfterLastSpawn: 0.25
+  debugDrawSpawnRadius: 0
+  skillConfig:
+    RuntimeVisualType: 2
+    RuntimePrefab: {fileID: 674253945504306269, guid: ce231956a7cef15488c364f1bf93d49d, type: 3}
+    SpawnPositionType: 0
+    FollowType: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    LifeTime: 1
+    UseLifeTime: 0
+    DespawnOnAnimationComplete: 1
+    AnimationName: animation
+    LoopAnimation: 0
+    LockCasterWhileAlive: 0
+    LockCasterDuringHeroAnimation: 0

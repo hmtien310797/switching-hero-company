@@ -1,9 +1,11 @@
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.HeroUIView
@@ -11,11 +13,15 @@ namespace Immortal_Switch.Scripts.HeroUIView
     public class HeroInfoView : AnimatedUIView
     {
         [Header("Root")] [SerializeField] private Button btnClose;
+        [SerializeField] private Button btnUpgrade;
         [SerializeField] private Button btnFormation;
         [SerializeField] private Button btnNext;
         [SerializeField] private Button btnPrev;
 
         [Header("Database")] [SerializeField] private HeroUIIconConfigSO heroUiDb;
+        [SerializeField] private HeroRarityVisualConfigSO heroRarityVisualConfig;
+        [SerializeField] private HeroSummonRarityVisualConfigSO heroSummonRarityVisualConfigSo;
+        [SerializeField] private HeroProgressionDatabaseSO heroDatabase;
 
         [Header("References")] [SerializeField]
         private Image imgShard;
@@ -35,6 +41,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         [SerializeField] private Image imgRace;
         [SerializeField] private TMP_Text txtElement;
+        [SerializeField] private TMP_Text txtClass;
+        [SerializeField] private TMP_Text txtHeroName;
         [SerializeField] private Image imgElement;
 
         [Header("Stats")] [SerializeField] private UIHeroInfoStat statAtk;
@@ -42,7 +50,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private UIHeroInfoStat statSpd;
 
         // --- Private Fields ---
+        private const string HERO_SPRITE_ATLAS_KEY = "hero_sprite_atlas";
         private int _currentHeroIdx;
+        private SpriteAtlas _heroSpriteAlas;
+        private int heroId;
 
         private void Awake()
         {
@@ -50,6 +61,17 @@ namespace Immortal_Switch.Scripts.HeroUIView
             btnFormation.onClick.AddListener(OnClickFormation);
             btnNext.onClick.AddListener(OnClickNext);
             btnPrev.onClick.AddListener(OnClickPrev);
+            btnUpgrade.onClick.AddListener(UpgradeHero);
+        }
+
+        public override async UniTask PlayShowAsync(object args)
+        {
+            if (_heroSpriteAlas == null)
+            {
+                _heroSpriteAlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HERO_SPRITE_ATLAS_KEY);
+            }
+
+            base.PlayShowAsync(args).Forget();
         }
 
         private void OnClickClose()
@@ -59,7 +81,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void OnClickFormation()
         {
-            UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
+            UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>(_heroSpriteAlas).Forget();
         }
 
         private void OnClickNext()
@@ -83,6 +105,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
             RefreshHeroVisual(hero);
         }
 
+        private void UpgradeHero()
+        {
+            HeroProgressionManager.Instance.UpgradeHero(heroId);
+        }
+
         public void Bind(int heroId)
         {
             var allHeroes = MasterDataCache.Instance.GetAllHeroData();
@@ -94,6 +121,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 return;
             }
 
+            this.heroId = heroId;
             var hero = allHeroes[_currentHeroIdx];
 
             if (hero != null)
@@ -128,20 +156,38 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void RefreshHeroVisual(HeroDataSO hero)
         {
-            var elementIcon = heroUiDb.GetElementIcon(hero.Element);
-            var classIcon = heroUiDb.GetHeroClassIcon(hero.HeroClass);
+            var data = HeroCollectionItemViewDataFactory.Build(
+                hero,
+                heroSummonRarityVisualConfigSo,
+                heroDatabase,
+                HeroProgressionManager.Instance.Service,
+                heroRarityVisualConfig,
+                heroUiDb, _heroSpriteAlas);
 
-            if (elementIcon != null)
+            if (data != null)
             {
-                imgElement.sprite = elementIcon;
+                txtShard.text = $"{data.CurrentShard} / {data.RequiredShardToNext}";
+                imgProgress.fillAmount = data.ProgressNormalized;
             }
 
-            if (classIcon != null)
+            var element = heroUiDb.GetElement(hero.Element);
+            var @class = heroUiDb.GetHeroClass(hero.HeroClass);
+
+            if (element != null)
             {
-                imgRace.sprite = classIcon;
+                imgElement.sprite = element.Icon;
+                txtElement.text = element.ElementName;
+            }
+
+            if (@class != null)
+            {
+                imgRace.sprite = @class.Icon;
+                txtClass.text = @class.ClassName;
             }
 
             imgShard.sprite = hero.ShardIcon;
+            txtHeroName.text = hero.Name;
+
             statAtk.Bind(hero.Attack);
             statHp.Bind(hero.Health);
             statSpd.Bind(hero.AttackSpeed);

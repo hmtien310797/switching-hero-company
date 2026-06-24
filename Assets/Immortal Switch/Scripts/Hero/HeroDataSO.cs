@@ -1,5 +1,6 @@
 ﻿using Battle;
 using Sirenix.OdinInspector;
+using Spine.Unity;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Hero
@@ -26,6 +27,7 @@ namespace Immortal_Switch.Scripts.Hero
         [Header("UI")]
         [PreviewField] public Sprite PortraitIcon;
         [PreviewField] public Sprite ShardIcon;
+        public SkeletonDataAsset SkeletonDataAsset;
 
         [Header("Summon")] 
         public SummonRarity SummonRarity;

@@ -56,12 +56,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   portraitImage: {fileID: 1246958222164624832}
   rarityIcon: {fileID: 4041237546921526957}
+  bgImg: {fileID: 0}
   amountText: {fileID: 8947728383178636817}
   heroNameText: {fileID: 0}
   newTag: {fileID: 0}
   canvasGroup: {fileID: 1274120818371501419}
   rectTransform: {fileID: 6310150169298617095}
-  backgroundGradient: {fileID: 8477420107493277470}
+  backgroundGradient: {fileID: 0}
   glowRoot: {fileID: 3035496710364040545}
   glowBack: {fileID: 287661430971745047}
   glowRing: {fileID: 7320857724973523417}
@@ -645,7 +646,6 @@ GameObject:
   - component: {fileID: 1927914633739608019}
   - component: {fileID: 8464999359190203562}
   - component: {fileID: 4936203015492491321}
-  - component: {fileID: 8477420107493277470}
   m_Layer: 5
   m_Name: ImageTier
   m_TagString: Untagged
@@ -710,17 +710,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8477420107493277470
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8282778356554650230}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1950561576ff4daea1f5528a2843a307, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TopColor: {r: 0.09066844, g: 1, b: 0, a: 1}
-  BottomColor: {r: 0.7329566, g: 0.8584906, b: 0.73886406, a: 1}

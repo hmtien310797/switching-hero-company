@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.ItemSystem;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
@@ -32,6 +33,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
         [SerializeField] private Button btnAuto;
         [SerializeField] private Button btnHelp;
 
+        [Header("Auto rotate config")] [SerializeField]
+        private RectTransform rtAutoRotate;
+
+        [SerializeField] private float autoRotateDuration;
+
         [Header("Slot layout")] [SerializeField]
         private UITransmutationEquipment slotWeapon;
 
@@ -47,10 +53,14 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         // --- Private Fields ---
         private Dictionary<string, UITransmutationEquipment> _equipments = new();
+        private Tweener _tweenerAutoRotate;
 
         private void Awake()
         {
             TransmutationSystemManager.Instance.OnChanged += OnTransmutationSystemChanged;
+            TransmutationSystemManager.Instance.OnEquipChanged += OnTransmutationEquipChanged;
+            TransmutationSystemManager.Instance.OnSettingChanged += OnTransmutationSettingChanged;
+
             btnTransmutation.onClick.AddListener(() => OnClickTransmutation().Forget());
             btnAuto.onClick.AddListener(OnClickAuto);
             btnTotalStat.onClick.AddListener(() => OnClickTotalStat().Forget());
@@ -73,13 +83,25 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private void OnEnable()
         {
-            Initialize();
+            InitializeEquipment();
             TransmutationSystemManager.Instance.NotifyReady();
         }
 
         private void OnDestroy()
         {
             TransmutationSystemManager.Instance.OnChanged -= OnTransmutationSystemChanged;
+            TransmutationSystemManager.Instance.OnEquipChanged -= OnTransmutationEquipChanged;
+            TransmutationSystemManager.Instance.OnSettingChanged -= OnTransmutationSettingChanged;
+        }
+
+        private void OnTransmutationEquipChanged(PlayerEquipItem arg1, PlayerEquipItem arg2)
+        {
+            RebuildEquipment(arg2);
+        }
+
+        private void OnTransmutationSettingChanged(TransmutationSystemAutoSettingData arg)
+        {
+            SetRotate(arg.Enabled);
         }
 
         private void OnTransmutationSystemChanged(TransmutationSystemChanged arg)
@@ -99,7 +121,16 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private void OnClickAuto()
         {
-            UIManager.Instance.OpenPopupAsync<TransmutationSystemAutoSettingView>().Forget();
+            var setting = TransmutationSystemManager.Instance.Storage.Data.Setting;
+
+            if (setting is not { Enabled: true, })
+            {
+                UIManager.Instance.OpenPopupAsync<TransmutationSystemAutoSettingView>().Forget();
+            }
+            else
+            {
+                TransmutationSystemManager.Instance.SaveSetting(setting.UniqueOptions, setting.Count, setting.Tier, false);
+            }
         }
 
         private async UniTask OnClickTotalStat()
@@ -130,7 +161,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private async UniTask OnClickTransmutation()
         {
-            var newEquip = TransmutationSystemManager.Instance.Fuse();
+            var newEquip = TransmutationSystemManager.Instance.FuseIfPossible();
 
             if (newEquip != null)
             {
@@ -144,12 +175,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
                 else
                 {
                     TransmutationSystemManager.Instance.Equip(newEquip, null);
-                    UIManager.Instance.TogglePopupAsync<UITransmutationSystemReplaceStuckPanel>().Forget();
                 }
             }
         }
 
-        private void Initialize()
+        private void InitializeEquipment()
         {
             EmptyAllEquipment();
             var equips = TransmutationSystemManager.Instance.GetEquips();
@@ -157,6 +187,24 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
             foreach (var equip in equips)
             {
                 RebuildEquipment(equip);
+            }
+        }
+
+        private void SetRotate(bool value)
+        {
+            _tweenerAutoRotate?.Kill();
+            _tweenerAutoRotate = null;
+
+            if (value)
+            {
+                _tweenerAutoRotate = rtAutoRotate
+                    .DOLocalRotate(Vector3.forward * 180f, autoRotateDuration, RotateMode.FastBeyond360)
+                    .SetEase(Ease.Linear)
+                    .SetLoops(-1, LoopType.Incremental);
+            }
+            else
+            {
+                rtAutoRotate.rotation = Quaternion.Euler(Vector3.zero);
             }
         }
 

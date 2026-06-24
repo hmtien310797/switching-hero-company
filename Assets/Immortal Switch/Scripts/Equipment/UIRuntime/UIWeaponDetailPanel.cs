@@ -214,12 +214,12 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             fusionPopup.Show(vm, RequestRefresh);
         }
 
-        private void OnClickFuseAll()
+        private async void OnClickFuseAll()
         {
             if (WeaponManager.Instance == null)
                 return;
 
-            var result = WeaponManager.Instance.TryFuseAllStandardWeapons();
+            var result = await WeaponManager.Instance.TryFuseAllStandardWeaponsAsync();
 
             if (result != null &&
                 result.HasAnyReward &&
