@@ -6,6 +6,7 @@ using Battle;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.SkillRemake;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
@@ -66,6 +67,16 @@ namespace Immortal_Switch.Scripts.Skill
         public event Action<HeroSkillController> SkillsChanged;
 
         public HeroActor Owner => owner;
+
+        public async UniTask InitializeUltimateSkillData()
+        {
+            await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(ultimateSkill);
+        }
+
+        public void DespawnAllInstanceOfUltimateSkill()
+        {
+            AddressableSkillSpawnService.DisposeSkillComponent(ultimateSkill);
+        }
         
         public float GetCooldownRemaining(SkillDataSO skillData)
         {
@@ -124,6 +135,14 @@ namespace Immortal_Switch.Scripts.Skill
             SkillsChanged?.Invoke(this);
         }
         
+        public bool EquipSkill(SkillDataSO skillData)
+        {
+            int emptySlotIndex = GetFirstEmptyClassSkillSlot();
+            classSkills[emptySlotIndex] = skillData;
+            SkillsChanged?.Invoke(this);
+            return true;
+        }
+        
         public bool UnequipSkill(SkillDataSO skillData, bool resetCooldown = false)
         {
             if (skillData == null)
@@ -156,6 +175,28 @@ namespace Immortal_Switch.Scripts.Skill
             return true;
         }
         
+        public bool ReplaceSkillAt(
+            int slotIndex,
+            SkillDataSO newSkill,
+            bool resetOldSkillCooldown = false)
+        {
+            EnsureClassSkillSlotCapacity();
+
+            SkillDataSO oldSkill = classSkills[slotIndex];
+            
+            classSkills[slotIndex] = newSkill;
+
+            ResetCooldown(oldSkill);
+
+            SkillsChanged?.Invoke(this);
+            return true;
+        }
+
+        private bool CanReplaceSkill(int slotIndex)
+        {
+            return IsValidClassSkillSlot(slotIndex);
+        }
+        
         public int GetEquippedClassSkillSlot(SkillDataSO skillData)
         {
             if (skillData == null)
@@ -171,12 +212,56 @@ namespace Immortal_Switch.Scripts.Skill
 
             return -1;
         }
+        
+        public int GetFirstEmptyClassSkillSlot()
+        {
+            EnsureClassSkillSlotCapacity();
+
+            for (int i = 0; i < ClassSkillSlotCount; i++)
+            {
+                if (classSkills[i] == null)
+                    return i;
+            }
+
+            return -1;
+        }
 
         public bool CanCastClassSkillAt(int slotIndex)
         {
             SkillDataSO skillData = GetClassSkillAt(slotIndex);
             return skillData != null && IsCooldownReady(skillData);
         }
+        
+        public bool CanEquipClassSkill(SkillDataSO skillData, out int slotIndex)
+        {
+            if (skillData == null)
+            {
+                slotIndex = -1;
+                return false;
+            }
+
+            if (IsClassSkillEquipped(skillData))
+            {
+                slotIndex = -1;
+                return false;
+            }
+            
+            int emptySlotIndex = GetFirstEmptyClassSkillSlot();
+            if (emptySlotIndex < 0)
+            {
+                slotIndex = -1;
+                return false;
+            }
+            
+            slotIndex = emptySlotIndex;
+            return true;
+        }
+        
+        public bool IsClassSkillEquipped(SkillDataSO skillData)
+        {
+            return GetEquippedClassSkillSlot(skillData) >= 0;
+        }
+
 
         public bool CanCastUltimate()
         {

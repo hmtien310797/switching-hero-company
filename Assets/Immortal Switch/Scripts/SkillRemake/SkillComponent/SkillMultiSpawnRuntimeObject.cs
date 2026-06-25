@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
+using System.Threading;
 using Common;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Immortal_Switch.Scripts.Skill
 {
@@ -24,7 +27,7 @@ namespace Immortal_Switch.Scripts.Skill
                     : null;
             }
         }
-        protected Coroutine spawnRoutine;
+        protected CancellationTokenSource spawnCancellationTokenSource;
 
         protected override void OnRuntimeInitialized(object arg)
         {
@@ -54,66 +57,96 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
             }
 
-            if (spawnRoutine != null)
-            {
-                StopCoroutine(spawnRoutine);
-                spawnRoutine = null;
-            }
+            CancelSpawnTask();
 
-            spawnRoutine = StartCoroutine(SpawnChildrenRoutine());
+            spawnCancellationTokenSource =
+                CancellationTokenSource.CreateLinkedTokenSource(
+                    this.GetCancellationTokenOnDestroy()
+                );
+
+            SpawnChildrenAsync(
+                    spawnCancellationTokenSource.Token
+                )
+                .Forget();
         }
 
-        private IEnumerator SpawnChildrenRoutine()
+        protected virtual async UniTask SpawnChildrenAsync(
+            CancellationToken cancellationToken)
         {
-            SkillMultiSpawnConfig multiSpawnConfig = MultiSpawnConfig;
-
-            if (multiSpawnConfig == null)
+            try
             {
-                spawnRoutine = null;
-                yield break;
-            }
+                SkillMultiSpawnConfig multiSpawnConfig =
+                    MultiSpawnConfig;
 
-            if (multiSpawnConfig.StartDelay > 0f)
-            {
-                yield return new WaitForSeconds(
-                    multiSpawnConfig.StartDelay
-                );
-            }
+                if (multiSpawnConfig == null)
+                    return;
 
-            int spawnCount = Mathf.Max(
-                1,
-                multiSpawnConfig.SpawnCount
-            );
-
-            for (int i = 0; i < spawnCount; i++)
-            {
-                yield return SpawnChild(i).ToCoroutine();
-
-                if (multiSpawnConfig.SpawnInterval > 0f &&
-                    i < spawnCount - 1)
+                if (multiSpawnConfig.StartDelay > 0f)
                 {
-                    yield return new WaitForSeconds(
-                        multiSpawnConfig.SpawnInterval
+                    await UniTask.Delay(
+                        TimeSpan.FromSeconds(
+                            multiSpawnConfig.StartDelay
+                        ),
+                        cancellationToken: cancellationToken
                     );
                 }
-            }
 
-            spawnRoutine = null;
-
-            if (!multiSpawnConfig.DespawnControllerAfterSpawn)
-                yield break;
-
-            if (multiSpawnConfig.DespawnDelayAfterLastSpawn > 0f)
-            {
-                yield return new WaitForSeconds(
-                    multiSpawnConfig.DespawnDelayAfterLastSpawn
+                int spawnCount = Mathf.Max(
+                    1,
+                    multiSpawnConfig.SpawnCount
                 );
-            }
 
-            ForceDespawn();
+                for (int i = 0; i < spawnCount; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    await SpawnChild(
+                        i,
+                        cancellationToken
+                    );
+
+                    if (multiSpawnConfig.SpawnInterval > 0f &&
+                        i < spawnCount - 1)
+                    {
+                        await UniTask.Delay(
+                            TimeSpan.FromSeconds(
+                                multiSpawnConfig.SpawnInterval
+                            ),
+                            cancellationToken: cancellationToken
+                        );
+                    }
+                }
+
+                if (!multiSpawnConfig.DespawnControllerAfterSpawn)
+                    return;
+
+                if (multiSpawnConfig.DespawnDelayAfterLastSpawn > 0f)
+                {
+                    await UniTask.Delay(
+                        TimeSpan.FromSeconds(
+                            multiSpawnConfig.DespawnDelayAfterLastSpawn
+                        ),
+                        cancellationToken: cancellationToken
+                    );
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                ForceDespawn();
+            }
+            catch (OperationCanceledException)
+            {
+                // Task bị hủy khi object despawn, re-init hoặc bị destroy.
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception, this);
+            }
         }
 
-        protected virtual async UniTask SpawnChild(int index)
+        protected virtual async UniTask SpawnChild(
+            int index,
+            CancellationToken cancellationToken)
         {
             SkillMultiSpawnConfig multiSpawnConfig =
                 MultiSpawnConfig;
@@ -126,6 +159,8 @@ namespace Immortal_Switch.Scripts.Skill
             {
                 return;
             }
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             Vector3 spawnPosition =
                 GetChildSpawnPosition(index);
@@ -155,7 +190,12 @@ namespace Immortal_Switch.Scripts.Skill
             if (child == null)
                 return;
 
-            // Sau await phải kiểm tra lại controller.
+            if (cancellationToken.IsCancellationRequested)
+            {
+                child.ForceDespawn();
+                return;
+            }
+            
             if (Context == null ||
                 Executor == null ||
                 TargetResolver == null ||
@@ -277,25 +317,31 @@ namespace Immortal_Switch.Scripts.Skill
                     false
             };
         }
+        
+        protected void CancelSpawnTask()
+        {
+            if (spawnCancellationTokenSource == null)
+                return;
+
+            if (!spawnCancellationTokenSource.IsCancellationRequested)
+            {
+                spawnCancellationTokenSource.Cancel();
+            }
+
+            spawnCancellationTokenSource.Dispose();
+            spawnCancellationTokenSource = null;
+        }
 
         public override void ForceDespawn()
         {
-            if (spawnRoutine != null)
-            {
-                StopCoroutine(spawnRoutine);
-                spawnRoutine = null;
-            }
+            CancelSpawnTask();
 
             base.ForceDespawn();
         }
 
         public override void OnDespawnedToPool()
         {
-            if (spawnRoutine != null)
-            {
-                StopCoroutine(spawnRoutine);
-                spawnRoutine = null;
-            }
+            CancelSpawnTask();
 
             base.OnDespawnedToPool();
         }

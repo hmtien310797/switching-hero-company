@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.SkillRemake;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -158,11 +159,34 @@ namespace Common
             for (int i = 0; i < inBattleHeroes.Length; i++)
             {
                 var currentHero = inBattleHeroes[i];
-                if (currentHero.HeroData.Id == heroId)
+
+                if (currentHero == null ||
+                    currentHero.HeroData == null ||
+                    currentHero.HeroData.Id != heroId ||
+                    currentHero.HeroSkillController == null)
                 {
-                    List<int> allClassSkillIds = currentHero.HeroSkillController.GetAllEquippedClassSkills().ConvertAll(skill => skill.SkillId);
-                    return allClassSkillIds;
+                    continue;
                 }
+
+                var equippedSkills = currentHero.HeroSkillController.GetAllEquippedClassSkills();
+                var skillIds = new List<int>();
+
+                if (equippedSkills == null)
+                {
+                    return skillIds;
+                }
+
+                for (int j = 0; j < equippedSkills.Count; j++)
+                {
+                    var skill = equippedSkills[j];
+
+                    if (skill != null)
+                    {
+                        skillIds.Add(skill.SkillId);
+                    }
+                }
+
+                return skillIds;
             }
 
             return null;
@@ -193,6 +217,14 @@ namespace Common
                 }
             }
             return null;
+        }
+        
+        public int GetServerSkillLevel(int skillId)
+        {
+            if (SkillList?.Owned == null) return 0;
+            foreach (var s in SkillList.Owned)
+                if (s.SkillId == skillId) return s.Level > 0 ? s.Level : 1;
+            return 0;
         }
 
         #endregion
@@ -273,57 +305,51 @@ namespace Common
 
         #region HERO LOADOUT
 
-        public bool EquipSkill(int heroId, int skillId)
+        public async UniTask<bool> EquipSkill(int heroId, int skillId)
         {
-            var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
-            if (hero == null)
+            HeroActor currentHero = GetInBattleHeroActorById(heroId);
+        
+            if (!IsUnlocked(currentHero.HeroClass, skillId))
                 return false;
-        
-            if (!IsUnlocked(hero.HeroClass, skillId))
-                return false;
-        
-            var list = GetEquippedClassSkillIds(heroId);
-        
-            if (list.Count >= 5) return false;
-            if (list.Contains(skillId)) return true;
-        
-            list.Add(skillId);
-            OnHeroSkillChanged?.Invoke(heroId);
-            return true;
+            
+            SkillDataSO skillToEquip = MasterDataCache.Instance.GetSkillDataById(skillId);
+
+            bool equipResult = currentHero.HeroSkillController.CanEquipClassSkill(skillToEquip, out _);
+            if (equipResult)
+            {
+                await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(skillToEquip);
+                currentHero.HeroSkillController.EquipSkill(skillToEquip);
+                OnHeroSkillChanged?.Invoke(heroId);
+            }
+            return equipResult;
         }
 
         public bool UnequipSkill(int heroId, int skillId)
         {
             SkillDataSO equippedSkillData = GetEquippedSkillDataById(heroId, skillId);
             HeroActor actor = GetInBattleHeroActorById(heroId);
-            return actor.HeroSkillController.UnequipSkill(equippedSkillData);
+            bool equipResult = actor.HeroSkillController.UnequipSkill(equippedSkillData);
+            if (equipResult)
+            {
+                AddressableSkillSpawnService.DisposeSkillComponent(equippedSkillData);
+                OnHeroSkillChanged?.Invoke(heroId);
+            }
+            return equipResult;
         }
         
-        // public bool ReplaceSkill(int heroId, int slot, int skillId)
-        // {
-        //     var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
-        //     if (!IsUnlocked(hero.HeroClass, skillId)) return false;
-        //
-        //     var list = GetEquippedSkills(heroId);
-        //
-        //     while (list.Count < 5)
-        //         list.Add(0);
-        //
-        //     list[slot] = skillId;
-        //
-        //     list = list.Where(x => x > 0).Distinct().ToList();
-        //
-        //     SetEquippedSkillsForHero(heroId, list);
-        //     return true;
-        // }
-
-        #endregion
-
-        #region UTIL
-
-        List<int> Normalize(List<int> ids)
+        public async UniTask<bool> ReplaceSkill(int heroId, int slot, int skillId)
         {
-            return ids?.Where(x => x > 0).Distinct().ToList() ?? new List<int>();
+            HeroActor currentHero = GetInBattleHeroActorById(heroId);
+            SkillDataSO skillData = GetEquippedSkillDataById(heroId, skillId);
+            if (skillData == null || currentHero == null)
+            {
+                return false;
+            }
+            AddressableSkillSpawnService.DisposeSkillComponent(currentHero.HeroSkillController.GetClassSkillAt(slot));
+            await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(skillData);
+            bool equipResult = currentHero.HeroSkillController.ReplaceSkillAt(slot, skillData, true);
+            OnHeroSkillChanged?.Invoke(heroId);
+            return equipResult;
         }
 
         #endregion

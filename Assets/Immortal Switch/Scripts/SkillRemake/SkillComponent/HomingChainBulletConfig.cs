@@ -5,8 +5,9 @@ using UnityEngine;
 [Serializable]
 public class HomingChainBulletConfig
 {
-    [Header("Prefab")]
-    public HomingChainBulletProjectile bulletPrefab;
+    [Header("Addressable Bullet")]
+    [Tooltip("Addressable key của prefab HomingChainBulletProjectile.")]
+    public string bulletAddressableKey;
 
     [Header("Spawn")]
     public int bulletCount = 1;

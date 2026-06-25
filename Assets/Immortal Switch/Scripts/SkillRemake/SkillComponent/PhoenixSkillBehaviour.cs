@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Battle;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Skill;
@@ -9,7 +10,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
 {
     public class PhoenixSkillBehaviour : SkillMultiSpawnRuntimeObject
     {
-        protected override async UniTask SpawnChild(int index)
+        protected override async UniTask SpawnChild(int index, CancellationToken cancellationToken)
         {
             SkillMultiSpawnConfig multiSpawnConfig =
                 MultiSpawnConfig;
@@ -23,6 +24,8 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 return;
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+            
             Vector3 spawnPosition =
                 GetChildSpawnPosition(index);
 
@@ -51,11 +54,12 @@ namespace Immortal_Switch.Scripts.SkillRemake
             if (child == null)
                 return;
 
-            /*
-             * Trong lúc Addressable load, Phoenix controller có thể đã
-             * bị cancel hoặc release. Khi đó child vừa load phải được trả
-             * lại đúng nguồn spawn, không được tiếp tục Init.
-             */
+            if (cancellationToken.IsCancellationRequested)
+            {
+                child.ForceDespawn();
+                return;
+            }
+            
             if (Context == null ||
                 Executor == null ||
                 TargetResolver == null ||
@@ -115,6 +119,80 @@ namespace Immortal_Switch.Scripts.SkillRemake
 
             child.transform.position =
                 currentTarget.Position;
+        }
+        
+         protected override async UniTask SpawnChildrenAsync(
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                SkillMultiSpawnConfig multiSpawnConfig =
+                    MultiSpawnConfig;
+
+                if (multiSpawnConfig == null)
+                    return;
+
+                if (multiSpawnConfig.StartDelay > 0f)
+                {
+                    await UniTask.Delay(
+                        TimeSpan.FromSeconds(
+                            multiSpawnConfig.StartDelay
+                        ),
+                        cancellationToken: cancellationToken
+                    );
+                }
+
+                int spawnCount = Mathf.Max(
+                    1,
+                    multiSpawnConfig.SpawnCount
+                );
+
+                for (int i = 0; i < spawnCount; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    SpawnChild(
+                        i,
+                        cancellationToken
+                    ).Forget();
+
+                    if (multiSpawnConfig.SpawnInterval > 0f &&
+                        i < spawnCount - 1)
+                    {
+                        await UniTask.Delay(
+                            TimeSpan.FromSeconds(
+                                multiSpawnConfig.SpawnInterval
+                            ),
+                            cancellationToken: cancellationToken
+                        );
+                    }
+                }
+
+                if (!multiSpawnConfig.DespawnControllerAfterSpawn)
+                    return;
+
+                if (multiSpawnConfig.DespawnDelayAfterLastSpawn > 0f)
+                {
+                    await UniTask.Delay(
+                        TimeSpan.FromSeconds(
+                            multiSpawnConfig.DespawnDelayAfterLastSpawn
+                        ),
+                        cancellationToken: cancellationToken
+                    );
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                ForceDespawn();
+            }
+            catch (OperationCanceledException)
+            {
+                // Task bị hủy khi object despawn, re-init hoặc bị destroy.
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception, this);
+            }
         }
     }
 }

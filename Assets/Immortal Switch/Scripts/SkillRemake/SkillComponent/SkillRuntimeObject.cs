@@ -11,7 +11,7 @@ namespace Immortal_Switch.Scripts.Skill
     /// Generic spawned skill object. This object can represent a Spine VFX, particle VFX, aura,
     /// ground effect, slash object, etc. It is independent from the caster after spawning.
     /// </summary>
-    public class SkillRuntimeObject : PoolableBehaviour
+    public class SkillRuntimeObject : MonoBehaviour
     {
         public event Action<SkillRuntimeObject> Despawned;
 
@@ -258,7 +258,7 @@ namespace Immortal_Switch.Scripts.Skill
             debugRuntimeEventCount = 0;
         }
 
-        public override void OnDespawnedToPool()
+        public virtual void OnDespawnedToPool()
         {
             ClearRuntimeState();
 

@@ -1,14 +1,19 @@
-﻿using Common;
-using Immortal_Switch.Scripts.Combat;
-using Immortal_Switch.Scripts.Enemy;
+﻿using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
-public class BulletProjectile : PoolableBehaviour
+[DisallowMultipleComponent]
+[RequireComponent(typeof(AddressableProjectilePoolable))]
+public class BulletProjectile :
+    MonoBehaviour,
+    IAddressableProjectile
 {
     [Header("Collision")]
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private bool despawnOnHit = true;
+
+    private AddressableProjectilePoolable addressablePoolable;
 
     private Vector3 direction;
     private float speed;
@@ -16,48 +21,73 @@ public class BulletProjectile : PoolableBehaviour
     private float timer;
     private bool isInitialized;
     private float damage;
-    private ICombatUnit sourceCombatUnit;
-    
 
-    public void Setup(ICombatUnit source, Vector3 moveDirection, float bulletSpeed, float bulletLifeTime, float damage)
+    private ICombatUnit sourceCombatUnit;
+
+    private void Awake()
     {
-        direction = moveDirection.normalized;
+        addressablePoolable =
+            GetComponent<AddressableProjectilePoolable>();
+
+        if (addressablePoolable == null)
+        {
+            Debug.LogError(
+                $"[{nameof(BulletProjectile)}] Missing " +
+                $"{nameof(AddressableProjectilePoolable)}.",
+                this
+            );
+        }
+    }
+
+    public void Setup(
+        ICombatUnit source,
+        Vector3 moveDirection,
+        float bulletSpeed,
+        float bulletLifeTime,
+        float damage)
+    {
+        /*
+         * Luôn ghi source mới, kể cả source là null.
+         *
+         * Nếu chỉ assign khi source != null, pooled bullet có thể
+         * giữ sourceCombatUnit từ lần sử dụng trước.
+         */
+        sourceCombatUnit = source;
+
+        direction =
+            moveDirection.sqrMagnitude > 0.0001f
+                ? moveDirection.normalized
+                : Vector3.zero;
+
         speed = bulletSpeed;
         lifeTime = bulletLifeTime;
+        this.damage = damage;
+
         timer = 0f;
         isInitialized = true;
-        this.damage = damage;
-        
+
         if (direction.sqrMagnitude > 0.0001f)
         {
-            transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+            transform.rotation =
+                Quaternion.LookRotation(
+                    direction,
+                    Vector3.up
+                );
         }
-        
-        if (source == null)
-        {
-            return;
-        }
-        
-        sourceCombatUnit = source;
     }
 
-    public override void OnSpawnedFromPool()
+    public void OnProjectileSpawnedFromPool()
     {
-        base.OnSpawnedFromPool();
-
-        timer = 0f;
-        isInitialized = false;
+        /*
+         * AddressablePoolService gọi callback này trước Setup().
+         * Chỉ reset trạng thái chờ Setup, không kích hoạt bullet tại đây.
+         */
+        ResetRuntimeData();
     }
 
-    public override void OnDespawnedToPool()
+    public void OnProjectileDespawnedToPool()
     {
-        base.OnDespawnedToPool();
-
-        isInitialized = false;
-        timer = 0f;
-        direction = Vector3.zero;
-        speed = 0f;
-        lifeTime = 0f;
+        ResetRuntimeData();
     }
 
     private void Update()
@@ -65,11 +95,13 @@ public class BulletProjectile : PoolableBehaviour
         if (!isInitialized)
             return;
 
-        float dt = Time.deltaTime;
+        float deltaTime = Time.deltaTime;
 
-        transform.position += direction * speed * dt;
+        transform.position +=
+            direction * speed * deltaTime;
 
-        timer += dt;
+        timer += deltaTime;
+
         if (timer >= lifeTime)
         {
             DespawnSelf();
@@ -81,23 +113,88 @@ public class BulletProjectile : PoolableBehaviour
         if (!isInitialized)
             return;
 
-        if (!IsInLayerMask(other.gameObject.layer, enemyLayer))
+        if (!IsInLayerMask(
+                other.gameObject.layer,
+                enemyLayer))
+        {
+            return;
+        }
+
+        ICombatUnit targetCombatUnit =
+            other.GetComponent<ICombatUnit>();
+
+        if (targetCombatUnit == null)
             return;
 
-        ICombatUnit combatUnit = other.GetComponent<ICombatUnit>();
-        if(combatUnit == null)
-            return;
-        
-        DamageResult damageResult = DamageCalculator.CalculateDamage(sourceCombatUnit, combatUnit, damage);
-        combatUnit.TakeDamage(damageResult);
-        
+        /*
+         * Giữ nguyên logic cũ:
+         * DamageCalculator nhận source và target để tính damage.
+         */
+        DamageResult damageResult =
+            DamageCalculator.CalculateDamage(
+                sourceCombatUnit,
+                targetCombatUnit,
+                damage
+            );
+
+        targetCombatUnit.TakeDamage(damageResult);
+
         if (despawnOnHit)
         {
             DespawnSelf();
         }
     }
 
-    private bool IsInLayerMask(int layer, LayerMask layerMask)
+    private void DespawnSelf()
+    {
+        if (!isInitialized)
+            return;
+
+        /*
+         * Chặn bullet tiếp tục Update hoặc xử lý trigger khác
+         * trong lúc đang được trả về pool.
+         */
+        isInitialized = false;
+
+        if (addressablePoolable == null)
+        {
+            addressablePoolable =
+                GetComponent<AddressableProjectilePoolable>();
+        }
+
+        if (addressablePoolable == null)
+        {
+            Debug.LogError(
+                $"[{nameof(BulletProjectile)}] Cannot return bullet " +
+                $"to Addressable Pool because " +
+                $"{nameof(AddressableProjectilePoolable)} is missing.",
+                this
+            );
+
+            gameObject.SetActive(false);
+            return;
+        }
+
+        addressablePoolable.Despawn();
+    }
+
+    private void ResetRuntimeData()
+    {
+        isInitialized = false;
+
+        sourceCombatUnit = null;
+
+        direction = Vector3.zero;
+
+        speed = 0f;
+        lifeTime = 0f;
+        timer = 0f;
+        damage = 0f;
+    }
+
+    private static bool IsInLayerMask(
+        int layer,
+        LayerMask layerMask)
     {
         return (layerMask.value & (1 << layer)) != 0;
     }

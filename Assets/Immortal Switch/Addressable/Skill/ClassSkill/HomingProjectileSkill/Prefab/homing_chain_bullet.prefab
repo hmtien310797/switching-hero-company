@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 5312589322574495880}
   - component: {fileID: 9000214464624851853}
   - component: {fileID: 6947051746291144229}
+  - component: {fileID: 4843705301900684374}
   m_Layer: 11
-  m_Name: HomingChainBullet
+  m_Name: homing_chain_bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,8 +68,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c73ab24f58b04d0ea214423bc622b8a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PoolSize>k__BackingField: 2
-  <DeSpawnedOnStart>k__BackingField: 1
+--- !u!114 &4843705301900684374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4616406935645676614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a04dc37457424f019c2410f4bc35be76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3950864756423599761
 PrefabInstance:
   m_ObjectHideFlags: 0

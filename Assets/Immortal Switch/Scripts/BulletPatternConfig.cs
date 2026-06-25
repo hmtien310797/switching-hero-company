@@ -6,7 +6,9 @@ public struct BulletPatternConfig
 {
     [Header("Base Settings")]
     public PatternType patternType;
-    public BulletProjectile bulletPrefab;
+    [Header("Addressable Bullet")]
+    [Tooltip("Addressable key của prefab BulletProjectile.")]
+    public string bulletAddressableKey;
     public float bulletSpeed;
     public float bulletLifeTime;
 

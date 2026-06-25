@@ -1,12 +1,13 @@
 ﻿using System.Collections;
-using Common;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SkillRemake
 {
-    public class HomingChainBulletSkillRuntimeObject : SkillRuntimeObject
+    public class HomingChainBulletSkillRuntimeObject
+        : SkillRuntimeObject
     {
         private HomingChainBulletConfig config;
         private Coroutine spawnCoroutine;
@@ -14,13 +15,49 @@ namespace Immortal_Switch.Scripts.SkillRemake
         protected override void OnRuntimeInitialized(object arg)
         {
             base.OnRuntimeInitialized(arg);
-            if (Context.SkillData.OwnerType == SkillOwnerType.ClassSkill)
+
+            if (Context == null ||
+                Context.SkillData == null)
             {
-                config = Context.SkillData.BasePhases[0].Actions[0].Projectile.HomingChainBulletConfig;
+                Debug.LogError(
+                    $"[{nameof(HomingChainBulletSkillRuntimeObject)}] " +
+                    $"Missing runtime context or SkillData.",
+                    this
+                );
+
+                ForceDespawn();
+                return;
+            }
+
+            if (Context.SkillData.OwnerType ==
+                SkillOwnerType.ClassSkill)
+            {
+                config = Context.SkillData
+                    .BasePhases[0]
+                    .Actions[0]
+                    .Projectile
+                    .HomingChainBulletConfig;
             }
             else
             {
-                config = Context.SkillData.Levels[Context.SkillLevel].Phases[0].Actions[0].Projectile.HomingChainBulletConfig;
+                config = Context.SkillData
+                    .Levels[Context.SkillLevel - 1]
+                    .Phases[0]
+                    .Actions[0]
+                    .Projectile
+                    .HomingChainBulletConfig;
+            }
+
+            if (config == null)
+            {
+                Debug.LogError(
+                    $"[{nameof(HomingChainBulletSkillRuntimeObject)}] " +
+                    $"Missing HomingChainBulletConfig.",
+                    this
+                );
+
+                ForceDespawn();
+                return;
             }
 
             TryFire();
@@ -29,54 +66,110 @@ namespace Immortal_Switch.Scripts.SkillRemake
         [Button]
         private void TryFire()
         {
-            if (spawnCoroutine != null)
-                StopCoroutine(spawnCoroutine);
+            StopSpawnCoroutine();
 
-            spawnCoroutine = StartCoroutine(SpawnBulletRoutine());
+            spawnCoroutine =
+                StartCoroutine(SpawnBulletRoutine());
         }
 
         private IEnumerator SpawnBulletRoutine()
         {
-            int count = Mathf.Max(1, config.bulletCount);
+            int count =
+                Mathf.Max(1, config.bulletCount);
 
             for (int i = 0; i < count; i++)
             {
-                SpawnOneBullet(i);
+                SpawnOneBullet();
 
-                if (config.delayBetweenBullets > 0f && i < count - 1)
-                    yield return new WaitForSeconds(config.delayBetweenBullets);
+                if (config.delayBetweenBullets > 0f &&
+                    i < count - 1)
+                {
+                    yield return new WaitForSeconds(
+                        config.delayBetweenBullets
+                    );
+                }
             }
 
             spawnCoroutine = null;
 
-            // Runtime object này chỉ cần sống tới khi spawn đủ bullet.
-            // Bullet đã tự quản lý chain target và tự despawn.
-            // Nếu bạn có hàm Finish/Despawn runtime riêng thì gọi ở đây.
-            // DespawnSelf();
+            // Controller chỉ chịu trách nhiệm spawn đạn.
+            // Mỗi viên đạn tự quản lý lifetime và tự trả pool.
+            ForceDespawn();
         }
 
-        private void SpawnOneBullet(int index)
+        private void SpawnOneBullet()
         {
-            Vector3 spawnPosition = transform.position;
+            if (config == null)
+                return;
 
-            Vector3 initialDirection = transform.forward;
+            if (string.IsNullOrWhiteSpace(
+                    config.bulletAddressableKey))
+            {
+                Debug.LogError(
+                    $"[{nameof(HomingChainBulletSkillRuntimeObject)}] " +
+                    $"Bullet Addressable key is null or empty.",
+                    this
+                );
+
+                return;
+            }
+
+            AddressablePoolService poolService =
+                AddressablePoolService.Instance;
+
+            if (poolService == null)
+            {
+                Debug.LogError(
+                    $"[{nameof(HomingChainBulletSkillRuntimeObject)}] " +
+                    $"{nameof(AddressablePoolService)}.Instance is null.",
+                    this
+                );
+
+                return;
+            }
+
+            Vector3 spawnPosition =
+                transform.position;
+
+            Vector3 initialDirection =
+                transform.forward;
+
             initialDirection.y = 0f;
 
             if (initialDirection.sqrMagnitude <= 0.0001f)
-                initialDirection = Vector3.forward;
+            {
+                initialDirection =
+                    Vector3.forward;
+            }
 
             initialDirection.Normalize();
 
-            Quaternion rotation = Quaternion.LookRotation(initialDirection, Vector3.up);
+            Quaternion rotation =
+                Quaternion.LookRotation(
+                    initialDirection,
+                    Vector3.up
+                );
 
-            HomingChainBulletProjectile bullet = PoolManager.Instance.Spawn(
-                config.bulletPrefab,
-                spawnPosition,
-                rotation
-            );
+            HomingChainBulletProjectile bullet =
+                poolService.Spawn<HomingChainBulletProjectile>(
+                    config.bulletAddressableKey,
+                    spawnPosition,
+                    rotation
+                );
 
             if (bullet == null)
                 return;
+
+            if (Context == null ||
+                Context.Caster == null)
+            {
+                AddressableProjectilePoolable poolable =
+                    bullet.GetComponent<
+                        AddressableProjectilePoolable>();
+
+                poolable?.Despawn();
+                return;
+            }
 
             bullet.Setup(
                 Context.Caster,
@@ -86,13 +179,18 @@ namespace Immortal_Switch.Scripts.SkillRemake
             );
         }
 
+        private void StopSpawnCoroutine()
+        {
+            if (spawnCoroutine == null)
+                return;
+
+            StopCoroutine(spawnCoroutine);
+            spawnCoroutine = null;
+        }
+
         private void OnDisable()
         {
-            if (spawnCoroutine != null)
-            {
-                StopCoroutine(spawnCoroutine);
-                spawnCoroutine = null;
-            }
+            StopSpawnCoroutine();
         }
     }
 }

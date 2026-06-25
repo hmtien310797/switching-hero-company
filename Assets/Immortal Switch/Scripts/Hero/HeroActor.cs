@@ -1,6 +1,7 @@
 ﻿using System;
 using Battle;
 using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
@@ -177,7 +178,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         stateMachine.ChangeState(!completed ? HeroStateId.BossSpawn : HeroStateId.Idle);
     }
 
-    public void Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController)
+    public async UniTask Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController)
     {
         heroData = data;
         
@@ -185,6 +186,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         pveBattleController = battleController;
         skillController?.Init(this, battleController);
 
+        await skillController.InitializeUltimateSkillData();
         ResetData();
     }
 

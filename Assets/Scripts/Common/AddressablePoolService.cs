@@ -16,6 +16,10 @@ namespace Immortal_Switch.Scripts.Pooling
         private readonly Dictionary<string, AddressablePool> pools = new();
         private readonly Dictionary<string, Transform> parents = new();
         private readonly Dictionary<string, int> activeCounts = new();
+        private readonly Dictionary<
+                string,
+                HashSet<AddressablePoolHandle>>
+            activeHandles = new();
 
         private bool initialized;
 
@@ -90,6 +94,10 @@ namespace Immortal_Switch.Scripts.Pooling
                 );
 
                 activeCounts.Add(key, 0);
+                activeHandles.Add(
+                    key,
+                    new HashSet<AddressablePoolHandle>()
+                );
 
                 if (warmupCount > 0)
                 {
@@ -119,6 +127,7 @@ namespace Immortal_Switch.Scripts.Pooling
                 pools.Remove(key);
                 parents.Remove(key);
                 activeCounts.Remove(key);
+                activeHandles.Remove(key);
 
                 return false;
             }
@@ -219,6 +228,16 @@ namespace Immortal_Switch.Scripts.Pooling
                 key,
                 pooledObject
             );
+            
+            if (!activeHandles.TryGetValue(
+                    key,
+                    out HashSet<AddressablePoolHandle> handles))
+            {
+                handles = new HashSet<AddressablePoolHandle>();
+                activeHandles[key] = handles;
+            }
+
+            handles.Add(handle);
 
             if (activeCounts.TryGetValue(key, out int activeCount))
             {
@@ -252,34 +271,207 @@ namespace Immortal_Switch.Scripts.Pooling
             }
         }
 
-        internal void ReturnInternal(string key, PooledObject pooledObject)
+        internal void ReturnInternal(
+            string key,
+            PooledObject pooledObject,
+            AddressablePoolHandle handle)
         {
-            if (pooledObject == null || pooledObject.Instance == null)
+            if (handle != null &&
+                activeHandles.TryGetValue(
+                    key,
+                    out HashSet<AddressablePoolHandle> handles))
+            {
+                handles.Remove(handle);
+            }
+
+            if (pooledObject == null ||
+                pooledObject.Instance == null)
+            {
+                DecreaseActiveCount(key);
                 return;
+            }
 
             GameObject instance = pooledObject.Instance;
 
-            if (instance.TryGetComponent(out IAddressablePoolable poolable))
-                poolable.OnDespawned();
+            try
+            {
+                if (instance.TryGetComponent(
+                        out IAddressablePoolable poolable))
+                {
+                    poolable.OnDespawned();
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(
+                    $"[AddressablePoolService] OnDespawned failed. " +
+                    $"Key={key}, Instance={instance.name}"
+                );
+
+                Debug.LogException(exception);
+            }
 
             instance.SetActive(false);
 
-            if (activeCounts.TryGetValue(key, out int activeCount))
-            {
-                activeCounts[key] = Mathf.Max(
-                    0,
-                    activeCount - 1
-                );
-            }
+            DecreaseActiveCount(key);
 
-            if (pools.TryGetValue(key, out AddressablePool pool))
+            if (pools.TryGetValue(
+                    key,
+                    out AddressablePool pool))
             {
                 pool.Return(pooledObject);
             }
             else
             {
+                /*
+                 * Pool đã bị remove ngoài ý muốn.
+                 * Không còn nơi để trả object nên dispose thẳng.
+                 */
                 pooledObject.Dispose();
             }
+        }
+        
+        private void DecreaseActiveCount(string key)
+        {
+            if (!activeCounts.TryGetValue(
+                    key,
+                    out int activeCount))
+            {
+                return;
+            }
+
+            activeCounts[key] = Mathf.Max(
+                0,
+                activeCount - 1
+            );
+        }
+        
+        public int DespawnAllActive(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                return 0;
+
+            if (!activeHandles.TryGetValue(
+                    key,
+                    out HashSet<AddressablePoolHandle> handles))
+            {
+                return 0;
+            }
+
+            if (handles.Count == 0)
+                return 0;
+
+            /*
+             * Bắt buộc tạo snapshot vì handle.Despawn()
+             * sẽ xóa handle khỏi HashSet gốc.
+             */
+            AddressablePoolHandle[] snapshot =
+                new AddressablePoolHandle[handles.Count];
+
+            handles.CopyTo(snapshot);
+
+            int despawnedCount = 0;
+
+            for (int i = 0; i < snapshot.Length; i++)
+            {
+                AddressablePoolHandle handle =
+                    snapshot[i];
+
+                if (handle == null ||
+                    handle.IsDisposed)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    handle.Despawn();
+                    despawnedCount++;
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError(
+                        $"[AddressablePoolService] Failed to force despawn " +
+                        $"an active instance. Key={key}"
+                    );
+
+                    Debug.LogException(exception);
+                }
+            }
+
+            return despawnedCount;
+        }
+        
+        public bool DespawnAndDisposePool(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                return false;
+
+            if (!pools.TryGetValue(
+                    key,
+                    out AddressablePool pool))
+            {
+                /*
+                 * Pool không tồn tại thì xem như đã cleanup.
+                 */
+                RemovePoolTracking(key);
+                return true;
+            }
+
+            int despawnedCount =
+                DespawnAllActive(key);
+
+            int remainingActiveCount =
+                GetActiveCount(key);
+
+            if (remainingActiveCount > 0)
+            {
+                Debug.LogError(
+                    $"[AddressablePoolService] Cannot dispose pool because " +
+                    $"some active instances could not be despawned. " +
+                    $"Key={key}, RemainingActive={remainingActiveCount}"
+                );
+
+                return false;
+            }
+
+            try
+            {
+                /*
+                 * Lúc này toàn bộ active đã được Return() về pool.
+                 * pool.Dispose() sẽ dispose toàn bộ inactive object,
+                 * bao gồm các object vừa được thu hồi.
+                 */
+                pool.Dispose();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(
+                    $"[AddressablePoolService] Failed to dispose pool. " +
+                    $"Key={key}"
+                );
+
+                Debug.LogException(exception);
+                return false;
+            }
+
+            RemovePoolTracking(key);
+
+            Debug.Log(
+                $"[AddressablePoolService] Despawned active instances " +
+                $"and disposed pool. " +
+                $"Key={key}, DespawnedActive={despawnedCount}"
+            );
+
+            return true;
+        }
+        
+        private void RemovePoolTracking(string key)
+        {
+            pools.Remove(key);
+            parents.Remove(key);
+            activeCounts.Remove(key);
+            activeHandles.Remove(key);
         }
 
         public bool DisposePool(string key)
@@ -287,17 +479,24 @@ namespace Immortal_Switch.Scripts.Pooling
             if (string.IsNullOrWhiteSpace(key))
                 return false;
 
-            if (!pools.TryGetValue(key, out AddressablePool pool))
+            if (!pools.TryGetValue(
+                    key,
+                    out AddressablePool pool))
+            {
+                RemovePoolTracking(key);
                 return true;
+            }
 
-            int activeCount = GetActiveCount(key);
+            int activeCount =
+                GetActiveCount(key);
 
             if (activeCount > 0)
             {
                 Debug.LogWarning(
                     $"[AddressablePoolService] Cannot dispose pool " +
                     $"while instances are active. " +
-                    $"Key={key}, ActiveCount={activeCount}"
+                    $"Key={key}, ActiveCount={activeCount}. " +
+                    $"Use {nameof(DespawnAndDisposePool)} if force cleanup is intended."
                 );
 
                 return false;
@@ -305,9 +504,7 @@ namespace Immortal_Switch.Scripts.Pooling
 
             pool.Dispose();
 
-            pools.Remove(key);
-            parents.Remove(key);
-            activeCounts.Remove(key);
+            RemovePoolTracking(key);
 
             Debug.Log(
                 $"[AddressablePoolService] Disposed pool. Key={key}"
@@ -318,17 +515,43 @@ namespace Immortal_Switch.Scripts.Pooling
 
         public void DisposeAll()
         {
-            foreach (var pair in pools)
+            if (pools.Count == 0)
             {
-                pair.Value.Dispose();
+                ClearAllTracking();
+                return;
             }
 
+            string[] keys =
+                new string[pools.Count];
+
+            pools.Keys.CopyTo(keys, 0);
+
+            int disposedPoolCount = 0;
+
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (DespawnAndDisposePool(keys[i]))
+                {
+                    disposedPoolCount++;
+                }
+            }
+
+            ClearAllTracking();
+
+            initialized = false;
+
+            Debug.Log(
+                $"[AddressablePoolService] Disposed all pools. " +
+                $"Count={disposedPoolCount}"
+            );
+        }
+        
+        private void ClearAllTracking()
+        {
             pools.Clear();
             parents.Clear();
             activeCounts.Clear();
-            initialized = false;
-
-            Debug.Log("[AddressablePoolService] Dispose all pools.");
+            activeHandles.Clear();
         }
         
         public bool HasPool(string key)

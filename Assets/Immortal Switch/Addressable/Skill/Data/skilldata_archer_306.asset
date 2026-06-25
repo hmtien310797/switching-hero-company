@@ -31,8 +31,8 @@ MonoBehaviour:
     HeroAnimationName: 
   RuntimeObjectConfig:
     RuntimeVisualType: 7
-    SpawnMode: 1
-    RuntimeAddressableKey: 
+    SpawnMode: 0
+    RuntimeAddressableKey: homing_chain_bullet_skill_runtime_object
     SpawnPositionType: 0
     FollowType: 1
     SpawnOffset: {x: 0, y: 1, z: 0}
@@ -103,7 +103,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -116,7 +116,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 6947051746291144229, guid: b5a65f74548706a4db38b19ba99ba941, type: 3}
+          bulletAddressableKey: homing_chain_bullet
           bulletCount: 8
           delayBetweenBullets: 0.05
           enemyLayer:

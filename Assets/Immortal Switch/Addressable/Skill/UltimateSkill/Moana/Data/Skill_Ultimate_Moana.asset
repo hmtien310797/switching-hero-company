@@ -31,7 +31,8 @@ MonoBehaviour:
     HeroAnimationName: ulti
   RuntimeObjectConfig:
     RuntimeVisualType: 4
-    SkillRuntimePrefab: {fileID: 4914210960243289194, guid: 89829804ef37cd44f92345c897c49f71, type: 3}
+    SpawnMode: 1
+    RuntimeAddressableKey: moana_ultimate_spine_runtime_object
     SpawnPositionType: 0
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -43,7 +44,8 @@ MonoBehaviour:
     LockCasterWhileAlive: 0
     LockCasterDuringHeroAnimation: 1
     MultiSpawnConfig:
-      ChildRuntimePrefab: {fileID: 0}
+      ChildSpawnMode: 1
+      ChildRuntimeAddressableKey: 
       ChildAnimationName: 
       ChildLoopAnimation: 0
       ChildUseLifeTime: 1
@@ -119,7 +121,7 @@ MonoBehaviour:
         Projectile:
           BulletPatternConfig:
             patternType: 0
-            bulletPrefab: {fileID: 0}
+            bulletAddressableKey: 
             bulletSpeed: 0
             bulletLifeTime: 0
             totalWaves: 0
@@ -132,7 +134,7 @@ MonoBehaviour:
             damage: 0
             delayWhenStartFiring: 0
           HomingChainBulletConfig:
-            bulletPrefab: {fileID: 0}
+            bulletAddressableKey: 
             bulletCount: 1
             delayBetweenBullets: 0.05
             enemyLayer:
@@ -203,7 +205,7 @@ MonoBehaviour:
         Projectile:
           BulletPatternConfig:
             patternType: 0
-            bulletPrefab: {fileID: 0}
+            bulletAddressableKey: 
             bulletSpeed: 0
             bulletLifeTime: 0
             totalWaves: 0
@@ -216,7 +218,7 @@ MonoBehaviour:
             damage: 0
             delayWhenStartFiring: 0
           HomingChainBulletConfig:
-            bulletPrefab: {fileID: 0}
+            bulletAddressableKey: 
             bulletCount: 1
             delayBetweenBullets: 0.05
             enemyLayer:

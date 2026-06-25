@@ -103,7 +103,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -116,7 +116,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -180,4 +180,91 @@ MonoBehaviour:
     RequiredShard: 2
   - Level: 9
     RequiredShard: 2
-  Levels: []
+  Levels:
+  - Level: 1
+    Phases:
+    - PhaseId: 0
+      TriggerType: 1
+      EventName: hit
+      Delay: 0
+      NormalizedTime: 0
+      Actions:
+      - ActionType: 0
+        ChancePercent: 100
+        TargetTypeOverride: 0
+        Damage:
+          SkillDamageBonusPercent: 0
+          ScaleWithClassSkillLevel: 1
+          CountAsSkillDamage: 1
+        Dot:
+          EffectId: DOT
+          TickDamageBonusPercent: 0
+          ScaleDamageWithClassSkillLevel: 1
+          TickInterval: 1
+          Duration: 5
+          DamageType: 0
+          StackRule: 0
+        StatModifier:
+          ModifierId: 
+          StatType: 0
+          PercentValue: 0
+          ScaleValueWithClassSkillLevel: 1
+          Duration: 5
+        Area:
+          AreaPrefab: {fileID: 0}
+          Shape: 0
+          PositionType: 1
+          Radius: 2
+          BoxSize: {x: 2, y: 2}
+          Duration: 0
+          TickInterval: 0
+          HitOncePerTarget: 1
+          OnHitActions: []
+        Projectile:
+          BulletPatternConfig:
+            patternType: 0
+            bulletAddressableKey: 
+            bulletSpeed: 0
+            bulletLifeTime: 0
+            totalWaves: 0
+            timeBetweenWaves: 0
+            bulletsPerWave: 0
+            spreadAngle: 0
+            rotationSpeedPerWave: 0
+            bulletSpawnDelay: 0
+            alternateBulletOrderEachWave: 0
+            damage: 0
+            delayWhenStartFiring: 0
+          HomingChainBulletConfig:
+            bulletAddressableKey: 
+            bulletCount: 1
+            delayBetweenBullets: 0.05
+            enemyLayer:
+              serializedVersion: 2
+              m_Bits: 0
+            searchRadius: 20
+            maxTargetsPerBullet: 4
+            straightSpeed: 18
+            curveSpeed: 22
+            arriveDistance: 0.2
+            curveTangentLength: 3
+            damage: 100
+            drawDebugPath: 0
+            curveHeight: 4
+            alternateCurveSide: 1
+            useVerticalArc: 1
+            alternateVerticalArc: 1
+            verticalArcOnFirstChainMove: 1
+            verticalArcHeightRange: {x: 0.5, y: 3}
+            UseShortDistanceDetour: 1
+            minDetourDistance: 5
+            virtualPointXRange: {x: 8, y: 12}
+            virtualPointZRange: {x: 5, y: 9}
+            virtualPointYRange: {x: 2, y: 3}
+            virtualPointFindAttempts: 12
+          OnHitActions: []
+        Stack:
+          StackKey: 
+          Amount: 1
+        TriggerSkill: {fileID: 0}
+    DescriptionParams: []

@@ -264,7 +264,7 @@ namespace Battle
             TopMainView.Instance.SetHeroSkeletonAnimationGraphic(newHeroData);
 
             newHero.gameObject.SetActive(true);
-            newHero.Init(newHeroData, this, heroTeamController);
+            await newHero.Init(newHeroData, this, heroTeamController);
             oldHero.OnDead -= OnHeroDead;
             newHero.OnDead += OnHeroDead;
 
@@ -280,6 +280,7 @@ namespace Battle
                 gameCameraController.SetFollowHero(newHero.transform);
             }
 
+            oldHero.HeroSkillController.DespawnAllInstanceOfUltimateSkill();
             AddressableSpawnService.ReleaseInstance(oldHero);
         }
 
@@ -348,7 +349,7 @@ namespace Battle
             }
 
             hero.gameObject.SetActive(true);
-            hero.Init(heroData, this, heroTeamController);
+            await hero.Init(heroData, this, heroTeamController);
             hero.OnDead -= OnHeroDead;
             hero.OnDead += OnHeroDead;
 

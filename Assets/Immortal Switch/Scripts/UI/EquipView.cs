@@ -23,9 +23,9 @@ namespace Immortal_Switch.Scripts.UI
         private void Awake()
         {
             BindSegmentedControl();
+            userDataCache = UserDataCache.Instance;
             TrySetupSubViews();
             RefreshViews(0);
-            userDataCache = UserDataCache.Instance;
         }
 
         private void OnEnable()

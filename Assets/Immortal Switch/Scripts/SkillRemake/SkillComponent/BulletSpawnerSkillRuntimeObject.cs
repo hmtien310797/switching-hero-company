@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections;
 using Common;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SkillRemake
 {
-    public class BulletSpawnerSkillRuntimeObject: SkillRuntimeObject
+    public class BulletSpawnerSkillRuntimeObject : SkillRuntimeObject
     {
         private BulletPatternConfig currentPattern;
         public BulletPatternConfig debugPattern;
-        public bool Debug;
-        
+        public bool EnableDebug;
+
         [Header("Debug")] [SerializeField] private bool fireBySpace = true;
 
         private bool isFiring;
+        private Coroutine patternCoroutine;
 
         private void Awake()
         {
-            if (Debug)
+            if (EnableDebug)
             {
                 currentPattern = debugPattern;
             }
@@ -28,21 +30,22 @@ namespace Immortal_Switch.Scripts.SkillRemake
         protected override void OnRuntimeInitialized(object arg)
         {
             base.OnRuntimeInitialized(arg);
-            
+
             if (Context.SkillData.OwnerType == SkillOwnerType.ClassSkill)
             {
                 currentPattern = Context.SkillData.BasePhases[0].Actions[0].Projectile.BulletPatternConfig;
             }
             else
             {
-                currentPattern = Context.SkillData.Levels[Context.SkillLevel - 1].Phases[0].Actions[0].Projectile.BulletPatternConfig;
+                currentPattern = Context.SkillData.Levels[Context.SkillLevel - 1].Phases[0].Actions[0].Projectile
+                    .BulletPatternConfig;
             }
-            
+
             Vector3 direction = GetDirectionToTarget(Context.Caster.transform, Context.MainTarget.Transform);
             transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             TryFire();
         }
-        
+
         private Vector3 GetDirectionToTarget(Transform from, Transform target)
         {
             Vector3 direction = target.position - from.position;
@@ -57,19 +60,16 @@ namespace Immortal_Switch.Scripts.SkillRemake
         [Button]
         private void TryFire()
         {
-            if (Debug)
+            if (EnableDebug)
             {
-                currentPattern =  debugPattern;
+                currentPattern = debugPattern;
             }
+
             StartCoroutine(ExecutePatternRoutine());
         }
 
         private IEnumerator ExecutePatternRoutine()
         {
-            if (currentPattern.delayWhenStartFiring >= 0)
-            {
-                yield return new WaitForSeconds(currentPattern.delayWhenStartFiring);
-            }
             int totalWaves = Mathf.Max(1, currentPattern.totalWaves);
 
             for (int waveIndex = 0; waveIndex < totalWaves; waveIndex++)
@@ -83,15 +83,23 @@ namespace Immortal_Switch.Scripts.SkillRemake
                     SpawnCurrentWaveInstant(waveIndex);
                 }
 
-                if (currentPattern.timeBetweenWaves > 0f)
+                // Không cần chờ timeBetweenWaves sau wave cuối cùng.
+                bool hasNextWave = waveIndex < totalWaves - 1;
+
+                if (hasNextWave &&
+                    currentPattern.timeBetweenWaves > 0f)
                 {
-                    yield return new WaitForSeconds(currentPattern.timeBetweenWaves);
+                    yield return new WaitForSeconds(
+                        currentPattern.timeBetweenWaves
+                    );
                 }
             }
 
-            if (!Debug)
+            patternCoroutine = null;
+
+            if (!EnableDebug)
             {
-                DespawnSelf();
+                ForceDespawn();
             }
         }
 
@@ -116,42 +124,100 @@ namespace Immortal_Switch.Scripts.SkillRemake
             }
         }
 
-        private void SpawnBulletByPattern(int waveIndex, int bulletIndex, int bulletCount)
+        private void SpawnBulletByPattern(
+            int waveIndex,
+            int bulletIndex,
+            int bulletCount)
         {
-            float angle = GetBulletAngle(waveIndex, bulletIndex, bulletCount);
-            Vector3 direction = AngleToDirectionXZ(angle);
 
-            Quaternion rotation = Quaternion.identity;
-            if (direction.sqrMagnitude > 0.0001f)
+            if (string.IsNullOrWhiteSpace(
+                    currentPattern.bulletAddressableKey))
             {
-                rotation = Quaternion.LookRotation(direction, Vector3.up);
+                Debug.LogError(
+                    $"[{nameof(BulletSpawnerSkillRuntimeObject)}] " +
+                    $"Bullet Addressable key is null or empty.",
+                    this
+                );
+
+                return;
             }
 
-            BulletProjectile bullet = PoolManager.Instance.Spawn(
-                currentPattern.bulletPrefab,
-                this.transform.position,
-                rotation
-            );
+            AddressablePoolService poolService =
+                AddressablePoolService.Instance;
+
+            if (poolService == null)
+            {
+                Debug.LogError(
+                    $"[{nameof(BulletSpawnerSkillRuntimeObject)}] " +
+                    $"{nameof(AddressablePoolService)}.Instance is null.",
+                    this
+                );
+
+                return;
+            }
+
+            float angle =
+                GetBulletAngle(
+                    waveIndex,
+                    bulletIndex,
+                    bulletCount
+                );
+
+            Vector3 direction =
+                AngleToDirectionXZ(angle);
+
+            Quaternion rotation =
+                Quaternion.identity;
+
+            if (direction.sqrMagnitude > 0.0001f)
+            {
+                rotation =
+                    Quaternion.LookRotation(
+                        direction,
+                        Vector3.up
+                    );
+            }
+
+            BulletProjectile bullet =
+                poolService.Spawn<BulletProjectile>(
+                    currentPattern.bulletAddressableKey,
+                    transform.position,
+                    rotation
+                );
 
             if (bullet == null)
                 return;
-            
-            if (Debug)
+
+            if (EnableDebug)
             {
                 bullet.Setup(
                     null,
                     direction,
                     currentPattern.bulletSpeed,
-                    currentPattern.bulletLifeTime, currentPattern.damage
+                    currentPattern.bulletLifeTime,
+                    currentPattern.damage
                 );
+
                 return;
             }
-            
+
+            if (Context == null ||
+                Context.Caster == null)
+            {
+                AddressableProjectilePoolable poolable =
+                    bullet.GetComponent<
+                        AddressableProjectilePoolable>();
+
+                poolable?.Despawn();
+                return;
+            }
+
             bullet.Setup(
                 Context.Caster,
                 direction,
                 currentPattern.bulletSpeed,
-                currentPattern.bulletLifeTime, currentPattern.damage
+                currentPattern.bulletLifeTime,
+                currentPattern.damage
             );
         }
 

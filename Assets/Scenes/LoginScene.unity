@@ -731,7 +731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 443019d144d14509bcd2bb168d85503c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DontDestroyOnLoadEnabled: 0
+  DontDestroyOnLoadEnabled: 1
   logChanged: 1
 --- !u!1 &231819094
 GameObject:
@@ -3886,6 +3886,7 @@ MonoBehaviour:
   backdropPrefab: {fileID: 7244221478175341517, guid: cf2120243e124a0478a7c3db44e4af03, type: 3}
   loadingSceneCanvasGroup: {fileID: 540939585}
   tapeAnimator: {fileID: 1958012450}
+  canvasScaler: {fileID: 1021969637}
 --- !u!1 &1028588243
 GameObject:
   m_ObjectHideFlags: 0
@@ -6268,7 +6269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scheme: http
-  host: 192.168.8.82
+  host: 171.244.44.71
   port: 7350
   serverKey: switchinghero-server-key
   httpKey: switchinghero-http-key

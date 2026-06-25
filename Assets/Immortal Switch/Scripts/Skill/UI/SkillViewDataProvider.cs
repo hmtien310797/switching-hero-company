@@ -288,7 +288,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             var equippedIds = heroContext != null ? heroContext.EquippedSkillIds : new List<int>();
 
-            int level = GetServerSkillLevel(skillData.SkillId);
+            int level = userDataCache.GetServerSkillLevel(skillData.SkillId);
             int currentShard = GetServerSkillShard(skillData.SkillId);
             bool isOwned = IsServerSkillOwned(skillData.SkillId) || currentShard > 0;
 
@@ -310,15 +310,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
             state.IsEquipped = state.EquippedSlotIndex >= 0;
 
             return state;
-        }
-
-        private int GetServerSkillLevel(int skillId)
-        {
-            var skillList = UserDataCache.Instance?.SkillList;
-            if (skillList?.Owned == null) return 0;
-            foreach (var s in skillList.Owned)
-                if (s.SkillId == skillId) return s.Level > 0 ? s.Level : 1;
-            return 0;
         }
 
         private int GetServerSkillShard(int skillId)
@@ -366,7 +357,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             return sorted;
         }
 
-        public bool TryEquipSkillToHero(SkillViewHeroContext heroContext, int skillId)
+        public async UniTask<bool> TryEquipSkillToHero(SkillViewHeroContext heroContext, int skillId)
         {
             if (heroContext == null)
             {
@@ -383,7 +374,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             Log($"TryEquipSkillToHero -> heroId={heroContext.HeroId}, skillId={skillId}");
 
             int slotIndex = heroContext.EquippedSkillIds?.Count ?? 0;
-            bool success = UserDataCache.Instance.EquipSkill(heroContext.HeroId, skillId);
+            bool success = await UserDataCache.Instance.EquipSkill(heroContext.HeroId, skillId);
             if (!success)
             {
                 LogWarning($"TryEquipSkillToHero failed -> heroId={heroContext.HeroId}, skillId={skillId}");
@@ -431,7 +422,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             return true;
         }
 
-        public bool TryReplaceSkillOnHero(SkillViewHeroContext heroContext, int slotIndex, int newSkillId)
+        public async UniTask<bool> TryReplaceSkillOnHero(SkillViewHeroContext heroContext, int slotIndex, int newSkillId)
         {
             if (heroContext == null)
             {
@@ -447,7 +438,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             Log($"TryReplaceSkillOnHero -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
 
-            bool success = UserDataCache.Instance.ReplaceSkill(heroContext.HeroId, slotIndex, newSkillId);
+            bool success = await UserDataCache.Instance.ReplaceSkill(heroContext.HeroId, slotIndex, newSkillId);
             if (!success)
             {
                 LogWarning($"TryReplaceSkillOnHero failed -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");

@@ -89,6 +89,9 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private GameObject tapeAnimator;
 
+        [SerializeField] 
+        private CanvasScaler canvasScaler;
+
         // ===== Layer roots =====
         private readonly Dictionary<UILayer, RectTransform> _layerRoots = new();
 
@@ -123,6 +126,24 @@ namespace Immortal_Switch.Scripts.UI
         private void Start()
         {
             GameEventManager.Subscribe(GameEvents.OnInitSceneDataComplete, OnInitSceneDataComplete);
+
+            canvasScaler.matchWidthOrHeight = ScreenOrientationTracker.Instance.CurrentMode ==
+                                              ScreenOrientationTracker.ScreenViewMode.Landscape
+                ? 0.5f
+                : 0f;
+            
+            ScreenOrientationTracker.Instance.OnOrientationChanged += ScreenViewMode =>
+            {
+                switch (ScreenViewMode)
+                {
+                    case ScreenOrientationTracker.ScreenViewMode.Landscape:
+                        canvasScaler.matchWidthOrHeight = 0.5f;
+                        break;
+                    case ScreenOrientationTracker.ScreenViewMode.Portrait:
+                        canvasScaler.matchWidthOrHeight = 0f;
+                        break;
+                }
+            };
         }
 
         public override async UniTask InitializeAsync()

@@ -36,7 +36,7 @@ MonoBehaviour:
     SpawnPositionType: 0
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
-    LifeTime: 3
+    LifeTime: 7
     UseLifeTime: 1
     DespawnOnAnimationComplete: 0
     AnimationName: 
@@ -48,7 +48,7 @@ MonoBehaviour:
       ChildRuntimeAddressableKey: prefab_phoenix
       ChildAnimationName: animation
       ChildLoopAnimation: 0
-      ChildUseLifeTime: 1
+      ChildUseLifeTime: 0
       ChildLifeTime: 1.5
       ChildDespawnOnAnimationComplete: 1
       SpawnCount: 10
@@ -59,8 +59,8 @@ MonoBehaviour:
       IncludeCenterAsFirstSpawn: 1
       ChildSpawnOffset: {x: 0, y: 0, z: 0}
       RandomizeYRotation: 0
-      DespawnControllerAfterSpawn: 1
-      DespawnDelayAfterLastSpawn: 0.25
+      DespawnControllerAfterSpawn: 0
+      DespawnDelayAfterLastSpawn: 5
       DebugDrawSpawnRadius: 0
   BasePhases:
   - PhaseId: 0

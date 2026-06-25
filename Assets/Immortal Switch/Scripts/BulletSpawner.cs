@@ -41,13 +41,11 @@ public class BulletSpawner : MonoBehaviour
 
     private bool ValidatePattern()
     {
-
-
-        if (currentPattern.bulletPrefab == null)
-        {
-            Debug.LogError("[BulletSpawner] Bullet prefab is null.");
-            return false;
-        }
+        // if (currentPattern.bulletPrefab == null)
+        // {
+        //     Debug.LogError("[BulletSpawner] Bullet prefab is null.");
+        //     return false;
+        // }
 
         if (firePoint == null)
         {
@@ -122,14 +120,14 @@ public class BulletSpawner : MonoBehaviour
             rotation = Quaternion.LookRotation(direction, Vector3.up);
         }
 
-        BulletProjectile bullet = PoolManager.Instance.Spawn(
-            currentPattern.bulletPrefab,
-            firePoint.position,
-            rotation
-        );
+        // BulletProjectile bullet = PoolManager.Instance.Spawn(
+        //     currentPattern.bulletPrefab,
+        //     firePoint.position,
+        //     rotation
+        // );
 
-        if (bullet == null)
-            return;
+        // if (bullet == null)
+        //     return;
     }
 
     private float GetBulletAngle(int waveIndex, int bulletIndex, int bulletCount)

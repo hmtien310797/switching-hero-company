@@ -11,6 +11,7 @@ namespace Immortal_Switch.Scripts.Pooling
         private readonly PooledObject pooledObject;
 
         private bool disposed;
+        public bool IsDisposed => disposed;
 
         public GameObject Instance => pooledObject.Instance;
 
@@ -35,7 +36,12 @@ namespace Immortal_Switch.Scripts.Pooling
                 return;
 
             disposed = true;
-            service.ReturnInternal(key, pooledObject);
+
+            service.ReturnInternal(
+                key,
+                pooledObject,
+                this
+            );
         }
     }
 }

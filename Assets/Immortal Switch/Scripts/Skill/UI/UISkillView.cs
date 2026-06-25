@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
 using TMPro;
 using UnityEngine;
@@ -237,7 +238,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         private void RefreshCurrentContext()
         {
-            if (dataProvider == null)
+            if (dataProvider ==null)
             {
                 LogErrorView("DataProvider is null.");
                 return;
@@ -519,8 +520,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             int equippedCount = selectedHero.EquippedSkillIds != null ? selectedHero.EquippedSkillIds.Count : 0;
             if (equippedCount < 5)
             {
-                bool success = dataProvider.TryEquipSkillToHero(selectedHero, selectedSkill.SkillId);
-                LogView($"Equip to empty result -> success={success}, equippedCountBefore={equippedCount}");
+                dataProvider.TryEquipSkillToHero(selectedHero, selectedSkill.SkillId);
                 return;
             }
 
@@ -561,11 +561,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 replaceSlotViews[i].Setup(slotIndex, skillData != null ? skillData.SkillIcon : null);
                 replaceSlotViews[i].Button.onClick.RemoveAllListeners();
-                replaceSlotViews[i].Button.onClick.AddListener(() => OnClickReplaceSlot(slotIndex));
+                replaceSlotViews[i].Button.onClick.AddListener(() => OnClickReplaceSlot(slotIndex).Forget());
             }
         }
 
-        private void OnClickReplaceSlot(int slotIndex)
+        private async UniTask OnClickReplaceSlot(int slotIndex)
         {
             if (!isReplaceMode)
             {
@@ -587,7 +587,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             LogView($"OnClickReplaceSlot -> heroId={selectedHero.HeroId}, slotIndex={slotIndex}, newSkillId={pendingReplaceSkill.SkillId}");
 
-            bool success = dataProvider.TryReplaceSkillOnHero(selectedHero, slotIndex, pendingReplaceSkill.SkillId);
+            bool success = await dataProvider.TryReplaceSkillOnHero(selectedHero, slotIndex, pendingReplaceSkill.SkillId);
             if (!success)
             {
                 LogWarningView($"Replace failed -> heroId={selectedHero.HeroId}, slotIndex={slotIndex}, skillId={pendingReplaceSkill.SkillId}");

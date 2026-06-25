@@ -4,10 +4,12 @@ using Battle;
 using Common;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
-public class HomingChainBulletProjectile : PoolableBehaviour
+public class HomingChainBulletProjectile : MonoBehaviour,
+    IAddressableProjectile
 {
     private readonly List<ICombatUnit> visitedTargets = new();
 
@@ -22,7 +24,23 @@ public class HomingChainBulletProjectile : PoolableBehaviour
     private bool isInitialized;
     private bool isMovingToVirtualPoint;
 
+    private AddressableProjectilePoolable addressablePoolable;
     private Transform pendingTarget;
+    
+    private void Awake()
+    {
+        addressablePoolable =
+            GetComponent<AddressableProjectilePoolable>();
+
+        if (addressablePoolable == null)
+        {
+            Debug.LogError(
+                $"[{nameof(HomingChainBulletProjectile)}] " +
+                $"Missing {nameof(AddressableProjectilePoolable)}.",
+                this
+            );
+        }
+    }
 
     public void Setup(
         ICombatUnit owner,
@@ -30,18 +48,28 @@ public class HomingChainBulletProjectile : PoolableBehaviour
         Vector3 initialDirection,
         HomingChainBulletConfig bulletConfig)
     {
+        KillMoveTween();
+
         caster = owner;
         config = bulletConfig;
 
         transform.position = spawnPosition;
 
         visitedTargets.Clear();
+
+        currentTarget = null;
+        pendingTarget = null;
+
         hitTargetCount = 0;
         isInitialized = true;
+        isMovingToVirtualPoint = false;
 
-        lastMoveDirection = initialDirection.sqrMagnitude > 0.0001f
-            ? initialDirection.normalized
-            : transform.forward;
+        previousPosition = spawnPosition;
+
+        lastMoveDirection =
+            initialDirection.sqrMagnitude > 0.0001f
+                ? initialDirection.normalized
+                : transform.forward;
 
         StartFirstTarget();
     }
@@ -287,6 +315,32 @@ public class HomingChainBulletProjectile : PoolableBehaviour
                 StartNextTarget();
             });
     }
+    
+    private void DespawnSelf()
+    {
+        KillMoveTween();
+
+        if (addressablePoolable == null)
+        {
+            addressablePoolable =
+                GetComponent<AddressableProjectilePoolable>();
+        }
+
+        if (addressablePoolable == null)
+        {
+            Debug.LogError(
+                $"[{nameof(HomingChainBulletProjectile)}] " +
+                $"Cannot return bullet to pool because " +
+                $"{nameof(AddressableProjectilePoolable)} is missing.",
+                this
+            );
+
+            gameObject.SetActive(false);
+            return;
+        }
+
+        addressablePoolable.Despawn();
+    }
 
     private Vector3[] BuildCurvePath(
         Vector3 start,
@@ -490,22 +544,47 @@ public class HomingChainBulletProjectile : PoolableBehaviour
 
         previousPosition = transform.position;
     }
+    
+    public void OnProjectileSpawnedFromPool()
+    {
+        // Không gọi Setup ở đây.
+        // Caster và config được truyền sau khi Spawn() hoàn tất.
 
-    public override void OnDespawnedToPool()
+        KillMoveTween();
+
+        isInitialized = false;
+        isMovingToVirtualPoint = false;
+
+        currentTarget = null;
+        pendingTarget = null;
+
+        hitTargetCount = 0;
+
+        visitedTargets.Clear();
+
+        lastMoveDirection = Vector3.zero;
+        previousPosition = transform.position;
+    }
+
+    public void OnProjectileDespawnedToPool()
     {
         KillMoveTween();
 
         config = null;
         caster = null;
+
         currentTarget = null;
+        pendingTarget = null;
 
         visitedTargets.Clear();
 
         hitTargetCount = 0;
-        isInitialized = false;
-        lastMoveDirection = Vector3.zero;
 
-        base.OnDespawnedToPool();
+        isInitialized = false;
+        isMovingToVirtualPoint = false;
+
+        lastMoveDirection = Vector3.zero;
+        previousPosition = Vector3.zero;
     }
 
     private void OnDisable()

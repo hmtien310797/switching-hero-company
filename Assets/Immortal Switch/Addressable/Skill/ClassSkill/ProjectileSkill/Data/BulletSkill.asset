@@ -31,7 +31,8 @@ MonoBehaviour:
     HeroAnimationName: ulti
   RuntimeObjectConfig:
     RuntimeVisualType: 5
-    SkillRuntimePrefab: {fileID: 4163558728880364041, guid: d0accb2e82587134697a2ac23d200cd8, type: 3}
+    SpawnMode: 0
+    RuntimeAddressableKey: bullet_spawner_skill_runtime_object
     SpawnPositionType: 0
     FollowType: 1
     SpawnOffset: {x: 0, y: 1.5, z: 0}
@@ -42,6 +43,25 @@ MonoBehaviour:
     LoopAnimation: 0
     LockCasterWhileAlive: 0
     LockCasterDuringHeroAnimation: 0
+    MultiSpawnConfig:
+      ChildSpawnMode: 1
+      ChildRuntimeAddressableKey: 
+      ChildAnimationName: 
+      ChildLoopAnimation: 0
+      ChildUseLifeTime: 1
+      ChildLifeTime: 1.5
+      ChildDespawnOnAnimationComplete: 1
+      SpawnCount: 10
+      StartDelay: 0
+      SpawnInterval: 0.15
+      SpawnRadius: 2.5
+      RandomInsideCircle: 1
+      IncludeCenterAsFirstSpawn: 1
+      ChildSpawnOffset: {x: 0, y: 0, z: 0}
+      RandomizeYRotation: 0
+      DespawnControllerAfterSpawn: 1
+      DespawnDelayAfterLastSpawn: 0.25
+      DebugDrawSpawnRadius: 0
   BasePhases: []
   ClassSkillScaling:
     GrowthPercentPerLevel: 6
@@ -103,7 +123,7 @@ MonoBehaviour:
         Projectile:
           BulletPatternConfig:
             patternType: 1
-            bulletPrefab: {fileID: 804791343669178177, guid: b66a75eb36632cc449817963a73f22f6, type: 3}
+            bulletAddressableKey: bullet_projectile
             bulletSpeed: 50
             bulletLifeTime: 1
             totalWaves: 20
@@ -116,7 +136,7 @@ MonoBehaviour:
             damage: 100
             delayWhenStartFiring: 0
           HomingChainBulletConfig:
-            bulletPrefab: {fileID: 0}
+            bulletAddressableKey: 
             bulletCount: 1
             delayBetweenBullets: 0.05
             enemyLayer:
