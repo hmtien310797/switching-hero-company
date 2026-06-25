@@ -57,7 +57,6 @@ namespace Battle
         [SerializeField] private int temporaryHighestUnlockedStage = 50;
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
-        //[SerializeField] private ChapterStageSO[] chapterStages;
 
         [Header("Stage Resolver")] [SerializeField]
         private StageDataResolverSO stageDataResolver;
@@ -105,9 +104,7 @@ namespace Battle
         private bool isReadyBattle = false;
         private bool losingStage = false;
         private bool playCompletedStage = false;
-
-        private readonly HeroActor[] inBattleHeroes = new HeroActor[2];
-        private readonly Dictionary<int, HeroActor> inBattleHeroMapper = new();
+        
         private readonly Dictionary<int, BaseStat> cachedScaledCreepStats = new();
         private readonly Dictionary<int, BaseStat> cachedScaledBossStats = new();
         private GameCameraController gameCameraController;
@@ -126,10 +123,12 @@ namespace Battle
         private readonly HashSet<string> activeStageCreepPoolKeys = new();
 
         public int HighestUnlockedStage => temporaryHighestUnlockedStage;
-        //temp
+        
+        private UserDataCache userDataCache;
 
         private void Start()
         {
+            userDataCache = UserDataCache.Instance;
             gameCameraController = GameCameraController.Instance;
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
@@ -158,9 +157,9 @@ namespace Battle
 
         public void SetAutoSkill(bool isAutoSkill)
         {
-            for (int i = 0; i < inBattleHeroes.Length; i++)
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
-                inBattleHeroes[i].SetAutoSkill(isAutoSkill);
+                userDataCache.inBattleHeroes[i].SetAutoSkill(isAutoSkill);
             }
         }
 
@@ -219,15 +218,15 @@ namespace Battle
             if (!CanSwitchHero(sourceHeroId, targetHeroId))
                 return;
 
-            int slotIndex = UserDataCache.Instance.InBattleHeroIdList.IndexOf(sourceHeroId);
+            int slotIndex = userDataCache.InBattleHeroIdList.IndexOf(sourceHeroId);
 
-            if (slotIndex < 0 || slotIndex >= inBattleHeroes.Length)
+            if (slotIndex < 0 || slotIndex >= userDataCache.inBattleHeroes.Length)
             {
                 Debug.LogError($"[PvE] Cannot find slot for sourceHeroId={sourceHeroId}");
                 return;
             }
 
-            HeroActor oldHero = inBattleHeroes[slotIndex];
+            HeroActor oldHero = userDataCache.inBattleHeroes[slotIndex];
 
             if (oldHero == null)
             {
@@ -251,9 +250,7 @@ namespace Battle
                 return;
             }
 
-            UserDataCache.Instance.InBattleHeroIdList[slotIndex] = targetHeroId;
-
-            inBattleHeroMapper.Remove(sourceHeroId);
+            userDataCache.InBattleHeroIdList[slotIndex] = targetHeroId;
 
             HeroActor newHero = await AddressableSpawnService.SpawnAsync<HeroActor>(string.Empty,
                 newHeroData.HeroAddressKey,
@@ -271,8 +268,7 @@ namespace Battle
             oldHero.OnDead -= OnHeroDead;
             newHero.OnDead += OnHeroDead;
 
-            inBattleHeroes[slotIndex] = newHero;
-            inBattleHeroMapper[targetHeroId] = newHero;
+            userDataCache.inBattleHeroes[slotIndex] = newHero;
 
             RefreshHeroSlotCache();
             RefreshHeroTeamController();
@@ -315,7 +311,7 @@ namespace Battle
                 await SpawnHero(heroDt, heroIndex);
                 if (heroIndex == 0)
                 {
-                    gameCameraController.SetFollowHero(inBattleHeroes[heroIndex].transform);
+                    gameCameraController.SetFollowHero(userDataCache.inBattleHeroes[heroIndex].transform);
                     TopMainView.Instance.SetHeroSkeletonAnimationGraphic(heroDt);
                 }
             }
@@ -356,8 +352,7 @@ namespace Battle
             hero.OnDead -= OnHeroDead;
             hero.OnDead += OnHeroDead;
 
-            inBattleHeroes[heroIndex] = hero;
-            inBattleHeroMapper[heroData.Id] = hero;
+            userDataCache.inBattleHeroes[heroIndex] = hero;
 
             RefreshHeroSlotCache();
             RefreshHeroTeamController();
@@ -399,8 +394,8 @@ namespace Battle
 
         private void RefreshHeroSlotCache()
         {
-            inBattleHeroA = inBattleHeroes[0];
-            inBattleHeroB = inBattleHeroes[1];
+            inBattleHeroA = userDataCache.inBattleHeroes[0];
+            inBattleHeroB = userDataCache.inBattleHeroes[1];
         }
 
         private void RefreshHeroTeamController()
@@ -424,10 +419,10 @@ namespace Battle
             if (sourceHeroId == targetHeroId)
                 return false;
 
-            if (!UserDataCache.Instance.InBattleHeroIdList.Contains(sourceHeroId))
+            if (!userDataCache.InBattleHeroIdList.Contains(sourceHeroId))
                 return false;
 
-            return !UserDataCache.Instance.InBattleHeroIdList.Contains(targetHeroId);
+            return !userDataCache.InBattleHeroIdList.Contains(targetHeroId);
         }
 
         public void RequestSwitchHero(int sourceHeroId, int targetHeroId)
@@ -440,16 +435,16 @@ namespace Battle
 
         public HeroActor GetControlledHero()
         {
-            if (controlledHeroSlotIndex < 0 || controlledHeroSlotIndex >= inBattleHeroes.Length)
+            if (controlledHeroSlotIndex < 0 || controlledHeroSlotIndex >= userDataCache.inBattleHeroes.Length)
                 controlledHeroSlotIndex = 0;
 
-            return inBattleHeroes[controlledHeroSlotIndex];
+            return userDataCache.inBattleHeroes[controlledHeroSlotIndex];
         }
 
         public HeroActor GetFollowerHero()
         {
             int followerSlotIndex = controlledHeroSlotIndex == 0 ? 1 : 0;
-            return inBattleHeroes[followerSlotIndex];
+            return userDataCache.inBattleHeroes[followerSlotIndex];
         }
 
         public int GetControlledHeroSlotIndex()
@@ -459,13 +454,13 @@ namespace Battle
 
         public HeroDataSO SelectControlledHeroSlot(int slotIndex)
         {
-            if (slotIndex < 0 || slotIndex >= inBattleHeroes.Length)
+            if (slotIndex < 0 || slotIndex >= userDataCache.inBattleHeroes.Length)
             {
                 Debug.LogWarning($"[PvE] Invalid controlled hero slot index: {slotIndex}");
                 return null;
             }
 
-            if (inBattleHeroes[slotIndex] == null)
+            if (userDataCache.inBattleHeroes[slotIndex] == null)
             {
                 Debug.LogWarning($"[PvE] Cannot select empty hero slot: {slotIndex}");
                 return null;
@@ -474,8 +469,8 @@ namespace Battle
             controlledHeroSlotIndex = slotIndex;
             ApplyControlledHeroSelectionToTeamController();
             RefreshControlledHeroSkillUI();
-            gameCameraController.SetFollowHero(inBattleHeroes[slotIndex].transform);
-            return inBattleHeroes[slotIndex].HeroData;
+            gameCameraController.SetFollowHero(userDataCache.inBattleHeroes[slotIndex].transform);
+            return userDataCache.inBattleHeroes[slotIndex].HeroData;
         }
 
         public HeroDataSO SwitchControlledHero()
@@ -499,9 +494,9 @@ namespace Battle
             if (heroTeamController == null)
                 return;
 
-            for (int i = 0; i < inBattleHeroes.Length; i++)
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
-                var hero = inBattleHeroes[i];
+                var hero = userDataCache.inBattleHeroes[i];
                 if (hero == null)
                 {
                     continue;
@@ -1768,19 +1763,19 @@ namespace Battle
             await UniTask.Delay(TimeSpan.FromSeconds(5.7f));
             Debug.Log("[PvE] Next Stage");
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
-            for (int i = 0; i < inBattleHeroes.Length; i++)
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
                 Vector3 spawnPos = GetHeroSpawnPosition(i);
-                inBattleHeroes[i].ActiveHealthBar(false);
-                inBattleHeroes[i].ActiveVisual(false);
-                inBattleHeroes[i].ResetSpawnPosition(spawnPos);
+                userDataCache.inBattleHeroes[i].ActiveHealthBar(false);
+                userDataCache.inBattleHeroes[i].ActiveVisual(false);
+                userDataCache.inBattleHeroes[i].ResetSpawnPosition(spawnPos);
             }
 
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
-            for (int i = 0; i < inBattleHeroes.Length; i++)
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
-                inBattleHeroes[i].ResetData();
+                userDataCache.inBattleHeroes[i].ResetData();
                 await UniTask.Delay(800);
             }
 
@@ -1796,20 +1791,20 @@ namespace Battle
 
             Debug.Log("[PvE] Play Current Stage");
             await Transitioner.Instance.TransitionOutWithoutChangingScene();
-            for (int i = 0; i < inBattleHeroes.Length; i++)
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
                 Vector3 spawnPos = GetHeroSpawnPosition(i);
-                inBattleHeroes[i].ActiveHealthBar(false);
-                inBattleHeroes[i].ActiveVisual(false);
-                inBattleHeroes[i].ResetSpawnPosition(spawnPos);
+                userDataCache.inBattleHeroes[i].ActiveHealthBar(false);
+                userDataCache.inBattleHeroes[i].ActiveVisual(false);
+                userDataCache.inBattleHeroes[i].ResetSpawnPosition(spawnPos);
             }
 
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
             Transitioner.Instance.TransitionInWithoutChangingScene();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5));
-            for (int i = 0; i < inBattleHeroes.Length; i++)
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
-                inBattleHeroes[i].ResetData();
+                userDataCache.inBattleHeroes[i].ResetData();
                 await UniTask.Delay(800);
             }
 
@@ -1819,7 +1814,7 @@ namespace Battle
         public bool IsHeroCurrentlyActive(int heroId)
         {
             if (heroId <= 0) return false;
-            return UserDataCache.Instance.InBattleHeroIdList.Contains(heroId);
+            return userDataCache.InBattleHeroIdList.Contains(heroId);
         }
 
         private void NotifyIdleScreenStageChanged()

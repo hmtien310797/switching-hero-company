@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Common;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
 using TMPro;
@@ -181,7 +182,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (Battle.PvEBattleController.Instance == null)
                 return;
 
-            var activeHeroes = Battle.PvEBattleController.Instance.GetActiveHeroControllers();
+            var activeHeroes = UserDataCache.Instance.inBattleHeroes;
             WeaponManager.Instance.TryAutoEquipForHeroes(activeHeroes);
 
             RequestRefresh();

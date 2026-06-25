@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Battle;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
@@ -38,6 +39,8 @@ namespace Immortal_Switch.Scripts.Equipment.Core
         public event Action<int> OnHeroWeaponChanged;
         public event Action<int> OnStandardWeaponStateChanged;
         public event Action<int> OnExclusiveWeaponStateChanged;
+        
+        private UserDataCache userDataCache;
 
         private void Awake()
         {
@@ -51,6 +54,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             DontDestroyOnLoad(gameObject);
 
             Load();
+            userDataCache = UserDataCache.Instance;
             BuildServices();
         }
 
@@ -366,8 +370,8 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             // refresh runtime heroes
             if (Battle.PvEBattleController.Instance != null)
             {
-                var activeHeroes = PvEBattleController.Instance.GetActiveHeroControllers();
-                for (int i = 0; i < activeHeroes.Count; i++)
+                var activeHeroes = userDataCache.inBattleHeroes;
+                for (int i = 0; i < activeHeroes.Length; i++)
                 {
                     var hero = activeHeroes[i];
                     if (hero == null)

@@ -46,12 +46,14 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private SpriteAtlas heroSpriteAtlas;
         private const string HeroSpriteAtlasKey = "hero_sprite_atlas";
         public event Action OnDataChanged;
+        private UserDataCache userDataCache;
 
         public override async UniTask InitializeAsync()
         {
             allSkills = MasterDataCache.Instance.GetAllSkillData();
             BuildPoolLookup();
             BuildCacheIfNeeded();
+            userDataCache = UserDataCache.Instance;
             heroSpriteAtlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
         }
 
@@ -203,8 +205,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             var result = new List<SkillViewHeroContext>();
 
-            var activeHeroes = PvEBattleController.Instance.GetActiveHeroControllers();
-            Log($"GetAssignedHeroes -> active count={activeHeroes.Count}");
+            var activeHeroes = UserDataCache.Instance.inBattleHeroes;
 
             foreach (var hero in activeHeroes)
             {
@@ -216,7 +217,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 int heroId = hero.GetHeroId();
                 var equipped = UserDataCache.Instance != null
-                    ? UserDataCache.Instance.GetEquippedSkills(heroId)
+                    ? UserDataCache.Instance.GetEquippedClassSkillIds(heroId)
                     : new List<int>();
 
                 result.Add(new SkillViewHeroContext
@@ -245,7 +246,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             int heroId = heroController.GetHeroId();
             var equipped = UserDataCache.Instance != null
-                ? UserDataCache.Instance.GetEquippedSkills(heroId)
+                ? UserDataCache.Instance.GetEquippedClassSkillIds(heroId)
                 : new List<int>();
 
             Log($"GetAssignedHeroByClass -> class={heroClass}, heroId={heroId}, equipped=[{string.Join(",", equipped)}]");

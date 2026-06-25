@@ -66,10 +66,7 @@ namespace Immortal_Switch.Scripts.Skill
         public event Action<HeroSkillController> SkillsChanged;
 
         public HeroActor Owner => owner;
-        public SkillDataSO UltimateSkill => ultimateSkill;
-        public SkillDataSO PassiveSkill => passiveSkill;
-        public HeroAutoSkillController AutoSkillController => autoSkillController;
-
+        
         public float GetCooldownRemaining(SkillDataSO skillData)
         {
             if (skillData == null)
@@ -103,6 +100,11 @@ namespace Immortal_Switch.Scripts.Skill
             return classSkills[slotIndex];
         }
 
+        public List<SkillDataSO> GetAllEquippedClassSkills()
+        {
+            return classSkills;
+        }
+        
         public SkillDataSO GetUltimateSkill()
         {
             return ultimateSkill;
@@ -120,6 +122,54 @@ namespace Immortal_Switch.Scripts.Skill
 
             classSkills[slotIndex] = skillData;
             SkillsChanged?.Invoke(this);
+        }
+        
+        public bool UnequipSkill(SkillDataSO skillData, bool resetCooldown = false)
+        {
+            if (skillData == null)
+                return false;
+
+            int slotIndex = GetEquippedClassSkillSlot(skillData);
+            if (slotIndex < 0)
+                return false;
+
+            return UnequipSkillAt(slotIndex, resetCooldown);
+        }
+        
+        public bool UnequipSkillAt(int slotIndex, bool resetCooldown = false)
+        {
+            EnsureClassSkillSlotCapacity();
+
+            if (!IsValidClassSkillSlot(slotIndex))
+                return false;
+
+            SkillDataSO equippedSkill = classSkills[slotIndex];
+            if (equippedSkill == null)
+                return false;
+
+            classSkills[slotIndex] = null;
+
+            if (resetCooldown)
+                ResetCooldown(equippedSkill);
+
+            SkillsChanged?.Invoke(this);
+            return true;
+        }
+        
+        public int GetEquippedClassSkillSlot(SkillDataSO skillData)
+        {
+            if (skillData == null)
+                return -1;
+
+            EnsureClassSkillSlotCapacity();
+
+            for (int i = 0; i < ClassSkillSlotCount; i++)
+            {
+                if (classSkills[i] == skillData)
+                    return i;
+            }
+
+            return -1;
         }
 
         public bool CanCastClassSkillAt(int slotIndex)
@@ -186,6 +236,11 @@ namespace Immortal_Switch.Scripts.Skill
         {
             UnbindEvents();
             ResetRuntimeOnSwitchOut();
+        }
+        
+        private static bool IsValidClassSkillSlot(int slotIndex)
+        {
+            return slotIndex >= 0 && slotIndex < ClassSkillSlotCount;
         }
 
         public void Init(HeroActor owner, PvEBattleController battleController, ISkillLevelProvider levelProvider = null)

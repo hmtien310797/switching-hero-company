@@ -1,5 +1,6 @@
 ﻿using System;
 using Battle;
+using Common;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
@@ -81,7 +82,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     public event Action<HeroActor> OnDead;
 
     public HeroDataSO HeroData => heroData;
-
+    public HeroSkillController HeroSkillController => skillController;
     public StatsController Stats => stats;
     public Element Element => heroData.Element;
     public HealthBarController HealthBarController => healthBarController;

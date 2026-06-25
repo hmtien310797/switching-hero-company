@@ -7,16 +7,11 @@ namespace Battle
 {
     public partial class PvEBattleController
     {
-        public IReadOnlyList<HeroActor> GetActiveHeroControllers()
-        {
-            return inBattleHeroes;
-        }
-
         public HeroActor TryGetActiveHeroByClass(HeroClass heroClass)
         {
-            for (int i = 0; i < inBattleHeroes.Length; i++)
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
-                HeroActor hero = inBattleHeroes[i];
+                HeroActor hero = userDataCache.inBattleHeroes[i];
 
                 if (hero == null || hero.IsDead)
                     continue;

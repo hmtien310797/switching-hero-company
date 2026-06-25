@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
+using Immortal_Switch.Scripts.Skill;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace Common
         [SerializeField] private bool enableLog = true;
         
         public ClassSkillUnlockData ClassSkillUnlock = new();
-        public HeroSkillLoadoutData HeroSkillLoadout = new();
+        //public HeroSkillLoadoutData HeroSkillLoadout = new();
 
         /// <summary>Hero inventory từ server — set bởi GameBootstrap từ player/me (owned + lineup + shards).</summary>
         public HeroInventory HeroList { get; set; }
@@ -46,7 +47,8 @@ namespace Common
         /// <summary>Weapon list từ server — set bởi GameBootstrap sau login.</summary>
         public WeaponListResponse WeaponList { get; set; }
 
-        public List<int> InBattleHeroIdList { get;  set; } = new();
+        public List<int> InBattleHeroIdList { get; private set; } = new();
+        public readonly HeroActor[] inBattleHeroes = new HeroActor[2];
 
         public event Action<int> OnHeroSkillChanged;
 
@@ -151,30 +153,64 @@ namespace Common
 
         #region HERO
 
-        public List<int> GetEquippedSkills(int heroId)
+        public List<int> GetEquippedClassSkillIds(int heroId)
         {
-            if (!HeroSkillLoadout.EquippedSkillIdsByHero.TryGetValue(heroId, out var list))
-                return new List<int>();
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                var currentHero = inBattleHeroes[i];
+                if (currentHero.HeroData.Id == heroId)
+                {
+                    List<int> allClassSkillIds = currentHero.HeroSkillController.GetAllEquippedClassSkills().ConvertAll(skill => skill.SkillId);
+                    return allClassSkillIds;
+                }
+            }
 
-            return new List<int>(list);
+            return null;
+        }
+
+        public HeroActor GetInBattleHeroActorById(int heroId)
+        {
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                var currentHero = inBattleHeroes[i];
+                if (currentHero.HeroData.Id == heroId)
+                {
+                    return currentHero;
+                }
+            }
+            return null;
+        }
+
+        public SkillDataSO GetEquippedSkillDataById(int heroId,int skillId)
+        {
+            var currentHero = GetInBattleHeroActorById(heroId);
+            for (int i = 0; i < currentHero.HeroSkillController.GetAllEquippedClassSkills().Count; i++)
+            {
+                SkillDataSO skillData = currentHero.HeroSkillController.GetAllEquippedClassSkills()[i];
+                if (skillData.SkillId == skillId)
+                {
+                    return skillData;
+                }
+            }
+            return null;
         }
 
         #endregion
 
         #region CLASS UNLOCK
 
-        private void SetUnlockedSkillsForClass(HeroClass heroClass, List<int> ids)
-        {
-            ClassSkillUnlock.UnlockedSkillIdsByClass[heroClass] = Normalize(ids);
-        }
+        // private void SetUnlockedSkillsForClass(HeroClass heroClass, List<int> ids)
+        // {
+        //     ClassSkillUnlock.UnlockedSkillIdsByClass[heroClass] = Normalize(ids);
+        // }
 
-        public List<int> GetUnlockedSkills(HeroClass heroClass)
-        {
-            if (!ClassSkillUnlock.UnlockedSkillIdsByClass.TryGetValue(heroClass, out var list))
-                return new List<int>();
-
-            return new List<int>(list);
-        }
+        // public List<int> GetUnlockedSkills(HeroClass heroClass)
+        // {
+        //     if (!ClassSkillUnlock.UnlockedSkillIdsByClass.TryGetValue(heroClass, out var list))
+        //         return new List<int>();
+        //
+        //     return new List<int>(list);
+        // }
         
         private void EnsureInitialSkillInventoryForUnlockedClassSkills()
         {
@@ -237,75 +273,49 @@ namespace Common
 
         #region HERO LOADOUT
 
-        public void SetEquippedSkillsForHero(int heroId, List<int> ids, bool notify = true)
-        {
-            var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
-            if (hero == null)
-            {
-                LogError($"Hero null {heroId} ");
-                return;
-            }
-
-            var unlocked = GetUnlockedSkills(hero.HeroClass);
-
-            var valid = Normalize(ids)
-                .Where(unlocked.Contains)
-                .Take(6)
-                .ToList();
-
-            HeroSkillLoadout.EquippedSkillIdsByHero[heroId] = valid;
-
-            if (notify)
-            {
-                OnHeroSkillChanged?.Invoke(heroId);
-            }
-        }
-
         public bool EquipSkill(int heroId, int skillId)
         {
             var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
             if (hero == null)
                 return false;
-
+        
             if (!IsUnlocked(hero.HeroClass, skillId))
                 return false;
-
-            var list = GetEquippedSkills(heroId);
-
+        
+            var list = GetEquippedClassSkillIds(heroId);
+        
             if (list.Count >= 5) return false;
             if (list.Contains(skillId)) return true;
-
+        
             list.Add(skillId);
-            SetEquippedSkillsForHero(heroId, list);
+            OnHeroSkillChanged?.Invoke(heroId);
             return true;
         }
 
         public bool UnequipSkill(int heroId, int skillId)
         {
-            var list = GetEquippedSkills(heroId);
-            if (!list.Remove(skillId)) return false;
-
-            SetEquippedSkillsForHero(heroId, list);
-            return true;
+            SkillDataSO equippedSkillData = GetEquippedSkillDataById(heroId, skillId);
+            HeroActor actor = GetInBattleHeroActorById(heroId);
+            return actor.HeroSkillController.UnequipSkill(equippedSkillData);
         }
-
-        public bool ReplaceSkill(int heroId, int slot, int skillId)
-        {
-            var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
-            if (!IsUnlocked(hero.HeroClass, skillId)) return false;
-
-            var list = GetEquippedSkills(heroId);
-
-            while (list.Count < 5)
-                list.Add(0);
-
-            list[slot] = skillId;
-
-            list = list.Where(x => x > 0).Distinct().ToList();
-
-            SetEquippedSkillsForHero(heroId, list);
-            return true;
-        }
+        
+        // public bool ReplaceSkill(int heroId, int slot, int skillId)
+        // {
+        //     var hero = MasterDataCache.Instance.GetHeroDataById(heroId);
+        //     if (!IsUnlocked(hero.HeroClass, skillId)) return false;
+        //
+        //     var list = GetEquippedSkills(heroId);
+        //
+        //     while (list.Count < 5)
+        //         list.Add(0);
+        //
+        //     list[slot] = skillId;
+        //
+        //     list = list.Where(x => x > 0).Distinct().ToList();
+        //
+        //     SetEquippedSkillsForHero(heroId, list);
+        //     return true;
+        // }
 
         #endregion
 

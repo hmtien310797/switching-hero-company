@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Battle;
+using Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
@@ -17,12 +18,14 @@ namespace Immortal_Switch.Scripts.UI
 
         private int currentIndex = -1;
         private bool subscribedBattleLineup;
+        private UserDataCache userDataCache;
 
         private void Awake()
         {
             BindSegmentedControl();
             TrySetupSubViews();
             RefreshViews(0);
+            userDataCache = UserDataCache.Instance;
         }
 
         private void OnEnable()
@@ -101,8 +104,8 @@ namespace Immortal_Switch.Scripts.UI
             if (PvEBattleController.Instance == null)
                 return;
 
-            var activeHeroes = PvEBattleController.Instance.GetActiveHeroControllers();
-            if (activeHeroes == null || activeHeroes.Count == 0)
+            var activeHeroes = userDataCache.inBattleHeroes;
+            if (activeHeroes == null || activeHeroes.Length == 0)
                 return;
 
             var focusHero = activeHeroes[0];
@@ -153,8 +156,8 @@ namespace Immortal_Switch.Scripts.UI
             if (PvEBattleController.Instance == null)
                 return;
 
-            var activeHeroes = PvEBattleController.Instance.GetActiveHeroControllers();
-            if (activeHeroes == null || activeHeroes.Count == 0)
+            var activeHeroes = userDataCache.inBattleHeroes;
+            if (activeHeroes == null || activeHeroes.Length == 0)
                 return;
 
             var focusHero = activeHeroes[0];

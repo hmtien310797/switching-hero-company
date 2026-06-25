@@ -1,5 +1,6 @@
 using System;
 using Battle;
+using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Addressable;
@@ -146,9 +147,9 @@ namespace Immortal_Switch.Scripts.UI
 
         public void SetHeroImage()
         {
-            for (int i = 0; i < PvEBattleController.Instance.GetActiveHeroControllers().Count; i++)
+            for (int i = 0; i < UserDataCache.Instance.inBattleHeroes.Length; i++)
             {
-                HeroDataSO heroDataSo = PvEBattleController.Instance.GetActiveHeroControllers()[i].HeroData;
+                HeroDataSO heroDataSo = UserDataCache.Instance.inBattleHeroes[i].HeroData;
                 iconHeroImage[i].sprite = HeroImageService.GetHeroIcon(heroDataSo.HeroIconKey);
             }
         }
