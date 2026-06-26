@@ -1,4 +1,3 @@
-using System;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
@@ -8,7 +7,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Stage;
-using Immortal_Switch.Scripts.PlayerSystem.UI;
+using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.StageSelection;
 using Sirenix.OdinInspector;
@@ -69,7 +68,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnClickProfile()
         {
-            UIManager.Instance.OpenPopupAsync<UIProfileView>().Forget();
+            UIManager.Instance.OpenPopupAsync<ProfileView>().Forget();
         }
 
 
@@ -91,17 +90,13 @@ namespace Immortal_Switch.Scripts.UI
             autoSkillButton.onClick.AddListener(() =>
             {
                 isAutoActived = !isAutoActived;
-                PvEBattleController.Instance.SetAutoSkill(isAutoActived);
+                UserDataCache.Instance.SetAutoSkill(isAutoActived);
                 rotateObject.transform
                     .DOLocalRotate(new Vector3(0, 0, isAutoActived ? 180 : 0), 0.2f, RotateMode.FastBeyond360)
                     .SetEase(Ease.Linear).SetLoops(-1, LoopType.Incremental);
             });
 
             SetHeroTeamController(HeroTeamController.Instance);
-            GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
-            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
-            GameEventManager.Subscribe(GameEvents.OnWaveStart, OnStageStart);
-            GameEventManager.Subscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
             moveButton.onClick.AddListener(() =>
             {
                 UIManager.Instance.TogglePopupAsync<StageSelectionView>(new StageSelectionOpenArgs
@@ -110,6 +105,35 @@ namespace Immortal_Switch.Scripts.UI
                     HighestUnlockedStage = PvEBattleController.Instance.HighestUnlockedStage
                 }).Forget();
             });
+            
+            GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
+            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
+            GameEventManager.Subscribe(GameEvents.OnWaveStart, OnStageStart);
+            GameEventManager.Subscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
+        }
+        
+        private void OnDestroy()
+        {
+            GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
+            GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLost);
+            GameEventManager.Unsubscribe(GameEvents.OnWaveStart, OnStageStart);
+            GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
+            for (int i = 0; i < heroIconTweens.Length; i++)
+            {
+                heroIconTweens[i]?.Kill(false);
+                heroIconTweens[i] = null;
+            }
+
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+
+            if (switchMainSubHeroButton != null)
+            {
+                switchMainSubHeroButton.onClick.RemoveListener(
+                    OnSwitchMainSubHeroButtonClicked);
+            }
         }
 
         public void SetHeroSkeletonAnimationGraphic(HeroDataSO heroData)
@@ -150,27 +174,7 @@ namespace Immortal_Switch.Scripts.UI
             for (int i = 0; i < UserDataCache.Instance.inBattleHeroes.Length; i++)
             {
                 HeroDataSO heroDataSo = UserDataCache.Instance.inBattleHeroes[i].HeroData;
-                iconHeroImage[i].sprite = HeroImageService.GetHeroIcon(heroDataSo.HeroIconKey);
-            }
-        }
-
-        private void OnDestroy()
-        {
-            for (int i = 0; i < heroIconTweens.Length; i++)
-            {
-                heroIconTweens[i]?.Kill(false);
-                heroIconTweens[i] = null;
-            }
-
-            if (Instance == this)
-            {
-                Instance = null;
-            }
-
-            if (switchMainSubHeroButton != null)
-            {
-                switchMainSubHeroButton.onClick.RemoveListener(
-                    OnSwitchMainSubHeroButtonClicked);
+                iconHeroImage[i].sprite = HeroImageService.GetHeroIcon(heroDataSo);
             }
         }
 

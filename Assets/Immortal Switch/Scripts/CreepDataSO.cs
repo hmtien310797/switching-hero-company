@@ -1,6 +1,4 @@
-﻿using Battle;
-using Immortal_Switch.Scripts.Enemy;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Immortal_Switch.Scripts
 {

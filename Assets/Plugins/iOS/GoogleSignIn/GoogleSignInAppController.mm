@@ -17,9 +17,6 @@
 #import "GoogleSignInAppController.h"
 #import <objc/runtime.h>
 
-// Handles Google SignIn UI and events.
-GoogleSignInHandler *gsiHandler;
-
 /*
  * Create a category to customize the application.  When this is loaded the
  * method for the existing application and  GoogleSignIn are swizzled into the
@@ -70,13 +67,9 @@ GoogleSignInHandler *gsiHandler;
   NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
   NSString *clientId = [dict objectForKey:@"CLIENT_ID"];
 
-  gsiHandler = [GoogleSignInHandler alloc];
-
-  // Setup the Sign-In instance.
-  GIDSignIn *signIn = [GIDSignIn sharedInstance];
-  signIn.clientID = clientId;
-  signIn.uiDelegate = gsiHandler;
-  signIn.delegate = gsiHandler;
+  // Cached so GoogleSignIn_Configure (called later from C#) can build a
+  // GIDConfiguration combining this with the server client ID.
+  GoogleSignIn_SetClientID(clientId);
 
   // looks like it's just calling itself, but the implementations were swapped
   // so we're actually calling the original once we're done
@@ -96,10 +89,7 @@ GoogleSignInHandler *gsiHandler;
                                sourceApplication:sourceApplication
                                       annotation:annotation];
 
-  return [[GIDSignIn sharedInstance] handleURL:url
-                             sourceApplication:sourceApplication
-                                    annotation:annotation] ||
-         handled;
+  return [[GIDSignIn sharedInstance] handleURL:url] || handled;
 }
 
 /**
@@ -112,13 +102,7 @@ GoogleSignInHandler *gsiHandler;
   BOOL handled =
       [self GoogleSignInAppController:app openURL:url options:options];
 
-  return [[GIDSignIn sharedInstance]
-                     handleURL:url
-             sourceApplication:
-                 options[UIApplicationOpenURLOptionsSourceApplicationKey]
-                    annotation:
-                        options[UIApplicationOpenURLOptionsAnnotationKey]] ||
-         handled;
+  return [[GIDSignIn sharedInstance] handleURL:url] || handled;
 }
 
 @end

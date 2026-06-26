@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
-using Immortal_Switch.Scripts.HeroUIView;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,10 +28,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         [SerializeField] private WeaponSummonProbabilityRowUI gradeARow;
         [SerializeField] private WeaponSummonProbabilityRowUI gradeSRow;
         [SerializeField] private WeaponSummonProbabilityRowUI gradeSSRow;
-
-        [Header("Tier Icons")]
-        [SerializeField] private HeroRarityVisualConfigSO heroRarityVisualConfigSO;
-
+        
         private readonly List<WeaponSummonLevelEntry> cachedLevels = new();
         private int currentIndex;
 
@@ -154,12 +151,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (summonLevelText != null)
                 summonLevelText.text = $"Lv.{levelData.SummonLevel}";
 
-            gradeDRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Epic), levelData.GradeDRate);
-            gradeCRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Rare), levelData.GradeCRate);
-            gradeBRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.UnCommon), levelData.GradeBRate);
-            gradeARow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Common), levelData.GradeARate);
-            gradeSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Legendary), levelData.GradeSRate);
-            gradeSSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Mythic), levelData.GradeSSRate);
+            gradeDRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Epic) , levelData.GradeDRate);
+            gradeCRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Rare), levelData.GradeCRate);
+            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), levelData.GradeBRate);
+            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common), levelData.GradeARate);
+            gradeSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Legendary), levelData.GradeSRate);
+            gradeSSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Mythic), levelData.GradeSSRate);
 
             /*star1Row?.Bind(1, levelData.Star1Rate);
             star2Row?.Bind(2, levelData.Star2Rate);
@@ -179,12 +176,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (summonLevelText != null)
                 summonLevelText.text = "Lv.-";
 
-            gradeDRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Epic), 0f);
-            gradeCRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Rare), 0f);
-            gradeBRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.UnCommon), 0f);
-            gradeARow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Common), 0f);
-            gradeSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Legendary), 0f);
-            gradeSSRow?.Bind(heroRarityVisualConfigSO.GetIcon(HeroProgressTier.Mythic), 0f);
+            gradeDRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Epic) , 0f);
+            gradeCRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Rare), 0f);
+            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), 0f);
+            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common), 0f);
+            gradeSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Legendary), 0f);
+            gradeSSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Mythic) , 0f);
 
             /*star1Row?.Bind(1, 0f);
             star2Row?.Bind(2, 0f);

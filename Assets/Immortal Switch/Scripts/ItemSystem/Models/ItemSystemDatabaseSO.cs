@@ -21,44 +21,46 @@ namespace Immortal_Switch.Scripts.ItemSystem.Models
         /// </summary>
         [SerializeField] private string prefixCurrencyIcon;
 
-        public async UniTask<Sprite> GetCurrencyIcon(int itemId)
+        public async UniTask<Sprite> LoadCurrencyIconByItemId(int itemId)
         {
-            var item = GetItem(itemId);
+            var item = FindItem(itemId);
 
             if (item != null)
             {
                 // todo: chi dung de test. su dung item.iconKey thay the.
                 var iconKey = "icon_diamond";
-                var path = Path.Join(prefixCurrencyIcon, iconKey).Replace('\\', '/');
-                Debug.Log($"Path: {path} of {itemId}");
-                return await Addressables.LoadAssetAsync<Sprite>(path).ToUniTask();
+                return await LoadIcon(iconKey);
             }
 
             return null;
         }
 
-        public async UniTask<Sprite> GetCurrencyIcon(string itemKey)
+        public async UniTask<Sprite> LoadCurrencyIconByKey(string itemKey)
         {
-            var item = GetItem(itemKey);
+            var item = FindItem(itemKey);
 
             if (item != null)
             {
                 // todo: chi dung de test. su dung item.iconKey thay the.
                 var iconKey = "icon_diamond";
-                var path = Path.Join(prefixCurrencyIcon, iconKey).Replace('\\', '/');
-                Debug.Log($"Path: {path} of {itemKey}");
-                return await Addressables.LoadAssetAsync<Sprite>(path).ToUniTask();
+                return await LoadIcon(iconKey);
             }
 
             return null;
         }
 
-        public DynamicHeroesGlobalSpecificationsItemConfigRow GetItem(int itemId)
+        public async UniTask<Sprite> LoadIcon(string iconKey)
+        {
+            var path = Path.Join(prefixCurrencyIcon, iconKey).Replace('\\', '/');
+            return await Addressables.LoadAssetAsync<Sprite>(path).ToUniTask();
+        }
+
+        public DynamicHeroesGlobalSpecificationsItemConfigRow FindItem(int itemId)
         {
             return ItemConfig.rows.FirstOrDefault(v => v.itemId == itemId);
         }
 
-        public DynamicHeroesGlobalSpecificationsItemConfigRow GetItem(string itemKey)
+        public DynamicHeroesGlobalSpecificationsItemConfigRow FindItem(string itemKey)
         {
             return ItemConfig.rows.FirstOrDefault(v => v.itemKey == itemKey);
         }

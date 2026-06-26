@@ -1,6 +1,5 @@
 ﻿using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.DamageNumber;
-using UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.StatSystem

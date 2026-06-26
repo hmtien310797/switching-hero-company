@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Threading;
-using Common;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -220,7 +218,7 @@ namespace Immortal_Switch.Scripts.Skill
             );
         }
 
-        protected Vector3 GetChildSpawnPosition(int index)
+        protected virtual Vector3 GetChildSpawnPosition(int index)
         {
             SkillMultiSpawnConfig multiSpawnConfig = MultiSpawnConfig;
 

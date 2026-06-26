@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.DungeonSystem.Views;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.MissionSystem.Views;
@@ -48,27 +49,29 @@ namespace Immortal_Switch.Scripts.UI
             ButtonHero.AddListener(() => OnToggleMain<HeroCollectionView>(ButtonHero).Forget());
             ButtonMission.AddListener(() => OnToggleMain<MissionSystemView>(ButtonMission).Forget());
             ButtonGem.onClick.AddListener(() => OnToggleMain<TransmutationSystemView>(null, false).Forget());
+            ButtonDungeon.AddListener(() => OnToggleMain<DungeonMainView>(ButtonDungeon).Forget());
 
             if (ButtonClose != null)
                 ButtonClose.onClick.AddListener(OnClickClose);
-
-            TransmutationSystemManager.Instance.OnChanged += OnTransmutationSystemChanged;
         }
 
         private void Start()
         {
+            TransmutationSystemManager.Instance.OnChanged += OnTransmutationSystemChanged;
             GameEventManager.Subscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
+        }
+        
+        private void OnDestroy()
+        {
+            TransmutationSystemManager.Instance.OnChanged -= OnTransmutationSystemChanged;
+            GameEventManager.Unsubscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
         }
 
         private void OnTransmutationSystemChanged(TransmutationSystemChanged obj)
         {
             txtEnergy.SetText(BigIntegerHelper.Format(obj.Data.Energy));
         }
-
-        private void OnDestroy()
-        {
-            TransmutationSystemManager.Instance.OnChanged -= OnTransmutationSystemChanged;
-        }
+        
 
         private void OnEnable()
         {

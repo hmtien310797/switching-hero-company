@@ -1,6 +1,5 @@
 ﻿using System;
 using Battle;
-using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
@@ -11,7 +10,6 @@ using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
-using UI;
 using UnityEngine;
 
 public enum HeroStateId
@@ -148,19 +146,15 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     private void Start()
     {
         GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
-        GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, (_) =>
-        {
-            ActiveHealthBar(false);
-            stateMachine.ChangeState(HeroStateId.Win);
-        });
-        GameEventManager.Subscribe(GameEvents.OnStageLost, () =>
-        {
-            stateMachine.ChangeState(HeroStateId.Dead);
-        });
+        GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageClearEvent);
+        GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLostEvent);
     }
 
     private void OnDestroy()
     {
+        GameEventManager.Unsubscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
+        GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageClearEvent);
+        GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLostEvent);
         skillController?.ResetRuntimeOnSwitchOut();
     }
 
@@ -178,16 +172,28 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         stateMachine.ChangeState(!completed ? HeroStateId.BossSpawn : HeroStateId.Idle);
     }
 
-    public async UniTask Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController)
+    private void OnStageClearEvent(int stage)
+    {
+        ActiveHealthBar(false);
+        stateMachine.ChangeState(HeroStateId.Win);
+    }
+
+    private void OnStageLostEvent()
+    {
+        stateMachine.ChangeState(HeroStateId.Dead);
+    }
+
+    public async UniTask Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController, bool useAutoSkill)
     {
         heroData = data;
         
         this.heroTeamController = heroTeamController;
         pveBattleController = battleController;
         skillController?.Init(this, battleController);
-
-        await skillController.InitializeUltimateSkillData();
+        
         ResetData();
+        SetAutoSkill(useAutoSkill);
+        await skillController.InitializeUltimateSkillData();
     }
 
     public void SetChosen(bool chosen)

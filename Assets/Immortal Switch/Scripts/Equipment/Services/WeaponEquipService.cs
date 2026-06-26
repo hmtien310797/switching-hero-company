@@ -1,6 +1,4 @@
-﻿using Battle;
-using Immortal_Switch.Scripts.Equipment.Definitions;
-using Immortal_Switch.Scripts.Equipment.Models;
+﻿using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Hero;
 
 namespace Immortal_Switch.Scripts.Equipment.Services

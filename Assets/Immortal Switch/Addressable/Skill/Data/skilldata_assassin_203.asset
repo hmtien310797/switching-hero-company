@@ -18,7 +18,11 @@ MonoBehaviour:
   SkillName: Shadow Burst Slash
   IconSkillKey: icon_skilldata_assassin_203
   SkillIcon: {fileID: 21300000, guid: 4c01d07068be19044a6ae219280af31c, type: 3}
-  DescriptionTemplate: 
+  Description: "Tung m\u1ED9t \u0111\xF2n ch\xE9m b\xF3ng t\u1ED1i v\xE0o m\u1EE5c
+    ti\xEAu \u01B0u ti\xEAn, g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng.
+    Khi tr\xFAng \u0111\u1ECBch, t\u1EA1o v\xF9ng s\xE1t th\u01B0\u01A1ng nh\u1ECF
+    xung quanh m\u1EE5c ti\xEAu, g\xE2y th\xEAm s\xE1t th\u01B0\u01A1ng l\xEAn c\xE1c
+    k\u1EBB \u0111\u1ECBch l\xE2n c\u1EADn."
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 1
@@ -103,7 +107,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -116,7 +120,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -181,3 +185,4 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
+  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

@@ -1,5 +1,4 @@
 ﻿using System;
-using Battle;
 using Immortal_Switch.Scripts.Equipment.UI;
 using Immortal_Switch.Scripts.Hero;
 using TMPro;

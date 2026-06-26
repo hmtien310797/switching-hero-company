@@ -7,7 +7,6 @@ using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
 using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class GameCameraController : Singleton<GameCameraController>
 {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.HeroUIView;
 using TMPro;
 using UnityEngine;
 using UnityEngine.U2D;

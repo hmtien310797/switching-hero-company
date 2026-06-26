@@ -1,5 +1,4 @@
 ﻿using Immortal_Switch.Scripts.HeroUIView;
-using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -18,7 +17,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [SerializeField] private Image elementIcon;
         
         [SerializeField] private HeroUIIconConfigSO iconConfig;
-        [SerializeField] private HeroSummonRarityVisualConfigSO tierConfig;
 
         public void Bind(HeroSummonProbabilityHeroData data, SpriteAtlas heroSpriteAtlas, ElementIconEntry element, HeroClassIconEntry heroClass)
         {
@@ -37,12 +35,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             elementIcon.sprite = element.Icon;
             classIcon.sprite = heroClass.Icon;
 
-            if (tierConfig != null)
-            {
-                var visual = tierConfig.Get(data.Hero.SummonRarity);
-
-                if (visual == null) return;
-            }
+            // if (tierConfig != null)
+            // {
+            //     var visual = tierConfig.Get(data.Hero.SummonRarity);
+            //
+            //     if (visual == null) return;
+            // }
         }
     }
 }

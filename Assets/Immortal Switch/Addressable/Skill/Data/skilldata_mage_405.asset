@@ -18,7 +18,11 @@ MonoBehaviour:
   SkillName: Celestial Prism Storm
   IconSkillKey: icon_skilldata_mage_405
   SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
-  DescriptionTemplate: 
+  Description: "Tri\u1EC7u h\u1ED3i c\xE1c tinh th\u1EC3 ma ph\xE1p xoay quanh b\u1EA3n
+    th\xE2n, li\xEAn t\u1EE5c b\u1EAFn laser qu\xE9t chi\u1EBFn tr\u01B0\u1EDDng.
+    K\u1EBB \u0111\u1ECBch ch\u1EA1m tia laser nh\u1EADn {hit}% ATK s\xE1t th\u01B0\u01A1ng
+    k\u1EF9 n\u0103ng. Trong th\u1EDDi gian thi tri\u1EC3n, b\u1EA3n th\xE2n \u0111\u01B0\u1EE3c
+    gi\u1EA3m s\xE1t th\u01B0\u01A1ng nh\u1EADn v\xE0o."
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 3
@@ -103,7 +107,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -116,7 +120,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -181,3 +185,4 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
+  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

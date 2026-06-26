@@ -12,9 +12,9 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
         private Image imgTier;
 
         // --- Private Fields ---
-        public EEquipmentTier Tier { get; private set; }
+        public EItemTier Tier { get; private set; }
 
-        public void Bind(EEquipmentTier type, Sprite tier, int idx, string txt, Action<int> onClick)
+        public void Bind(EItemTier type, Sprite tier, int idx, string txt, Action<int> onClick)
         {
             Tier = type;
             imgTier.sprite = tier;

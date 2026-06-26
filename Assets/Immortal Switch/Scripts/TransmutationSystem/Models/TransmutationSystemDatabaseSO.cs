@@ -62,14 +62,14 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         /// key: tier
         /// value: list item in tier
         /// </summary>
-        private readonly Dictionary<EEquipmentTier, List<DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow>> _itemTiers =
+        private readonly Dictionary<EItemTier, List<DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow>> _itemTiers =
             new();
 
         public void Load()
         {
             foreach (var entry in ItemConfig.rows)
             {
-                var tier = Enum.TryParse<EEquipmentTier>(entry.tier, true, out var result) ? result : EEquipmentTier.D;
+                var tier = Enum.TryParse<EItemTier>(entry.tier, true, out var result) ? result : EItemTier.D;
 
                 if (_itemTiers.TryGetValue(tier, out var rows))
                 {
@@ -85,7 +85,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
             }
         }
 
-        public DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow RandomItem(EEquipmentTier tier)
+        public DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow RandomItem(EItemTier tier)
         {
             if (!_itemTiers.TryGetValue(tier, out var rows))
             {

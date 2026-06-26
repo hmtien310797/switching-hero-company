@@ -2,7 +2,6 @@
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
-using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,37 +10,35 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 {
     public class WeaponSummonSequenceCardUI : MonoBehaviour
     {
-        [Header("Main")]
-        [SerializeField] private Image weaponIconImage;
+        [Header("Main")] [SerializeField] private Image weaponIconImage;
         [SerializeField] private Image tierIcon;
+        [SerializeField] private Image icBorder;
         [SerializeField] private TMP_Text amountText;
         [SerializeField] private GameObject newTag;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private RectTransform rectTransform;
 
-        [Header("Star")]
-        [SerializeField] private UIWeaponStarDisplay starDisplay;
+        [Header("Star")] [SerializeField] private UIWeaponStarDisplay starDisplay;
 
-        [Header("Tier Visual")]
-        [SerializeField] private WeaponTierVisualConfigSO tierVisualConfig;
+        [Header("Tier Visual")] [SerializeField]
+        private WeaponTierVisualConfigSO tierVisualConfig;
 
-        [Header("Background")]
-        [SerializeField] private Image tierBackground;
+        [Header("Background")] [SerializeField]
+        private Image tierBackground;
 
-        [Header("Glow")]
-        [SerializeField] private GameObject glowRoot;
+        [Header("Glow")] [SerializeField] private GameObject glowRoot;
         [SerializeField] private Image glowBack;
         [SerializeField] private Image glowRing;
         [SerializeField] private UISoftGlowPulse glowBackPulse;
         [SerializeField] private UISoftGlowPulse glowRingPulse;
 
-        [Header("Reveal Anim")]
-        [SerializeField] private float revealDuration = 0.22f;
+        [Header("Reveal Anim")] [SerializeField]
+        private float revealDuration = 0.22f;
+
         [SerializeField] private Vector3 hiddenScale = new Vector3(0.72f, 0.72f, 1f);
         [SerializeField] private Vector3 shownScale = Vector3.one;
 
-        [Header("Rare Feel")]
-        [SerializeField] private float tierAScaleMultiplier = 1.06f;
+        [Header("Rare Feel")] [SerializeField] private float tierAScaleMultiplier = 1.06f;
         [SerializeField] private float tierSScaleMultiplier = 1.12f;
         [SerializeField] private float tierSSScaleMultiplier = 1.16f;
         [SerializeField] private float highStarBonusScale = 0.03f;
@@ -81,9 +78,25 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (starDisplay != null)
                 starDisplay.BindStandard(entry.Star);
 
-            ApplyTierVisual(entry.Tier);
+            //ApplyTierVisual(entry.Tier);
+            if (tierBackground != null)
+            {
+                tierBackground.sprite = entry.TierInfo.background;
+                tierBackground.enabled = true;
+            }
 
-            ApplyGlowByTier(entry.Tier, entry.Star);
+            if (tierIcon != null)
+            {
+                tierIcon.sprite = entry.TierInfo.tier;
+                tierIcon.enabled = true;
+            }
+
+            if (icBorder != null)
+            {
+                icBorder.sprite = entry.TierInfo.border;
+            }
+
+            //ApplyGlowByTier(entry.Tier, entry.Star);
             SetHiddenImmediate();
         }
 
@@ -266,6 +279,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             Vector3 overshootScale = targetScale * (IsRareFeel() ? 1.08f : 1.04f);
 
             float time = 0f;
+
             while (time < revealDuration)
             {
                 time += Time.deltaTime;
@@ -308,6 +322,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             }
 
             time = 0f;
+
             while (time < rarePulseDuration)
             {
                 time += Time.deltaTime;

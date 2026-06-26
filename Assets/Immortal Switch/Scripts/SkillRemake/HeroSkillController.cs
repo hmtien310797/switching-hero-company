@@ -4,9 +4,7 @@ using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 using Battle;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.SkillRemake;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
@@ -73,9 +71,19 @@ namespace Immortal_Switch.Scripts.Skill
             await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(ultimateSkill);
         }
 
-        public void DespawnAllInstanceOfUltimateSkill()
+        public void DespawnAllInstanceOfUltimateSkillAndClassSkill()
         {
             AddressableSkillSpawnService.DisposeSkillComponent(ultimateSkill);
+            for (int i = 0; i < classSkills.Count; i++)
+            {
+                SkillDataSO currentSkill = classSkills[i];
+                if (currentSkill == null)
+                {
+                    continue;
+                }
+
+                AddressableSkillSpawnService.DisposeSkillComponent(currentSkill);
+            }
         }
         
         public float GetCooldownRemaining(SkillDataSO skillData)
@@ -516,6 +524,12 @@ namespace Immortal_Switch.Scripts.Skill
         {
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
+        }
+
+        private void OnDestroy()
+        {
+            GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+            GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLost);
         }
 
         public void ResetRuntimeOnSwitchOut()

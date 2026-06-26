@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Helper;
-using Immortal_Switch.Scripts.ItemSystem;
 using Immortal_Switch.Scripts.MissionSystem.Models;
+using Immortal_Switch.Scripts.Shared;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
@@ -121,7 +120,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                 if (rewards.Count > 0)
                 {
                     var reward = rewards[0];
-                    sprite = await ItemSystemManager.Instance.Database.GetCurrencyIcon(reward.itemKey);
+                    sprite = await DatabaseManager.Instance.ItemDb.LoadCurrencyIconByKey(reward.itemKey);
                     quantityFormat = BigIntegerHelper.Format(reward.quantity);
                 }
 

@@ -121,7 +121,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private void InitTabTiers()
         {
-            var entries = DatabaseManager.Instance.EquipmentTierDatabase.entries;
+            var entries = DatabaseManager.Instance.ItemTierDb.entries;
 
             for (var i = 0; i < entries.Length; i++)
             {

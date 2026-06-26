@@ -2,7 +2,6 @@
 using Battle;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
 
 public abstract class HeroStateBase : IHeroState

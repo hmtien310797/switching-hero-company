@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4803117725975843705}
   - component: {fileID: 5783137982317197840}
   - component: {fileID: -6369894177799528475}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: prefab_celestial_prism_storm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5810456733718107875}
+  - {fileID: 8986369354651921278}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5783137982317197840
@@ -46,13 +46,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55221917133741fabf50d43db1e315c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PoolSize>k__BackingField: 1
-  <DeSpawnedOnStart>k__BackingField: 1
   debugCountRuntimeEvent: 0
   debugCountEventName: hit
   debugLogRuntimeEventCount: 1
   debugLogRuntimeEventTotalOnDespawn: 1
-  skeletonAnimation: {fileID: 5371422607815202878}
+  skeletonAnimation: {fileID: 162339617449855622}
   fallbackAnimationName: 
   fallbackLoop: 0
 --- !u!114 &-6369894177799528475
@@ -67,7 +65,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75fc3c6e03e54e74b915e52b6e7a6703, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &4715119890692246528
+--- !u!1 &4499010965463977092
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -75,63 +73,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5810456733718107875}
-  - component: {fileID: 439939810255933730}
-  - component: {fileID: 8584461975037730534}
-  - component: {fileID: 4639978267986253833}
-  - component: {fileID: 5371422607815202878}
-  m_Layer: 7
+  - component: {fileID: 8986369354651921278}
+  - component: {fileID: 3981936272629871345}
+  - component: {fileID: 811925381296665560}
+  - component: {fileID: 162339617449855622}
+  m_Layer: 9
   m_Name: Spine GameObject (CelestialPrismStorm)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5810456733718107875
+--- !u!4 &8986369354651921278
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4715119890692246528}
+  m_GameObject: {fileID: 4499010965463977092}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4803117725975843705}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &439939810255933730
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4715119890692246528}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b473abb659158442b906826a22f18bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playWhenSelected: 1
-  playWhenDeselected: 1
-  fixedTrackTime: 0
---- !u!33 &8584461975037730534
+--- !u!33 &3981936272629871345
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4715119890692246528}
+  m_GameObject: {fileID: 4499010965463977092}
   m_Mesh: {fileID: 0}
---- !u!23 &4639978267986253833
+--- !u!23 &811925381296665560
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4715119890692246528}
+  m_GameObject: {fileID: 4499010965463977092}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -168,15 +150,15 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &5371422607815202878
+--- !u!114 &162339617449855622
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4715119890692246528}
+  m_GameObject: {fileID: 4499010965463977092}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
@@ -212,6 +194,6 @@ MonoBehaviour:
   unscaledTime: 0
   limitRuntimeUpdateRate: 0
   targetRuntimeFps: 20
-  _animationName: animation
+  _animationName: 
   loop: 1
   timeScale: 1

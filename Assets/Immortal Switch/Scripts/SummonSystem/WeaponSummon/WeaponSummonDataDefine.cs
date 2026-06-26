@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
+using Immortal_Switch.Scripts.Shared.Database;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
@@ -25,6 +26,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
         public bool IsNewWeapon;
         public int ShardGained;
         public int TotalShardAfter;
+
+        // thong tin tier,
+        public ItemTierEntry TierInfo;
     }
 
     [Serializable]

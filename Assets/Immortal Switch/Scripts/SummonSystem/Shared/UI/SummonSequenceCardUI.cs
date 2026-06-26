@@ -1,10 +1,9 @@
 ﻿using System.Collections;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
-using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
@@ -14,6 +13,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         [SerializeField] private Image portraitImage;
         [SerializeField] private Image rarityIcon;
         [SerializeField] private Image bgImg;
+        [SerializeField] private Image frameImg;
         [SerializeField] private TMP_Text amountText;
         [SerializeField] private TMP_Text heroNameText;
         [SerializeField] private GameObject newTag;
@@ -46,9 +46,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         public void Bind(
             HeroSummonGroupedResultEntry entry,
-            SpriteAtlas heroSpriteAtlas,
-            Sprite raritySprite,
-            Sprite bgSprite,
             bool lastCard = false)
         {
             var hero = entry.HeroAsset as HeroDataSO;
@@ -57,10 +54,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             isLastCard = lastCard;
 
             if (portraitImage != null)
-                portraitImage.sprite = hero != null ? heroSpriteAtlas.GetSprite(hero.HeroIconKey) : null;
+                portraitImage.sprite = HeroImageService.GetHeroIcon(hero);
 
             if (rarityIcon != null)
-                rarityIcon.sprite = raritySprite;
+                rarityIcon.sprite = HeroImageService.GetHeroTierIcon(boundRarity);
 
             if (amountText != null)
                 amountText.text = $"x{entry.Count}";
@@ -71,7 +68,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             if (newTag != null)
                 newTag.SetActive(entry.IsNewHero);
 
-            //bgImg.sprite = bgSprite;
+            if (bgImg != null)
+                bgImg.sprite = HeroImageService.GetHeroTierBackground(boundRarity);
+
+            if (frameImg != null)
+                frameImg.sprite = HeroImageService.GetHeroTierFrame(boundRarity);
             //ApplyGlowByRarity(entry.Rarity, topColor, bottomColor);
             SetHiddenImmediate();
         }

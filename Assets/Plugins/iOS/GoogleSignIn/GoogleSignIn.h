@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 #import <GoogleSignIn/GIDSignIn.h>
-@interface GoogleSignInHandler
-    : NSObject <GIDSignInDelegate, GIDSignInUIDelegate>
 
-@end
+// Caches the iOS OAuth client ID read from GoogleService-Info.plist at
+// launch (see GoogleSignInAppController.mm) so GoogleSignIn_Configure can
+// combine it with the server client ID into a GIDConfiguration.
+void GoogleSignIn_SetClientID(NSString *clientID);

@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System;
-
-public class TransitionOrderSpiral : TransitionOrderBase
+﻿public class TransitionOrderSpiral : TransitionOrderBase
 {
     public SpiralDirection _spiralDirection;
     public TransitionStartCorner _transitionStartCorner;

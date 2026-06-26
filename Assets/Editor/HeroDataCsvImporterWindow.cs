@@ -656,7 +656,7 @@ public class HeroDataCsvImporterWindow : EditorWindow
         heroData.SummonWeight = row.SummonWeight;
 
         heroData.HeroAddressKey = row.HeroAddressKey;
-        heroData.SpineAddressKey = row.SpineAddressKey;
+        //heroData.SpineAddressKey = row.SpineAddressKey;
         heroData.HeroIconKey = row.HeroIconKey;
 
         /*

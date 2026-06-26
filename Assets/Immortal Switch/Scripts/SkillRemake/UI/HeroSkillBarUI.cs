@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 using UnityEngine.Events;

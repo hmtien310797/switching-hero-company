@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -27,6 +26,9 @@ namespace Immortal_Switch.Scripts.UI
         [Header("Clamp")] [SerializeField] private float minScale = 0.35f;
         [SerializeField] private float maxScale = 1f;
 
+        [Header("Fixed anchored position, unity auto fill value")] [ReadOnly] [SerializeField]
+        private float anchoredY;
+
         [Header("Optional Y Offset")] [SerializeField]
         private bool changePosY = false;
 
@@ -46,6 +48,16 @@ namespace Immortal_Switch.Scripts.UI
             Apply();
         }*/
 
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (panelRoot != null)
+            {
+                anchoredY = panelRoot.anchoredPosition.y;
+            }
+        }
+#endif
+
         private IEnumerator Start()
         {
             // cho unity tinh toan height chinh xac cua canvas.
@@ -55,7 +67,7 @@ namespace Immortal_Switch.Scripts.UI
             Apply();
         }
 
-        private void LateUpdate()
+        private void Update()
         {
             if (NeedRefresh())
             {
@@ -77,7 +89,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private void CacheDesignSize()
         {
-            if (/*!autoDetectDesignSize ||*/
+            if ( /*!autoDetectDesignSize ||*/
                 cachedDesignSize ||
                 panelRoot == null)
                 return;
@@ -135,7 +147,9 @@ namespace Immortal_Switch.Scripts.UI
                 ? Screen.safeArea
                 : new Rect(0, 0, Screen.width, Screen.height);
 
-            float yOffset = Mathf.Max(0f, panelRoot.anchoredPosition.y);
+            // ko su dung dynamic vi moi lan thay doi orientation, UI can thoi gian hien thi
+            //float yOffset = Mathf.Max(0f, panelRoot.anchoredPosition.y);
+            float yOffset = Mathf.Max(0f, changePosY ? yPosLandscape : anchoredY);
             float finalY = (panelRoot.root as RectTransform)!.rect.height;
 
             var sizeDelta = panelRoot.sizeDelta;

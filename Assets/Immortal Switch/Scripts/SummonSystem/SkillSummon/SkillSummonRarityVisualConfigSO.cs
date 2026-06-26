@@ -21,8 +21,5 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
     public class SkillSummonRarityVisualEntry
     {
         public SkillSummonGrade grade;
-        public Sprite icon;
-        public Color topColor = Color.white;
-        public Color bottomColor = Color.white;
     }
 }

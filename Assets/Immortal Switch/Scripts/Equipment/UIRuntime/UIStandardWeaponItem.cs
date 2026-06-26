@@ -1,8 +1,5 @@
 ﻿using System;
 using Immortal_Switch.Scripts.Equipment.UI;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {

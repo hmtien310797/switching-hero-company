@@ -1,4 +1,5 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Shared.Database;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,9 @@ namespace Immortal_Switch.Scripts.Skill.UI
     {
         [SerializeField] private Button button;
         [SerializeField] private Image icon;
+        [SerializeField] private Image frameImg;
+        [SerializeField] private Image bgImg;
+        [SerializeField] private Image tierImg;
         [SerializeField] private GameObject selectedObject;
         [SerializeField] private GameObject equippedTagObject;
         [SerializeField] private GameObject darkenObject;
@@ -22,7 +26,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public Button Button => button;
         public int SkillId => skillData != null ? skillData.SkillId : -1;
 
-        public void Setup(SkillViewSkillState state, bool isSelected, Action<SkillDataSO> onClick)
+        public void Setup(SkillViewSkillState state, ItemTierEntry tierInfo, bool isSelected, Action<SkillDataSO> onClick)
         {
             skillData = state.SkillData;
             clickCallback = onClick;
@@ -47,6 +51,14 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             if (selectedObject != null)
                 selectedObject.SetActive(isSelected);
+
+            if (bgImg != null)
+                bgImg.sprite = tierInfo.background;
+            
+            if (frameImg != null)
+                frameImg.sprite = tierInfo.border;
+            if (tierImg != null)
+                tierImg.sprite = tierInfo.tier;
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() => clickCallback?.Invoke(skillData));

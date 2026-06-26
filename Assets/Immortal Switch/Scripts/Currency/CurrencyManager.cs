@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Reward;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Currency

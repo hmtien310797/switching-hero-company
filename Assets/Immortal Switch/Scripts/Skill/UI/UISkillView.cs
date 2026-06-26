@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Database;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,6 +37,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         [Header("Detail")] 
         [SerializeField] private Image detailIcon;
+        [SerializeField] private Image bgImg;
+        [SerializeField] private Image frameImg;
         [SerializeField] private TMP_Text detailLevelText;
         [SerializeField] private TMP_Text detailNameText;
         [SerializeField] private TMP_Text detailTypeText;
@@ -261,13 +266,18 @@ namespace Immortal_Switch.Scripts.Skill.UI
             {
                 selectedHero = null;
 
+                var notInBattleHeroSkillPool = dataProvider.GetSortedPoolForNotInBattleHero(selectedClass);
+                selectedSkill = ValidateSelectedSkill(notInBattleHeroSkillPool, selectedHero);
+                var itemTier1 = EnumHelper.TierSkillToItemTier(selectedSkill.SkillTier);
+                var tierInfo1 = DatabaseManager.Instance.ItemTierDb.Get(itemTier1);
+
                 if (warningText != null)
                     warningText.text = "Cannot equip skill because this Hero's class is not assigned";
 
                 BindHeroTabs();
                 BindEquippedSlots();
                 RebuildGridByClass(selectedClass, null);
-                BindDetail(null, selectedSkill);
+                BindDetail(null, selectedSkill, tierInfo1);
                 CloseReplacePopup();
 
                 LogWarningView($"Class {selectedClass} has no assigned hero. Showing warning mode.");
@@ -291,11 +301,14 @@ namespace Immortal_Switch.Scripts.Skill.UI
             var pool = dataProvider.GetSortedPoolForHero(selectedHero);
             selectedSkill = ValidateSelectedSkill(pool, selectedHero);
 
+            var itemTier = EnumHelper.TierSkillToItemTier(selectedSkill.SkillTier);
+            var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
+
             LogView(
                 $"SelectedSkill -> {(selectedSkill != null ? $"{selectedSkill.SkillId}-{selectedSkill.SkillName}" : "null")}");
 
             RebuildGridByClass(selectedClass, selectedHero);
-            BindDetail(selectedHero, selectedSkill);
+            BindDetail(selectedHero, selectedSkill, tierInfo);
 
             if (isReplaceMode)
             {
@@ -425,7 +438,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             spawnedGridItems.Clear();
 
-            var pool = hero != null ? dataProvider.GetSortedPoolForHero(hero) : dataProvider.GetClassPool(heroClass);
+            var pool = hero != null ? dataProvider.GetSortedPoolForHero(hero) : dataProvider.GetSortedPoolForNotInBattleHero(heroClass);
 
             foreach (var skillData in pool)
             {
@@ -435,13 +448,17 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 var item = Instantiate(skillItemPrefab, gridRoot);
                 bool isSelected = selectedSkill != null && skillData != null &&
                                   selectedSkill.SkillId == skillData.SkillId;
+
                 item.name = $"skill_{skillData.SkillClass}_{skillData.SkillId}";
-                item.Setup(state, isSelected, OnClickGridSkill);
+                var itemTier = EnumHelper.TierSkillToItemTier(skillData.SkillTier);
+                var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
+                
+                item.Setup(state, tierInfo, isSelected, OnClickGridSkill);
                 spawnedGridItems.Add(item);
             }
         }
 
-        private void BindDetail(SkillViewHeroContext hero, SkillDataSO skillData)
+        private void BindDetail(SkillViewHeroContext hero, SkillDataSO skillData, ItemTierEntry tierInfo)
         {
             if (skillData == null)
             {
@@ -461,6 +478,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
             var state = dataProvider.BuildSkillState(hero, skillData);
 
             if (detailIcon != null) detailIcon.sprite = skillData.SkillIcon;
+            if (bgImg != null) bgImg.sprite = tierInfo.background;
+            if (frameImg != null) frameImg.sprite = tierInfo.border;
             if (detailLevelText != null) detailLevelText.text = $"Cấp.{state.Level}";
             if (detailNameText != null) detailNameText.text = skillData.SkillName;
             //if (detailTypeText != null) detailTypeText.text = $"{skillData.CastType} kỹ năng";

@@ -1,6 +1,5 @@
 using Common;
 using UnityEngine;
-using Battle;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.Skill

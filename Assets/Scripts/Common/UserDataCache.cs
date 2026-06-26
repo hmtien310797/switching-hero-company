@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
@@ -52,6 +51,7 @@ namespace Common
         public readonly HeroActor[] inBattleHeroes = new HeroActor[2];
 
         public event Action<int> OnHeroSkillChanged;
+        public bool AutoSkill;
 
         public override UniTask InitializeAsync()
         {
@@ -64,6 +64,15 @@ namespace Common
         void EnsureInitialized()
         {
             EnsureInitialSkillInventoryForUnlockedClassSkills();
+        }
+        
+        public void SetAutoSkill(bool isAutoSkill)
+        {
+            AutoSkill = isAutoSkill;
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                inBattleHeroes[i].SetAutoSkill(isAutoSkill);
+            }
         }
 
         public void ApplySkillEnhanceEntries(SkillEnhanceEntry[] entries)

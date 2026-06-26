@@ -1,10 +1,8 @@
-﻿using Battle;
-using Immortal_Switch.Scripts.Equipment.Core;
+﻿using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Services;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.Equipment.Runtime
 {

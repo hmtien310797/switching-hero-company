@@ -8,7 +8,6 @@ using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
-using Newtonsoft.Json;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -52,19 +51,19 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             _storage.Save();
         }
 
-        public EEquipmentTier RollTier(DynamicHeroesGlobalSpecificationsTransmutationRateConfigRow row)
+        public EItemTier RollTier(DynamicHeroesGlobalSpecificationsTransmutationRateConfigRow row)
         {
-            var weights = new Dictionary<EEquipmentTier, float>
+            var weights = new Dictionary<EItemTier, float>
             {
-                { EEquipmentTier.D, row.d },
-                { EEquipmentTier.C, row.c },
-                { EEquipmentTier.B, row.b },
-                { EEquipmentTier.A, row.a },
-                { EEquipmentTier.S, row.s },
-                { EEquipmentTier.SS, row.sS },
-                { EEquipmentTier.SSS, row.sSS },
-                { EEquipmentTier.R, row.r },
-                { EEquipmentTier.SR, row.sR },
+                { EItemTier.D, row.d },
+                { EItemTier.C, row.c },
+                { EItemTier.B, row.b },
+                { EItemTier.A, row.a },
+                { EItemTier.S, row.s },
+                { EItemTier.SS, row.sS },
+                { EItemTier.SSS, row.sSS },
+                { EItemTier.R, row.r },
+                { EItemTier.SR, row.sR },
             };
 
             // loại bỏ các weight <= 0
@@ -74,7 +73,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
             if (validWeights.Count <= 0)
             {
-                return EEquipmentTier.D;
+                return EItemTier.D;
             }
 
             // tổng weight
@@ -173,7 +172,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return _storage.Data.Setting.IsWaiting;
         }
 
-        public void SaveSetting(List<List<string>> uniqueOptions, int count, EEquipmentTier tier, bool enabled)
+        public void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool enabled)
         {
             _storage.Data.Setting.Enabled = enabled;
             _storage.Data.Setting.Count = count;

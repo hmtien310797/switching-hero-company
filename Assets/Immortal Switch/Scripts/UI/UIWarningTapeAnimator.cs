@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using Immortal_Switch.Scripts.Core;
 using Sirenix.OdinInspector;
@@ -94,11 +93,18 @@ public class UIWarningTapeAnimator : MonoBehaviour
 
     private void Start()
     {
-        GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, result =>
-        {
-            if (!result)
-                Show();
-        });
+        GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationEvent);
+    }
+
+    private void OnDestroy()
+    {
+        GameEventManager.Unsubscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationEvent);
+    }
+
+    private void OnBossSpawnAnimationEvent(bool result)
+    {
+        if (!result)
+            Show();
     }
 
     private void Update()

@@ -1,5 +1,3 @@
-using Battle;
-
 namespace Immortal_Switch.Scripts.Boss
 {
     public interface IBossSkillLogic

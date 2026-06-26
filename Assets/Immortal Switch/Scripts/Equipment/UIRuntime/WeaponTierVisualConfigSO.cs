@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Battle;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Sirenix.OdinInspector;
 

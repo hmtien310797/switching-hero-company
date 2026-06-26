@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.ItemSystem;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.StageSelection
@@ -25,7 +25,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                     continue;
 
                 RewardItemView item = Instantiate(itemPrefab, contentRoot);
-                Sprite icon = await ItemSystemManager.Instance.Database.GetCurrencyIcon(reward.currencyType.ToString());
+                Sprite icon = await DatabaseManager.Instance.ItemDb.LoadCurrencyIconByKey(reward.currencyType.ToString());
                 item.Bind(reward);
             }
         }

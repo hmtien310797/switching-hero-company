@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using Common;
+﻿using System.Collections;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
 using Sirenix.OdinInspector;

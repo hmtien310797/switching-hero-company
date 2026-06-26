@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using DamageNumbersPro;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.DamageNumber

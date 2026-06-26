@@ -3,7 +3,6 @@ using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -17,8 +16,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
     {
         [Header("Data")]
         [SerializeField] private HeroProgressionDatabaseSO heroDatabase;
-        [SerializeField] private HeroRarityVisualConfigSO heroRarityVisualConfig;
-        [SerializeField] private HeroSummonRarityVisualConfigSO heroSummonRarityVisualConfig;
         [SerializeField] private HeroUIIconConfigSO heroUIIconConfig;
 
         [Header("Top Slots")]
@@ -122,13 +119,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             var data1 = HeroCollectionItemViewDataFactory.Build(
                 hero1,
-                heroSummonRarityVisualConfig,
-                heroDatabase, service, heroRarityVisualConfig, heroUIIconConfig, heroSpriteAtlas);
+                heroDatabase, service, heroUIIconConfig);
 
             var data2 = HeroCollectionItemViewDataFactory.Build(
                 hero2,
-                heroSummonRarityVisualConfig,
-                heroDatabase, service, heroRarityVisualConfig, heroUIIconConfig, heroSpriteAtlas);
+                heroDatabase, service, heroUIIconConfig);
 
             slot1UI?.Bind(1, data1, OnClickSourceSlot);
             slot2UI?.Bind(2, data2, OnClickSourceSlot);
@@ -149,11 +144,9 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
                 var data = HeroCollectionItemViewDataFactory.Build(
                     hero,
-                    heroSummonRarityVisualConfig,
                     heroDatabase,
                     service,
-                    heroRarityVisualConfig,
-                    heroUIIconConfig, heroSpriteAtlas);
+                    heroUIIconConfig);
 
                 if (data == null) continue;
                 if (!data.IsAcquired) continue;

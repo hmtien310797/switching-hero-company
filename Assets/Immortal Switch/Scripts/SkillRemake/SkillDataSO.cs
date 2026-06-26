@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
-using Immortal_Switch.Scripts.SkillRemake;
 using Immortal_Switch.Scripts.SkillSystem.Description;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -203,6 +202,7 @@ namespace Immortal_Switch.Scripts.Skill
         [Min(0f)] public float Delay;
         [Range(0f, 1f)] public float NormalizedTime;
         public List<SkillActionData> Actions = new();
+        public bool hasCameraShake;
     }
 
     [Serializable]
@@ -241,6 +241,8 @@ namespace Immortal_Switch.Scripts.Skill
         public string SkillName;
         public string IconSkillKey;
         public Sprite SkillIcon;
+        [TextArea(3,12)]
+        public String Description;
 
         [Header("Type")]
         public SkillOwnerType OwnerType = SkillOwnerType.ClassSkill;
@@ -266,8 +268,6 @@ namespace Immortal_Switch.Scripts.Skill
 
         [Header("Levels")]
         public List<SkillLevelData> Levels = new();
-        
-        public String Description;
         
         [SerializeField]
         private Color hitDamageColor = new Color(1f, 0.25f, 0.25f);

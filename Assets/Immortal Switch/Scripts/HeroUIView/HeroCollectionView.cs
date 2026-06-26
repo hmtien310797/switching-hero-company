@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Common;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.U2D;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.HeroUIView
@@ -17,9 +15,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
     {
         [Header("References")] [SerializeField]
         private HeroProgressionDatabaseSO heroDatabase;
-
-        [SerializeField] private HeroRarityVisualConfigSO heroRarityVisualConfig;
-        [SerializeField] private HeroSummonRarityVisualConfigSO heroSummonRarityVisualConfigSo;
+        
         [SerializeField] private HeroUIIconConfigSO heroUIIconConfig;
         [SerializeField] private Transform contentRoot;
         [SerializeField] private HeroCollectionItemUI itemPrefab;
@@ -47,9 +43,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private HeroCollectionItemUI currentSelectedItem;
         private List<HeroDataSO> allHeroData;
-        private SpriteAtlas heroSpriteAlas;
-        private const string HeroSpriteAtlasKey = "hero_sprite_atlas";
         private readonly HashSet<int> lineupHeroIds = new();
+        private HeroInfoView currentHeroInfoView;
 
         private void Awake()
         {
@@ -61,7 +56,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             InitFilters();
             combatFormationButton.onClick.AddListener(() =>
             {
-                UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>(heroSpriteAlas).Forget();
+                UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
             });
             upgradeAllHeroButton.onClick.AddListener(HeroProgressionManager.Instance.UpgradeAllHeroes);
         }
@@ -74,11 +69,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
         
         public override async UniTask PlayShowAsync(object args)
         {
-            if (heroSpriteAlas == null)
-            {
-                heroSpriteAlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
-            }
-
             await RefreshFromServerAsync();
 
             base.PlayShowAsync(args).Forget();
@@ -144,6 +134,21 @@ namespace Immortal_Switch.Scripts.HeroUIView
         private void HandleHeroCollectionChanged(HeroCollectionChangedArgs args)
         {
             RefreshAll();
+
+            if (currentHeroInfoView == null)
+            {
+                return;
+            }
+            
+            for (int i = 0; i < allItemsData.Count; i++)
+            {
+                var currentItemData = allItemsData[i];
+                if (currentItemData.HeroId == currentHeroInfoView.heroId)
+                {
+                    currentHeroInfoView.SetHeroCollectionViewData(currentItemData);
+                    break;
+                }
+            }
         }
 
         private void InitFilters()
@@ -247,11 +252,9 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
                 var data = HeroCollectionItemViewDataFactory.Build(
                     hero,
-                    heroSummonRarityVisualConfigSo,
                     heroDatabase,
                     service,
-                    heroRarityVisualConfig,
-                    heroUIIconConfig, heroSpriteAlas);
+                    heroUIIconConfig);
 
                 if (data != null)
                 {
@@ -325,11 +328,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
         private async UniTask OpenHeroInfo(int heroId)
         {
             Debug.Log($"Open hero info: {heroId}");
-            var ui = await UIManager.Instance.OpenPopupAsync<HeroInfoView>();
-
-            if (ui != null)
+            currentHeroInfoView = await UIManager.Instance.OpenPopupAsync<HeroInfoView>();
+            
+            if (currentHeroInfoView != null)
             {
-                ui.Bind(heroId);
+                currentHeroInfoView.Bind(heroId);
             }
         }
 

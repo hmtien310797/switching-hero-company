@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
@@ -260,6 +261,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                     Enum.TryParse<WeaponTier>(entry.Grade, true, out var tier);
                     var weaponDef = WeaponSummonManager.Instance.Config.GetWeapon(entry.WeaponId, entry.WeaponName);
 
+                    Enum.TryParse<EItemTier>(entry.Grade, true, out var itemTier);
+                    var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
+
                     result.Entries.Add(new WeaponSummonResultEntry
                     {
                         RollIndex    = entry.RollIndex,
@@ -271,7 +275,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                         Star         = entry.Star,
                         IsNewWeapon  = entry.IsNew,
                         ShardGained  = entry.ShardGained,
-                        TotalShardAfter = 0
+                        TotalShardAfter = 0,
+                        TierInfo = tierInfo,
                     });
                 }
 

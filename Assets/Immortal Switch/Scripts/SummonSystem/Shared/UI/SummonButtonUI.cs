@@ -76,7 +76,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
 
             if (rollCountText != null)
-                rollCountText.text = option.RollCount.ToString();
+                rollCountText.text = $"{option.RollCount} lần";
 
             BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
@@ -102,7 +102,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
 
             if (rollCountText != null)
-                rollCountText.text = option.RollCount.ToString();
+                rollCountText.text = $"{option.RollCount} lần";
 
             BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.WeaponTicket);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
@@ -128,7 +128,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
 
             if (rollCountText != null)
-                rollCountText.text = option.RollCount.ToString();
+                rollCountText.text = $"{option.RollCount} lần";
 
             BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.SkillTicket);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);

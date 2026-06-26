@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.PlayerSystem.Models

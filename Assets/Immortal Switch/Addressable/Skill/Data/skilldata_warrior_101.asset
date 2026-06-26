@@ -18,7 +18,13 @@ MonoBehaviour:
   SkillName: Holy Blade Pierce
   IconSkillKey: icon_skilldata_warrior_101
   SkillIcon: {fileID: 21300000, guid: b0f5c98300e54a143b92c4742634e640, type: 3}
-  DescriptionTemplate: 
+  Description: "Tri\u1EC7u h\u1ED3i c\xE1c l\u01B0\u1EE1i ki\u1EBFm \u1EA3o \u1EA3nh
+    t\u1EEB c\u1ED5ng kh\xF4ng gian, lao t\u1EDBi k\u1EBB \u0111\u1ECBch v\xE0 ch\xE9m
+    li\xEAn t\u1EE5c, g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng
+    m\u1ED7i l\u1EA7n \u0111\xE1nh. Sau \u0111\xF3 tung nh\xE1t ch\xE9m k\u1EBFt
+    li\u1EC5u h\xECnh ch\u1EEF X, g\xE2y th\xEAm {finalhit}% ATK s\xE1t th\u01B0\u01A1ng
+    k\u1EF9 n\u0103ng l\xEAn c\xE1c k\u1EBB \u0111\u1ECBch xung quanh m\u1EE5c ti\xEAu
+    ch\xEDnh."
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 3
@@ -103,7 +109,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -116,7 +122,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -187,7 +193,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -200,7 +206,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -271,7 +277,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -284,7 +290,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -349,3 +355,4 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
+  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

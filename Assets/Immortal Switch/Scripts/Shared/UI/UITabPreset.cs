@@ -72,7 +72,7 @@ namespace Immortal_Switch.Scripts.Shared.UI
             }
         }
 
-        public void SetStatus(ETabPresetStatus status)
+        public virtual void SetStatus(ETabPresetStatus status)
         {
             // trang thai cu bo qua
             if (_status == status)

@@ -18,26 +18,30 @@ MonoBehaviour:
   SkillName: Void Thunderfall
   IconSkillKey: icon_skilldata_mage_401
   SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
-  DescriptionTemplate: 
+  Description: "Tri\u1EC7u h\u1ED3i ma tr\u1EADn l\xF4i \u0111i\u1EC7n t\u1EA1i khu
+    v\u1EF1c m\u1EE5c ti\xEAu, li\xEAn t\u1EE5c gi\xE1ng s\xE9t xu\u1ED1ng k\u1EBB
+    \u0111\u1ECBch trong v\xF9ng. M\u1ED7i tia s\xE9t g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
+    k\u1EF9 n\u0103ng. Sau hit cu\u1ED1i, t\u1EA1o v\u1EE5 n\u1ED5 \u0111i\u1EC7n
+    v\xE0 g\xE2y Electrified l\xEAn k\u1EBB \u0111\u1ECBch tr\xFAng chi\xEAu."
   OwnerType: 0
   MaxLevel: 10
-  SkillTier: 1
+  SkillTier: 2
   CastConfig:
     RequireTarget: 1
-    MoveToCastRange: 1
+    MoveToCastRange: 0
     CastRange: 2
-    Cooldown: 1
-    TargetSelectType: 1
+    Cooldown: 9
+    TargetSelectType: 0
     HeroAnimationName: 
   RuntimeObjectConfig:
     RuntimeVisualType: 2
-    SpawnMode: 1
-    RuntimeAddressableKey: 
+    SpawnMode: 0
+    RuntimeAddressableKey: prefab_void_thunder_fall_controller
     SpawnPositionType: 0
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
     LifeTime: 1
-    UseLifeTime: 1
+    UseLifeTime: 0
     DespawnOnAnimationComplete: 1
     AnimationName: 
     LoopAnimation: 0
@@ -45,24 +49,109 @@ MonoBehaviour:
     LockCasterDuringHeroAnimation: 1
     MultiSpawnConfig:
       ChildSpawnMode: 1
-      ChildRuntimeAddressableKey: 
-      ChildAnimationName: 
+      ChildRuntimeAddressableKey: prefab_void_thunder_fall
+      ChildAnimationName: animation
       ChildLoopAnimation: 0
-      ChildUseLifeTime: 1
+      ChildUseLifeTime: 0
       ChildLifeTime: 1.5
       ChildDespawnOnAnimationComplete: 1
-      SpawnCount: 10
+      SpawnCount: 8
       StartDelay: 0
-      SpawnInterval: 0.15
-      SpawnRadius: 2.5
+      SpawnInterval: 0.2
+      SpawnRadius: 10
       RandomInsideCircle: 1
       IncludeCenterAsFirstSpawn: 1
       ChildSpawnOffset: {x: 0, y: 0, z: 0}
       RandomizeYRotation: 0
-      DespawnControllerAfterSpawn: 1
-      DespawnDelayAfterLastSpawn: 0.25
+      DespawnControllerAfterSpawn: 0
+      DespawnDelayAfterLastSpawn: 5
       DebugDrawSpawnRadius: 0
-  BasePhases: []
+  BasePhases:
+  - PhaseId: 0
+    TriggerType: 1
+    EventName: hit
+    Delay: 0
+    NormalizedTime: 0
+    Actions:
+    - ActionType: 0
+      ChancePercent: 100
+      TargetTypeOverride: 0
+      Damage:
+        SkillDamageBonusPercent: 185
+        ScaleWithClassSkillLevel: 1
+        CountAsSkillDamage: 1
+      Dot:
+        EffectId: DOT
+        TickDamageBonusPercent: 0
+        ScaleDamageWithClassSkillLevel: 1
+        TickInterval: 1
+        Duration: 5
+        DamageType: 0
+        StackRule: 0
+      StatModifier:
+        ModifierId: 
+        StatType: 0
+        PercentValue: 0
+        ScaleValueWithClassSkillLevel: 1
+        Duration: 5
+      Area:
+        AreaPrefab: {fileID: 0}
+        Shape: 0
+        PositionType: 1
+        Radius: 2
+        BoxSize: {x: 2, y: 2}
+        Duration: 0
+        TickInterval: 0
+        HitOncePerTarget: 1
+        OnHitActions: []
+      Projectile:
+        BulletPatternConfig:
+          patternType: 0
+          bulletAddressableKey: 
+          bulletSpeed: 0
+          bulletLifeTime: 0
+          totalWaves: 0
+          timeBetweenWaves: 0
+          bulletsPerWave: 0
+          spreadAngle: 0
+          rotationSpeedPerWave: 0
+          bulletSpawnDelay: 0
+          alternateBulletOrderEachWave: 0
+          damage: 0
+          delayWhenStartFiring: 0
+        HomingChainBulletConfig:
+          bulletAddressableKey: 
+          bulletCount: 1
+          delayBetweenBullets: 0.05
+          enemyLayer:
+            serializedVersion: 2
+            m_Bits: 0
+          searchRadius: 20
+          maxTargetsPerBullet: 4
+          straightSpeed: 18
+          curveSpeed: 22
+          arriveDistance: 0.2
+          curveTangentLength: 3
+          damage: 100
+          drawDebugPath: 0
+          curveHeight: 4
+          alternateCurveSide: 1
+          useVerticalArc: 1
+          alternateVerticalArc: 1
+          verticalArcOnFirstChainMove: 1
+          verticalArcHeightRange: {x: 0.5, y: 3}
+          UseShortDistanceDetour: 1
+          minDetourDistance: 5
+          virtualPointXRange: {x: 8, y: 12}
+          virtualPointZRange: {x: 5, y: 9}
+          virtualPointYRange: {x: 2, y: 3}
+          virtualPointFindAttempts: 12
+        OnHitActions: []
+      Stack:
+        StackKey: 
+        Amount: 1
+      TriggerSkill: {fileID: 0}
+    hasCameraShake: 1
   ClassSkillScaling:
     GrowthPercentPerLevel: 6
   PassiveConfig:
@@ -97,3 +186,4 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
+  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

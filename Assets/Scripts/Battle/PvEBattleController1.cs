@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 

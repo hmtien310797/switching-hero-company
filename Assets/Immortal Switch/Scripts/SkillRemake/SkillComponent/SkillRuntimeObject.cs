@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Common;
 using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Pooling;
 using UnityEngine;
@@ -160,7 +159,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             isDespawning = true;
-
+            transform.localScale = Vector3.one;
             switch (runtimeSpawnMode)
             {
                 case SkillRuntimeSpawnMode.AddressablePool:

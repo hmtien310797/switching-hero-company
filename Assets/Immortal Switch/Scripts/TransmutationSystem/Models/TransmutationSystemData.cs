@@ -65,7 +65,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         /// <summary>
         /// tier da chon
         /// </summary>
-        public EEquipmentTier Tier;
+        public EItemTier Tier;
 
         /// <summary>
         /// sl chon

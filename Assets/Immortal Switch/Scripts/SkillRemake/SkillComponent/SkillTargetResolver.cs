@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Enemy;
 using UnityEngine;
-using Battle;
 using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.StatSystem;
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.StatSystem;
-using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

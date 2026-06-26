@@ -74,38 +74,231 @@ namespace Immortal_Switch.Scripts.Addressable
                 loadingRequest = null;
             }
         }
-
-        /// <summary>
-        /// Lấy hero icon bất đồng bộ.
-        /// Nếu atlas chưa load thì service sẽ tự load.
-        /// </summary>
-        public static async UniTask<Sprite> GetHeroIconAsync(
-            string spriteName)
+        
+        public static Sprite GetHeroIcon(HeroDataSO heroData)
         {
-            if (string.IsNullOrWhiteSpace(spriteName))
+            if (heroData == null)
+                return null;
+
+            return GetHeroIcon(heroData.HeroIconKey);
+        }
+
+        public static Sprite GetHeroTierIcon(SummonRarity rarity)
+        {
+            string rarityKey = $"tier_{rarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
+
+            if (heroAtlas == null)
             {
                 Debug.LogError(
-                    "[HeroImageService] Hero sprite name is null or empty."
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
                 );
 
                 return null;
             }
 
-            if (SpriteCache.TryGetValue(spriteName, out Sprite cachedSprite))
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
+        public static Sprite GetHeroTierIcon(HeroProgressTier rarity)
+        {
+            string rarityKey = $"tier_{rarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
                 return cachedSprite;
 
-            bool initialized = await InitializeAsync();
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
 
-            if (!initialized)
                 return null;
+            }
 
-            return GetHeroIcon(spriteName);
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
         }
+        
+        public static Sprite GetHeroTierFrame(HeroProgressTier rarity)
+        {
+            string rarityKey = $"frame_{rarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
 
-        /// <summary>
-        /// Lấy icon đồng bộ khi atlas đã load.
-        /// </summary>
-        public static Sprite GetHeroIcon(string spriteName)
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
+        public static Sprite GetHeroTierFrame(SummonRarity rarity)
+        {
+            string rarityKey = $"frame_{rarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
+
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
+        public static Sprite GetHeroTierBackground(SummonRarity rarity)
+        {
+            string rarityKey = $"background_{rarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
+
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
+        public static Sprite GetHeroTierBackground(HeroProgressTier rarity)
+        {
+            string rarityKey = $"background_{rarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
+
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
+        public static void Release()
+        {
+            if (heroAtlas == null)
+            {
+                SpriteCache.Clear();
+                return;
+            }
+
+            SpriteCache.Clear();
+
+            AddressableSpriteAtlasService.ReleaseAtlas(
+                HeroAtlasKey
+            );
+
+            heroAtlas = null;
+        }
+        
+        private static Sprite GetHeroIcon(string spriteName)
         {
             if (string.IsNullOrWhiteSpace(spriteName))
                 return null;
@@ -136,58 +329,7 @@ namespace Immortal_Switch.Scripts.Addressable
             }
 
             SpriteCache.Add(spriteName, sprite);
-
             return sprite;
-        }
-
-        /// <summary>
-        /// Helper lấy icon trực tiếp từ HeroDataSO.
-        /// Đổi IconSpriteName theo property thực tế trong project của bạn.
-        /// </summary>
-        public static UniTask<Sprite> GetHeroIconAsync(HeroDataSO heroData)
-        {
-            if (heroData == null)
-            {
-                Debug.LogError("[HeroImageService] HeroDataSO is null.");
-                return UniTask.FromResult<Sprite>(null);
-            }
-
-            return GetHeroIconAsync(heroData.HeroIconKey);
-        }
-
-        /// <summary>
-        /// Helper đồng bộ từ HeroDataSO.
-        /// Chỉ dùng sau khi InitializeAsync thành công.
-        /// </summary>
-        public static Sprite GetHeroIcon(HeroDataSO heroData)
-        {
-            if (heroData == null)
-                return null;
-
-            return GetHeroIcon(heroData.HeroIconKey);
-        }
-
-        /// <summary>
-        /// Release atlas hero và xóa toàn bộ Sprite clone đã cache.
-        ///
-        /// Chỉ gọi khi không còn Image nào sử dụng hero icon,
-        /// ví dụ logout, về title hoặc unload toàn bộ Main Hub.
-        /// </summary>
-        public static void Release()
-        {
-            if (heroAtlas == null)
-            {
-                SpriteCache.Clear();
-                return;
-            }
-
-            SpriteCache.Clear();
-
-            AddressableSpriteAtlasService.ReleaseAtlas(
-                HeroAtlasKey
-            );
-
-            heroAtlas = null;
         }
     }
 }

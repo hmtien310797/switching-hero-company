@@ -78,7 +78,7 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Models
         /// <summary>
         /// parsed tier string sang enum
         /// </summary>
-        public EEquipmentTier ParsedTier => Enum.TryParse<EEquipmentTier>(Tier, true, out var result) ? result : EEquipmentTier.D;
+        public EItemTier ParsedTier => Enum.TryParse<EItemTier>(Tier, true, out var result) ? result : EItemTier.D;
     }
 
     public class PlayerEquipViewData : PlayerEquipItem

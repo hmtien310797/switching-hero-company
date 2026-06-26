@@ -1,6 +1,6 @@
-﻿using Immortal_Switch.Scripts.Hero;
+﻿using Immortal_Switch.Scripts.Addressable;
+using Immortal_Switch.Scripts.Hero;
 using UnityEngine;
-using UnityEngine.U2D;
 
 namespace Immortal_Switch.Scripts.HeroUIView
 {
@@ -8,11 +8,9 @@ namespace Immortal_Switch.Scripts.HeroUIView
     {
         public static HeroCollectionItemViewData Build(
             HeroDataSO hero,
-            HeroSummonRarityVisualConfigSO heroSummonRarityVisualConfig,
             HeroProgressionDatabaseSO heroDatabase,
             HeroProgressionService service,
-            HeroRarityVisualConfigSO heroRarityVisualConfig,
-            HeroUIIconConfigSO heroUIIconConfig, SpriteAtlas heroSpriteAtlas)
+            HeroUIIconConfigSO heroUIIconConfig)
         {
             if (hero == null || heroDatabase == null || service == null)
                 return null;
@@ -31,21 +29,20 @@ namespace Immortal_Switch.Scripts.HeroUIView
             {
                 displayTier = progressionConfig.StartingTier;
             }
-
-            var cfg = heroSummonRarityVisualConfig?.Get(hero.SummonRarity);
+            
             var viewData = new HeroCollectionItemViewData
             {
                 HeroId = hero.Id,
                 HeroName = hero.Name,
-                PortraitIcon = heroSpriteAtlas.GetSprite(hero.HeroIconKey),
+                SummonRarity = hero.SummonRarity,
+                PortraitIcon = HeroImageService.GetHeroIcon(hero),
                 ShardIcon = hero.ShardIcon,
-                RarityIcon = heroRarityVisualConfig != null ? heroRarityVisualConfig.GetIcon(displayTier) : null,
+                RarityIcon = HeroImageService.GetHeroTierIcon(displayTier),
                 ElementIcon = heroUIIconConfig != null ? heroUIIconConfig.GetElementIcon(hero.Element) : null,
                 HeroClassIcon = heroUIIconConfig != null ? heroUIIconConfig.GetHeroClassIcon(hero.HeroClass) : null,
-                BgIcon = cfg?.Background,
-                FrameIcon = cfg?.Frame,
+                BgIcon = HeroImageService.GetHeroTierBackground(hero.SummonRarity),
+                FrameIcon = HeroImageService.GetHeroTierFrame(hero.SummonRarity),
                 IsAcquired = isAcquired,
-                SummonRarity = hero.SummonRarity,
                 Element = hero.Element,
                 HeroClass = hero.HeroClass,
                 DisplayTier = displayTier

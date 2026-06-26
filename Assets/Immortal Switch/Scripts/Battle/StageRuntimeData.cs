@@ -1,8 +1,4 @@
-﻿using Battle;
-using Immortal_Switch.Scripts.Level.Stage;
-using UnityEngine;
-
-namespace Immortal_Switch.Scripts.Level.Stage
+﻿namespace Immortal_Switch.Scripts.Level.Stage
 {
     public class StageRuntimeData
     {

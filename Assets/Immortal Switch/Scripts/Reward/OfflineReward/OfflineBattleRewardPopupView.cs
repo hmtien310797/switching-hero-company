@@ -1,5 +1,4 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.StageSelection;
 using TMPro;

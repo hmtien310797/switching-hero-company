@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Battle;
-using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using UnityEngine;

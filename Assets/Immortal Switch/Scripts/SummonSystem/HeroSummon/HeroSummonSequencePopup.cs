@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
-using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using UnityEngine;
@@ -38,9 +37,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [SerializeField] private float maxRevealInterval = 0.18f;
         [SerializeField] private float highRarityExtraPause = 0.18f;
         [SerializeField] private float lastCardExtraPause = 0.12f;
-
-        [Header("Rarity Visual")]
-        [SerializeField] private HeroSummonRarityVisualConfigSO rarityVisualConfig;
 
         private readonly List<SummonSequenceCardUI> spawnedCards = new();
         private readonly List<SummonSequenceCardUI> cardPool = new();
@@ -195,14 +191,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             for (int i = 0; i < currentGroupedEntries.Count; i++)
             {
                 var entry = currentGroupedEntries[i];
-                var visual = rarityVisualConfig != null ? rarityVisualConfig.Get(entry.Rarity) : null;
 
                 var card = GetCardFromPool();
                 card.Bind(
                     entry,
-                    heroSpriteAtlas,
-                    visual != null ? visual.Icon : null,
-                    visual != null ? visual.Background : null,
                     i == currentGroupedEntries.Count - 1
                 );
 

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Combat;
 using UnityEngine;
-using Battle;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -23,7 +22,12 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             for (int i = 0; i < phase.Actions.Count; i++)
-                ExecuteAction(context, phase.Actions[i]);
+            {
+                ExecuteAction(context, phase.Actions[i]);    
+            }
+            
+            if(phase.hasCameraShake)
+                GameCameraController.Instance.ShakeCamera();
         }
 
         public void ExecuteAction(SkillRuntimeContext context, SkillActionData action)

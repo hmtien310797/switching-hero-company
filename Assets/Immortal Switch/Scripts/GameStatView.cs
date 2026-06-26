@@ -28,15 +28,25 @@ public class GameStatView : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        
+        buttonBoss.onClick.AddListener(PvEBattleController.Instance.SpawnBossDirectly);
+        buttonBoss.interactable = false;
+        buttonGiveUp.interactable = false;
+        
         GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         GameEventManager.Subscribe(GameEvents.OnWaveStart, OnInitNewStage);
         GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
         GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
         GameEventManager.Subscribe(GameEvents.OnInitNewStage,(Action<bool, bool, StageRuntimeData>) OnInitNewStage);
-        
-        buttonBoss.onClick.AddListener(PvEBattleController.Instance.SpawnBossDirectly);
-        buttonBoss.interactable = false;
-        buttonGiveUp.interactable = false;
+    }
+
+    private void OnDestroy()
+    {
+        GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
+        GameEventManager.Unsubscribe(GameEvents.OnWaveStart, OnInitNewStage);
+        GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+        GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLost);
+        GameEventManager.Unsubscribe(GameEvents.OnInitNewStage,(Action<bool, bool, StageRuntimeData>) OnInitNewStage);
     }
 
     private void OnEnemyDead(int deadCount)

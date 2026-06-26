@@ -1,8 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
-using Immortal_Switch.Scripts.PowerUpSystem;
- using Immortal_Switch.Scripts.StatSystem;
+using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;

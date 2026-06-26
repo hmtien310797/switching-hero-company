@@ -13,7 +13,6 @@ using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Reward;
-using Immortal_Switch.Scripts.StageSelection;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -130,11 +129,22 @@ namespace Battle
         {
             userDataCache = UserDataCache.Instance;
             gameCameraController = GameCameraController.Instance;
+            
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
             GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
             GameEventManager.Subscribe<int>(GameEvents.OnMoveStageRequested, HandleMoveStageRequested);
+        }
+
+        protected override void OnDestroy()
+        {
+            GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+            GameEventManager.Unsubscribe(GameEvents.OnChangeHero, (Action<int, int>)OnChangeHero);
+            GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageFailed);
+            GameEventManager.Unsubscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
+            GameEventManager.Unsubscribe<int>(GameEvents.OnMoveStageRequested, HandleMoveStageRequested);
+            base.OnDestroy();
         }
 
         private void OnBossSpawnAnimationComplete(bool result)
@@ -153,14 +163,6 @@ namespace Battle
             BuildSpawnPositions();
             gameData = GameData.Instance;
             await StartAsync();
-        }
-
-        public void SetAutoSkill(bool isAutoSkill)
-        {
-            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
-            {
-                userDataCache.inBattleHeroes[i].SetAutoSkill(isAutoSkill);
-            }
         }
 
         private async UniTask StartAsync()
@@ -264,7 +266,7 @@ namespace Battle
             TopMainView.Instance.SetHeroSkeletonAnimationGraphic(newHeroData);
 
             newHero.gameObject.SetActive(true);
-            await newHero.Init(newHeroData, this, heroTeamController);
+            await newHero.Init(newHeroData, this, heroTeamController, userDataCache.AutoSkill);
             oldHero.OnDead -= OnHeroDead;
             newHero.OnDead += OnHeroDead;
 
@@ -280,7 +282,7 @@ namespace Battle
                 gameCameraController.SetFollowHero(newHero.transform);
             }
 
-            oldHero.HeroSkillController.DespawnAllInstanceOfUltimateSkill();
+            oldHero.HeroSkillController.DespawnAllInstanceOfUltimateSkillAndClassSkill();
             AddressableSpawnService.ReleaseInstance(oldHero);
         }
 
@@ -349,7 +351,7 @@ namespace Battle
             }
 
             hero.gameObject.SetActive(true);
-            await hero.Init(heroData, this, heroTeamController);
+            await hero.Init(heroData, this, heroTeamController, userDataCache.AutoSkill);
             hero.OnDead -= OnHeroDead;
             hero.OnDead += OnHeroDead;
 
@@ -811,7 +813,7 @@ namespace Battle
                 bool created =
                     await poolService.CreatePoolAsync(
                         poolKey,
-                        warmupCount
+                        Mathf.CeilToInt(warmupCount * 1.5f)
                     );
 
                 if (!created)
@@ -1269,9 +1271,7 @@ namespace Battle
                 return;
             if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage || playCompletedStage)
             {
-                isReadyBattle = false;
                 SpawnNextCreepBatch();
-                isReadyBattle = true;
                 return;
             }
 

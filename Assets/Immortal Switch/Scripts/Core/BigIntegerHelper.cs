@@ -1,5 +1,9 @@
 using System;
+using System.Globalization;
+using System.Linq;
 using System.Numerics;
+using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 
 namespace Immortal_Switch.Scripts.Core
 {
@@ -87,6 +91,91 @@ namespace Immortal_Switch.Scripts.Core
             }
 
             return result;
+        }
+
+        public static bool TryParse([CanBeNull] string text, out BigInteger result)
+        {
+            result = BigInteger.Zero;
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return false;
+            }
+
+            text = text.Trim().ToUpperInvariant();
+
+            var match = Regex.Match(text, @"^([0-9]+(?:\.[0-9]+)?)([A-Z]*)$");
+
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            if (!decimal.TryParse(
+                    match.Groups[1].Value,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out var number))
+            {
+                return false;
+            }
+
+            var suffix = match.Groups[2].Value;
+            var multiplier = BigInteger.One;
+
+            if (suffix.Length > 0)
+            {
+                var tier = GetSuffixIndex(suffix);
+                multiplier = BigInteger.Pow(1000, tier + 1);
+            }
+
+            result = new BigInteger(number * (decimal)multiplier);
+            return true;
+        }
+
+        public static BigInteger Parse(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return BigInteger.Zero;
+            }
+
+            text = text.Trim().ToUpperInvariant();
+
+            var match = Regex.Match(text, @"^([0-9]+(?:\.[0-9]+)?)([A-Z]*)$");
+
+            if (!match.Success)
+            {
+                throw new FormatException($"Invalid BigInteger format: {text}");
+            }
+
+            var numberText = match.Groups[1].Value;
+            var suffix = match.Groups[2].Value;
+
+            if (!decimal.TryParse(
+                    numberText,
+                    NumberStyles.Number,
+                    CultureInfo.InvariantCulture,
+                    out var number))
+            {
+                throw new FormatException($"Invalid number: {numberText}");
+            }
+
+            if (string.IsNullOrEmpty(suffix))
+            {
+                return new BigInteger(number);
+            }
+
+            var tier = GetSuffixIndex(suffix);
+            var multiplier = BigInteger.Pow(1000, tier + 1);
+            return new BigInteger(number * (decimal)multiplier);
+        }
+
+        private static int GetSuffixIndex(string suffix)
+        {
+            // A = 0, B = 1, ..., Z = 25, AA = 26
+            var index = suffix.Aggregate(0, (current, c) => current * 26 + (c - 'A' + 1));
+            return index - 1;
         }
     }
 }

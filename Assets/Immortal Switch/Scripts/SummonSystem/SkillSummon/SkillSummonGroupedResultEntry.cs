@@ -7,6 +7,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
     {
         public SkillDataSO SkillAsset;
         public Sprite Icon;
+        public Sprite BgIcon;
         public string SkillName;
         public int Count;
         public bool IsNewSkill;

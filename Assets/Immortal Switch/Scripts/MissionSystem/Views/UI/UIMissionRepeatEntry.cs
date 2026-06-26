@@ -1,9 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
-using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Helper;
-using Immortal_Switch.Scripts.ItemSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

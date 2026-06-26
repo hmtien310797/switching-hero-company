@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Battle;
 using DG.Tweening;
-using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;

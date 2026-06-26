@@ -163,7 +163,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             };
         }
 
-        public ETabPresetStatus IsUnlockGradeOption(EEquipmentTier tier)
+        public ETabPresetStatus IsUnlockGradeOption(EItemTier tier)
         {
             var firstCfg = Database.GradeConfig.rows.Find(v => v.highestUnlockedGrade == tier.ToString());
 
@@ -181,7 +181,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return Service.GetEquips();
         }
 
-        public void SaveSetting(List<List<string>> uniqueOptions, int count, EEquipmentTier tier, bool isEnabled)
+        public void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool isEnabled)
         {
             Service.SaveSetting(uniqueOptions, count, tier, isEnabled);
             OnSettingChanged?.Invoke(Storage.Data.Setting);
@@ -238,7 +238,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return modifiers.ToList();
         }
 
-        public async UniTask TwiceFuse(int count, bool isWaitingMaterial, EEquipmentTier tier)
+        public async UniTask TwiceFuse(int count, bool isWaitingMaterial, EItemTier tier)
         {
             for (var i = 0; i < count; i++)
             {
@@ -291,7 +291,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         private void StopFuse()
         {
             // dung cau hinh tu dong.
-            SaveSetting(new List<List<string>>(), 0, EEquipmentTier.D, false);
+            SaveSetting(new List<List<string>>(), 0, EItemTier.D, false);
         }
 
         private bool TryStopFuse(PlayerEquipViewData view)

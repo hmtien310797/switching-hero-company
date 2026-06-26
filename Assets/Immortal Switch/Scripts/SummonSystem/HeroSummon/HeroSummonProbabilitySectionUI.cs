@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.Core;
+﻿using Immortal_Switch.Scripts.Addressable;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.HeroUIView;
 using TMPro;
 using UnityEngine;
@@ -10,7 +11,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
     public class HeroSummonProbabilitySectionUI : MonoBehaviour
     {
         [Header("Configs")]
-        [SerializeField] private HeroSummonRarityVisualConfigSO heroSummonRarityVisualConfig;
         [SerializeField] private HeroUIIconConfigSO heroUIConfig;
 
         [SerializeField] private Image imgRarity;
@@ -27,12 +27,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         public void Bind(HeroSummonProbabilitySectionData data, SpriteAtlas heroSpriteAtlas)
         {
-            var spr = heroSummonRarityVisualConfig.GetIcon(data.Rarity);
-
-            if (spr != null)
-            {
-                imgRarity.sprite = spr;
-            }
+            imgRarity.sprite = HeroImageService.GetHeroTierIcon(data.Rarity);
 
             if (totalRateText != null)
                 totalRateText.text = data != null ? $"{data.TotalRatePercent:0.####}%" : "";

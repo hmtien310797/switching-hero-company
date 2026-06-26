@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Common;
 using UnityEngine;

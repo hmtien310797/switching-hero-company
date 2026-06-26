@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Helper;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
@@ -192,14 +194,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             for (int i = 0; i < currentGroupedEntries.Count; i++)
             {
                 var entry = currentGroupedEntries[i];
-                var visual = rarityVisualConfig != null ? rarityVisualConfig.Get(entry.Grade) : null;
+                var itemTier = EnumHelper.GradeToItemTier(entry.Grade);
+                var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
 
                 var card = GetCardFromPool();
                 card.Bind(
                     entry,
-                    visual != null ? visual.icon : null,
-                    visual != null ? visual.topColor : Color.white,
-                    visual != null ? visual.bottomColor : Color.white,
+                    tierInfo,
                     i == currentGroupedEntries.Count - 1
                 );
 

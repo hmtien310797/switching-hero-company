@@ -2,7 +2,9 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.UI;
+using Spine.Unity;
 using TMPro;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -19,8 +21,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private Button btnPrev;
 
         [Header("Database")] [SerializeField] private HeroUIIconConfigSO heroUiDb;
-        [SerializeField] private HeroRarityVisualConfigSO heroRarityVisualConfig;
-        [SerializeField] private HeroSummonRarityVisualConfigSO heroSummonRarityVisualConfigSo;
         [SerializeField] private HeroProgressionDatabaseSO heroDatabase;
 
         [Header("References")] [SerializeField]
@@ -33,6 +33,9 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         [SerializeField] private Image imgProgress;
 
+        [Header("Hero spine")] [SerializeField]
+        private SkeletonGraphic heroSkeletonGraphic;
+
         [Header("Star")] [SerializeField] private RectTransform starContainer;
         [SerializeField] private GameObject starTemplate;
 
@@ -44,16 +47,20 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private TMP_Text txtClass;
         [SerializeField] private TMP_Text txtHeroName;
         [SerializeField] private Image imgElement;
+        [SerializeField] private TMP_Text shardText;
+        [SerializeField] private Image shardProgress;
+        [SerializeField] private Image tierImage;
 
         [Header("Stats")] [SerializeField] private UIHeroInfoStat statAtk;
         [SerializeField] private UIHeroInfoStat statHp;
         [SerializeField] private UIHeroInfoStat statSpd;
-
-        // --- Private Fields ---
+        
         private const string HERO_SPRITE_ATLAS_KEY = "hero_sprite_atlas";
         private int _currentHeroIdx;
         private SpriteAtlas _heroSpriteAlas;
-        private int heroId;
+        private HeroCollectionItemViewData heroCollectionItemViewData;
+        public int heroId { get; private set; }
+        private HeroStatSnapshot heroStatSnapshot;
 
         private void Awake()
         {
@@ -63,7 +70,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             btnPrev.onClick.AddListener(OnClickPrev);
             btnUpgrade.onClick.AddListener(UpgradeHero);
         }
-
+        
         public override async UniTask PlayShowAsync(object args)
         {
             if (_heroSpriteAlas == null)
@@ -72,6 +79,18 @@ namespace Immortal_Switch.Scripts.HeroUIView
             }
 
             base.PlayShowAsync(args).Forget();
+        }
+
+        public void SetHeroCollectionViewData(HeroCollectionItemViewData heroItemViewData)
+        {
+            heroCollectionItemViewData = heroItemViewData;
+            shardText.text = $"{heroCollectionItemViewData.CurrentShard}/{heroCollectionItemViewData.RequiredShardToNext}";
+            shardProgress.fillAmount = heroCollectionItemViewData.ProgressNormalized;
+            tierImage.sprite = HeroImageService.GetHeroTierIcon(heroCollectionItemViewData.DisplayTier);
+            heroStatSnapshot = HeroProgressionManager.Instance.Service.GetCurrentStats(heroId);
+            statAtk.Bind(heroStatSnapshot.Attack);
+            statHp.Bind(heroStatSnapshot.Health);
+            statSpd.Bind(heroStatSnapshot.AttackSpeed);
         }
 
         private void OnClickClose()
@@ -102,6 +121,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             RefreshBtnDirection();
 
             var hero = allHeroes[_currentHeroIdx];
+            heroId = hero.Id;
             RefreshHeroVisual(hero);
         }
 
@@ -114,14 +134,14 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             var allHeroes = MasterDataCache.Instance.GetAllHeroData();
             _currentHeroIdx = allHeroes.FindIndex(v => v.Id == heroId);
+            this.heroId = heroId;
 
             if (_currentHeroIdx < 0)
             {
                 Debug.LogError($"Hero {heroId} not found");
                 return;
             }
-
-            this.heroId = heroId;
+            
             var hero = allHeroes[_currentHeroIdx];
 
             if (hero != null)
@@ -158,16 +178,32 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             var data = HeroCollectionItemViewDataFactory.Build(
                 hero,
-                heroSummonRarityVisualConfigSo,
                 heroDatabase,
                 HeroProgressionManager.Instance.Service,
-                heroRarityVisualConfig,
-                heroUiDb, _heroSpriteAlas);
+                heroUiDb);
 
             if (data != null)
             {
                 txtShard.text = $"{data.CurrentShard} / {data.RequiredShardToNext}";
                 imgProgress.fillAmount = data.ProgressNormalized;
+                tierImage.sprite = HeroImageService.GetHeroTierIcon(data.DisplayTier);
+            }
+
+            if (hero.Spine != null)
+            {
+                // 1. Assign the new skeleton data
+                heroSkeletonGraphic.skeletonDataAsset = hero.Spine;
+                heroSkeletonGraphic.material = heroSkeletonGraphic.skeletonDataAsset.atlasAssets[0].PrimaryMaterial;
+
+                // 2. Re-initialize the graphic (true forces a full rebuild)
+                heroSkeletonGraphic.Initialize(true);
+
+                // set animation
+                heroSkeletonGraphic.AnimationState.ClearTracks();
+                heroSkeletonGraphic.AnimationState.SetAnimation(0, HeroAnimationNameConst.IDLE, true);
+
+                // update lại mesh UI
+                heroSkeletonGraphic.LateUpdate();
             }
 
             var element = heroUiDb.GetElement(hero.Element);
@@ -187,10 +223,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             imgShard.sprite = hero.ShardIcon;
             txtHeroName.text = hero.Name;
-
-            statAtk.Bind(hero.Attack);
-            statHp.Bind(hero.Health);
-            statSpd.Bind(hero.AttackSpeed);
+            heroStatSnapshot = HeroProgressionManager.Instance.Service.GetCurrentStats(heroId);
+            statAtk.Bind(heroStatSnapshot.Attack);
+            statHp.Bind(heroStatSnapshot.Health);
+            statSpd.Bind(heroStatSnapshot.AttackSpeed);
         }
     }
 }

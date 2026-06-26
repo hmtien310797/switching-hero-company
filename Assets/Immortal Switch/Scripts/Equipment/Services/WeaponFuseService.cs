@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Battle;
-using UnityEngine;
+﻿using UnityEngine;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;

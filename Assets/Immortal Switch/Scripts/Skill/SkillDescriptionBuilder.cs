@@ -1,5 +1,4 @@
-﻿using Immortal_Switch.Scripts.Boss;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
 {

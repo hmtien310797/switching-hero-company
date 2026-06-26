@@ -22,7 +22,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             }
         }
 
-        public void Bind(EquipmentTierEntry cfg, int level)
+        public void Bind(ItemTierEntry cfg, int level)
         {
             SetEmpty(false);
             txtLevel.text = $"Lv {level:00}";

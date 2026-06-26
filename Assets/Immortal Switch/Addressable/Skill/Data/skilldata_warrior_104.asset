@@ -18,7 +18,10 @@ MonoBehaviour:
   SkillName: Blade Vortex
   IconSkillKey: icon_skilldata_warrior_104
   SkillIcon: {fileID: 21300000, guid: 6c9b75bfb15794043be2187e58d11a45, type: 3}
-  DescriptionTemplate: 
+  Description: "T\u1EA1o m\u1ED9t v\xF2ng ki\u1EBFm xoay t\u1EA1i v\u1ECB tr\xED
+    m\u1EE5c ti\xEAu, g\xE2y s\xE1t th\u01B0\u01A1ng li\xEAn t\u1EE5c l\xEAn k\u1EBB
+    \u0111\u1ECBch trong v\xF9ng. M\u1ED7i nh\u1ECBp g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
+    k\u1EF9 n\u0103ng v\xE0 c\xF3 th\u1EC3 l\xE0m ch\u1EADm k\u1EBB \u0111\u1ECBch."
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 0
@@ -103,7 +106,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -116,7 +119,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -181,3 +184,4 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
+  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

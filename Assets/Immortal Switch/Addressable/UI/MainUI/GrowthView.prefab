@@ -311,9 +311,10 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 1
-  changePosY: 0
-  yPosPortrait: 1
-  yPosLandscape: 1
+  anchoredY: 245
+  changePosY: 1
+  yPosPortrait: 245
+  yPosLandscape: 175
 --- !u!1 &1671260351971618172
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,7 +639,7 @@ MonoBehaviour:
   MainMode: 0
   CloseOnBackdrop: 0
   CacheOnClose: 0
-  animatedRoot: {fileID: 8637351277118781264}
+  animatedRoot: {fileID: 0}
   showDuration: 0.25
   hideDuration: 0.2
   showFromOffset: {x: 0, y: 900}

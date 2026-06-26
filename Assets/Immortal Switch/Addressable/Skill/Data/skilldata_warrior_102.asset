@@ -18,7 +18,11 @@ MonoBehaviour:
   SkillName: Divine Blade Fall
   IconSkillKey: icon_skilldata_warrior_102
   SkillIcon: {fileID: 21300000, guid: 0c4ebff9e2d03eb46b7504cb10f5dba7, type: 3}
-  DescriptionTemplate: 
+  Description: "Tri\u1EC7u h\u1ED3i th\xE1nh ki\u1EBFm r\u01A1i xu\u1ED1ng khu v\u1EF1c
+    k\u1EBB \u0111\u1ECBch, g\xE2y nhi\u1EC1u \u0111\u1EE3t s\xE1t th\u01B0\u01A1ng
+    li\xEAn ti\u1EBFp. M\u1ED7i th\xE1nh ki\u1EBFm g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
+    k\u1EF9 n\u0103ng l\xEAn c\xE1c k\u1EBB \u0111\u1ECBch trong ph\u1EA1m vi \u1EA3nh
+    h\u01B0\u1EDFng."
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 2
@@ -103,7 +107,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -116,7 +120,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -181,3 +185,4 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
+  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

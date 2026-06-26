@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Battle;
-using Common;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Stage;
-using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
-using UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Boss

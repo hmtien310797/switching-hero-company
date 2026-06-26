@@ -32,7 +32,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
         /// <summary>
         /// roll ngau nhien ra item trong level hien tai.
         /// </summary>
-        EEquipmentTier RollTier(DynamicHeroesGlobalSpecificationsTransmutationRateConfigRow row);
+        EItemTier RollTier(DynamicHeroesGlobalSpecificationsTransmutationRateConfigRow row);
 
         /// <summary>
         /// tao modifier item tu row cfg
@@ -79,6 +79,6 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
         /// <summary>
         /// luu cai dat
         /// </summary>
-        void SaveSetting(List<List<string>> uniqueOptions, int count, EEquipmentTier tier, bool enabled);
+        void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool enabled);
     }
 }

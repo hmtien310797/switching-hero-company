@@ -18,7 +18,12 @@ MonoBehaviour:
   SkillName: Frost Nova Prison
   IconSkillKey: icon_skilldata_mage_402
   SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
-  DescriptionTemplate: 
+  Description: "T\u1EA1o v\xF2ng b\u0103ng d\u01B0\u1EDBi ch\xE2n k\u1EBB \u0111\u1ECBch,
+    sau \u0111\xF3 tri\u1EC7u h\u1ED3i c\xE1c c\u1ED9t b\u0103ng b\xF9ng n\u1ED5
+    trong ph\u1EA1m vi, g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng
+    v\xE0 l\xE0m ch\u1EADm k\u1EBB \u0111\u1ECBch tr\xFAng chi\xEAu. N\u1EBFu m\u1EE5c
+    ti\xEAu \u0111ang b\u1ECB Burn ho\u1EB7c Electrified, g\xE2y th\xEAm {bonusHit}%
+    ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng."
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 0
@@ -103,7 +108,7 @@ MonoBehaviour:
       Projectile:
         BulletPatternConfig:
           patternType: 0
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletSpeed: 0
           bulletLifeTime: 0
           totalWaves: 0
@@ -116,7 +121,7 @@ MonoBehaviour:
           damage: 0
           delayWhenStartFiring: 0
         HomingChainBulletConfig:
-          bulletPrefab: {fileID: 0}
+          bulletAddressableKey: 
           bulletCount: 1
           delayBetweenBullets: 0.05
           enemyLayer:
@@ -181,3 +186,4 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
+  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

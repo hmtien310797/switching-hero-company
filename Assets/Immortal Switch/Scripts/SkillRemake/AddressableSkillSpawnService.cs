@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
+using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SkillRemake
 {
@@ -9,7 +10,12 @@ namespace Immortal_Switch.Scripts.SkillRemake
     {
         public static async UniTask PrewarmSkillRuntimeAssetsAsync(SkillDataSO skillData)
         {
-            int level = UserDataCache.Instance.GetServerSkillLevel(skillData.SkillId);
+            int level = 1;
+            if (skillData.OwnerType == SkillOwnerType.ClassSkill)
+            {
+                UserDataCache.Instance.GetServerSkillLevel(skillData.SkillId);
+            }
+            
             switch (skillData.RuntimeObjectConfig.RuntimeVisualType)
             {
                 case SkillRuntimeVisualType.SpawnedSkillObject:
@@ -53,7 +59,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
                     case SkillRuntimeVisualType.HeroSpineObjectAndProjectile:
                     case SkillRuntimeVisualType.SpawnProjectilePatternBehavior:
                         await AddressablePoolService.Instance.CreatePoolAsync(
-                            skillData.Levels[level-1].Phases[0].Actions[0].Projectile.BulletPatternConfig.bulletAddressableKey, skillData.Levels[level-1].Phases[0].Actions[0].Projectile.BulletPatternConfig.bulletsPerWave * skillData.Levels[level-1].Phases[0].Actions[0].Projectile.BulletPatternConfig.totalWaves);
+                            skillData.Levels[level-1].Phases[0].Actions[0].Projectile.BulletPatternConfig.bulletAddressableKey, skillData.Levels[level-1].Phases[0].Actions[0].Projectile.BulletPatternConfig.bulletsPerWave * Mathf.CeilToInt(skillData.Levels[level-1].Phases[0].Actions[0].Projectile.BulletPatternConfig.bulletLifeTime) * 3);
                         break;
                 }
             }

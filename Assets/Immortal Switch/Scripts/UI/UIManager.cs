@@ -135,6 +135,13 @@ namespace Immortal_Switch.Scripts.UI
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
         }
 
+        protected override void OnDestroy()
+        {
+            GameEventManager.Unsubscribe(GameEvents.OnInitSceneDataComplete, OnInitSceneDataComplete);
+            ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
+            base.OnDestroy();
+        }
+
         private void OnOrientationChanged(ScreenOrientationTracker.ScreenViewMode newOrientation)
         {
             switch (newOrientation)

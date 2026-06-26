@@ -1,5 +1,4 @@
-﻿using Battle;
-using Immortal_Switch.Scripts.Equipment.Core;
+﻿using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
 using TMPro;
 using UnityEngine;

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
+using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
-using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,14 +12,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
     {
         [SerializeField] private Image skillIconImage;
         [SerializeField] private Image rarityIcon;
+        [SerializeField] private Image bgImg;
+        [SerializeField] private Image frameImg;
         [SerializeField] private TMP_Text amountText;
         [SerializeField] private TMP_Text skillNameText;
         [SerializeField] private GameObject newTag;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private RectTransform rectTransform;
-
-        [Header("Background")]
-        [SerializeField] private UIGradient backgroundGradient;
 
         [Header("Glow")]
         [SerializeField] private GameObject glowRoot;
@@ -47,9 +46,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
         public void Bind(
             SkillSummonGroupedResultEntry entry,
-            Sprite raritySprite,
-            Color topColor,
-            Color bottomColor,
+            ItemTierEntry tierInfo,
             bool lastCard = false)
         {
             boundGrade = entry.Grade;
@@ -60,10 +57,16 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
             if (rarityIcon != null)
             {
-                rarityIcon.sprite = raritySprite;
-                rarityIcon.enabled = raritySprite != null;
+                rarityIcon.sprite = tierInfo.tier;
+                rarityIcon.enabled = tierInfo.tier != null;
             }
 
+            if (bgImg != null)
+                bgImg.sprite = tierInfo.background;
+
+            if (frameImg != null)
+                frameImg.sprite = tierInfo.border;
+            
             if (amountText != null)
                 amountText.text = $"x{entry.Count}";
 
@@ -73,10 +76,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (newTag != null)
                 newTag.SetActive(entry.IsNewSkill);
 
-            if (backgroundGradient != null)
-                backgroundGradient.Refresh(topColor, bottomColor);
-
-            ApplyGlowByGrade(entry.Grade, topColor, bottomColor);
+            //ApplyGlowByGrade(entry.Grade, topColor, bottomColor);
             SetHiddenImmediate();
         }
 

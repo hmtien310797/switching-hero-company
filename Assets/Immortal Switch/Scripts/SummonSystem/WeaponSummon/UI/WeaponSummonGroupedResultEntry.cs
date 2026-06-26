@@ -1,5 +1,6 @@
 ﻿using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
+using Immortal_Switch.Scripts.Shared.Database;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
@@ -17,5 +18,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         public int TotalShardGained;
         public int TotalShardAfter;
         public bool IsNewWeapon;
+
+        // thông tin item.
+        public ItemTierEntry TierInfo;
     }
 }

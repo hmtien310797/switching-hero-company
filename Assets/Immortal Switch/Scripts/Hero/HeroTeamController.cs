@@ -90,6 +90,14 @@ public class HeroTeamController : Singleton<HeroTeamController>
         GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
     }
 
+    protected override void OnDestroy()
+    {
+        GameEventManager.Unsubscribe(GameEvents.OnWaveStart, UnblockTeamControl);
+        GameEventManager.Unsubscribe(GameEvents.OnStageLost, BlockTeamControl);
+        GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+        base.OnDestroy();
+    }
+
     private void Update()
     {
         if(blockTeamMovement)

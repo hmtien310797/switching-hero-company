@@ -107,23 +107,23 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
         {
             var cfg = _rows[_currentIdx];
 
-            var dic = new Dictionary<EEquipmentTier, float>
+            var dic = new Dictionary<EItemTier, float>
             {
-                { EEquipmentTier.D, cfg.d },
-                { EEquipmentTier.C, cfg.c },
-                { EEquipmentTier.B, cfg.b },
-                { EEquipmentTier.A, cfg.a },
-                { EEquipmentTier.S, cfg.s },
-                { EEquipmentTier.SS, cfg.sS },
-                { EEquipmentTier.SSS, cfg.sSS },
-                { EEquipmentTier.R, cfg.r },
-                { EEquipmentTier.SR, cfg.sR },
+                { EItemTier.D, cfg.d },
+                { EItemTier.C, cfg.c },
+                { EItemTier.B, cfg.b },
+                { EItemTier.A, cfg.a },
+                { EItemTier.S, cfg.s },
+                { EItemTier.SS, cfg.sS },
+                { EItemTier.SSS, cfg.sSS },
+                { EItemTier.R, cfg.r },
+                { EItemTier.SR, cfg.sR },
             };
 
             for (var i = 0; i < dic.Count; i++)
             {
                 var item = dic.ElementAt(i);
-                var cfgTier = DatabaseManager.Instance.EquipmentTierDatabase.Get(item.Key);
+                var cfgTier = DatabaseManager.Instance.ItemTierDb.Get(item.Key);
 
                 if (_levelInfos.Count > i)
                 {

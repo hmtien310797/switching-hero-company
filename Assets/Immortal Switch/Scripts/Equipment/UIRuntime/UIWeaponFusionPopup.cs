@@ -1,5 +1,4 @@
 ﻿using System;
-using Battle;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;

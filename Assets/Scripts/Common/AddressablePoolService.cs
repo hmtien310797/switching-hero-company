@@ -198,7 +198,17 @@ namespace Immortal_Switch.Scripts.Pooling
                 return null;
             }
 
-            PooledObject pooledObject = pool.Use();
+            PooledObject pooledObject; 
+            
+            try
+            {
+                pooledObject = pool.Use();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(exception);
+                return null;
+            }
             
             if (pooledObject == null || pooledObject.Instance == null)
             {

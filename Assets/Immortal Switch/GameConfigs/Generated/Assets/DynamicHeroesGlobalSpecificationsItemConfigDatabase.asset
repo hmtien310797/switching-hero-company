@@ -20,7 +20,7 @@ MonoBehaviour:
     itemName: Gold
     desc: "Soft currency d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p hero, equipment v\xE0
       mua v\u1EADt ph\u1EA9m th\u01B0\u1EDDng"
-    rarity: Common
+    rarity: D
     isCurrency: 1
     isStackable: 1
     maxStack: 999999999
@@ -29,558 +29,633 @@ MonoBehaviour:
     sortOrder: 1
     status: Active
   - itemId: 2
+    itemKey: crystal
+    itemType: Currency
+    itemGroup: PremiumCurrency
+    itemName: Crystal
+    desc: "Premium currency cao c\u1EA5p d\xF9ng cho summon \u0111\u1EB7c bi\u1EC7t
+      v\xE0 shop gi\u1EDBi h\u1EA1n"
+    rarity: A
+    isCurrency: 1
+    isStackable: 1
+    maxStack: 999999999
+    useType: Resource
+    iconKey: icon_crystal
+    sortOrder: 2
+    status: Active
+  - itemId: 3
     itemKey: diamond
     itemType: Currency
     itemGroup: PremiumCurrency
     itemName: Diamond
     desc: "Premium currency d\xF9ng \u0111\u1EC3 summon, mua v\u1EADt ph\u1EA9m hi\u1EBFm
       v\xE0 t\u0103ng t\u1ED1c ti\u1EBFn tr\xECnh"
-    rarity: Epic
+    rarity: B
     isCurrency: 1
     isStackable: 1
     maxStack: 999999999
     useType: Resource
     iconKey: icon_diamond
-    sortOrder: 2
+    sortOrder: 3
     status: Active
-  - itemId: 3
+  - itemId: 4
     itemKey: energy
     itemType: Currency
     itemGroup: Stamina
     itemName: Energy
     desc: "D\xF9ng \u0111\u1EC3 tham gia dungeon, boss challenge v\xE0 activity \u0111\u1EB7c
       bi\u1EC7t"
-    rarity: Common
+    rarity: D
     isCurrency: 1
     isStackable: 1
     maxStack: 999999
     useType: Resource
     iconKey: icon_energy
-    sortOrder: 3
+    sortOrder: 4
     status: Active
-  - itemId: 4
+  - itemId: 5
     itemKey: arena_token
     itemType: Currency
     itemGroup: ShopToken
     itemName: Arena Token
     desc: "Token nh\u1EADn t\u1EEB Arena PvP d\xF9ng trong Arena Shop"
-    rarity: Rare
+    rarity: C
     isCurrency: 1
     isStackable: 1
     maxStack: 999999999
     useType: Resource
     iconKey: icon_arena_token
-    sortOrder: 4
+    sortOrder: 5
     status: Active
-  - itemId: 5
+  - itemId: 6
     itemKey: guild_coin
     itemType: Currency
     itemGroup: ShopToken
     itemName: Guild Coin
     desc: "Coin nh\u1EADn t\u1EEB Guild Boss v\xE0 Guild Event d\xF9ng trong Guild
       Shop"
-    rarity: Rare
+    rarity: C
     isCurrency: 1
     isStackable: 1
     maxStack: 999999999
     useType: Resource
     iconKey: icon_guild_coin
-    sortOrder: 5
+    sortOrder: 6
     status: Active
-  - itemId: 6
+  - itemId: 7
     itemKey: event_token
     itemType: Currency
     itemGroup: EventCurrency
     itemName: Event Token
     desc: "Token gi\u1EDBi h\u1EA1n th\u1EDDi gian d\xF9ng \u0111\u1EC3 \u0111\u1ED5i
       reward trong Event Shop"
-    rarity: Rare
+    rarity: C
     isCurrency: 1
     isStackable: 1
     maxStack: 999999999
     useType: Resource
     iconKey: icon_event_token
-    sortOrder: 6
+    sortOrder: 7
     status: Active
-  - itemId: 7
+  - itemId: 8
     itemKey: summon_ticket
     itemType: Gacha
     itemGroup: Ticket
     itemName: Summon Ticket
     desc: "V\xE9 summon hero trong banner th\u01B0\u1EDDng"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_summon_ticket
-    sortOrder: 7
+    sortOrder: 8
     status: Active
-  - itemId: 8
+  - itemId: 9
     itemKey: advanced_summon_ticket
     itemType: Gacha
     itemGroup: Ticket
     itemName: Advanced Summon Ticket
     desc: "V\xE9 summon cao c\u1EA5p v\u1EDBi t\u1EC9 l\u1EC7 hero hi\u1EBFm cao
       h\u01A1n"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_advanced_summon_ticket
-    sortOrder: 8
+    sortOrder: 9
     status: Active
-  - itemId: 9
+  - itemId: 10
     itemKey: hero_exp
     itemType: Resource
     itemGroup: HeroGrowth
     itemName: Hero EXP
     desc: "T\xE0i nguy\xEAn d\xF9ng \u0111\u1EC3 t\u0103ng level hero"
-    rarity: Common
+    rarity: D
     isCurrency: 0
     isStackable: 1
     maxStack: 999999999
     useType: Consume
     iconKey: icon_hero_exp
-    sortOrder: 9
+    sortOrder: 10
     status: Active
-  - itemId: 10
+  - itemId: 11
     itemKey: hero_fragment
     itemType: Resource
     itemGroup: HeroFragment
     itemName: Hero Fragment
     desc: "M\u1EA3nh hero d\xF9ng \u0111\u1EC3 m\u1EDF kh\xF3a ho\u1EB7c n\xE2ng
       sao hero"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_hero_fragment
-    sortOrder: 10
+    sortOrder: 11
     status: Active
-  - itemId: 11
+  - itemId: 12
     itemKey: epic_hero_fragment
     itemType: Resource
     itemGroup: HeroFragment
     itemName: Epic Hero Fragment
     desc: "M\u1EA3nh hero Epic d\xF9ng \u0111\u1EC3 ti\u1EBFn h\xF3a hero c\u1EA5p
       Epic"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_epic_hero_fragment
-    sortOrder: 11
+    sortOrder: 12
     status: Active
-  - itemId: 12
+  - itemId: 13
     itemKey: legendary_hero_fragment
     itemType: Resource
     itemGroup: HeroFragment
     itemName: Legendary Hero Fragment
     desc: "M\u1EA3nh hero Legendary d\xF9ng \u0111\u1EC3 ti\u1EBFn h\xF3a hero cao
       c\u1EA5p"
-    rarity: Legendary
+    rarity: A
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_legendary_hero_fragment
-    sortOrder: 12
+    sortOrder: 13
     status: Active
-  - itemId: 13
+  - itemId: 14
     itemKey: equipment_upgrade_stone
     itemType: Upgrade
     itemGroup: EquipmentUpgrade
     itemName: Equipment Upgrade Stone
     desc: "Nguy\xEAn li\u1EC7u n\xE2ng c\u1EA5p level trang b\u1ECB"
-    rarity: Common
+    rarity: D
     isCurrency: 0
     isStackable: 1
     maxStack: 9999999
     useType: Consume
     iconKey: icon_equipment_upgrade_stone
-    sortOrder: 13
+    sortOrder: 14
     status: Active
-  - itemId: 14
+  - itemId: 15
     itemKey: gear_refinement_stone
     itemType: Upgrade
     itemGroup: EquipmentRefine
     itemName: Gear Refinement Stone
     desc: "Nguy\xEAn li\u1EC7u refine ho\u1EB7c enhance trang b\u1ECB"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 9999999
     useType: Consume
     iconKey: icon_gear_refinement_stone
-    sortOrder: 14
+    sortOrder: 15
     status: Active
-  - itemId: 15
+  - itemId: 16
     itemKey: breakthrough_stone
     itemType: Upgrade
     itemGroup: HeroBreakthrough
     itemName: Breakthrough Stone
     desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 breakthrough hero"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 9999999
     useType: Consume
     iconKey: icon_breakthrough_stone
-    sortOrder: 15
+    sortOrder: 16
     status: Active
-  - itemId: 16
+  - itemId: 17
     itemKey: transcendence_stone
     itemType: Upgrade
     itemGroup: HeroTranscendence
     itemName: Transcendence Stone
     desc: "V\u1EADt ph\u1EA9m d\xF9ng \u0111\u1EC3 transcend hero \u1EDF c\u1EA5p
       cao"
-    rarity: Legendary
+    rarity: A
     isCurrency: 0
     isStackable: 1
     maxStack: 9999999
     useType: Consume
     iconKey: icon_transcendence_stone
-    sortOrder: 16
+    sortOrder: 17
     status: Active
-  - itemId: 17
+  - itemId: 18
     itemKey: equipment_chest
     itemType: Equipment
     itemGroup: Chest
     itemName: Equipment Chest
     desc: "R\u01B0\u01A1ng ch\u1EE9a trang b\u1ECB ng\u1EABu nhi\xEAn"
-    rarity: Common
+    rarity: D
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenChest
     iconKey: icon_equipment_chest
-    sortOrder: 17
+    sortOrder: 18
     status: Active
-  - itemId: 18
+  - itemId: 19
     itemKey: rare_equipment_chest
     itemType: Equipment
     itemGroup: Chest
     itemName: Rare Equipment Chest
     desc: "R\u01B0\u01A1ng ch\u1EE9a trang b\u1ECB Rare ho\u1EB7c cao h\u01A1n"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenChest
     iconKey: icon_rare_equipment_chest
-    sortOrder: 18
+    sortOrder: 19
     status: Active
-  - itemId: 19
+  - itemId: 20
     itemKey: epic_equipment_chest
     itemType: Equipment
     itemGroup: Chest
     itemName: Epic Equipment Chest
     desc: "R\u01B0\u01A1ng ch\u1EE9a trang b\u1ECB Epic ho\u1EB7c cao h\u01A1n"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenChest
     iconKey: icon_epic_equipment_chest
-    sortOrder: 19
+    sortOrder: 20
     status: Active
-  - itemId: 20
+  - itemId: 21
     itemKey: legendary_equipment_chest
     itemType: Equipment
     itemGroup: Chest
     itemName: Legendary Equipment Chest
     desc: "R\u01B0\u01A1ng ch\u1EE9a trang b\u1ECB Legendary"
-    rarity: Legendary
+    rarity: A
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenChest
     iconKey: icon_legendary_equipment_chest
-    sortOrder: 20
+    sortOrder: 21
     status: Active
-  - itemId: 21
+  - itemId: 22
     itemKey: dungeon_key
     itemType: Dungeon
     itemGroup: EntryTicket
     itemName: Dungeon Key
     desc: "Ch\xECa kh\xF3a d\xF9ng \u0111\u1EC3 v\xE0o dungeon \u0111\u1EB7c bi\u1EC7t"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_dungeon_key
-    sortOrder: 21
+    sortOrder: 22
     status: Active
-  - itemId: 22
+  - itemId: 23
     itemKey: boss_challenge_ticket
     itemType: Dungeon
     itemGroup: EntryTicket
     itemName: Boss Challenge Ticket
     desc: "V\xE9 d\xF9ng \u0111\u1EC3 tham gia Boss Challenge"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_boss_challenge_ticket
-    sortOrder: 22
+    sortOrder: 23
     status: Active
-  - itemId: 23
+  - itemId: 24
     itemKey: event_dice
     itemType: Event
     itemGroup: EventTool
     itemName: Event Dice
     desc: "X\xFAc x\u1EAFc d\xF9ng trong mini game event board"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_event_dice
-    sortOrder: 23
+    sortOrder: 24
     status: Active
-  - itemId: 24
+  - itemId: 25
     itemKey: bingo_ticket
     itemType: Event
     itemGroup: EventTool
     itemName: Bingo Ticket
     desc: "Ticket d\xF9ng \u0111\u1EC3 m\u1EDF \xF4 trong Bingo Event"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_bingo_ticket
-    sortOrder: 24
+    sortOrder: 25
     status: Active
-  - itemId: 25
+  - itemId: 26
     itemKey: treasure_map
     itemType: Event
     itemGroup: EventTool
     itemName: Treasure Map
     desc: "V\u1EADt ph\u1EA9m d\xF9ng \u0111\u1EC3 m\u1EDF Treasure Hunt Event"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_treasure_map
-    sortOrder: 25
+    sortOrder: 26
     status: Active
-  - itemId: 26
+  - itemId: 27
     itemKey: gold_chest
     itemType: Shop
     itemGroup: Chest
     itemName: Gold Chest
     desc: "R\u01B0\u01A1ng m\u1EDF ra nh\u1EADn Gold"
-    rarity: Common
+    rarity: D
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenChest
     iconKey: icon_gold_chest
-    sortOrder: 26
+    sortOrder: 27
     status: Active
-  - itemId: 27
+  - itemId: 28
     itemKey: diamond_chest
     itemType: Shop
     itemGroup: Chest
     itemName: Diamond Chest
     desc: "R\u01B0\u01A1ng m\u1EDF ra nh\u1EADn Diamond"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenChest
     iconKey: icon_diamond_chest
-    sortOrder: 27
+    sortOrder: 28
     status: Active
-  - itemId: 28
+  - itemId: 29
     itemKey: resource_pack
     itemType: Shop
     itemGroup: Pack
     itemName: Resource Pack
     desc: "G\xF3i ch\u1EE9a nhi\u1EC1u t\xE0i nguy\xEAn n\xE2ng c\u1EA5p"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenPack
     iconKey: icon_resource_pack
-    sortOrder: 28
+    sortOrder: 29
     status: Active
-  - itemId: 29
+  - itemId: 30
     itemKey: pet_egg
     itemType: Pet
     itemGroup: PetGacha
     itemName: Pet Egg
     desc: "Tr\u1EE9ng pet m\u1EDF ra pet h\u1ED7 tr\u1EE3 chi\u1EBFn \u0111\u1EA5u"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenChest
     iconKey: icon_pet_egg
-    sortOrder: 29
+    sortOrder: 30
     status: Active
-  - itemId: 30
+  - itemId: 31
     itemKey: pet_upgrade_food
     itemType: Pet
     itemGroup: PetUpgrade
     itemName: Pet Upgrade Food
     desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p pet"
-    rarity: Common
+    rarity: D
     isCurrency: 0
     isStackable: 1
     maxStack: 9999999
     useType: Consume
     iconKey: icon_pet_upgrade_food
-    sortOrder: 30
+    sortOrder: 31
     status: Active
-  - itemId: 31
+  - itemId: 32
     itemKey: relic_fragment
     itemType: Relic
     itemGroup: RelicFragment
     itemName: Relic Fragment
     desc: "M\u1EA3nh relic d\xF9ng \u0111\u1EC3 m\u1EDF kh\xF3a relic"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_relic_fragment
-    sortOrder: 31
+    sortOrder: 32
     status: Active
-  - itemId: 32
+  - itemId: 33
     itemKey: relic_upgrade_stone
     itemType: Relic
     itemGroup: RelicUpgrade
     itemName: Relic Upgrade Stone
     desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p relic"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 9999999
     useType: Consume
     iconKey: icon_relic_upgrade_stone
-    sortOrder: 32
+    sortOrder: 33
     status: Active
-  - itemId: 33
+  - itemId: 34
     itemKey: monster_card
     itemType: MonsterCard
     itemGroup: Card
     itemName: Monster Card
     desc: "Th\u1EBB monster d\xF9ng \u0111\u1EC3 m\u1EDF kh\xF3a passive bonus"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_monster_card
-    sortOrder: 33
+    sortOrder: 34
     status: Active
-  - itemId: 34
+  - itemId: 35
     itemKey: monster_essence
     itemType: MonsterCard
     itemGroup: CardUpgrade
     itemName: Monster Essence
     desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p monster card"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 9999999
     useType: Consume
     iconKey: icon_monster_essence
-    sortOrder: 34
+    sortOrder: 35
     status: Active
-  - itemId: 35
+  - itemId: 36
     itemKey: artifact_fragment
     itemType: Artifact
     itemGroup: ArtifactFragment
     itemName: Artifact Fragment
     desc: "M\u1EA3nh artifact d\xF9ng \u0111\u1EC3 m\u1EDF kh\xF3a artifact"
-    rarity: Epic
+    rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_artifact_fragment
-    sortOrder: 35
+    sortOrder: 36
     status: Active
-  - itemId: 36
+  - itemId: 37
     itemKey: artifact_upgrade_core
     itemType: Artifact
     itemGroup: ArtifactUpgrade
     itemName: Artifact Upgrade Core
     desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p artifact"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 9999999
     useType: Consume
     iconKey: icon_artifact_upgrade_core
-    sortOrder: 36
+    sortOrder: 37
     status: Active
-  - itemId: 37
+  - itemId: 38
     itemKey: resource_coin
     itemType: Event
     itemGroup: LeaderboardCurrency
     itemName: Resource Coin
     desc: "Currency d\xF9ng trong event leaderboard"
-    rarity: Rare
+    rarity: C
     isCurrency: 1
     isStackable: 1
     maxStack: 999999999
     useType: Resource
     iconKey: icon_resource_coin
-    sortOrder: 37
+    sortOrder: 38
     status: Active
-  - itemId: 38
+  - itemId: 39
     itemKey: roulette_ticket
     itemType: Event
     itemGroup: EventTicket
     itemName: Roulette Ticket
     desc: "V\xE9 d\xF9ng \u0111\u1EC3 quay v\xF2ng quay may m\u1EAFn"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_roulette_ticket
-    sortOrder: 38
+    sortOrder: 39
     status: Active
-  - itemId: 39
+  - itemId: 40
     itemKey: offline_reward_chest
     itemType: Idle
     itemGroup: Chest
     itemName: Offline Reward Chest
     desc: "R\u01B0\u01A1ng ph\u1EA7n th\u01B0\u1EDFng idle khi offline"
-    rarity: Common
+    rarity: D
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: OpenChest
     iconKey: icon_offline_reward_chest
-    sortOrder: 39
+    sortOrder: 40
     status: Active
-  - itemId: 40
+  - itemId: 41
     itemKey: quick_loot_ticket
     itemType: Idle
     itemGroup: Ticket
     itemName: Quick Loot Ticket
     desc: "V\xE9 d\xF9ng \u0111\u1EC3 nh\u1EADn nhanh ph\u1EA7n th\u01B0\u1EDFng
       idle"
-    rarity: Rare
+    rarity: C
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
     iconKey: icon_quick_loot_ticket
-    sortOrder: 40
+    sortOrder: 41
+    status: Active
+  - itemId: 42
+    itemKey: awakening_fruit
+    itemType: Resource
+    itemGroup: HeroAwaken
+    itemName: Awakening Fruit
+    desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 awaken hero, nh\u1EADn t\u1EEB
+      H\u1EA7m Kim C\u01B0\u01A1ng"
+    rarity: A
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 9999999
+    useType: Consume
+    iconKey: icon_awakening_fruit
+    sortOrder: 42
+    status: Active
+  - itemId: 43
+    itemKey: weapon_ore
+    itemType: Upgrade
+    itemGroup: WeaponUpgrade
+    itemName: Weapon Ore
+    desc: "Nguy\xEAn li\u1EC7u n\xE2ng c\u1EA5p v\u0169 kh\xED, nh\u1EADn t\u1EEB
+      H\u1EA7m Trang B\u1ECB"
+    rarity: D
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 9999999
+    useType: Consume
+    iconKey: icon_weapon_ore
+    sortOrder: 43
+    status: Active
+  - itemId: 44
+    itemKey: weapon_gem
+    itemType: Upgrade
+    itemGroup: WeaponUpgrade
+    itemName: Weapon Gem
+    desc: "Nguy\xEAn li\u1EC7u c\u01B0\u1EDDng h\xF3a v\u0169 kh\xED, nh\u1EADn t\u1EEB
+      H\u1EA7m Trang B\u1ECB"
+    rarity: C
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 9999999
+    useType: Consume
+    iconKey: icon_weapon_gem
+    sortOrder: 44
+    status: Active
+  - itemId: 45
+    itemKey: weapon_essence
+    itemType: Upgrade
+    itemGroup: WeaponUpgrade
+    itemName: Weapon Essence
+    desc: "Nguy\xEAn li\u1EC7u tinh luy\u1EC7n v\u0169 kh\xED c\u1EA5p cao, nh\u1EADn
+      t\u1EEB H\u1EA7m Trang B\u1ECB"
+    rarity: B
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 9999999
+    useType: Consume
+    iconKey: icon_weapon_essence
+    sortOrder: 45
     status: Active

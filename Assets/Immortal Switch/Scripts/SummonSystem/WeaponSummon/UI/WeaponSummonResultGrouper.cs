@@ -33,7 +33,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                         Count = 0,
                         TotalShardGained = 0,
                         TotalShardAfter = entry.TotalShardAfter,
-                        IsNewWeapon = false
+                        IsNewWeapon = false,
+                        TierInfo = entry.TierInfo,
                     };
 
                     map.Add(key, grouped);

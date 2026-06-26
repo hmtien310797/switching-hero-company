@@ -1,4 +1,3 @@
-using System;
 using Battle;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Reward;

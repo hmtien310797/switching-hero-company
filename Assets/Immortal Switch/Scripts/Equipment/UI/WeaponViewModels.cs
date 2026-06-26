@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Battle;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;

@@ -1,5 +1,4 @@
-﻿using Battle;
-using Sirenix.OdinInspector;
+﻿using Sirenix.OdinInspector;
 using Spine.Unity;
 using UnityEngine;
 
@@ -35,7 +34,7 @@ namespace Immortal_Switch.Scripts.Hero
         [Min(1)] 
         public int SummonWeight = 1;
         public string HeroAddressKey;
-        public string SpineAddressKey;
+        public SkeletonDataAsset Spine;
         public string HeroIconKey;
     }
 

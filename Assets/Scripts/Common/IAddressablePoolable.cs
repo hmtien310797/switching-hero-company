@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Immortal_Switch.Scripts.Pooling
+﻿namespace Immortal_Switch.Scripts.Pooling
 {
     public interface IAddressablePoolable
     {

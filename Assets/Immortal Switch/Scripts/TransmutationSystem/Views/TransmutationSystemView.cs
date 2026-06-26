@@ -220,7 +220,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
         {
             if (_equipments.TryGetValue(equip.ItemType, out var equipment))
             {
-                var cfg = DatabaseManager.Instance.EquipmentTierDatabase.Get(equip.ParsedTier);
+                var cfg = DatabaseManager.Instance.ItemTierDb.Get(equip.ParsedTier);
                 equipment.Bind(cfg, equip.Level);
             }
             else

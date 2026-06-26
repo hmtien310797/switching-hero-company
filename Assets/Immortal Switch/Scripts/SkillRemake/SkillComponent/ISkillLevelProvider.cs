@@ -1,4 +1,3 @@
-using Battle;
 using Common;
 
 namespace Immortal_Switch.Scripts.Skill

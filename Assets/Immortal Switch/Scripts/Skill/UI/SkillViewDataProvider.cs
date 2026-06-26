@@ -26,6 +26,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
     {
         public SkillDataSO SkillData;
         public int SkillId;
+        public TierSkill TierSkill;
         public int Level;
         public int CurrentShard;
         public int RequiredShard;
@@ -303,12 +304,41 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 Level = level,
                 CurrentShard = currentShard,
                 RequiredShard = requiredShard,
-                IsOwned = isOwned
+                IsOwned = isOwned,
+                TierSkill = skillData.SkillTier
             };
 
             state.EquippedSlotIndex = equippedIds.FindIndex(x => x == state.SkillId);
             state.IsEquipped = state.EquippedSlotIndex >= 0;
 
+            return state;
+        }
+        
+        public SkillViewSkillState BuildSkillStateForNotInBattleHeroTab(SkillDataSO skillData)
+        {
+            if (skillData == null)
+                return null;
+
+            int level = userDataCache.GetServerSkillLevel(skillData.SkillId);
+            int currentShard = GetServerSkillShard(skillData.SkillId);
+            bool isOwned = IsServerSkillOwned(skillData.SkillId) || currentShard > 0;
+
+            int requiredShard = 0;
+            if (!skillData.IsMaxLevel(level))
+                requiredShard = skillData.GetRequiredShardForLevel(level);
+
+            var state = new SkillViewSkillState
+            {
+                SkillData = skillData,
+                SkillId = skillData.SkillId,
+                Level = level,
+                CurrentShard = currentShard,
+                RequiredShard = requiredShard,
+                IsOwned = isOwned,
+                TierSkill = skillData.SkillTier
+            };
+            
+            state.IsEquipped = state.EquippedSlotIndex >= 0;
             return state;
         }
 
@@ -343,17 +373,24 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 .OrderByDescending(x =>
                 {
                     var state = BuildSkillState(heroContext, x);
-                    return state != null && state.IsEquipped;
-                })
-                .ThenByDescending(x =>
-                {
-                    var state = BuildSkillState(heroContext, x);
-                    return state != null && state.IsOwned;
-                })
-                .ThenBy(x => x.SkillId)
-                .ToList();
+                    return state?.TierSkill ?? TierSkill.B;
+                }).ToList();
 
             Log($"GetSortedPoolForHero -> heroId={heroContext.HeroId}, class={heroContext.HeroClass}, count={sorted.Count}");
+            return sorted;
+        }
+        
+        public List<SkillDataSO> GetSortedPoolForNotInBattleHero(HeroClass heroClass)
+        {
+            var pool = GetClassPool(heroClass);
+            
+            var sorted = pool
+                .OrderByDescending(x =>
+                {
+                    var state = BuildSkillStateForNotInBattleHeroTab(x);
+                    return state?.TierSkill ?? TierSkill.B;
+                }).ToList();
+            
             return sorted;
         }
 

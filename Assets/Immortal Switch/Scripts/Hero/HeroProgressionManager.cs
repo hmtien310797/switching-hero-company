@@ -19,6 +19,7 @@ namespace Immortal_Switch.Scripts.Hero
         public HeroProgressionDatabaseSO Database => database;
         public event Action<HeroCollectionChangedArgs> OnHeroCollectionChanged;
         private readonly Dictionary<int, List<HeroProgressionRuntimeBridge>> heroBridges = new();
+        
 
         protected override void Awake()
         {

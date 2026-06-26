@@ -6,7 +6,6 @@ using Immortal_Switch.Scripts.StatSystem;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
-using Random = System.Random;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 {
@@ -32,7 +31,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 
         public void Bind(PlayerEquipViewData showEquip, [CanBeNull] PlayerEquipViewData oldEquip, bool isUsed)
         {
-            var showEquipCfg = DatabaseManager.Instance.EquipmentTierDatabase.Get(showEquip.ParsedTier);
+            var showEquipCfg = DatabaseManager.Instance.ItemTierDb.Get(showEquip.ParsedTier);
             txtTitle.SetText(showEquip.Title);
             goUsedLayout.SetActive(isUsed);
             selectedEquip.Bind(showEquipCfg, showEquip.Level);

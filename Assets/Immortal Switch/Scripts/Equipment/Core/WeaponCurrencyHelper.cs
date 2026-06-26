@@ -1,5 +1,4 @@
-﻿using Battle;
-using Immortal_Switch.Scripts.Currency;
+﻿using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Hero;
 
 namespace Immortal_Switch.Scripts.Equipment.Core

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Battle;
-using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
@@ -9,8 +7,6 @@ using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
-using UI;
-using Unity.VisualScripting;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
