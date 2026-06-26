@@ -10,7 +10,7 @@ namespace Immortal_Switch.Scripts.Skill
             if (skillData == null)
                 return string.Empty;
 
-            string result = skillData.DescriptionTemplate;
+            string result = skillData.Description;
             if (string.IsNullOrWhiteSpace(result))
                 return string.Empty;
 

@@ -131,19 +131,21 @@ namespace Immortal_Switch.Scripts.UI
                                               ScreenOrientationTracker.ScreenViewMode.Landscape
                 ? 0.5f
                 : 0f;
-            
-            ScreenOrientationTracker.Instance.OnOrientationChanged += ScreenViewMode =>
+
+            ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
+        }
+
+        private void OnOrientationChanged(ScreenOrientationTracker.ScreenViewMode newOrientation)
+        {
+            switch (newOrientation)
             {
-                switch (ScreenViewMode)
-                {
-                    case ScreenOrientationTracker.ScreenViewMode.Landscape:
-                        canvasScaler.matchWidthOrHeight = 0.5f;
-                        break;
-                    case ScreenOrientationTracker.ScreenViewMode.Portrait:
-                        canvasScaler.matchWidthOrHeight = 0f;
-                        break;
-                }
-            };
+                case ScreenOrientationTracker.ScreenViewMode.Landscape:
+                    canvasScaler.matchWidthOrHeight = 0.5f;
+                    break;
+                case ScreenOrientationTracker.ScreenViewMode.Portrait:
+                    canvasScaler.matchWidthOrHeight = 0f;
+                    break;
+            }
         }
 
         public override async UniTask InitializeAsync()

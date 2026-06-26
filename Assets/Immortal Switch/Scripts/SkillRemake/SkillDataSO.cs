@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.SkillRemake;
+using Immortal_Switch.Scripts.SkillSystem.Description;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -240,7 +241,6 @@ namespace Immortal_Switch.Scripts.Skill
         public string SkillName;
         public string IconSkillKey;
         public Sprite SkillIcon;
-        [TextArea(3, 8)] public string DescriptionTemplate;
 
         [Header("Type")]
         public SkillOwnerType OwnerType = SkillOwnerType.ClassSkill;
@@ -266,6 +266,11 @@ namespace Immortal_Switch.Scripts.Skill
 
         [Header("Levels")]
         public List<SkillLevelData> Levels = new();
+        
+        public String Description;
+        
+        [SerializeField]
+        private Color hitDamageColor = new Color(1f, 0.25f, 0.25f);
 
         public int GetSafeLevel(int level)
         {
@@ -275,6 +280,18 @@ namespace Immortal_Switch.Scripts.Skill
         public bool IsMaxLevel(int level)
         {
             return GetSafeLevel(level) >= Mathf.Max(1, MaxLevel);
+        }
+
+        public string BuildDescription(int level)
+        {
+            switch (RuntimeObjectConfig.RuntimeVisualType)
+            {
+                case SkillRuntimeVisualType.SpawnedSkillObject:
+                case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:
+                    return SpineSkillDescriptionBuilder.Build(this, level, hitDamageColor, hitDamageColor);
+            }
+
+            return null;
         }
 
         public SkillLevelData GetLevelData(int level)

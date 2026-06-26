@@ -267,7 +267,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 BindHeroTabs();
                 BindEquippedSlots();
                 RebuildGridByClass(selectedClass, null);
-                BindDetail(null, null);
+                BindDetail(null, selectedSkill);
                 CloseReplacePopup();
 
                 LogWarningView($"Class {selectedClass} has no assigned hero. Showing warning mode.");
@@ -464,7 +464,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             if (detailLevelText != null) detailLevelText.text = $"Cấp.{state.Level}";
             if (detailNameText != null) detailNameText.text = skillData.SkillName;
             //if (detailTypeText != null) detailTypeText.text = $"{skillData.CastType} kỹ năng";
-            //if (detailDescText != null) detailDescText.text = skillData.BuildDescription(state.Level);
+            if (detailDescText != null) detailDescText.text = skillData.BuildDescription(state.Level);
             if (detailShardText != null) detailShardText.text = $"{state.CurrentShard}/{state.RequiredShard}";
             if (detailShardFill != null)
                 detailShardFill.fillAmount =

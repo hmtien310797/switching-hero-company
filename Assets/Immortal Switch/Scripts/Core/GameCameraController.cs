@@ -57,6 +57,12 @@ public class GameCameraController : Singleton<GameCameraController>
         followHeroCameraNoise.FrequencyGain = frequency;
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        ScreenOrientationTracker.Instance.OnOrientationChanged -= SetCameraFieldOfView;
+    }
+
     private void SetCameraFieldOfView(ScreenOrientationTracker.ScreenViewMode mode)
     {
         switch (mode)
