@@ -144,4 +144,17 @@ namespace Immortal_Switch.Scripts.Skill
         Ally,
         OwnerAndAlly
     }
+    
+    public enum PassiveLevelMergeMode
+    {
+        Override,
+        Additive
+    }
+
+    public enum PassiveHitSourceFilter
+    {
+        Any,
+        BasicAttackOnly,
+        SkillOnly
+    }
 }

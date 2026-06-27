@@ -40,6 +40,7 @@ namespace Immortal_Switch.Scripts.Hero
 
     public enum HeroClass
     {
+        None = 0,
         Warrior,
         Assassin,
         Archer,

@@ -100,12 +100,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (dataProvider != null)
                 dataProvider.OnDataChanged += RefreshCurrentContext;
-
-            OpenDefaultClass();
         }
 
         private void OnDisable()
         {
+            selectedClass = HeroClass.None;
             if (dataProvider != null)
                 dataProvider.OnDataChanged -= RefreshCurrentContext;
         }
@@ -139,17 +138,25 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 replaceCloseButton.onClick.AddListener(CloseReplacePopup);
         }
 
-        private void OpenDefaultClass()
+        public void OpenDefaultClass(bool open = true)
         {
+            gameObject.SetActive(open);
+            if (!open)
+            {
+                return;
+            }
             if (classButtons == null || classButtons.Length == 0)
             {
                 LogErrorView("ClassButtons is null or empty.");
                 return;
             }
 
-            var firstAssigned = classButtons.FirstOrDefault(x =>
-                x != null && dataProvider != null && dataProvider.HasAssignedHero(x.HeroClass));
-            selectedClass = firstAssigned != null ? firstAssigned.HeroClass : classButtons[0].HeroClass;
+            if (selectedClass == HeroClass.None)
+            {
+                var firstAssigned = classButtons.FirstOrDefault(x =>
+                    x != null && dataProvider != null && dataProvider.HasAssignedHero(x.HeroClass));
+                selectedClass = firstAssigned != null ? firstAssigned.HeroClass : classButtons[0].HeroClass;
+            }
 
             selectedHero = null;
             selectedSkill = null;
@@ -204,6 +211,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
             // RefreshSkillGrid();
             // RefreshEquippedSlots();
             // RefreshSelectedSkillDetail();
+        }
+
+        public void SetSelectedHeroClass(HeroClass heroClass)
+        {
+            selectedClass = heroClass;
         }
 
         private void OnClickEquippedSlot(int slotIndex)

@@ -79,8 +79,19 @@ namespace Immortal_Switch.Scripts.Skill
                     );
 
                 case SkillRuntimeSpawnMode.AddressableInstance:
+                    string keyAsset = config.RuntimeAddressableKey;
+                    switch (config.RuntimeVisualType)
+                    {
+                        case SkillRuntimeVisualType.SpawnHomingProjectile:
+                            keyAsset = SkillRuntimeObjectConfig.HomingBulletSpawnerKey;
+                            break;
+                        case SkillRuntimeVisualType.SpawnProjectilePatternBehavior:
+                        case SkillRuntimeVisualType.HeroSpineObjectAndProjectile:
+                            keyAsset = SkillRuntimeObjectConfig.BulletPatternSpawnerKey;
+                            break;
+                    }
                     return await SpawnAddressableInstanceAsync(
-                        config.RuntimeAddressableKey,
+                        keyAsset,
                         position,
                         rotation,
                         parent

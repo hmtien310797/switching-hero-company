@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkillId: 402
   SkillKey: skilldata_mage_402
-  SkillClass: 3
+  SkillClass: 4
   SkillName: Frost Nova Prison
   IconSkillKey: icon_skilldata_mage_402
   SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
@@ -152,6 +152,7 @@ MonoBehaviour:
         StackKey: 
         Amount: 1
       TriggerSkill: {fileID: 0}
+    hasCameraShake: 0
   ClassSkillScaling:
     GrowthPercentPerLevel: 6
   PassiveConfig:
@@ -160,11 +161,18 @@ MonoBehaviour:
     MaxStack: 3
     ResetStackOnTrigger: 1
     ConsumeStackOnTrigger: 1
+    BlockStackGainDuringCooldown: 1
     StackGainTriggers: []
     EnemyCountCondition:
       Enabled: 0
       MinEnemyCount: 1
       Range: 5
+    BuffDuration: 4
+    BaseModifiers: []
+    PassiveAuraAnimation: passive
+    PassiveAuraTrackIndex: 2
+    PlayTriggerAnimation: 1
+    TriggerAnimation: passive_cast
   CustomBehaviourPrefab: {fileID: 0}
   UpgradeShardCosts:
   - Level: 1

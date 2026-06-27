@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkillId: 302
   SkillKey: skilldata_archer_302
-  SkillClass: 2
+  SkillClass: 3
   SkillName: LightningDragon
   IconSkillKey: icon_skilldata_archer_302
   SkillIcon: {fileID: 21300000, guid: b0f5c98300e54a143b92c4742634e640, type: 3}
@@ -150,6 +150,7 @@ MonoBehaviour:
         StackKey: 
         Amount: 1
       TriggerSkill: {fileID: 0}
+    hasCameraShake: 0
   - PhaseId: 0
     TriggerType: 1
     EventName: finalhit
@@ -234,6 +235,7 @@ MonoBehaviour:
         StackKey: 
         Amount: 1
       TriggerSkill: {fileID: 0}
+    hasCameraShake: 0
   ClassSkillScaling:
     GrowthPercentPerLevel: 6
   PassiveConfig:
@@ -242,11 +244,18 @@ MonoBehaviour:
     MaxStack: 3
     ResetStackOnTrigger: 1
     ConsumeStackOnTrigger: 1
+    BlockStackGainDuringCooldown: 1
     StackGainTriggers: []
     EnemyCountCondition:
       Enabled: 0
       MinEnemyCount: 1
       Range: 5
+    BuffDuration: 4
+    BaseModifiers: []
+    PassiveAuraAnimation: passive
+    PassiveAuraTrackIndex: 2
+    PlayTriggerAnimation: 1
+    TriggerAnimation: passive_cast
   CustomBehaviourPrefab: {fileID: 0}
   UpgradeShardCosts:
   - Level: 1

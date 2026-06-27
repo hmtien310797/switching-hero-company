@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkillId: 104
   SkillKey: skilldata_warrior_104
-  SkillClass: 0
+  SkillClass: 1
   SkillName: Blade Vortex
   IconSkillKey: icon_skilldata_warrior_104
   SkillIcon: {fileID: 21300000, guid: 6c9b75bfb15794043be2187e58d11a45, type: 3}
@@ -150,6 +150,7 @@ MonoBehaviour:
         StackKey: 
         Amount: 1
       TriggerSkill: {fileID: 0}
+    hasCameraShake: 0
   ClassSkillScaling:
     GrowthPercentPerLevel: 6
   PassiveConfig:
@@ -158,11 +159,18 @@ MonoBehaviour:
     MaxStack: 3
     ResetStackOnTrigger: 1
     ConsumeStackOnTrigger: 1
+    BlockStackGainDuringCooldown: 1
     StackGainTriggers: []
     EnemyCountCondition:
       Enabled: 0
       MinEnemyCount: 1
       Range: 5
+    BuffDuration: 4
+    BaseModifiers: []
+    PassiveAuraAnimation: passive
+    PassiveAuraTrackIndex: 2
+    PlayTriggerAnimation: 1
+    TriggerAnimation: passive_cast
   CustomBehaviourPrefab: {fileID: 0}
   UpgradeShardCosts:
   - Level: 1

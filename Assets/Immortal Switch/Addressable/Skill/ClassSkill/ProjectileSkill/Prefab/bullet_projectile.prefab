@@ -9,8 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5312589322574495880}
-  - component: {fileID: 9000214464624851853}
   - component: {fileID: 804791343669178177}
+  - component: {fileID: 3709888703266499680}
+  - component: {fileID: 5906741514992106239}
   m_Layer: 11
   m_Name: bullet_projectile
   m_TagString: Untagged
@@ -34,8 +35,36 @@ Transform:
   - {fileID: 5735781350656192290}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &9000214464624851853
-SphereCollider:
+--- !u!114 &804791343669178177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4616406935645676614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d379b831846d4fa08d0f6be80b9f1825, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 320
+  despawnOnHit: 0
+--- !u!114 &3709888703266499680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4616406935645676614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a04dc37457424f019c2410f4bc35be76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &5906741514992106239
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -53,26 +82,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Size: {x: 6, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &804791343669178177
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4616406935645676614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d379b831846d4fa08d0f6be80b9f1825, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <PoolSize>k__BackingField: 20
-  <DeSpawnedOnStart>k__BackingField: 1
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 320
-  despawnOnHit: 0
 --- !u!1001 &8956258791554921881
 PrefabInstance:
   m_ObjectHideFlags: 0

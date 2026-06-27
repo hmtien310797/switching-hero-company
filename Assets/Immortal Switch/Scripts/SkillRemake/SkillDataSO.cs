@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.SkillSystem.Description;
+using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -134,6 +135,9 @@ namespace Immortal_Switch.Scripts.Skill
         [Tooltip("Chỉ sử dụng khi SkillRuntimePrefab kế thừa SkillMultiSpawnRuntimeObject.")]
         public SkillMultiSpawnConfig MultiSpawnConfig = new();
 
+        public static string BulletPatternSpawnerKey = "bullet_spawner_skill_runtime_object";
+        public static string HomingBulletSpawnerKey = "homing_chain_bullet_skill_runtime_object";
+
         private bool IsUsingSkillRuntimePrefab()
         {
             return RuntimeVisualType == SkillRuntimeVisualType.SpawnedSkillObject ||
@@ -143,12 +147,35 @@ namespace Immortal_Switch.Scripts.Skill
                    RuntimeVisualType == SkillRuntimeVisualType.HeroSpineObjectAndProjectile;
         }
     }
+    
+    [Serializable]
+    public class SkillPassiveLevelConfig
+    {
+        [Tooltip(
+            "Override: xóa modifier từ level trước.\n" +
+            "Additive: giữ modifier level trước và cộng thêm modifier hiện tại.")]
+        public PassiveLevelMergeMode MergeMode =
+            PassiveLevelMergeMode.Override;
+
+        public List<StatModifier> Modifiers = new();
+    }
 
     [Serializable]
     public class SkillTriggerStackGainData
     {
         public SkillTriggerEventType EventType = SkillTriggerEventType.OnHit;
-        public SkillEventSourceFilter SourceFilter = SkillEventSourceFilter.Owner;
+
+        public SkillEventSourceFilter SourceFilter =
+            SkillEventSourceFilter.Owner;
+
+        [Tooltip(
+            "Any: nhận mọi loại hit.\n" +
+            "BasicAttackOnly: chỉ nhận hit không có SkillDataSO.\n" +
+            "SkillOnly: chỉ nhận hit có SkillDataSO.")]
+        public PassiveHitSourceFilter HitSourceFilter =
+            PassiveHitSourceFilter.Any;
+
+        [Min(1)]
         public int StackGainAmount = 1;
     }
 
@@ -163,13 +190,44 @@ namespace Immortal_Switch.Scripts.Skill
     [Serializable]
     public class SkillPassiveConfig
     {
+        [Header("Stack")]
         public string StackKey;
+
+        [Min(1)]
         public int RequiredStack = 3;
+
+        [Min(1)]
         public int MaxStack = 3;
+
         public bool ResetStackOnTrigger = true;
         public bool ConsumeStackOnTrigger = true;
+
+        [Tooltip("Trong cooldown passive sẽ không nhận thêm stack.")]
+        public bool BlockStackGainDuringCooldown = true;
+
         public List<SkillTriggerStackGainData> StackGainTriggers = new();
+
+        [Header("Activation Condition")]
         public SkillEnemyCountConditionData EnemyCountCondition = new();
+
+        [Header("Buff")]
+        [Min(0f)]
+        public float BuffDuration = 4f;
+
+        public List<StatModifier> BaseModifiers = new();
+
+        [Header("Spine Animation")]
+        [Tooltip("Animation aura luôn chạy khi hero có passive.")]
+        public string PassiveAuraAnimation = "passive";
+
+        [Min(0)]
+        [Tooltip("Nên dùng track riêng để aura không ghi đè idle, attack và skill.")]
+        public int PassiveAuraTrackIndex = 2;
+
+        [Tooltip("Có chạy animation khi passive được kích hoạt hay không.")]
+        public bool PlayTriggerAnimation = true;
+
+        public string TriggerAnimation = "passive_cast";
     }
 
     [Serializable]
@@ -184,10 +242,14 @@ namespace Immortal_Switch.Scripts.Skill
     [Serializable]
     public class SkillLevelData
     {
-        [Min(1)] public int Level = 1;
-        
+        [Min(1)]
+        public int Level = 1;
+
         public List<SkillPhaseData> Phases = new();
         public List<SkillDescriptionParam> DescriptionParams = new();
+
+        [ShowIf("@$root.OwnerType == SkillOwnerType.PassiveSkill")]
+        public SkillPassiveLevelConfig PassiveLevelConfig;
     }
 
     [Serializable]
@@ -229,6 +291,12 @@ namespace Immortal_Switch.Scripts.Skill
         {
             return baseValue * GetMultiplier(currentLevel);
         }
+    }
+    
+    public sealed class ResolvedPassiveConfig
+    {
+        public SkillPassiveConfig BaseConfig;
+        public List<StatModifier> Modifiers = new();
     }
 
     [CreateAssetMenu(fileName = "Skill_", menuName = "ScriptableObjects/SkillDataSO")]
@@ -325,6 +393,92 @@ namespace Immortal_Switch.Scripts.Skill
         {
             SkillLevelData levelData = GetLevelData(level);
             return PassiveConfig;
+        }
+        
+        public ResolvedPassiveConfig GetResolvedPassiveConfig(int level)
+        {
+            if (PassiveConfig == null)
+                return null;
+
+            int safeLevel = GetSafeLevel(level);
+
+            ResolvedPassiveConfig result = new ResolvedPassiveConfig
+            {
+                BaseConfig = PassiveConfig,
+                Modifiers = new List<StatModifier>()
+            };
+
+            AddClonedModifiers(
+                result.Modifiers,
+                PassiveConfig.BaseModifiers);
+
+            if (Levels == null || Levels.Count == 0)
+                return result;
+
+            // Resolve lần lượt từ level 1 đến current level.
+            // Không phụ thuộc thứ tự phần tử trong Inspector.
+            for (int currentLevel = 1;
+                 currentLevel <= safeLevel;
+                 currentLevel++)
+            {
+                SkillLevelData levelData =
+                    FindExactLevelData(currentLevel);
+
+                SkillPassiveLevelConfig passiveLevelConfig =
+                    levelData?.PassiveLevelConfig;
+
+                if (passiveLevelConfig == null)
+                    continue;
+
+                if (passiveLevelConfig.MergeMode ==
+                    PassiveLevelMergeMode.Override)
+                {
+                    result.Modifiers.Clear();
+                }
+
+                AddClonedModifiers(
+                    result.Modifiers,
+                    passiveLevelConfig.Modifiers);
+            }
+
+            return result;
+        }
+
+        private SkillLevelData FindExactLevelData(int level)
+        {
+            if (Levels == null)
+                return null;
+
+            for (int i = 0; i < Levels.Count; i++)
+            {
+                SkillLevelData levelData = Levels[i];
+
+                if (levelData != null &&
+                    levelData.Level == level)
+                {
+                    return levelData;
+                }
+            }
+
+            return null;
+        }
+
+        private static void AddClonedModifiers(
+            List<StatModifier> destination,
+            List<StatModifier> source)
+        {
+            if (destination == null || source == null)
+                return;
+
+            for (int i = 0; i < source.Count; i++)
+            {
+                StatModifier modifier = source[i];
+
+                if (modifier == null)
+                    continue;
+
+                destination.Add(modifier.Clone());
+            }
         }
 
         public SkillPhaseData GetPhaseByEvent(int level, string eventName)

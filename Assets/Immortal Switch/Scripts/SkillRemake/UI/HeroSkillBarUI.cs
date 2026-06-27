@@ -195,6 +195,13 @@ namespace Immortal_Switch.Scripts.UI.Skill
                 RequestEquipClassSkill?.Invoke(currentHero, slotIndex);
                 onRequestEquipClassSkill?.Invoke(currentHero, slotIndex);
 
+                EquipViewData equipViewData = new EquipViewData()
+                {
+                    Type = EquipViewType.SkillView,
+                    Data1 = currentHero.HeroClass
+                };
+
+                UIManager.Instance.TogglePopupAsync<EquipView>(args:equipViewData).Forget();
                 if (logClickResult)
                     Debug.Log($"[HeroSkillBarUI] Request equip class skill. Hero={currentHero.name}, Slot={slotIndex}", this);
 

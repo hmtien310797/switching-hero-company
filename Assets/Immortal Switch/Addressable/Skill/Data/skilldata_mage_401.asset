@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkillId: 401
   SkillKey: skilldata_mage_401
-  SkillClass: 3
+  SkillClass: 4
   SkillName: Void Thunderfall
   IconSkillKey: icon_skilldata_mage_401
   SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
@@ -160,11 +160,18 @@ MonoBehaviour:
     MaxStack: 3
     ResetStackOnTrigger: 1
     ConsumeStackOnTrigger: 1
+    BlockStackGainDuringCooldown: 1
     StackGainTriggers: []
     EnemyCountCondition:
       Enabled: 0
       MinEnemyCount: 1
       Range: 5
+    BuffDuration: 4
+    BaseModifiers: []
+    PassiveAuraAnimation: passive
+    PassiveAuraTrackIndex: 2
+    PlayTriggerAnimation: 1
+    TriggerAnimation: passive_cast
   CustomBehaviourPrefab: {fileID: 0}
   UpgradeShardCosts:
   - Level: 1

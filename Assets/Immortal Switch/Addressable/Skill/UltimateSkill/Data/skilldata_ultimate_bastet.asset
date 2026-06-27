@@ -1,0 +1,163 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 727400d8e1c143a4b86a6ec1f07fe5a1, type: 3}
+  m_Name: skilldata_ultimate_bastet
+  m_EditorClassIdentifier: 
+  SkillId: 0
+  SkillKey: 
+  SkillName: 
+  SkillIcon: {fileID: 21300000, guid: f09e32c6e2fd9e54ca6bf2a18524eff6, type: 3}
+  DescriptionTemplate: 
+  OwnerType: 1
+  MaxLevel: 1
+  SkillTier: 0
+  CastConfig:
+    RequireTarget: 1
+    MoveToCastRange: 0
+    CastRange: 2
+    Cooldown: 17
+    TargetSelectType: 0
+    HeroAnimationName: 
+  RuntimeObjectConfig:
+    RuntimeVisualType: 1
+    SpineRuntimePrefab: {fileID: 0}
+    runtimeObjectProjectileSpawner: {fileID: 0}
+    SpawnPositionType: 0
+    FollowType: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    LifeTime: 1
+    UseLifeTime: 1
+    DespawnOnAnimationComplete: 1
+    AnimationName: 
+    LoopAnimation: 0
+    LockCasterWhileAlive: 0
+    LockCasterDuringHeroAnimation: 1
+  PassiveConfig:
+    StackKey: 
+    RequiredStack: 3
+    MaxStack: 3
+    ResetStackOnTrigger: 1
+    ConsumeStackOnTrigger: 1
+    StackGainTriggers: []
+    EnemyCountCondition:
+      Enabled: 0
+      MinEnemyCount: 1
+      Range: 5
+  CustomBehaviourPrefab: {fileID: 6129234541465222230, guid: 1b7e4096924f543fc8789583f7e2db8c, type: 3}
+  UpgradeShardCosts: []
+  Levels:
+  - Level: 1
+    UseCastOverride: 0
+    UseRuntimeObjectOverride: 0
+    UsePassiveOverride: 0
+    HasBulletSpawner: 1
+    CastOverride:
+      RequireTarget: 0
+      MoveToCastRange: 0
+      CastRange: 2
+      Cooldown: 1
+      TargetSelectType: 1
+      HeroAnimationName: 
+    RuntimeObjectOverride:
+      RuntimeVisualType: 3
+      SpineRuntimePrefab: {fileID: 0}
+      runtimeObjectProjectileSpawner: {fileID: 0}
+      SpawnPositionType: 0
+      FollowType: 0
+      SpawnOffset: {x: 0, y: 0, z: 0}
+      LifeTime: 1
+      UseLifeTime: 1
+      DespawnOnAnimationComplete: 1
+      AnimationName: 
+      LoopAnimation: 0
+      LockCasterWhileAlive: 0
+      LockCasterDuringHeroAnimation: 1
+    PassiveOverride:
+      StackKey: 
+      RequiredStack: 3
+      MaxStack: 3
+      ResetStackOnTrigger: 1
+      ConsumeStackOnTrigger: 1
+      StackGainTriggers: []
+      EnemyCountCondition:
+        Enabled: 0
+        MinEnemyCount: 1
+        Range: 5
+    BulletSpawnerConfig:
+      patternType: 0
+      bulletPrefab: {fileID: 0}
+      bulletSpeed: 0
+      bulletLifeTime: 0
+      totalWaves: 0
+      timeBetweenWaves: 0
+      bulletsPerWave: 0
+      spreadAngle: 0
+      rotationSpeedPerWave: 0
+      bulletSpawnDelay: 0
+      alternateBulletOrderEachWave: 0
+      damage: 0
+    Phases:
+    - PhaseId: 0
+      TriggerType: 0
+      EventName: hit
+      Delay: 0
+      NormalizedTime: 0
+      Actions:
+      - ActionType: 0
+        ChancePercent: 100
+        TargetTypeOverride: 0
+        Damage:
+          SkillDamageBonusPercent: 250
+          CountAsSkillDamage: 1
+        Dot:
+          EffectId: DOT
+          TickDamageBonusPercent: 0
+          TickInterval: 1
+          Duration: 5
+          DamageType: 0
+          StackRule: 0
+        StatModifier:
+          ModifierId: 
+          StatType: 0
+          PercentValue: 0
+          Duration: 5
+        Area:
+          AreaPrefab: {fileID: 0}
+          Shape: 0
+          PositionType: 1
+          Radius: 2
+          BoxSize: {x: 2, y: 2}
+          Duration: 0
+          TickInterval: 0
+          HitOncePerTarget: 1
+          OnHitActions: []
+        Projectile:
+          ProjectilePrefab: {fileID: 0}
+          MoveType: 1
+          HitDetectionType: 0
+          SpawnPositionType: 2
+          FollowType: 0
+          CustomSocketName: 
+          Count: 1
+          SpreadAngle: 0
+          DelayBetweenShots: 0
+          Speed: 8
+          LifeTime: 3
+          HitRadius: 0.25
+          Pierce: 0
+          PierceCount: 0
+          OnHitActions: []
+        Stack:
+          StackKey: 
+          Amount: 1
+        TriggerSkill: {fileID: 0}
+    DescriptionParams: []

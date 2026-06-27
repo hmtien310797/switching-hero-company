@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.SkillRemake;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
+using Spine.Unity;
 
 namespace Immortal_Switch.Scripts.Skill
 {
@@ -46,6 +47,8 @@ namespace Immortal_Switch.Scripts.Skill
         [SerializeField] private List<SkillCooldownDebugView> cooldownDebugView = new();
 
         private PassiveSkillRuntime passiveRuntime;
+        private SkeletonAnimation ownerSkeletonAnimation;
+        private int activePassiveAuraTrack = -1;
         private readonly SkillTargetResolver targetResolver = new();
         private readonly Dictionary<SkillDataSO, float> cooldownRemainingBySkill = new();
 
@@ -308,6 +311,8 @@ namespace Immortal_Switch.Scripts.Skill
 
             owner = GetComponent<HeroActor>();
             animationDriver = GetComponent<HeroAnimationDriver>();
+            ownerSkeletonAnimation =
+                GetComponentInChildren<SkeletonAnimation>(true);
             executor = new SkillExecutor(targetResolver, objectSpawner);
             EnsureClassSkillSlotCapacity();
             autoSkillController.Init(this);
@@ -342,7 +347,11 @@ namespace Immortal_Switch.Scripts.Skill
             this.battleController = battleController;
 
             if (owner != null)
+            {
                 animationDriver = owner.Anim;
+                ownerSkeletonAnimation =
+                    owner.GetComponentInChildren<SkeletonAnimation>(true);
+            }
 
             if (levelProvider != null)
                 this.levelProvider = levelProvider;
@@ -472,24 +481,85 @@ namespace Immortal_Switch.Scripts.Skill
             CastSkillInternalAsync(skillData, level, target, interrupt: true, isUltimate);
         }
 
-        public void CastPassiveTriggeredSkill(SkillDataSO triggeredPassiveSkill)
+        public bool TryActivatePassive(
+            SkillDataSO triggeredPassiveSkill,
+            BuffData buffData)
         {
-            SkillDataSO skillToCast = triggeredPassiveSkill != null ? triggeredPassiveSkill : passiveSkill;
-            if (skillToCast == null)
+            SkillDataSO skillToActivate =
+                triggeredPassiveSkill != null
+                    ? triggeredPassiveSkill
+                    : passiveSkill;
+
+            if (skillToActivate == null ||
+                owner == null ||
+                owner.IsDead)
+            {
+                return false;
+            }
+
+            int level =
+                levelProvider.GetSkillLevel(
+                    skillToActivate,
+                    owner);
+
+            if (!CanCastSkillByCooldown(
+                    skillToActivate,
+                    level))
+            {
+                return false;
+            }
+
+            if (owner.Stats == null ||
+                owner.Stats.BuffModule == null)
+            {
+                return false;
+            }
+
+            // Cooldown chỉ bắt đầu khi buff thực sự có thể apply.
+            StartCooldown(skillToActivate, level);
+
+            if (buffData != null)
+                owner.Stats.BuffModule.ApplyBuff(buffData);
+
+            PlayPassiveTriggerAnimation(
+                skillToActivate,
+                level);
+
+            SkillEventBus.Raise(new SkillEventContext
+            {
+                EventType = SkillTriggerEventType.OnCastSkill,
+                Owner = owner,
+                Source = owner,
+                Target = owner,
+                Skill = skillToActivate
+            });
+
+            return true;
+        }
+        
+        private void PlayPassiveTriggerAnimation(
+            SkillDataSO skillData,
+            int level)
+        {
+            if (skillData == null ||
+                animationDriver == null)
+            {
                 return;
+            }
 
-            int level = levelProvider.GetSkillLevel(skillToCast, owner);
+            SkillPassiveConfig passiveConfig =
+                skillData.GetPassiveConfig(level);
 
-            if (!CanCastSkillByCooldown(skillToCast, level))
+            if (passiveConfig == null ||
+                !passiveConfig.PlayTriggerAnimation ||
+                string.IsNullOrEmpty(
+                    passiveConfig.TriggerAnimation))
+            {
                 return;
+            }
 
-            ICombatUnit target = owner != null && owner.HasValidTarget()
-                ? owner.CurrentTarget
-                : battleController != null && owner != null
-                    ? battleController.GetNearestEnemy(owner.Position)
-                    : null;
-
-            CastSkillInternalAsync(skillToCast, level, target, interrupt: true, false);
+            animationDriver.PlaySkill(
+                passiveConfig.TriggerAnimation);
         }
 
         public int CountEnemiesInRange(float range)
@@ -511,12 +581,59 @@ namespace Immortal_Switch.Scripts.Skill
             return await TryCastUltimateAsync();
         }
 
-        public async UniTask<bool> TryDebugCastPassive()
+        public UniTask<bool> TryDebugCastPassive()
         {
-            if (passiveSkill == null)
-                return false;
+            if (passiveSkill == null ||
+                passiveRuntime == null)
+            {
+                return UniTask.FromResult(false);
+            }
 
-            return await TryCastSkillAsync(passiveSkill);
+            int level =
+                levelProvider.GetSkillLevel(
+                    passiveSkill,
+                    owner);
+
+            ResolvedPassiveConfig resolvedConfig =
+                passiveSkill.GetResolvedPassiveConfig(level);
+
+            SkillPassiveConfig config =
+                resolvedConfig?.BaseConfig;
+
+            if (config == null)
+                return UniTask.FromResult(false);
+
+            BuffData debugBuff = new BuffData
+            {
+                Id = $"passive_{passiveSkill.SkillKey}_{passiveSkill.SkillId}",
+                Name = passiveSkill.SkillName,
+                Kind = BuffKind.Buff,
+                Duration = config.BuffDuration,
+                MaxStacks = 1,
+                StackRule = BuffStackRule.Replace,
+                Modifiers = new List<StatModifier>()
+            };
+
+            if (resolvedConfig.Modifiers != null)
+            {
+                for (int i = 0;
+                     i < resolvedConfig.Modifiers.Count;
+                     i++)
+                {
+                    StatModifier modifier =
+                        resolvedConfig.Modifiers[i];
+
+                    if (modifier != null)
+                        debugBuff.Modifiers.Add(modifier.Clone());
+                }
+            }
+
+            bool result =
+                TryActivatePassive(
+                    passiveSkill,
+                    debugBuff);
+
+            return UniTask.FromResult(result);
         }
 
 
@@ -534,8 +651,10 @@ namespace Immortal_Switch.Scripts.Skill
 
         public void ResetRuntimeOnSwitchOut()
         {
-            CancelCurrentSkill();
             passiveRuntime?.Reset();
+            ClearPassiveAura();
+
+            CancelCurrentSkill();
         }
 
         private bool CanCastSkillByCooldown(SkillDataSO skillData, int level)
@@ -1042,13 +1161,75 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void BuildPassiveRuntime()
         {
+            ClearPassiveAura();
+
+            passiveRuntime?.Reset();
             passiveRuntime = null;
 
-            if (passiveSkill == null)
+            if (passiveSkill == null ||
+                owner == null)
+            {
                 return;
+            }
 
-            int level = levelProvider.GetSkillLevel(passiveSkill, owner);
-            passiveRuntime = new PassiveSkillRuntime(this, passiveSkill, level);
+            int level =
+                levelProvider.GetSkillLevel(
+                    passiveSkill,
+                    owner);
+
+            passiveRuntime =
+                new PassiveSkillRuntime(
+                    this,
+                    passiveSkill,
+                    level);
+
+            PlayPassiveAura(level);
+        }
+        
+        private void PlayPassiveAura(int level)
+        {
+            if (passiveSkill == null ||
+                ownerSkeletonAnimation == null ||
+                ownerSkeletonAnimation.AnimationState == null)
+            {
+                return;
+            }
+
+            SkillPassiveConfig passiveConfig =
+                passiveSkill.GetPassiveConfig(level);
+
+            if (passiveConfig == null ||
+                string.IsNullOrEmpty(
+                    passiveConfig.PassiveAuraAnimation))
+            {
+                return;
+            }
+
+            int trackIndex =
+                Mathf.Max(1, passiveConfig.PassiveAuraTrackIndex);
+
+            activePassiveAuraTrack = trackIndex;
+
+            ownerSkeletonAnimation.AnimationState.SetAnimation(
+                trackIndex,
+                passiveConfig.PassiveAuraAnimation,
+                true);
+        }
+
+        private void ClearPassiveAura()
+        {
+            if (ownerSkeletonAnimation == null ||
+                ownerSkeletonAnimation.AnimationState == null ||
+                activePassiveAuraTrack < 0)
+            {
+                activePassiveAuraTrack = -1;
+                return;
+            }
+
+            ownerSkeletonAnimation.AnimationState.ClearTrack(
+                activePassiveAuraTrack);
+
+            activePassiveAuraTrack = -1;
         }
 
         private void OnSkillEvent(SkillEventContext context)

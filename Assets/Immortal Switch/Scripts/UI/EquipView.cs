@@ -4,6 +4,7 @@ using Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill.UI;
 using UnityEngine;
 
@@ -19,25 +20,11 @@ namespace Immortal_Switch.Scripts.UI
         private int currentIndex = -1;
         private bool subscribedBattleLineup;
         private UserDataCache userDataCache;
+        private EquipViewData equipViewData;
 
         private void Awake()
         {
-            BindSegmentedControl();
             userDataCache = UserDataCache.Instance;
-            TrySetupSubViews();
-            RefreshViews(0);
-        }
-
-        private void OnEnable()
-        {
-            BindSegmentedControl();
-            SubscribeBattleLineupChanged();
-            TrySetupSubViews();
-        }
-
-        private void OnDisable()
-        {
-            UnsubscribeBattleLineupChanged();
         }
 
         public override void OnShow(object args)
@@ -50,6 +37,12 @@ namespace Immortal_Switch.Scripts.UI
 
             int index = segmentedControl != null ? segmentedControl.GetCurrentIndex() : 0;
             if (index < 0) index = 0;
+            
+            if (args != null)
+            {
+                equipViewData = (EquipViewData)args;
+                index = (int)equipViewData.Type - 1;
+            }
 
             RefreshViews(index);
         }
@@ -87,16 +80,17 @@ namespace Immortal_Switch.Scripts.UI
                 uiWeaponView.gameObject.SetActive(showWeapon);
 
             if (uiSkillView != null)
-                uiSkillView.gameObject.SetActive(showSkill);
+            {
+                if (showSkill && equipViewData is { Type: EquipViewType.SkillView })
+                {
+                    uiSkillView.SetSelectedHeroClass((HeroClass)equipViewData.Data1);
+                }
+                uiSkillView.OpenDefaultClass(showSkill);
+            }
 
             if (showWeapon && uiWeaponView != null)
                 uiWeaponView.RefreshAll();
 
-            if (showSkill && uiSkillView != null)
-            {
-                // nếu UISkillView có refresh riêng thì gọi ở đây
-                // uiSkillView.RefreshAll();
-            }
         }
 
         private void TrySetupSubViews()
@@ -179,7 +173,19 @@ namespace Immortal_Switch.Scripts.UI
                 // uiSkillView.RefreshAll();
             }
         }
-        
-        
+    }
+
+    public class EquipViewData
+    {
+        public EquipViewType Type { get; set; }
+        public object Data1 { get; set; }
+        public object Data2 { get; set; }
+    }
+
+    public enum EquipViewType
+    {
+        None = 0,
+        WeaponView = 1,
+        SkillView = 2,
     }
 }

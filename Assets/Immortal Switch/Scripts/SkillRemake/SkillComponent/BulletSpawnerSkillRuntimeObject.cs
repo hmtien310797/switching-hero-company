@@ -68,6 +68,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
 
         private IEnumerator ExecutePatternRoutine()
         {
+            yield return new WaitForSeconds(currentPattern.delayWhenStartFiring);
             int totalWaves = Mathf.Max(1, currentPattern.totalWaves);
 
             for (int waveIndex = 0; waveIndex < totalWaves; waveIndex++)
