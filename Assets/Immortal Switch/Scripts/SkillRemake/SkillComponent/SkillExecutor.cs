@@ -23,10 +23,10 @@ namespace Immortal_Switch.Scripts.Skill
 
             for (int i = 0; i < phase.Actions.Count; i++)
             {
-                ExecuteAction(context, phase.Actions[i]);    
+                ExecuteAction(context, phase.Actions[i]);
             }
-            
-            if(phase.hasCameraShake)
+
+            if (phase.hasCameraShake)
                 GameCameraController.Instance.ShakeCamera();
         }
 
@@ -37,7 +37,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             if (Random.Range(0f, 100f) > action.ChancePercent)
                 return;
-            
+
             bool isUltimate = context.SkillData.OwnerType == SkillOwnerType.UltimateSkill;
 
             SkillTargetType targetType = action.TargetTypeOverride;
@@ -67,7 +67,8 @@ namespace Immortal_Switch.Scripts.Skill
 
                 case SkillActionType.ApplyBuff:
                 case SkillActionType.ApplyDebuff:
-                    Debug.LogWarning("[SkillExecutor] Buff/Debuff action data is ready, but BuffModule integration is not implemented in phase 1.");
+                    Debug.LogWarning(
+                        "[SkillExecutor] Buff/Debuff action data is ready, but BuffModule integration is not implemented in phase 1.");
                     break;
             }
         }
@@ -80,7 +81,7 @@ namespace Immortal_Switch.Scripts.Skill
             for (int i = 0; i < actions.Count; i++)
                 ExecuteAction(context, actions[i]);
         }
-        
+
         private float GetScaledValue(
             SkillRuntimeContext context,
             float baseValue,
@@ -103,13 +104,13 @@ namespace Immortal_Switch.Scripts.Skill
                 targetType,
                 action.Area
             );
-            
+
             float effectiveSkillCoefficient = GetScaledValue(
                 context,
                 action.Damage.SkillDamageBonusPercent,
                 action.Damage.ScaleWithClassSkillLevel
             );
-            
+
             for (int i = 0; i < targets.Count; i++)
             {
                 ICombatUnit target = targets[i];
@@ -128,14 +129,14 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void ExecuteDot(SkillRuntimeContext context, SkillActionData action, SkillTargetType targetType)
         {
-            List<ICombatUnit> targets = targetResolver.ResolveTargets(context, targetType);
-            
+            List<ICombatUnit> targets = targetResolver.ResolveTargets(context, targetType,action.Area);
+
             float effectiveDotCoefficient = GetScaledValue(
                 context,
                 action.Dot.TickDamageBonusPercent,
                 action.Dot.ScaleDamageWithClassSkillLevel
             );
-            
+
             for (int i = 0; i < targets.Count; i++)
             {
                 ICombatUnit target = targets[i];
@@ -161,17 +162,52 @@ namespace Immortal_Switch.Scripts.Skill
             }
         }
 
-        private void ExecuteSpawnArea(SkillRuntimeContext context, SkillActionData action)
+        private void ExecuteSpawnArea(
+            SkillRuntimeContext context,
+            SkillActionData action)
         {
-            if (action.Area == null || action.Area.AreaPrefab == null)
+            if (context == null ||
+                action == null ||
+                action.Area == null ||
+                action.Area.AreaPrefab == null)
+            {
                 return;
+            }
 
-            Vector3 position = GetAreaPosition(context, action.Area);
-            SkillAreaRuntime area = objectSpawner.Spawn(action.Area.AreaPrefab, position, Quaternion.identity);
+            SkillAreaData areaData = action.Area;
+
+            Vector3 castDirection =
+                GetAreaCastDirection(context);
+
+            Vector3 areaOrigin =
+                GetAreaOrigin(
+                    context,
+                    areaData,
+                    castDirection);
+
+            Vector3 areaCenter =
+                areaData.ResolveAreaCenter(
+                    areaOrigin,
+                    castDirection);
+
+            Quaternion rotation =
+                GetAreaRotation(castDirection);
+
+            SkillAreaRuntime area =
+                objectSpawner.Spawn(
+                    areaData.AreaPrefab,
+                    areaCenter,
+                    rotation);
+
             if (area == null)
                 return;
 
-            area.Init(context, action.Area, this, targetResolver, objectSpawner);
+            area.Init(
+                context,
+                areaData,
+                this,
+                targetResolver,
+                objectSpawner);
         }
 
         private void ExecuteSpawnProjectile(SkillRuntimeContext context, SkillActionData action)
@@ -191,6 +227,111 @@ namespace Immortal_Switch.Scripts.Skill
             // }
         }
 
+        private Vector3 GetAreaOrigin(
+            SkillRuntimeContext context,
+            SkillAreaData areaData,
+            Vector3 castDirection)
+        {
+            if (context == null)
+                return Vector3.zero;
+
+            switch (areaData.PositionType)
+            {
+                case SkillAreaPositionType.Self:
+                    return context.Caster != null
+                        ? context.Caster.Position
+                        : context.CastPosition;
+
+                case SkillAreaPositionType.Target:
+                    return context.MainTarget != null
+                        ? context.MainTarget.Position
+                        : context.TargetPosition;
+
+                case SkillAreaPositionType.CastPosition:
+                    return context.CastPosition;
+
+                case SkillAreaPositionType.ForwardOffset:
+                {
+                    Vector3 casterPosition =
+                        context.Caster != null
+                            ? context.Caster.Position
+                            : context.CastPosition;
+
+                    // Giữ behavior cũ:
+                    // Radius đang được dùng như khoảng offset phía trước.
+                    return casterPosition
+                           + castDirection * areaData.Radius;
+                }
+
+                default:
+                    return context.TargetPosition;
+            }
+        }
+
+        private Vector3 GetAreaCastDirection(
+            SkillRuntimeContext context)
+        {
+            if (context == null)
+                return Vector3.right;
+
+            Vector3 origin =
+                context.Caster != null
+                    ? context.Caster.Position
+                    : context.CastPosition;
+
+            Vector3 destination;
+
+            if (context.MainTarget != null &&
+                !context.MainTarget.IsDead)
+            {
+                destination =
+                    context.MainTarget.Position;
+            }
+            else if ((context.TargetPosition - origin)
+                     .sqrMagnitude > 0.0001f)
+            {
+                destination =
+                    context.TargetPosition;
+            }
+            else
+            {
+                destination =
+                    context.CastPosition;
+            }
+
+            Vector3 direction =
+                destination - origin;
+
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude <= 0.0001f &&
+                context.Caster != null)
+            {
+                direction =
+                    context.Caster.transform.forward;
+
+                direction.y = 0f;
+            }
+
+            if (direction.sqrMagnitude <= 0.0001f)
+                direction = Vector3.right;
+
+            return direction.normalized;
+        }
+
+        private Quaternion GetAreaRotation(
+            Vector3 castDirection)
+        {
+            castDirection.y = 0f;
+
+            if (castDirection.sqrMagnitude <= 0.0001f)
+                return Quaternion.identity;
+
+            return Quaternion.LookRotation(
+                castDirection.normalized,
+                Vector3.up);
+        }
+
         private Vector3 GetAreaPosition(SkillRuntimeContext context, SkillAreaData areaData)
         {
             switch (areaData.PositionType)
@@ -202,11 +343,12 @@ namespace Immortal_Switch.Scripts.Skill
                 case SkillAreaPositionType.CastPosition:
                     return context.CastPosition;
                 case SkillAreaPositionType.ForwardOffset:
-                    return context.Caster != null ? context.Caster.Position + context.Caster.transform.forward * areaData.Radius : context.CastPosition;
+                    return context.Caster != null
+                        ? context.Caster.Position + context.Caster.transform.forward * areaData.Radius
+                        : context.CastPosition;
                 default:
                     return context.TargetPosition;
             }
         }
-        
     }
 }

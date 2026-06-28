@@ -58,14 +58,73 @@ namespace Immortal_Switch.Scripts.Skill
     public class SkillAreaData
     {
         public SkillAreaRuntime AreaPrefab;
-        public SkillAreaShape Shape = SkillAreaShape.Circle;
-        public SkillAreaPositionType PositionType = SkillAreaPositionType.Target;
+
+        public SkillAreaShape Shape =
+            SkillAreaShape.Circle;
+
+        public SkillAreaPositionType PositionType =
+            SkillAreaPositionType.Target;
+
+        [Tooltip(
+            "Chỉ áp dụng cho Box.\n" +
+            "Center: origin là tâm box.\n" +
+            "Forward: box kéo về phía trước.\n" +
+            "Backward: box kéo về phía sau.")]
+        public SkillAreaAnchor Anchor =
+            SkillAreaAnchor.Center;
+
         public float Radius = 2f;
-        public Vector2 BoxSize = new(2f, 2f);
+
+        [Tooltip(
+            "X = chiều dài theo hướng cast.\n" +
+            "Y = chiều rộng vuông góc hướng cast.")]
+        public Vector2 BoxSize =
+            new Vector2(2f, 2f);
+
         public float Duration;
         public float TickInterval;
         public bool HitOncePerTarget = true;
+
         public List<SkillActionData> OnHitActions = new();
+
+        public float BoxLength =>
+            Mathf.Max(0f, BoxSize.x);
+
+        public float BoxWidth =>
+            Mathf.Max(0f, BoxSize.y);
+
+        public Vector3 ResolveAreaCenter(
+            Vector3 areaOrigin,
+            Vector3 castDirection)
+        {
+            if (Shape != SkillAreaShape.Box)
+                return areaOrigin;
+
+            castDirection.y = 0f;
+
+            if (castDirection.sqrMagnitude <= 0.0001f)
+                castDirection = Vector3.right;
+
+            castDirection.Normalize();
+
+            float halfLength =
+                BoxLength * 0.5f;
+
+            switch (Anchor)
+            {
+                case SkillAreaAnchor.Forward:
+                    return areaOrigin
+                           + castDirection * halfLength;
+
+                case SkillAreaAnchor.Backward:
+                    return areaOrigin
+                           - castDirection * halfLength;
+
+                case SkillAreaAnchor.Center:
+                default:
+                    return areaOrigin;
+            }
+        }
     }
 
     [Serializable]

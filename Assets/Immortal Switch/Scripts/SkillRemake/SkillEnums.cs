@@ -82,6 +82,13 @@ namespace Immortal_Switch.Scripts.Skill
         Circle,
         Box
     }
+    
+    public enum SkillAreaAnchor
+    {
+        Center,
+        Forward,
+        Backward
+    }
 
     public enum SkillAreaPositionType
     {
