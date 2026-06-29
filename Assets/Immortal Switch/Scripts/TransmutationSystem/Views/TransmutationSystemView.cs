@@ -81,8 +81,13 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
             };
         }
 
-        private void OnEnable()
+        private async void OnEnable()
         {
+            // Resync transmutation/list mỗi lần mở màn — tránh hiển thị data cũ leak từ
+            // session/account khác (xem Docs/be-transmutation-rpc-spec.md mục 9). Thất bại thì
+            // vẫn hiển thị tiếp bằng cache local (SyncFromServerAsync tự log lỗi, không throw).
+            await TransmutationSystemManager.Instance.SyncFromServerAsync();
+
             InitializeEquipment();
             TransmutationSystemManager.Instance.NotifyReady();
         }
@@ -161,7 +166,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private async UniTask OnClickTransmutation()
         {
-            var newEquip = TransmutationSystemManager.Instance.FuseIfPossible();
+            var newEquip = await TransmutationSystemManager.Instance.FuseIfPossibleAsync();
 
             if (newEquip != null)
             {
@@ -174,7 +179,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
                 }
                 else
                 {
-                    TransmutationSystemManager.Instance.Equip(newEquip, null);
+                    await TransmutationSystemManager.Instance.EquipAsync();
                 }
             }
         }

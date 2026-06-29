@@ -43,6 +43,10 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             foreach (HeroClass heroClass in System.Enum.GetValues(typeof(HeroClass)))
             {
+                if (heroClass == HeroClass.None)
+                {
+                    continue;
+                }
                 vm.ClassTabs.Add(new WeaponClassTabViewModel
                 {
                     HeroClass = heroClass,
@@ -128,8 +132,11 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 ShardProgressNormalized = 0f,
                 CurrentStar = state.CurrentStar,
                 MaxStar = def.MaxStar,
-                CanLevelUp = CanLevelUpExclusive(heroId),
-                CanLimitBreak = CanLimitBreakExclusive(heroId),
+                // Exclusive equip/upgrade/limit-break chưa có RPC server hỗ trợ (thiếu master data
+                // hero→exclusive weapon) — tắt cứng cho tới khi BE bổ sung, xem
+                // Docs/be-weapon-equip-upgrade-rpc-spec.md mục 7.
+                CanLevelUp = false,
+                CanLimitBreak = false,
                 CanTranscend = false
             };
 
@@ -214,15 +221,17 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 IsUnlocked = state.IsUnlocked,
                 IsEquipped = isEquippedByFocusedHero,
                 
-                ShowEquip = state.IsUnlocked && !isEquippedByFocusedHero,
-                CanEquip = state.IsUnlocked && !isEquippedByFocusedHero,
+                // Exclusive equip/upgrade chưa có RPC server hỗ trợ — tắt cứng, xem
+                // Docs/be-weapon-equip-upgrade-rpc-spec.md mục 7.
+                ShowEquip = false,
+                CanEquip = false,
                 ShowAutoEquip = true,
-                ShowOpenUpgrade = true,
+                ShowOpenUpgrade = false,
                 ShowFusion = false,
                 ShowFuseAll = false,
-                
+
                 CanAutoEquip = true,
-                CanOpenUpgrade = state.IsUnlocked,
+                CanOpenUpgrade = false,
                 CanFusion = false,
                 CanFuseAll = false,
 
@@ -373,23 +382,20 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             panel.Mode = isAtCurrentCap ? WeaponUpgradePanelMode.LimitBreak : WeaponUpgradePanelMode.Upgrade;
 
+            // Exclusive equip/upgrade/limit-break chưa có RPC server hỗ trợ — tắt cứng toàn bộ nút,
+            // xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 7.
             panel.ShowUpgradeMode = !isAtCurrentCap;
-            panel.ShowLevelUp = !isAtCurrentCap;
-            panel.ShowLevelUpAll = !isAtCurrentCap;
-            panel.CanLevelUp = CanLevelUpExclusive(heroId);
-            panel.CanLevelUpAll = CalculateLevelUpAllCostExclusive(def, state, heroId) > 0 &&
-                                  CurrencyLedgerService.Instance != null &&
-                                  CurrencyLedgerService.Instance.HasEnoughDisplayBalance(
-                                      CurrencyType.WeaponEnhancementStone,
-                                      CalculateLevelUpAllCostExclusive(def, state, heroId)
-                                  );
+            panel.ShowLevelUp = false;
+            panel.ShowLevelUpAll = false;
+            panel.CanLevelUp = false;
+            panel.CanLevelUpAll = false;
 
             panel.NextLevelCost = nextLevelCost;
             panel.LevelUpAllCost = CalculateLevelUpAllCostExclusive(def, state, heroId);
 
             panel.ShowLimitBreakMode = isAtCurrentCap;
-            panel.ShowLimitBreak = isAtCurrentCap && nextBreakEntry != null;
-            panel.CanLimitBreak = CanLimitBreakExclusive(heroId);
+            panel.ShowLimitBreak = false;
+            panel.CanLimitBreak = false;
             panel.BreakThroughCost = nextBreakEntry != null ? nextBreakEntry.BreakThroughStoneCost : 0;
             panel.LimitBreakSuccessRate = nextBreakEntry != null ? nextBreakEntry.SuccessRate : 0f;
             panel.NextBreakRequiredLevel = nextBreakEntry != null ? nextBreakEntry.RequiredLevel : 0;

@@ -1,4 +1,6 @@
-﻿using Immortal_Switch.Scripts.Combat;
+﻿using System;
+using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
@@ -78,16 +80,27 @@ public class BulletProjectile :
 
     public void OnProjectileSpawnedFromPool()
     {
-        /*
-         * AddressablePoolService gọi callback này trước Setup().
-         * Chỉ reset trạng thái chờ Setup, không kích hoạt bullet tại đây.
-         */
         ResetRuntimeData();
     }
 
     public void OnProjectileDespawnedToPool()
     {
         ResetRuntimeData();
+    }
+
+    private void OnEnable()
+    {
+        GameEventManager.Subscribe(GameEvents.OnStageChange, DespawnSelf);
+    }
+    
+    private void OnDisable()
+    {
+        GameEventManager.Unsubscribe(GameEvents.OnStageChange, DespawnSelf);
+    }
+
+    private void OnDestroy()
+    {
+        GameEventManager.Unsubscribe(GameEvents.OnStageChange, DespawnSelf);
     }
 
     private void Update()
@@ -190,6 +203,7 @@ public class BulletProjectile :
         lifeTime = 0f;
         timer = 0f;
         damage = 0f;
+        
     }
 
     private static bool IsInLayerMask(

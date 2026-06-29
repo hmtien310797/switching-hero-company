@@ -40,9 +40,9 @@ MonoBehaviour:
     SpawnPositionType: 0
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
-    LifeTime: 1
-    UseLifeTime: 0
-    DespawnOnAnimationComplete: 1
+    LifeTime: 5
+    UseLifeTime: 1
+    DespawnOnAnimationComplete: 0
     AnimationName: 
     LoopAnimation: 0
     LockCasterWhileAlive: 0
@@ -75,7 +75,7 @@ MonoBehaviour:
     Actions:
     - ActionType: 0
       ChancePercent: 100
-      TargetTypeOverride: 0
+      TargetTypeOverride: 10
       Damage:
         SkillDamageBonusPercent: 185
         ScaleWithClassSkillLevel: 1
@@ -98,7 +98,8 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
-        Radius: 2
+        Anchor: 0
+        Radius: 12
         BoxSize: {x: 2, y: 2}
         Duration: 0
         TickInterval: 0

@@ -21,6 +21,8 @@ public class PlayerMeResponse
     [JsonProperty("heroes")]         public HeroInventory      heroes;
     [JsonProperty("skills")]         public SkillListResponse  skills;
     [JsonProperty("weapons")]        public WeaponListResponse weapons;
+    /// <summary>current_unlocked_tier + stack từng stat của hệ thống Growth — xem Docs/be-growth-rpc-spec.md mục 8.</summary>
+    [JsonProperty("growth")]         public GrowthStateResponse growth;
     /// <summary>current_stage/current_chapter/highest_stage_cleared — nguồn sự thật cho stage, dùng ngay sau login, không cần gọi battle/progression riêng.</summary>
     [JsonProperty("progression")]    public BattleProgression  progression;
 }

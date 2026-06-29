@@ -25,7 +25,7 @@ public class HeroProjectile : MonoBehaviour
 
     private void Update()
     {
-        if (target == null || target.IsDead)
+        if (!IsTargetValid())
         {
             Destroy(gameObject);
             return;
@@ -57,5 +57,15 @@ public class HeroProjectile : MonoBehaviour
             HitEffectManager.Instance.Play(target);
             Destroy(gameObject);
         }
+    }
+
+    private bool IsTargetValid()
+    {
+        if (!target.IsUnityAlive())
+        {
+            return false;
+        }
+        
+        return !target.IsDead;
     }
 }

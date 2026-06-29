@@ -54,6 +54,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
         [SerializeField] private TMP_Text equipButtonText;
         [SerializeField] private Button optionButton;
         [SerializeField] private Button glyphButton;
+        [SerializeField] private Button autoEquipButton;
+        [SerializeField] private TMP_Text autoEquipButtonText;
 
         [Header("Replace Popup")] 
         [SerializeField] private GameObject replacePopupRoot;
@@ -71,6 +73,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private SkillDataSO selectedSkill;
         private SkillDataSO pendingReplaceSkill;
         private bool isReplaceMode;
+        private bool isAutoEquipping;
         [SerializeField] private bool enableDebugLog = true;
 
         private void LogView(string message)
@@ -133,6 +136,9 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             if (equipButton != null)
                 equipButton.onClick.AddListener(OnClickEquipOrUnequip);
+            
+            if (autoEquipButton != null)
+                autoEquipButton.onClick.AddListener(() => OnClickAutoEquip().Forget());
 
             if (replaceCloseButton != null)
                 replaceCloseButton.onClick.AddListener(CloseReplacePopup);
@@ -203,6 +209,85 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             LogView($"OnClickHeroTab -> heroId={selectedHero.HeroId}, class={selectedClass}");
             RefreshCurrentContext();
+        }
+        
+        private async UniTaskVoid OnClickAutoEquip()
+        {
+            if (isAutoEquipping)
+            {
+                LogWarningView("Auto equip ignored because another auto equip is running.");
+                return;
+            }
+
+            if (isReplaceMode)
+            {
+                LogWarningView("Auto equip ignored because replace mode is active.");
+                return;
+            }
+
+            if (selectedHero == null)
+            {
+                LogWarningView("Auto equip failed because selectedHero is null.");
+                return;
+            }
+
+            if (dataProvider == null)
+            {
+                LogErrorView("Auto equip failed because dataProvider is null.");
+                return;
+            }
+
+            isAutoEquipping = true;
+            SetAutoEquipButtonState(false, "Đang trang bị...");
+
+            try
+            {
+                int heroId = selectedHero.HeroId;
+
+                LogView(
+                    $"OnClickAutoEquip started -> " +
+                    $"heroId={selectedHero.HeroId}, class={selectedHero.HeroClass}");
+
+                SkillAutoEquipResult result =
+                    await dataProvider.TryAutoEquipSkillsToHero(selectedHero);
+
+                if (!result.Success)
+                {
+                    LogWarningView(
+                        $"Auto equip failed -> heroId={heroId}");
+                    return;
+                }
+
+                LogView(
+                    $"Auto equip completed -> " +
+                    $"heroId={heroId}, " +
+                    $"hasChanged={result.HasChanged}, " +
+                    $"equippedCount={result.EquippedCount}, " +
+                    $"skills=[{string.Join(",", result.EquippedSkillIds)}]");
+
+                /*
+                 * Lấy lại context mới từ DataProvider.
+                 * Không tiếp tục dùng selectedHero cũ vì danh sách EquippedSkillIds
+                 * trong context cũ có thể chưa được cập nhật.
+                 */
+                selectedHero = dataProvider.GetAssignedHeroByClass(selectedClass);
+
+                RefreshCurrentContext();
+            }
+            finally
+            {
+                isAutoEquipping = false;
+                SetAutoEquipButtonState(selectedHero != null, "Tự động trang bị");
+            }
+        }
+        
+        private void SetAutoEquipButtonState(bool interactable, string buttonText)
+        {
+            if (autoEquipButton != null)
+                autoEquipButton.interactable = interactable;
+
+            if (autoEquipButtonText != null)
+                autoEquipButtonText.text = buttonText;
         }
         
         public void RefreshAll()
@@ -305,7 +390,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             }
 
             LogView(
-                $"ResolvedHero -> heroId={selectedHero.HeroId}, class={selectedHero.HeroClass}, equippedCount={selectedHero.EquippedSkillIds?.Count ?? 0}");
+                $"ResolvedHero -> heroId={selectedHero.HeroId}, class={selectedHero.HeroClass}, equippedCount={selectedHero.EquippedSkillIds?.Count(id => id > 0) ?? 0}");
 
             BindHeroTabs();
             BindEquippedSlots();
@@ -548,7 +633,9 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 return;
             }
 
-            int equippedCount = selectedHero.EquippedSkillIds != null ? selectedHero.EquippedSkillIds.Count : 0;
+            // EquippedSkillIds giờ giữ đúng 5 slot thật (0 = trống), không còn bị dồn lại — đếm số
+            // slot thật sự có skill (>0) thay vì dùng List.Count (luôn là 5).
+            int equippedCount = selectedHero.EquippedSkillIds?.Count(id => id > 0) ?? 0;
             if (equippedCount < 5)
             {
                 dataProvider.TryEquipSkillToHero(selectedHero, selectedSkill.SkillId);

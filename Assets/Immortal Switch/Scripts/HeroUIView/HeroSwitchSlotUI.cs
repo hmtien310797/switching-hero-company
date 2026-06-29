@@ -1,4 +1,5 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Hero;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,12 +13,14 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private Button button;
 
         private int heroId;
-        private Action<int> onClick;
+        private Action<int, int> onClick;
 
+        private int slotIndex;
         public int HeroId => heroId;
         public HeroCollectionItemUI HeroItemUI => heroItemUI;
+        public HeroClass heroSlotClass { get; private set; }
 
-        public void Bind(int slotIndex, HeroCollectionItemViewData data, Action<int> clickCallback)
+        public void Bind(int slotIndex, HeroCollectionItemViewData data, Action<int, int> clickCallback)
         {
             heroId = data != null ? data.HeroId : 0;
             onClick = clickCallback;
@@ -27,6 +30,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             if (heroItemUI != null && data != null)
             {
+                this.slotIndex = slotIndex; 
                 heroItemUI.Bind(data);
                 heroItemUI.ClearClickCallback();
                 
@@ -34,6 +38,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 heroItemUI.SetDimmed(false);
                 heroItemUI.SetSelected(false);
                 heroItemUI.SetReadyHighlight(false);
+                heroSlotClass = data.HeroClass;
             }
 
             if (button != null)
@@ -57,7 +62,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void HandleClick()
         {
-            onClick?.Invoke(heroId);
+            onClick?.Invoke(heroId, slotIndex);
         }
     }
 }

@@ -63,11 +63,18 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
                 btnStandardTab.onClick.AddListener(OnClickStandardTab);
             }
 
+            // Exclusive weapon ẩn ở v1 — BE chưa có master data mapping hero→exclusive_weapon_id,
+            // mọi request category="exclusive" luôn trả EXCLUSIVE_NOT_FOUND/EXCLUSIVE_NOT_OWNED
+            // (xem docs/api_weapon_equip_upgrade.md mục 1, 9). Ẩn hẳn tab để người chơi không bấm
+            // vào rồi luôn gặp lỗi. currentMainTab mặc định Standard nên không cần xử lý gì thêm.
             if (btnExclusiveTab != null)
             {
                 btnExclusiveTab.onClick.RemoveListener(OnClickExclusiveTab);
-                btnExclusiveTab.onClick.AddListener(OnClickExclusiveTab);
+                btnExclusiveTab.gameObject.SetActive(false);
             }
+
+            if (exclusiveRoot != null)
+                exclusiveRoot.SetActive(false);
         }
 
         public void RefreshAll()

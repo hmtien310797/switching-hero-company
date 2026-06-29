@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.ItemSystem;
+using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.StatSystem;
+using UnityEngine;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem
 {
@@ -173,6 +175,74 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public static bool IsValidModifier(string modifier)
         {
             return ModifierToStatTypeMap.ContainsKey(modifier);
+        }
+
+        /// <summary>
+        /// Convert modifiers trả về từ server (stat_type/op dạng string) sang StatModifier dùng ở client.
+        /// </summary>
+        public static List<StatModifier> ToModifiers(List<TransmutationModifierDto> dtos)
+        {
+            var result = new List<StatModifier>();
+
+            if (dtos == null)
+            {
+                return result;
+            }
+
+            foreach (var dto in dtos)
+            {
+                if (!Enum.TryParse<StatType>(dto.StatType, true, out var statType))
+                {
+                    Debug.LogError($"Transmutation: unknown stat_type from server: {dto.StatType}");
+                    continue;
+                }
+
+                if (!Enum.TryParse<ModifierOp>(dto.Op, true, out var op))
+                {
+                    Debug.LogError($"Transmutation: unknown op from server: {dto.Op}");
+                    continue;
+                }
+
+                result.Add(new StatModifier(statType, op, dto.Value, string.Empty, dto.IsUnique));
+            }
+
+            return result;
+        }
+
+        /// <summary>Dùng cho equips[]/pending trả về từ server — có item_type riêng.</summary>
+        public static PlayerEquipItem ToPlayerEquipItem(TransmutationItemDto dto)
+        {
+            if (dto == null)
+            {
+                return null;
+            }
+
+            return new PlayerEquipItem
+            {
+                CfgId = dto.CfgId,
+                ItemType = dto.ItemType,
+                Level = dto.Level,
+                Tier = dto.Tier,
+                Modifiers = ToModifiers(dto.Modifiers),
+            };
+        }
+
+        /// <summary>Dùng cho current_equip/equipped/replaced trả về từ server — item_type lấy từ field ngoài (xem TransmutationItemBaseDto).</summary>
+        public static PlayerEquipItem ToPlayerEquipItem(string itemType, TransmutationItemBaseDto dto)
+        {
+            if (dto == null)
+            {
+                return null;
+            }
+
+            return new PlayerEquipItem
+            {
+                CfgId = dto.CfgId,
+                ItemType = itemType,
+                Level = dto.Level,
+                Tier = dto.Tier,
+                Modifiers = ToModifiers(dto.Modifiers),
+            };
         }
     }
 }

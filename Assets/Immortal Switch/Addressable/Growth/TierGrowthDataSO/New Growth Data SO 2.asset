@@ -11,16 +11,23 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56a361aca523ac84c8511160489f2ca0, type: 3}
   m_Name: New Growth Data SO 2
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Tier: 3
   MaxStack: 500
   StatGrowths:
-  - Stat: 0
-    ValuePerLevel: 0.1
-    GoldCostPerLevel: 2
   - Stat: 1
-    ValuePerLevel: 0.1
-    GoldCostPerLevel: 2
-  - Stat: 2
-    ValuePerLevel: 0.1
-    GoldCostPerLevel: 2
+    ValueType: 0
+    ValuePerLevel: 0.001
+    GoldCostPerLevel: 2777
+  - Stat: 0
+    ValueType: 0
+    ValuePerLevel: 0.001
+    GoldCostPerLevel: 2777
+  - Stat: 3
+    ValueType: 0
+    ValuePerLevel: 0.08
+    GoldCostPerLevel: 2360
+  - Stat: 7
+    ValueType: 0
+    ValuePerLevel: 0.0001
+    GoldCostPerLevel: 3748

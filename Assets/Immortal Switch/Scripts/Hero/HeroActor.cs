@@ -1,5 +1,6 @@
 ﻿using System;
 using Battle;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
@@ -190,10 +191,14 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         this.heroTeamController = heroTeamController;
         pveBattleController = battleController;
         skillController?.Init(this, battleController);
-        
+
+        // Áp loadout skill từ server (skill/list.equipped) nếu hero này đã từng equip qua server —
+        // nếu chưa, giữ nguyên skill mặc định bake sẵn trên prefab (xem UserDataCache.ApplyServerLoadoutToHero).
+        UserDataCache.Instance?.ApplyServerLoadoutToHero(this, heroData.Id);
+
         ResetData();
         SetAutoSkill(useAutoSkill);
-        await skillController.InitializeUltimateSkillData();
+        await skillController.InitializeUltimateSkillDataAndClassSkillData();
     }
 
     public void SetChosen(bool chosen)
@@ -433,14 +438,18 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     public bool HasValidTarget()
     {
-        return currentTarget != null && !currentTarget.IsDead;
+        if (!currentTarget.IsUnityAlive())
+        {
+            return false;
+        }
+        return !currentTarget.IsDead;
     }
 
     public bool IsTargetInAttackRange()
     {
         if (!HasValidTarget())
             return false;
-
+        
         Vector3 self = transform.position;
         Vector3 target = currentTarget.Position;
 

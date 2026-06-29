@@ -160,21 +160,21 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             }
         }
 
-        private void OnClickEquip()
+        private async void OnClickEquip()
         {
             if (WeaponManager.Instance == null ||
                 currentVm == null)
                 return;
 
             if (currentVm.IsExclusive)
-                WeaponManager.Instance.EquipExclusive(currentHeroId);
+                await WeaponManager.Instance.EquipExclusiveAsync(currentHeroId);
             else
-                WeaponManager.Instance.EquipStandard(currentHeroId, currentVm.HeroClass, currentVm.WeaponId);
+                await WeaponManager.Instance.EquipStandardAsync(currentHeroId, currentVm.WeaponId);
 
             RequestRefresh();
         }
 
-        private void OnClickAutoEquip()
+        private async void OnClickAutoEquip()
         {
             if (WeaponManager.Instance == null)
                 return;
@@ -183,7 +183,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
                 return;
 
             var activeHeroes = UserDataCache.Instance.inBattleHeroes;
-            WeaponManager.Instance.TryAutoEquipForHeroes(activeHeroes);
+            await WeaponManager.Instance.TryAutoEquipForHeroesAsync(activeHeroes);
 
             RequestRefresh();
         }

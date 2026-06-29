@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Common;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pooling;
 using UnityEngine;
 
@@ -134,7 +135,7 @@ namespace Immortal_Switch.Scripts.Skill
         /// Fired by this runtime object. For Spine objects, call this from Spine event callback.
         /// For particle/timeline objects later, call this from animation event or script.
         /// </summary>
-        public void EmitRuntimeEvent(string eventName)
+        protected void EmitRuntimeEvent(string eventName)
         {
             DebugCountRuntimeEvent(eventName);
 
@@ -180,8 +181,25 @@ namespace Immortal_Switch.Scripts.Skill
                     gameObject.SetActive(false);
                     break;
             }
+            
+            OnDespawnedToPool();
         }
-        
+
+        private void OnEnable()
+        {
+            GameEventManager.Subscribe(GameEvents.OnStageChange, ForceDespawn);
+        }
+
+        private void OnDisable()
+        {
+            GameEventManager.Unsubscribe(GameEvents.OnStageChange, ForceDespawn);
+        }
+
+        private void OnDestroy()
+        {
+            GameEventManager.Unsubscribe(GameEvents.OnStageChange, ForceDespawn);
+        }
+
         public void NotifyAddressablePoolDespawned()
         {
             ClearRuntimeState();
@@ -204,7 +222,7 @@ namespace Immortal_Switch.Scripts.Skill
                     $"Missing AddressablePoolHandle. Object={name}",
                     this
                 );
-
+                
                 ClearRuntimeState();
                 gameObject.SetActive(false);
                 return;
@@ -257,12 +275,9 @@ namespace Immortal_Switch.Scripts.Skill
             debugRuntimeEventCount = 0;
         }
 
-        public virtual void OnDespawnedToPool()
+        protected virtual void OnDespawnedToPool()
         {
-            ClearRuntimeState();
-
-            addressablePoolHandle = null;
-            isDespawning = false;
+            
         }
 
         [System.Diagnostics.Conditional("UNITY_EDITOR")]

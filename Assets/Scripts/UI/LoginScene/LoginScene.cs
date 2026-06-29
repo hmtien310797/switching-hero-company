@@ -95,6 +95,15 @@ public class LoginScene : MonoBehaviour
             RequestIdToken = true,
             UseGameSignIn = false
         };
+
+        // Quay về LoginScene sau khi bị server force-logout (vd: login ở thiết bị khác) —
+        // NakamaClient lưu lý do trước khi load lại scene này, đọc 1 lần rồi xoá.
+        var reason = NakamaClient.Instance.LastForceLogoutReason;
+        if (!string.IsNullOrEmpty(reason))
+        {
+            NakamaClient.Instance.LastForceLogoutReason = null;
+            Debug.LogWarning($"[LoginScene] Đã đăng xuất: {reason}");
+        }
     }
 
     private void Update()

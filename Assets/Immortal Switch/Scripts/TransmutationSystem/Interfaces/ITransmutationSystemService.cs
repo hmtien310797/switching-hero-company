@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Numerics;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Shared.Database;
@@ -9,20 +8,14 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
 {
     public interface ITransmutationSystemService
     {
-        /// <summary>
-        /// add exp to transmulate
-        /// </summary>
-        void UpdateExp(BigInteger quantity);
+        /// <summary>Apply toàn bộ state từ transmutation/list — ghi đè, không merge.</summary>
+        void ApplyListResponse(TransmutationListResponse response);
 
-        /// <summary>
-        /// add energy to transmulate
-        /// </summary>
-        void UpdateEnergy(BigInteger quantity);
+        /// <summary>Apply kết quả roll từ transmutation/fuse (energy/exp/level mới + pending mới).</summary>
+        void ApplyFuseResult(TransmutationFuseResponse response);
 
-        /// <summary>
-        /// tang cap
-        /// </summary>
-        void UpdateLevel(int level);
+        /// <summary>Apply kết quả chốt giữ pending từ transmutation/equip.</summary>
+        void ApplyEquipResult(TransmutationEquipResponse response);
 
         /// <summary>
         /// dismantle item
@@ -50,6 +43,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
             IReadOnlyList<DynamicHeroesGlobalSpecificationsTransmutationItemUniqueRow> rows,
             int count
         );
+        /// <summary>Apply kết quả huỷ pending từ transmutation/dismantle (energy refund/exp/level mới).</summary>
+        void ApplyDismantleResult(TransmutationDismantleResponse response);
 
         /// <summary>
         /// lay ra equip hien tai theo type
@@ -60,11 +55,6 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
         /// lay ra ds equip dang mac.
         /// </summary>
         IEnumerable<PlayerEquipItem> GetEquips();
-
-        /// <summary>
-        /// trang bi item moi
-        /// </summary>
-        void Equip(PlayerEquipItem newEquip);
 
         /// <summary>
         /// set waiting material

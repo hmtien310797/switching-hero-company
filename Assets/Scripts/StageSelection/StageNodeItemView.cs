@@ -10,10 +10,10 @@ namespace Immortal_Switch.Scripts.StageSelection
     {
         [SerializeField] private Button button;
         [SerializeField] private TMP_Text stageText;
-        [SerializeField] private Image icon;
-        [SerializeField] private GameObject selectedArrow;
-        [SerializeField] private GameObject lockOverlay;
-        [SerializeField] private GameObject currentStageMark;
+        [SerializeField] private GameObject selectedStageArrow;
+        [SerializeField] private GameObject openDoor;
+        [SerializeField] private GameObject passedDoor;
+        [SerializeField] private GameObject belowCurrentStageIndicator;
 
         private int stage;
         private Action<int> onClick;
@@ -32,6 +32,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             bool isSelected,
             bool isLocked,
             bool isCurrentStage,
+            bool isViewportBelowCurrentStage,
             Action<int> onClick
         )
         {
@@ -41,23 +42,32 @@ namespace Immortal_Switch.Scripts.StageSelection
             if (stageText != null)
                 stageText.text = stage.ToString();
 
-            if (icon != null)
+            // stage chua mo
+            if (isLocked)
             {
-                icon.sprite = stageIcon;
-                icon.gameObject.SetActive(stageIcon != null);
+                openDoor.SetActive(false);
+                passedDoor.SetActive(false);
             }
-
-            if (selectedArrow != null)
-                selectedArrow.SetActive(isSelected);
-
-            if (lockOverlay != null)
-                lockOverlay.SetActive(isLocked);
-
-            if (currentStageMark != null)
-                currentStageMark.SetActive(isCurrentStage);
+            // stage hien tai
+            else if (isCurrentStage)
+            {
+                openDoor.SetActive(true);
+                passedDoor.SetActive(false);
+            }
+            // stage da vuot qua
+            else
+            {
+                openDoor.SetActive(false);
+                passedDoor.SetActive(true);
+            }
 
             if (button != null)
                 button.interactable = !isLocked;
+            
+            if (selectedStageArrow != null)
+                selectedStageArrow.SetActive(isSelected);
+            
+            belowCurrentStageIndicator.SetActive(isViewportBelowCurrentStage);
         }
 
         private void HandleClick()

@@ -35,10 +35,17 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public int EquippedSlotIndex = -1;
     }
 
+    public class SkillAutoEquipResult
+    {
+        public bool Success;
+        public bool HasChanged;
+        public int EquippedCount;
+        public List<int> EquippedSkillIds = new();
+    }
+
     public class SkillViewDataProvider : Singleton<SkillViewDataProvider>
     {
-        [Header("Debug")]
-        [SerializeField] private bool enableDebugLog = true;
+        [Header("Debug")] [SerializeField] private bool enableDebugLog = true;
 
         private Dictionary<int, SkillDataSO> skillCache;
         private Dictionary<HeroClass, List<SkillDataSO>> poolLookup = new();
@@ -73,7 +80,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             if (UserDataCache.Instance != null)
                 UserDataCache.Instance.OnHeroSkillChanged -= HandleHeroSkillChanged;
         }
-        
+
         public void NotifyDataChanged()
         {
             OnDataChanged?.Invoke();
@@ -121,7 +128,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 if (skill == null)
                     continue;
-                
+
                 if (skill.OwnerType != SkillOwnerType.ClassSkill)
                     continue;
 
@@ -195,6 +202,160 @@ namespace Immortal_Switch.Scripts.Skill.UI
             return masterData;
         }
 
+        public async UniTask<SkillAutoEquipResult> TryAutoEquipSkillsToHero(
+            SkillViewHeroContext heroContext)
+        {
+            var result = new SkillAutoEquipResult();
+
+            if (heroContext == null)
+            {
+                LogError("TryAutoEquipSkillsToHero failed because heroContext is null.");
+                return result;
+            }
+
+            if (UserDataCache.Instance == null)
+            {
+                LogError("TryAutoEquipSkillsToHero failed because UserDataCache.Instance is null.");
+                return result;
+            }
+
+            List<SkillDataSO> classPool = GetClassPool(heroContext.HeroClass);
+
+            if (classPool == null || classPool.Count == 0)
+            {
+                LogWarning(
+                    $"TryAutoEquipSkillsToHero found no skill pool for class={heroContext.HeroClass}.");
+                return result;
+            }
+
+            // Chỉ lấy skill đã sở hữu.
+            // Ưu tiên Tier -> Level -> SkillId.
+            List<SkillDataSO> bestSkills = classPool
+                .Where(skill =>
+                {
+                    if (skill == null)
+                        return false;
+
+                    SkillViewSkillState state = BuildSkillState(heroContext, skill);
+                    return state != null && state.IsOwned;
+                })
+                .OrderByDescending(skill => skill.SkillTier)
+                .ThenByDescending(skill =>
+                {
+                    SkillViewSkillState state = BuildSkillState(heroContext, skill);
+                    return state?.Level ?? 1;
+                })
+                .ThenBy(skill => skill.SkillId)
+                .Take(5)
+                .ToList();
+
+            if (bestSkills.Count == 0)
+            {
+                LogWarning(
+                    $"TryAutoEquipSkillsToHero found no owned skills for heroId={heroContext.HeroId}.");
+                return result;
+            }
+
+            List<int> targetSkillIds = bestSkills
+                .Select(skill => skill.SkillId)
+                .ToList();
+
+            // Danh sách theo đúng slot thật (0 = slot trống) — KHÔNG dồn lại, vì so khớp/equip dưới
+            // đây phải làm theo skill_id, không theo vị trí (vị trí thật có thể có khoảng trống nếu
+            // trước đó player unequip không theo thứ tự).
+            List<int> currentSkillIds =
+                UserDataCache.Instance.GetEquippedClassSkillIds(heroContext.HeroId)
+                ?? new List<int>();
+
+            bool hasChanged = false;
+            var keptSkillIds = new HashSet<int>();
+
+            Log(
+                $"TryAutoEquipSkillsToHero started -> " +
+                $"heroId={heroContext.HeroId}, " +
+                $"current=[{string.Join(",", currentSkillIds)}], " +
+                $"target=[{string.Join(",", targetSkillIds)}]");
+
+            // Gỡ những skill đang trang bị nhưng không còn nằm trong target — theo skill_id, không
+            // theo vị trí, để không động vào slot của skill vẫn còn hợp lệ.
+            foreach (int currentSkillId in currentSkillIds)
+            {
+                if (currentSkillId <= 0)
+                    continue;
+
+                if (targetSkillIds.Contains(currentSkillId))
+                {
+                    keptSkillIds.Add(currentSkillId);
+                    continue;
+                }
+
+                bool unequipSuccess = UserDataCache.Instance.UnequipSkill(
+                    heroContext.HeroId,
+                    currentSkillId);
+
+                if (!unequipSuccess)
+                {
+                    LogWarning(
+                        $"Auto equip unequip extra skill failed -> " +
+                        $"heroId={heroContext.HeroId}, skillId={currentSkillId}");
+
+                    continue;
+                }
+
+                hasChanged = true;
+                SyncUnequipAsync(currentSkillId).Forget();
+            }
+
+            // Trang bị các skill còn thiếu vào slot trống thật (HeroSkillController tự tìm slot,
+            // trả về slot thật để gửi đúng lên server — không suy ra slot từ vị trí trong target).
+            foreach (int targetSkillId in targetSkillIds)
+            {
+                if (keptSkillIds.Contains(targetSkillId))
+                    continue;
+
+                int equippedSlotIndex = await UserDataCache.Instance.EquipSkill(
+                    heroContext.HeroId,
+                    targetSkillId);
+
+                if (equippedSlotIndex < 0)
+                {
+                    LogError(
+                        $"Auto equip failed -> " +
+                        $"heroId={heroContext.HeroId}, " +
+                        $"skillId={targetSkillId}");
+
+                    return result;
+                }
+
+                hasChanged = true;
+                keptSkillIds.Add(targetSkillId);
+
+                SyncEquipAsync(
+                    heroContext.HeroId,
+                    targetSkillId,
+                    equippedSlotIndex).Forget();
+            }
+
+            result.Success = true;
+            result.HasChanged = hasChanged;
+            result.EquippedCount = keptSkillIds.Count;
+            result.EquippedSkillIds = keptSkillIds.ToList();
+
+            if (hasChanged)
+            {
+                heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
+                OnDataChanged?.Invoke();
+            }
+
+            Log(
+                $"TryAutoEquipSkillsToHero completed -> " +
+                $"heroId={heroContext.HeroId}, " +
+                $"hasChanged={hasChanged}, " +
+                $"equipped=[{string.Join(",", keptSkillIds)}]");
+
+            return result;
+        }
+
         public bool HasAssignedHero(HeroClass heroClass)
         {
             bool result = PvEBattleController.Instance.HasActiveHeroOfClass(heroClass);
@@ -230,7 +391,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
                     RuntimeController = hero
                 });
 
-                Log($"GetAssignedHeroes -> heroId={heroId}, class={hero.HeroClass}, equipped=[{string.Join(",", equipped)}]");
+                Log(
+                    $"GetAssignedHeroes -> heroId={heroId}, class={hero.HeroClass}, equipped=[{string.Join(",", equipped)}]");
             }
 
             return result;
@@ -250,7 +412,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 ? UserDataCache.Instance.GetEquippedClassSkillIds(heroId)
                 : new List<int>();
 
-            Log($"GetAssignedHeroByClass -> class={heroClass}, heroId={heroId}, equipped=[{string.Join(",", equipped)}]");
+            Log(
+                $"GetAssignedHeroByClass -> class={heroClass}, heroId={heroId}, equipped=[{string.Join(",", equipped)}]");
 
             return new SkillViewHeroContext
             {
@@ -313,7 +476,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             return state;
         }
-        
+
         public SkillViewSkillState BuildSkillStateForNotInBattleHeroTab(SkillDataSO skillData)
         {
             if (skillData == null)
@@ -337,7 +500,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 IsOwned = isOwned,
                 TierSkill = skillData.SkillTier
             };
-            
+
             state.IsEquipped = state.EquippedSlotIndex >= 0;
             return state;
         }
@@ -354,7 +517,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
             var skillList = UserDataCache.Instance?.SkillList;
             if (skillList?.Owned == null) return false;
             foreach (var s in skillList.Owned)
-                if (s.SkillId == skillId) return true;
+                if (s.SkillId == skillId)
+                    return true;
             return false;
         }
 
@@ -376,21 +540,22 @@ namespace Immortal_Switch.Scripts.Skill.UI
                     return state?.TierSkill ?? TierSkill.B;
                 }).ToList();
 
-            Log($"GetSortedPoolForHero -> heroId={heroContext.HeroId}, class={heroContext.HeroClass}, count={sorted.Count}");
+            Log(
+                $"GetSortedPoolForHero -> heroId={heroContext.HeroId}, class={heroContext.HeroClass}, count={sorted.Count}");
             return sorted;
         }
-        
+
         public List<SkillDataSO> GetSortedPoolForNotInBattleHero(HeroClass heroClass)
         {
             var pool = GetClassPool(heroClass);
-            
+
             var sorted = pool
                 .OrderByDescending(x =>
                 {
                     var state = BuildSkillStateForNotInBattleHeroTab(x);
                     return state?.TierSkill ?? TierSkill.B;
                 }).ToList();
-            
+
             return sorted;
         }
 
@@ -410,9 +575,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             Log($"TryEquipSkillToHero -> heroId={heroContext.HeroId}, skillId={skillId}");
 
-            int slotIndex = heroContext.EquippedSkillIds?.Count ?? 0;
-            bool success = await UserDataCache.Instance.EquipSkill(heroContext.HeroId, skillId);
-            if (!success)
+            int slotIndex = await UserDataCache.Instance.EquipSkill(heroContext.HeroId, skillId);
+            if (slotIndex < 0)
             {
                 LogWarning($"TryEquipSkillToHero failed -> heroId={heroContext.HeroId}, skillId={skillId}");
                 return false;
@@ -423,7 +587,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             SyncEquipAsync(heroContext.HeroId, skillId, slotIndex).Forget();
 
-            Log($"TryEquipSkillToHero success -> heroId={heroContext.HeroId}, skillId={skillId}, slotIndex={slotIndex}");
+            Log(
+                $"TryEquipSkillToHero success -> heroId={heroContext.HeroId}, skillId={skillId}, slotIndex={slotIndex}");
             return true;
         }
 
@@ -459,7 +624,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
             return true;
         }
 
-        public async UniTask<bool> TryReplaceSkillOnHero(SkillViewHeroContext heroContext, int slotIndex, int newSkillId)
+        public async UniTask<bool> TryReplaceSkillOnHero(SkillViewHeroContext heroContext, int slotIndex,
+            int newSkillId)
         {
             if (heroContext == null)
             {
@@ -473,12 +639,14 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 return false;
             }
 
-            Log($"TryReplaceSkillOnHero -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
+            Log(
+                $"TryReplaceSkillOnHero -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
 
             bool success = await UserDataCache.Instance.ReplaceSkill(heroContext.HeroId, slotIndex, newSkillId);
             if (!success)
             {
-                LogWarning($"TryReplaceSkillOnHero failed -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
+                LogWarning(
+                    $"TryReplaceSkillOnHero failed -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
                 return false;
             }
 
@@ -487,7 +655,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             SyncEquipAsync(heroContext.HeroId, newSkillId, slotIndex).Forget();
 
-            Log($"TryReplaceSkillOnHero success -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
+            Log(
+                $"TryReplaceSkillOnHero success -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
             return true;
         }
 
@@ -495,7 +664,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
 
-            string heroUid  = UserDataCache.Instance?.GetHeroUid(heroId);
+            string heroUid = UserDataCache.Instance?.GetHeroUid(heroId);
             string skillUid = UserDataCache.Instance?.GetSkillUid(skillId);
             if (heroUid == null || skillUid == null)
             {
@@ -505,8 +674,18 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             try
             {
-                await NakamaClient.Instance.SkillEquipAsync(heroUid, slotIndex, skillUid);
-                Log($"SyncEquipAsync done — heroUid={heroUid}, skillUid={skillUid}, slot={slotIndex}");
+                var response = await NakamaClient.Instance.SkillEquipAsync(heroUid, slotIndex, skillUid);
+                if (response != null && response.Updated)
+                {
+                    // Server có thể đã âm thầm gỡ skill này khỏi 1 hero/slot khác (xem
+                    // Docs/api_skill_equip.md mục 1) — đối soát toàn bộ map, không chỉ hero vừa thao tác.
+                    UserDataCache.Instance?.ReconcileEquippedFromServer(response.Equipped);
+                    Log($"SyncEquipAsync done — heroUid={heroUid}, skillUid={skillUid}, slot={slotIndex}");
+                }
+                else
+                {
+                    LogWarning($"SyncEquipAsync not updated — heroUid={heroUid}, skillUid={skillUid}, slot={slotIndex}");
+                }
             }
             catch (ApiResponseException ex) when (ex.StatusCode == 16)
             {
@@ -531,8 +710,18 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             try
             {
-                await NakamaClient.Instance.SkillUnequipAsync(skillUid);
-                Log($"SyncUnequipAsync done — skillUid={skillUid}");
+                var response = await NakamaClient.Instance.SkillUnequipAsync(skillUid);
+                if (response != null && response.Updated)
+                {
+                    UserDataCache.Instance?.ReconcileEquippedFromServer(response.Equipped);
+                    Log($"SyncUnequipAsync done — skillUid={skillUid}");
+                }
+                else
+                {
+                    // "not_equipped" — skill đã ở trạng thái mong muốn từ trước, không phải lỗi (xem
+                    // Docs/api_skill_equip.md mục 5), nhưng không phải "done" thật nên log riêng.
+                    LogWarning($"SyncUnequipAsync not updated (reason={response?.Reason}) — skillUid={skillUid}");
+                }
             }
             catch (ApiResponseException ex) when (ex.StatusCode == 16)
             {

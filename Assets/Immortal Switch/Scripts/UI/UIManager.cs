@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -91,6 +92,12 @@ namespace Immortal_Switch.Scripts.UI
 
         [SerializeField] 
         private CanvasScaler canvasScaler;
+        
+        [Header("Toast")]
+        [SerializeField]
+        private ToastMessageView toastMessagePrefab;
+
+        private ToastMessageView _toastMessageInstance;
 
         // ===== Layer roots =====
         private readonly Dictionary<UILayer, RectTransform> _layerRoots = new();
@@ -160,6 +167,37 @@ namespace Immortal_Switch.Scripts.UI
             CreateLayerRootsFromEnum();
             InitLayerLists();
             await InitMainScene();
+        }
+        
+        [Button]
+        public void ShowToast(string message, float displayDuration = 1.5f)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            if (_toastMessageInstance == null)
+            {
+                if (toastMessagePrefab == null)
+                {
+                    Debug.LogError("[UIManager] Toast Message Prefab has not been assigned.");
+                    return;
+                }
+
+                var toastRoot = GetLayerRoot(UILayer.Toast);
+                if (toastRoot == null)
+                {
+                    Debug.LogError("[UIManager] UILayer.Toast root was not found.");
+                    return;
+                }
+
+                _toastMessageInstance = Instantiate(
+                    toastMessagePrefab,
+                    toastRoot,
+                    false);
+            }
+
+            _toastMessageInstance.transform.SetAsLastSibling();
+            _toastMessageInstance.Show(message, displayDuration);
         }
 
         #region Layer Roots

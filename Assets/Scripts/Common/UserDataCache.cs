@@ -185,14 +185,16 @@ namespace Common
                     return skillIds;
                 }
 
+                // Giữ đúng vị trí slot thật (0 = slot trống) — KHÔNG dồn (compact) danh sách,
+                // vì server lưu equipped[hero_uid] là mảng cố định 5 phần tử theo slot_index thật
+                // (xem docs/api_skill_equip.md). Nếu dồn lại, slotIndex tính từ List.Count ở các
+                // hàm gọi (TryEquipSkillToHero, TryAutoEquipSkillsToHero) sẽ lệch khỏi slot thật
+                // ngay khi 1 skill bị unequip không phải ở cuối danh sách, khiến lần equip kế tiếp
+                // ghi đè/làm mất skill ở slot khác trên server.
                 for (int j = 0; j < equippedSkills.Count; j++)
                 {
                     var skill = equippedSkills[j];
-
-                    if (skill != null)
-                    {
-                        skillIds.Add(skill.SkillId);
-                    }
+                    skillIds.Add(skill != null ? skill.SkillId : 0);
                 }
 
                 return skillIds;
@@ -217,10 +219,18 @@ namespace Common
         public SkillDataSO GetEquippedSkillDataById(int heroId,int skillId)
         {
             var currentHero = GetInBattleHeroActorById(heroId);
-            for (int i = 0; i < currentHero.HeroSkillController.GetAllEquippedClassSkills().Count; i++)
+
+            List<SkillDataSO> allEquipClassSkill = currentHero.HeroSkillController.GetAllEquippedClassSkills();
+
+            if (allEquipClassSkill == null)
             {
-                SkillDataSO skillData = currentHero.HeroSkillController.GetAllEquippedClassSkills()[i];
-                if (skillData.SkillId == skillId)
+                return null;
+            }
+            
+            for (int i = 0; i < allEquipClassSkill.Count; i++)
+            {
+                SkillDataSO skillData = allEquipClassSkill[i];
+                if (skillData != null && skillData.SkillId == skillId)
                 {
                     return skillData;
                 }
@@ -314,23 +324,26 @@ namespace Common
 
         #region HERO LOADOUT
 
-        public async UniTask<bool> EquipSkill(int heroId, int skillId)
+        /// <summary>Trang bị skill vào slot trống đầu tiên (thật, không phải vị trí đã dồn).
+        /// Trả về slot_index thật đã dùng để caller gửi đúng lên server (skill/equip), hoặc -1 nếu
+        /// không trang bị được.</summary>
+        public async UniTask<int> EquipSkill(int heroId, int skillId)
         {
             HeroActor currentHero = GetInBattleHeroActorById(heroId);
-        
+
             if (!IsUnlocked(currentHero.HeroClass, skillId))
-                return false;
-            
+                return -1;
+
             SkillDataSO skillToEquip = MasterDataCache.Instance.GetSkillDataById(skillId);
 
-            bool equipResult = currentHero.HeroSkillController.CanEquipClassSkill(skillToEquip, out _);
-            if (equipResult)
-            {
-                await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(skillToEquip);
-                currentHero.HeroSkillController.EquipSkill(skillToEquip);
-                OnHeroSkillChanged?.Invoke(heroId);
-            }
-            return equipResult;
+            bool canEquip = currentHero.HeroSkillController.CanEquipClassSkill(skillToEquip, out int slotIndex);
+            if (!canEquip)
+                return -1;
+
+            await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(skillToEquip);
+            currentHero.HeroSkillController.EquipSkill(skillToEquip);
+            OnHeroSkillChanged?.Invoke(heroId);
+            return slotIndex;
         }
 
         public bool UnequipSkill(int heroId, int skillId)
@@ -359,6 +372,68 @@ namespace Common
             bool equipResult = currentHero.HeroSkillController.ReplaceSkillAt(slot, skillData, true);
             OnHeroSkillChanged?.Invoke(heroId);
             return equipResult;
+        }
+
+        /// <summary>uid → skill_id, dùng để resolve mảng equipped[hero_uid] (skill_uid) trả về từ server.</summary>
+        private int GetSkillIdByUid(string skillUid)
+        {
+            if (string.IsNullOrEmpty(skillUid) || SkillList?.Owned == null) return 0;
+            foreach (var s in SkillList.Owned)
+                if (s.Uid == skillUid) return s.SkillId;
+            return 0;
+        }
+
+        /// <summary>Resolve mảng skill_uid|null (5 slot) của 1 hero_uid trong SkillList.Equipped thành SkillDataSO.
+        /// Trả null nếu hero_uid chưa có entry nào trong map (khác với "có entry nhưng toàn slot trống").</summary>
+        private List<SkillDataSO> ResolveEquippedSkillData(string heroUid)
+        {
+            if (string.IsNullOrEmpty(heroUid) || SkillList?.Equipped == null) return null;
+            if (!SkillList.Equipped.TryGetValue(heroUid, out var slotSkillUids) || slotSkillUids == null) return null;
+
+            var result = new List<SkillDataSO>(slotSkillUids.Length);
+            foreach (var skillUid in slotSkillUids)
+            {
+                int skillId = GetSkillIdByUid(skillUid);
+                result.Add(skillId > 0 ? MasterDataCache.Instance.GetSkillDataById(skillId) : null);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Áp loadout skill từ server (SkillList.Equipped) lên 1 hero vừa spawn — gọi từ HeroActor.Init,
+        /// nhận trực tiếp instance vì tại thời điểm đó hero CHƯA được đăng ký vào inBattleHeroes
+        /// (PvEBattleController chỉ gán sau khi Init trả về) nên không thể lookup qua GetInBattleHeroActorById.
+        /// Nếu hero_uid chưa có entry nào trong Equipped (chưa từng equip qua server), giữ nguyên skill
+        /// mặc định bake sẵn trên prefab — không xoá trắng.
+        /// </summary>
+        public void ApplyServerLoadoutToHero(HeroActor actor, int heroId)
+        {
+            var resolved = ResolveEquippedSkillData(GetHeroUid(heroId));
+            if (resolved == null) return;
+
+            actor?.HeroSkillController.SetClassSkills(resolved);
+        }
+
+        /// <summary>
+        /// Đối soát toàn bộ map equipped trả về từ skill/equip hoặc skill/unequip — ghi đè SkillList.Equipped
+        /// và áp lại cho MỌI hero đang in-battle (không chỉ hero vừa thao tác), vì server có thể đã âm thầm
+        /// gỡ skill khỏi 1 hero/slot khác (xem Docs/api_skill_equip.md mục 1 — "ghi đè im lặng").
+        /// </summary>
+        public void ReconcileEquippedFromServer(Dictionary<string, string[]> equippedMap)
+        {
+            if (SkillList == null) SkillList = new SkillListResponse();
+            SkillList.Equipped = equippedMap;
+
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                HeroActor actor = inBattleHeroes[i];
+                if (actor?.HeroData == null) continue;
+
+                string heroUid = GetHeroUid(actor.HeroData.Id);
+                var resolved = ResolveEquippedSkillData(heroUid) ?? new List<SkillDataSO>();
+                actor.HeroSkillController.SetClassSkills(resolved);
+                OnHeroSkillChanged?.Invoke(actor.HeroData.Id);
+            }
         }
 
         #endregion

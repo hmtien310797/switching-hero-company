@@ -53,6 +53,24 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             growthManager.OnTierReadyToUpgradePopup -= HandleTierReadyPopup;
         }
 
+        public override async UniTask PlayShowAsync(object args)
+        {
+            await RefreshFromServerAsync();
+
+            base.PlayShowAsync(args).Forget();
+        }
+
+        /// <summary>
+        /// Gọi growth/state lấy tiến trình mới nhất cho tài khoản hiện tại, rồi sync vào GrowthManager
+        /// trước khi build UI — tránh hiển thị data cũ leak từ tài khoản/session khác (xem
+        /// Docs/be-growth-rpc-spec.md mục 8).
+        /// </summary>
+        private async UniTask RefreshFromServerAsync()
+        {
+            await growthManager.SyncFromServerAsync();
+            growthManager.CheckAndNotifyTierReady();
+        }
+
         public void RefreshUI()
         {
             BigNumber currentGold = CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.gold);
@@ -105,7 +123,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
             tierUpgradePopupView.Show(popupData, () =>
             {
-                growthManager.UnlockTier(nextTier);
+                growthManager.UnlockTier();
                 tierUpgradePopupView.Hide();
                 RefreshUI();
             });

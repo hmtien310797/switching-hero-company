@@ -59,6 +59,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             bool isSelected = stage == selectedStage;
             bool isCurrentStage = stage == currentBattleStage;
             bool isLocked = stage > highestUnlockedStage;
+            var isViewportBelowCurrentStage = stage < highestUnlockedStage && !isSelected;
 
             Sprite icon = await GetStageIcon(data);
 
@@ -68,6 +69,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 isSelected,
                 isLocked,
                 isCurrentStage,
+                isViewportBelowCurrentStage,
                 onStageClicked
             );
         }

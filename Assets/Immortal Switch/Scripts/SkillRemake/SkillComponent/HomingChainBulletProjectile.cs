@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Battle;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
@@ -39,6 +41,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
             );
         }
     }
+    
 
     public void Setup(
         ICombatUnit owner,
@@ -585,8 +588,20 @@ public class HomingChainBulletProjectile : MonoBehaviour,
         previousPosition = Vector3.zero;
     }
 
+    private void OnEnable()
+    {
+        GameEventManager.Subscribe(GameEvents.OnStageChange, DespawnSelf);
+    }
+
     private void OnDisable()
     {
         KillMoveTween();
+        GameEventManager.Unsubscribe(GameEvents.OnStageChange, DespawnSelf);
+    }
+    
+
+    private void OnDestroy()
+    {
+        GameEventManager.Unsubscribe(GameEvents.OnStageChange, DespawnSelf);
     }
 }

@@ -154,6 +154,11 @@ namespace Immortal_Switch.Scripts.Skill
                 waitingForHit = true;
                 animationCompleted = false;
 
+                if (jumpIndex == 0)
+                {
+                    yield return new WaitForSeconds(0.5f);
+                }
+
                 float animationDuration = PlayUltimateAnimation();
                 yield return new WaitForSeconds(0.3f);
                 yield return MoveTweenRoutine(landingPosition);
@@ -170,6 +175,8 @@ namespace Immortal_Switch.Scripts.Skill
             routine = null;
             Context.SkillController.FinishCustomBehaviour(this, true);
         }
+        
+        
 
         private float PlayUltimateAnimation()
         {

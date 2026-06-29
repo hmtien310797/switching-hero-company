@@ -14,7 +14,6 @@ namespace Immortal_Switch.Scripts.StageSelection
         
         [Header("Header")]
         [SerializeField] private TMP_Text chapterNameText;
-        [SerializeField] private TMP_Text chapterRangeText;
         [SerializeField] private TMP_Text selectedStageText;
 
         [Header("Rewards")]
@@ -115,9 +114,6 @@ namespace Immortal_Switch.Scripts.StageSelection
             if (chapterNameText != null)
                 chapterNameText.text = "-";
 
-            if (chapterRangeText != null)
-                chapterRangeText.text = "-";
-
             if (selectedStageText != null)
                 selectedStageText.text = "-";
 
@@ -144,10 +140,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 return;
 
             if (chapterNameText != null)
-                chapterNameText.text = $"{data.ChapterId}. {data.ChapterName}";
-
-            if (chapterRangeText != null)
-                chapterRangeText.text = $"{data.ChapterStartStage}~{data.ChapterEndStage}";
+                chapterNameText.text = $"{data.ChapterName}\n{data.ChapterStartStage}~{data.ChapterEndStage}";
         }
         
         private void HandleMoveStageClicked()

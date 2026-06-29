@@ -20,7 +20,16 @@ namespace Immortal_Switch.Scripts.Combat
         private float tickTimer;
 
         public bool IsExpired => RemainingDuration <= 0f;
-        public bool IsValid => Target != null && Target.Stats.HealthModule != null;
+
+        public bool IsValid()
+        {
+            if (!Target.IsUnityAlive())
+            {
+                return false;
+            }
+
+            return Target.Stats.HealthModule != null;
+        }
 
         public DotInstance(
             string effectId,
@@ -59,7 +68,7 @@ namespace Immortal_Switch.Scripts.Combat
 
         public void Update(float deltaTime)
         {
-            if (!IsValid || IsExpired)
+            if (!IsValid() || IsExpired)
                 return;
 
             RemainingDuration -= deltaTime;

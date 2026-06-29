@@ -2,50 +2,79 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-// ── Weapon Instance ───────────────────────────────────────────────────────────
+// ── weapon/list ───────────────────────────────────────────────────────────────
+// Xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 3 — id-based, thay thế hoàn toàn shape
+// owned[]/shards{}/equipped{} (uid-based) cũ vì thiếu limit_break_stage và chưa từng được client
+// dùng. player/me.weapons cũng dùng chung shape WeaponListResponse này.
 
 [Serializable]
-public class WeaponInstance
+public class WeaponStandardStateDto
 {
-    /// <summary>Unique instance ID — dùng để equip/unequip.</summary>
-    [JsonProperty("uid")]       public string Uid;
-    [JsonProperty("weapon_id")] public int    WeaponId;
-    [JsonProperty("name")]      public string Name;
-    /// <summary>"D"|"C"|"B"|"A"|"S"|"SS"</summary>
-    [JsonProperty("grade")]     public string Grade;
-    /// <summary>1–5</summary>
-    [JsonProperty("star")]      public int    Star;
-    [JsonProperty("level")]     public int    Level;
-    [JsonProperty("exp")]       public int    Exp;
+    [JsonProperty("weapon_id")]         public int  WeaponId;
+    [JsonProperty("is_unlocked")]       public bool IsUnlocked;
+    [JsonProperty("level")]             public int  Level;
+    [JsonProperty("limit_break_stage")] public int  LimitBreakStage;
+    [JsonProperty("shard")]             public int  Shard;
 }
 
-// ── weapon/list ───────────────────────────────────────────────────────────────
+[Serializable]
+public class WeaponExclusiveStateDto
+{
+    [JsonProperty("exclusive_weapon_id")] public int  ExclusiveWeaponId;
+    [JsonProperty("hero_id")]             public int  HeroId;
+    [JsonProperty("is_unlocked")]         public bool IsUnlocked;
+    [JsonProperty("level")]               public int  Level;
+    [JsonProperty("limit_break_stage")]   public int  LimitBreakStage;
+    [JsonProperty("shard")]               public int  Shard;
+    [JsonProperty("star")]                public int  Star;
+}
 
+[Serializable]
+public class WeaponHeroEquipDto
+{
+    [JsonProperty("hero_id")]                      public int  HeroId;
+    [JsonProperty("equipped_standard_weapon_id")]  public int  EquippedStandardWeaponId;
+    [JsonProperty("equipped_exclusive_weapon_id")] public int  EquippedExclusiveWeaponId;
+    [JsonProperty("use_exclusive")]                public bool UseExclusive;
+}
+
+/// <summary>Response từ weapon/list (và field player/me.weapons) — toàn bộ state hiện tại của user.</summary>
 [Serializable]
 public class WeaponListResponse
 {
-    [JsonProperty("owned")]    public WeaponInstance[]           Owned;
-    /// <summary>weapon_id (string) → số lượng shard. VD: { "15": 2 }</summary>
-    [JsonProperty("shards")]   public Dictionary<string, int>    Shards;
-    /// <summary>hero_uid → weapon_uid | null (1 slot / hero)</summary>
-    [JsonProperty("equipped")] public Dictionary<string, string> Equipped;
+    [JsonProperty("standard")]   public List<WeaponStandardStateDto>  Standard;
+    [JsonProperty("exclusive")]  public List<WeaponExclusiveStateDto> Exclusive;
+    [JsonProperty("hero_equip")] public List<WeaponHeroEquipDto>      HeroEquip;
 }
 
 // ── weapon/equip ──────────────────────────────────────────────────────────────
+// Xem Docs/be-weapon-equip-upgrade-rpc-spec.md — id-based (weapon_id/hero_id), không dùng
+// hero_uid/weapon_uid (contract nháp cũ, chưa từng được client gọi).
 
 [Serializable]
 public class WeaponEquipRequest
 {
-    [JsonProperty("hero_uid")]   public string HeroUid;
-    /// <summary>uid của weapon. null hoặc "" để bỏ trang bị.</summary>
-    [JsonProperty("weapon_uid")] public string WeaponUid;
+    [JsonProperty("hero_id")]   public int    HeroId;
+    /// <summary>"standard" | "exclusive"</summary>
+    [JsonProperty("category")] public string Category;
+    /// <summary>weapon_id (master data). Bắt buộc khi category = "standard"; bỏ qua khi "exclusive".</summary>
+    [JsonProperty("weapon_id")] public int    WeaponId;
 }
 
+/// <summary>Response từ weapon/equip. Khi Success = false, chỉ Error có giá trị.</summary>
 [Serializable]
 public class WeaponEquipResponse
 {
-    [JsonProperty("updated")]  public bool                        Updated;
-    [JsonProperty("equipped")] public Dictionary<string, string>  Equipped;
+    [JsonProperty("success")] public bool   Success;
+    /// <summary>"INVALID_HERO_ID" | "INVALID_CATEGORY" | "INVALID_WEAPON_ID" | "WEAPON_CLASS_MISMATCH" | "WEAPON_NOT_OWNED" | "EXCLUSIVE_NOT_FOUND" | "EXCLUSIVE_NOT_OWNED"</summary>
+    [JsonProperty("error")]   public string Error;
+
+    [JsonProperty("hero_id")] public int    HeroId;
+    /// <summary>"standard" | "exclusive" | "none"</summary>
+    [JsonProperty("active_source")] public string ActiveSource;
+    [JsonProperty("equipped_standard_weapon_id")]  public int  EquippedStandardWeaponId;
+    [JsonProperty("equipped_exclusive_weapon_id")] public int  EquippedExclusiveWeaponId;
+    [JsonProperty("use_exclusive")] public bool UseExclusive;
 }
 
 // ── weapon/unequip ────────────────────────────────────────────────────────────
@@ -96,4 +125,78 @@ public class WeaponFuseResponse
     [JsonProperty("shard_balance")] public int    ShardBalance;
     /// <summary>true nếu node mới (sau khi fuse) không thể fuse tiếp.</summary>
     [JsonProperty("is_max_node")]   public bool   IsMaxNode;
+}
+
+// ── weapon/upgrade (level up) ─────────────────────────────────────────────────
+// Xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 4.
+
+[Serializable]
+public class WeaponUpgradeRequest
+{
+    /// <summary>"standard" | "exclusive"</summary>
+    [JsonProperty("category")]  public string Category;
+    /// <summary>weapon_id (master data). Bắt buộc khi category = "standard".</summary>
+    [JsonProperty("weapon_id")] public int    WeaponId;
+    /// <summary>hero_id. Bắt buộc khi category = "exclusive".</summary>
+    [JsonProperty("hero_id")]   public int    HeroId;
+}
+
+/// <summary>Response từ weapon/upgrade. Khi Success = false, chỉ Error có giá trị.</summary>
+[Serializable]
+public class WeaponUpgradeResponse
+{
+    [JsonProperty("success")] public bool   Success;
+    /// <summary>"INVALID_CATEGORY" | "INVALID_WEAPON_ID" | "INVALID_HERO_ID" | "WEAPON_NOT_OWNED" | "EXCLUSIVE_NOT_OWNED" | "CONFIG_NOT_FOUND" | "MAX_LEVEL_REACHED"</summary>
+    [JsonProperty("error")]   public string Error;
+
+    [JsonProperty("category")]  public string Category;
+    [JsonProperty("weapon_id")] public int    WeaponId;
+    [JsonProperty("hero_id")]   public int    HeroId;
+
+    [JsonProperty("old_level")] public int OldLevel;
+    [JsonProperty("new_level")] public int NewLevel;
+    [JsonProperty("current_limit_break_stage")] public int CurrentLimitBreakStage;
+    [JsonProperty("current_max_level")]         public int CurrentMaxLevel;
+
+    /// <summary>Số WeaponEnhancementStone đáng lẽ phải trừ — server hiện KHÔNG validate/trừ thật, xem mục 7 doc.</summary>
+    [JsonProperty("stone_cost")]   public int  StoneCost;
+    [JsonProperty("is_max_level")] public bool IsMaxLevel;
+}
+
+// ── weapon/limitbreak ─────────────────────────────────────────────────────────
+// Xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 5.
+
+[Serializable]
+public class WeaponLimitBreakRequest
+{
+    /// <summary>"standard" | "exclusive"</summary>
+    [JsonProperty("category")]  public string Category;
+    /// <summary>weapon_id (master data). Bắt buộc khi category = "standard".</summary>
+    [JsonProperty("weapon_id")] public int    WeaponId;
+    /// <summary>hero_id. Bắt buộc khi category = "exclusive".</summary>
+    [JsonProperty("hero_id")]   public int    HeroId;
+}
+
+/// <summary>Response từ weapon/limitbreak. Khi Success = false, chỉ Error có giá trị.</summary>
+[Serializable]
+public class WeaponLimitBreakResponse
+{
+    [JsonProperty("success")] public bool   Success;
+    /// <summary>"INVALID_CATEGORY" | "INVALID_WEAPON_ID" | "INVALID_HERO_ID" | "WEAPON_NOT_OWNED" | "EXCLUSIVE_NOT_OWNED" | "CONFIG_NOT_FOUND" | "MAXED" | "REQUIRED_LEVEL_NOT_REACHED"</summary>
+    [JsonProperty("error")]   public string Error;
+
+    [JsonProperty("category")]  public string Category;
+    [JsonProperty("weapon_id")] public int    WeaponId;
+    [JsonProperty("hero_id")]   public int    HeroId;
+
+    /// <summary>"success" | "failed" — kết quả roll theo success_rate (server RNG).</summary>
+    [JsonProperty("result")]        public string Result;
+    [JsonProperty("old_stage")]     public int    OldStage;
+    /// <summary>Giữ nguyên old_stage nếu result = "failed".</summary>
+    [JsonProperty("new_stage")]     public int    NewStage;
+    [JsonProperty("new_max_level")] public int    NewMaxLevel;
+
+    /// <summary>Số WeaponBreakThroughStone đáng lẽ phải trừ — tốn cả khi fail. Server hiện KHÔNG validate/trừ thật, xem mục 7 doc.</summary>
+    [JsonProperty("stone_cost")] public int  StoneCost;
+    [JsonProperty("is_maxed")]   public bool IsMaxed;
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
 using Immortal_Switch.Scripts.Equipment.Runtime;
@@ -76,6 +77,91 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             saveData = ES3.KeyExists(SaveKey)
                 ? ES3.Load<WeaponSaveData>(SaveKey)
                 : new WeaponSaveData();
+        }
+
+        /// <summary>
+        /// Sync toàn bộ weapon collection từ server (weapon/list, player/me.weapons) — nguồn sự thật.
+        /// Ghi đè toàn bộ state local (không merge) — weapon nào unlock ở local (qua debug tool) mà
+        /// server không có sẽ tự "khoá lại" sau lần sync này, tránh leak state cheat/account khác
+        /// (xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 3 &amp; 9).
+        /// </summary>
+        public void SyncFromServer(WeaponListResponse response, bool autoSave = true)
+        {
+            if (response == null)
+                return;
+
+            saveData.StandardWeapons.Clear();
+            if (response.Standard != null)
+            {
+                foreach (var dto in response.Standard)
+                {
+                    saveData.StandardWeapons.Add(new StandardWeaponState
+                    {
+                        WeaponId = dto.WeaponId,
+                        IsUnlocked = dto.IsUnlocked,
+                        Level = Mathf.Max(1, dto.Level),
+                        LimitBreakStage = Mathf.Max(0, dto.LimitBreakStage),
+                        CurrentShard = Mathf.Max(0, dto.Shard)
+                    });
+                }
+            }
+
+            saveData.ExclusiveWeapons.Clear();
+            if (response.Exclusive != null)
+            {
+                foreach (var dto in response.Exclusive)
+                {
+                    saveData.ExclusiveWeapons.Add(new ExclusiveWeaponState
+                    {
+                        ExclusiveWeaponId = dto.ExclusiveWeaponId,
+                        HeroId = dto.HeroId,
+                        IsUnlocked = dto.IsUnlocked,
+                        Level = Mathf.Max(1, dto.Level),
+                        LimitBreakStage = Mathf.Max(0, dto.LimitBreakStage),
+                        CurrentShard = Mathf.Max(0, dto.Shard),
+                        CurrentStar = Mathf.Max(1, dto.Star)
+                    });
+                }
+            }
+
+            saveData.HeroEquips.Clear();
+            if (response.HeroEquip != null)
+            {
+                foreach (var dto in response.HeroEquip)
+                {
+                    saveData.HeroEquips.Add(new HeroWeaponEquipEntry
+                    {
+                        HeroId = dto.HeroId,
+                        EquippedStandardWeaponId = dto.EquippedStandardWeaponId,
+                        EquippedExclusiveWeaponId = dto.EquippedExclusiveWeaponId,
+                        UseExclusive = dto.UseExclusive
+                    });
+                }
+            }
+
+            if (autoSave)
+                Save();
+        }
+
+        /// <summary>Gọi weapon/list rồi apply ngay qua <see cref="SyncFromServer"/> — dùng khi cần re-sync (mở màn hình Trang Bị).</summary>
+        public async UniTask<bool> SyncFromServerAsync()
+        {
+            WeaponListResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.GetWeaponListAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[WeaponManager] weapon/list RPC failed: {e.Message}");
+                return false;
+            }
+
+            if (response == null)
+                return false;
+
+            SyncFromServer(response);
+            return true;
         }
 
         public void UnlockStandard(int weaponId, bool autoSave = true)
@@ -178,11 +264,32 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
         }
 
-        public bool EquipStandard(int heroId, HeroClass heroClass, int weaponId, bool autoSave = true)
+        /// <summary>
+        /// Equip standard weapon cho hero qua RPC weapon/equip. Server là nguồn sự thật — validate
+        /// class/ownership + set use_exclusive=false, client chỉ apply lại kết quả trả về
+        /// (xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 3).
+        /// </summary>
+        public async UniTask<bool> EquipStandardAsync(int heroId, int weaponId, bool autoSave = true)
         {
-            bool result = equip.EquipStandard(heroId, heroClass, weaponId);
-            if (!result)
+            WeaponEquipResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.EquipWeaponAsync(heroId, "standard", weaponId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[WeaponManager] weapon/equip RPC failed for heroId={heroId}, weaponId={weaponId}: {e.Message}");
                 return false;
+            }
+
+            if (response == null || !response.Success)
+            {
+                if (response != null)
+                    Debug.LogWarning($"[WeaponManager] weapon/equip rejected for heroId={heroId}, weaponId={weaponId}: {response.Error}");
+                return false;
+            }
+
+            ApplyEquipResult(response);
 
             if (autoSave)
                 Save();
@@ -191,11 +298,28 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             return true;
         }
 
-        public bool EquipExclusive(int heroId, bool autoSave = true)
+        /// <summary>Equip exclusive weapon của hero qua RPC weapon/equip (server tự suy weapon từ heroId).</summary>
+        public async UniTask<bool> EquipExclusiveAsync(int heroId, bool autoSave = true)
         {
-            bool result = equip.EquipExclusive(heroId);
-            if (!result)
+            WeaponEquipResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.EquipWeaponAsync(heroId, "exclusive");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[WeaponManager] weapon/equip RPC failed for heroId={heroId} (exclusive): {e.Message}");
                 return false;
+            }
+
+            if (response == null || !response.Success)
+            {
+                if (response != null)
+                    Debug.LogWarning($"[WeaponManager] weapon/equip rejected for heroId={heroId} (exclusive): {response.Error}");
+                return false;
+            }
+
+            ApplyEquipResult(response);
 
             if (autoSave)
                 Save();
@@ -204,42 +328,56 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             return true;
         }
 
-        public bool TryAutoEquip(int heroId, HeroClass heroClass, bool autoSave = true)
+        private void ApplyEquipResult(WeaponEquipResponse response)
         {
-            bool result = autoEquip.AutoEquip(heroId, heroClass);
-            if (!result)
+            var equipEntry = inventory.GetOrCreateHeroEquip(response.HeroId);
+            equipEntry.EquippedStandardWeaponId = response.EquippedStandardWeaponId;
+            equipEntry.EquippedExclusiveWeaponId = response.EquippedExclusiveWeaponId;
+            equipEntry.UseExclusive = response.UseExclusive;
+        }
+
+        /// <summary>
+        /// Tự động chọn vũ khí tốt nhất đang sở hữu rồi equip qua cùng RPC weapon/equip với nút
+        /// Equip thủ công (server là nguồn sự thật) — phần "chọn vũ khí nào" vẫn tính local
+        /// (<see cref="WeaponAutoEquipService.GetBestStandardForClass"/>) vì chỉ xét trong số đã
+        /// sở hữu/đã sync, không cần round-trip riêng. Trước đây gọi local-only qua
+        /// <c>WeaponEquipService</c> nên lựa chọn auto-equip không persist lên server và bị
+        /// <see cref="SyncFromServer"/> ghi đè mất ở lần sync kế tiếp — nay đã fix.
+        /// </summary>
+        public async UniTask<bool> TryAutoEquipAsync(int heroId, HeroClass heroClass, bool autoSave = true)
+        {
+            var exclusive = database.GetExclusiveByHeroId(heroId);
+            if (exclusive != null)
+            {
+                var exState = inventory.GetOrCreateExclusiveState(exclusive.ExclusiveWeaponId, heroId);
+                if (exState.IsUnlocked)
+                    return await EquipExclusiveAsync(heroId, autoSave);
+            }
+
+            var best = autoEquip.GetBestStandardForClass(heroClass);
+            if (best == null)
                 return false;
 
-            if (autoSave)
-                Save();
-
-            NotifyHeroWeaponChanged(heroId);
-            return true;
+            return await EquipStandardAsync(heroId, best.WeaponId, autoSave);
         }
-        
-        public bool TryAutoEquipForHeroes(IEnumerable<HeroActor> heroes, bool autoSave = true)
+
+        public async UniTask<bool> TryAutoEquipForHeroesAsync(IEnumerable<HeroActor> heroes, bool autoSave = true)
         {
             if (heroes == null)
                 return false;
 
-            var heroList = new List<HeroActor>(heroes);
-            bool result = autoEquip.AutoEquipForHeroes(heroList);
-            if (!result)
-                return false;
+            bool changedAny = false;
 
-            if (autoSave)
-                Save();
-
-            for (int i = 0; i < heroList.Count; i++)
+            foreach (var hero in heroes)
             {
-                var hero = heroList[i];
                 if (hero == null || !hero.gameObject.activeInHierarchy)
                     continue;
 
-                NotifyHeroWeaponChanged(hero.GetHeroId());
+                bool changed = await TryAutoEquipAsync(hero.GetHeroId(), hero.HeroClass, autoSave);
+                changedAny |= changed;
             }
 
-            return true;
+            return changedAny;
         }
         
         /// <summary>
@@ -443,11 +581,34 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             return uiResult;
         }
 
-        public bool TryLevelUpStandard(int weaponId, bool autoSave = true)
+        /// <summary>
+        /// Level up standard weapon qua RPC weapon/upgrade. Server validate trần level theo
+        /// limit-break stage, client apply level mới rồi mới trừ WeaponEnhancementStone local
+        /// theo stone_cost server trả về (currency chưa được server validate — xem
+        /// Docs/be-weapon-equip-upgrade-rpc-spec.md mục 4 &amp; 7).
+        /// </summary>
+        public async UniTask<bool> TryLevelUpStandardAsync(int weaponId, bool autoSave = true)
         {
-            bool result = upgrade.TryLevelUpStandard(weaponId);
-            if (!result)
+            WeaponUpgradeResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.UpgradeWeaponAsync("standard", weaponId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[WeaponManager] weapon/upgrade RPC failed for weaponId={weaponId}: {e.Message}");
                 return false;
+            }
+
+            if (response == null || !response.Success)
+            {
+                if (response != null)
+                    Debug.LogWarning($"[WeaponManager] weapon/upgrade rejected for weaponId={weaponId}: {response.Error}");
+                return false;
+            }
+
+            inventory.GetOrCreateStandardState(weaponId).Level = response.NewLevel;
+            SpendStoneForUpgrade(response.StoneCost, CurrencyTransactionReason.LevelUpStandardWeapon);
 
             if (autoSave)
                 Save();
@@ -456,15 +617,33 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             return true;
         }
 
-        public bool TryLevelUpExclusive(int heroId, bool autoSave = true)
+        /// <summary>Level up exclusive weapon của hero qua RPC weapon/upgrade (server tự suy weapon từ heroId).</summary>
+        public async UniTask<bool> TryLevelUpExclusiveAsync(int heroId, bool autoSave = true)
         {
             var def = database.GetExclusiveByHeroId(heroId);
             if (def == null)
                 return false;
 
-            bool result = upgrade.TryLevelUpExclusive(def.ExclusiveWeaponId, heroId);
-            if (!result)
+            WeaponUpgradeResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.UpgradeWeaponAsync("exclusive", 0, heroId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[WeaponManager] weapon/upgrade RPC failed for heroId={heroId} (exclusive): {e.Message}");
                 return false;
+            }
+
+            if (response == null || !response.Success)
+            {
+                if (response != null)
+                    Debug.LogWarning($"[WeaponManager] weapon/upgrade rejected for heroId={heroId} (exclusive): {response.Error}");
+                return false;
+            }
+
+            inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId).Level = response.NewLevel;
+            SpendStoneForUpgrade(response.StoneCost, CurrencyTransactionReason.LevelUpExclusiveWeapon);
 
             if (autoSave)
                 Save();
@@ -473,38 +652,103 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             return true;
         }
 
-        public WeaponLimitBreakResult TryLimitBreakStandard(int weaponId, bool autoSave = true)
+        /// <summary>
+        /// Limit break standard weapon qua RPC weapon/limitbreak. RNG pass/fail nằm server-side —
+        /// client chỉ apply lại stage trả về (xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 5).
+        /// </summary>
+        public async UniTask<WeaponLimitBreakResult> TryLimitBreakStandardAsync(int weaponId, bool autoSave = true)
         {
-            var result = upgrade.TryLimitBreakStandard(weaponId);
-
-            if (result == WeaponLimitBreakResult.Success || result == WeaponLimitBreakResult.Failed)
+            WeaponLimitBreakResponse response;
+            try
             {
-                if (autoSave)
-                    Save();
-
-                NotifyStandardWeaponChanged(weaponId);
+                response = await NakamaClient.Instance.LimitBreakWeaponAsync("standard", weaponId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[WeaponManager] weapon/limitbreak RPC failed for weaponId={weaponId}: {e.Message}");
+                return WeaponLimitBreakResult.Invalid;
             }
 
-            return result;
+            if (response == null)
+                return WeaponLimitBreakResult.Invalid;
+
+            if (!response.Success)
+            {
+                Debug.LogWarning($"[WeaponManager] weapon/limitbreak rejected for weaponId={weaponId}: {response.Error}");
+                return MapLimitBreakError(response.Error);
+            }
+
+            inventory.GetOrCreateStandardState(weaponId).LimitBreakStage = response.NewStage;
+            SpendStoneForUpgrade(response.StoneCost, CurrencyTransactionReason.LimitBreakStandardWeapon);
+
+            if (autoSave)
+                Save();
+
+            NotifyStandardWeaponChanged(weaponId);
+
+            return response.Result == "success" ? WeaponLimitBreakResult.Success : WeaponLimitBreakResult.Failed;
         }
 
-        public WeaponLimitBreakResult TryLimitBreakExclusive(int heroId, bool autoSave = true)
+        /// <summary>Limit break exclusive weapon của hero qua RPC weapon/limitbreak (server tự suy weapon từ heroId).</summary>
+        public async UniTask<WeaponLimitBreakResult> TryLimitBreakExclusiveAsync(int heroId, bool autoSave = true)
         {
             var def = database.GetExclusiveByHeroId(heroId);
             if (def == null)
                 return WeaponLimitBreakResult.Invalid;
 
-            var result = upgrade.TryLimitBreakExclusive(def.ExclusiveWeaponId, heroId);
-
-            if (result == WeaponLimitBreakResult.Success || result == WeaponLimitBreakResult.Failed)
+            WeaponLimitBreakResponse response;
+            try
             {
-                if (autoSave)
-                    Save();
-
-                NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
+                response = await NakamaClient.Instance.LimitBreakWeaponAsync("exclusive", 0, heroId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[WeaponManager] weapon/limitbreak RPC failed for heroId={heroId} (exclusive): {e.Message}");
+                return WeaponLimitBreakResult.Invalid;
             }
 
-            return result;
+            if (response == null)
+                return WeaponLimitBreakResult.Invalid;
+
+            if (!response.Success)
+            {
+                Debug.LogWarning($"[WeaponManager] weapon/limitbreak rejected for heroId={heroId} (exclusive): {response.Error}");
+                return MapLimitBreakError(response.Error);
+            }
+
+            inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId).LimitBreakStage = response.NewStage;
+            SpendStoneForUpgrade(response.StoneCost, CurrencyTransactionReason.LimitBreakExclusiveWeapon);
+
+            if (autoSave)
+                Save();
+
+            NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
+
+            return response.Result == "success" ? WeaponLimitBreakResult.Success : WeaponLimitBreakResult.Failed;
+        }
+
+        private static WeaponLimitBreakResult MapLimitBreakError(string error)
+        {
+            switch (error)
+            {
+                case "MAXED": return WeaponLimitBreakResult.Maxed;
+                case "REQUIRED_LEVEL_NOT_REACHED": return WeaponLimitBreakResult.RequiredLevelNotReached;
+                default: return WeaponLimitBreakResult.Invalid;
+            }
+        }
+
+        /// <summary>
+        /// Currency vẫn do client tự quản lý cho tới khi có wallet sync chung — server chỉ trả
+        /// stone_cost để client trừ đúng số (xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 7).
+        /// </summary>
+        private static void SpendStoneForUpgrade(int stoneCost, CurrencyTransactionReason reason)
+        {
+            var currencyType = reason == CurrencyTransactionReason.LimitBreakStandardWeapon ||
+                                reason == CurrencyTransactionReason.LimitBreakExclusiveWeapon
+                ? CurrencyType.WeaponBreakThroughStone
+                : CurrencyType.WeaponEnhancementStone;
+
+            CurrencyLedgerService.Instance.TrySpend(currencyType, stoneCost, reason);
         }
 
         /// <summary>Fuse local-only (không gọi server) — dùng cho Editor debug và nhánh ToRandomExclusive (spec server chưa cover).</summary>
@@ -527,7 +771,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                 NotifyExclusiveWeaponChanged(result.TargetExclusiveWeaponId, result.TargetHeroId);
 
                 // auto equip exclusive ngay khi có
-                EquipExclusive(result.TargetHeroId, autoSave);
+                EquipExclusiveAsync(result.TargetHeroId, autoSave).Forget();
             }
 
             return result;

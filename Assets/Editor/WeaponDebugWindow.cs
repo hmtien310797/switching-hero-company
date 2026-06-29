@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Battle;
 using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
@@ -189,7 +190,7 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
             if (GUILayout.Button("Equip Standard"))
             {
-                WeaponManager.Instance.EquipStandard(selectedHeroId, selectedHeroClass, selectedStandard.WeaponId);
+                WeaponManager.Instance.EquipStandardAsync(selectedHeroId, selectedStandard.WeaponId).Forget();
             }
             EditorGUILayout.EndHorizontal();
 
@@ -213,13 +214,12 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
             if (GUILayout.Button("Try Level Up Standard"))
             {
-                WeaponManager.Instance.TryLevelUpStandard(selectedStandard.WeaponId);
+                WeaponManager.Instance.TryLevelUpStandardAsync(selectedStandard.WeaponId).Forget();
             }
 
             if (GUILayout.Button("Try Limit Break Standard"))
             {
-                var result = WeaponManager.Instance.TryLimitBreakStandard(selectedStandard.WeaponId);
-                Debug.Log($"[WeaponDebug] Standard LimitBreak Result = {result}");
+                LogLimitBreakStandardAsync(selectedStandard.WeaponId).Forget();
             }
 
             if (GUILayout.Button("Try Fuse Standard"))
@@ -262,7 +262,7 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
             if (GUILayout.Button("Equip Exclusive"))
             {
-                WeaponManager.Instance.EquipExclusive(selectedHeroId);
+                WeaponManager.Instance.EquipExclusiveAsync(selectedHeroId).Forget();
             }
             EditorGUILayout.EndHorizontal();
 
@@ -292,13 +292,12 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
             if (GUILayout.Button("Try Level Up Exclusive"))
             {
-                WeaponManager.Instance.TryLevelUpExclusive(selectedHeroId);
+                WeaponManager.Instance.TryLevelUpExclusiveAsync(selectedHeroId).Forget();
             }
 
             if (GUILayout.Button("Try Limit Break Exclusive"))
             {
-                var result = WeaponManager.Instance.TryLimitBreakExclusive(selectedHeroId);
-                Debug.Log($"[WeaponDebug] Exclusive LimitBreak Result = {result}");
+                LogLimitBreakExclusiveAsync(selectedHeroId).Forget();
             }
 
             EditorGUILayout.EndVertical();
@@ -311,7 +310,7 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
             if (GUILayout.Button("Try Auto Equip"))
             {
-                WeaponManager.Instance.TryAutoEquip(selectedHeroId, selectedHeroClass);
+                WeaponManager.Instance.TryAutoEquipAsync(selectedHeroId, selectedHeroClass).Forget();
             }
 
             if (GUILayout.Button("Refresh Hero Equipment Runtime"))
@@ -354,6 +353,18 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
             EditorGUILayout.LabelField("Final CritChance", module.GetFinalStat(StatType.CritChance).ToString("0.##"));
 
             EditorGUILayout.EndVertical();
+        }
+
+        private async UniTask LogLimitBreakStandardAsync(int weaponId)
+        {
+            var result = await WeaponManager.Instance.TryLimitBreakStandardAsync(weaponId);
+            Debug.Log($"[WeaponDebug] Standard LimitBreak Result = {result}");
+        }
+
+        private async UniTask LogLimitBreakExclusiveAsync(int heroId)
+        {
+            var result = await WeaponManager.Instance.TryLimitBreakExclusiveAsync(heroId);
+            Debug.Log($"[WeaponDebug] Exclusive LimitBreak Result = {result}");
         }
     }
 }

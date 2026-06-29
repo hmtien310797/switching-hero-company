@@ -7,6 +7,7 @@ using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Boss;
 using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Level.Pattern;
@@ -53,7 +54,6 @@ namespace Battle
         [field: SerializeField]
         public int CurrentStage { get; private set; } = 1;
 
-        [SerializeField] private int temporaryHighestUnlockedStage = 50;
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
 
@@ -96,6 +96,15 @@ namespace Battle
         private float[] rates;
         private int heroDeadCount;
         private int totalMonstersKilledThisStage;
+        /// <summary>Time.time lúc bắt đầu stage hiện tại — dùng tính duration_seconds cho battle/end (set trong InitStage).</summary>
+        private float stageStartTime;
+        /// <summary>
+        /// current_stage thật mà server đang lưu — KHÁC CurrentStage (CurrentStage bị MoveToStage
+        /// ghi đè khi player replay 1 stage cũ qua Stage Selection). Chỉ được set bởi
+        /// ApplyServerProgression — dùng để phân biệt "đang đánh ở frontier" (gọi battle/end) với
+        /// "đang replay/farm stage cũ" (không gọi battle/end, không reward, không resync).
+        /// </summary>
+        private int serverFrontierStage = 1;
 
         private GameData gameData;
         private BossActor currentBoss;
@@ -121,7 +130,11 @@ namespace Battle
         public List<EnemyActor> CreepList => creeps;
         private readonly HashSet<string> activeStageCreepPoolKeys = new();
 
-        public int HighestUnlockedStage => temporaryHighestUnlockedStage;
+        /// <summary>Stage tiếp theo được unlock để chơi/chọn — bằng serverFrontierStage (current_stage
+        /// thật từ server, đã cap đúng ở stage cuối game). KHÔNG suy từ highest_stage_cleared + 1: 2 giá
+        /// trị này chỉ lệch nhau đúng ở stage cuối cùng của game (server cap current_stage ở maxStage
+        /// trong khi highest_stage_cleared cũng đạt maxStage), lúc đó +1 sẽ vượt quá tổng số stage thật.</summary>
+        public int HighestUnlockedStage => Mathf.Max(1, serverFrontierStage);
         
         private UserDataCache userDataCache;
 
@@ -284,6 +297,37 @@ namespace Battle
 
             oldHero.HeroSkillController.DespawnAllInstanceOfUltimateSkillAndClassSkill();
             AddressableSpawnService.ReleaseInstance(oldHero);
+
+            SyncLineupToServerAsync().Forget();
+        }
+
+        /// <summary>
+        /// Lưu đội hình hiện tại (userDataCache.InBattleHeroIdList) lên server qua hero/set_lineup,
+        /// để login lại đúng đội hình thay vì luôn về lineup cũ/mặc định. Fire-and-forget — UI đã
+        /// apply đổi hero ngay tại chỗ, RPC này chỉ để persist, không chặn luồng chơi.
+        /// </summary>
+        private async UniTask SyncLineupToServerAsync()
+        {
+            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn)
+                return;
+
+            var lineupUids = new string[userDataCache.InBattleHeroIdList.Count];
+            for (int i = 0; i < lineupUids.Length; i++)
+            {
+                int heroId = userDataCache.InBattleHeroIdList[i];
+                lineupUids[i] = heroId > 0 ? userDataCache.GetHeroUid(heroId) : null;
+            }
+
+            try
+            {
+                var response = await NakamaClient.Instance.SetLineupAsync(lineupUids);
+                if (response != null && response.Updated && userDataCache.HeroList != null)
+                    userDataCache.HeroList.Lineup = response.Lineup;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[PvE] hero/set_lineup RPC failed: {e.Message}");
+            }
         }
 
         private void OnHeroDead(HeroActor hero)
@@ -304,7 +348,27 @@ namespace Battle
 
         private async UniTask InitPlayerHeroById(bool isSwitch = false)
         {
-            List<int> heroIds = new List<int>(){2,4};
+            // Lineup thật từ server (player/me → UserDataCache.GetPlayerDataFromServer), không
+            // hardcode {2,4} nữa. Fallback theo thứ tự: lineup server → 2 hero đầu tiên đang sở hữu
+            // → {2,4} (an toàn cuối cùng nếu player/me fetch lỗi và chưa có dữ liệu hero nào).
+            List<int> heroIds = new List<int>(userDataCache.InBattleHeroIdList);
+            while (heroIds.Count < 2) heroIds.Add(-1);
+
+            if (!heroIds.Exists(id => id > 0))
+            {
+                var owned = userDataCache.HeroList?.Owned;
+                if (owned != null && owned.Length > 0)
+                {
+                    for (int i = 0; i < heroIds.Count && i < owned.Length; i++)
+                        heroIds[i] = owned[i].HeroId;
+                }
+                else
+                {
+                    heroIds[0] = 2;
+                    if (heroIds.Count > 1) heroIds[1] = 4;
+                }
+            }
+
             for (int heroIndex = 0; heroIndex < heroIds.Count; heroIndex++)
             {
                 var id = heroIds[heroIndex];
@@ -531,7 +595,8 @@ namespace Battle
             heroDeadCount = 0;
             result = BattleResult.None;
             SetState(BattleState.Initializing);
-            CurrentStage++;
+            // CurrentStage đã được set đúng từ server (ApplyServerProgression trong OnStageCleared,
+            // qua response battle/end.updated_progression) — không tự "++" cục bộ nữa.
             NotifyIdleScreenStageChanged();
             InitStage(CurrentStage);
 
@@ -597,11 +662,54 @@ namespace Battle
             result = BattleResult.None;
             DespawnCreepAndBoss();
             PlayCurrentStage().Forget();
+            GameEventManager.Trigger(GameEvents.OnStageChange);
         }
 
         private int GetResolvedChapterIndexByStage(int stage)
         {
             return stageDataResolver.GetChapterIndexByStage(stage);
+        }
+
+        /// <summary>
+        /// Ghi đè progression từ server (player/me.progression, battle/end.updated_progression, hoặc
+        /// resync battle/progression) — nguồn sự thật duy nhất cho CurrentStage, không tự "++" cục bộ
+        /// nữa (xem Docs battle/end — HandleNextStageAsync không còn tăng CurrentStage thủ công).
+        /// Cũng ghi đè serverFrontierStage — dùng để nhận biết replay stage cũ qua Stage Selection.
+        /// </summary>
+        public void ApplyServerProgression(BattleProgression progression)
+        {
+            if (progression == null) return;
+            CurrentStage = Mathf.Max(1, progression.CurrentStage);
+            serverFrontierStage = CurrentStage;
+            CurrentStageService.SetCurrentStage(CurrentStage);
+        }
+
+        /// <summary>Resync current_stage thật từ server sau lỗi STAGE_MISMATCH/INVALID_STAGE của battle/end.</summary>
+        private async UniTask ResyncProgressionFromServerAsync()
+        {
+            try
+            {
+                BattleProgression progression = await NakamaClient.Instance.GetBattleProgressionAsync();
+                ApplyServerProgression(progression);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[PvE] battle/progression resync failed: {e.Message}");
+            }
+        }
+
+        private BattleEndRequest BuildBattleEndRequest(string result, int stage)
+        {
+            return new BattleEndRequest
+            {
+                Result          = result,
+                Stage           = stage,
+                CreepKills      = deadCreepCount,
+                TotalCreeps     = totalCreepsSpawnedThisStage,
+                HeroDeadCount   = heroDeadCount,
+                DurationSeconds = Time.time - stageStartTime,
+                HeroIds         = userDataCache.InBattleHeroIdList.Select(id => id.ToString()).ToArray()
+            };
         }
 
         // ======================
@@ -610,6 +718,7 @@ namespace Battle
 
         private void InitStage(int stage)
         {
+            stageStartTime = Time.time;
             playCompletedStage = stage < HighestUnlockedStage;
             aliveCreepCount = 0;
             totalCreepsSpawnedThisStage = 0;
@@ -1226,24 +1335,94 @@ namespace Battle
             GameEventManager.Trigger(GameEvents.OnStageCleared, CurrentStage);
         }
 
-        private void OnStageCleared(int _)
+        private async void OnStageCleared(int stage)
         {
             result = BattleResult.Victory;
             SetState(BattleState.Ended);
             currentBoss = null;
             losingStage = false;
-            rewardSyncService?.ClaimClearStageReward(stageRuntimeData).Forget();
+
+            // Stage khác frontier server == player đang replay/farm 1 stage cũ qua Stage Selection
+            // (MoveToStage) — KHÔNG gọi battle/end (server sẽ luôn reject bằng STAGE_MISMATCH vì
+            // không có khái niệm replay trong spec hiện tại). Không có Clear reward, không resync,
+            // chỉ tăng CurrentStage cục bộ để tiếp tục chơi — giữ đúng hành vi cũ trước khi có RPC này.
+            if (stage != serverFrontierStage)
+            {
+                CurrentStage = stage + 1;
+                CurrentStageService.SetCurrentStage(CurrentStage);
+                NextStageCallback().Forget();
+                return;
+            }
+
+            BattleEndRequest request = BuildBattleEndRequest("Victory", stage);
+            BattleEndResponse response = null;
+            try
+            {
+                response = await NakamaClient.Instance.BattleEndAsync(request);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[PvE] battle/end RPC failed: {e.Message}");
+            }
+
+            if (response != null && response.Success)
+            {
+                ApplyServerProgression(response.UpdatedProgression);
+
+                if (response.UpdatedResources != null)
+                {
+                    CurrencyManager.Instance.ApplyServerBalances(
+                        response.UpdatedResources.Gold,
+                        response.UpdatedResources.Diamonds,
+                        response.UpdatedResources.Energy,
+                        response.UpdatedResources.Items
+                    );
+                }
+
+                if (response.Rewards != null)
+                {
+                    foreach (var kv in response.Rewards)
+                        Debug.Log($"[PvE] battle/end clear reward: {kv.Key} = {kv.Value}");
+                }
+            }
+            else if (response != null && (response.Error == "STAGE_MISMATCH" || response.Error == "INVALID_STAGE"))
+            {
+                Debug.LogWarning($"[PvE] battle/end rejected ({response.Error}) — resyncing progression.");
+                await ResyncProgressionFromServerAsync();
+            }
+
+            // KHÔNG còn gọi rewardSyncService?.ClaimClearStageReward(stageRuntimeData) ở đây nữa —
+            // reward stage-clear giờ lấy từ response battle/end. SetCurrentStageData (Online Idle)
+            // vẫn chạy như cũ qua CacheStageSpawnData trong InitStage, không thuộc phạm vi RPC này.
             NextStageCallback().Forget();
+            GameEventManager.Trigger(GameEvents.OnStageChange);
         }
 
-        private void OnStageFailed()
+        private async void OnStageFailed()
         {
             heroDeadCount = 0;
             SetState(BattleState.Ended);
             result = BattleResult.Defeat;
             losingStage = true;
             DespawnCreepAndBoss();
+
+            // Defeat khi đang replay stage cũ (không phải frontier) — không cần báo server, không
+            // ảnh hưởng progression dù có gọi hay không, bỏ qua để tránh gọi RPC vô nghĩa.
+            if (CurrentStage == serverFrontierStage)
+            {
+                BattleEndRequest request = BuildBattleEndRequest("Defeat", CurrentStage);
+                try
+                {
+                    await NakamaClient.Instance.BattleEndAsync(request);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[PvE] battle/end RPC failed: {e.Message}");
+                }
+            }
+
             PlayCurrentStage(1).Forget();
+            GameEventManager.Trigger(GameEvents.OnStageChange);
         }
 
         private void SetState(BattleState newState)

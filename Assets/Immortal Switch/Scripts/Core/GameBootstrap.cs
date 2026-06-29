@@ -4,6 +4,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.MissionSystem;
@@ -43,9 +44,10 @@ namespace Immortal_Switch.Scripts.Core
                 await MissionSystemManager.Instance.InitializeAsync();
 
                 // Fetch player data — includes heroes/skills/weapons inventory
+                PlayerMeResponse player = null;
                 try
                 {
-                    var player = await NakamaClient.Instance.GetPlayerMeAsync();
+                    player = await NakamaClient.Instance.GetPlayerMeAsync();
                     ApplyPlayerData(player);
                 }
                 catch (Exception ex)
@@ -83,6 +85,7 @@ namespace Immortal_Switch.Scripts.Core
 
                 await UserDataCache.Instance.InitializeAsync();
                 await GrowthManager.Instance.InitializeAsync();
+                SyncGrowthToManager(player?.growth);
                 await PowerUpManager.Instance.InitializeAsync();
                 await SkillViewDataProvider.Instance.InitializeAsync();
                 await AddressablePoolService.Instance.InitializeAsync();
@@ -157,10 +160,19 @@ namespace Immortal_Switch.Scripts.Core
                 SyncHeroListToProgression(player.heroes);
             }
 
-            UserDataCache.Instance.GetPlayerDataFromServer(player.heroes, player.skills, player.weapons);
+            if (player.weapons != null)
+            {
+                SyncWeaponListToManager(player.weapons);
+            }
 
-            Debug.Log(
-                $"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, Energy={player.energy}");
+            UserDataCache.Instance.GetPlayerDataFromServer(player.heroes, player.skills, player.weapons);
+            
+            // current_stage/current_chapter/highest_stage_cleared — nguồn sự thật cho stage,
+            // không cần gọi battle/progression riêng (chỉ gọi lại khi resync sau STAGE_MISMATCH/INVALID_STAGE)
+            PvEBattleController.Instance.ApplyServerProgression(player.progression);
+
+            Debug.Log($"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, Energy={player.energy}");
+
         }
 
         private void ApplySummonState(SummonStateResponse state)
@@ -206,6 +218,32 @@ namespace Immortal_Switch.Scripts.Core
             }
 
             SkillInventorySaveService.Save();
+        }
+        
+        private void SyncWeaponListToManager(WeaponListResponse weaponList)
+        {
+            if (weaponList == null)
+                return;
+
+            if (WeaponManager.Instance == null)
+                return;
+
+            WeaponManager.Instance.SyncFromServer(weaponList);
+        }
+
+        /// <summary>
+        /// Áp player/me.growth vào GrowthManager — phải gọi SAU GrowthManager.InitializeAsync() (load
+        /// ES3 xong) vì SaveData chỉ được tạo trong Load(), khác Hero/WeaponManager load sẵn trong Awake().
+        /// </summary>
+        private void SyncGrowthToManager(GrowthStateResponse growthState)
+        {
+            if (growthState == null)
+                return;
+
+            if (GrowthManager.Instance == null)
+                return;
+
+            GrowthManager.Instance.SyncFromServer(growthState);
         }
 
         public override UniTask InitializeAsync()

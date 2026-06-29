@@ -1,6 +1,7 @@
 using Spine;
 using Spine.Unity;
 using UnityEngine;
+using AnimationState = Spine.AnimationState;
 
 namespace Immortal_Switch.Scripts.Skill
 {
@@ -56,12 +57,18 @@ namespace Immortal_Switch.Scripts.Skill
                 ForceDespawn();
         }
 
-        public override void OnDespawnedToPool()
+        protected override void OnDespawnedToPool()
         {
             if (skeletonAnimation != null && skeletonAnimation.AnimationState != null)
             {
                 skeletonAnimation.AnimationState.Event -= OnSpineEvent;
                 skeletonAnimation.AnimationState.Complete -= OnSpineComplete;
+                
+                AnimationState animationState = skeletonAnimation.AnimationState;
+                Skeleton skeleton = skeletonAnimation.Skeleton;
+
+                animationState.ClearTracks();
+                skeleton.SetToSetupPose();
             }
 
             base.OnDespawnedToPool();

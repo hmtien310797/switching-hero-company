@@ -119,7 +119,7 @@ namespace Immortal_Switch.Scripts.Boss
 
             ApplyData(data, scale);
             SetHeroTargets(heroA, heroB);
-
+            HealthBarController.ResetHealth();
             NormalAttackCount = 0;
             currentTarget = null;
             attackTimer = 0f;
@@ -144,7 +144,7 @@ namespace Immortal_Switch.Scripts.Boss
             ApplyBaseStat(data, cachedBaseStat);
 
             SetHeroTargets(heroA, heroB);
-
+            HealthBarController.ResetHealth();
             NormalAttackCount = 0;
             currentTarget = null;
             attackTimer = 0f;
@@ -392,9 +392,16 @@ namespace Immortal_Switch.Scripts.Boss
 
             hasHitThisAttack = true;
 
-            if (currentTarget == null || currentTarget.IsDead)
+            if (!currentTarget.IsUnityAlive())
+            {
                 return;
+            }
 
+            if (currentTarget.IsDead)
+            {
+                return;
+            }
+            
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
             currentTarget.TakeDamage(damageResult);
 
@@ -525,8 +532,15 @@ namespace Immortal_Switch.Scripts.Boss
 
         public void DealDamageToTarget(ICombatUnit target, float damageMultiplierPercent)
         {
-            if (target == null || target.IsDead)
+            if (!currentTarget.IsUnityAlive())
+            {
                 return;
+            }
+
+            if (currentTarget.IsDead)
+            {
+                return;
+            }
             
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget, damageMultiplierPercent);
             target.TakeDamage(damageResult);
@@ -538,8 +552,16 @@ namespace Immortal_Switch.Scripts.Boss
             {
                 ICombatUnit target = heroTargets[i];
 
-                if (target == null || target.IsDead)
-                    continue;
+                if (!target.IsUnityAlive())
+                {
+                    return;
+                }
+
+                if (target.IsDead)
+                {
+                    return;
+                }
+                
                 DamageResult damageResult = DamageCalculator.CalculateDamage(this, target, damageMultiplierPercent);
                 target.TakeDamage(damageResult);
             }

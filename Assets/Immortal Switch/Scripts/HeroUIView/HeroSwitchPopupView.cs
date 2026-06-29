@@ -54,11 +54,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private Vector2 slot1ArrowAnchoredPos;
         private Vector2 slot2ArrowAnchoredPos;
-        private SpriteAtlas heroSpriteAtlas;
+        private int heroSwitchSlotUIIndex;
         
         public override void OnShow(object args)
         {
-            heroSpriteAtlas = args as SpriteAtlas;
             RefreshView();
             base.OnShow(args);
         }
@@ -173,11 +172,12 @@ namespace Immortal_Switch.Scripts.HeroUIView
             }
         }
 
-        private void OnClickSourceSlot(int heroId)
+        private void OnClickSourceSlot(int heroId, int heroSwitchSlotIndex)
         {
             if (heroId <= 0) return;
 
             selectedSourceHeroId = heroId;
+            heroSwitchSlotUIIndex = heroSwitchSlotIndex;
             RefreshSelectionVisualState();
         }
 
@@ -198,8 +198,16 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (selectedSourceHeroId == selectedTargetHeroId) return false;
             if (!battleController.IsHeroCurrentlyActive(selectedSourceHeroId)) return false;
             if (battleController.IsHeroCurrentlyActive(selectedTargetHeroId)) return false;
-
-            return true;
+            HeroDataSO targetSourceHeroIdData = MasterDataCache.Instance.GetHeroDataById(selectedTargetHeroId);
+            if (heroSwitchSlotUIIndex == 1)
+            {
+                if (slot2UI.heroSlotClass != targetSourceHeroIdData.HeroClass) return true;
+                UIManager.Instance.ShowToast("Can Not Assign Hero Of The Same Class");
+                return false;
+            }
+            if (slot1UI.heroSlotClass != targetSourceHeroIdData.HeroClass) return true;
+            UIManager.Instance.ShowToast("Can Not Assign Hero Of The Same Class");
+            return false;
         }
 
         private void RefreshSelectionVisualState()

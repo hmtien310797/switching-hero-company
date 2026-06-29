@@ -49,8 +49,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 237ec3f9546f43ba93da6221b6905e33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PoolSize>k__BackingField: 2
-  <DeSpawnedOnStart>k__BackingField: 1
   stats: {fileID: 4378392224121908283}
   animationDriver: {fileID: 2157218445760095175}
   locomotion: {fileID: 2301857392755416939}
@@ -246,6 +244,8 @@ MonoBehaviour:
   physicsMovementRelativeTo: {fileID: 0}
   updateTiming: 1
   unscaledTime: 0
+  limitRuntimeUpdateRate: 0
+  targetRuntimeFps: 20
   _animationName: 
   loop: 1
   timeScale: 1
@@ -335,7 +335,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7688634025904658460, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: maxWidth
-      value: 2
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688634025904658460, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: hideWhenFull
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8882419513620984265, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_Layer

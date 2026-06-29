@@ -13,7 +13,7 @@ public sealed class HealthBarController : MonoBehaviour
 
     private Vector2 fillOriginalSize;
 
-    public void SetHealthNormalized(float normalizedHealth)
+    private void SetHealthNormalized(float normalizedHealth)
     {
         normalizedHealth = Mathf.Clamp01(normalizedHealth);
 

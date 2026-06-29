@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Battle;
 using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Hero;
@@ -47,6 +49,26 @@ namespace Immortal_Switch.Scripts.UI
             RefreshViews(index);
         }
 
+        public override async UniTask PlayShowAsync(object args)
+        {
+            await RefreshWeaponListFromServerAsync();
+
+            base.PlayShowAsync(args).Forget();
+        }
+
+        /// <summary>
+        /// Gọi weapon/list lấy state mới nhất (standard/exclusive/hero_equip) cho tài khoản hiện
+        /// tại, rồi sync vào WeaponManager trước khi OnShow build UI — tránh hiển thị data cũ leak
+        /// từ tài khoản/session khác (xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 9).
+        /// </summary>
+        private async UniTask RefreshWeaponListFromServerAsync()
+        {
+            if (WeaponManager.Instance == null)
+                return;
+
+            await WeaponManager.Instance.SyncFromServerAsync();
+        }
+
         public override void OnHide()
         {
             base.OnHide();
@@ -90,7 +112,6 @@ namespace Immortal_Switch.Scripts.UI
 
             if (showWeapon && uiWeaponView != null)
                 uiWeaponView.RefreshAll();
-
         }
 
         private void TrySetupSubViews()

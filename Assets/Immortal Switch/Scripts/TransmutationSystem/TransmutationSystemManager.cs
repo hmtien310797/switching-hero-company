@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
@@ -60,35 +59,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             _lastAutoFuseTime = now + autoFuseInterval;
 
             Load();
-            GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
-        }
-
-        private void OnEnemyDead(int obj)
-        {
-            Debug.Log($"Transmutation: OnEnemyDead: {obj}");
-
-            if (obj < 1)
-            {
-                return;
-            }
-
-            var cfg = Database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
-
-            if (cfg == null)
-            {
-                Debug.LogError($"Energy dont config: {Storage.Data.Level}");
-                return;
-            }
-
-            var quantity = obj + Storage.Data.Level + cfg.cost;
-            Service.UpdateEnergy(quantity);
-            _DispatchChanged();
         }
 
         public override UniTask InitializeAsync()
@@ -96,12 +71,39 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return UniTask.CompletedTask;
         }
 
+        /// <summary>
+        /// Đồng bộ toàn bộ state từ server (transmutation/list) — nguồn sự thật. Ghi đè toàn bộ
+        /// state local (level/exp/energy/equips/pending), không merge — giống
+        /// WeaponManager.SyncFromServer (xem Docs/be-transmutation-rpc-spec.md mục 3 &amp; 9).
+        /// </summary>
+        public async UniTask<bool> SyncFromServerAsync()
+        {
+            TransmutationListResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.GetTransmutationListAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[TransmutationSystemManager] transmutation/list RPC failed: {e.Message}");
+                return false;
+            }
+
+            if (response == null)
+            {
+                return false;
+            }
+
+            Service.ApplyListResponse(response);
+            _DispatchChanged();
+            return true;
+        }
+
         private void Load()
         {
             Storage = new TransmutationSystemStorage(Database);
             Service = new TransmutationSystemService(Storage);
 
-            Database.Load();
             Storage.Load();
         }
 
@@ -248,7 +250,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                     return;
                 }
 
-                var newEquip = Fuse();
+                var newEquip = await FuseAsync();
 
                 if (newEquip != null)
                 {
@@ -266,7 +268,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                         }
                         else
                         {
-                            Equip(newEquip, null);
+                            await EquipAsync();
                         }
 
                         // check dieu kien dung
@@ -277,7 +279,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                     }
                     else
                     {
-                        Dismantle();
+                        await DismantleAsync();
                     }
                 }
                 else if (!isWaitingMaterial)
@@ -303,9 +305,13 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             });
         }
 
-        public PlayerEquipViewData FuseIfPossible()
+        /// <summary>
+        /// Roll 1 lần nếu không có pending chờ resolve, hoặc trả lại pending hiện tại nếu auto-fuse
+        /// đang Enabled (không roll mới — vòng lặp auto-fuse tự gọi <see cref="FuseAsync"/> riêng).
+        /// </summary>
+        public async UniTask<PlayerEquipViewData> FuseIfPossibleAsync()
         {
-            return Storage.Data.Setting.Enabled ? GetStuckIfPossible() : Fuse();
+            return Storage.Data.Setting.Enabled ? GetStuckIfPossible() : await FuseAsync();
         }
 
         private PlayerEquipViewData GetStuckIfPossible()
@@ -333,7 +339,13 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return null;
         }
 
-        private PlayerEquipViewData Fuse()
+        /// <summary>
+        /// Roll 1 lần qua RPC transmutation/fuse — RNG (tier/base stat/unique stat) nằm hoàn toàn
+        /// server-side, client chỉ apply lại kết quả (xem Docs/be-transmutation-rpc-spec.md mục 4).
+        /// Nếu đang có pending chưa resolve, server trả lại đúng pending đó (không tốn thêm Energy)
+        /// — <see cref="GetStuckIfPossible"/> ở đây chỉ là tối ưu hiển thị ngay từ cache local.
+        /// </summary>
+        private async UniTask<PlayerEquipViewData> FuseAsync()
         {
             var stuckEquip = GetStuckIfPossible();
 
@@ -342,75 +354,106 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return stuckEquip;
             }
 
-            var levelRangeCfg = Database.LevelRangeConfig.rows.Find(v => v.transmutationLevel == Storage.Data.Level);
-
-            if (levelRangeCfg == null)
+            TransmutationFuseResponse response;
+            try
             {
-                Debug.LogError($"Level range config not found: {Storage.Data.Level}");
+                response = await NakamaClient.Instance.FuseTransmutationAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[TransmutationSystemManager] transmutation/fuse RPC failed: {e.Message}");
                 return null;
             }
 
-            var cfg = Database.RateConfig.rows.Find(v => v.level == Storage.Data.Level);
-
-            if (cfg == null ||
-                cfg.cost > Storage.Data.Energy)
+            if (response == null || !response.Success)
             {
-                Debug.LogError($"Energy dont enough for roll: current energy: {Storage.Data.Energy} - {cfg?.cost}");
+                if (response != null)
+                {
+                    Debug.LogWarning($"[TransmutationSystemManager] transmutation/fuse rejected: {response.Error}");
+                }
+
                 return null;
             }
 
-            var tier = Service.RollTier(cfg);
-            var itemCfg = Database.RandomItem(tier);
+            Service.ApplyFuseResult(response);
+            _DispatchChanged();
 
-            if (itemCfg == null)
-            {
-                Debug.LogError($"{tier} not found");
-                return null;
-            }
-
-            var modifiersOption = Database.ItemUniqueConfig.rows.Where(v => v.tier == itemCfg.tier).ToList();
-            var uniqueModifiers = Service.BuildUniqueModifiers(modifiersOption, 2);
-            var equip = Service.BuildEquip(itemCfg, levelRangeCfg, uniqueModifiers);
+            var itemCfg = Database.ItemConfig.rows.Find(v => v.configId == response.Pending.CfgId);
 
             return new PlayerEquipViewData
             {
-                Title = itemCfg.itemName,
-                CfgId = itemCfg.configId,
-                ItemType = itemCfg.itemType,
-                Level = equip.Level,
-                Modifiers = equip.Modifiers,
-                Tier = equip.Tier,
+                Title = itemCfg != null ? itemCfg.itemName : response.Pending.CfgId,
+                CfgId = response.Pending.CfgId,
+                ItemType = response.Pending.ItemType,
+                Level = response.Pending.Level,
+                Modifiers = TransmutationSystemHelper.ToModifiers(response.Pending.Modifiers),
+                Tier = response.Pending.Tier,
             };
         }
 
-        public void Equip(PlayerEquipItem newEquip, PlayerEquipItem oldEquip)
+        /// <summary>
+        /// Chốt giữ item pending hiện tại qua RPC transmutation/equip — server tự biết pending của
+        /// user, không cần truyền id (xem Docs/be-transmutation-rpc-spec.md mục 5).
+        /// </summary>
+        public async UniTask<bool> EquipAsync()
         {
-            Service.Equip(newEquip);
-            OnEquipChanged?.Invoke(oldEquip, newEquip);
-        }
-
-        public void Dismantle()
-        {
-            Service.Dismantle();
-        }
-
-        public void AddExp(BigInteger quantity)
-        {
-            var cfg = Database.LevelConfig.rows.Find(v => v.level == Storage.Data.Level);
-            var targetExp = cfg?.totalExp ?? 0;
-            var currentExp = Storage.Data.Exp + quantity;
-            var currentLevel = Storage.Data.Level;
-
-            if (currentExp >= targetExp)
+            TransmutationEquipResponse response;
+            try
             {
-                // tăng cấp
-                var maxLevel = Database.LevelConfig.rows.Last().level;
-                currentLevel = Math.Min(currentLevel + 1, maxLevel);
+                response = await NakamaClient.Instance.EquipTransmutationAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[TransmutationSystemManager] transmutation/equip RPC failed: {e.Message}");
+                return false;
             }
 
-            Service.UpdateExp(currentExp);
-            Service.UpdateLevel(currentLevel);
+            if (response == null || !response.Success)
+            {
+                if (response != null)
+                {
+                    Debug.LogWarning($"[TransmutationSystemManager] transmutation/equip rejected: {response.Error}");
+                }
+
+                return false;
+            }
+
+            var oldEquip = TransmutationSystemHelper.ToPlayerEquipItem(response.ItemType, response.Replaced);
+            var newEquip = TransmutationSystemHelper.ToPlayerEquipItem(response.ItemType, response.Equipped);
+
+            Service.ApplyEquipResult(response);
             _DispatchChanged();
+            OnEquipChanged?.Invoke(oldEquip, newEquip);
+            return true;
+        }
+
+        /// <summary>Huỷ item pending hiện tại qua RPC transmutation/dismantle.</summary>
+        public async UniTask<bool> DismantleAsync()
+        {
+            TransmutationDismantleResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.DismantleTransmutationAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[TransmutationSystemManager] transmutation/dismantle RPC failed: {e.Message}");
+                return false;
+            }
+
+            if (response == null || !response.Success)
+            {
+                if (response != null)
+                {
+                    Debug.LogWarning($"[TransmutationSystemManager] transmutation/dismantle rejected: {response.Error}");
+                }
+
+                return false;
+            }
+
+            Service.ApplyDismantleResult(response);
+            _DispatchChanged();
+            return true;
         }
 
         private void _DispatchChanged()

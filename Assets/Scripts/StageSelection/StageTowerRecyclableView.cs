@@ -14,6 +14,9 @@ namespace Immortal_Switch.Scripts.StageSelection
         [Header("RSR")] [SerializeField] private RSR rsr;
         [SerializeField] private GameObject itemPrototype;
 
+        [Header("Final item")] [SerializeField]
+        private RectTransform finalFloorItem; 
+
         [Header("Item Size")] [SerializeField] private bool isItemSizeKnown = true;
         [SerializeField] private float itemSize = 130f;
 
@@ -103,10 +106,16 @@ namespace Immortal_Switch.Scripts.StageSelection
             if (scrollToStageAfterBind)
             {
                 if (chapterChanged)
+                {
                     ScrollToStage(chapterEndStage);
+                }
                 else
+                {
                     ScrollToStage(selectedStage);
+                }
             }
+
+            SetFirstSibling();
         }
         
         private void ForceRefreshVisibleItems()
@@ -203,7 +212,7 @@ namespace Immortal_Switch.Scripts.StageSelection
         {
             if (item is not StageNodeItemView view)
                 return;
-
+            
             int stage = GetStageByIndex(itemIndex);
 
             StageRuntimeData data = resolveStageFunc?.Invoke(stage);
@@ -213,6 +222,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             bool isSelected = stage == selectedStage;
             bool isCurrentStage = stage == currentBattleStage;
             bool isLocked = stage > highestUnlockedStage;
+            var isViewportBelowCurrentStage = stage < highestUnlockedStage && !isSelected;
 
             Sprite icon = await GetStageIcon(data);
 
@@ -222,6 +232,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 isSelected,
                 isLocked,
                 isCurrentStage,
+                isViewportBelowCurrentStage,
                 onStageClicked
             );
         }
@@ -233,10 +244,12 @@ namespace Immortal_Switch.Scripts.StageSelection
 
         public void ItemCreated(int itemIndex, IItem item, GameObject itemGo)
         {
+            SetFirstSibling();
         }
 
         public void ItemHidden(IItem item, int itemIndex)
         {
+            SetFirstSibling();
         }
 
         public void ScrolledToItem(IItem item, int itemIndex)
@@ -266,6 +279,12 @@ namespace Immortal_Switch.Scripts.StageSelection
 
         public void LastItemIsVisible()
         {
+        }
+
+        private void SetFirstSibling()
+        {
+            // luon luon set len dau content
+            finalFloorItem.SetAsFirstSibling();
         }
     }
 }

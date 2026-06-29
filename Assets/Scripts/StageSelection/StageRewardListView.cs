@@ -1,6 +1,7 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Level.Stage;
-using Immortal_Switch.Scripts.Shared;
+using StageSelection.UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.StageSelection
@@ -8,12 +9,13 @@ namespace Immortal_Switch.Scripts.StageSelection
     public class StageRewardListView : MonoBehaviour
     {
         [SerializeField] private Transform contentRoot;
-        [SerializeField] private RewardItemView itemPrefab;
+        [SerializeField] private UIChapterStageBaseReward itemPrefab;
 
-        public async UniTask Bind(StageReward[] rewards)
+        // --- Private Fields ---
+        private List<UIChapterStageBaseReward> _rewards = new();
+        
+        public void Bind(StageReward[] rewards)
         {
-            Clear();
-
             if (rewards == null || rewards.Length == 0)
                 return;
 
@@ -24,20 +26,22 @@ namespace Immortal_Switch.Scripts.StageSelection
                 if (!reward.IsValid)
                     continue;
 
-                RewardItemView item = Instantiate(itemPrefab, contentRoot);
-                Sprite icon = await DatabaseManager.Instance.ItemDb.LoadCurrencyIconByKey(reward.currencyType.ToString());
-                item.Bind(reward);
+                if (_rewards.Count > i)
+                {
+                    var clone = _rewards[i];
+                    clone.Bind(reward).Forget();
+                }
+                else
+                {
+                    var clone = Instantiate(itemPrefab, contentRoot);
+                    clone.Bind(reward).Forget();
+                    _rewards.Add(clone);
+                }
             }
-        }
 
-        private void Clear()
-        {
-            if (contentRoot == null)
-                return;
-
-            for (int i = contentRoot.childCount - 1; i >= 0; i--)
+            for (int i = rewards.Length; i < _rewards.Count; i++)
             {
-                Destroy(contentRoot.GetChild(i).gameObject);
+                _rewards[i].gameObject.SetActive(false);
             }
         }
     }

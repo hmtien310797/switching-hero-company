@@ -69,9 +69,27 @@ namespace Immortal_Switch.Scripts.Skill
 
         public HeroActor Owner => owner;
 
-        public async UniTask InitializeUltimateSkillData()
+        public async UniTask InitializeUltimateSkillDataAndClassSkillData()
         {
-            await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(ultimateSkill);
+            var prewarmTasks = new List<UniTask>(classSkills.Count + 1);
+
+            for (int i = 0; i < classSkills.Count; i++)
+            {
+                var classSkill = classSkills[i];
+
+                if (classSkill == null)
+                    continue;
+
+                prewarmTasks.Add(
+                    AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(classSkill)
+                );
+            }
+
+            prewarmTasks.Add(
+                AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(ultimateSkill)
+            );
+
+            await UniTask.WhenAll(prewarmTasks);
         }
 
         public void DespawnAllInstanceOfUltimateSkillAndClassSkill()
@@ -787,7 +805,7 @@ namespace Immortal_Switch.Scripts.Skill
                 currentCustomBehaviour = Instantiate(skillData.CustomBehaviourPrefab, transform);
                 currentCustomBehaviour.Init(context);
                 currentCustomBehaviour.Cast();
-                return false;
+                return true;
             }
 
             SkillCastConfig castConfig = skillData.GetCastConfig(level);

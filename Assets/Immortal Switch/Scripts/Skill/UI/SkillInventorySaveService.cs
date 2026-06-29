@@ -18,17 +18,13 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
     public static class SkillInventorySaveService
     {
-        private const string SaveFile = "SkillInventory.es3";
-        private const string AllProgressKey = "all_skill_progress";
-
         private static Dictionary<int, SkillProgressSaveData> cache;
 
         private static void EnsureLoaded()
         {
             if (cache != null)
                 return;
-
-            cache = ES3.Load(AllProgressKey, SaveFile, new Dictionary<int, SkillProgressSaveData>());
+            
             if (cache == null)
                 cache = new Dictionary<int, SkillProgressSaveData>();
         }
@@ -36,7 +32,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private static void SaveAll()
         {
             EnsureLoaded();
-            ES3.Save(AllProgressKey, cache, SaveFile);
         }
 
         public static SkillProgressSaveData GetOrCreate(int skillId)
@@ -122,13 +117,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             SaveAll();
         }
-
-        public static void ClearAll()
-        {
-            cache = new Dictionary<int, SkillProgressSaveData>();
-
-            if (ES3.KeyExists(AllProgressKey, SaveFile))
-                ES3.DeleteKey(AllProgressKey, SaveFile);
-        }
+        
     }
 }

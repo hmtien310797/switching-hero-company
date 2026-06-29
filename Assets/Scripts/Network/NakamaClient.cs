@@ -3,12 +3,14 @@ using System.Threading.Tasks;
 using Nakama;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NakamaClient : MonoBehaviour
 {
     private const string SessionPrefKey        = "nakama.session";
     private const string RefreshTokenPrefKey   = "nakama.refreshtoken";
     private const string SingletonName         = "[NakamaClient]";
+    private const string LoginSceneName        = "LoginScene";
 
     [Header("Server Config")]
     [SerializeField] private string scheme = "http";
@@ -39,6 +41,19 @@ public class NakamaClient : MonoBehaviour
     public bool IsSocketConnected => Socket?.IsConnected ?? false;
     public bool IsLoggedIn         => Session != null && !Session.IsExpired;
 
+    /// <summary>
+    /// Bắn ra khi server buộc đăng xuất tài khoản hiện tại (vd: cùng tài khoản vừa đăng nhập
+    /// ở thiết bị khác). Session local đã bị xoá trước khi event này bắn.
+    /// </summary>
+    public event Action<string> ForceLoggedOut;
+
+    /// <summary>Lý do của lần force-logout gần nhất — LoginScene đọc giá trị này sau khi bị
+    /// chuyển scene để hiển thị thông báo cho người dùng, rồi nên tự xoá.</summary>
+    public string LastForceLogoutReason { get; set; }
+
+    private bool _forceLogoutHandled;
+    private bool _intentionalSocketClose;
+
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -59,7 +74,14 @@ public class NakamaClient : MonoBehaviour
         Socket = Client.NewSocket();
 
         Socket.Connected += () => Debug.Log("[NakamaClient] Socket connected.");
-        Socket.Closed += (reason) => Debug.Log($"[NakamaClient] Socket closed: {reason}");
+        Socket.Closed += (reason) =>
+        {
+            Debug.Log($"[NakamaClient] Socket closed: {reason}");
+            var wasIntentional = _intentionalSocketClose;
+            _intentionalSocketClose = false;
+            if (!wasIntentional)
+                HandleForceLogout("Mất kết nối với server — có thể tài khoản đã đăng nhập ở thiết bị khác.");
+        };
         Socket.ReceivedError += ex => Debug.LogError($"[NakamaClient] Socket error: {ex.Message}");
 
         _ = TryRestoreSessionAsync();
@@ -67,9 +89,33 @@ public class NakamaClient : MonoBehaviour
 
     private void SaveSession(ISession session)
     {
+        _forceLogoutHandled = false;
         PlayerPrefs.SetString(SessionPrefKey, session.AuthToken);
         PlayerPrefs.SetString(RefreshTokenPrefKey, session.RefreshToken ?? "");
         PlayerPrefs.Save();
+    }
+
+    /// <summary>
+    /// Server đã invalidate session hiện tại (sessionLogout/sessionDisconnect khi login ở thiết bị
+    /// khác, hoặc socket bị đóng ngoài ý muốn). Xoá session local, bắn event và quay về LoginScene.
+    /// </summary>
+    private void HandleForceLogout(string reason)
+    {
+        if (_forceLogoutHandled) return;
+        _forceLogoutHandled = true;
+
+        Debug.LogWarning($"[NakamaClient] Force logout: {reason}");
+        ClearSession();
+        LastForceLogoutReason = reason;
+        ForceLoggedOut?.Invoke(reason);
+        _ = ReturnToLoginSceneAsync();
+    }
+
+    private async Task ReturnToLoginSceneAsync()
+    {
+        await DisconnectSocketAsync();
+        if (SceneManager.GetActiveScene().name != LoginSceneName)
+            await SceneManager.LoadSceneAsync(LoginSceneName);
     }
 
     /// <summary>
@@ -109,7 +155,7 @@ public class NakamaClient : MonoBehaviour
     /// <summary>
     /// Authenticate guest bằng device ID — tạo account mới nếu chưa có.
     /// </summary>
-    public async Task<ISession> AuthenticateDeviceAsync() // Guest 
+    public async Task<ISession> AuthenticateDeviceAsync() // Guest
     {
         var deviceId = PlayerPrefs.GetString("nakama.deviceid", null);
         if (string.IsNullOrEmpty(deviceId))
@@ -221,9 +267,36 @@ public class NakamaClient : MonoBehaviour
     /// </summary>
     public async Task RefreshSessionAsync()
     {
-        Session = await Client.SessionRefreshAsync(Session);
-        SaveSession(Session);
-        Debug.Log($"[NakamaClient] Session refreshed. UserId={Session.UserId}");
+        try
+        {
+            Session = await Client.SessionRefreshAsync(Session);
+            SaveSession(Session);
+            Debug.Log($"[NakamaClient] Session refreshed. UserId={Session.UserId}");
+        }
+        catch (ApiResponseException e) when (e.StatusCode == 401)
+        {
+            HandleForceLogout("Tài khoản đã đăng nhập ở thiết bị khác.");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Gọi RPC đã authenticate, tự phát hiện trường hợp session bị server invalidate (401 —
+    /// thường do tài khoản vừa đăng nhập ở thiết bị khác) và chuyển về LoginScene.
+    /// </summary>
+    private async Task<IApiRpc> CallRpcAsync(string id, string payload = null)
+    {
+        try
+        {
+            return payload == null
+                ? await Client.RpcAsync(Session, id)
+                : await Client.RpcAsync(Session, id, payload);
+        }
+        catch (ApiResponseException e) when (e.StatusCode == 401)
+        {
+            HandleForceLogout("Tài khoản đã đăng nhập ở thiết bị khác.");
+            throw;
+        }
     }
 
     /// <summary>
@@ -243,8 +316,9 @@ public class NakamaClient : MonoBehaviour
 
     public async Task DisconnectSocketAsync()
     {
-        if (IsSocketConnected)
-            await Socket.CloseAsync();
+        if (!IsSocketConnected) return;
+        _intentionalSocketClose = true;
+        await Socket.CloseAsync();
     }
 
     public void ClearSession()
@@ -258,7 +332,7 @@ public class NakamaClient : MonoBehaviour
 
     public async Task<HeroListResponse> GetHeroListAsync()
     {
-        var response = await Client.RpcAsync(Session, "hero/list");
+        var response = await CallRpcAsync("hero/list");
         return JsonConvert.DeserializeObject<HeroListResponse>(response.Payload);
     }
 
@@ -268,7 +342,7 @@ public class NakamaClient : MonoBehaviour
     public async Task<HeroSetLineupResponse> SetLineupAsync(string[] lineup)
     {
         var payload = JsonConvert.SerializeObject(new SetLineupRequest { Lineup = lineup });
-        var response = await Client.RpcAsync(Session, "hero/set_lineup", payload);
+        var response = await CallRpcAsync("hero/set_lineup", payload);
         return JsonConvert.DeserializeObject<HeroSetLineupResponse>(response.Payload);
     }
 
@@ -276,7 +350,7 @@ public class NakamaClient : MonoBehaviour
     public async Task<HeroUpgradeResponse> UpgradeHeroAsync(int heroId)
     {
         var payload = JsonConvert.SerializeObject(new HeroUpgradeRequest { HeroId = heroId });
-        var response = await Client.RpcAsync(Session, "hero/upgrade", payload);
+        var response = await CallRpcAsync("hero/upgrade", payload);
         return JsonConvert.DeserializeObject<HeroUpgradeResponse>(response.Payload);
     }
 
@@ -284,7 +358,7 @@ public class NakamaClient : MonoBehaviour
 
     public async Task<BagResponse> GetBagAsync()
     {
-        var response = await Client.RpcAsync(Session, "bag/get");
+        var response = await CallRpcAsync("bag/get");
         return JsonConvert.DeserializeObject<BagResponse>(response.Payload);
     }
 
@@ -292,14 +366,14 @@ public class NakamaClient : MonoBehaviour
 
     public async Task<PlayerMeResponse> GetPlayerMeAsync()
     {
-        var response = await Client.RpcAsync(Session, "player/me");
+        var response = await CallRpcAsync("player/me");
         return JsonConvert.DeserializeObject<PlayerMeResponse>(response.Payload);
     }
 
     public async Task<PlayerUpdateResponse> UpdatePlayerAsync(PlayerUpdateRequest request)
     {
         var payload = JsonUtility.ToJson(request);
-        var response = await Client.RpcAsync(Session, "player/update", payload);
+        var response = await CallRpcAsync("player/update", payload);
         return JsonUtility.FromJson<PlayerUpdateResponse>(response.Payload);
     }
 
@@ -308,21 +382,21 @@ public class NakamaClient : MonoBehaviour
     public async Task<SummonExecuteResponse> SummonHeroAsync(string optionId)
     {
         var payload  = JsonConvert.SerializeObject(new SummonRequest { OptionId = optionId });
-        var response = await Client.RpcAsync(Session, "summon/hero", payload);
+        var response = await CallRpcAsync("summon/hero", payload);
         return JsonConvert.DeserializeObject<SummonExecuteResponse>(response.Payload);
     }
 
     public async Task<SummonExecuteResponse> SummonSkillAsync(string optionId)
     {
         var payload  = JsonConvert.SerializeObject(new SummonRequest { OptionId = optionId });
-        var response = await Client.RpcAsync(Session, "summon/skill", payload);
+        var response = await CallRpcAsync("summon/skill", payload);
         return JsonConvert.DeserializeObject<SummonExecuteResponse>(response.Payload);
     }
 
     public async Task<SummonExecuteResponse> SummonWeaponAsync(string optionId)
     {
         var payload  = JsonConvert.SerializeObject(new SummonRequest { OptionId = optionId });
-        var response = await Client.RpcAsync(Session, "summon/weapon", payload);
+        var response = await CallRpcAsync("summon/weapon", payload);
         return JsonConvert.DeserializeObject<SummonExecuteResponse>(response.Payload);
     }
 
@@ -331,28 +405,28 @@ public class NakamaClient : MonoBehaviour
     public async Task<ClaimRewardResponse> SummonHeroClaimRewardAsync(int summonLevel)
     {
         var payload  = JsonConvert.SerializeObject(new ClaimRewardRequest { SummonLevel = summonLevel });
-        var response = await Client.RpcAsync(Session, "summon/hero/claim_reward", payload);
+        var response = await CallRpcAsync("summon/hero/claim_reward", payload);
         return JsonConvert.DeserializeObject<ClaimRewardResponse>(response.Payload);
     }
 
     public async Task<ClaimRewardResponse> SummonSkillClaimRewardAsync(int summonLevel)
     {
         var payload  = JsonConvert.SerializeObject(new ClaimRewardRequest { SummonLevel = summonLevel });
-        var response = await Client.RpcAsync(Session, "summon/skill/claim_reward", payload);
+        var response = await CallRpcAsync("summon/skill/claim_reward", payload);
         return JsonConvert.DeserializeObject<ClaimRewardResponse>(response.Payload);
     }
 
     public async Task<ClaimRewardResponse> SummonWeaponClaimRewardAsync(int summonLevel)
     {
         var payload  = JsonConvert.SerializeObject(new ClaimRewardRequest { SummonLevel = summonLevel });
-        var response = await Client.RpcAsync(Session, "summon/weapon/claim_reward", payload);
+        var response = await CallRpcAsync("summon/weapon/claim_reward", payload);
         return JsonConvert.DeserializeObject<ClaimRewardResponse>(response.Payload);
     }
 
     /// <summary>Lấy trạng thái summon của cả 3 loại (gọi sau login để đồng bộ).</summary>
     public async Task<SummonStateResponse> GetSummonStateAsync()
     {
-        var response = await Client.RpcAsync(Session, "summon/state", "{}");
+        var response = await CallRpcAsync("summon/state", "{}");
         return JsonConvert.DeserializeObject<SummonStateResponse>(response.Payload);
     }
 
@@ -361,7 +435,7 @@ public class NakamaClient : MonoBehaviour
     /// <summary>Lấy toàn bộ skill sở hữu, shard và trang bị (gọi sau login).</summary>
     public async Task<SkillListResponse> GetSkillListAsync()
     {
-        var response = await Client.RpcAsync(Session, "skill/list", "{}");
+        var response = await CallRpcAsync("skill/list", "{}");
         return JsonConvert.DeserializeObject<SkillListResponse>(response.Payload);
     }
 
@@ -376,7 +450,7 @@ public class NakamaClient : MonoBehaviour
             SlotIndex  = slotIndex,
             SkillUid   = skillUid
         });
-        var response = await Client.RpcAsync(Session, "skill/equip", payload);
+        var response = await CallRpcAsync("skill/equip", payload);
         return JsonConvert.DeserializeObject<SkillEquipResponse>(response.Payload);
     }
 
@@ -384,7 +458,7 @@ public class NakamaClient : MonoBehaviour
     public async Task<SkillUnequipResponse> SkillUnequipAsync(string skillUid)
     {
         var payload = JsonConvert.SerializeObject(new SkillUnequipRequest { SkillUid = skillUid });
-        var response = await Client.RpcAsync(Session, "skill/unequip", payload);
+        var response = await CallRpcAsync("skill/unequip", payload);
         return JsonConvert.DeserializeObject<SkillUnequipResponse>(response.Payload);
     }
 
@@ -392,7 +466,7 @@ public class NakamaClient : MonoBehaviour
     /// level cho mọi skill đủ điều kiện trong 1 lần gọi.</summary>
     public async Task<SkillEnhanceAllResponse> EnhanceAllSkillsAsync()
     {
-        var response = await Client.RpcAsync(Session, "skill/enhance_all", "{}");
+        var response = await CallRpcAsync("skill/enhance_all", "{}");
         return JsonConvert.DeserializeObject<SkillEnhanceAllResponse>(response.Payload);
     }
 
@@ -400,23 +474,39 @@ public class NakamaClient : MonoBehaviour
 
     public async Task<WeaponListResponse> GetWeaponListAsync()
     {
-        var response = await Client.RpcAsync(Session, "weapon/list", "{}");
+        var response = await CallRpcAsync("weapon/list", "{}");
         return JsonConvert.DeserializeObject<WeaponListResponse>(response.Payload);
     }
 
-    /// <summary>Trang bị weapon vào hero (1 slot / hero). weaponUid = null để bỏ trang bị.</summary>
-    public async Task<WeaponEquipResponse> WeaponEquipAsync(string heroUid, string weaponUid = null)
+    /// <summary>Trang bị weapon vào hero (id-based — xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 3). weaponId bỏ qua khi category = "exclusive".</summary>
+    public async Task<WeaponEquipResponse> EquipWeaponAsync(int heroId, string category, int weaponId = 0)
     {
-        var payload  = JsonConvert.SerializeObject(new WeaponEquipRequest { HeroUid = heroUid, WeaponUid = weaponUid });
-        var response = await Client.RpcAsync(Session, "weapon/equip", payload);
+        var payload  = JsonConvert.SerializeObject(new WeaponEquipRequest { HeroId = heroId, Category = category, WeaponId = weaponId });
+        var response = await CallRpcAsync("weapon/equip", payload);
         return JsonConvert.DeserializeObject<WeaponEquipResponse>(response.Payload);
+    }
+
+    /// <summary>Level up weapon (xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 4). heroId dùng khi category = "exclusive", weaponId dùng khi "standard".</summary>
+    public async Task<WeaponUpgradeResponse> UpgradeWeaponAsync(string category, int weaponId = 0, int heroId = 0)
+    {
+        var payload  = JsonConvert.SerializeObject(new WeaponUpgradeRequest { Category = category, WeaponId = weaponId, HeroId = heroId });
+        var response = await CallRpcAsync("weapon/upgrade", payload);
+        return JsonConvert.DeserializeObject<WeaponUpgradeResponse>(response.Payload);
+    }
+
+    /// <summary>Limit break weapon (xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 5). heroId dùng khi category = "exclusive", weaponId dùng khi "standard".</summary>
+    public async Task<WeaponLimitBreakResponse> LimitBreakWeaponAsync(string category, int weaponId = 0, int heroId = 0)
+    {
+        var payload  = JsonConvert.SerializeObject(new WeaponLimitBreakRequest { Category = category, WeaponId = weaponId, HeroId = heroId });
+        var response = await CallRpcAsync("weapon/limitbreak", payload);
+        return JsonConvert.DeserializeObject<WeaponLimitBreakResponse>(response.Payload);
     }
 
     /// <summary>Gỡ weapon khỏi bất kỳ hero nào đang đeo nó.</summary>
     public async Task<WeaponUnequipResponse> WeaponUnequipAsync(string weaponUid)
     {
         var payload  = JsonConvert.SerializeObject(new WeaponUnequipRequest { WeaponUid = weaponUid });
-        var response = await Client.RpcAsync(Session, "weapon/unequip", payload);
+        var response = await CallRpcAsync("weapon/unequip", payload);
         return JsonConvert.DeserializeObject<WeaponUnequipResponse>(response.Payload);
     }
 
@@ -424,8 +514,33 @@ public class NakamaClient : MonoBehaviour
     public async Task<WeaponFuseResponse> FuseWeaponAsync(int weaponId)
     {
         var payload  = JsonConvert.SerializeObject(new WeaponFuseRequest { WeaponId = weaponId });
-        var response = await Client.RpcAsync(Session, "weapon/fuse", payload);
+        var response = await CallRpcAsync("weapon/fuse", payload);
         return JsonConvert.DeserializeObject<WeaponFuseResponse>(response.Payload);
+    }
+
+    // ── Growth Management ─────────────────────────────────────────────────────
+    // Xem Docs/be-growth-rpc-spec.md.
+
+    /// <summary>Đồng bộ toàn bộ tiến trình Growth (current_unlocked_tier + stack từng stat) — gọi sau login và mỗi lần mở màn Growth.</summary>
+    public async Task<GrowthStateResponse> GetGrowthStateAsync()
+    {
+        var response = await CallRpcAsync("growth/state", "{}");
+        return JsonConvert.DeserializeObject<GrowthStateResponse>(response.Payload);
+    }
+
+    /// <summary>Mua thêm stack cho 1 stat bằng Gold. Server tự clamp theo trần stack còn lại — trả bought_amount thực tế.</summary>
+    public async Task<GrowthUpgradeResponse> UpgradeGrowthAsync(string stat, int amount)
+    {
+        var payload  = JsonConvert.SerializeObject(new GrowthUpgradeRequest { Stat = stat, Amount = amount });
+        var response = await CallRpcAsync("growth/upgrade", payload);
+        return JsonConvert.DeserializeObject<GrowthUpgradeResponse>(response.Payload);
+    }
+
+    /// <summary>Mở tier kế tiếp (miễn phí — chỉ là gate xác nhận). Server tự suy next_tier = current_unlocked_tier + 1.</summary>
+    public async Task<GrowthUnlockTierResponse> UnlockGrowthTierAsync()
+    {
+        var response = await CallRpcAsync("growth/unlocktier", "{}");
+        return JsonConvert.DeserializeObject<GrowthUnlockTierResponse>(response.Payload);
     }
 
     // ── Battle ────────────────────────────────────────────────────────────────
@@ -433,7 +548,7 @@ public class NakamaClient : MonoBehaviour
     /// <summary>Progression thật từ server (current_stage/current_chapter/highest_stage_cleared). Gọi sau login trước khi vào màn chọn stage.</summary>
     public async Task<BattleProgression> GetBattleProgressionAsync()
     {
-        var response = await Client.RpcAsync(Session, "battle/progression");
+        var response = await CallRpcAsync("battle/progression");
         return JsonConvert.DeserializeObject<BattleProgression>(response.Payload);
     }
 
@@ -441,8 +556,38 @@ public class NakamaClient : MonoBehaviour
     public async Task<BattleEndResponse> BattleEndAsync(BattleEndRequest request)
     {
         var payload  = JsonConvert.SerializeObject(request);
-        var response = await Client.RpcAsync(Session, "battle/end", payload);
+        var response = await CallRpcAsync("battle/end", payload);
         return JsonConvert.DeserializeObject<BattleEndResponse>(response.Payload);
+    }
+
+    // ── Transmutation ─────────────────────────────────────────────────────────
+
+    /// <summary>Đồng bộ toàn bộ state Luyện Hóa (level/exp/energy/equips/pending) — gọi sau login và mỗi lần mở màn Luyện Hóa.</summary>
+    public async Task<TransmutationListResponse> GetTransmutationListAsync()
+    {
+        var response = await CallRpcAsync("transmutation/list", "{}");
+        return JsonConvert.DeserializeObject<TransmutationListResponse>(response.Payload);
+    }
+
+    /// <summary>Roll 1 lần. RNG luôn nằm server-side — không có field nào để gửi lên (xem Docs/be-transmutation-rpc-spec.md mục 4).</summary>
+    public async Task<TransmutationFuseResponse> FuseTransmutationAsync()
+    {
+        var response = await CallRpcAsync("transmutation/fuse", "{}");
+        return JsonConvert.DeserializeObject<TransmutationFuseResponse>(response.Payload);
+    }
+
+    /// <summary>Chốt giữ item pending hiện tại — server tự biết pending của user, không cần gửi id.</summary>
+    public async Task<TransmutationEquipResponse> EquipTransmutationAsync()
+    {
+        var response = await CallRpcAsync("transmutation/equip", "{}");
+        return JsonConvert.DeserializeObject<TransmutationEquipResponse>(response.Payload);
+    }
+
+    /// <summary>Huỷ item pending hiện tại.</summary>
+    public async Task<TransmutationDismantleResponse> DismantleTransmutationAsync()
+    {
+        var response = await CallRpcAsync("transmutation/dismantle", "{}");
+        return JsonConvert.DeserializeObject<TransmutationDismantleResponse>(response.Payload);
     }
 
     private async void OnApplicationQuit()

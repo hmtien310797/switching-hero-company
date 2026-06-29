@@ -40,12 +40,12 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             UIManager.Instance.TogglePopupAsync<UITransmutationSystemReplaceStuckPanel>().Forget();
         }
 
-        private void OnClickEquip()
+        private async void OnClickEquip()
         {
             if (_newEquip != null &&
                 _oldEquip != null)
             {
-                TransmutationSystemManager.Instance.Equip(_newEquip, _oldEquip);
+                await TransmutationSystemManager.Instance.EquipAsync();
                 OnClickClose();
 
                 _newEquip = null;
@@ -57,9 +57,9 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             }
         }
 
-        private void OnClickDismantle()
+        private async void OnClickDismantle()
         {
-            TransmutationSystemManager.Instance.Dismantle();
+            await TransmutationSystemManager.Instance.DismantleAsync();
             OnClickClose();
 
             _newEquip = null;

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Battle;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Core;
@@ -12,16 +14,27 @@ using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Immortal_Switch.Scripts.Equipment.Editor
 {
     public class WeaponCsvImporterWindow : EditorWindow
     {
-        private TextAsset standardWeaponCsv;
-        private TextAsset exclusiveWeaponCsv;
-        private TextAsset weaponStatCsv;
-        private TextAsset weaponLevelConfigCsv;
-        private TextAsset weaponLimitBreakConfigCsv;
+        // Mỗi URL trỏ tới một sheet/tab khác nhau bằng gid.
+        private const string StandardWeaponCsvUrl =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=1775448913&single=true&output=csv";
+
+        private const string ExclusiveWeaponCsvUrl =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=286312787&single=true&output=csv";
+
+        private const string WeaponStatCsvUrl =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=1553024302&single=true&output=csv";
+
+        private const string WeaponLevelConfigCsvUrl =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=1298802847&single=true&output=csv";
+
+        private const string WeaponLimitBreakConfigCsvUrl =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=368806139&single=true&output=csv";
 
         private string databaseAssetPath = "Assets/Data/Equipment/WeaponDatabase.asset";
         private string standardWeaponFolder = "Assets/Data/Equipment/StandardWeapons";
@@ -29,17 +42,14 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
         private string levelConfigFolder = "Assets/Data/Equipment/LevelConfigs";
         private string limitBreakConfigFolder = "Assets/Data/Equipment/LimitBreakConfigs";
 
-        private const string PrefKeyStandardCsv = "WeaponCsvImporter.StandardCsv";
-        private const string PrefKeyExclusiveCsv = "WeaponCsvImporter.ExclusiveCsv";
-        private const string PrefKeyWeaponStatCsv = "WeaponCsvImporter.WeaponStatCsv";
-        private const string PrefKeyWeaponLevelConfigCsv = "WeaponCsvImporter.LevelConfigCsv";
-        private const string PrefKeyWeaponLimitBreakConfigCsv = "WeaponCsvImporter.LimitBreakConfigCsv";
-
         private const string PrefKeyDatabaseAssetPath = "WeaponCsvImporter.DatabaseAssetPath";
         private const string PrefKeyStandardFolder = "WeaponCsvImporter.StandardFolder";
         private const string PrefKeyExclusiveFolder = "WeaponCsvImporter.ExclusiveFolder";
         private const string PrefKeyLevelConfigFolder = "WeaponCsvImporter.LevelConfigFolder";
         private const string PrefKeyLimitBreakConfigFolder = "WeaponCsvImporter.LimitBreakConfigFolder";
+
+        private bool isImporting;
+        private string importStatus;
 
         private void OnEnable()
         {
@@ -48,12 +58,6 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
         private void LoadPrefs()
         {
-            standardWeaponCsv = LoadAssetFromPrefs<TextAsset>(PrefKeyStandardCsv);
-            exclusiveWeaponCsv = LoadAssetFromPrefs<TextAsset>(PrefKeyExclusiveCsv);
-            weaponStatCsv = LoadAssetFromPrefs<TextAsset>(PrefKeyWeaponStatCsv);
-            weaponLevelConfigCsv = LoadAssetFromPrefs<TextAsset>(PrefKeyWeaponLevelConfigCsv);
-            weaponLimitBreakConfigCsv = LoadAssetFromPrefs<TextAsset>(PrefKeyWeaponLimitBreakConfigCsv);
-
             databaseAssetPath = EditorPrefs.GetString(
                 PrefKeyDatabaseAssetPath,
                 "Assets/Data/Equipment/WeaponDatabase.asset"
@@ -82,32 +86,11 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
         private void SavePrefs()
         {
-            SaveAssetToPrefs(PrefKeyStandardCsv, standardWeaponCsv);
-            SaveAssetToPrefs(PrefKeyExclusiveCsv, exclusiveWeaponCsv);
-            SaveAssetToPrefs(PrefKeyWeaponStatCsv, weaponStatCsv);
-            SaveAssetToPrefs(PrefKeyWeaponLevelConfigCsv, weaponLevelConfigCsv);
-            SaveAssetToPrefs(PrefKeyWeaponLimitBreakConfigCsv, weaponLimitBreakConfigCsv);
-
             EditorPrefs.SetString(PrefKeyDatabaseAssetPath, databaseAssetPath ?? string.Empty);
             EditorPrefs.SetString(PrefKeyStandardFolder, standardWeaponFolder ?? string.Empty);
             EditorPrefs.SetString(PrefKeyExclusiveFolder, exclusiveWeaponFolder ?? string.Empty);
             EditorPrefs.SetString(PrefKeyLevelConfigFolder, levelConfigFolder ?? string.Empty);
             EditorPrefs.SetString(PrefKeyLimitBreakConfigFolder, limitBreakConfigFolder ?? string.Empty);
-        }
-
-        private static void SaveAssetToPrefs(string key, UnityEngine.Object asset)
-        {
-            string path = asset != null ? AssetDatabase.GetAssetPath(asset) : string.Empty;
-            EditorPrefs.SetString(key, path);
-        }
-
-        private static T LoadAssetFromPrefs<T>(string key) where T : UnityEngine.Object
-        {
-            string path = EditorPrefs.GetString(key, string.Empty);
-            if (string.IsNullOrWhiteSpace(path))
-                return null;
-
-            return AssetDatabase.LoadAssetAtPath<T>(path);
         }
 
         [MenuItem("Tools/Equipment/Weapon CSV Importer")]
@@ -120,19 +103,22 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
         {
             EditorGUI.BeginChangeCheck();
 
-            GUILayout.Label("CSV Sources", EditorStyles.boldLabel);
+            GUILayout.Label("Google Sheet Sources", EditorStyles.boldLabel);
 
-            standardWeaponCsv =
-                (TextAsset)EditorGUILayout.ObjectField("StandardWeapon CSV", standardWeaponCsv, typeof(TextAsset),
-                    false);
-            exclusiveWeaponCsv = (TextAsset)EditorGUILayout.ObjectField("ExclusiveWeapon CSV", exclusiveWeaponCsv,
-                typeof(TextAsset), false);
-            weaponStatCsv =
-                (TextAsset)EditorGUILayout.ObjectField("WeaponStat CSV", weaponStatCsv, typeof(TextAsset), false);
-            weaponLevelConfigCsv = (TextAsset)EditorGUILayout.ObjectField("WeaponLevelConfig CSV", weaponLevelConfigCsv,
-                typeof(TextAsset), false);
-            weaponLimitBreakConfigCsv = (TextAsset)EditorGUILayout.ObjectField("WeaponLimitBreakConfig CSV",
-                weaponLimitBreakConfigCsv, typeof(TextAsset), false);
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.TextField("Standard Weapon", StandardWeaponCsvUrl);
+                EditorGUILayout.TextField("Exclusive Weapon", ExclusiveWeaponCsvUrl);
+                EditorGUILayout.TextField("Weapon Stat", WeaponStatCsvUrl);
+                EditorGUILayout.TextField("Level Config", WeaponLevelConfigCsvUrl);
+                EditorGUILayout.TextField("Limit Break Config", WeaponLimitBreakConfigCsvUrl);
+            }
+
+            EditorGUILayout.HelpBox(
+                "Google Sheet phải được chia sẻ quyền Viewer. " +
+                "Mỗi URL phải dùng export?format=csv&gid=...",
+                MessageType.Info
+            );
 
             EditorGUILayout.Space();
             GUILayout.Label("Output", EditorStyles.boldLabel);
@@ -150,60 +136,205 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
             EditorGUILayout.Space();
 
-            using (new EditorGUI.DisabledScope(
-                       standardWeaponCsv == null ||
-                       exclusiveWeaponCsv == null ||
-                       weaponStatCsv == null ||
-                       weaponLevelConfigCsv == null ||
-                       weaponLimitBreakConfigCsv == null))
+            if (!string.IsNullOrWhiteSpace(importStatus))
             {
-                if (GUILayout.Button("Import / Update Weapon Data", GUILayout.Height(32)))
+                EditorGUILayout.HelpBox(
+                    importStatus,
+                    isImporting ? MessageType.Info : MessageType.None
+                );
+            }
+
+            using (new EditorGUI.DisabledScope(isImporting))
+            {
+                string buttonLabel = isImporting
+                    ? "Downloading Google Sheet..."
+                    : "Import / Update Weapon Data";
+
+                if (GUILayout.Button(buttonLabel, GUILayout.Height(32)))
                 {
-                    try
-                    {
-                        SavePrefs();
-                        ImportAll();
-                        EditorUtility.DisplayDialog("Success", "Import weapon CSV completed.", "OK");
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogException(ex);
-                        EditorUtility.DisplayDialog("Import Failed", ex.Message, "OK");
-                    }
+                    ImportAllAsync();
                 }
             }
         }
 
-        private void ImportAll()
+        private async void ImportAllAsync()
         {
-            EnsureFolder(standardWeaponFolder);
-            EnsureFolder(exclusiveWeaponFolder);
-            EnsureFolder(levelConfigFolder);
-            EnsureFolder(limitBreakConfigFolder);
-            EnsureFolder(Path.GetDirectoryName(databaseAssetPath)?.Replace("\\", "/"));
+            if (isImporting)
+                return;
 
-            var standardRows = CsvUtility.ReadRows(AssetDatabase.GetAssetPath(standardWeaponCsv));
-            var exclusiveRows = CsvUtility.ReadRows(AssetDatabase.GetAssetPath(exclusiveWeaponCsv));
-            var statRows = CsvUtility.ReadRows(AssetDatabase.GetAssetPath(weaponStatCsv));
-            var levelRows = CsvUtility.ReadRows(AssetDatabase.GetAssetPath(weaponLevelConfigCsv));
-            var limitBreakRows = CsvUtility.ReadRows(AssetDatabase.GetAssetPath(weaponLimitBreakConfigCsv));
+            isImporting = true;
+            importStatus = "Đang tải dữ liệu từ Google Sheet...";
+            Repaint();
 
-            var statMap = BuildStatMap(statRows);
-            var levelConfigMap = BuildLevelConfigs(levelRows);
-            var limitBreakConfigMap = BuildLimitBreakConfigs(limitBreakRows);
+            try
+            {
+                SavePrefs();
 
-            var standardAssets = ImportStandardWeapons(standardRows, statMap, levelConfigMap, limitBreakConfigMap);
-            var exclusiveAssets = ImportExclusiveWeapons(exclusiveRows, statMap, levelConfigMap, limitBreakConfigMap);
+                EnsureFolder(standardWeaponFolder);
+                EnsureFolder(exclusiveWeaponFolder);
+                EnsureFolder(levelConfigFolder);
+                EnsureFolder(limitBreakConfigFolder);
+                EnsureFolder(Path.GetDirectoryName(databaseAssetPath)?.Replace("\\", "/"));
 
-            BuildDatabase(
-                standardAssets,
-                exclusiveAssets,
-                levelConfigMap.Values.ToList(),
-                limitBreakConfigMap.Values.ToList()
-            );
+                importStatus = "Đang tải Standard Weapon...";
+                Repaint();
 
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+                string standardWeaponCsvText = await DownloadCsvAsync(
+                    StandardWeaponCsvUrl,
+                    "Standard Weapon"
+                );
+
+                importStatus = "Đang tải Exclusive Weapon...";
+                Repaint();
+
+                string exclusiveWeaponCsvText = await DownloadCsvAsync(
+                    ExclusiveWeaponCsvUrl,
+                    "Exclusive Weapon"
+                );
+
+                importStatus = "Đang tải Weapon Stat...";
+                Repaint();
+
+                string weaponStatCsvText = await DownloadCsvAsync(
+                    WeaponStatCsvUrl,
+                    "Weapon Stat"
+                );
+
+                importStatus = "Đang tải Weapon Level Config...";
+                Repaint();
+
+                string weaponLevelConfigCsvText = await DownloadCsvAsync(
+                    WeaponLevelConfigCsvUrl,
+                    "Weapon Level Config"
+                );
+
+                importStatus = "Đang tải Weapon Limit Break Config...";
+                Repaint();
+
+                string weaponLimitBreakConfigCsvText = await DownloadCsvAsync(
+                    WeaponLimitBreakConfigCsvUrl,
+                    "Weapon Limit Break Config"
+                );
+
+                importStatus = "Đang đọc và tạo Weapon Data...";
+                Repaint();
+
+                var standardRows = CsvUtility.ReadRowsFromText(standardWeaponCsvText);
+                var exclusiveRows = CsvUtility.ReadRowsFromText(exclusiveWeaponCsvText);
+                var statRows = CsvUtility.ReadRowsFromText(weaponStatCsvText);
+                var levelRows = CsvUtility.ReadRowsFromText(weaponLevelConfigCsvText);
+                var limitBreakRows = CsvUtility.ReadRowsFromText(weaponLimitBreakConfigCsvText);
+
+                var statMap = BuildStatMap(statRows);
+                var levelConfigMap = BuildLevelConfigs(levelRows);
+                var limitBreakConfigMap = BuildLimitBreakConfigs(limitBreakRows);
+
+                var standardAssets = ImportStandardWeapons(
+                    standardRows,
+                    statMap,
+                    levelConfigMap,
+                    limitBreakConfigMap
+                );
+
+                var exclusiveAssets = ImportExclusiveWeapons(
+                    exclusiveRows,
+                    statMap,
+                    levelConfigMap,
+                    limitBreakConfigMap
+                );
+
+                BuildDatabase(
+                    standardAssets,
+                    exclusiveAssets,
+                    levelConfigMap.Values.ToList(),
+                    limitBreakConfigMap.Values.ToList()
+                );
+
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+
+                importStatus = "Import Google Sheet hoàn tất.";
+
+                EditorUtility.DisplayDialog(
+                    "Success",
+                    "Import weapon data từ Google Sheet hoàn tất.",
+                    "OK"
+                );
+            }
+            catch (Exception ex)
+            {
+                importStatus = $"Import thất bại: {ex.Message}";
+
+                Debug.LogException(ex);
+
+                EditorUtility.DisplayDialog(
+                    "Import Failed",
+                    ex.Message,
+                    "OK"
+                );
+            }
+            finally
+            {
+                isImporting = false;
+                Repaint();
+            }
+        }
+
+        private static async Task<string> DownloadCsvAsync(
+            string url,
+            string sheetName)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                throw new Exception($"Google Sheet URL của '{sheetName}' đang trống.");
+
+            if (!url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                throw new Exception($"Google Sheet URL không hợp lệ của '{sheetName}': {url}");
+
+            using var request = UnityWebRequest.Get(url);
+
+            request.timeout = 30;
+
+            var operation = request.SendWebRequest();
+
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
+
+#if UNITY_2020_2_OR_NEWER
+            bool hasError = request.result != UnityWebRequest.Result.Success;
+#else
+    bool hasError = request.isNetworkError || request.isHttpError;
+#endif
+
+            if (hasError)
+            {
+                throw new Exception(
+                    $"Không thể tải Google Sheet '{sheetName}'.\n" +
+                    $"URL: {url}\n" +
+                    $"HTTP Code: {request.responseCode}\n" +
+                    $"Error: {request.error}"
+                );
+            }
+
+            string csvText = request.downloadHandler.text;
+
+            if (string.IsNullOrWhiteSpace(csvText))
+                throw new Exception($"Google Sheet '{sheetName}' trả về dữ liệu trống.");
+
+            // Trường hợp URL trả về trang đăng nhập hoặc HTML thay vì CSV.
+            string trimmedText = csvText.TrimStart();
+
+            if (trimmedText.StartsWith("<!DOCTYPE html", StringComparison.OrdinalIgnoreCase) ||
+                trimmedText.StartsWith("<html", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception(
+                    $"Google Sheet '{sheetName}' trả về HTML thay vì CSV. " +
+                    "Hãy kiểm tra quyền chia sẻ hoặc URL export CSV."
+                );
+            }
+
+            return csvText;
         }
 
         private Dictionary<string, List<WeaponStatBlock>> BuildStatMap(List<Dictionary<string, string>> rows)
@@ -316,7 +447,6 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
                 HeroClass heroClass = ParseEnum<HeroClass>(GetRequired(row, "Class"), "Class");
                 WeaponTier tier = ParseEnum<WeaponTier>(GetRequired(row, "Tier"), "Tier");
                 int star = ParseInt(GetRequired(row, "Star"), "Star");
-                string iconName = GetOptional(row, "Icon");
                 string statGroupId = GetRequired(row, "StatGroupId");
 
                 WeaponFuseMode fuseMode = ParseEnum<WeaponFuseMode>(GetRequired(row, "FuseMode"), "FuseMode");
@@ -338,7 +468,6 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
                 asset.WeaponClass = heroClass;
                 asset.Tier = tier;
                 asset.Star = star;
-                asset.Icon = FindSpriteByName(iconName);
                 asset.EquipStats = statMap.TryGetValue(statGroupId, out var stats)
                     ? stats.ToArray()
                     : Array.Empty<WeaponStatBlock>();
@@ -373,7 +502,6 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
                 string weaponName = GetRequired(row, "Name");
                 int heroId = ParseInt(GetRequired(row, "HeroId"), "HeroId");
                 HeroClass heroClass = ParseEnum<HeroClass>(GetRequired(row, "Class"), "Class");
-                string iconName = GetOptional(row, "Icon");
                 string statGroupId = GetRequired(row, "StatGroupId");
                 string levelConfigId = GetRequired(row, "LevelConfigId");
                 string limitBreakConfigId = GetRequired(row, "LimitBreakConfigId");
@@ -386,7 +514,6 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
                 asset.WeaponName = weaponName;
                 asset.HeroId = heroId;
                 asset.HeroClass = heroClass;
-                asset.Icon = FindSpriteByName(iconName);
                 asset.EquipStats = statMap.TryGetValue(statGroupId, out var stats)
                     ? stats.ToArray()
                     : Array.Empty<WeaponStatBlock>();
@@ -544,36 +671,58 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
         }
     }
 
-    internal static class CsvUtility
+    public static class CsvUtility
     {
-        public static List<Dictionary<string, string>> ReadRows(string assetPath)
+        public static List<Dictionary<string, string>> ReadRowsFromText(string csvText)
         {
-            if (string.IsNullOrWhiteSpace(assetPath))
-                throw new Exception("CSV asset path is null or empty.");
+            if (string.IsNullOrWhiteSpace(csvText))
+                throw new Exception("CSV content is null or empty.");
 
-            string fullPath = Path.GetFullPath(assetPath);
-            if (!File.Exists(fullPath))
-                throw new Exception($"CSV file not found: {fullPath}");
+            csvText = csvText
+                .Replace("\r\n", "\n")
+                .Replace('\r', '\n');
 
-            string[] lines = File.ReadAllLines(fullPath);
-            if (lines.Length <= 1)
+            List<string> lines = SplitCsvLines(csvText);
+
+            if (lines.Count == 0)
                 return new List<Dictionary<string, string>>();
 
-            var headers = ParseCsvLine(lines[0]).Select(x => x.Trim()).ToList();
+            string headerLine = lines[0].TrimStart('\uFEFF');
+
+            List<string> headers = ParseCsvLine(headerLine);
+
+            for (int i = 0; i < headers.Count; i++)
+            {
+                headers[i] = headers[i].Trim();
+            }
+
             var rows = new List<Dictionary<string, string>>();
 
-            for (int i = 1; i < lines.Length; i++)
+            for (int lineIndex = 1; lineIndex < lines.Count; lineIndex++)
             {
-                if (string.IsNullOrWhiteSpace(lines[i]))
+                string line = lines[lineIndex];
+
+                if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                var values = ParseCsvLine(lines[i]);
-                var row = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                List<string> values = ParseCsvLine(line);
 
-                for (int h = 0; h < headers.Count; h++)
+                var row = new Dictionary<string, string>(
+                    StringComparer.OrdinalIgnoreCase
+                );
+
+                for (int columnIndex = 0; columnIndex < headers.Count; columnIndex++)
                 {
-                    string value = h < values.Count ? values[h] : string.Empty;
-                    row[headers[h]] = value;
+                    string header = headers[columnIndex];
+
+                    if (string.IsNullOrWhiteSpace(header))
+                        continue;
+
+                    string value = columnIndex < values.Count
+                        ? values[columnIndex]
+                        : string.Empty;
+
+                    row[header] = value.Trim();
                 }
 
                 rows.Add(row);
@@ -582,49 +731,104 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
             return rows;
         }
 
-        private static List<string> ParseCsvLine(string line)
+        public static List<string> ParseCsvLine(string line)
         {
-            var result = new List<string>();
+            var values = new List<string>();
+
             if (line == null)
             {
-                result.Add(string.Empty);
-                return result;
+                values.Add(string.Empty);
+                return values;
             }
 
-            bool inQuotes = false;
-            var current = new System.Text.StringBuilder();
+            var currentValue = new StringBuilder();
+
+            bool isInsideQuotes = false;
 
             for (int i = 0; i < line.Length; i++)
             {
-                char c = line[i];
+                char currentCharacter = line[i];
 
-                if (c == '"')
+                if (currentCharacter == '"')
                 {
-                    if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                    bool isEscapedQuote =
+                        isInsideQuotes &&
+                        i + 1 < line.Length &&
+                        line[i + 1] == '"';
+
+                    if (isEscapedQuote)
                     {
-                        current.Append('"');
+                        currentValue.Append('"');
                         i++;
-                    }
-                    else
-                    {
-                        inQuotes = !inQuotes;
+                        continue;
                     }
 
+                    isInsideQuotes = !isInsideQuotes;
                     continue;
                 }
 
-                if (c == ',' && !inQuotes)
+                if (currentCharacter == ',' && !isInsideQuotes)
                 {
-                    result.Add(current.ToString());
-                    current.Clear();
+                    values.Add(currentValue.ToString());
+                    currentValue.Clear();
                     continue;
                 }
 
-                current.Append(c);
+                currentValue.Append(currentCharacter);
             }
 
-            result.Add(current.ToString());
-            return result;
+            values.Add(currentValue.ToString());
+
+            return values;
+        }
+
+        private static List<string> SplitCsvLines(string csvText)
+        {
+            var lines = new List<string>();
+            var currentLine = new StringBuilder();
+
+            bool isInsideQuotes = false;
+
+            for (int i = 0; i < csvText.Length; i++)
+            {
+                char currentCharacter = csvText[i];
+
+                if (currentCharacter == '"')
+                {
+                    bool isEscapedQuote =
+                        isInsideQuotes &&
+                        i + 1 < csvText.Length &&
+                        csvText[i + 1] == '"';
+
+                    if (isEscapedQuote)
+                    {
+                        currentLine.Append(currentCharacter);
+                        currentLine.Append(csvText[i + 1]);
+                        i++;
+                        continue;
+                    }
+
+                    isInsideQuotes = !isInsideQuotes;
+                    currentLine.Append(currentCharacter);
+                    continue;
+                }
+
+                if (currentCharacter == '\n' && !isInsideQuotes)
+                {
+                    lines.Add(currentLine.ToString());
+                    currentLine.Clear();
+                    continue;
+                }
+
+                currentLine.Append(currentCharacter);
+            }
+
+            if (currentLine.Length > 0)
+            {
+                lines.Add(currentLine.ToString());
+            }
+
+            return lines;
         }
     }
 }

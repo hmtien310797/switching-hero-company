@@ -103,7 +103,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             {
                 if (GUILayout.Button("Unlock Next Tier", EditorStyles.toolbarButton, GUILayout.Width(110)))
                 {
-                    manager.UnlockTier(manager.SaveData.CurrentUnlockedTier + 1);
+                    manager.DebugUnlockTierLocal(manager.SaveData.CurrentUnlockedTier + 1);
                     RefreshData();
                 }
 

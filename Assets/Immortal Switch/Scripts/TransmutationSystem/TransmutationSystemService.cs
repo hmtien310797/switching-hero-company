@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
@@ -22,21 +21,52 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             _storage = storage;
         }
 
-        public void UpdateExp(BigInteger quantity)
+        public void ApplyListResponse(TransmutationListResponse response)
         {
-            _storage.Data.UpdateExp(quantity);
+            _storage.Data.Level = response.Level;
+            _storage.Data.Exp = response.Exp;
+            _storage.Data.Energy = response.Energy;
+
+            _storage.Data.Equips.Clear();
+            if (response.Equips != null)
+            {
+                foreach (var dto in response.Equips)
+                {
+                    _storage.Data.Equips[dto.ItemType] = TransmutationSystemHelper.ToPlayerEquipItem(dto);
+                }
+            }
+
+            _storage.Data.StuckEquip = TransmutationSystemHelper.ToPlayerEquipItem(response.Pending);
+
             _storage.Save();
         }
 
-        public void UpdateEnergy(BigInteger quantity)
+        public void ApplyFuseResult(TransmutationFuseResponse response)
         {
-            _storage.Data.UpdateEnergy(quantity);
+            _storage.Data.Energy = response.EnergyBalance;
+            _storage.Data.Exp += response.ExpGained;
+            _storage.Data.Level = response.Level;
+            _storage.Data.StuckEquip = TransmutationSystemHelper.ToPlayerEquipItem(response.Pending);
+
             _storage.Save();
         }
 
-        public void UpdateLevel(int level)
+        public void ApplyEquipResult(TransmutationEquipResponse response)
         {
-            _storage.Data.UpdateLevel(level);
+            _storage.Data.Equips[response.ItemType] =
+                TransmutationSystemHelper.ToPlayerEquipItem(response.ItemType, response.Equipped);
+            _storage.Data.StuckEquip = null;
+
+            _storage.Save();
+        }
+
+        public void ApplyDismantleResult(TransmutationDismantleResponse response)
+        {
+            _storage.Data.Energy = response.EnergyBalance;
+            _storage.Data.Exp += response.ExpGained;
+            _storage.Data.Level = response.Level;
+            _storage.Data.StuckEquip = null;
+
             _storage.Save();
         }
 
@@ -146,17 +176,6 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public IEnumerable<PlayerEquipItem> GetEquips()
         {
             return _storage.Data.Equips.Values;
-        }
-
-        public void Equip(PlayerEquipItem newEquip)
-        {
-            if (!_storage.Data.Equips.TryAdd(newEquip.ItemType, newEquip))
-            {
-                _storage.Data.Equips[newEquip.ItemType] = newEquip;
-                _storage.Data.StuckEquip = null;
-            }
-
-            _storage.Save();
         }
 
         public void SetWaitingMaterial(bool value)

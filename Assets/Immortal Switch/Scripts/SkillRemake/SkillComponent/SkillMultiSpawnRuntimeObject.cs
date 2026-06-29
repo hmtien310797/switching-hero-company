@@ -337,7 +337,7 @@ namespace Immortal_Switch.Scripts.Skill
             base.ForceDespawn();
         }
 
-        public override void OnDespawnedToPool()
+        protected override void OnDespawnedToPool()
         {
             CancelSpawnTask();
 

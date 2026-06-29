@@ -21,7 +21,7 @@ namespace Immortal_Switch.Scripts.Combat
             {
                 var dot = activeDots[i];
 
-                if (dot == null || !dot.IsValid)
+                if (dot == null || !dot.IsValid())
                 {
                     activeDots.RemoveAt(i);
                     continue;

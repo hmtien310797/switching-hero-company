@@ -5,13 +5,14 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.StatSystem;
+using Immortal_Switch.Scripts.TransmutationSystem;
 
 namespace Immortal_Switch.Scripts.PowerUpSystem
 {
     public class PowerUpManager : Singleton<PowerUpManager>
     {
         private GrowthManager growthManager;
-        //private TransmutationSystemManager _transmutationSystemManager;
+        private TransmutationSystemManager _transmutationSystemManager;
 
         private PowerUpSystemService service;
         private readonly List<StatsController> boundPlayerStats = new();
@@ -25,7 +26,7 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
         public override UniTask InitializeAsync()
         {
             growthManager = GrowthManager.Instance;
-            //_transmutationSystemManager = TransmutationSystemManager.Instance;
+            _transmutationSystemManager = TransmutationSystemManager.Instance;
             service = new PowerUpSystemService();
             service.OnPowerUpRebuilt += HandlePowerUpRebuilt;
             TryInitializeSources();
@@ -41,8 +42,8 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
             if (growthManager != null)
                 growthManager.OnGrowthChanged -= HandleAnySourceChanged;
 
-            // if (_transmutationSystemManager != null)
-            //     _transmutationSystemManager.OnEquipChanged -= OnTransmutationSystemEquipChanged;
+            if (_transmutationSystemManager != null)
+                _transmutationSystemManager.OnEquipChanged -= OnTransmutationSystemEquipChanged;
         }
 
         public void TryInitializeSources()
@@ -59,11 +60,11 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
                 growthManager.OnGrowthChanged += HandleAnySourceChanged;
             }
 
-            // if (_transmutationSystemManager != null)
-            // {
-            //     _transmutationSystemManager.OnEquipChanged -= OnTransmutationSystemEquipChanged;
-            //     _transmutationSystemManager.OnEquipChanged += OnTransmutationSystemEquipChanged;
-            // }
+            if (_transmutationSystemManager != null)
+            {
+                _transmutationSystemManager.OnEquipChanged -= OnTransmutationSystemEquipChanged;
+                _transmutationSystemManager.OnEquipChanged += OnTransmutationSystemEquipChanged;
+            }
 
             sourcesInitialized = true;
         }

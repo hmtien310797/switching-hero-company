@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Shared.Database;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Models
 {
@@ -92,7 +91,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
                 return null;
             }
 
-            var rnd = Random.Range(0, rows.Count);
+            var rnd = UnityEngine.Random.Range(0, rows.Count);
             return rows[rnd];
         }
     }

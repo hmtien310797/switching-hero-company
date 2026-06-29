@@ -114,7 +114,13 @@ namespace Immortal_Switch.Scripts.Skill
             for (int i = 0; i < targets.Count; i++)
             {
                 ICombatUnit target = targets[i];
-                DamageResult damageResult =
+
+                if (!HasValidTarget(target))
+                {
+                    continue;
+                }
+                
+                DamageResult damageResult = 
                     DamageCalculator.CalculateDamage(context.Caster, target, effectiveSkillCoefficient);
                 target.TakeDamage(damageResult);
                 SkillCombatEventReporter.ReportDamageDealt(
@@ -125,6 +131,15 @@ namespace Immortal_Switch.Scripts.Skill
                     damageResult
                 );
             }
+        }
+
+        private bool HasValidTarget(ICombatUnit currentTarget)
+        {
+            if (!currentTarget.IsUnityAlive())
+            {
+                return false;
+            }
+            return !currentTarget.IsDead;
         }
 
         private void ExecuteDot(SkillRuntimeContext context, SkillActionData action, SkillTargetType targetType)

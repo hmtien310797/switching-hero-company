@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,10 +9,15 @@ namespace Immortal_Switch.Scripts.StageSelection
     {
         [SerializeField] private Image icon;
         [SerializeField] private Image elementIcon;
-        [SerializeField] private TMP_Text enemyIdText;
-        [SerializeField] private GameObject bossMark;
+        [SerializeField] private TMP_Text txtBoss;
+        [SerializeField] private GameObject overlay;
 
         private bool isBoss;
+
+        private void Awake()
+        {
+            overlay.SetActive(false);
+        }
 
         public void Bind(int enemyId, Sprite enemyIcon = null, bool isBoss = false)
         {
@@ -21,11 +27,8 @@ namespace Immortal_Switch.Scripts.StageSelection
                 icon.gameObject.SetActive(enemyIcon != null);
             }
 
-            if (enemyIdText != null)
-                enemyIdText.text = enemyId.ToString();
-
-            if (bossMark != null)
-                bossMark.SetActive(isBoss);
+            if (txtBoss != null && isBoss)
+                txtBoss.text = "Trùm";
         }
     }
 }

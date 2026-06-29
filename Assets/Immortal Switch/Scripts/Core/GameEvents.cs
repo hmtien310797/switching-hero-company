@@ -25,5 +25,6 @@
         public const string OnAppQuit = "OnAppQuit";
         public const string OnActiveLineupChanged = "OnActiveLineupChanged";
         public const string OnInitSceneDataComplete = "OnInitSceneDataComplete";
+        public const string OnStageChange = "OnStageChange";
     }
 }

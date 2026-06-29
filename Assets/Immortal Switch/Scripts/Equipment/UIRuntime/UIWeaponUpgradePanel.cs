@@ -202,33 +202,33 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             }
         }
 
-        private void OnClickLevelUp()
+        private async void OnClickLevelUp()
         {
             if (WeaponManager.Instance == null || currentDetailVm == null)
                 return;
 
             if (currentDetailVm.IsExclusive)
-                WeaponManager.Instance.TryLevelUpExclusive(currentHeroId);
+                await WeaponManager.Instance.TryLevelUpExclusiveAsync(currentHeroId);
             else
-                WeaponManager.Instance.TryLevelUpStandard(currentDetailVm.WeaponId);
+                await WeaponManager.Instance.TryLevelUpStandardAsync(currentDetailVm.WeaponId);
 
             onChanged?.Invoke();
         }
 
-        private void OnClickLevelUpAll()
+        private async void OnClickLevelUpAll()
         {
             if (WeaponManager.Instance == null || currentDetailVm == null)
                 return;
 
             if (currentDetailVm.IsExclusive)
             {
-                while (WeaponManager.Instance.TryLevelUpExclusive(currentHeroId, false)) { }
+                while (await WeaponManager.Instance.TryLevelUpExclusiveAsync(currentHeroId, false)) { }
                 WeaponManager.Instance.Save();
                 WeaponManager.Instance.NotifyHeroWeaponChanged(currentHeroId);
             }
             else
             {
-                while (WeaponManager.Instance.TryLevelUpStandard(currentDetailVm.WeaponId, false)) { }
+                while (await WeaponManager.Instance.TryLevelUpStandardAsync(currentDetailVm.WeaponId, false)) { }
                 WeaponManager.Instance.Save();
                 WeaponManager.Instance.NotifyStandardWeaponChanged(currentDetailVm.WeaponId);
             }
@@ -236,15 +236,15 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             onChanged?.Invoke();
         }
 
-        private void OnClickLimitBreak()
+        private async void OnClickLimitBreak()
         {
             if (WeaponManager.Instance == null || currentDetailVm == null)
                 return;
 
             if (currentDetailVm.IsExclusive)
-                WeaponManager.Instance.TryLimitBreakExclusive(currentHeroId);
+                await WeaponManager.Instance.TryLimitBreakExclusiveAsync(currentHeroId);
             else
-                WeaponManager.Instance.TryLimitBreakStandard(currentDetailVm.WeaponId);
+                await WeaponManager.Instance.TryLimitBreakStandardAsync(currentDetailVm.WeaponId);
 
             onChanged?.Invoke();
         }

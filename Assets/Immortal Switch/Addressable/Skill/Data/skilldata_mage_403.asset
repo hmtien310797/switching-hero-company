@@ -29,12 +29,12 @@ MonoBehaviour:
     RequireTarget: 1
     MoveToCastRange: 0
     CastRange: 2
-    Cooldown: 1
+    Cooldown: 12
     TargetSelectType: 1
     HeroAnimationName: 
   RuntimeObjectConfig:
     RuntimeVisualType: 2
-    SpawnMode: 1
+    SpawnMode: 0
     RuntimeAddressableKey: prefab_inferno_meteor_rain_controller
     SpawnPositionType: 1
     FollowType: 0
@@ -74,7 +74,7 @@ MonoBehaviour:
     Actions:
     - ActionType: 0
       ChancePercent: 100
-      TargetTypeOverride: 0
+      TargetTypeOverride: 10
       Damage:
         SkillDamageBonusPercent: 210
         ScaleWithClassSkillLevel: 1
@@ -97,7 +97,8 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
-        Radius: 2
+        Anchor: 0
+        Radius: 7
         BoxSize: {x: 2, y: 2}
         Duration: 0
         TickInterval: 0

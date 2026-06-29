@@ -5,6 +5,7 @@ using System.Numerics;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.DungeonSystem.Models;
 using Immortal_Switch.Scripts.ItemSystem.Models;
 using Immortal_Switch.Scripts.Shared.Database;
@@ -48,6 +49,43 @@ namespace Immortal_Switch.Scripts.Shared
         {
             return UniTask.CompletedTask;
         }
+
+#region Helper
+
+        /// <summary>
+        /// lay tier info tu itemkey
+        /// </summary>
+        /// <param name="type">loai currency</param>
+        public async UniTask<ItemSpriteSet> GetSpriteSetByCurrency(CurrencyType type)
+        {
+            return CurrencyMapper.TryParse(type, out var currency) ? await GetSpriteSetByItemKey(currency) : null;
+        }
+
+        /// <summary>
+        /// lay tier info tu itemkey
+        /// </summary>
+        /// <param name="itemKey">itemkey</param>
+        public async UniTask<ItemSpriteSet> GetSpriteSetByItemKey(string itemKey)
+        {
+            var item = ItemDb.FindItem(itemKey);
+
+            if (item != null)
+            {
+                var tier = Enum.TryParse<EItemTier>(item.rarity, true, out var result) ? result : EItemTier.D;
+                var tierInfo = ItemTierDb.Get(tier);
+                var icon = await ItemDb.LoadIcon("icon_diamond");
+
+                return new ItemSpriteSet
+                {
+                    ItemIcon = icon,
+                    TierInfo = tierInfo,
+                };
+            }
+
+            return null;
+        }
+
+#endregion
 
 #region Badword db
 

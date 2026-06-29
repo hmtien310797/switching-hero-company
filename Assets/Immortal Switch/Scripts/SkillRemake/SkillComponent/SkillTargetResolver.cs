@@ -253,15 +253,7 @@ namespace Immortal_Switch.Scripts.Skill
             Vector3 areaCenter,
             Vector3 castDirection)
         {
-            if (unit == null ||
-                unit.IsDead ||
-                areaData == null)
-            {
-                return false;
-            }
-
-            if (unit is Component component &&
-                !component.gameObject.activeInHierarchy)
+            if (!HasValidTarget(unit) || areaData == null)
             {
                 return false;
             }
@@ -295,6 +287,15 @@ namespace Immortal_Switch.Scripts.Skill
                         .sqrMagnitude <= sqrRadius;
                 }
             }
+        }
+        
+        public bool HasValidTarget(ICombatUnit currentTarget)
+        {
+            if (!currentTarget.IsUnityAlive())
+            {
+                return false;
+            }
+            return !currentTarget.IsDead;
         }
         
         private bool IsInsideBox(
@@ -348,6 +349,9 @@ namespace Immortal_Switch.Scripts.Skill
             SkillRuntimeContext context)
         {
             if (context == null)
+                return Vector3.right;
+            
+            if (!context.MainTarget.IsUnityAlive())
                 return Vector3.right;
 
             Vector3 origin =
