@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using Nakama;
 using Newtonsoft.Json;
@@ -11,6 +12,16 @@ public class NakamaClient : MonoBehaviour
     private const string RefreshTokenPrefKey   = "nakama.refreshtoken";
     private const string SingletonName         = "[NakamaClient]";
     private const string LoginSceneName        = "LoginScene";
+
+    /// <summary>Tần suất kiểm tra session còn hạn hay không (giây). Chạy song song với
+    /// auto-refresh nội bộ của Nakama SDK — SDK refresh âm thầm và không báo lỗi ra ngoài,
+    /// nên watchdog này là nơi duy nhất phát hiện refresh token đã hết hạn (vd: AFK quá lâu)
+    /// và đưa người chơi về LoginScene thay vì để app bị treo, không thao tác được nữa.</summary>
+    private const float SessionWatchdogIntervalSec = 30f;
+
+    /// <summary>Chủ động refresh khi AuthToken còn cách hạn dưới ngần này (giây), để không phải
+    /// chờ tới khi nó hết hạn hẳn rồi mới phát hiện refresh token cũng đã chết.</summary>
+    private const int SessionRefreshLeadSec = 120;
 
     [Header("Server Config")]
     [SerializeField] private string scheme = "http";
@@ -85,6 +96,52 @@ public class NakamaClient : MonoBehaviour
         Socket.ReceivedError += ex => Debug.LogError($"[NakamaClient] Socket error: {ex.Message}");
 
         _ = TryRestoreSessionAsync();
+        StartCoroutine(SessionWatchdogRoutine());
+    }
+
+    /// <summary>
+    /// Định kỳ kiểm tra AuthToken sắp hết hạn và chủ động refresh. Đây là cơ chế dự phòng cho
+    /// auto-refresh nội bộ của Nakama SDK: nếu refresh token cũng đã hết hạn (vd: app mở AFK quá
+    /// 1 tiếng không thao tác), SDK chỉ log lỗi rồi thôi chứ không báo cho code game biết — khiến
+    /// app treo, không gọi RPC nào được nữa. Watchdog này gọi RefreshSessionAsync() (đã có sẵn
+    /// try/catch bắt 401 → HandleForceLogout) nên lỗi sẽ được phát hiện và đưa người chơi về
+    /// LoginScene thay vì im lặng treo máy.
+    /// </summary>
+    private IEnumerator SessionWatchdogRoutine()
+    {
+        var wait = new WaitForSeconds(SessionWatchdogIntervalSec);
+        while (true)
+        {
+            yield return wait;
+            if (Session == null) continue;
+            if (!Session.HasExpired(DateTime.UtcNow.AddSeconds(SessionRefreshLeadSec))) continue;
+
+            _ = TryRefreshSessionSilentlyAsync();
+        }
+    }
+
+    /// <summary>Gọi RefreshSessionAsync() và nuốt exception — HandleForceLogout (nếu cần) đã
+    /// chạy bên trong RefreshSessionAsync trước khi nó rethrow, nên ở đây không cần xử lý thêm.</summary>
+    private async Task TryRefreshSessionSilentlyAsync()
+    {
+        try
+        {
+            await RefreshSessionAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[NakamaClient] Watchdog refresh failed: {e.Message}");
+        }
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        // App vừa quay lại foreground sau một khoảng thời gian bị suspend (timer nội bộ của SDK
+        // không chạy khi app bị pause) — kiểm tra lại session ngay thay vì chờ tới chu kỳ watchdog.
+        if (!pauseStatus && Session != null && Session.HasExpired(DateTime.UtcNow.AddSeconds(SessionRefreshLeadSec)))
+        {
+            _ = TryRefreshSessionSilentlyAsync();
+        }
     }
 
     private void SaveSession(ISession session)

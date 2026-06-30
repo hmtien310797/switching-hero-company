@@ -12,7 +12,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         [SerializeField] private TMP_Text statName;
         [SerializeField] private Image statProgress;
         [SerializeField] private TMP_Text statCurrentStackValue;
-        [SerializeField] private Button levelUpButton;
+        [field: SerializeField] public Button levelUpButton { get; private set; }
         [SerializeField] private TMP_Text statValuePay;
         [SerializeField] private Image maxImage;
 
@@ -44,7 +44,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             }
         }
 
-        private void OnClickLevelUp()
+        public void OnClickLevelUp()
         {
             onClickUpgrade?.Invoke(currentStat);
         }

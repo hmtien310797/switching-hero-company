@@ -73,9 +73,10 @@ public class SummonEntry
 [Serializable]
 public class CurrencyBalances
 {
-    [JsonProperty("hero_ticket")]  public int HeroTicket;
-    [JsonProperty("skill_ticket")] public int SkillTicket;
-    [JsonProperty("diamond")]      public int Diamond;
+    [JsonProperty("hero_ticket")]   public int HeroTicket;
+    [JsonProperty("skill_ticket")]  public int SkillTicket;
+    [JsonProperty("weapon_ticket")] public int WeaponTicket;
+    [JsonProperty("diamond")]       public int Diamond;
 }
 
 // ── Response: claim_reward ───────────────────────────────────────────────────

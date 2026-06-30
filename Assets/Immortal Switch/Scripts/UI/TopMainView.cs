@@ -10,6 +10,7 @@ using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.StageSelection;
+using Immortal_Switch.Scripts.Tutorial;
 using Sirenix.OdinInspector;
 using Spine.Unity;
 using UnityEngine;
@@ -27,6 +28,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] CurrencyView currencyView;
         [SerializeField] HeroJoystick heroJostick;
         [SerializeField] private Button autoSkillButton;
+        [SerializeField] private Button autoSwitchButton;
         [SerializeField] private Button profileBtn;
         [SerializeField] private GameObject rotateObject;
         [SerializeField] private GameObject[] hideAbleObjects;
@@ -57,6 +59,8 @@ namespace Immortal_Switch.Scripts.UI
 
         private void Awake()
         {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
             Instance = this;
 
             profileBtn.onClick.AddListener(OnClickProfile);
@@ -65,7 +69,48 @@ namespace Immortal_Switch.Scripts.UI
             HideAbleObjects();
             skeletonGraphic.gameObject.SetActive(false);
         }
+        private UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                // step 6
+                case 6:
+                    //dong het cac ui main view
+                    UIManager.Instance.CloseTopMain();
+                    OnSwitchMainSubHeroButtonClicked();
+                    break;
 
+                case 7:
+                    OnSwitchMainSubHeroButtonClicked();
+                    break;
+                
+                case 8:
+                    OnClickAutoSkill();
+                    break;
+            }
+
+            return UniTask.CompletedTask;
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                // step 6
+                case 6:
+                case 7:
+                    return switchMainSubHeroButton.transform as RectTransform;
+
+                case 8:
+                    return autoSkillButton.transform as RectTransform;
+                
+                case 10:
+                    return autoSwitchButton.transform as RectTransform;
+
+                default:
+                    return null;
+            }
+        }
         private void OnClickProfile()
         {
             UIManager.Instance.OpenPopupAsync<ProfileView>().Forget();
@@ -85,17 +130,17 @@ namespace Immortal_Switch.Scripts.UI
             FarmingIdleScreenService.Close();
         }
 
+        private void OnClickAutoSkill()
+        {
+            isAutoActived = !isAutoActived;
+            UserDataCache.Instance.SetAutoSkill(isAutoActived);
+            rotateObject.transform
+                .DOLocalRotate(new Vector3(0, 0, isAutoActived ? 180 : 0), 0.2f, RotateMode.FastBeyond360)
+                .SetEase(Ease.Linear).SetLoops(-1, LoopType.Incremental);
+        }
         private void Start()
         {
-            autoSkillButton.onClick.AddListener(() =>
-            {
-                isAutoActived = !isAutoActived;
-                UserDataCache.Instance.SetAutoSkill(isAutoActived);
-                rotateObject.transform
-                    .DOLocalRotate(new Vector3(0, 0, isAutoActived ? 180 : 0), 0.2f, RotateMode.FastBeyond360)
-                    .SetEase(Ease.Linear).SetLoops(-1, LoopType.Incremental);
-            });
-
+            autoSkillButton.onClick.AddListener(OnClickAutoSkill);
             SetHeroTeamController(HeroTeamController.Instance);
             moveButton.onClick.AddListener(() =>
             {
@@ -114,6 +159,8 @@ namespace Immortal_Switch.Scripts.UI
         
         private void OnDestroy()
         {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
             GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLost);
             GameEventManager.Unsubscribe(GameEvents.OnWaveStart, OnStageStart);
@@ -173,7 +220,12 @@ namespace Immortal_Switch.Scripts.UI
         {
             for (int i = 0; i < UserDataCache.Instance.inBattleHeroes.Length; i++)
             {
-                HeroDataSO heroDataSo = UserDataCache.Instance.inBattleHeroes[i].HeroData;
+                HeroActor currentHero = UserDataCache.Instance.inBattleHeroes[i];
+                if (currentHero == null)
+                {
+                    continue;
+                }
+                HeroDataSO heroDataSo = currentHero.HeroData;
                 iconHeroImage[i].sprite = HeroImageService.GetHeroIcon(heroDataSo);
             }
         }

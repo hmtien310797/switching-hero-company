@@ -1,0 +1,897 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fceae935f1d75e7488c6be20276e7856, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsTutConfigDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - tutorialId: TUT_001
+    stepId: 1
+    stepKey: 1_1.main
+    tutorialGroup: OPENING
+    triggerType: FirstLogin
+    triggerValue: none
+    conditionKey: 1_1_main_done
+    actionType: Dialogue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 2
+    narratorId: kata
+    localizeKey: TUT.1_1.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_001
+    stepId: 2
+    stepKey: 1_1.variant
+    tutorialGroup: OPENING
+    triggerType: AfterStep
+    triggerValue: 1
+    conditionKey: 1_1_variant_done
+    actionType: Dialogue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 3
+    narratorId: kata
+    localizeKey: TUT.1_1.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_001
+    stepId: 3
+    stepKey: 1_2.main
+    tutorialGroup: OPENING
+    triggerType: AfterStep
+    triggerValue: 2
+    conditionKey: 1_2_main_done
+    actionType: Dialogue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 4
+    narratorId: kata
+    localizeKey: TUT.1_2.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_001
+    stepId: 4
+    stepKey: 1_2.variant
+    tutorialGroup: OPENING
+    triggerType: AfterStep
+    triggerValue: 3
+    conditionKey: 1_2_variant_done
+    actionType: Dialogue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 5
+    narratorId: kata
+    localizeKey: TUT.1_2.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_002
+    stepId: 5
+    stepKey: 2_1.main
+    tutorialGroup: SKILL_SWITCH
+    triggerType: OnScreenOpen
+    triggerValue: SkillScreen
+    conditionKey: 2_1_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: HeroPortrait_Main
+    arrowFrom: GuideNPC
+    arrowTo: HeroPortrait_Main
+    isBlocking: 1
+    nextStepId: 6
+    narratorId: kata
+    localizeKey: TUT.2_1.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_002
+    stepId: 6
+    stepKey: 2_1.variant
+    tutorialGroup: SKILL_SWITCH
+    triggerType: AfterStep
+    triggerValue: 5
+    conditionKey: 2_1_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: HeroPortrait_Main
+    arrowFrom: GuideNPC
+    arrowTo: HeroPortrait_Main
+    isBlocking: 1
+    nextStepId: 7
+    narratorId: kata
+    localizeKey: TUT.2_1.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_002
+    stepId: 7
+    stepKey: 2_2.main
+    tutorialGroup: SKILL_SWITCH
+    triggerType: AfterStep
+    triggerValue: 6
+    conditionKey: 2_2_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: SwitchButton
+    arrowFrom: GuideNPC
+    arrowTo: SwitchButton
+    isBlocking: 1
+    nextStepId: 8
+    narratorId: kata
+    localizeKey: TUT.2_2.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_003
+    stepId: 8
+    stepKey: 3_1.main
+    tutorialGroup: AUTO_MODE
+    triggerType: OnScreenOpen
+    triggerValue: AutoScreen
+    conditionKey: 3_1_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: AutoAttackButton
+    arrowFrom: GuideNPC
+    arrowTo: AutoAttackButton
+    isBlocking: 1
+    nextStepId: 9
+    narratorId: kata
+    localizeKey: TUT.3_1.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_003
+    stepId: 9
+    stepKey: 3_1.variant
+    tutorialGroup: AUTO_MODE
+    triggerType: AfterStep
+    triggerValue: 8
+    conditionKey: 3_1_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: AutoAttackButton
+    arrowFrom: GuideNPC
+    arrowTo: AutoAttackButton
+    isBlocking: 1
+    nextStepId: 10
+    narratorId: kata
+    localizeKey: TUT.3_1.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_003
+    stepId: 10
+    stepKey: 3_2.main
+    tutorialGroup: AUTO_MODE
+    triggerType: AfterStep
+    triggerValue: 9
+    conditionKey: 3_2_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: AutoUltButton
+    arrowFrom: GuideNPC
+    arrowTo: AutoUltButton
+    isBlocking: 1
+    nextStepId: 11
+    narratorId: kata
+    localizeKey: TUT.3_2.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_003
+    stepId: 11
+    stepKey: 3_2.variant
+    tutorialGroup: AUTO_MODE
+    triggerType: AfterStep
+    triggerValue: 10
+    conditionKey: 3_2_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: AutoUltButton
+    arrowFrom: GuideNPC
+    arrowTo: AutoUltButton
+    isBlocking: 1
+    nextStepId: 12
+    narratorId: kata
+    localizeKey: TUT.3_2.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_004
+    stepId: 12
+    stepKey: 4_1.main
+    tutorialGroup: QUEST
+    triggerType: OnScreenOpen
+    triggerValue: QuestScreen
+    conditionKey: 4_1_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: QuestButton
+    arrowFrom: GuideNPC
+    arrowTo: QuestButton
+    isBlocking: 1
+    nextStepId: 13
+    narratorId: kata
+    localizeKey: TUT.4_1.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_004
+    stepId: 13
+    stepKey: 4_1.variant
+    tutorialGroup: QUEST
+    triggerType: AfterStep
+    triggerValue: 12
+    conditionKey: 4_1_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: QuestButton
+    arrowFrom: GuideNPC
+    arrowTo: QuestButton
+    isBlocking: 1
+    nextStepId: 14
+    narratorId: kata
+    localizeKey: TUT.4_1.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_004
+    stepId: 14
+    stepKey: 4_2.main
+    tutorialGroup: QUEST
+    triggerType: AfterStep
+    triggerValue: 13
+    conditionKey: 4_2_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: QuestClaimButton
+    arrowFrom: GuideNPC
+    arrowTo: QuestClaimButton
+    isBlocking: 1
+    nextStepId: 15
+    narratorId: kata
+    localizeKey: TUT.4_2.main
+    rewardRef: QUEST_001
+    rewardItems: gold:5000;diamond:100
+  - tutorialId: TUT_004
+    stepId: 15
+    stepKey: 4_2.variant
+    tutorialGroup: QUEST
+    triggerType: AfterStep
+    triggerValue: 14
+    conditionKey: 4_2_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: QuestClaimButton
+    arrowFrom: GuideNPC
+    arrowTo: QuestClaimButton
+    isBlocking: 1
+    nextStepId: 16
+    narratorId: kata
+    localizeKey: TUT.4_2.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 16
+    stepKey: 5_1.main
+    tutorialGroup: TEAM_SETUP
+    triggerType: OnScreenOpen
+    triggerValue: TeamScreen
+    conditionKey: 5_1_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: SummonEntryButton
+    arrowFrom: GuideNPC
+    arrowTo: SummonEntryButton
+    isBlocking: 1
+    nextStepId: 17
+    narratorId: kata
+    localizeKey: TUT.5_1.main
+    rewardRef: SUMMON_STARTER
+    rewardItems: summon_ticket:10;advanced_summon_ticket:1
+  - tutorialId: TUT_005
+    stepId: 17
+    stepKey: 5_1.variant
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 16
+    conditionKey: 5_1_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: SummonEntryButton
+    arrowFrom: GuideNPC
+    arrowTo: SummonEntryButton
+    isBlocking: 1
+    nextStepId: 18
+    narratorId: kata
+    localizeKey: TUT.5_1.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 18
+    stepKey: 5_2.main
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 17
+    conditionKey: 5_2_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: SummonButton
+    arrowFrom: GuideNPC
+    arrowTo: SummonButton
+    isBlocking: 1
+    nextStepId: 19
+    narratorId: kata
+    localizeKey: TUT.5_2.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 19
+    stepKey: 5_2.variant
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 18
+    conditionKey: 5_2_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: SummonButton
+    arrowFrom: GuideNPC
+    arrowTo: SummonButton
+    isBlocking: 1
+    nextStepId: 20
+    narratorId: kata
+    localizeKey: TUT.5_2.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 20
+    stepKey: 5_3.main
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 19
+    conditionKey: 5_3_main_done
+    actionType: TapContinue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 21
+    narratorId: kata
+    localizeKey: TUT.5_3.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 21
+    stepKey: 5_3.variant
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 20
+    conditionKey: 5_3_variant_done
+    actionType: TapContinue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 22
+    narratorId: kata
+    localizeKey: TUT.5_3.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 22
+    stepKey: 5_4.main
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 21
+    conditionKey: 5_4_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: HeroAreaButton
+    arrowFrom: GuideNPC
+    arrowTo: HeroAreaButton
+    isBlocking: 1
+    nextStepId: 23
+    narratorId: kata
+    localizeKey: TUT.5_4.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 23
+    stepKey: 5_4.variant
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 22
+    conditionKey: 5_4_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: HeroAreaButton
+    arrowFrom: GuideNPC
+    arrowTo: HeroAreaButton
+    isBlocking: 1
+    nextStepId: 24
+    narratorId: kata
+    localizeKey: TUT.5_4.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 24
+    stepKey: 5_5.main
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 23
+    conditionKey: 5_5_main_done
+    actionType: DragOrClick
+    highlightType: Circle
+    targetUI: TeamSlot_Empty
+    arrowFrom: GuideNPC
+    arrowTo: TeamSlot_Empty
+    isBlocking: 1
+    nextStepId: 25
+    narratorId: kata
+    localizeKey: TUT.5_5.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 25
+    stepKey: 5_5.variant
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 24
+    conditionKey: 5_5_variant_done
+    actionType: DragOrClick
+    highlightType: Circle
+    targetUI: TeamSlot_Empty
+    arrowFrom: GuideNPC
+    arrowTo: TeamSlot_Empty
+    isBlocking: 1
+    nextStepId: 26
+    narratorId: kata
+    localizeKey: TUT.5_5.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 26
+    stepKey: 5_6.main
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 25
+    conditionKey: 5_6_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: ConfirmTeamButton
+    arrowFrom: GuideNPC
+    arrowTo: ConfirmTeamButton
+    isBlocking: 1
+    nextStepId: 27
+    narratorId: kata
+    localizeKey: TUT.5_6.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_005
+    stepId: 27
+    stepKey: 5_6.variant
+    tutorialGroup: TEAM_SETUP
+    triggerType: AfterStep
+    triggerValue: 26
+    conditionKey: 5_6_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: ConfirmTeamButton
+    arrowFrom: GuideNPC
+    arrowTo: ConfirmTeamButton
+    isBlocking: 1
+    nextStepId: 28
+    narratorId: kata
+    localizeKey: TUT.5_6.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_006
+    stepId: 28
+    stepKey: 6_1.main
+    tutorialGroup: GROWTH_UPGRADE
+    triggerType: OnScreenOpen
+    triggerValue: GrowthScreen
+    conditionKey: 6_1_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: GrowthEntryButton
+    arrowFrom: GuideNPC
+    arrowTo: GrowthEntryButton
+    isBlocking: 1
+    nextStepId: 29
+    narratorId: kata
+    localizeKey: TUT.6_1.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_006
+    stepId: 29
+    stepKey: 6_1.variant
+    tutorialGroup: GROWTH_UPGRADE
+    triggerType: AfterStep
+    triggerValue: 28
+    conditionKey: 6_1_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: GrowthEntryButton
+    arrowFrom: GuideNPC
+    arrowTo: GrowthEntryButton
+    isBlocking: 1
+    nextStepId: 30
+    narratorId: kata
+    localizeKey: TUT.6_1.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_006
+    stepId: 30
+    stepKey: 6_2.main
+    tutorialGroup: GROWTH_UPGRADE
+    triggerType: AfterStep
+    triggerValue: 29
+    conditionKey: 6_2_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: StatUpgradeButton
+    arrowFrom: GuideNPC
+    arrowTo: StatUpgradeButton
+    isBlocking: 1
+    nextStepId: 31
+    narratorId: kata
+    localizeKey: TUT.6_2.main
+    rewardRef: GROWTH_STARTER
+    rewardItems: gold:10000;hero_exp:2000
+  - tutorialId: TUT_006
+    stepId: 31
+    stepKey: 6_2.variant
+    tutorialGroup: GROWTH_UPGRADE
+    triggerType: AfterStep
+    triggerValue: 30
+    conditionKey: 6_2_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: StatUpgradeButton
+    arrowFrom: GuideNPC
+    arrowTo: StatUpgradeButton
+    isBlocking: 1
+    nextStepId: 32
+    narratorId: kata
+    localizeKey: TUT.6_2.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_006
+    stepId: 32
+    stepKey: 6_3.main
+    tutorialGroup: GROWTH_UPGRADE
+    triggerType: AfterStep
+    triggerValue: 31
+    conditionKey: 6_3_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: ExitButton
+    arrowFrom: GuideNPC
+    arrowTo: ExitButton
+    isBlocking: 1
+    nextStepId: 33
+    narratorId: kata
+    localizeKey: TUT.6_3.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_006
+    stepId: 33
+    stepKey: 6_3.variant
+    tutorialGroup: GROWTH_UPGRADE
+    triggerType: AfterStep
+    triggerValue: 32
+    conditionKey: 6_3_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: ExitButton
+    arrowFrom: GuideNPC
+    arrowTo: ExitButton
+    isBlocking: 1
+    nextStepId: 34
+    narratorId: kata
+    localizeKey: TUT.6_3.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_006
+    stepId: 34
+    stepKey: 6_4.main
+    tutorialGroup: GROWTH_UPGRADE
+    triggerType: AfterStep
+    triggerValue: 33
+    conditionKey: 6_4_main_done
+    actionType: Dialogue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 35
+    narratorId: kata
+    localizeKey: TUT.6_4.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_006
+    stepId: 35
+    stepKey: 6_4.variant
+    tutorialGroup: GROWTH_UPGRADE
+    triggerType: AfterStep
+    triggerValue: 34
+    conditionKey: 6_4_variant_done
+    actionType: Dialogue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 36
+    narratorId: kata
+    localizeKey: TUT.6_4.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 36
+    stepKey: 7_1.main
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: OnScreenOpen
+    triggerValue: EquipScreen
+    conditionKey: 7_1_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: WeaponSummonEntry
+    arrowFrom: GuideNPC
+    arrowTo: WeaponSummonEntry
+    isBlocking: 1
+    nextStepId: 37
+    narratorId: kata
+    localizeKey: TUT.7_1.main
+    rewardRef: WEAPON_STARTER
+    rewardItems: weapon_ore:50;weapon_gem:20;equipment_upgrade_stone:30
+  - tutorialId: TUT_007
+    stepId: 37
+    stepKey: 7_1.variant
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 36
+    conditionKey: 7_1_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: WeaponSummonEntry
+    arrowFrom: GuideNPC
+    arrowTo: WeaponSummonEntry
+    isBlocking: 1
+    nextStepId: 38
+    narratorId: kata
+    localizeKey: TUT.7_1.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 38
+    stepKey: 7_2.main
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 37
+    conditionKey: 7_2_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: WeaponSummonButton
+    arrowFrom: GuideNPC
+    arrowTo: WeaponSummonButton
+    isBlocking: 1
+    nextStepId: 39
+    narratorId: kata
+    localizeKey: TUT.7_2.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 39
+    stepKey: 7_2.variant
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 38
+    conditionKey: 7_2_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: WeaponSummonButton
+    arrowFrom: GuideNPC
+    arrowTo: WeaponSummonButton
+    isBlocking: 1
+    nextStepId: 40
+    narratorId: kata
+    localizeKey: TUT.7_2.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 40
+    stepKey: 7_3.main
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 39
+    conditionKey: 7_3_main_done
+    actionType: TapContinue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 41
+    narratorId: kata
+    localizeKey: TUT.7_3.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 41
+    stepKey: 7_3.variant
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 40
+    conditionKey: 7_3_variant_done
+    actionType: TapContinue
+    highlightType: None
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
+    isBlocking: 1
+    nextStepId: 42
+    narratorId: kata
+    localizeKey: TUT.7_3.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 42
+    stepKey: 7_4.main
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 41
+    conditionKey: 7_4_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: EquipAreaButton
+    arrowFrom: GuideNPC
+    arrowTo: EquipAreaButton
+    isBlocking: 1
+    nextStepId: 43
+    narratorId: kata
+    localizeKey: TUT.7_4.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 43
+    stepKey: 7_4.variant
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 42
+    conditionKey: 7_4_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: EquipAreaButton
+    arrowFrom: GuideNPC
+    arrowTo: EquipAreaButton
+    isBlocking: 1
+    nextStepId: 44
+    narratorId: kata
+    localizeKey: TUT.7_4.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 44
+    stepKey: 7_5.main
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 43
+    conditionKey: 7_5_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: WeaponSlot_Empty
+    arrowFrom: GuideNPC
+    arrowTo: WeaponSlot_Empty
+    isBlocking: 1
+    nextStepId: 45
+    narratorId: kata
+    localizeKey: TUT.7_5.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 45
+    stepKey: 7_5.variant
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 44
+    conditionKey: 7_5_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: WeaponSlot_Empty
+    arrowFrom: GuideNPC
+    arrowTo: WeaponSlot_Empty
+    isBlocking: 1
+    nextStepId: 46
+    narratorId: kata
+    localizeKey: TUT.7_5.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 46
+    stepKey: 7_6.main
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 45
+    conditionKey: 7_6_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: WeaponListItem
+    arrowFrom: GuideNPC
+    arrowTo: WeaponListItem
+    isBlocking: 1
+    nextStepId: 47
+    narratorId: kata
+    localizeKey: TUT.7_6.main
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 47
+    stepKey: 7_6.variant
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 46
+    conditionKey: 7_6_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: WeaponListItem
+    arrowFrom: GuideNPC
+    arrowTo: WeaponListItem
+    isBlocking: 1
+    nextStepId: 48
+    narratorId: kata
+    localizeKey: TUT.7_6.variant
+    rewardRef: none
+    rewardItems: 
+  - tutorialId: TUT_007
+    stepId: 48
+    stepKey: 7_7.main
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 47
+    conditionKey: 7_7_main_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: EquipConfirmButton
+    arrowFrom: GuideNPC
+    arrowTo: EquipConfirmButton
+    isBlocking: 1
+    nextStepId: 49
+    narratorId: kata
+    localizeKey: TUT.7_7.main
+    rewardRef: FTUE_COMPLETE
+    rewardItems: gold:50000;diamond:500;crystal:50;advanced_summon_ticket:5;energy:120;rare_equipment_chest:2
+  - tutorialId: TUT_007
+    stepId: 49
+    stepKey: 7_7.variant
+    tutorialGroup: EQUIP_WEAPON
+    triggerType: AfterStep
+    triggerValue: 48
+    conditionKey: 7_7_variant_done
+    actionType: FocusClick
+    highlightType: Circle
+    targetUI: EquipConfirmButton
+    arrowFrom: GuideNPC
+    arrowTo: EquipConfirmButton
+    isBlocking: 1
+    nextStepId: 0
+    narratorId: kata
+    localizeKey: TUT.7_7.variant
+    rewardRef: none
+    rewardItems: 

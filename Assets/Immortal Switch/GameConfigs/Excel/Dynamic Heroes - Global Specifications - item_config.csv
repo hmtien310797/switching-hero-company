@@ -6,8 +6,8 @@ item_id,item_key,item_type,item_group,item_name,desc,rarity,is_currency,is_stack
 5,arena_token,Currency,ShopToken,Arena Token,Token nhận từ Arena PvP dùng trong Arena Shop,C,TRUE,TRUE,999999999,Resource,icon_arena_token,5,Active
 6,guild_coin,Currency,ShopToken,Guild Coin,Coin nhận từ Guild Boss và Guild Event dùng trong Guild Shop,C,TRUE,TRUE,999999999,Resource,icon_guild_coin,6,Active
 7,event_token,Currency,EventCurrency,Event Token,Token giới hạn thời gian dùng để đổi reward trong Event Shop,C,TRUE,TRUE,999999999,Resource,icon_event_token,7,Active
-8,summon_ticket,Gacha,Ticket,Summon Ticket,Vé summon hero trong banner thường,C,FALSE,TRUE,999999,Consume,icon_summon_ticket,8,Active
-9,advanced_summon_ticket,Gacha,Ticket,Advanced Summon Ticket,Vé summon cao cấp với tỉ lệ hero hiếm cao hơn,B,FALSE,TRUE,999999,Consume,icon_advanced_summon_ticket,9,Active
+8,summon_ticket_hero,Gacha,Ticket,Summon Ticket Heroes,Vé summon hero trong banner thường,C,FALSE,TRUE,999999,Consume,icon_summon_ticket,8,Active
+9,summon_ticket_weapon,Gacha,Ticket,Summon Ticket Weapon,Vé summon weapon,B,FALSE,TRUE,999999,Consume,icon_summon_ticket_weapon,9,Active
 10,hero_exp,Resource,HeroGrowth,Hero EXP,Tài nguyên dùng để tăng level hero,D,FALSE,TRUE,999999999,Consume,icon_hero_exp,10,Active
 11,hero_fragment,Resource,HeroFragment,Hero Fragment,Mảnh hero dùng để mở khóa hoặc nâng sao hero,C,FALSE,TRUE,999999,Consume,icon_hero_fragment,11,Active
 12,epic_hero_fragment,Resource,HeroFragment,Epic Hero Fragment,Mảnh hero Epic dùng để tiến hóa hero cấp Epic,B,FALSE,TRUE,999999,Consume,icon_epic_hero_fragment,12,Active
@@ -44,3 +44,5 @@ item_id,item_key,item_type,item_group,item_name,desc,rarity,is_currency,is_stack
 43,weapon_ore,Upgrade,WeaponUpgrade,Weapon Ore,"Nguyên liệu nâng cấp vũ khí, nhận từ Hầm Trang Bị",D,FALSE,TRUE,9999999,Consume,icon_weapon_ore,43,Active
 44,weapon_gem,Upgrade,WeaponUpgrade,Weapon Gem,"Nguyên liệu cường hóa vũ khí, nhận từ Hầm Trang Bị",C,FALSE,TRUE,9999999,Consume,icon_weapon_gem,44,Active
 45,weapon_essence,Upgrade,WeaponUpgrade,Weapon Essence,"Nguyên liệu tinh luyện vũ khí cấp cao, nhận từ Hầm Trang Bị",B,FALSE,TRUE,9999999,Consume,icon_weapon_essence,45,Active
+46,summon_ticket_skill,Gacha,Ticket,Summon Ticket Skill,Vé summon skill trong banner thường,C,FALSE,TRUE,999999,Consume,icon_summon_ticket_skill,46,Active
+47,summon_ticket_hero_banner,Gacha,Ticket,Summon Ticket hero banner,Vé summon hero trong banner event,B,FALSE,TRUE,999999,Consume,icon_summon_ticket_hero_banner,47,Active

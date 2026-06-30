@@ -18,7 +18,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
         public static WeaponManager Instance { get; private set; }
 
         [SerializeField] private WeaponDatabaseSO database;
-        private const string SaveKey = "weapon_save_data";
 
         private WeaponSaveData saveData;
 
@@ -67,16 +66,10 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             fuse = new WeaponFuseService(database, inventory);
         }
 
-        public void Save()
-        {
-            ES3.Save(SaveKey, saveData);
-        }
 
-        public void Load()
+        private void Load()
         {
-            saveData = ES3.KeyExists(SaveKey)
-                ? ES3.Load<WeaponSaveData>(SaveKey)
-                : new WeaponSaveData();
+            saveData = new WeaponSaveData();
         }
 
         /// <summary>
@@ -138,9 +131,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                     });
                 }
             }
-
-            if (autoSave)
-                Save();
         }
 
         /// <summary>Gọi weapon/list rồi apply ngay qua <see cref="SyncFromServer"/> — dùng khi cần re-sync (mở màn hình Trang Bị).</summary>
@@ -173,9 +163,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                 state.Level = Mathf.Max(1, state.Level);
             }
 
-            if (autoSave)
-                Save();
-
             NotifyStandardWeaponChanged(weaponId);
         }
 
@@ -186,9 +173,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 
             var state = inventory.GetOrCreateStandardState(weaponId);
             state.CurrentShard += amount;
-
-            if (autoSave)
-                Save();
 
             NotifyStandardWeaponChanged(weaponId);
         }
@@ -205,10 +189,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                 state.IsUnlocked = true;
                 state.Level = Mathf.Max(1, state.Level);
             }
-
-            if (autoSave)
-                Save();
-
+            
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
         }
         
@@ -239,11 +220,63 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 
             totalShardAfter = state.CurrentShard;
 
-            if (autoSave)
-                Save();
-
             NotifyStandardWeaponChanged(weaponId);
             return true;
+        }
+
+        /// <summary>
+        /// Apply 1 weapon/summon RPC roll result locally — weaponId is already resolved server-side
+        /// to the correct target (see be summon.js addWeaponOrShardByClass: duplicate-of-lower-tier
+        /// rolls redirect to the currently held weapon_id, rolls ahead jump the held record forward).
+        /// Each class chain has at most 1 local <see cref="StandardWeaponState"/> too (same identity
+        /// rule as the server's owned[] — weapon/fuse mutates in place, never duplicates), so this
+        /// must never create a 2nd parallel local state for a class already unlocked. Returns the
+        /// shard balance after applying, for the summon result UI (was previously hard-coded to 0
+        /// since nothing actually synced summoned weapons into local inventory until the next
+        /// weapon/list call).
+        /// </summary>
+        public int ApplyStandardSummonEntry(int weaponId, int shardGained, bool autoSave = false)
+        {
+            var rolledDef = database.GetStandard(weaponId);
+            if (rolledDef == null)
+                return 0;
+
+            StandardWeaponState existing = null;
+            foreach (var state in saveData.StandardWeapons)
+            {
+                if (!state.IsUnlocked) continue;
+                var def = database.GetStandard(state.WeaponId);
+                if (def != null && def.WeaponClass == rolledDef.WeaponClass)
+                {
+                    existing = state;
+                    break;
+                }
+            }
+
+            StandardWeaponState target;
+
+            if (existing == null)
+            {
+                target = inventory.GetOrCreateStandardState(weaponId);
+                target.IsUnlocked = true;
+                target.Level = Mathf.Max(1, target.Level);
+            }
+            else if (weaponId <= existing.WeaponId)
+            {
+                target = existing;
+            }
+            else
+            {
+                // Roll landed ahead of the player's current chain position — jump the existing
+                // record forward (free upgrade), same mutation weapon/fuse already does.
+                existing.WeaponId = weaponId;
+                target = existing;
+            }
+
+            target.CurrentShard = Mathf.Max(0, target.CurrentShard + shardGained);
+
+            NotifyStandardWeaponChanged(target.WeaponId);
+            return target.CurrentShard;
         }
 
         public void AddExclusiveShard(int heroId, int amount, bool autoSave = true)
@@ -257,9 +290,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 
             var state = inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
             state.CurrentShard += amount;
-
-            if (autoSave)
-                Save();
 
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
         }
@@ -291,9 +321,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 
             ApplyEquipResult(response);
 
-            if (autoSave)
-                Save();
-
             NotifyHeroWeaponChanged(heroId);
             return true;
         }
@@ -320,9 +347,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             }
 
             ApplyEquipResult(response);
-
-            if (autoSave)
-                Save();
 
             NotifyHeroWeaponChanged(heroId);
             return true;
@@ -434,7 +458,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 
             if (changedAny)
             {
-                Save();
                 NotifyAllRelevantWeaponChangesAfterFuseAll(result);
             }
 
@@ -574,7 +597,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 
             if (uiResult.HasAnyReward)
             {
-                Save();
                 NotifyAllRelevantWeaponChangesAfterFuseAll(uiResult);
             }
 
@@ -582,10 +604,9 @@ namespace Immortal_Switch.Scripts.Equipment.Core
         }
 
         /// <summary>
-        /// Level up standard weapon qua RPC weapon/upgrade. Server validate trần level theo
-        /// limit-break stage, client apply level mới rồi mới trừ WeaponEnhancementStone local
-        /// theo stone_cost server trả về (currency chưa được server validate — xem
-        /// Docs/be-weapon-equip-upgrade-rpc-spec.md mục 4 &amp; 7).
+        /// Level up standard weapon qua RPC weapon/upgrade. Server giờ validate/trừ thật
+        /// weapon_ore qua bag.items và trả về stone_balance tuyệt đối sau khi trừ — client chỉ
+        /// Set() lại CurrencyManager theo đúng số đó, không tự trừ cục bộ nữa (tránh lệch số).
         /// </summary>
         public async UniTask<bool> TryLevelUpStandardAsync(int weaponId, bool autoSave = true)
         {
@@ -608,10 +629,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             }
 
             inventory.GetOrCreateStandardState(weaponId).Level = response.NewLevel;
-            SpendStoneForUpgrade(response.StoneCost, CurrencyTransactionReason.LevelUpStandardWeapon);
-
-            if (autoSave)
-                Save();
+            CurrencyManager.Instance.Set(CurrencyType.weapon_ore, response.StoneBalance);
 
             NotifyStandardWeaponChanged(weaponId);
             return true;
@@ -643,10 +661,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             }
 
             inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId).Level = response.NewLevel;
-            SpendStoneForUpgrade(response.StoneCost, CurrencyTransactionReason.LevelUpExclusiveWeapon);
-
-            if (autoSave)
-                Save();
+            CurrencyManager.Instance.Set(CurrencyType.weapon_ore, response.StoneBalance);
 
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
             return true;
@@ -679,10 +694,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             }
 
             inventory.GetOrCreateStandardState(weaponId).LimitBreakStage = response.NewStage;
-            SpendStoneForUpgrade(response.StoneCost, CurrencyTransactionReason.LimitBreakStandardWeapon);
-
-            if (autoSave)
-                Save();
+            SpendStoneForLimitBreak(response.StoneCost, CurrencyTransactionReason.LimitBreakStandardWeapon);
 
             NotifyStandardWeaponChanged(weaponId);
 
@@ -717,10 +729,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             }
 
             inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId).LimitBreakStage = response.NewStage;
-            SpendStoneForUpgrade(response.StoneCost, CurrencyTransactionReason.LimitBreakExclusiveWeapon);
-
-            if (autoSave)
-                Save();
+            SpendStoneForLimitBreak(response.StoneCost, CurrencyTransactionReason.LimitBreakExclusiveWeapon);
 
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
 
@@ -738,17 +747,14 @@ namespace Immortal_Switch.Scripts.Equipment.Core
         }
 
         /// <summary>
-        /// Currency vẫn do client tự quản lý cho tới khi có wallet sync chung — server chỉ trả
-        /// stone_cost để client trừ đúng số (xem Docs/be-weapon-equip-upgrade-rpc-spec.md mục 7).
+        /// Limit break vẫn dùng WeaponBreakThroughStone local-only (server chưa validate/trừ
+        /// currency cho limit break — chỉ trả RNG result + stage, xem rpcWeaponLimitBreak).
+        /// Level up KHÔNG còn dùng hàm này — xem TryLevelUpStandardAsync/TryLevelUpExclusiveAsync,
+        /// giờ Set() trực tiếp theo stone_balance tuyệt đối server trả về.
         /// </summary>
-        private static void SpendStoneForUpgrade(int stoneCost, CurrencyTransactionReason reason)
+        private static void SpendStoneForLimitBreak(int stoneCost, CurrencyTransactionReason reason)
         {
-            var currencyType = reason == CurrencyTransactionReason.LimitBreakStandardWeapon ||
-                                reason == CurrencyTransactionReason.LimitBreakExclusiveWeapon
-                ? CurrencyType.WeaponBreakThroughStone
-                : CurrencyType.WeaponEnhancementStone;
-
-            CurrencyLedgerService.Instance.TrySpend(currencyType, stoneCost, reason);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.WeaponBreakThroughStone, stoneCost, reason);
         }
 
         /// <summary>Fuse local-only (không gọi server) — dùng cho Editor debug và nhánh ToRandomExclusive (spec server chưa cover).</summary>
@@ -757,9 +763,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             var result = fuse.TryFuseStandard(weaponId);
             if (!result.Success)
                 return result;
-
-            if (autoSave)
-                Save();
 
             NotifyStandardWeaponChanged(weaponId);
 
@@ -813,10 +816,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             }
 
             ApplyFuseResult(response);
-
-            if (autoSave)
-                Save();
-
+            
             NotifyStandardWeaponChanged(response.OldWeaponId);
             NotifyStandardWeaponChanged(response.NewWeaponId);
 
@@ -837,6 +837,11 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                 newState.Level = Mathf.Max(1, oldState.Level);
                 newState.LimitBreakStage = 0;
             }
+
+            // Server carries any leftover shard (banked beyond FuseShardRequired) forward to the
+            // new id so Fuse All can keep chaining — apply that here instead of leaving it at 0,
+            // otherwise local state would desync from server right after the first fuse in a batch.
+            newState.CurrentShard = Mathf.Max(0, response.NewWeaponShardBalance);
         }
 
         public void NotifyHeroWeaponChanged(int heroId)
@@ -862,9 +867,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             var state = inventory.GetOrCreateStandardState(weaponId);
             state.Level = Mathf.Max(1, level);
 
-            if (autoSave)
-                Save();
-
             NotifyStandardWeaponChanged(weaponId);
         }
 
@@ -873,9 +875,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             var state = inventory.GetOrCreateStandardState(weaponId);
             state.LimitBreakStage = Mathf.Max(0, stage);
 
-            if (autoSave)
-                Save();
-
             NotifyStandardWeaponChanged(weaponId);
         }
 
@@ -883,9 +882,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
         {
             var state = inventory.GetOrCreateStandardState(weaponId);
             state.CurrentShard = Mathf.Max(0, shard);
-
-            if (autoSave)
-                Save();
 
             NotifyStandardWeaponChanged(weaponId);
         }
@@ -899,9 +895,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             var state = inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
             state.Level = Mathf.Max(1, level);
 
-            if (autoSave)
-                Save();
-
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
         }
 
@@ -913,9 +906,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 
             var state = inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
             state.LimitBreakStage = Mathf.Max(0, stage);
-
-            if (autoSave)
-                Save();
 
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
         }
@@ -929,9 +919,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             var state = inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
             state.CurrentShard = Mathf.Max(0, shard);
 
-            if (autoSave)
-                Save();
-
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
         }
 
@@ -944,10 +931,21 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             var state = inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
             state.CurrentStar = Mathf.Max(1, star);
 
-            if (autoSave)
-                Save();
-
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
+        }
+
+        /// <summary>
+        /// Debug-only: cấp tạm currency cho test account cũ. weapon_ore (Level Up) giờ đã có nguồn
+        /// cấp thật (player_defaults.js lúc tạo account + server trừ/trả balance thật qua
+        /// weapon/upgrade) — hàm này chỉ còn cần cho account tạo trước migration hoặc đã xài hết.
+        /// WeaponBreakThroughStone (Limit Break) vẫn chưa có nguồn cấp thật nào (shop/reward).
+        /// </summary>
+        public void DebugAddWeaponCurrency(CurrencyType currencyType, int amount)
+        {
+            if (amount <= 0)
+                return;
+
+            CurrencyLedgerService.Instance?.AddOrMergeIncome(currencyType, amount, CurrencyTransactionReason.DebugGrant);
         }
     }
 }

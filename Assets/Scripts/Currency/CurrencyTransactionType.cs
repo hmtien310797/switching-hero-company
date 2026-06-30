@@ -29,6 +29,9 @@
         LevelUpStandardWeapon,
         LevelUpExclusiveWeapon,
         LimitBreakStandardWeapon,
-        LimitBreakExclusiveWeapon
+        LimitBreakExclusiveWeapon,
+
+        DebugGrant,
+        TutorialReward = 115,
     }
 }

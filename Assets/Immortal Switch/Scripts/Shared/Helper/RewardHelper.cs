@@ -3,7 +3,7 @@ using System.Numerics;
 using Immortal_Switch.Scripts.ItemSystem.Models;
 using UnityEngine;
 
-namespace Immortal_Switch.Scripts.Helper
+namespace Immortal_Switch.Scripts.Shared.Helper
 {
     public static class RewardHelper
     {

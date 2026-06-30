@@ -223,13 +223,11 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (currentDetailVm.IsExclusive)
             {
                 while (await WeaponManager.Instance.TryLevelUpExclusiveAsync(currentHeroId, false)) { }
-                WeaponManager.Instance.Save();
                 WeaponManager.Instance.NotifyHeroWeaponChanged(currentHeroId);
             }
             else
             {
                 while (await WeaponManager.Instance.TryLevelUpStandardAsync(currentDetailVm.WeaponId, false)) { }
-                WeaponManager.Instance.Save();
                 WeaponManager.Instance.NotifyStandardWeaponChanged(currentDetailVm.WeaponId);
             }
 

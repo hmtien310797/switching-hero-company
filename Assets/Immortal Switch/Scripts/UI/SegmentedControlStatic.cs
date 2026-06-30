@@ -25,6 +25,17 @@ namespace Immortal_Switch.Scripts.UI
             SetSelected(defaultIndex, true);
         }
 
+        public SegmentedControlOption GetOptions(int idx)
+        {
+            if (idx < 0 ||
+                idx >= options.Count)
+            {
+                return null;
+            }
+
+            return options[idx];
+        }
+
         private void BindOptions()
         {
             for (int i = 0; i < options.Count; i++)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
@@ -32,6 +33,9 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
         private int setExclusiveLevel = 1;
         private int setExclusiveLimitBreak = 0;
         private int setExclusiveStar = 1;
+
+        private int grantWeaponEnhancementStoneAmount = 10000;
+        private int grantWeaponBreakThroughStoneAmount = 10000;
 
         [MenuItem("Tools/Debug Window/Equipment/Weapon Debug Window")]
         public static void Open()
@@ -85,6 +89,9 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
             EditorGUILayout.Space(8);
 
             DrawEquipSection();
+            EditorGUILayout.Space(8);
+
+            DrawCurrencySection();
             EditorGUILayout.Space(8);
 
             DrawRuntimePreview();
@@ -316,6 +323,31 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
             if (GUILayout.Button("Refresh Hero Equipment Runtime"))
             {
                 WeaponManager.Instance.NotifyHeroWeaponChanged(selectedHeroId);
+            }
+
+            EditorGUILayout.EndVertical();
+        }
+
+        private void DrawCurrencySection()
+        {
+            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.LabelField("CURRENCY (DEBUG)", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox(
+                "Level Up giờ dùng weapon_ore (server trừ thật qua weapon/upgrade, player_defaults.js " +
+                "đã cấp sẵn 9999 lúc tạo account mới — chỉ cần grant tay nếu test account cũ đã hết). " +
+                "WeaponBreakThroughStone (Limit Break) vẫn chưa có nguồn cấp thật, grant tạm để test.",
+                MessageType.Info);
+
+            grantWeaponEnhancementStoneAmount = EditorGUILayout.IntField("Grant weapon_ore", grantWeaponEnhancementStoneAmount);
+            if (GUILayout.Button("Grant weapon_ore"))
+            {
+                WeaponManager.Instance.DebugAddWeaponCurrency(CurrencyType.weapon_ore, grantWeaponEnhancementStoneAmount);
+            }
+
+            grantWeaponBreakThroughStoneAmount = EditorGUILayout.IntField("Grant BreakThrough Stone", grantWeaponBreakThroughStoneAmount);
+            if (GUILayout.Button("Grant BreakThrough Stone"))
+            {
+                WeaponManager.Instance.DebugAddWeaponCurrency(CurrencyType.WeaponBreakThroughStone, grantWeaponBreakThroughStoneAmount);
             }
 
             EditorGUILayout.EndVertical();

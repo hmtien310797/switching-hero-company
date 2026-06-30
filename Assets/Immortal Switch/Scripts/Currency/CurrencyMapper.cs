@@ -78,6 +78,12 @@ namespace Immortal_Switch.Scripts.Currency
             [CurrencyType.weapon_essence] = "weapon_essence",
         };
 
+        private static readonly Dictionary<string, CurrencyType> StringToEnum =
+            EnumToString.ToDictionary(
+                pair => pair.Value,
+                pair => pair.Key,
+                StringComparer.OrdinalIgnoreCase);
+
         public static string Parse(CurrencyType type)
         {
             return EnumToString.TryGetValue(type, out var value)
@@ -88,6 +94,18 @@ namespace Immortal_Switch.Scripts.Currency
         public static bool TryParse(CurrencyType type, out string value)
         {
             return EnumToString.TryGetValue(type, out value);
+        }
+
+        public static CurrencyType Parse(string key)
+        {
+            return StringToEnum.TryGetValue(key, out var value)
+                ? value
+                : throw new ArgumentException($"Unknown currency key: {key}", nameof(key));
+        }
+
+        public static bool TryParse(string key, out CurrencyType value)
+        {
+            return StringToEnum.TryGetValue(key, out value);
         }
     }
 }

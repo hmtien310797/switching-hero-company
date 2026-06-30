@@ -328,7 +328,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             panel.CanLevelUpAll = CalculateLevelUpAllCostStandard(def, state) > 0 &&
                                   CurrencyLedgerService.Instance != null &&
                                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(
-                                      CurrencyType.WeaponEnhancementStone,
+                                      CurrencyType.weapon_ore,
                                       CalculateLevelUpAllCostStandard(def, state)
                                   );
 
@@ -496,6 +496,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (deployedHeroes == null || deployedHeroes.Count == 0 || WeaponManager.Instance == null)
                 return false;
 
+            bool hasHero = false;
             for (int i = 0; i < deployedHeroes.Count; i++)
             {
                 var hero = deployedHeroes[i];
@@ -503,14 +504,18 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                     continue;
 
                 if (hero.HeroClass != heroClass)
+                {
                     continue;
+                }
 
+                hasHero = true;
                 var source = WeaponManager.Instance.Inventory.ResolveActiveSource(hero.GetHeroId());
-                if (source == WeaponEquipSource.Standard)
-                    return true;
+                if (source == WeaponEquipSource.Exclusive)
+                    return false;
+                break;
             }
 
-            return false;
+            return hasHero;
         }
 
         private bool CanLevelUpStandard(int weaponId)
@@ -533,7 +538,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(state.Level + 1) : 0;
             return CurrencyLedgerService.Instance != null &&
                    cost > 0 &&
-                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.WeaponEnhancementStone, cost);
+                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.weapon_ore, cost);
         }
 
         private bool CanLevelUpExclusive(int heroId)
@@ -556,7 +561,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(state.Level + 1) : 0;
             return CurrencyLedgerService.Instance != null &&
                    cost > 0 &&
-                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.WeaponEnhancementStone, cost);
+                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.weapon_ore, cost);
         }
 
         private bool CanLimitBreakStandard(int weaponId)

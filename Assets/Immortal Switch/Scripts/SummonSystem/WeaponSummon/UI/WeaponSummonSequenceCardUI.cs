@@ -69,8 +69,15 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 weaponIconImage.enabled = entry.Icon != null;
             }
 
+            // Count (number of rolls that landed on this card) instead of TotalShardGained —
+            // a first-time unlock or a free tier-up (rolled ahead of the class' current node)
+            // both have ShardGained=0 even though the player did get the card, which used to
+            // show a misleading "x0".
             if (amountText != null)
-                amountText.text = $"x{entry.TotalShardGained}";
+            {
+                
+                amountText.text = $"x{entry.Count}";
+            }
 
             if (newTag != null)
                 newTag.SetActive(entry.IsNewWeapon);

@@ -5,10 +5,6 @@ public class BottomMainButton : NavigationButtonBase
 {
     public void AddListener(UnityAction methodCall)
     {
-        Button.onClick.AddListener(() =>
-        {
-            methodCall();
-            SetStateByManager(NavState.Hover);
-        });
+        Button.onClick.AddListener(methodCall);
     }
 }

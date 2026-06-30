@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.Tutorial;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -40,7 +41,31 @@ namespace Immortal_Switch.Scripts.UI.Skill
 
         private void Awake()
         {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
             BindSlotClickEvents();
+        }
+
+        private UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            // step 5
+            if (arg2 == 5)
+            {
+                HandleSlotClicked(classSkillSlots[0]);
+            }
+
+            return UniTask.CompletedTask;
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            // step 5
+            if (arg2 == 5)
+            {
+                return classSkillSlots[0].transform as RectTransform;
+            }
+
+            return null;
         }
 
         private void OnEnable()
@@ -52,6 +77,12 @@ namespace Immortal_Switch.Scripts.UI.Skill
         private void OnDisable()
         {
             UnbindControllerEvent();
+        }
+
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
         }
 
         private void Update()

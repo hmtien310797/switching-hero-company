@@ -16,6 +16,7 @@ using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.WeaponSummon;
+using Immortal_Switch.Scripts.Tutorial;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
@@ -45,6 +46,7 @@ namespace Immortal_Switch.Scripts.Core
 
                 // Fetch player data — includes heroes/skills/weapons inventory
                 PlayerMeResponse player = null;
+
                 try
                 {
                     player = await NakamaClient.Instance.GetPlayerMeAsync();
@@ -60,6 +62,7 @@ namespace Immortal_Switch.Scripts.Core
                 try
                 {
                     var skillList = await NakamaClient.Instance.GetSkillListAsync();
+
                     if (skillList != null)
                     {
                         UserDataCache.Instance.SkillList = skillList;
@@ -92,6 +95,7 @@ namespace Immortal_Switch.Scripts.Core
                 await UIManager.Instance.InitializeAsync();
                 await HeroImageService.InitializeAsync();
                 await PvEBattleController.Instance.InitializeAsync();
+                TutorialManager.Instance.TryGuide(TutorialGuideIds.NEW_USER_GUIDE);
 
                 Debug.Log("Bootstrap completed");
             }
@@ -154,6 +158,9 @@ namespace Immortal_Switch.Scripts.Core
             CurrencyManager.Instance.Set(CurrencyType.diamond, player.gems);
             CurrencyManager.Instance.Set(CurrencyType.HeroTicket, player.hero_ticket);
             CurrencyManager.Instance.Set(CurrencyType.SkillTicket, player.skill_ticket);
+            CurrencyManager.Instance.Set(CurrencyType.WeaponTicket, player.weapon_ticket);
+            CurrencyManager.Instance.Set(CurrencyType.weapon_ore, player.weapon_ore);
+
 
             if (player.heroes != null)
             {
@@ -166,12 +173,13 @@ namespace Immortal_Switch.Scripts.Core
             }
 
             UserDataCache.Instance.GetPlayerDataFromServer(player.heroes, player.skills, player.weapons);
-            
+
             // current_stage/current_chapter/highest_stage_cleared — nguồn sự thật cho stage,
             // không cần gọi battle/progression riêng (chỉ gọi lại khi resync sau STAGE_MISMATCH/INVALID_STAGE)
             PvEBattleController.Instance.ApplyServerProgression(player.progression);
 
-            Debug.Log($"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, Energy={player.energy}");
+            Debug.Log($"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, WeaponTicket={player.weapon_ticket}, WeaponOre={player.weapon_ore}, Energy={player.energy}");
+
 
         }
 
@@ -202,7 +210,9 @@ namespace Immortal_Switch.Scripts.Core
             {
                 foreach (var skill in skills.Owned)
                 {
-                    if (skill.SkillId <= 0) continue;
+                    if (skill.SkillId <= 0)
+                        continue;
+
                     SkillInventorySaveService.SetOwned(skill.SkillId, true);
                     SkillInventorySaveService.SetLevel(skill.SkillId, skill.Level > 0 ? skill.Level : 1);
                 }
@@ -212,14 +222,15 @@ namespace Immortal_Switch.Scripts.Core
             {
                 foreach (var kv in skills.Shards)
                 {
-                    if (int.TryParse(kv.Key, out int skillId) && skillId > 0)
+                    if (int.TryParse(kv.Key, out int skillId) &&
+                        skillId > 0)
                         SkillInventorySaveService.SetCurrentShard(skillId, kv.Value);
                 }
             }
 
             SkillInventorySaveService.Save();
         }
-        
+
         private void SyncWeaponListToManager(WeaponListResponse weaponList)
         {
             if (weaponList == null)

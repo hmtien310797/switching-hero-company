@@ -1,4 +1,3 @@
-using System.Numerics;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Shared.UI;
 using TMPro;
@@ -11,9 +10,9 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views.UI
         [Header("Reward references")] [SerializeField]
         private TextMeshProUGUI txtQuantity;
 
-        public void BindQuantity(BigInteger quantity)
+        public void BindQuantity(BigNumber quantity)
         {
-            txtQuantity.text = BigIntegerHelper.Format(quantity);
+            txtQuantity.text = quantity.ToInputString();
         }
     }
 }

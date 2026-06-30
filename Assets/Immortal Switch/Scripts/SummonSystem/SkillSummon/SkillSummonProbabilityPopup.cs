@@ -152,8 +152,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (summonLevelText != null)
                 summonLevelText.text = $"Lv.{levelData.SummonLevel}";
 
-            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), levelData.GradeBRate);
-            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common), levelData.GradeARate);
+            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common), levelData.GradeBRate);
+            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), levelData.GradeARate);
             gradeSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Legendary), levelData.GradeSRate);
             gradeSSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Mythic) , levelData.GradeSSRate);
 
@@ -169,8 +169,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (summonLevelText != null)
                 summonLevelText.text = "Lv.-";
 
-            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon) , 0f);
-            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common), 0f);
+            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common) , 0f);
+            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), 0f);
             gradeSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Legendary), 0f);
             gradeSSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Mythic), 0f);
 

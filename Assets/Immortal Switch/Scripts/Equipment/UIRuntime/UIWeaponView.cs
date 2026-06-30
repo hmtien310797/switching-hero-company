@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using Battle;
+using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.UI;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Tutorial;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,33 +12,69 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {
     public class UIWeaponView : MonoBehaviour
     {
-        [Header("References")]
-        [SerializeField] private WeaponViewDataProvider dataProvider;
+        [Header("References")] [SerializeField]
+        private WeaponViewDataProvider dataProvider;
 
-        [Header("Mode Tabs")]
-        [SerializeField] private Button btnStandardTab;
+        [Header("Mode Tabs")] [SerializeField] private Button btnStandardTab;
         [SerializeField] private Button btnExclusiveTab;
         [SerializeField] private GameObject standardRoot;
         [SerializeField] private GameObject exclusiveRoot;
 
-        [Header("Class Tabs")]
-        [SerializeField] private UIWeaponClassTabItem[] uIWeaponClassTabItems;
+        [Header("Class Tabs")] [SerializeField]
+        private UIWeaponClassTabItem[] uIWeaponClassTabItems;
 
-        [Header("Shared Weapon Item Container")]
-        [SerializeField] private Transform weaponItemContainer;
+        [Header("Shared Weapon Item Container")] [SerializeField]
+        private Transform weaponItemContainer;
+
         [SerializeField] private UIStandardWeaponItem standardItemPrefab;
         [SerializeField] private UIExclusiveWeaponItem exclusiveItemPrefab;
 
-        [Header("Detail")]
-        [SerializeField] private UIWeaponDetailPanel detailPanel;
-        
+        [Header("Detail")] [SerializeField] private UIWeaponDetailPanel detailPanel;
+
         private readonly List<UIStandardWeaponItem> standardItems = new();
         private readonly List<UIExclusiveWeaponItem> exclusiveItems = new();
-
+        private StandardWeaponTabViewModel vmStandard;
+        
         private WeaponMainTab currentMainTab = WeaponMainTab.Standard;
         private HeroClass selectedClass = HeroClass.Archer;
         private int selectedStandardWeaponId;
         private int selectedHeroId;
+
+        private void Awake()
+        {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
+        }
+
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
+        }
+
+        private UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 46:
+                    OnSelectStandardWeapon(vmStandard.Weapons[0].WeaponId);
+                    break;
+            }
+
+            return UniTask.CompletedTask;
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 46:
+                    return standardItems[0].transform as RectTransform;
+                
+                default:
+                    return null;
+            }
+        }
 
         public void Setup(WeaponViewDataProvider provider, int heroId, HeroClass defaultClass, List<HeroActor> deployedHeroes)
         {
@@ -82,7 +121,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             RefreshMode();
             RefreshCurrentTab();
         }
-        
+
         public void SetDeployedHeroes(List<HeroActor> heroes)
         {
             if (dataProvider != null)
@@ -118,6 +157,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         private void RefreshStandardTab()
         {
             var vm = dataProvider.BuildStandardTab(selectedClass, selectedStandardWeaponId, selectedHeroId);
+            vmStandard = vm;
+
             if (vm == null)
                 return;
 
@@ -125,20 +166,23 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             BindStandardItems(vm.Weapons);
             HideExclusiveItems();
 
-            if (vm.SelectedDetail != null && detailPanel != null)
+            if (vm.SelectedDetail != null &&
+                detailPanel != null)
                 detailPanel.Bind(vm.SelectedDetail, selectedHeroId, RefreshAll);
         }
 
         private void RefreshExclusiveTab()
         {
             var vm = dataProvider.BuildExclusiveTab(selectedHeroId);
+
             if (vm == null)
                 return;
 
             BindExclusiveItems(vm.ExclusiveCard);
             HideStandardItems();
 
-            if (vm.SelectedDetail != null && detailPanel != null)
+            if (vm.SelectedDetail != null &&
+                detailPanel != null)
                 detailPanel.Bind(vm.SelectedDetail, selectedHeroId, RefreshAll);
         }
 
@@ -241,8 +285,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         {
             selectedClass = heroClass;
             selectedStandardWeaponId = 0;
-
-            HeroActor heroController = PvEBattleController.Instance.TryGetActiveHeroByClass(heroClass);
+            
+            HeroActor heroController = UserDataCache.Instance.TryGetActiveHeroByClass(heroClass);
             if (PvEBattleController.Instance != null &&
                 heroController != null)
             {

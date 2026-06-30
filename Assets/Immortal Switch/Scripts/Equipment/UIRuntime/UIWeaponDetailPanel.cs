@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
+using Immortal_Switch.Scripts.Tutorial;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,8 +13,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {
     public class UIWeaponDetailPanel : MonoBehaviour
     {
-        [Header("Top Info")]
-        [SerializeField] private TMP_Text txtWeaponName;
+        [Header("Top Info")] [SerializeField] private TMP_Text txtWeaponName;
+
         [Header("Equip Effect")] [SerializeField]
         private Transform statLineContainer;
 
@@ -49,6 +51,42 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         private int currentHeroId;
         private Action onRequestRefresh;
 
+        private void Awake()
+        {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
+        }
+
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
+        }
+
+        private UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 46:
+                    btnEquip.onClick.Invoke();
+                    break;
+            }
+
+            return UniTask.CompletedTask;
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 48:
+                    return btnEquip.transform as RectTransform;
+
+                default:
+                    return null;
+            }
+        }
+
         private void OnEnable()
         {
             RefreshVisual();
@@ -67,6 +105,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (txtWeaponName != null)
                 txtWeaponName.text = vm.WeaponName;
+
             selectedWeapon.BindCommon(
                 vm.Icon,
                 $"+{vm.Level}",

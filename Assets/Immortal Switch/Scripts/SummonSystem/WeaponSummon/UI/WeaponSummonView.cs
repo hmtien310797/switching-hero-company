@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
+using Immortal_Switch.Scripts.Tutorial;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,37 +19,71 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
     {
         public override SummonCategory Category => SummonCategory.Weapon;
 
-        [Header("Buttons")]
-        [SerializeField] private SummonButtonUI summonButtonA;
+        [Header("Buttons")] [SerializeField] private SummonButtonUI summonButtonA;
         [SerializeField] private SummonButtonUI summonButtonB;
 
-        [Header("Texts")]
-        [SerializeField] private TMP_Text summonLevelText;
+        [Header("Texts")] [SerializeField] private TMP_Text summonLevelText;
 
-        [Header("Progress")]
-        [SerializeField] private Image summonLevelProgressFill;
+        [Header("Progress")] [SerializeField] private Image summonLevelProgressFill;
 
-        [Header("Reward Preview")]
-        [SerializeField] private SummonLevelRewardPreviewUI levelRewardPreviewUI;
+        [Header("Reward Preview")] [SerializeField]
+        private SummonLevelRewardPreviewUI levelRewardPreviewUI;
 
-        [Header("Popup")]
-        [SerializeField] private SummonConfirmPopup confirmPopup;
+        [Header("Popup")] [SerializeField] private SummonConfirmPopup confirmPopup;
         [SerializeField] private WeaponSummonProbabilityPopup probabilityPopup;
         [SerializeField] private WeaponSummonSequencePopup sequencePopup;
 
-        [Header("Achievement")]
-        [SerializeField] private SummonAchievementRewardView summonAchievementRewardView;
+        [Header("Achievement")] [SerializeField]
+        private SummonAchievementRewardView summonAchievementRewardView;
+
         [SerializeField] private Button summonAchievementButton;
 
-        [Header("Probability")]
-        [SerializeField] private Button probabilityInfoButton;
+        [Header("Probability")] [SerializeField]
+        private Button probabilityInfoButton;
 
-        [Header("Option Id")]
-        [SerializeField] private string optionAId = "summon_30";
+        [Header("Option Id")] [SerializeField] private string optionAId = "summon_30";
         [SerializeField] private string optionBId = "summon_50";
 
         private bool isBound;
         private bool isSummoning;
+
+        private void Awake()
+        {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
+        }
+
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
+        }
+
+        private UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 39:
+                {
+                    TrySummon(optionBId);
+                    break;
+                }
+            }
+
+            return UniTask.CompletedTask;
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 39:
+                    return summonButtonB.transform as RectTransform;
+
+                default:
+                    return null;
+            }
+        }
 
         private void OnEnable()
         {
@@ -60,7 +95,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         private void OnDisable()
         {
             UnsubscribeEvents();
-            
         }
 
         protected override void OnShowPanel()
@@ -70,12 +104,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         protected override void OnHidePanel()
         {
-            
         }
 
         public override bool HasNotification()
         {
-            if (WeaponSummonManager.Instance == null || WeaponSummonManager.Instance.Service == null)
+            if (WeaponSummonManager.Instance == null ||
+                WeaponSummonManager.Instance.Service == null)
                 return false;
 
             var claimables = WeaponSummonManager.Instance.Service.GetClaimableRewardLevels();
@@ -84,7 +118,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         public override void RefreshView()
         {
-            if (WeaponSummonManager.Instance == null || WeaponSummonManager.Instance.Service == null)
+            if (WeaponSummonManager.Instance == null ||
+                WeaponSummonManager.Instance.Service == null)
                 return;
 
             RefreshSummonLevel();
@@ -154,7 +189,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         private void OpenProbabilityPopup()
         {
-            if (probabilityPopup == null || WeaponSummonManager.Instance == null)
+            if (probabilityPopup == null ||
+                WeaponSummonManager.Instance == null)
                 return;
 
             probabilityPopup.Show(WeaponSummonManager.Instance.GetCurrentSummonLevel());
@@ -164,7 +200,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         {
             summonAchievementRewardView?.Show(SummonAchievementTab.Weapon);
         }
-        
+
         private void TrySummon(string optionId)
         {
             if (isSummoning)
@@ -185,6 +221,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (paymentType == WeaponSummonPaymentType.Gem)
             {
                 bool skipConfirm = WeaponSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
+
                 if (skipConfirm)
                 {
                     ExecuteSummonAsync(optionId).Forget();
@@ -235,6 +272,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 }
 
                 // Cập nhật currency HUD từ server
+                CurrencyManager.Instance.Set(CurrencyType.WeaponTicket, response.CurrencyBalances.WeaponTicket);
                 CurrencyManager.Instance.Set(CurrencyType.diamond, response.CurrencyBalances.Diamond);
 
                 // Sync local save data
@@ -243,11 +281,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 // Map server entries → WeaponSummonResult để drive animation
                 var result = new WeaponSummonResult
                 {
-                    PaidAmount                = response.PaidAmount,
-                    OldTotalRoll              = response.OldTotalRoll,
-                    NewTotalRoll              = response.NewTotalRoll,
-                    OldSummonLevel            = response.OldSummonLevel,
-                    NewSummonLevel            = response.NewSummonLevel,
+                    PaidAmount = response.PaidAmount,
+                    OldTotalRoll = response.OldTotalRoll,
+                    NewTotalRoll = response.NewTotalRoll,
+                    OldSummonLevel = response.OldSummonLevel,
+                    NewSummonLevel = response.NewSummonLevel,
                     NewlyUnlockedRewardLevels = response.NewlyUnlockedRewardLevels != null
                         ? new List<int>(response.NewlyUnlockedRewardLevels)
                         : new List<int>()
@@ -264,18 +302,22 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                     Enum.TryParse<EItemTier>(entry.Grade, true, out var itemTier);
                     var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
 
+                    int totalShardAfter = WeaponManager.Instance != null
+                        ? WeaponManager.Instance.ApplyStandardSummonEntry(entry.WeaponId, entry.ShardGained)
+                        : 0;
+
                     result.Entries.Add(new WeaponSummonResultEntry
                     {
-                        RollIndex    = entry.RollIndex,
-                        Weapon       = weaponDef,
-                        WeaponId     = entry.WeaponId,
-                        WeaponName   = entry.WeaponName,
-                        Icon         = weaponDef != null ? weaponDef.Icon : null,
-                        Tier         = tier,
-                        Star         = entry.Star,
-                        IsNewWeapon  = entry.IsNew,
-                        ShardGained  = entry.ShardGained,
-                        TotalShardAfter = 0,
+                        RollIndex = entry.RollIndex,
+                        Weapon = weaponDef,
+                        WeaponId = entry.WeaponId,
+                        WeaponName = entry.WeaponName,
+                        Icon = weaponDef != null ? weaponDef.Icon : null,
+                        Tier = tier,
+                        Star = entry.Star,
+                        IsNewWeapon = entry.IsNew,
+                        ShardGained = entry.ShardGained,
+                        TotalShardAfter = totalShardAfter,
                         TierInfo = tierInfo,
                     });
                 }

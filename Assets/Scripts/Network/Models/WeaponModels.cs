@@ -123,6 +123,9 @@ public class WeaponFuseResponse
     [JsonProperty("shard_spent")]   public int    ShardSpent;
     /// <summary>Shard còn lại của weapon_id cũ — luôn là 0 sau khi fuse thành công.</summary>
     [JsonProperty("shard_balance")] public int    ShardBalance;
+    /// <summary>Shard của weapon_id mới sau khi cộng dồn phần dư từ weapon_id cũ (carry-forward) —
+    /// dùng số này thay vì giả định 0, để Fuse All có thể chạy liên tiếp nhiều bậc nếu đã tích đủ shard.</summary>
+    [JsonProperty("new_weapon_shard_balance")] public int NewWeaponShardBalance;
     /// <summary>true nếu node mới (sau khi fuse) không thể fuse tiếp.</summary>
     [JsonProperty("is_max_node")]   public bool   IsMaxNode;
 }
@@ -158,9 +161,11 @@ public class WeaponUpgradeResponse
     [JsonProperty("current_limit_break_stage")] public int CurrentLimitBreakStage;
     [JsonProperty("current_max_level")]         public int CurrentMaxLevel;
 
-    /// <summary>Số WeaponEnhancementStone đáng lẽ phải trừ — server hiện KHÔNG validate/trừ thật, xem mục 7 doc.</summary>
-    [JsonProperty("stone_cost")]   public int  StoneCost;
-    [JsonProperty("is_max_level")] public bool IsMaxLevel;
+    /// <summary>Số weapon_ore đã trừ — server giờ validate/trừ thật qua bag.items, không còn local-only.</summary>
+    [JsonProperty("stone_cost")]    public int  StoneCost;
+    /// <summary>Số dư weapon_ore còn lại sau khi trừ — dùng để Set() tuyệt đối thay vì cộng dồn local.</summary>
+    [JsonProperty("stone_balance")] public int  StoneBalance;
+    [JsonProperty("is_max_level")]  public bool IsMaxLevel;
 }
 
 // ── weapon/limitbreak ─────────────────────────────────────────────────────────

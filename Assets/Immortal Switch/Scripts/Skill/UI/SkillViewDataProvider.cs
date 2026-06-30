@@ -358,7 +358,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         public bool HasAssignedHero(HeroClass heroClass)
         {
-            bool result = PvEBattleController.Instance.HasActiveHeroOfClass(heroClass);
+            bool result = userDataCache.HasActiveHeroOfClass(heroClass);
             Log($"HasAssignedHero -> class={heroClass}, result={result}");
             return result;
         }
@@ -400,7 +400,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         public SkillViewHeroContext GetAssignedHeroByClass(HeroClass heroClass)
         {
-            HeroActor heroController = PvEBattleController.Instance.TryGetActiveHeroByClass(heroClass);
+            HeroActor heroController = userDataCache.TryGetActiveHeroByClass(heroClass);
             if (heroController == null)
             {
                 LogWarning($"GetAssignedHeroByClass -> no active hero for class={heroClass}");

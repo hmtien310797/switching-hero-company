@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
+using Immortal_Switch.Scripts.Tutorial;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -12,15 +14,14 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 {
     public class SummonHubView : AnimatedUIView
     {
-        [Header("Panels")]
-        [SerializeField] private List<BaseSummonPanelView> panels;
+        [Header("Panels")] [SerializeField] private List<BaseSummonPanelView> panels;
         [SerializeField] private List<GameObject> currencyViews;
 
-        [Header("Default")]
-        [SerializeField] private SummonCategory defaultCategory = SummonCategory.Hero;
+        [Header("Default")] [SerializeField] private SummonCategory defaultCategory = SummonCategory.Hero;
 
-        [Header("Navigation")]
-        [SerializeField] private SegmentedControlStatic segmentedControl;
+        [Header("Navigation")] [SerializeField]
+        private SegmentedControlStatic segmentedControl;
+
         [SerializeField] private bool useSliderHighlight = true;
 
         private BaseSummonPanelView currentPanel;
@@ -38,8 +39,62 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         private void Awake()
         {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
+
             BindSegmentedControl();
             HideAllPanelsImmediate();
+        }
+
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
+        }
+
+        private UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 18:
+                case 19:
+                {
+                    segmentedControl.SetSelected((int)SummonCategory.Hero);
+                    OnSegmentChanged((int)SummonCategory.Hero);
+                    break;
+                }
+
+                case 38:
+                {
+                    segmentedControl.SetSelected((int)SummonCategory.Weapon);
+                    OnSegmentChanged((int)SummonCategory.Weapon);
+                    break;
+                }
+            }
+
+            return UniTask.CompletedTask;
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 18:
+                case 19:
+                {
+                    var option = segmentedControl.GetOptions((int)SummonCategory.Hero);
+                    return option != null ? option.transform as RectTransform : null;
+                }
+
+                case 38:
+                {
+                    var option = segmentedControl.GetOptions((int)SummonCategory.Weapon);
+                    return option != null ? option.transform as RectTransform : null;
+                }
+
+                default:
+                    return null;
+            }
         }
 
         public override async UniTask PlayShowAsync(object args)
@@ -48,6 +103,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             {
                 heroSpriteAtlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
             }
+
             base.PlayShowAsync(args).Forget();
         }
 
@@ -55,6 +111,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         {
             if (!firstShow)
                 return;
+
             if (segmentedControl != null)
             {
                 segmentedControl.SetSelected((int)defaultCategory, true);
@@ -67,6 +124,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             for (int i = 0; i < panels.Count; i++)
             {
                 var baseSummonPanelView = panels[i];
+
                 if (baseSummonPanelView.TryGetComponent(out HeroSummonView heroSummonView))
                 {
                     heroSummonView.SetHeroSpriteAtlas(heroSpriteAtlas);
@@ -100,7 +158,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 if (panels[i] != null)
                     panels[i].HidePanel();
 
-                if (currencyViews != null && i < currencyViews.Count && currencyViews[i] != null)
+                if (currencyViews != null &&
+                    i < currencyViews.Count &&
+                    currencyViews[i] != null)
                     currencyViews[i].SetActive(false);
             }
         }
@@ -141,7 +201,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             currentPanel.ShowPanel();
             currentPanel.RefreshView();
 
-            if (currencyViews != null && targetIndex >= 0 && targetIndex < currencyViews.Count && currencyViews[targetIndex] != null)
+            if (currencyViews != null &&
+                targetIndex >= 0 &&
+                targetIndex < currencyViews.Count &&
+                currencyViews[targetIndex] != null)
                 currencyViews[targetIndex].SetActive(true);
         }
     }

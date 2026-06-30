@@ -99,9 +99,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 
                 if (result.CurrencyBalances != null)
                 {
-                    CurrencyManager.Instance.Set(CurrencyType.HeroTicket,  result.CurrencyBalances.HeroTicket);
-                    CurrencyManager.Instance.Set(CurrencyType.SkillTicket, result.CurrencyBalances.SkillTicket);
-                    CurrencyManager.Instance.Set(CurrencyType.diamond,     result.CurrencyBalances.Diamond);
+                    CurrencyManager.Instance.Set(CurrencyType.HeroTicket,   result.CurrencyBalances.HeroTicket);
+                    CurrencyManager.Instance.Set(CurrencyType.SkillTicket,  result.CurrencyBalances.SkillTicket);
+                    CurrencyManager.Instance.Set(CurrencyType.WeaponTicket, result.CurrencyBalances.WeaponTicket);
+                    CurrencyManager.Instance.Set(CurrencyType.diamond,      result.CurrencyBalances.Diamond);
                 }
             }
             catch (System.Exception ex)

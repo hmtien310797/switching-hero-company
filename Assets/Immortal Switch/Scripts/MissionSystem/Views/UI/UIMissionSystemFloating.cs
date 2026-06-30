@@ -1,8 +1,11 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Helper;
+using Immortal_Switch.Scripts.Tutorial;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,6 +33,8 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void Awake()
         {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
             MissionSystemManager.Instance.OnChangeProgress += OnMissionSystemChangeProgress;
             btnClaim.onClick.AddListener(OnClaim);
         }
@@ -37,6 +42,44 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         private void OnEnable()
         {
             MissionSystemManager.Instance.NotifyReady();
+        }
+
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
+            MissionSystemManager.Instance.OnChangeProgress -= OnMissionSystemChangeProgress;
+            btnClaim.onClick.RemoveListener(OnClaim);
+        }
+
+        private UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                    OnClaim();
+                    break;
+            }
+
+            return UniTask.CompletedTask;
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                    return transform as RectTransform;
+
+                default:
+                    return null;
+            }
         }
 
         private void OnMissionSystemChangeProgress(string arg1, int arg2, string arg3)

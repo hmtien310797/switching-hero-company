@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
@@ -9,6 +8,7 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.DungeonSystem.Models;
 using Immortal_Switch.Scripts.ItemSystem.Models;
 using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Tutorial.Models;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shared
@@ -21,7 +21,8 @@ namespace Immortal_Switch.Scripts.Shared
 
     public class ItemRewardSet : ItemSpriteSet
     {
-        public BigInteger Quantity;
+        public string ItemKey;
+        public BigNumber Quantity;
     }
 
     public class DatabaseManager : Singleton<DatabaseManager>
@@ -38,6 +39,10 @@ namespace Immortal_Switch.Scripts.Shared
 
         [SerializeField] private DynamicHeroesGlobalSpecificationsDungeonConfigDatabase dungeonConfigDb;
         [field: SerializeField] public DungeonSystemDatabaseSO DungeonDb { get; private set; }
+
+        [Header("Tutorial database")]
+        [field: SerializeField]
+        public TutorialDatabaseSO TutorialDb { get; private set; }
 
         protected override void OnSingletonAwake()
         {
@@ -85,6 +90,55 @@ namespace Immortal_Switch.Scripts.Shared
             return null;
         }
 
+        /// <summary>
+        /// parse string rewards ra array
+        /// </summary>
+        public async UniTask<List<ItemRewardSet>> GetRewards(string rewards)
+        {
+            var entries = new List<(string itemKey, BigNumber quantity)>();
+            var splitRewards = rewards.Split(';');
+
+            foreach (var reward in splitRewards)
+            {
+                var splits = reward.Split(':');
+
+                // có 2 key là item key va quantity
+                if (splits.Length > 1)
+                {
+                    var itemKey = splits[0];
+                    BigNumber.TryParse(splits[1], out var quantity);
+                    entries.Add((itemKey, quantity));
+                }
+                else
+                {
+                    Debug.LogError($"Reward {reward} wrong config");
+                }
+            }
+
+            if (entries.Count < 1)
+            {
+                Debug.LogError("Rewards not found");
+                return new List<ItemRewardSet>();
+            }
+
+            var tasks = Enumerable.Select(entries, entry => GetItemSpriteSet(entry.itemKey)).ToList();
+            var sets = await UniTask.WhenAll(tasks);
+            var results = new List<ItemRewardSet>(entries.Count);
+
+            for (var i = 0; i < entries.Count; i++)
+            {
+                results.Add(new ItemRewardSet
+                {
+                    ItemIcon = sets[i].ItemIcon,
+                    TierInfo = sets[i].TierInfo,
+                    Quantity = entries[i].quantity,
+                    ItemKey = entries[i].itemKey,
+                });
+            }
+
+            return results;
+        }
+
 #endregion
 
 #region Badword db
@@ -121,7 +175,8 @@ namespace Immortal_Switch.Scripts.Shared
                     {
                         ItemIcon = sets.Item1.ItemIcon,
                         TierInfo = sets.Item1.TierInfo,
-                        Quantity = BigIntegerHelper.TryParse(entry.reward1Amount, out var result) ? result : 0,
+                        Quantity = BigNumber.TryParse(entry.reward1Amount, out var result) ? result : 0,
+                        ItemKey = entry.reward1Key,
                     });
                 }
 
@@ -131,7 +186,8 @@ namespace Immortal_Switch.Scripts.Shared
                     {
                         ItemIcon = sets.Item2.ItemIcon,
                         TierInfo = sets.Item2.TierInfo,
-                        Quantity = BigIntegerHelper.TryParse(entry.reward2Amount, out var result) ? result : 0,
+                        Quantity = BigNumber.TryParse(entry.reward2Amount, out var result) ? result : 0,
+                        ItemKey = entry.reward2Key,
                     });
                 }
 
@@ -142,6 +198,7 @@ namespace Immortal_Switch.Scripts.Shared
                         ItemIcon = sets.Item3.ItemIcon,
                         TierInfo = sets.Item3.TierInfo,
                         Quantity = entry.reward3Amount,
+                        ItemKey = entry.reward3Key,
                     });
                 }
 

@@ -398,6 +398,7 @@ GameObject:
   - component: {fileID: 5539859680320194102}
   - component: {fileID: 279485079296711565}
   - component: {fileID: 4039913590461409734}
+  - component: {fileID: 2228667656798400678}
   m_Layer: 5
   m_Name: ButtonEnhanceAll
   m_TagString: Untagged
@@ -508,6 +509,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2228667656798400678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630786465366141056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d75ec3c4a424c4292d5fc2338ada1c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  pressedScale: 0.9
+  bounceScale: 1.1
+  pressDuration: 0.08
+  bounceDuration: 0.15
 --- !u!1 &708581467535843990
 GameObject:
   m_ObjectHideFlags: 0
@@ -1143,6 +1161,7 @@ GameObject:
   - component: {fileID: 5621376070606381534}
   - component: {fileID: 1760828996444366969}
   - component: {fileID: 6013768094897047388}
+  - component: {fileID: 4000280243613335670}
   m_Layer: 5
   m_Name: ButtonEquipUnEquip
   m_TagString: Untagged
@@ -1252,6 +1271,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4000280243613335670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100667314144618460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d75ec3c4a424c4292d5fc2338ada1c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  pressedScale: 0.9
+  bounceScale: 1.1
+  pressDuration: 0.08
+  bounceDuration: 0.15
 --- !u!1 &2170143884954236025
 GameObject:
   m_ObjectHideFlags: 0
@@ -1264,6 +1300,7 @@ GameObject:
   - component: {fileID: 5304481893178481054}
   - component: {fileID: 6274058059802253104}
   - component: {fileID: 6811244355080934085}
+  - component: {fileID: 858201908725286819}
   m_Layer: 5
   m_Name: ButtonAutoEquip
   m_TagString: Untagged
@@ -1373,6 +1410,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &858201908725286819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2170143884954236025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d75ec3c4a424c4292d5fc2338ada1c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  pressedScale: 0.9
+  bounceScale: 1.1
+  pressDuration: 0.08
+  bounceDuration: 0.15
 --- !u!1 &2473952494852852749
 GameObject:
   m_ObjectHideFlags: 0
@@ -3361,6 +3415,7 @@ GameObject:
   - component: {fileID: 5400535415694252542}
   - component: {fileID: 745521657886031567}
   - component: {fileID: 4003640447682480549}
+  - component: {fileID: 436573659170349250}
   m_Layer: 5
   m_Name: ButtonOption
   m_TagString: Untagged
@@ -3470,6 +3525,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &436573659170349250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5299922983817053006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d75ec3c4a424c4292d5fc2338ada1c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  pressedScale: 0.9
+  bounceScale: 1.1
+  pressDuration: 0.08
+  bounceDuration: 0.15
 --- !u!1 &5383001534158554473
 GameObject:
   m_ObjectHideFlags: 0
@@ -7274,10 +7346,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8935235519096352833}
     m_Modifications:
-    - target: {fileID: 1020285080766952241, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 545f84b069172be48b6fb71e7bf9e992, type: 3}
     - target: {fileID: 1706217013608813419, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -7361,22 +7429,6 @@ PrefabInstance:
     - target: {fileID: 2267563271524623580, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
       propertyPath: m_Name
       value: UISkillTabClass (3)
-      objectReference: {fileID: 0}
-    - target: {fileID: 3273030331478372810, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -0.40000153
-      objectReference: {fileID: 0}
-    - target: {fileID: 3365586743179419777, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 19c5360733a5d4e48a7dc6312d76d89e, type: 3}
-    - target: {fileID: 3885672762487319451, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
-      propertyPath: heroClass
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8913778687607149491, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 32.6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7967,10 +8019,6 @@ PrefabInstance:
     - target: {fileID: 2267563271524623580, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
       propertyPath: m_Name
       value: UISkillTabClass
-      objectReference: {fileID: 0}
-    - target: {fileID: 3885672762487319451, guid: 6d0c04e19386615498356741b9a9a16f, type: 3}
-      propertyPath: heroClass
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

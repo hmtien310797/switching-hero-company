@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.TransmutationSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Models;
 using Immortal_Switch.Scripts.TransmutationSystem.Views;
+using Immortal_Switch.Scripts.Tutorial;
 using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -40,13 +41,13 @@ namespace Immortal_Switch.Scripts.UI
             Layer = UILayer.SubMain;
 
             if (ButtonGrowth != null)
-                ButtonGrowth.AddListener(() => OnToggleMain<GrowthView>(ButtonGrowth).Forget());
+                ButtonGrowth.AddListener(OnClickBtnGrowth);
 
             if (ButtonEquip != null)
-                ButtonEquip.AddListener(() => OnToggleMain<EquipView>(ButtonEquip).Forget());
+                ButtonEquip.AddListener(OnClickBtnEquip);
 
-            ButtonShop.AddListener(() => OnToggleMain<SummonHubView>(ButtonShop).Forget());
-            ButtonHero.AddListener(() => OnToggleMain<HeroCollectionView>(ButtonHero).Forget());
+            ButtonShop.AddListener(OnClickBtnShop);
+            ButtonHero.AddListener(OnClickBtnHero);
             ButtonMission.AddListener(() => OnToggleMain<MissionSystemView>(ButtonMission).Forget());
             ButtonGem.onClick.AddListener(() => OnToggleMain<TransmutationSystemView>(null, false).Forget());
             ButtonDungeon.AddListener(() => OnToggleMain<DungeonMainView>(ButtonDungeon).Forget());
@@ -55,14 +56,93 @@ namespace Immortal_Switch.Scripts.UI
                 ButtonClose.onClick.AddListener(OnClickClose);
         }
 
+        private void OnClickBtnEquip()
+        {
+            OnToggleMain<EquipView>(ButtonEquip).Forget();
+        }
+
+        private void OnClickBtnShop()
+        {
+            OnToggleMain<SummonHubView>(ButtonShop).Forget();
+        }
+
+        private void OnClickBtnHero()
+        {
+            OnToggleMain<HeroCollectionView>(ButtonHero).Forget();
+        }
+
+        private void OnClickBtnGrowth()
+        {
+            OnToggleMain<GrowthView>(ButtonGrowth).Forget();
+        }
+
         private void Start()
         {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
             TransmutationSystemManager.Instance.OnChanged += OnTransmutationSystemChanged;
             GameEventManager.Subscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
         }
-        
+
+        private async UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 16:
+                case 36:
+                    OnClickBtnShop();
+                    break;
+
+                case 22:
+                    OnClickBtnHero();
+                    break;
+
+                case 28:
+                    await OnToggleMain<GrowthView>(ButtonGrowth);
+                    break;
+
+                case 32:
+                    OnClickClose();
+                    break;
+
+                case 42:
+                    OnClickBtnEquip();
+                    break;
+            }
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 16:
+                case 36:
+                    return ButtonShop.transform as RectTransform;
+
+                case 22:
+                    UIManager.Instance.Close<SummonHubView>();
+                    return ButtonHero.transform as RectTransform;
+
+                case 28:
+                    UIManager.Instance.Close<HeroCollectionView>();
+                    return ButtonGrowth.transform as RectTransform;
+
+                case 32:
+                    return ButtonClose.transform as RectTransform;
+
+                case 42:
+                    UIManager.Instance.Close<SummonHubView>();
+                    return ButtonEquip.transform as RectTransform;
+
+                default:
+                    return null;
+            }
+        }
+
         private void OnDestroy()
         {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
             TransmutationSystemManager.Instance.OnChanged -= OnTransmutationSystemChanged;
             GameEventManager.Unsubscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
         }
@@ -71,14 +151,13 @@ namespace Immortal_Switch.Scripts.UI
         {
             txtEnergy.SetText(BigIntegerHelper.Format(obj.Data.Energy));
         }
-        
 
         private void OnEnable()
         {
             RefreshCloseAndGem();
         }
 
-        private async UniTaskVoid OnToggleMain<T>([CanBeNull] BottomMainButton selected, bool withBackdrop = true)
+        private async UniTask OnToggleMain<T>([CanBeNull] BottomMainButton selected, bool withBackdrop = true)
             where T : UIView
         {
             if (selected != null)
@@ -118,6 +197,19 @@ namespace Immortal_Switch.Scripts.UI
         {
             ButtonClose.gameObject.SetActive(value);
             Gem.SetActive(!value);
+
+            if (_selectedBtn != null)
+            {
+                if (!value)
+                {
+                    _selectedBtn.SetStateByManager(NavState.Closed);
+                    _selectedBtn = null;
+                }
+                else
+                {
+                    _selectedBtn.SetStateByManager(NavState.Hover);
+                }
+            }
         }
     }
 }

@@ -13,8 +13,14 @@ public class PlayerMeResponse
     [JsonProperty("gems")]   public int gems;
     [JsonProperty("coins")]  public int coins;
     [JsonProperty("items")]  public System.Collections.Generic.Dictionary<string, int> items;
-    public int hero_ticket   => items != null && items.TryGetValue("1", out var h) ? h : 0;
-    public int skill_ticket  => items != null && items.TryGetValue("2", out var s) ? s : 0;
+    // item_id 8 = summon_ticket_hero, 9 = summon_ticket_weapon, 46 = summon_ticket_skill (server
+    // game_item.js). Ids 1/2 are gold/crystal as of the server's item table restructure — do not
+    // revert to those.
+    public int hero_ticket   => items != null && items.TryGetValue("8", out var h) ? h : 0;
+    public int weapon_ticket => items != null && items.TryGetValue("9", out var w) ? w : 0;
+    public int skill_ticket  => items != null && items.TryGetValue("46", out var s) ? s : 0;
+    // item_id 43 = weapon_ore — material thật cho weapon/upgrade (Level Up), xem WeaponManager.cs.
+    public int weapon_ore    => items != null && items.TryGetValue("43", out var o) ? o : 0;
     [JsonProperty("energy")]         public int                energy;
     [JsonProperty("rating")]         public int                rating;
     [JsonProperty("total_summons")]  public int                total_summons;

@@ -118,11 +118,11 @@ MonoBehaviour:
     sortOrder: 7
     status: Active
   - itemId: 8
-    itemKey: summon_ticket
+    itemKey: summon_ticket_hero
     itemType: Gacha
     itemGroup: Ticket
-    itemName: Summon Ticket
-    desc: "V\xE9 summon hero trong banner th\u01B0\u1EDDng"
+    itemName: Summon Ticket Heroes
+    desc: "V\u00E9 summon hero trong banner th\u01B0\u1EDDng"
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -132,18 +132,17 @@ MonoBehaviour:
     sortOrder: 8
     status: Active
   - itemId: 9
-    itemKey: advanced_summon_ticket
+    itemKey: summon_ticket_weapon
     itemType: Gacha
     itemGroup: Ticket
-    itemName: Advanced Summon Ticket
-    desc: "V\xE9 summon cao c\u1EA5p v\u1EDBi t\u1EC9 l\u1EC7 hero hi\u1EBFm cao
-      h\u01A1n"
+    itemName: Summon Ticket Weapon
+    desc: "V\u00E9 summon weapon"
     rarity: B
     isCurrency: 0
     isStackable: 1
     maxStack: 999999
     useType: Consume
-    iconKey: icon_advanced_summon_ticket
+    iconKey: icon_summon_ticket_weapon
     sortOrder: 9
     status: Active
   - itemId: 10
@@ -658,4 +657,32 @@ MonoBehaviour:
     useType: Consume
     iconKey: icon_weapon_essence
     sortOrder: 45
+    status: Active
+  - itemId: 46
+    itemKey: summon_ticket_skill
+    itemType: Gacha
+    itemGroup: Ticket
+    itemName: Summon Ticket Skill
+    desc: "V\u00E9 summon skill trong banner th\u01B0\u1EDDng"
+    rarity: C
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 999999
+    useType: Consume
+    iconKey: icon_summon_ticket_skill
+    sortOrder: 46
+    status: Active
+  - itemId: 47
+    itemKey: summon_ticket_hero_banner
+    itemType: Gacha
+    itemGroup: Ticket
+    itemName: Summon Ticket hero banner
+    desc: "V\u00E9 summon hero trong banner event"
+    rarity: B
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 999999
+    useType: Consume
+    iconKey: icon_summon_ticket_hero_banner
+    sortOrder: 47
     status: Active

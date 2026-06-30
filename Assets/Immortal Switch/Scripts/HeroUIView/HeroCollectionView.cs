@@ -4,6 +4,8 @@ using System.Linq;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
+using Immortal_Switch.Scripts.Tutorial;
 using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -48,9 +50,42 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void Awake()
         {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
             allHeroData = MasterDataCache.Instance.GetAllHeroData();
         }
+
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
+        }
         
+        private UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 24:
+                    OnClickHeroItem(spawnedItems[0]);
+                    break;
+            }
+
+            return UniTask.CompletedTask;
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 23:
+                case 24:
+                    return spawnedItems[0].transform as RectTransform;
+
+                default:
+                    return null;
+            }
+        }
+
         private void Start()
         {
             InitFilters();

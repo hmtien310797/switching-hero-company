@@ -47,31 +47,30 @@ namespace Common
         /// <summary>Weapon list từ server — set bởi GameBootstrap sau login.</summary>
         public WeaponListResponse WeaponList { get; set; }
 
-        public List<int> InBattleHeroIdList { get; private set; } = new();
-        public readonly HeroActor[] inBattleHeroes = new HeroActor[2];
+        private const int BattleHeroSlotCountValue = 2;
+
+        public int BattleHeroSlotCount => BattleHeroSlotCountValue;
+        public List<int> InBattleHeroIdList { get; private set; } = new() { -1, -1 };
+        public readonly HeroActor[] inBattleHeroes = new HeroActor[BattleHeroSlotCountValue];
+
+        public event Action OnBattleLineupChanged;
 
         public event Action<int> OnHeroSkillChanged;
         public bool AutoSkill;
 
         public override UniTask InitializeAsync()
         {
-            EnsureInitialized();
             return UniTask.CompletedTask;
         }
 
-        #region INIT
-
-        void EnsureInitialized()
-        {
-            EnsureInitialSkillInventoryForUnlockedClassSkills();
-        }
+        #region SKILL
         
         public void SetAutoSkill(bool isAutoSkill)
         {
             AutoSkill = isAutoSkill;
             for (int i = 0; i < inBattleHeroes.Length; i++)
             {
-                inBattleHeroes[i].SetAutoSkill(isAutoSkill);
+                inBattleHeroes[i]?.SetAutoSkill(isAutoSkill);
             }
         }
 
@@ -127,42 +126,6 @@ namespace Common
             }
         }
 
-        public void GetPlayerDataFromServer(HeroInventory heroInventory, SkillListResponse skillListResponse, WeaponListResponse weaponListResponse)
-        {
-            InBattleHeroIdList = new List<int> { -1, -1 };
-            try
-            {
-                HeroList = heroInventory;
-                SkillList = skillListResponse;
-                WeaponList = weaponListResponse;
-
-                int heroIndex = 0;
-                for (int i = 0; i < HeroList.Lineup.Length; i++)
-                {
-                    string currentHeroInLineUp = HeroList.Lineup[i];
-                    for (int j = 0; j < HeroList.Owned.Length; j++)
-                    {
-                        var currentHeroOwned = HeroList.Owned[j];
-                        if (string.Equals(currentHeroInLineUp, currentHeroOwned.Uid))
-                        {
-                            InBattleHeroIdList[heroIndex] = currentHeroOwned.HeroId;
-                            heroIndex++;
-                            break;
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e.Message);
-            }
-            
-        }
-
-        #endregion
-
-        #region HERO
-
         public List<int> GetEquippedClassSkillIds(int heroId)
         {
             for (int i = 0; i < inBattleHeroes.Length; i++)
@@ -202,41 +165,6 @@ namespace Common
 
             return null;
         }
-
-        public HeroActor GetInBattleHeroActorById(int heroId)
-        {
-            for (int i = 0; i < inBattleHeroes.Length; i++)
-            {
-                var currentHero = inBattleHeroes[i];
-                if (currentHero.HeroData.Id == heroId)
-                {
-                    return currentHero;
-                }
-            }
-            return null;
-        }
-
-        public SkillDataSO GetEquippedSkillDataById(int heroId,int skillId)
-        {
-            var currentHero = GetInBattleHeroActorById(heroId);
-
-            List<SkillDataSO> allEquipClassSkill = currentHero.HeroSkillController.GetAllEquippedClassSkills();
-
-            if (allEquipClassSkill == null)
-            {
-                return null;
-            }
-            
-            for (int i = 0; i < allEquipClassSkill.Count; i++)
-            {
-                SkillDataSO skillData = allEquipClassSkill[i];
-                if (skillData != null && skillData.SkillId == skillId)
-                {
-                    return skillData;
-                }
-            }
-            return null;
-        }
         
         public int GetServerSkillLevel(int skillId)
         {
@@ -245,86 +173,8 @@ namespace Common
                 if (s.SkillId == skillId) return s.Level > 0 ? s.Level : 1;
             return 0;
         }
-
-        #endregion
-
-        #region CLASS UNLOCK
-
-        // private void SetUnlockedSkillsForClass(HeroClass heroClass, List<int> ids)
-        // {
-        //     ClassSkillUnlock.UnlockedSkillIdsByClass[heroClass] = Normalize(ids);
-        // }
-
-        // public List<int> GetUnlockedSkills(HeroClass heroClass)
-        // {
-        //     if (!ClassSkillUnlock.UnlockedSkillIdsByClass.TryGetValue(heroClass, out var list))
-        //         return new List<int>();
-        //
-        //     return new List<int>(list);
-        // }
         
-        private void EnsureInitialSkillInventoryForUnlockedClassSkills()
-        {
-            // if (classSkillUnlockInitSO == null || classSkillUnlockInitSO.ClassEntries == null)
-            //     return;
-            //
-            // foreach (var e in classSkillUnlockInitSO.ClassEntries)
-            // {
-            //     if (e == null || e.UnlockedSkillIds == null)
-            //         continue;
-            //
-            //     foreach (int skillId in e.UnlockedSkillIds)
-            //     {
-            //         if (skillId <= 0)
-            //             continue;
-            //
-            //         var data = Immortal_Switch.Scripts.Skill.UI.SkillInventorySaveService.GetOrCreate(skillId);
-            //
-            //         // Rule: skill unlock for game must be owned in inventory 
-            //         if (!data.IsOwned)
-            //             data.IsOwned = true;
-            //
-            //         if (data.Level <= 0)
-            //             data.Level = 1;
-            //
-            //         if (data.CurrentShard < 0)
-            //             data.CurrentShard = 0;
-            //     }
-            // }
-            //
-            // Immortal_Switch.Scripts.Skill.UI.SkillInventorySaveService.Save();
-        }
-
-        private bool IsUnlocked(HeroClass heroClass, int skillId)
-        {
-            // Source of truth: server-owned skill list (UnlockedSkillIdsByClass is never populated)
-            if (SkillList?.Owned != null)
-                foreach (var inst in SkillList.Owned)
-                    if (inst.SkillId == skillId) return true;
-            return false;
-        }
-
-        public string GetHeroUid(int heroId)
-        {
-            if (HeroList?.Owned == null) return null;
-            foreach (var h in HeroList.Owned)
-                if (h.HeroId == heroId) return h.Uid;
-            return null;
-        }
-
-        public string GetSkillUid(int skillId)
-        {
-            if (SkillList?.Owned == null) return null;
-            foreach (var s in SkillList.Owned)
-                if (s.SkillId == skillId) return s.Uid;
-            return null;
-        }
-
-        #endregion
-
-        #region HERO LOADOUT
-
-        /// <summary>Trang bị skill vào slot trống đầu tiên (thật, không phải vị trí đã dồn).
+                /// <summary>Trang bị skill vào slot trống đầu tiên (thật, không phải vị trí đã dồn).
         /// Trả về slot_index thật đã dùng để caller gửi đúng lên server (skill/equip), hoặc -1 nếu
         /// không trang bị được.</summary>
         public async UniTask<int> EquipSkill(int heroId, int skillId)
@@ -373,6 +223,29 @@ namespace Common
             OnHeroSkillChanged?.Invoke(heroId);
             return equipResult;
         }
+        
+        public SkillDataSO GetEquippedSkillDataById(int heroId,int skillId)
+        {
+            var currentHero = GetInBattleHeroActorById(heroId);
+
+            List<SkillDataSO> allEquipClassSkill = currentHero.HeroSkillController.GetAllEquippedClassSkills();
+
+            if (allEquipClassSkill == null)
+            {
+                return null;
+            }
+            
+            for (int i = 0; i < allEquipClassSkill.Count; i++)
+            {
+                SkillDataSO skillData = allEquipClassSkill[i];
+                if (skillData != null && skillData.SkillId == skillId)
+                {
+                    return skillData;
+                }
+            }
+            return null;
+        }
+
 
         /// <summary>uid → skill_id, dùng để resolve mảng equipped[hero_uid] (skill_uid) trả về từ server.</summary>
         private int GetSkillIdByUid(string skillUid)
@@ -398,6 +271,189 @@ namespace Common
             }
             return result;
         }
+        
+        #endregion
+
+        #region HERO
+        public void GetPlayerDataFromServer(HeroInventory heroInventory, SkillListResponse skillListResponse, WeaponListResponse weaponListResponse)
+        {
+            HeroList = heroInventory;
+            SkillList = skillListResponse;
+            WeaponList = weaponListResponse;
+
+            var resolvedLineup = new List<int> { -1, -1 };
+
+            if (HeroList?.Lineup == null || HeroList.Owned == null)
+            {
+                SetBattleLineup(resolvedLineup);
+                LogError("Hero inventory, lineup or owned hero list is null.");
+                return;
+            }
+
+            int resolvedSlot = 0;
+            for (int lineupIndex = 0;
+                 lineupIndex < HeroList.Lineup.Length && resolvedSlot < BattleHeroSlotCountValue;
+                 lineupIndex++)
+            {
+                string heroUid = HeroList.Lineup[lineupIndex];
+                if (string.IsNullOrEmpty(heroUid))
+                    continue;
+
+                for (int ownedIndex = 0; ownedIndex < HeroList.Owned.Length; ownedIndex++)
+                {
+                    var ownedHero = HeroList.Owned[ownedIndex];
+                    if (!string.Equals(heroUid, ownedHero.Uid, StringComparison.Ordinal))
+                        continue;
+
+                    resolvedLineup[resolvedSlot++] = ownedHero.HeroId;
+                    break;
+                }
+            }
+
+            SetBattleLineup(resolvedLineup);
+            Log($"Resolved battle lineup: [{resolvedLineup[0]}, {resolvedLineup[1]}]");
+        }
+
+        public int GetBattleHeroIdAt(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= InBattleHeroIdList.Count)
+                return -1;
+
+            return InBattleHeroIdList[slotIndex];
+        }
+
+        public HeroActor GetInBattleHeroActorAt(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= inBattleHeroes.Length)
+                return null;
+
+            return inBattleHeroes[slotIndex];
+        }
+
+        public void SetBattleLineup(IReadOnlyList<int> heroIds)
+        {
+            if (InBattleHeroIdList == null || InBattleHeroIdList.Count != BattleHeroSlotCountValue)
+                InBattleHeroIdList = new List<int> { -1, -1 };
+
+            for (int i = 0; i < BattleHeroSlotCountValue; i++)
+            {
+                int heroId = heroIds != null && i < heroIds.Count ? heroIds[i] : -1;
+                InBattleHeroIdList[i] = heroId > 0 ? heroId : -1;
+            }
+
+            OnBattleLineupChanged?.Invoke();
+        }
+
+        public bool TrySetInBattleHeroActor(int slotIndex, HeroActor heroActor)
+        {
+            if (slotIndex < 0 || slotIndex >= inBattleHeroes.Length)
+            {
+                LogError($"Invalid battle hero slot: {slotIndex}");
+                return false;
+            }
+
+            inBattleHeroes[slotIndex] = heroActor;
+            return true;
+        }
+
+        public bool TryReplaceBattleHero(int slotIndex, int expectedHeroId, int newHeroId, HeroActor newHeroActor)
+        {
+            if (slotIndex < 0 || slotIndex >= BattleHeroSlotCountValue || newHeroId <= 0 || newHeroActor == null)
+                return false;
+
+            if (InBattleHeroIdList[slotIndex] != expectedHeroId)
+                return false;
+
+            if (ContainsBattleHero(newHeroId))
+                return false;
+
+            InBattleHeroIdList[slotIndex] = newHeroId;
+            inBattleHeroes[slotIndex] = newHeroActor;
+            OnBattleLineupChanged?.Invoke();
+            return true;
+        }
+
+        public bool ContainsBattleHero(int heroId)
+        {
+            return heroId > 0 && InBattleHeroIdList.Contains(heroId);
+        }
+
+        public int FindBattleHeroSlot(int heroId)
+        {
+            return heroId > 0 ? InBattleHeroIdList.IndexOf(heroId) : -1;
+        }
+
+        public HeroActor GetInBattleHeroActorById(int heroId)
+        {
+            if (heroId <= 0)
+                return null;
+
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                HeroActor currentHero = inBattleHeroes[i];
+                if (currentHero == null || currentHero.HeroData == null)
+                    continue;
+
+                if (currentHero.HeroData.Id == heroId)
+                    return currentHero;
+            }
+
+            return null;
+        }
+        
+        public HeroActor TryGetActiveHeroByClass(HeroClass heroClass)
+        {
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                HeroActor hero = inBattleHeroes[i];
+
+                if (hero == null || hero.IsDead)
+                    continue;
+
+                if (hero.HeroClass == heroClass)
+                    return hero;
+            }
+
+            return null;
+        }
+
+        public bool HasActiveHeroOfClass(HeroClass heroClass)
+        {
+            return TryGetActiveHeroByClass(heroClass) != null;
+        }
+
+        #endregion
+
+        #region CLASS UNLOCK
+
+        private bool IsUnlocked(HeroClass heroClass, int skillId)
+        {
+            // Source of truth: server-owned skill list (UnlockedSkillIdsByClass is never populated)
+            if (SkillList?.Owned != null)
+                foreach (var inst in SkillList.Owned)
+                    if (inst.SkillId == skillId) return true;
+            return false;
+        }
+
+        public string GetHeroUid(int heroId)
+        {
+            if (HeroList?.Owned == null) return null;
+            foreach (var h in HeroList.Owned)
+                if (h.HeroId == heroId) return h.Uid;
+            return null;
+        }
+
+        public string GetSkillUid(int skillId)
+        {
+            if (SkillList?.Owned == null) return null;
+            foreach (var s in SkillList.Owned)
+                if (s.SkillId == skillId) return s.Uid;
+            return null;
+        }
+
+        #endregion
+
+        #region HERO LOADOUT
 
         /// <summary>
         /// Áp loadout skill từ server (SkillList.Equipped) lên 1 hero vừa spawn — gọi từ HeroActor.Init,

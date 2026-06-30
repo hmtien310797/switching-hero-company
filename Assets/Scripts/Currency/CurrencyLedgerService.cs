@@ -34,6 +34,24 @@ namespace Immortal_Switch.Scripts.Currency
             Instance = this;
         }
 
+        // CurrencyManager.Set() (full-balance sync from server: login, summon result, battle
+        // reward, ...) only fires CurrencyManager.OnCurrencyChanged. UI (CurrencyTextBinder) only
+        // listens to OnCurrencyLedgerChanged below, so without this bridge a server-driven Set()
+        // never reaches the UI — it only happened to look fine before this when some other
+        // ledger transaction (income/spend) for the same currency type fired separately.
+        private void Start()
+        {
+            if (CurrencyManager.Instance != null)
+            {
+                CurrencyManager.Instance.OnCurrencyChanged += HandleCurrencyManagerChanged;
+            }
+        }
+
+        private void HandleCurrencyManagerChanged(CurrencyChangedArgs args)
+        {
+            NotifyLedgerChanged(args.CurrencyType);
+        }
+
         private void Update()
         {
             syncTimer += Time.deltaTime;
@@ -396,6 +414,14 @@ namespace Immortal_Switch.Scripts.Currency
             foreach (CurrencyType type in changedTypes)
             {
                 NotifyLedgerChanged(type);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (CurrencyManager.Instance != null)
+            {
+                CurrencyManager.Instance.OnCurrencyChanged -= HandleCurrencyManagerChanged;
             }
         }
 
