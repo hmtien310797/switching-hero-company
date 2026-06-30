@@ -13,19 +13,19 @@ namespace Battle
         public async UniTask<HeroActor> SpawnAsync(
             int heroId,
             Vector3 spawnPosition,
-            PvEBattleController battleController,
+            IHeroBattleContext battleContext,
             HeroTeamController heroTeamController,
             bool autoSkill,
             Action<HeroActor> onHeroDead = null)
         {
             HeroDataSO heroData = MasterDataCache.Instance.GetHeroDataById(heroId);
-            return await SpawnAsync(heroData, spawnPosition, battleController, heroTeamController, autoSkill, onHeroDead);
+            return await SpawnAsync(heroData, spawnPosition, battleContext, heroTeamController, autoSkill, onHeroDead);
         }
 
         public async UniTask<HeroActor> SpawnAsync(
             HeroDataSO heroData,
             Vector3 spawnPosition,
-            PvEBattleController battleController,
+            IHeroBattleContext battleContext,
             HeroTeamController heroTeamController,
             bool autoSkill,
             Action<HeroActor> onHeroDead = null)
@@ -42,9 +42,9 @@ namespace Battle
                 return null;
             }
 
-            if (battleController == null)
+            if (battleContext == null)
             {
-                Debug.LogError($"[BattleHeroSpawnService] BattleController is null. heroId={heroData.Id}");
+                Debug.LogError($"[BattleHeroSpawnService] BattleContext is null. heroId={heroData.Id}");
                 return null;
             }
 
@@ -66,7 +66,7 @@ namespace Battle
 
                 hero.transform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
                 hero.gameObject.SetActive(true);
-                await hero.Init(heroData, battleController, heroTeamController, autoSkill);
+                await hero.Init(heroData, battleContext, heroTeamController, autoSkill);
 
                 if (onHeroDead != null)
                 {

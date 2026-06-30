@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Common;
@@ -45,7 +44,7 @@ namespace Immortal_Switch.Scripts.Boss
         [Header("Properties")]
         [field: SerializeField] public ActorType ActorType { get; private set;}
 
-        private readonly List<ICombatUnit> heroTargets = new();
+        private Battle.IEnemyTargetProvider targetProvider;
 
         private BossState currentState;
         
@@ -110,15 +109,31 @@ namespace Immortal_Switch.Scripts.Boss
 
         public void Init(BossDataSO data, ICombatUnit heroA, ICombatUnit heroB)
         {
-            Init(data, heroA, heroB, StageStatScale.Identity);
+            Init(
+                data,
+                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                StageStatScale.Identity
+            );
         }
 
         public void Init(BossDataSO data, ICombatUnit heroA, ICombatUnit heroB, StageStatScale scale)
         {
+            Init(
+                data,
+                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                scale
+            );
+        }
+
+        public void Init(
+            BossDataSO data,
+            Battle.IEnemyTargetProvider targetProvider,
+            StageStatScale scale)
+        {
             bossData = data;
+            this.targetProvider = targetProvider;
 
             ApplyData(data, scale);
-            SetHeroTargets(heroA, heroB);
             HealthBarController.ResetHealth();
             NormalAttackCount = 0;
             currentTarget = null;
@@ -139,11 +154,22 @@ namespace Immortal_Switch.Scripts.Boss
         
         public void Init(BossDataSO data, ICombatUnit heroA, ICombatUnit heroB, BaseStat cachedBaseStat)
         {
+            Init(
+                data,
+                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                cachedBaseStat
+            );
+        }
+
+        public void Init(
+            BossDataSO data,
+            Battle.IEnemyTargetProvider targetProvider,
+            BaseStat cachedBaseStat)
+        {
             bossData = data;
+            this.targetProvider = targetProvider;
 
             ApplyBaseStat(data, cachedBaseStat);
-
-            SetHeroTargets(heroA, heroB);
             HealthBarController.ResetHealth();
             NormalAttackCount = 0;
             currentTarget = null;
@@ -211,15 +237,17 @@ namespace Immortal_Switch.Scripts.Boss
             stats.Initialize(baseStat);
         }
 
+        public void SetTargetProvider(Battle.IEnemyTargetProvider targetProvider)
+        {
+            this.targetProvider = targetProvider;
+            currentTarget = null;
+        }
+
         public void SetHeroTargets(ICombatUnit heroA, ICombatUnit heroB)
         {
-            heroTargets.Clear();
-
-            if (heroA != null)
-                heroTargets.Add(heroA);
-
-            if (heroB != null)
-                heroTargets.Add(heroB);
+            SetTargetProvider(
+                new Battle.FixedEnemyTargetProvider(heroA, heroB)
+            );
         }
 
         private void BindDeathEvent()
@@ -299,7 +327,7 @@ namespace Immortal_Switch.Scripts.Boss
 
         private void TickIdle()
         {
-            currentTarget = FindNearestHero();
+            currentTarget = FindNearestTarget();
 
             if (currentTarget == null)
                 return;
@@ -423,34 +451,9 @@ namespace Immortal_Switch.Scripts.Boss
             }
         }
 
-        private ICombatUnit FindNearestHero()
+        private ICombatUnit FindNearestTarget()
         {
-            ICombatUnit nearest = null;
-            float nearestSqr = float.MaxValue;
-
-            Vector3 selfPos = transform.position;
-            selfPos.y = 0f;
-
-            for (int i = 0; i < heroTargets.Count; i++)
-            {
-                ICombatUnit hero = heroTargets[i];
-
-                if (hero == null || hero.IsDead)
-                    continue;
-
-                Vector3 heroPos = hero.Position;
-                heroPos.y = 0f;
-
-                float sqr = (heroPos - selfPos).sqrMagnitude;
-
-                if (sqr < nearestSqr)
-                {
-                    nearestSqr = sqr;
-                    nearest = hero;
-                }
-            }
-
-            return nearest;
+            return targetProvider?.GetNearestTarget(this);
         }
 
         private bool IsTargetInAttackRange()
@@ -548,18 +551,18 @@ namespace Immortal_Switch.Scripts.Boss
 
         public void DealDamageToAllHeroTargets(float damageMultiplierPercent)
         {
-            for (int i = 0; i < heroTargets.Count; i++)
+            var targets = targetProvider?.GetAllTargets();
+            if (targets == null)
+                return;
+
+            for (int i = 0; i < targets.Count; i++)
             {
-                ICombatUnit target = heroTargets[i];
+                ICombatUnit target = targets[i];
 
-                if (!target.IsUnityAlive())
+                if (targetProvider == null ||
+                    !targetProvider.IsValidTarget(target))
                 {
-                    return;
-                }
-
-                if (target.IsDead)
-                {
-                    return;
+                    continue;
                 }
                 
                 DamageResult damageResult = DamageCalculator.CalculateDamage(this, target, damageMultiplierPercent);

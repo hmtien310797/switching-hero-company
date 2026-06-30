@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
@@ -38,7 +37,7 @@ namespace Immortal_Switch.Scripts.Enemy
         [field: SerializeField]
         public ActorType ActorType { get; private set; }
 
-        private readonly List<ICombatUnit> heroTargets = new();
+        private Battle.IEnemyTargetProvider targetProvider;
 
         [ShowInInspector, ReadOnly] private ICombatUnit currentTarget;
         [ShowInInspector, ReadOnly] private EnemyState currentState;
@@ -97,15 +96,32 @@ namespace Immortal_Switch.Scripts.Enemy
 
         public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB)
         {
-            Init(data, heroA, heroB, StageStatScale.Identity);
+            Init(
+                data,
+                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                StageStatScale.Identity
+            );
         }
 
         public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB, StageStatScale scale)
         {
+            Init(
+                data,
+                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                scale
+            );
+        }
+
+        public void Init(
+            CreepDataSo data,
+            Battle.IEnemyTargetProvider targetProvider,
+            StageStatScale scale)
+        {
             creepData = data;
+            this.targetProvider = targetProvider;
+
             HealthBarController.ResetHealth();
             ApplyData(data, scale);
-            SetHeroTargets(heroA, heroB);
 
             currentTarget = null;
             attackTimer = 0f;
@@ -119,13 +135,23 @@ namespace Immortal_Switch.Scripts.Enemy
 
         public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB, BaseStat cachedBaseStat)
         {
+            Init(
+                data,
+                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                cachedBaseStat
+            );
+        }
+
+        public void Init(
+            CreepDataSo data,
+            Battle.IEnemyTargetProvider targetProvider,
+            BaseStat cachedBaseStat)
+        {
             creepData = data;
+            this.targetProvider = targetProvider;
 
             HealthBarController.ResetHealth();
-
             ApplyBaseStat(data, cachedBaseStat);
-
-            SetHeroTargets(heroA, heroB);
 
             currentTarget = null;
             attackTimer = 0f;
@@ -223,15 +249,17 @@ namespace Immortal_Switch.Scripts.Enemy
             animationDriver.SkeletonAnim.TargetRuntimeFps = 30;
         }
 
+        public void SetTargetProvider(Battle.IEnemyTargetProvider targetProvider)
+        {
+            this.targetProvider = targetProvider;
+            currentTarget = null;
+        }
+
         public void SetHeroTargets(ICombatUnit heroA, ICombatUnit heroB)
         {
-            heroTargets.Clear();
-
-            if (heroA != null)
-                heroTargets.Add(heroA);
-
-            if (heroB != null)
-                heroTargets.Add(heroB);
+            SetTargetProvider(
+                new Battle.FixedEnemyTargetProvider(heroA, heroB)
+            );
         }
 
         public void Heal(float amount)
@@ -271,7 +299,7 @@ namespace Immortal_Switch.Scripts.Enemy
 
         private void TickIdle()
         {
-            currentTarget = FindNearestHero();
+            currentTarget = FindNearestTarget();
 
             if (currentTarget == null)
                 return;
@@ -397,60 +425,9 @@ namespace Immortal_Switch.Scripts.Enemy
             }
         }
 
-        private ICombatUnit FindNearestHero()
+        private ICombatUnit FindNearestTarget()
         {
-            ICombatUnit nearest = null;
-            float nearestSqr = float.MaxValue;
-
-            Vector3 selfPos = transform.position;
-            selfPos.y = 0f;
-
-            if (heroTargets.Count == 0)
-            {
-                HeroActor[] heroes = Object.FindObjectsByType<HeroActor>(FindObjectsSortMode.None);
-
-                for (int i = 0; i < heroes.Length; i++)
-                {
-                    HeroActor hero = heroes[i];
-
-                    if (hero == null || hero.IsDead)
-                        continue;
-
-                    Vector3 heroPos = hero.Position;
-                    heroPos.y = 0f;
-
-                    float sqr = (heroPos - selfPos).sqrMagnitude;
-
-                    if (sqr < nearestSqr)
-                    {
-                        nearestSqr = sqr;
-                        nearest = hero;
-                    }
-                }
-
-                return nearest;
-            }
-
-            for (int i = 0; i < heroTargets.Count; i++)
-            {
-                ICombatUnit hero = heroTargets[i];
-
-                if (hero == null || hero.IsDead)
-                    continue;
-
-                Vector3 heroPos = hero.Position;
-                heroPos.y = 0f;
-
-                float sqr = (heroPos - selfPos).sqrMagnitude;
-
-                if (sqr < nearestSqr)
-                {
-                    nearestSqr = sqr;
-                    nearest = hero;
-                }
-            }
-
-            return nearest;
+            return targetProvider?.GetNearestTarget(this);
         }
 
         private bool IsTargetInAttackRange()
@@ -646,7 +623,7 @@ namespace Immortal_Switch.Scripts.Enemy
         {
             ForceEndExternalMovement();
             currentTarget = null;
-            heroTargets.Clear();
+            targetProvider = null;
             base.OnDespawned();
         }
     }

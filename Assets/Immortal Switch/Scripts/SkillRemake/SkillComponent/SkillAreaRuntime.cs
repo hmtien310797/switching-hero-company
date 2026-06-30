@@ -77,7 +77,7 @@ namespace Immortal_Switch.Scripts.Skill
                 SkillLevel = context.SkillLevel,
                 CastPosition = context.CastPosition,
                 TargetPosition = transform.position,
-                BattleController = context.BattleController,
+                BattleContext = context.BattleContext,
                 SkillController = context.SkillController,
                 RuntimeObject = context.RuntimeObject
             };

@@ -12,7 +12,7 @@ namespace Immortal_Switch.Scripts.Skill
         public int SkillLevel;
         public Vector3 CastPosition;
         public Vector3 TargetPosition;
-        public PvEBattleController BattleController;
+        public IHeroBattleContext BattleContext;
         public HeroSkillController SkillController;
         public SkillRuntimeObject RuntimeObject;
 
@@ -26,7 +26,7 @@ namespace Immortal_Switch.Scripts.Skill
                 SkillLevel = SkillLevel,
                 CastPosition = CastPosition,
                 TargetPosition = target != null ? target.Position : TargetPosition,
-                BattleController = BattleController,
+                BattleContext = BattleContext,
                 SkillController = SkillController,
                 RuntimeObject = RuntimeObject
             };
@@ -46,7 +46,7 @@ namespace Immortal_Switch.Scripts.Skill
                 TargetPosition = hasValidTarget
                     ? mainTarget.Position
                     : TargetPosition,
-                BattleController = BattleController,
+                BattleContext = BattleContext,
                 SkillController = SkillController,
                 RuntimeObject = runtimeObject
             };

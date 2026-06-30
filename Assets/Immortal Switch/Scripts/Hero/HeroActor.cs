@@ -74,7 +74,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     private ICombatUnit currentTarget;
     [SerializeField]
     private HeroStateMachine stateMachine;
-    private PvEBattleController pveBattleController;
+    private IHeroBattleContext battleContext;
     private HeroTeamController heroTeamController;
     private HeroDataSO heroData;
     private int attackComboIndex;
@@ -184,13 +184,13 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         stateMachine.ChangeState(HeroStateId.Dead);
     }
 
-    public async UniTask Init(HeroDataSO data, PvEBattleController battleController, HeroTeamController heroTeamController, bool useAutoSkill)
+    public async UniTask Init(HeroDataSO data, IHeroBattleContext battleContext, HeroTeamController heroTeamController, bool useAutoSkill)
     {
         heroData = data;
         
         this.heroTeamController = heroTeamController;
-        pveBattleController = battleController;
-        skillController?.Init(this, battleController);
+        this.battleContext = battleContext;
+        skillController?.Init(this, battleContext);
 
         // Áp loadout skill từ server (skill/list.equipped) nếu hero này đã từng equip qua server —
         // nếu chưa, giữ nguyên skill mặc định bake sẵn trên prefab (xem UserDataCache.ApplyServerLoadoutToHero).
@@ -467,13 +467,13 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
         nextTargetSearchTime = Time.time + targetSearchInterval;
 
-        if (pveBattleController == null)
+        if (battleContext == null)
         {
             currentTarget = null;
             return;
         }
 
-        currentTarget = pveBattleController.GetNearestEnemy(transform.position);
+        currentTarget = battleContext.GetNearestEnemy(transform.position);
     }
 
     // =========================================================

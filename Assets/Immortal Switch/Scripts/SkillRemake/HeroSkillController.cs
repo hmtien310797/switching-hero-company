@@ -54,7 +54,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         private HeroActor owner;
         private HeroAnimationDriver animationDriver;
-        private PvEBattleController battleController;
+        private IHeroBattleContext battleContext;
         private ISkillLevelProvider levelProvider = new DefaultSkillLevelProvider();
         private ISkillObjectSpawner objectSpawner = new PoolSkillObjectSpawner();
         private SkillExecutor executor;
@@ -359,10 +359,10 @@ namespace Immortal_Switch.Scripts.Skill
             return slotIndex >= 0 && slotIndex < ClassSkillSlotCount;
         }
 
-        public void Init(HeroActor owner, PvEBattleController battleController, ISkillLevelProvider levelProvider = null)
+        public void Init(HeroActor owner, IHeroBattleContext battleContext, ISkillLevelProvider levelProvider = null)
         {
             this.owner = owner;
-            this.battleController = battleController;
+            this.battleContext = battleContext;
 
             if (owner != null)
             {
@@ -478,7 +478,7 @@ namespace Immortal_Switch.Scripts.Skill
             bool result = await CastSkillInternalAsync(skillData, level, target, interrupt: true, isUltimate);
             if (owner.IsChosen && result && isUltimate)
             {
-                PvEBattleController.Instance.OnSelectedHeroCastUltimateSkill();
+                battleContext?.OnSelectedHeroCastUltimateSkill();
             }
             owner.SetActionLocked(false); 
             return true;
@@ -1062,7 +1062,7 @@ namespace Immortal_Switch.Scripts.Skill
                 SkillLevel = level,
                 CastPosition = ownerPos,
                 TargetPosition = target != null ? target.Position : ownerPos,
-                BattleController = battleController,
+                BattleContext = battleContext,
                 SkillController = this
             };
         }
