@@ -6,6 +6,6 @@
         Fire,
         Wood,
         Water,
-        Metal
+        Metal, None
     }
 }

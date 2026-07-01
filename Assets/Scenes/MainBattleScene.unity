@@ -242,6 +242,89 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22a566a96cb302f42be0dd2fe998141c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &252925624
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 252925626}
+  - component: {fileID: 252925625}
+  m_Layer: 0
+  m_Name: DungeonBattleController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &252925625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252925624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 610a47f8beb246f5bb13f7ffde243abf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  database: {fileID: 11400000, guid: f55d507dd85915e4ab0cb40ccc6023c7, type: 2}
+  dungeonId: 1
+  stage: 1
+  heroTeamController: {fileID: 569612736}
+  heroSpawnPoints:
+  - {fileID: 0}
+  enemySpawnPoints:
+  - {fileID: 1105610674}
+  - {fileID: 1484817586}
+  bossSpawnPoint: {fileID: 192462841}
+  specialTargetSpawnPoint: {fileID: 192462841}
+  damageDummyPrefab: {fileID: 0}
+  defenseObjectivePrefab: {fileID: 0}
+  damageDummyBaseStat:
+    Health: 0
+    IdleStateTime: 0
+    IdleIntervalTime: 0
+    AttackRange: 0
+    Defense: 0
+    Attack: 0
+    AttackSpeed: 0
+    CritChance: 0
+    CritDamage: 0
+    Accuracy: 0
+    MoveSpeed: 0
+    Element: 0
+  defenseObjectiveBaseStat:
+    Health: 0
+    IdleStateTime: 0
+    IdleIntervalTime: 0
+    AttackRange: 0
+    Defense: 0
+    Attack: 0
+    AttackSpeed: 0
+    CritChance: 0
+    CritDamage: 0
+    Accuracy: 0
+    MoveSpeed: 0
+    Element: 0
+--- !u!4 &252925626
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252925624}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &268590026
 GameObject:
   m_ObjectHideFlags: 0
@@ -2072,3 +2155,4 @@ SceneRoots:
   - {fileID: 1552892433}
   - {fileID: 1825327707}
   - {fileID: 1026343337}
+  - {fileID: 252925626}

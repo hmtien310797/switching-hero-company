@@ -482,7 +482,7 @@ namespace Immortal_Switch.Scripts.UI
                     closed = false,
                     cacheOnClose = typed.CacheOnClose || layer == UILayer.Main // main always cache by design
                 };
-
+                
                 // MAIN layer special
                 if (layer == UILayer.Main)
                 {
@@ -499,6 +499,7 @@ namespace Immortal_Switch.Scripts.UI
                     return typed;
                 }
 
+                go.SetActive(true);
                 // NORMAL popup logic (non-main)
                 if (withBackdrop)
                     CreatePerEntryBackdrop(entry);
@@ -633,7 +634,6 @@ namespace Immortal_Switch.Scripts.UI
             // ensure under correct parent (in case cached instance)
             var mainRoot = GetLayerRoot(UILayer.Main);
             entry.view.transform.SetParent(mainRoot, false);
-            entry.view.gameObject.SetActive(true);
 
             if (entry.view.MainMode == MainLayerMode.PageExclusive)
             {

@@ -1,0 +1,1285 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a953e5ef7e64c89a688f83b585818f7, type: 3}
+  m_Name: DungeonDatabase
+  m_EditorClassIdentifier: 
+  definitions:
+  - dungeonId: 1
+    dungeonKey: treasure
+    uiNameVi: "H\u1EA7m Kho B\xE1u"
+    uiNameEn: Treasure Dungeon
+    mode: 0
+    stageCount: 150
+    entryCostKey: dungeon_ticket
+    entryCostAmount: 1
+    stageTableKey: treasure
+    defaultTimeLimitSec: 90
+    enemyId: 1
+    bossId: 0
+  - dungeonId: 2
+    dungeonKey: relic
+    uiNameVi: "H\u1EA7m T\xEDn V\u1EADt"
+    uiNameEn: Relic Dungeon
+    mode: 1
+    stageCount: 150
+    entryCostKey: dungeon_ticket
+    entryCostAmount: 1
+    stageTableKey: relic
+    defaultTimeLimitSec: 120
+    enemyId: 201
+    bossId: 0
+  - dungeonId: 3
+    dungeonKey: awakening
+    uiNameVi: "H\u1EA7m Kim C\u01B0\u01A1ng"
+    uiNameEn: Awakening Dungeon
+    mode: 2
+    stageCount: 400
+    entryCostKey: dungeon_ticket
+    entryCostAmount: 1
+    stageTableKey: awakening
+    defaultTimeLimitSec: 60
+    enemyId: 0
+    bossId: 0
+  - dungeonId: 4
+    dungeonKey: weapon
+    uiNameVi: "H\u1EA7m Trang B\u1ECB"
+    uiNameEn: Equipment Dungeon
+    mode: 0
+    stageCount: 150
+    entryCostKey: dungeon_ticket
+    entryCostAmount: 1
+    stageTableKey: weapon
+    defaultTimeLimitSec: 90
+    enemyId: 301
+    bossId: 0
+  - dungeonId: 5
+    dungeonKey: dragon_boss
+    uiNameVi: "H\u1EA7m R\u1ED3ng"
+    uiNameEn: Dragon Boss Dungeon
+    mode: 3
+    stageCount: 150
+    entryCostKey: dungeon_ticket
+    entryCostAmount: 1
+    stageTableKey: dragon_boss
+    defaultTimeLimitSec: 90
+    enemyId: 0
+    bossId: 1001
+  - dungeonId: 6
+    dungeonKey: demon_boss
+    uiNameVi: "H\u1EA7m Ma V\u01B0\u01A1ng"
+    uiNameEn: Demon Boss Dungeon
+    mode: 3
+    stageCount: 150
+    entryCostKey: dungeon_ticket
+    entryCostAmount: 1
+    stageTableKey: demon_boss
+    defaultTimeLimitSec: 90
+    enemyId: 0
+    bossId: 2001
+  stageFormulaRows:
+  - tableKey: treasure
+    stage: 1
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 5000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 10
+    reward1:
+      formula: 2
+      baseValue: 100
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 1
+    reward2:
+      formula: 2
+      baseValue: 500
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 3
+    reward3:
+      formula: 4
+      baseValue: 5
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 1
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 2
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: treasure
+    stage: 15
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 55000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 10
+    reward1:
+      formula: 2
+      baseValue: 350
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 1
+    reward2:
+      formula: 2
+      baseValue: 1800
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 3
+    reward3:
+      formula: 4
+      baseValue: 10
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 2
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 3
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: treasure
+    stage: 30
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 250000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 10
+    reward1:
+      formula: 2
+      baseValue: 1200
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 1
+    reward2:
+      formula: 2
+      baseValue: 6500
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 3
+    reward3:
+      formula: 4
+      baseValue: 25
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 3
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 4
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: treasure
+    stage: 60
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 1500000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 10
+    reward1:
+      formula: 2
+      baseValue: 5000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 1
+    reward2:
+      formula: 2
+      baseValue: 25000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 3
+    reward3:
+      formula: 4
+      baseValue: 75
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 5
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 5
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: relic
+    stage: 1
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 7000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 32
+    reward1:
+      formula: 2
+      baseValue: 1
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 0
+    reward2:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 0
+    reward3:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 2
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: relic
+    stage: 30
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 95000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 32
+    reward1:
+      formula: 2
+      baseValue: 3
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 0
+    reward2:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 0
+    reward3:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 3
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: relic
+    stage: 75
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 650000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 32
+    reward1:
+      formula: 2
+      baseValue: 8
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 0
+    reward2:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 0
+    reward3:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 4
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: awakening
+    stage: 1
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 10000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 42
+    reward1:
+      formula: 2
+      baseValue: 1
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 0
+    reward2:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 0
+    reward3:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: awakening
+    stage: 50
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 180000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 42
+    reward1:
+      formula: 2
+      baseValue: 4
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 0
+    reward2:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 0
+    reward3:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: awakening
+    stage: 150
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 1800000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 42
+    reward1:
+      formula: 2
+      baseValue: 10
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 0
+    reward2:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 0
+    reward3:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: awakening
+    stage: 300
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 12000000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 42
+    reward1:
+      formula: 2
+      baseValue: 25
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 0
+    reward2:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward3ItemId: 0
+    reward3:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: weapon
+    stage: 1
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 8000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 43
+    reward1:
+      formula: 2
+      baseValue: 2
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 44
+    reward2:
+      formula: 4
+      baseValue: 1
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 10
+      stepValue: 1
+      roundMode: 2
+    reward3ItemId: 45
+    reward3:
+      formula: 4
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 15
+      stepValue: 1
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 2
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: weapon
+    stage: 30
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 120000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 43
+    reward1:
+      formula: 2
+      baseValue: 6
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 44
+    reward2:
+      formula: 4
+      baseValue: 2
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 10
+      stepValue: 1
+      roundMode: 2
+    reward3ItemId: 45
+    reward3:
+      formula: 4
+      baseValue: 1
+      coefficient: 0
+      exponent: 0
+      stepInterval: 15
+      stepValue: 1
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 3
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: weapon
+    stage: 80
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 950000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 43
+    reward1:
+      formula: 2
+      baseValue: 15
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 44
+    reward2:
+      formula: 4
+      baseValue: 4
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 10
+      stepValue: 2
+      roundMode: 2
+    reward3ItemId: 45
+    reward3:
+      formula: 4
+      baseValue: 2
+      coefficient: 0
+      exponent: 0
+      stepInterval: 15
+      stepValue: 1
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 40
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 4
+      roundMode: 2
+    enemyPerBatch: 20
+    delayBetweenBatchesSec: 0.5
+  - tableKey: dragon_boss
+    stage: 1
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 8000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 43
+    reward1:
+      formula: 2
+      baseValue: 2
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 44
+    reward2:
+      formula: 4
+      baseValue: 1
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 10
+      stepValue: 1
+      roundMode: 2
+    reward3ItemId: 45
+    reward3:
+      formula: 4
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 15
+      stepValue: 1
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 2
+      roundMode: 2
+    enemyPerBatch: 1
+    delayBetweenBatchesSec: 0
+  - tableKey: demon_boss
+    stage: 1
+    timeLimitOverrideSec: 0
+    recommendedPower:
+      formula: 2
+      baseValue: 8000
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyHp:
+      formula: 2
+      baseValue: 2000
+      coefficient: 0
+      exponent: 1.03
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyAtk:
+      formula: 2
+      baseValue: 20
+      coefficient: 0
+      exponent: 1.02
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    enemyDef:
+      formula: 2
+      baseValue: 60
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 1
+    reward1ItemId: 43
+    reward1:
+      formula: 2
+      baseValue: 2
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 2
+    reward2ItemId: 44
+    reward2:
+      formula: 4
+      baseValue: 1
+      coefficient: 0
+      exponent: 1.1
+      stepInterval: 10
+      stepValue: 1
+      roundMode: 2
+    reward3ItemId: 45
+    reward3:
+      formula: 4
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 15
+      stepValue: 1
+      roundMode: 2
+    enemyCount:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 5
+      stepValue: 2
+      roundMode: 2
+    enemyPerBatch: 1
+    delayBetweenBatchesSec: 0
+  damageThresholdRows:
+  - tableKey: awakening
+    stage: 1
+    requiredDamage:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 0
+    rewardMultiplierPercent: 100
+  - tableKey: awakening
+    stage: 50
+    requiredDamage:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 0
+    rewardMultiplierPercent: 100
+  - tableKey: awakening
+    stage: 150
+    requiredDamage:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 0
+    rewardMultiplierPercent: 100
+  - tableKey: awakening
+    stage: 300
+    requiredDamage:
+      formula: 0
+      baseValue: 0
+      coefficient: 0
+      exponent: 0
+      stepInterval: 0
+      stepValue: 0
+      roundMode: 0
+    rewardMultiplierPercent: 100

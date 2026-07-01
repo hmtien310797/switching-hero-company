@@ -1,4 +1,5 @@
 ﻿using System;
+using Battle;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Common;
@@ -44,7 +45,7 @@ namespace Immortal_Switch.Scripts.Boss
         [Header("Properties")]
         [field: SerializeField] public ActorType ActorType { get; private set;}
 
-        private Battle.IEnemyTargetProvider targetProvider;
+        private IEnemyTargetProvider targetProvider;
 
         private BossState currentState;
         
@@ -111,7 +112,7 @@ namespace Immortal_Switch.Scripts.Boss
         {
             Init(
                 data,
-                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                new FixedEnemyTargetProvider(heroA, heroB),
                 StageStatScale.Identity
             );
         }
@@ -120,14 +121,14 @@ namespace Immortal_Switch.Scripts.Boss
         {
             Init(
                 data,
-                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                new FixedEnemyTargetProvider(heroA, heroB),
                 scale
             );
         }
 
         public void Init(
             BossDataSO data,
-            Battle.IEnemyTargetProvider targetProvider,
+            IEnemyTargetProvider targetProvider,
             StageStatScale scale)
         {
             bossData = data;
@@ -156,14 +157,14 @@ namespace Immortal_Switch.Scripts.Boss
         {
             Init(
                 data,
-                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                new FixedEnemyTargetProvider(heroA, heroB),
                 cachedBaseStat
             );
         }
 
         public void Init(
             BossDataSO data,
-            Battle.IEnemyTargetProvider targetProvider,
+            IEnemyTargetProvider targetProvider,
             BaseStat cachedBaseStat)
         {
             bossData = data;
@@ -237,7 +238,7 @@ namespace Immortal_Switch.Scripts.Boss
             stats.Initialize(baseStat);
         }
 
-        public void SetTargetProvider(Battle.IEnemyTargetProvider targetProvider)
+        public void SetTargetProvider(IEnemyTargetProvider targetProvider)
         {
             this.targetProvider = targetProvider;
             currentTarget = null;
@@ -246,7 +247,7 @@ namespace Immortal_Switch.Scripts.Boss
         public void SetHeroTargets(ICombatUnit heroA, ICombatUnit heroB)
         {
             SetTargetProvider(
-                new Battle.FixedEnemyTargetProvider(heroA, heroB)
+                new FixedEnemyTargetProvider(heroA, heroB)
             );
         }
 

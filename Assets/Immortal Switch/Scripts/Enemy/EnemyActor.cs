@@ -1,4 +1,5 @@
 ﻿using System;
+using Battle;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Hero;
@@ -37,7 +38,7 @@ namespace Immortal_Switch.Scripts.Enemy
         [field: SerializeField]
         public ActorType ActorType { get; private set; }
 
-        private Battle.IEnemyTargetProvider targetProvider;
+        private IEnemyTargetProvider targetProvider;
 
         [ShowInInspector, ReadOnly] private ICombatUnit currentTarget;
         [ShowInInspector, ReadOnly] private EnemyState currentState;
@@ -98,7 +99,7 @@ namespace Immortal_Switch.Scripts.Enemy
         {
             Init(
                 data,
-                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                new FixedEnemyTargetProvider(heroA, heroB),
                 StageStatScale.Identity
             );
         }
@@ -107,14 +108,14 @@ namespace Immortal_Switch.Scripts.Enemy
         {
             Init(
                 data,
-                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                new FixedEnemyTargetProvider(heroA, heroB),
                 scale
             );
         }
 
         public void Init(
             CreepDataSo data,
-            Battle.IEnemyTargetProvider targetProvider,
+            IEnemyTargetProvider targetProvider,
             StageStatScale scale)
         {
             creepData = data;
@@ -137,14 +138,14 @@ namespace Immortal_Switch.Scripts.Enemy
         {
             Init(
                 data,
-                new Battle.FixedEnemyTargetProvider(heroA, heroB),
+                new FixedEnemyTargetProvider(heroA, heroB),
                 cachedBaseStat
             );
         }
 
         public void Init(
             CreepDataSo data,
-            Battle.IEnemyTargetProvider targetProvider,
+            IEnemyTargetProvider targetProvider,
             BaseStat cachedBaseStat)
         {
             creepData = data;
@@ -249,7 +250,7 @@ namespace Immortal_Switch.Scripts.Enemy
             animationDriver.SkeletonAnim.TargetRuntimeFps = 30;
         }
 
-        public void SetTargetProvider(Battle.IEnemyTargetProvider targetProvider)
+        public void SetTargetProvider(IEnemyTargetProvider targetProvider)
         {
             this.targetProvider = targetProvider;
             currentTarget = null;
@@ -258,7 +259,7 @@ namespace Immortal_Switch.Scripts.Enemy
         public void SetHeroTargets(ICombatUnit heroA, ICombatUnit heroB)
         {
             SetTargetProvider(
-                new Battle.FixedEnemyTargetProvider(heroA, heroB)
+                new FixedEnemyTargetProvider(heroA, heroB)
             );
         }
 

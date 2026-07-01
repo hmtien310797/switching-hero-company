@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
@@ -528,7 +529,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                 return;
 
             // refresh runtime heroes
-            if (Battle.PvEBattleController.Instance != null)
+            if (PvEBattleController.Instance != null)
             {
                 var activeHeroes = userDataCache.inBattleHeroes;
                 for (int i = 0; i < activeHeroes.Length; i++)

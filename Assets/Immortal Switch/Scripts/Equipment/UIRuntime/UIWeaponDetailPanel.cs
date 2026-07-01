@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.Core;
@@ -218,7 +219,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (WeaponManager.Instance == null)
                 return;
 
-            if (Battle.PvEBattleController.Instance == null)
+            if (PvEBattleController.Instance == null)
                 return;
 
             var activeHeroes = UserDataCache.Instance.inBattleHeroes;

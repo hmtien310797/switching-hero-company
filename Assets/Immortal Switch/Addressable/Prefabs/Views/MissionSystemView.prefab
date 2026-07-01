@@ -290,14 +290,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8637351277118781264}
-  - component: {fileID: 6894240137044347844}
   m_Layer: 5
   m_Name: RootView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8637351277118781264
 RectTransform:
   m_ObjectHideFlags: 0
@@ -323,26 +322,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 185}
   m_SizeDelta: {x: 861.3228, y: 1601.8809}
   m_Pivot: {x: 0.5, y: 0}
---- !u!114 &6894240137044347844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1336628210346896464}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df38ebce50a9aee4ea257ee941d79c42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  panelRoot: {fileID: 8637351277118781264}
-  fitMode: 2
-  useSafeArea: 1
-  minScale: 0.35
-  maxScale: 1
-  changePosY: 0
-  yPosPortrait: 1
-  yPosLandscape: 1
 --- !u!1 &1413095870504187962
 GameObject:
   m_ObjectHideFlags: 0
@@ -986,6 +965,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8725116991309460178}
   - component: {fileID: 3956835294722896193}
+  - component: {fileID: 188012970637793598}
   m_Layer: 5
   m_Name: MissionSystemView
   m_TagString: Untagged
@@ -1067,6 +1047,27 @@ MonoBehaviour:
   dailyOption: {fileID: 7703937934185137576}
   weeklyOption: {fileID: 3307806913035695005}
   repeatOption: {fileID: 5857584145741270879}
+--- !u!114 &188012970637793598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2854949072125150460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df38ebce50a9aee4ea257ee941d79c42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panelRoot: {fileID: 8637351277118781264}
+  fitMode: 2
+  useSafeArea: 1
+  minScale: 0.35
+  maxScale: 1
+  anchoredY: 185
+  changePosY: 0
+  yPosPortrait: 1
+  yPosLandscape: 1
 --- !u!1 &2969026814006074645
 GameObject:
   m_ObjectHideFlags: 0
@@ -1102,9 +1103,9 @@ RectTransform:
   - {fileID: 4717551260593923568}
   m_Father: {fileID: 4802026097476775338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 131.6575, y: -44.6975}
   m_SizeDelta: {x: 263.315, y: 92.047}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3626051826159351814
@@ -1637,9 +1638,9 @@ RectTransform:
   - {fileID: 7491442338066045668}
   m_Father: {fileID: 4802026097476775338}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 609.13477, y: -44.6975}
   m_SizeDelta: {x: 263.315, y: 92.047}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &236400225548415473
@@ -2448,9 +2449,9 @@ RectTransform:
   - {fileID: 5728046982403068354}
   m_Father: {fileID: 4802026097476775338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 370.39615, y: -44.6975}
   m_SizeDelta: {x: 214.1623, y: 92.047}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2872660372649872326

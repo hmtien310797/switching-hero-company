@@ -42,6 +42,7 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             _inited = true;
+            animatedRoot.gameObject.SetActive(false);
         }
 
         public override void OnShow(object args) { /* logic data-binding nếu cần */ }
@@ -59,6 +60,7 @@ namespace Immortal_Switch.Scripts.UI
 
             animatedRoot.anchoredPosition = startPos;
             if (fade && _cg != null) _cg.alpha = fromAlpha;
+            animatedRoot.gameObject.SetActive(true);
 
             await Tween01(showDuration, t =>
             {

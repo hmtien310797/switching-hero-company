@@ -33,6 +33,11 @@ namespace Immortal_Switch.Scripts.StatSystem
 
     public enum ActorType
     {
-        Hero, Boss, Creep, EnemyHero
+        Hero,
+        Boss,
+        Creep,
+        EnemyHero,
+        DamageDummy,
+        DefenseObjective
     }
 }
