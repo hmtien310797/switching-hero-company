@@ -72,6 +72,7 @@ namespace Battle.Dungeon
             {
                 DungeonId = definition.DungeonId,
                 DungeonKey = definition.DungeonKey,
+                MapName = definition.MapName,
                 Stage = currentStage,
                 Mode = definition.Mode,
                 EntryCostKey = definition.EntryCostKey,
@@ -93,6 +94,15 @@ namespace Battle.Dungeon
                 DelayBetweenBatchesSec = Mathf.Max(0f, formulaRow.DelayBetweenBatchesSec),
                 Rewards = BuildRewards(formulaRow, currentStage, formulaStartStage)
             };
+
+            if (string.IsNullOrWhiteSpace(definition.MapName))
+            {
+                Debug.LogError(
+                    $"[DungeonRuntimeBuilder] Dungeon requires map_name. " +
+                    $"dungeon={definition.DungeonKey}");
+                runtimeData = null;
+                return false;
+            }
 
             if (RequiresEnemy(definition.Mode) && definition.EnemyId <= 0)
             {

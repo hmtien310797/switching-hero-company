@@ -24,6 +24,10 @@ namespace Battle.Dungeon
         [Tooltip("Boss used by this dungeon for every stage. Use 0 when the mode is not BossChallenge.")]
         [SerializeField] private int bossId;
 
+        [Header("Addressable Map")]
+        [Tooltip("Addressable prefab name under Assets/Immortal Switch/Addressable/Map/Prefab.")]
+        [SerializeField] private string mapName;
+
         public int DungeonId => dungeonId;
         public string DungeonKey => dungeonKey;
         public string UiNameVi => uiNameVi;
@@ -36,6 +40,7 @@ namespace Battle.Dungeon
         public int DefaultTimeLimitSec => defaultTimeLimitSec;
         public int EnemyId => enemyId;
         public int BossId => bossId;
+        public string MapName => mapName;
 
         public bool ContainsStage(int stage)
         {

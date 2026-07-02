@@ -27,6 +27,7 @@ namespace Battle.Dungeon
     {
         public int DungeonId;
         public string DungeonKey;
+        public string MapName;
         public int Stage;
         public DungeonModeType Mode;
 

@@ -252,6 +252,7 @@ GameObject:
   m_Component:
   - component: {fileID: 252925626}
   - component: {fileID: 252925625}
+  - component: {fileID: 252925627}
   m_Layer: 0
   m_Name: DungeonBattleController
   m_TagString: Untagged
@@ -274,6 +275,7 @@ MonoBehaviour:
   database: {fileID: 11400000, guid: f55d507dd85915e4ab0cb40ccc6023c7, type: 2}
   dungeonId: 1
   stage: 1
+  dungeonMapController: {fileID: 238822548}
   heroTeamController: {fileID: 569612736}
   heroSpawnPoints:
   - {fileID: 0}
@@ -318,13 +320,28 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 252925624}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1100.6539, y: -883.5147, z: 0.13375995}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 811213264}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &252925627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252925624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18a0dbd54a716422886ca4672e4a5bd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  battleFlowController: {fileID: 811213263}
+  dungeonId: 1
+  dungeonStage: 1
 --- !u!1 &268590026
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,6 +819,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &811213262
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 811213264}
+  - component: {fileID: 811213263}
+  m_Layer: 0
+  m_Name: BattleFlowController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &811213263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 811213262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f44e8a1c3764a5097df1ccb3ad9fc7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chapterBattleController: {fileID: 4788671434723629499}
+  dungeonBattleController: {fileID: 252925625}
+  resultHoldSeconds: 1
+--- !u!4 &811213264
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 811213262}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1100.6539, y: 883.5147, z: -0.13375995}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 252925626}
+  - {fileID: 4788671434723629501}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &818825787
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -840,7 +906,7 @@ PrefabInstance:
       objectReference: {fileID: 2949855837492024296}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalPosition.y
@@ -848,7 +914,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -21
+      value: -14
       objectReference: {fileID: 0}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1965,7 +2031,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 811213264}
     m_Modifications:
     - target: {fileID: 441864012410880443, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: pvEMapController
@@ -1975,17 +2041,25 @@ PrefabInstance:
       propertyPath: heroTeamController
       value: 
       objectReference: {fileID: 569612736}
+    - target: {fileID: 441864012410880443, guid: d76312e609120d048acccc6888b73995, type: 3}
+      propertyPath: battleFlowController
+      value: 
+      objectReference: {fileID: 811213263}
+    - target: {fileID: 441864012410880443, guid: d76312e609120d048acccc6888b73995, type: 3}
+      propertyPath: offlineAfkRewardService
+      value: 
+      objectReference: {fileID: 4788671434723629500}
     - target: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1100.6539
       objectReference: {fileID: 0}
     - target: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -883.5147
       objectReference: {fileID: 0}
     - target: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 12
+      value: 12.1337595
       objectReference: {fileID: 0}
     - target: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1993,15 +2067,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2024,6 +2098,33 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d76312e609120d048acccc6888b73995, type: 3}
+--- !u!114 &4788671434723629499 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 441864012410880443, guid: d76312e609120d048acccc6888b73995, type: 3}
+  m_PrefabInstance: {fileID: 4788671434723629498}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdb95ea13516bad499e7a3c839f85aa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4788671434723629500 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1063563827273938730, guid: d76312e609120d048acccc6888b73995, type: 3}
+  m_PrefabInstance: {fileID: 4788671434723629498}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4d0187ab2eb4a16a617ac7465f2f615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &4788671434723629501 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 683103550981019987, guid: d76312e609120d048acccc6888b73995, type: 3}
+  m_PrefabInstance: {fileID: 4788671434723629498}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5433342314006405943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2127,7 +2228,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 238822547}
-  - {fileID: 4788671434723629498}
   - {fileID: 1411116361}
   - {fileID: 268590027}
   - {fileID: 2093848898}
@@ -2155,4 +2255,4 @@ SceneRoots:
   - {fileID: 1552892433}
   - {fileID: 1825327707}
   - {fileID: 1026343337}
-  - {fileID: 252925626}
+  - {fileID: 811213264}

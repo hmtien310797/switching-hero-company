@@ -21,16 +21,20 @@ namespace Battle.Dungeon
         [SerializeField] private int dungeonId = 1;
         [SerializeField, Min(1)] private int stage = 1;
 
+        [Header("Addressable Dungeon Map")]
+        [SerializeField] private PvEMapController dungeonMapController;
+
         [Header("Hero")]
         [SerializeField] private HeroTeamController heroTeamController;
-        [SerializeField] private Transform[] heroSpawnPoints;
 
-        [Header("Enemy")]
+        [Header("Fallback Spawn Points")]
+        [Tooltip("Only used when the spawned DungeonMapView has no corresponding point.")]
+        [SerializeField] private Transform[] heroSpawnPoints;
         [SerializeField] private Transform[] enemySpawnPoints;
         [SerializeField] private Transform bossSpawnPoint;
+        [SerializeField] private Transform specialTargetSpawnPoint;
 
         [Header("Special Mode Target")]
-        [SerializeField] private Transform specialTargetSpawnPoint;
         [SerializeField] private DungeonDamageDummy damageDummyPrefab;
         [SerializeField] private DungeonDefenseObjective defenseObjectivePrefab;
         [SerializeField] private BaseStat damageDummyBaseStat;
@@ -50,6 +54,7 @@ namespace Battle.Dungeon
         private BossActor activeBoss;
         private DungeonDamageDummy activeDamageDummy;
         private DungeonDefenseObjective activeDefenseObjective;
+        private PvEMapView activeDungeonMapView;
         private DungeonBattleState state;
         private DungeonBattleResult result;
         private float remainingTime;
@@ -186,9 +191,7 @@ namespace Battle.Dungeon
                 return null;
             }
 
-            Vector3 position = bossSpawnPoint != null
-                ? bossSpawnPoint.position
-                : Vector3.zero;
+            Vector3 position = bossSpawnPoint.position;
 
             activeBoss = await enemySpawnService.SpawnBossAsync(
                 bossData,
@@ -355,6 +358,10 @@ namespace Battle.Dungeon
             }
 
             targetRegistry.Clear();
+
+            activeDungeonMapView = null;
+            dungeonMapController?.ReleaseCurrentMap();
+
             runtimeData = null;
             state = DungeonBattleState.None;
         }

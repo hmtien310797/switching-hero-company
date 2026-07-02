@@ -29,7 +29,7 @@ namespace Battle.Dungeon.Editor
         [SerializeField] private DungeonDatabaseSO targetDatabase;
         private bool isImporting;
 
-        [MenuItem("Immortal Switch/Dungeon/Google Sheet Importer")]
+        [MenuItem("Tools/Game Data/Dungeun Data Importer")]
         private static void OpenWindow()
         {
             DungeonGoogleSheetImporterWindow window =
@@ -201,6 +201,7 @@ namespace Battle.Dungeon.Editor
                 SetPrivateField(data, "defaultTimeLimitSec", ReadInt(row, "default_time_limit_sec", 60));
                 SetPrivateField(data, "enemyId", ReadInt(row, "enemy_id"));
                 SetPrivateField(data, "bossId", ReadInt(row, "boss_id"));
+                SetPrivateField(data, "mapName", ReadString(row, "map_name"));
 
                 result.Add(data);
             }
@@ -240,115 +241,6 @@ namespace Battle.Dungeon.Editor
             }
 
             return result;
-        }
-        
-        private static DungeonFormulaData ParseFormula(
-            Dictionary<string, string> row,
-            string prefix)
-        {
-            DungeonFormulaData formulaData =
-                new DungeonFormulaData();
-
-            // DungeonFormulaData là struct nên phải box một lần.
-            object boxedData = formulaData;
-
-            SetPrivateField(
-                boxedData,
-                "formula",
-                ParseFormulaType(
-                    ReadString(
-                        row,
-                        $"{prefix}_formula"
-                    )
-                )
-            );
-
-            SetPrivateField(
-                boxedData,
-                "baseValue",
-                ReadDouble(
-                    row,
-                    $"{prefix}_base"
-                )
-            );
-
-            SetPrivateField(
-                boxedData,
-                "coefficient",
-                ReadDouble(
-                    row,
-                    $"{prefix}_coefficient"
-                )
-            );
-
-            SetPrivateField(
-                boxedData,
-                "exponent",
-                ReadDouble(
-                    row,
-                    $"{prefix}_exponent"
-                )
-            );
-
-            SetPrivateField(
-                boxedData,
-                "stepInterval",
-                ReadInt(
-                    row,
-                    $"{prefix}_step_interval"
-                )
-            );
-
-            SetPrivateField(
-                boxedData,
-                "stepValue",
-                ReadDouble(
-                    row,
-                    $"{prefix}_step_value"
-                )
-            );
-
-            SetPrivateField(
-                boxedData,
-                "roundMode",
-                ParseRoundMode(
-                    ReadString(
-                        row,
-                        $"{prefix}_round"
-                    )
-                )
-            );
-
-            return (DungeonFormulaData)boxedData;
-        }
-        
-        private static DungeonFormulaType ParseFormulaType(
-            string rawValue)
-        {
-            if (string.IsNullOrWhiteSpace(rawValue))
-            {
-                return DungeonFormulaType.Flat;
-            }
-
-            switch (rawValue.Trim().ToUpperInvariant())
-            {
-                case "FLAT":
-                    return DungeonFormulaType.Flat;
-
-                case "LINEAR":
-                    return DungeonFormulaType.Linear;
-
-                case "POWER":
-                    return DungeonFormulaType.Power;
-
-                case "STEP":
-                    return DungeonFormulaType.Step;
-
-                default:
-                    throw new FormatException(
-                        $"Dungeon formula không hợp lệ: '{rawValue}'"
-                    );
-            }
         }
 
         private static List<DungeonDamageThresholdRow>
@@ -405,6 +297,13 @@ namespace Battle.Dungeon.Editor
                     );
                 }
 
+                if (string.IsNullOrWhiteSpace(definition.MapName))
+                {
+                    throw new InvalidOperationException(
+                        $"Dungeon '{definition.DungeonKey}' yêu cầu map_name."
+                    );
+                }
+
                 if (!HasStageOneFormula(formulaRows, definition.StageTableKey))
                 {
                     throw new InvalidOperationException(
@@ -434,7 +333,7 @@ namespace Battle.Dungeon.Editor
                 }
 
                 if (definition.Mode == DungeonModeType.BossChallenge &&
-                    definition.BossId <= 0)
+                    definition.EnemyId <= 0)
                 {
                     throw new InvalidOperationException(
                         $"Boss Challenge '{definition.DungeonKey}' yêu cầu boss_id > 0."
@@ -485,6 +384,62 @@ namespace Battle.Dungeon.Editor
             return false;
         }
 
+
+        private static DungeonFormulaData ParseFormula(
+            Dictionary<string, string> row,
+            string prefix)
+        {
+            DungeonFormulaData formulaData = new DungeonFormulaData();
+
+            // DungeonFormulaData là struct: box một lần, set trên cùng boxed instance,
+            // sau đó unbox để không bị mất toàn bộ giá trị.
+            object boxedData = formulaData;
+
+            SetPrivateField(
+                boxedData,
+                "formula",
+                ParseFormulaType(ReadString(row, $"{prefix}_formula"))
+            );
+
+            SetPrivateField(
+                boxedData,
+                "baseValue",
+                ReadDouble(row, $"{prefix}_base")
+            );
+
+            SetPrivateField(
+                boxedData,
+                "coefficient",
+                ReadDouble(row, $"{prefix}_coefficient")
+            );
+
+            SetPrivateField(
+                boxedData,
+                "exponent",
+                ReadDouble(row, $"{prefix}_exponent")
+            );
+
+            SetPrivateField(
+                boxedData,
+                "stepInterval",
+                ReadInt(row, $"{prefix}_step_interval")
+            );
+
+            SetPrivateField(
+                boxedData,
+                "stepValue",
+                ReadDouble(row, $"{prefix}_step_value")
+            );
+
+            SetPrivateField(
+                boxedData,
+                "roundMode",
+                ParseRoundMode(ReadString(row, $"{prefix}_round"))
+            );
+
+            return (DungeonFormulaData)boxedData;
+        }
+
         private static DungeonModeType ParseMode(string value)
         {
             switch (Normalize(value))
@@ -511,7 +466,28 @@ namespace Battle.Dungeon.Editor
                     );
             }
         }
-        
+
+        private static DungeonFormulaType ParseFormulaType(string value)
+        {
+            switch (Normalize(value))
+            {
+                case "":
+                case "FLAT":
+                    return DungeonFormulaType.Flat;
+                case "LINEAR":
+                    return DungeonFormulaType.Linear;
+                case "POWER":
+                    return DungeonFormulaType.Power;
+                case "EXPONENTIAL":
+                    return DungeonFormulaType.Exponential;
+                case "STEP":
+                    return DungeonFormulaType.Step;
+                default:
+                    throw new InvalidOperationException(
+                        $"Formula không hợp lệ: '{value}'"
+                    );
+            }
+        }
 
         private static DungeonRoundMode ParseRoundMode(string value)
         {

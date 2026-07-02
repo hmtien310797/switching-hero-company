@@ -85,6 +85,10 @@ namespace Battle
         private int minimumWarmupPerCreepType = 20;
 
         [ShowInInspector] private readonly List<EnemyActor> creeps = new();
+        
+        [Header("Battle Flow")]
+        [SerializeField]
+        private BattleFlowController battleFlowController;
 
         private BattleResult result = BattleResult.None;
         private int aliveCreepCount;
@@ -194,7 +198,7 @@ namespace Battle
             SetState(BattleState.Initializing);
             CurrentStage = Mathf.Max(1, CurrentStage);
             InitStage(CurrentStage);
-            await pvEMapController.InitMapByChapterAsync(GetResolvedChapterIndexByStage(CurrentStage));
+            await pvEMapController.InitChapterMapAsync(GetResolvedChapterIndexByStage(CurrentStage));
             
             bool poolsReady =
                 await PrepareCreepPoolsForCurrentStageAsync();
@@ -217,6 +221,7 @@ namespace Battle
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
             GameEventManager.Trigger(GameEvents.OnWaveStart);
+            battleFlowController?.MarkChapterRunning();
         }
 
         private void HandleMoveStageRequested(int targetStage)
@@ -614,7 +619,7 @@ namespace Battle
             NotifyIdleScreenStageChanged();
             InitStage(CurrentStage);
 
-            await pvEMapController.InitMapByChapterAsync(
+            await pvEMapController.InitChapterMapAsync(
                 GetResolvedChapterIndexByStage(CurrentStage)
             );
 

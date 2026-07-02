@@ -16,6 +16,7 @@ namespace Battle
 
             DespawnCreepAndBoss();
             DespawnChapterHeroesForDungeon();
+            pvEMapController?.ReleaseCurrentMap();
 
             heroTeamController?.SetHeroes(null, null);
             RefreshHeroSlotCache();

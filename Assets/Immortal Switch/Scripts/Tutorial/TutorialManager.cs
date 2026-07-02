@@ -79,10 +79,10 @@ namespace Immortal_Switch.Scripts.Tutorial
         /// </summary>
         public void TryGuide(int guideId)
         {
-            if (!IsComplete(guideId))
-            {
-                StartAt(guideId);
-            }
+            // if (!IsComplete(guideId))
+            // {
+            //     StartAt(guideId);
+            // }
         }
 
         /// <summary>

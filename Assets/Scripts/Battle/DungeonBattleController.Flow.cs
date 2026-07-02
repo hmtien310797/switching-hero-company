@@ -33,6 +33,24 @@ namespace Battle.Dungeon
                 return false;
             }
 
+            if (dungeonMapController == null)
+            {
+                Debug.LogError("[Dungeon] DungeonMapController is missing.");
+                CleanupBattle();
+                return false;
+            }
+
+            activeDungeonMapView =
+                await dungeonMapController.InitDungeonMapAsync(runtimeData.MapName);
+
+            if (activeDungeonMapView == null)
+            {
+                Debug.LogError(
+                    $"[Dungeon] Cannot initialize map. mapName={runtimeData.MapName}");
+                CleanupBattle();
+                return false;
+            }
+
             activeEnemyTargetProvider = runtimeData.Mode == DungeonModeType.DefendObjective
                 ? defenseTargetProvider
                 : heroTargetProvider;
