@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
-public class Transitioner : MonoBehaviour
+public class Transitioner : Immortal_Switch.Scripts.Core.Singleton<Transitioner>
 {
     const float MinimumTransitionTime = 0.1f;
     const float MaximumTransitionTime = 5.0f;
@@ -15,10 +16,6 @@ public class Transitioner : MonoBehaviour
     public int _widthOfTransitionInBlocks = 9;
     [Tooltip("If true this transitioner will automatically transition into the scene when the scene is loaded. If it's false the transition will stay in front of the screen until you call Transitioner.Instance.FinishTransition(); and then the transition will finish. This will let you load assets in the background and transition in when you're ready.")]
     public bool _automaticallyTransitionIn = true;
-    [Tooltip("If true this transitioner will be a singleton that follows you into every scene. You will only need to place one down in your first scene if this is true. Otherwise, you'll need a transitioner in each scene you make. Either way you will call it the same way using Transitioner.Instance.TransitionToScene(LevelName); or Transitioner.Instance.TransitionToScene(levelNumber);.")]
-    public bool dontDestroyOnLoad = true;
-    [Tooltip("The camera that will display the transition. If one is not specified this will default to the main camera.")]
-    public Camera _transitionCamera;
 
     [Header("Transition Block Settings")]
     [Tooltip("The transition block that will be used in this transition")]
@@ -50,64 +47,18 @@ public class Transitioner : MonoBehaviour
     public bool _transitionInTriggered = false;
 
     public GameObject _transitionOrdererObject;
+    private Camera _transitionCamera;
 
-    #region singleton
-    private static Transitioner instance;
-
-    public static Transitioner Instance
+    protected override void Awake()
     {
-        get
-        {
-            if (instance == null)
-            {
-                instance = GameObject.FindObjectOfType<Transitioner>();
-                if (instance == null)
-                {
-                    Debug.LogError("No Transitioner was found in this scene. Make sure you place one in the scene.");
-                    return instance;
-                }
-            }
-            return instance;
-        }
+        base.Awake();
+        _transitionCamera = Camera.main;
     }
 
-    void Awake()
+    public override UniTask InitializeAsync()
     {
-        if (instance == null)
-        {
-            instance = GameObject.FindObjectOfType<Transitioner>();
-            if (instance == null)
-            {
-                Debug.LogError("No Transitioner was found in this scene. Make sure you place one in the scene.");
-                return;
-            }
-            if (dontDestroyOnLoad)
-            {
-                DontDestroyOnLoad(instance.gameObject);
-            }
-        }
-        else
-        {
-            DestroyNonInstanceTransitioners();
-        }
+        return UniTask.CompletedTask;
     }
-
-    public void OnApplicationQuit()
-    {
-        instance = null;
-    }
-
-    private bool DestroyNonInstanceTransitioners()
-    {
-        if (this != instance)
-        {
-            Destroy(gameObject);
-            return true;
-        }
-        return false;
-    }
-
-    #endregion
     
     public void TransitionToScene(string sceneName, bool waitUntilReady = false)
     {
@@ -145,11 +96,11 @@ public class Transitioner : MonoBehaviour
         SceneManager.LoadScene(sceneNumber);
     }
 
-    public async UniTask TransitionOutWithoutChangingScene()
+    public async UniTask TransitionOutWithoutChangingScene(CancellationToken cancellationToken)
     {
         if (_canTransition)
         {
-            await Transition(TransitionType.Out).ToUniTask();
+            await Transition(TransitionType.Out).ToUniTask(cancellationToken: cancellationToken);
         }
     }
 
@@ -157,15 +108,6 @@ public class Transitioner : MonoBehaviour
     {
         Destroy(_transitionOrdererObject);
         StartCoroutine(ActualTransitionIn());
-    }
-
-    protected virtual void SceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (!DestroyNonInstanceTransitioners())
-        {
-            _transitionInTriggered = false;
-            StartCoroutine(ActualTransitionIn());
-        }
     }
 
     public void FinishTransition()

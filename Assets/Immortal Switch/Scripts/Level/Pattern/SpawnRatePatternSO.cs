@@ -1,7 +1,6 @@
-﻿using Unity.Mathematics;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Immortal_Switch.Scripts
+namespace Immortal_Switch.Scripts.Level.Pattern
 {
     [CreateAssetMenu(fileName = "SpawnRatePattern", menuName = "ScriptableObjects/SpawnRatePattern")]
     public class SpawnRatePatternSO : ScriptableObject

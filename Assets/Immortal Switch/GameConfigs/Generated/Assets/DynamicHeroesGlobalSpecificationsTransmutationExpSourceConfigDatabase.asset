@@ -1,0 +1,183 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b5db88dab16ac04f8587c45ad9c3fe0, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsTransmutationExpSourceConfigDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - sourceId: EXP_ROLL_001
+    sourceType: ROLL
+    actionCondition: Each successful transmutation roll
+    expGain: 10
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_ROLL_005
+    sourceType: ROLL
+    actionCondition: Auto transmute 5 times
+    expGain: 50
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_ROLL_010
+    sourceType: ROLL
+    actionCondition: Auto transmute 10 times
+    expGain: 100
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_ROLL_015
+    sourceType: ROLL
+    actionCondition: Auto transmute 15 times
+    expGain: 150
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_D
+    sourceType: SALVAGE
+    actionCondition: Salvage D tier artifact
+    expGain: 2
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_C
+    sourceType: SALVAGE
+    actionCondition: Salvage C tier artifact
+    expGain: 4
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_B
+    sourceType: SALVAGE
+    actionCondition: Salvage B tier artifact
+    expGain: 8
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_A
+    sourceType: SALVAGE
+    actionCondition: Salvage A tier artifact
+    expGain: 15
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_S
+    sourceType: SALVAGE
+    actionCondition: Salvage S tier artifact
+    expGain: 30
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_SS
+    sourceType: SALVAGE
+    actionCondition: Salvage SS tier artifact
+    expGain: 60
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_SSS
+    sourceType: SALVAGE
+    actionCondition: Salvage SSS tier artifact
+    expGain: 120
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_R
+    sourceType: SALVAGE
+    actionCondition: Salvage R tier artifact
+    expGain: 250
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_SALVAGE_SR
+    sourceType: SALVAGE
+    actionCondition: Salvage SR tier artifact
+    expGain: 500
+    dailyLimit: 0
+    weeklyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+  - sourceId: EXP_DAILY_ROLL_10
+    sourceType: DAILY_MISSION
+    actionCondition: 'Complete daily mission: transmute 10 times'
+    expGain: 100
+    dailyLimit: 1
+    weeklyLimit: 0
+    isRepeatable: 0
+    isActive: 1
+  - sourceId: EXP_DAILY_ROLL_30
+    sourceType: DAILY_MISSION
+    actionCondition: 'Complete daily mission: transmute 30 times'
+    expGain: 250
+    dailyLimit: 1
+    weeklyLimit: 0
+    isRepeatable: 0
+    isActive: 1
+  - sourceId: EXP_DAILY_SALVAGE_10
+    sourceType: DAILY_MISSION
+    actionCondition: 'Complete daily mission: salvage 10 artifacts'
+    expGain: 150
+    dailyLimit: 1
+    weeklyLimit: 0
+    isRepeatable: 0
+    isActive: 1
+  - sourceId: EXP_DAILY_GET_S
+    sourceType: DAILY_MISSION
+    actionCondition: 'Complete daily mission: obtain 1 S tier artifact'
+    expGain: 200
+    dailyLimit: 1
+    weeklyLimit: 0
+    isRepeatable: 0
+    isActive: 1
+  - sourceId: EXP_DAILY_GET_SS
+    sourceType: DAILY_MISSION
+    actionCondition: 'Complete daily mission: obtain 1 SS tier artifact'
+    expGain: 400
+    dailyLimit: 1
+    weeklyLimit: 0
+    isRepeatable: 0
+    isActive: 1
+  - sourceId: EXP_WEEKLY_ROLL_100
+    sourceType: WEEKLY_MISSION
+    actionCondition: 'Complete weekly mission: transmute 100 times'
+    expGain: 1500
+    dailyLimit: 0
+    weeklyLimit: 1
+    isRepeatable: 0
+    isActive: 1
+  - sourceId: EXP_WEEKLY_SALVAGE_100
+    sourceType: WEEKLY_MISSION
+    actionCondition: 'Complete weekly mission: salvage 100 artifacts'
+    expGain: 1200
+    dailyLimit: 0
+    weeklyLimit: 1
+    isRepeatable: 0
+    isActive: 1
+  - sourceId: EXP_WEEKLY_GET_SSS
+    sourceType: WEEKLY_MISSION
+    actionCondition: 'Complete weekly mission: obtain 1 SSS tier artifact'
+    expGain: 2500
+    dailyLimit: 0
+    weeklyLimit: 1
+    isRepeatable: 0
+    isActive: 1

@@ -105,6 +105,55 @@ namespace Spine.Unity {
 		/// Instance SkeletonAnimation.timeScale will still be applied.</summary>
 		[SerializeField] protected bool unscaledTime;
 		public bool UnscaledTime { get { return unscaledTime; } set { unscaledTime = value; } }
+		
+		[Header("Runtime Update Rate Limit")]
+		[SerializeField] protected bool limitRuntimeUpdateRate = false;
+
+		[SerializeField, Range(1, 60)] protected int targetRuntimeFps = 20;
+
+		private float limitedUpdateAccumulator;
+
+		public bool LimitRuntimeUpdateRate {
+			get { return limitRuntimeUpdateRate; }
+			set {
+				limitRuntimeUpdateRate = value;
+				limitedUpdateAccumulator = 0f;
+			}
+		}
+
+		public int TargetRuntimeFps {
+			get { return targetRuntimeFps; }
+			set {
+				targetRuntimeFps = Mathf.Clamp(value, 1, 60);
+				limitedUpdateAccumulator = 0f;
+			}
+		}
+
+		private bool ShouldSkipLimitedUpdate (ref float deltaTime) {
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+				return false;
+#endif
+
+			if (!limitRuntimeUpdateRate)
+				return false;
+
+			if (targetRuntimeFps >= 60)
+				return false;
+
+			if (deltaTime <= 0f)
+				return false;
+
+			limitedUpdateAccumulator += deltaTime;
+
+			float interval = 1f / targetRuntimeFps;
+			if (limitedUpdateAccumulator < interval)
+				return true;
+
+			deltaTime = limitedUpdateAccumulator;
+			limitedUpdateAccumulator = 0f;
+			return false;
+		}
 		#endregion
 
 		#region Serialized state and Beginner API
@@ -216,13 +265,27 @@ namespace Spine.Unity {
 				return;
 			}
 #endif
-			if (updateTiming != UpdateTiming.InUpdate) return;
-			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+			if (updateTiming != UpdateTiming.InUpdate)
+				return;
+
+			float deltaTime = unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+
+			if (ShouldSkipLimitedUpdate(ref deltaTime))
+				return;
+
+			Update(deltaTime);
 		}
 
 		virtual protected void FixedUpdate () {
-			if (updateTiming != UpdateTiming.InFixedUpdate) return;
-			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+			if (updateTiming != UpdateTiming.InFixedUpdate)
+				return;
+
+			float deltaTime = unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+
+			if (ShouldSkipLimitedUpdate(ref deltaTime))
+				return;
+
+			Update(deltaTime);
 		}
 
 		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton. Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>
@@ -283,11 +346,16 @@ namespace Spine.Unity {
 		}
 
 		public override void LateUpdate () {
-			if (updateTiming == UpdateTiming.InLateUpdate && valid)
-				Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+			if (updateTiming == UpdateTiming.InLateUpdate && valid) {
+				float deltaTime = unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+
+				if (!ShouldSkipLimitedUpdate(ref deltaTime))
+					Update(deltaTime);
+			}
 
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
-			if (!wasUpdatedAfterInit) Update(0);
+			if (!wasUpdatedAfterInit)
+				Update(0);
 
 			base.LateUpdate();
 		}

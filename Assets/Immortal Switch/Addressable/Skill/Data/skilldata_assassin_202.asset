@@ -1,0 +1,201 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 727400d8e1c143a4b86a6ec1f07fe5a1, type: 3}
+  m_Name: skilldata_assassin_202
+  m_EditorClassIdentifier: 
+  SkillId: 202
+  SkillKey: skilldata_assassin_202
+  SkillClass: 2
+  SkillName: Fatal Mark Detonation
+  IconSkillKey: icon_skilldata_assassin_202
+  SkillIcon: {fileID: 21300000, guid: 0c4ebff9e2d03eb46b7504cb10f5dba7, type: 3}
+  Description: "G\u1EAFn \u1EA5n k\xFD l\xEAn m\u1EE5c ti\xEAu, sau \u0111\xF3 ph\xE1t
+    n\u1ED5 g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng. M\u1EE5c
+    ti\xEAu ch\xEDnh nh\u1EADn to\xE0n b\u1ED9 s\xE1t th\u01B0\u01A1ng, k\u1EBB \u0111\u1ECBch
+    xung quanh nh\u1EADn m\u1ED9t ph\u1EA7n s\xE1t th\u01B0\u01A1ng."
+  OwnerType: 0
+  MaxLevel: 10
+  SkillTier: 2
+  CastConfig:
+    RequireTarget: 1
+    MoveToCastRange: 0
+    CastRange: 7
+    Cooldown: 10
+    TargetSelectType: 1
+    HeroAnimationName: animation
+  RuntimeObjectConfig:
+    RuntimeVisualType: 2
+    SpawnMode: 1
+    RuntimeAddressableKey: prefab_fatal_mark_detonation
+    SpawnPositionType: 1
+    FollowType: 0
+    SpawnOffset: {x: 0, y: 0, z: 0}
+    LifeTime: 5
+    UseLifeTime: 0
+    DespawnOnAnimationComplete: 1
+    AnimationName: animation
+    LoopAnimation: 0
+    LockCasterWhileAlive: 0
+    LockCasterDuringHeroAnimation: 1
+    MultiSpawnConfig:
+      ChildSpawnMode: 1
+      ChildRuntimeAddressableKey: 
+      ChildAnimationName: 
+      ChildLoopAnimation: 0
+      ChildUseLifeTime: 1
+      ChildLifeTime: 1.5
+      ChildDespawnOnAnimationComplete: 1
+      SpawnCount: 10
+      StartDelay: 0
+      SpawnInterval: 0.15
+      SpawnRadius: 2.5
+      RandomInsideCircle: 1
+      IncludeCenterAsFirstSpawn: 1
+      ChildSpawnOffset: {x: 0, y: 0, z: 0}
+      RandomizeYRotation: 0
+      DespawnControllerAfterSpawn: 1
+      DespawnDelayAfterLastSpawn: 0.25
+      DebugDrawSpawnRadius: 0
+  BasePhases:
+  - PhaseId: 0
+    TriggerType: 1
+    EventName: hit
+    Delay: 0
+    NormalizedTime: 0
+    Actions:
+    - ActionType: 0
+      ChancePercent: 100
+      TargetTypeOverride: 10
+      Damage:
+        SkillDamageBonusPercent: 120
+        ScaleWithClassSkillLevel: 1
+        CountAsSkillDamage: 1
+      Dot:
+        EffectId: DOT
+        TickDamageBonusPercent: 0
+        ScaleDamageWithClassSkillLevel: 1
+        TickInterval: 1
+        Duration: 5
+        DamageType: 0
+        StackRule: 0
+      StatModifier:
+        ModifierId: 
+        StatType: 0
+        PercentValue: 0
+        ScaleValueWithClassSkillLevel: 1
+        Duration: 5
+      Area:
+        AreaPrefab: {fileID: 0}
+        Shape: 0
+        PositionType: 1
+        Radius: 3.5
+        BoxSize: {x: 2, y: 2}
+        Duration: 0
+        TickInterval: 0
+        HitOncePerTarget: 0
+        OnHitActions: []
+      Projectile:
+        BulletPatternConfig:
+          patternType: 0
+          bulletAddressableKey: 
+          bulletSpeed: 0
+          bulletLifeTime: 0
+          totalWaves: 0
+          timeBetweenWaves: 0
+          bulletsPerWave: 0
+          spreadAngle: 0
+          rotationSpeedPerWave: 0
+          bulletSpawnDelay: 0
+          alternateBulletOrderEachWave: 0
+          damage: 0
+          delayWhenStartFiring: 0
+        HomingChainBulletConfig:
+          bulletAddressableKey: 
+          bulletCount: 1
+          delayBetweenBullets: 0.05
+          enemyLayer:
+            serializedVersion: 2
+            m_Bits: 0
+          searchRadius: 20
+          maxTargetsPerBullet: 4
+          straightSpeed: 18
+          curveSpeed: 22
+          arriveDistance: 0.2
+          curveTangentLength: 3
+          damage: 100
+          drawDebugPath: 0
+          curveHeight: 4
+          alternateCurveSide: 1
+          useVerticalArc: 1
+          alternateVerticalArc: 1
+          verticalArcOnFirstChainMove: 1
+          verticalArcHeightRange: {x: 0.5, y: 3}
+          UseShortDistanceDetour: 1
+          minDetourDistance: 5
+          virtualPointXRange: {x: 8, y: 12}
+          virtualPointZRange: {x: 5, y: 9}
+          virtualPointYRange: {x: 2, y: 3}
+          virtualPointFindAttempts: 12
+        OnHitActions: []
+      Stack:
+        StackKey: 
+        Amount: 1
+      TriggerSkill: {fileID: 0}
+    hasCameraShake: 0
+  ClassSkillScaling:
+    GrowthPercentPerLevel: 6
+  PassiveConfig:
+    StackKey: 
+    RequiredStack: 3
+    MaxStack: 3
+    ResetStackOnTrigger: 1
+    ConsumeStackOnTrigger: 1
+    BlockStackGainDuringCooldown: 1
+    StackGainTriggers: []
+    EnemyCountCondition:
+      Enabled: 0
+      MinEnemyCount: 1
+      Range: 5
+    BuffDuration: 4
+    BaseModifiers: []
+    PassiveAuraAnimation: passive
+    PassiveAuraTrackIndex: 2
+    PlayTriggerAnimation: 1
+    TriggerAnimation: passive_cast
+  CustomBehaviourPrefab: {fileID: 0}
+  UpgradeShardCosts:
+  - Level: 1
+    RequiredShard: 2
+  - Level: 2
+    RequiredShard: 2
+  - Level: 3
+    RequiredShard: 2
+  - Level: 4
+    RequiredShard: 2
+  - Level: 5
+    RequiredShard: 2
+  - Level: 6
+    RequiredShard: 2
+  - Level: 7
+    RequiredShard: 2
+  - Level: 8
+    RequiredShard: 2
+  - Level: 9
+    RequiredShard: 2
+  Levels:
+  - Level: 1
+    Phases: []
+    DescriptionParams: []
+    PassiveLevelConfig:
+      MergeMode: 0
+      Modifiers: []
+  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

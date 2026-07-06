@@ -2,6 +2,10 @@
 {
     public enum Element
     {
-        Water, Fire, Earth
+        Earth,
+        Fire,
+        Wood,
+        Water,
+        Metal, None
     }
 }

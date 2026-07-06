@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5d32e2f68491c14cab55f393a397782, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsDungeonRewardsConfigDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - dungeonId: 1
+    dungeonKey: treasure
+    uiNameVi: "H\u1EA7m Kho B\xE1u"
+    uiNameEn: Treasure Dungeon
+    mode: CLEAR
+    stageCount: 150
+    ticketRequest: 1
+    stageTableKey: treasure
+    timeLimitSec: 90
+    reward1ItemId: 10
+    reward1Key: hero_exp
+    reward1Unit: per_hour
+    reward2ItemId: 1
+    reward2Key: gold
+    reward2Unit: per_hour
+    reward3ItemId: 3
+    reward3Key: diamond
+    reward3Unit: flat
+  - dungeonId: 2
+    dungeonKey: relic
+    uiNameVi: "H\u1EA7m T\xEDn V\u1EADt"
+    uiNameEn: Relic Dungeon
+    mode: DEFENSE
+    stageCount: 150
+    ticketRequest: 1
+    stageTableKey: relic
+    timeLimitSec: 120
+    reward1ItemId: 32
+    reward1Key: relic_fragment
+    reward1Unit: flat
+    reward2ItemId: 0
+    reward2Key: 
+    reward2Unit: 
+    reward3ItemId: 0
+    reward3Key: 
+    reward3Unit: 
+  - dungeonId: 3
+    dungeonKey: awakening
+    uiNameVi: "H\u1EA7m Kim C\u01B0\u01A1ng"
+    uiNameEn: Awakening Dungeon
+    mode: DPS
+    stageCount: 400
+    ticketRequest: 1
+    stageTableKey: awakening
+    timeLimitSec: 60
+    reward1ItemId: 42
+    reward1Key: awakening_fruit
+    reward1Unit: per_hour
+    reward2ItemId: 0
+    reward2Key: 
+    reward2Unit: 
+    reward3ItemId: 0
+    reward3Key: 
+    reward3Unit: 
+  - dungeonId: 4
+    dungeonKey: weapon
+    uiNameVi: "H\u1EA7m Trang B\u1ECB"
+    uiNameEn: Equipment Dungeon
+    mode: CLEAR
+    stageCount: 150
+    ticketRequest: 1
+    stageTableKey: weapon
+    timeLimitSec: 90
+    reward1ItemId: 43
+    reward1Key: weapon_ore
+    reward1Unit: flat
+    reward2ItemId: 44
+    reward2Key: weapon_gem
+    reward2Unit: flat
+    reward3ItemId: 45
+    reward3Key: weapon_essence
+    reward3Unit: flat

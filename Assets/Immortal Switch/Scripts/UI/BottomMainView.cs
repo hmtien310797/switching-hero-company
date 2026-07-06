@@ -1,75 +1,213 @@
-using System;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.UI;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.DungeonSystem.Views;
+using Immortal_Switch.Scripts.GrowthSystem.UI;
+using Immortal_Switch.Scripts.HeroUIView;
+using Immortal_Switch.Scripts.MissionSystem.Views;
+using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
+using Immortal_Switch.Scripts.TransmutationSystem.Views;
+using Immortal_Switch.Scripts.Tutorial;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BottomMainView : UIView
+namespace Immortal_Switch.Scripts.UI
 {
-    [SerializeField] private Button ButtonShop;
-    [SerializeField] private Button ButtonHero;
-    [SerializeField] private Button ButtonGrowth;
-    [SerializeField] private Button ButtonEquip;
-    [SerializeField] private Button ButtonMission;
-    [SerializeField] private Button ButtonDungeon;
-    [SerializeField] private Button ButtonClose;
-    [SerializeField] private GameObject Gem;
-
-
-    private void Awake()
+    public class BottomMainView : UIView
     {
-        // Ensure persistent layer (recommended)
-        Layer = UILayer.SubMain;
+        [SerializeField] private BottomMainButton ButtonShop;
+        [SerializeField] private BottomMainButton ButtonHero;
+        [SerializeField] private BottomMainButton ButtonGrowth;
+        [SerializeField] private BottomMainButton ButtonEquip;
+        [SerializeField] private BottomMainButton ButtonMission;
+        [SerializeField] private BottomMainButton ButtonDungeon;
+        [SerializeField] private Button ButtonGem;
+        [SerializeField] private Button ButtonClose;
+        [SerializeField] private GameObject Gem;
+        [SerializeField] private GameObject[] disableObjectsWhenPlayDungeon;
 
-        if (ButtonEquip != null)
-            ButtonEquip.onClick.AddListener(() => OnToggleMain<EquipView>().Forget());
+        // --- Private Field ---
+        private BottomMainButton _selectedBtn;
 
-        if (ButtonGrowth != null)
-            ButtonGrowth.onClick.AddListener(() => OnToggleMain<GrowthView>().Forget());
+        private void Awake()
+        {
+            // Ensure persistent layer (recommended)
+            Layer = UILayer.SubMain;
 
-        // if (ButtonDungeon != null)
-        //     ButtonDungeon.onClick.AddListener(() => OnToggleMain<DungeonView>().Forget());
+            if (ButtonGrowth != null)
+                ButtonGrowth.AddListener(OnClickBtnGrowth);
 
-        // Add other buttons similarly:
-        // ButtonShop.onClick.AddListener(() => OnToggleMain<ShopView>().Forget());
-        // ButtonHero.onClick.AddListener(() => OnToggleMain<HeroView>().Forget());
+            if (ButtonEquip != null)
+                ButtonEquip.AddListener(OnClickBtnEquip);
 
-        if (ButtonClose != null)
-            ButtonClose.onClick.AddListener(OnClickClose);
-    }
+            ButtonShop.AddListener(OnClickBtnShop);
+            ButtonHero.AddListener(OnClickBtnHero);
+            ButtonMission.AddListener(() => OnToggleMain<MissionSystemView>(ButtonMission).Forget());
+            ButtonGem.onClick.AddListener(() => OnToggleMain<TransmutationSystemView>(null, false).Forget());
+            ButtonDungeon.AddListener(() => OnToggleMain<DungeonMainView>(ButtonDungeon).Forget());
 
-    private void OnEnable()
-    {
-        RefreshCloseAndGem();
-    }
+            if (ButtonClose != null)
+                ButtonClose.onClick.AddListener(OnClickClose);
+        }
 
-    private async UniTaskVoid OnToggleMain<T>() where T : UIView
-    {
-        // Toggle on Main layer:
-        // - If opening a PageExclusive => UIManager will close Storm stack + close current page (Rule B)
-        // - If closing current active => it will hide and then main backdrop off if none left
-        await UIManager.Instance.TogglePopupAsync<T>();
+        private void OnClickBtnEquip()
+        {
+            OnToggleMain<EquipView>(ButtonEquip).Forget();
+        }
 
-        RefreshCloseAndGem();
-    }
+        private void OnClickBtnShop()
+        {
+            OnToggleMain<SummonHubView>(ButtonShop).Forget();
+        }
 
-    private void OnClickClose()
-    {
-        // Close top-most MAIN view:
-        // - closes Stackable first (Storm)
-        // - then closes PageExclusive (Dungeon/Equip/...)
-        UIManager.Instance.CloseTopMain();
-        RefreshCloseAndGem();
-    }
+        private void OnClickBtnHero()
+        {
+            OnToggleMain<HeroCollectionView>(ButtonHero).Forget();
+        }
 
-    private void RefreshCloseAndGem()
-    {
-        bool hasAnyMain = UIManager.Instance != null && UIManager.Instance.IsAnyMainVisible();
+        private void OnClickBtnGrowth()
+        {
+            OnToggleMain<GrowthView>(ButtonGrowth).Forget();
+        }
 
-        if (ButtonClose != null)
-            ButtonClose.gameObject.SetActive(hasAnyMain);
+        private void Start()
+        {
+            TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
+            TutorialManager.Instance.OnClick += OnClickTutorial;
+            GameEventManager.Subscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
+            GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
+        }
+        
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
+            GameEventManager.Unsubscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
+            GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
+        }
+        
+        private void OnPlayDungeon(bool result)
+        {
+            for (int i = 0; i < disableObjectsWhenPlayDungeon.Length; i++)
+            {
+                GameObject currentGameObject = disableObjectsWhenPlayDungeon[i];
+                currentGameObject.SetActive(!result);
+            }
+        }
 
-        if (Gem != null)
-            Gem.SetActive(!hasAnyMain);
+        private async UniTask OnClickTutorial(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 16:
+                case 36:
+                    OnClickBtnShop();
+                    break;
+
+                case 22:
+                    OnClickBtnHero();
+                    break;
+
+                case 28:
+                    await OnToggleMain<GrowthView>(ButtonGrowth);
+                    break;
+
+                case 32:
+                    OnClickClose();
+                    break;
+
+                case 42:
+                    OnClickBtnEquip();
+                    break;
+            }
+        }
+
+        private RectTransform OnResolveTarget(string arg1, int arg2)
+        {
+            switch (arg2)
+            {
+                case 16:
+                case 36:
+                    return ButtonShop.transform as RectTransform;
+
+                case 22:
+                    UIManager.Instance.Close<SummonHubView>();
+                    return ButtonHero.transform as RectTransform;
+
+                case 28:
+                    UIManager.Instance.Close<HeroCollectionView>();
+                    return ButtonGrowth.transform as RectTransform;
+
+                case 32:
+                    return ButtonClose.transform as RectTransform;
+
+                case 42:
+                    UIManager.Instance.Close<SummonHubView>();
+                    return ButtonEquip.transform as RectTransform;
+
+                default:
+                    return null;
+            }
+        }
+
+        private void OnEnable()
+        {
+            RefreshCloseAndGem();
+        }
+
+        private async UniTask OnToggleMain<T>([CanBeNull] BottomMainButton selected, bool withBackdrop = true)
+            where T : UIView
+        {
+            if (selected != null)
+            {
+                if (_selectedBtn != null)
+                {
+                    _selectedBtn.SetStateByManager(NavState.Closed);
+                    _selectedBtn = null;
+                }
+
+                _selectedBtn = selected;
+            }
+
+            Debug.Log($"Typeof: {typeof(T).Name}");
+            await UIManager.Instance.TogglePopupAsync<T>(withBackdrop: withBackdrop);
+        }
+
+        private void OnClickClose()
+        {
+            if (_selectedBtn != null)
+            {
+                _selectedBtn.SetStateByManager(NavState.Closed);
+                _selectedBtn = null;
+            }
+
+            UIManager.Instance.CloseTopMain();
+            TriggerButtonCloseAndGem(false);
+        }
+
+        private void RefreshCloseAndGem()
+        {
+            bool hasAnyMain = UIManager.Instance != null && UIManager.Instance.IsAnyMainVisible();
+            TriggerButtonCloseAndGem(hasAnyMain);
+        }
+
+        private void TriggerButtonCloseAndGem(bool value)
+        {
+            ButtonClose.gameObject.SetActive(value);
+            Gem.SetActive(!value);
+
+            if (_selectedBtn != null)
+            {
+                if (!value)
+                {
+                    _selectedBtn.SetStateByManager(NavState.Closed);
+                    _selectedBtn = null;
+                }
+                else
+                {
+                    _selectedBtn.SetStateByManager(NavState.Hover);
+                }
+            }
+        }
     }
 }

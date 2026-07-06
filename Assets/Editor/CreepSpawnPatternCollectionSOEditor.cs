@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.EditorTools;
+using Immortal_Switch.Scripts.Level.Pattern;
 using UnityEditor;
 using UnityEngine;
 

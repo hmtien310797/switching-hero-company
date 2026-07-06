@@ -1,42 +1,57 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scripts.UI
+namespace Immortal_Switch.Scripts.UI
 {
     public class BattleResultController : MonoBehaviour
     {
         [SerializeField] Button confirmBtn;
+        [SerializeField] Button autoNextBtn;
+        [SerializeField] GameObject innerSelected;
+        
+        private bool isAutoActived = false;
 
-        private Action confirmAct = null;
-
+        private void Awake()
+        {
+            //GameEventManager.Subscribe(GameEvents.OnStageCleared, ()=>SetBattleResultState(true));
+        }
+        
         void Start()
         {
             confirmBtn?.onClick.AddListener(OnConfirmBtnClick);
             gameObject.SetActive(false);
+            autoNextBtn?.onClick.AddListener(AutoNextCallback);
         }
-
-        public void RegisterConfirmAction(Action endAct)
-        {
-            confirmAct = endAct;
-        }
-
+        
         private void OnConfirmBtnClick()
         {
-            confirmAct?.Invoke();
+            if (!gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            //GameEventManager.Trigger(GameEvents.OnNextStageButtonClicked);
             SetBattleResultState(false);
-            //confirmAct = null;
         }
 
         private void SetBattleResultState(bool isEnable)
         {
             gameObject.SetActive(isEnable);
+
+            if(isEnable && isAutoActived)
+            {
+                Invoke(nameof(OnConfirmBtnClick), 3f);
+            }
         }
 
-        public void ShowBattleResult(bool isWin = true)
+        private void AutoNextCallback()
         {
-            SetBattleResultState(true);
+            isAutoActived = innerSelected?.activeInHierarchy ?? false;
+            if (innerSelected)
+            {
+                isAutoActived = !isAutoActived;
+                innerSelected.SetActive(isAutoActived);
+            }
         }
-
     }
 }

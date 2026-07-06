@@ -1,0 +1,17 @@
+statId,statName,group,valueType,calcLayer,baseValue,minValue,maxValue,formula,serverKey,clientKey,isCombatStat,allowPercent
+HP,Health Point,Base/Core,Flat,Base,0.00,0.00,999999999.00,FinalHP = (BaseHP + FlatHP) × (1 + HP_PCT),hp,hp,TRUE,TRUE
+ATK,Attack,Base/Core,Flat,Base,0.00,0.00,999999999.00,FinalATK = (BaseATK + FlatATK) × (1 + ATK_PCT),atk,atk,TRUE,TRUE
+DEF,Defense,Base/Core,Flat,Base,0.00,0.00,999999999.00,FinalDEF = (BaseDEF + FlatDEF) × (1 + DEF_PCT),def,def,TRUE,TRUE
+SPD,Attack Speed,Base/Core,Flat,Base,1.00,0.10,10.00,FinalSPD = BaseSPD × (1 + SPD_PCT),spd,spd,TRUE,TRUE
+HP_PCT,HP Percent Bonus,Base Modifier,Percent,Modifier,0.00,-0.90,10.00,HPBonus = ΣHP_PCT,hp_pct,hpPct,FALSE,FALSE
+ATK_PCT,Attack Percent Bonus,Base Modifier,Percent,Modifier,0.00,-0.90,10.00,ATKBonus = ΣATK_PCT,atk_pct,atkPct,FALSE,FALSE
+DEF_PCT,Defense Percent Bonus,Base Modifier,Percent,Modifier,0.00,-0.90,10.00,DEFBonus = ΣDEF_PCT,def_pct,defPct,FALSE,FALSE
+SPD_PCT,Speed Percent Bonus,Base Modifier,Percent,Modifier,0.00,-0.90,5.00,SPDBonus = ΣSPD_PCT,spd_pct,spdPct,FALSE,FALSE
+CRIT_RATE,Critical Rate,Core,Percent,Combat,0.05,0.00,1.00,FinalCritRate = CRIT_RATE - TargetCritResist,crit_rate,critRate,TRUE,FALSE
+CRIT_DMG,Critical Damage,Core,Percent,Combat,1.50,1.00,10.00,CritDamage = Damage × CRIT_DMG,crit_dmg,critDmg,TRUE,FALSE
+ACC,Accuracy,Core,Percent,Combat,1.00,0.00,999.00,HitChance = ACC / (ACC + EVA),acc,accuracy,TRUE,FALSE
+EVA,Evasion,Core,Percent,Combat,0.00,0.00,999.00,HitChance = ACC / (ACC + EVA),eva,evasion,TRUE,FALSE
+DMG_BONUS,Damage Bonus,Offensive,Percent,DamageCalc,0.00,-1.00,10.00,Damage = BaseDamage × (1 + DMG_BONUS),dmg_bonus,dmgBonus,TRUE,FALSE
+BASIC_DMG_BONUS,Basic Attack Damage Bonus,Offensive,Percent,DamageCalc,0.00,-1.00,10.00,BasicDamage = Damage × (1 + BASIC_DMG_BONUS),basic_dmg_bonus,basicDmgBonus,TRUE,FALSE
+SKILL_DMG_BONUS,Skill Damage Bonus,Offensive,Percent,DamageCalc,0.00,-1.00,10.00,SkillDamage = Damage × (1 + SKILL_DMG_BONUS),skill_dmg_bonus,skillDmgBonus,TRUE,FALSE
+FINAL_DMG_BONUS,Final Damage Bonus,Offensive,Percent,FinalLayer,0.00,-1.00,5.00,FinalDamage = DamageAfterMitigation × (1 + FINAL_DMG_BONUS),final_dmg_bonus,finalDmgBonus,TRUE,FALSE

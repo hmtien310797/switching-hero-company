@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 568bbe2283a79d54eb6b6c98f2365024, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsTransmuationUniqueDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - uniqueId: HP
+    statName: HP
+    statGroup: Base/Core
+    valueType: '%'
+    displayOrder: 1
+    isActive: 1
+  - uniqueId: ATK
+    statName: "C\xF4ng"
+    statGroup: Base/Core
+    valueType: '%'
+    displayOrder: 2
+    isActive: 1
+  - uniqueId: DEF
+    statName: "Th\u1EE7"
+    statGroup: Base/Core
+    valueType: '%'
+    displayOrder: 3
+    isActive: 1
+  - uniqueId: SPD
+    statName: "T\u1ED1c \u0111\xE1nh"
+    statGroup: Base/Core
+    valueType: '%'
+    displayOrder: 4
+    isActive: 1
+  - uniqueId: HP_PCT
+    statName: HP +%
+    statGroup: Base Modifier
+    valueType: '%'
+    displayOrder: 5
+    isActive: 1
+  - uniqueId: ATK_PCT
+    statName: "C\xF4ng +%"
+    statGroup: Base Modifier
+    valueType: '%'
+    displayOrder: 6
+    isActive: 1
+  - uniqueId: DEF_PCT
+    statName: "Th\u1EE7 +%"
+    statGroup: Base Modifier
+    valueType: '%'
+    displayOrder: 7
+    isActive: 1
+  - uniqueId: SPD_PCT
+    statName: "T\u1ED1c +%"
+    statGroup: Base Modifier
+    valueType: '%'
+    displayOrder: 8
+    isActive: 1
+  - uniqueId: CRIT_RATE
+    statName: "T\u1EC9 l\u1EC7 CM"
+    statGroup: Core
+    valueType: '%'
+    displayOrder: 9
+    isActive: 1
+  - uniqueId: CRIT_DMG
+    statName: ST CM
+    statGroup: Core
+    valueType: '%'
+    displayOrder: 10
+    isActive: 1
+  - uniqueId: ACC
+    statName: "Ch\xEDnh x\xE1c"
+    statGroup: Core
+    valueType: '%'
+    displayOrder: 11
+    isActive: 1
+  - uniqueId: EVA
+    statName: "N\xE9 tr\xE1nh"
+    statGroup: Core
+    valueType: '%'
+    displayOrder: 12
+    isActive: 1
+  - uniqueId: DMG_BONUS
+    statName: "T\u0103ng ST"
+    statGroup: Offensive
+    valueType: '%'
+    displayOrder: 13
+    isActive: 1
+  - uniqueId: BASIC_DMG_BONUS
+    statName: "ST \u0111\xE1nh th\u01B0\u1EDDng"
+    statGroup: Offensive
+    valueType: '%'
+    displayOrder: 14
+    isActive: 1
+  - uniqueId: SKILL_DMG_BONUS
+    statName: "ST k\u1EF9 n\u0103ng"
+    statGroup: Offensive
+    valueType: '%'
+    displayOrder: 15
+    isActive: 1
+  - uniqueId: FINAL_DMG_BONUS
+    statName: "ST cu\u1ED1i"
+    statGroup: Offensive
+    valueType: '%'
+    displayOrder: 16
+    isActive: 1

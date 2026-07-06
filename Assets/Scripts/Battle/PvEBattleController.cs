@@ -1,97 +1,527 @@
-using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts;
+using Immortal_Switch.Scripts.Boss;
+using Immortal_Switch.Scripts.Common;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Enemy;
+using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Level.Pattern;
+using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Pooling;
+using Immortal_Switch.Scripts.Reward;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
-using Scripts.Common;
+using Random = UnityEngine.Random;
+using Immortal_Switch.Scripts.StatSystem;
+using Sirenix.OdinInspector;
 
-
-#if UNITY_EDITOR
-using NaughtyAttributes;
-#endif
-
-namespace Scripts.Battle
+namespace Battle
 {
-    public class PvEBattleController : MonoBehaviour
+    public enum BattleState
     {
-        public enum BattleState
-        {
-            None,
-            Initializing,
-            FightingCreeps,
-            FightingBoss,
-            StageCleared
-        }
+        None,
+        Initializing,
+        FightingCreeps,
+        FightingBoss,
+        Ended
+    }
 
-        [Header("Refs")]
-        [SerializeField] private PlayerHeroController playerHeroController;
-        [SerializeField] private MonsterBossController boss;
+    public enum BattleResult
+    {
+        None,
+        Victory,
+        Defeat
+    }
 
-        [Header("Spawn Positions")]
-        [SerializeField] private List<Transform> leftSpawnPoss;
-        [SerializeField] private List<Transform> rightSpawnPoss;
+    public partial class PvEBattleController : Singleton<PvEBattleController>, IHeroBattleContext
+    {
+        [Header("Refs")] [SerializeField] FollowHeroController[] enemySpawnerCollection;
+        [SerializeField] PvEMapController pvEMapController;
+        [SerializeField] BattleCoinView coinPrefab;
 
-        [Header("Data (Creeps)")]
-        [SerializeField] private CreepDataSo[] creepDataSo;
-        [SerializeField] private CreepSpawnPatternCollectionSO creepSpawnPatternCollection; 
-        [SerializeField] private SpawnRatePatternSO spawnRatePattern; 
+        [Header("Spawn Positions ")] [SerializeField]
+        private List<Transform> spawnPoss;
+
+        [SerializeField] private CreepSpawnPatternCollectionSO creepSpawnPatternCollection;
+        [SerializeField] private SpawnRatePatternSO spawnRatePattern;
 
         [Header("Stage")]
-        [SerializeField] private int currentStage = 1;
-        [SerializeField] private int stagesPerPattern = 10;
+        [field: SerializeField]
+        public int CurrentStage { get; private set; } = 1;
 
-        [Header("Config")]
-        [SerializeField] private int maxCreepsPerStage = 80;
-        [SerializeField] private int creepBatchSize = 40;
-        
-        private BattleState state = BattleState.None;
-        
-        private readonly List<MonsterScrepController> creeps = new();
+        [SerializeField] private int stagesPerPattern = 10;
+        [SerializeField] private int battleTime = 20;
+
+        [Header("Stage Resolver")] [SerializeField]
+        private StageDataResolverSO stageDataResolver;
+
+        [SerializeField] private RewardSyncService rewardSyncService;
+        [SerializeField] private OfflineAfkRewardService offlineAfkRewardService;
+
+        [Header("Hero Session")] [SerializeField] private BattleHeroSessionController battleHeroSessionController;
+
+        [Header("Creep Spawn Formation")]
+        [SerializeField] private BattleSpawnFormationService spawnFormationService;
+
+        private readonly List<Vector3> cachedSpawnFormationPositions = new();
+
+        [Header("Creep Addressable Pools")] [SerializeField]
+        private BattleCreepPoolService creepPoolService;
+
+        [SerializeField, Min(1)] private int minimumWarmupPerCreepType = 20;
+
+        [ShowInInspector] private readonly List<EnemyActor> creeps = new();
+
+        [Header("Battle Flow")] 
+        [SerializeField] private BattleFlowController battleFlowController;
+
+        private BattleResult result = BattleResult.None;
         private int aliveCreepCount;
+        private int deadCreepCount;
         private int totalCreepsSpawnedThisStage;
         private bool isBossAlive;
         private int patternId;
         private int[] enemyIds;
         private float[] rates;
-        private List<Transform> spawnPoss;
-        private Dictionary<int, CreepDataSo> creepDataDict;
+        private int totalMonstersKilledThisStage;
 
-        public BattleState State => state;
+        /// <summary>Time.time lúc bắt đầu stage hiện tại — dùng tính duration_seconds cho battle/end (set trong InitStage).</summary>
+        private float stageStartTime;
 
-        private void Awake()
-        {
-            BuildCreepDataLookup();
-            spawnPoss = BuildSpawnPositions();
-        }
+        /// <summary>
+        /// current_stage thật mà server đang lưu — KHÁC CurrentStage (CurrentStage bị MoveToStage
+        /// ghi đè khi player replay 1 stage cũ qua Stage Selection). Chỉ được set bởi
+        /// ApplyServerProgression — dùng để phân biệt "đang đánh ở frontier" (gọi battle/end) với
+        /// "đang replay/farm stage cũ" (không gọi battle/end, không reward, không resync).
+        /// </summary>
+        private int serverFrontierStage = 1;
+
+        private GameData gameData;
+        private BossActor currentBoss;
+
+        private bool isReadyBattle = false;
+        private bool losingStage = false;
+        private bool playCompletedStage = false;
+
+        private readonly Dictionary<int, BaseStat> cachedScaledCreepStats = new();
+        private readonly Dictionary<int, BaseStat> cachedScaledBossStats = new();
+        private GameCameraController gameCameraController;
+
+
+        private readonly BattleTargetRegistry targetRegistry = new();
+        public IBattleTargetRegistry TargetRegistry => targetRegistry;
+
+        private readonly BattleEnemySelectionService enemySelectionService = new();
+
+        private StageRuntimeData stageRuntimeData;
+
+        private BattleState State { get; set; } = BattleState.None;
+        public RewardSyncService RewardSyncService => rewardSyncService;
+        public List<EnemyActor> CreepList => creeps;
+        public IReadOnlyList<EnemyActor> ActiveEnemies => creeps;
+
+        /// <summary>Stage tiếp theo được unlock để chơi/chọn — bằng serverFrontierStage (current_stage
+        /// thật từ server, đã cap đúng ở stage cuối game). KHÔNG suy từ highest_stage_cleared + 1: 2 giá
+        /// trị này chỉ lệch nhau đúng ở stage cuối cùng của game (server cap current_stage ở maxStage
+        /// trong khi highest_stage_cleared cũng đạt maxStage), lúc đó +1 sẽ vượt quá tổng số stage thật.</summary>
+        public int HighestUnlockedStage => Mathf.Max(1, serverFrontierStage);
+
+        private UserDataCache userDataCache;
+        private readonly BattleEnemySpawnService enemySpawnService = new();
+        private IEnemyTargetProvider enemyTargetProvider;
 
         private void Start()
         {
-            StartAsync().Forget();
+            userDataCache = UserDataCache.Instance;
+            gameCameraController = GameCameraController.Instance;
+            enemyTargetProvider = new HeroTargetProvider(
+                () => userDataCache.GetInBattleHeroActorAt(0),
+                () => userDataCache.GetInBattleHeroActorAt(1)
+            );
+
+            GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+            GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageFailed);
+            GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
+            GameEventManager.Subscribe<int>(GameEvents.OnMoveStageRequested, HandleMoveStageRequested);
         }
 
-        private async UniTaskVoid StartAsync()
+        protected override void OnDestroy()
         {
-            SetState(BattleState.Initializing);
-
-            currentStage = Mathf.Max(1, currentStage);
-            await UIManager.Instance.InitMainScene();
-
-            InitStage(currentStage);
-
-            playerHeroController.InitHero(this);
-
-            // Start fighting creeps right away
-            SpawnNextCreepBatch();
-            SetState(BattleState.FightingCreeps);
+            GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+            GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageFailed);
+            GameEventManager.Unsubscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
+            GameEventManager.Unsubscribe<int>(GameEvents.OnMoveStageRequested, HandleMoveStageRequested);
+            base.OnDestroy();
         }
 
-        private void HandleNextStage()
+        private void OnBossSpawnAnimationComplete(bool result)
+        {
+            if (!result)
+            {
+                gameCameraController.FollowBoss();
+                return;
+            }
+
+            gameCameraController.FollowLastHeroTarget();
+        }
+
+        public override async UniTask InitializeAsync()
+        {
+            BuildSpawnPositions();
+            gameData = GameData.Instance;
+            await StartAsync();
+        }
+        
+
+        private async UniTask StartAsync()
         {
             SetState(BattleState.Initializing);
-            currentStage++;
-            InitStage(currentStage);
+            CurrentStage = Mathf.Max(1, CurrentStage);
+            InitStage(CurrentStage);
+            await pvEMapController.InitChapterMapAsync(GetResolvedChapterIndexByStage(CurrentStage));
+
+            bool poolsReady =
+                await PrepareCreepPoolsForCurrentStageAsync(battleFlowController.stageFlowCancellationTokenSource.Token);
+            if (!poolsReady)
+            {
+                Debug.LogError(
+                    $"[PvE] Cannot start stage because creep pools " +
+                    $"are not ready. Stage={CurrentStage}"
+                );
+
+                return;
+            }
+
+            GameEventManager.Trigger(GameEvents.OnInitSceneDataComplete);
+            battleHeroSessionController?.BeginSession(
+                BattleHeroSessionType.Chapter,
+                this,
+                GetHeroSpawnPositionForSession,
+                HandleAllHeroesDeadFromSession
+            );
+
+            bool heroesSpawned = battleHeroSessionController != null &&
+                                 await battleHeroSessionController.SpawnLineupAsync();
+            if (!heroesSpawned)
+            {
+                Debug.LogError("[PvE] Cannot start because battle heroes could not be spawned.", this);
+                return;
+            }
+
+            battleHeroSessionController.LineupActorsChanged -= RefreshEnemyHeroTargets;
+            battleHeroSessionController.LineupActorsChanged += RefreshEnemyHeroTargets;
+            
+            GameEventManager.Trigger(GameEvents.OnActiveLineupChanged);
+            offlineAfkRewardService?.Initialize(CurrentStage);
             SpawnNextCreepBatch();
+            isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(GameEvents.OnWaveStart);
+            battleFlowController?.MarkChapterRunning();
+        }
+
+        private void HandleMoveStageRequested(int targetStage)
+        {
+            MoveToStage(targetStage);
+        }
+
+        public Vector3 GetEndMapPoint()
+        {
+            return pvEMapController.GetEndMapPosition();
+        }
+
+        public StageRuntimeData GetStageRuntimeData()
+        {
+            return stageRuntimeData;
+        }
+        
+        public void CleanupBattle(
+            bool despawnHeroes = false,
+            bool clearResult = true)
+        {
+            isReadyBattle = false;
+
+            if (clearResult)
+            {
+                result = BattleResult.None;
+            }
+
+            DespawnCreepAndBoss();
+
+            cachedSpawnFormationPositions.Clear();
+
+            aliveCreepCount = 0;
+            deadCreepCount = 0;
+            totalCreepsSpawnedThisStage = 0;
+
+            isBossAlive = false;
+            currentBoss = null;
+
+            targetRegistry.Clear();
+
+            if (despawnHeroes &&
+                battleHeroSessionController != null)
+            {
+                battleHeroSessionController.DespawnAllHeroes();
+            }
+
+            SetState(BattleState.Ended);
+            creepPoolService.DisposeAllEnemyPools();
+        }
+
+        public bool CanSwitchHero(int sourceHeroId, int targetHeroId)
+        {
+            return battleHeroSessionController != null &&
+                   battleHeroSessionController.CanReplaceHero(sourceHeroId, targetHeroId);
+        }
+
+        public void RequestSwitchHero(int sourceHeroId, int targetHeroId)
+        {
+            battleHeroSessionController?.RequestReplaceHero(sourceHeroId, targetHeroId);
+        }
+
+        public BossActor GetActiveBossActor()
+        {
+            return currentBoss;
+        }
+
+        public HeroActor GetControlledHero()
+        {
+            return battleHeroSessionController?.GetControlledHero();
+        }
+
+        public HeroActor GetFollowerHero()
+        {
+            return battleHeroSessionController?.GetFollowerHero();
+        }
+
+        public int GetControlledHeroSlotIndex()
+        {
+            return battleHeroSessionController != null
+                ? battleHeroSessionController.ControlledHeroSlotIndex
+                : 0;
+        }
+
+        public HeroDataSO SelectControlledHeroSlot(int slotIndex)
+        {
+            return battleHeroSessionController?.SelectControlledHeroSlot(slotIndex);
+        }
+
+        public HeroDataSO SwitchControlledHero()
+        {
+            return battleHeroSessionController?.SwitchControlledHero();
+        }
+
+        public HeroDataSO OnSwitchMainSubHeroButtonClicked()
+        {
+            return SwitchControlledHero();
+        }
+
+        public void OnSelectedHeroCastUltimateSkill()
+        {
+            battleHeroSessionController?.OnSelectedHeroCastUltimateSkill();
+        }
+
+        public Vector3 GetHeroSpawnPositionForSession(int heroIndex)
+        {
+            Vector3 center = Vector3.forward * 12f;
+            return heroIndex == 0
+                ? center + Vector3.left * 1.5f
+                : center + Vector3.right * 1.5f;
+        }
+
+        private void HandleAllHeroesDeadFromSession()
+        {
+            GameEventManager.Trigger(GameEvents.OnStageLost);
+        }
+
+        private void DespawnCreepAndBoss()
+        {
+            ClearAllHeroTargets();
+
+            if (currentBoss != null)
+            {
+                targetRegistry.UnregisterHostile(
+                    currentBoss
+                );
+
+                AddressableSpawnService.ReleaseInstance(
+                    currentBoss
+                );
+
+                currentBoss = null;
+            }
+
+            for (int i = creeps.Count - 1; i >= 0; i--)
+            {
+                EnemyActor creep = creeps[i];
+
+                if (creep == null)
+                {
+                    creeps.RemoveAt(i);
+                    continue;
+                }
+
+                targetRegistry.UnregisterHostile(creep);
+
+                creep.DespawnToPool(0f).Forget();
+
+                creeps.RemoveAt(i);
+            }
+
+            targetRegistry.Clear();
+
+            aliveCreepCount = 0;
+        }
+
+        private Vector3 GetHeroSpawnPosition(int heroIndex)
+        {
+            return GetHeroSpawnPositionForSession(heroIndex);
+        }
+
+        private void RefreshHeroSlotCache()
+        {
+            // Hero actors are owned by BattleHeroSessionController.
+        }
+
+        private void RefreshHeroTeamController()
+        {
+            // Hero team binding is owned by BattleHeroSessionController.
+        }
+
+        private void RefreshControlledHeroSkillUI()
+        {
+            battleHeroSessionController?.RefreshControlledHeroSkillUI();
+        }
+
+        private async UniTask HandleNextStageAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            /* Hero death state is owned by BattleHeroSessionController. */
+            result = BattleResult.None;
+            SetState(BattleState.Initializing);
+            // CurrentStage đã được set đúng từ server (ApplyServerProgression trong OnStageCleared,
+            // qua response battle/end.updated_progression) — không tự "++" cục bộ nữa.
+            NotifyIdleScreenStageChanged();
+            InitStage(CurrentStage);
+            await pvEMapController.InitChapterMapAsync(
+                GetResolvedChapterIndexByStage(CurrentStage)
+            ).AttachExternalCancellation(cancellationToken);
+
+            isReadyBattle = false;
+
+            bool poolsReady =
+                await PrepareCreepPoolsForCurrentStageAsync(cancellationToken);
+
+            if (!poolsReady)
+            {
+                Debug.LogError(
+                    $"[PvE] Cannot start next stage because creep pools " +
+                    $"are not ready. Stage={CurrentStage}"
+                );
+                return;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            SpawnNextCreepBatch();
+            isReadyBattle = true;
+            SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(
+                GameEvents.OnWaveStart
+            );
+        }
+
+        private async UniTask HandleCurrentStageAsync()
+        {
+            result = BattleResult.None;
+            SetState(BattleState.Initializing);
+            InitStage(CurrentStage);
+            isReadyBattle = false;
+
+            bool poolsReady =
+                await PrepareCreepPoolsForCurrentStageAsync(battleFlowController.stageFlowCancellationTokenSource.Token);
+
+            if (!poolsReady)
+            {
+                Debug.LogError(
+                    $"[PvE] Cannot replay stage because creep pools " +
+                    $"are not ready. Stage={CurrentStage}"
+                );
+
+                return;
+            }
+
+            SpawnNextCreepBatch();
+            isReadyBattle = true;
+            SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(
+                GameEvents.OnWaveStart
+            );
+        }
+
+        private void MoveToStage(int targetStage)
+        {
+            targetStage = Mathf.Max(1, targetStage);
+            CurrentStage = targetStage;
+            SetState(BattleState.Ended);
+            result = BattleResult.None;
+            DespawnCreepAndBoss();
+            PlayCurrentStage(battleFlowController.stageFlowCancellationTokenSource.Token).Forget();
+            GameEventManager.Trigger(GameEvents.OnStageSessionChange);
+        }
+
+        private int GetResolvedChapterIndexByStage(int stage)
+        {
+            return stageDataResolver.GetChapterIndexByStage(stage);
+        }
+
+        /// <summary>
+        /// Ghi đè progression từ server (player/me.progression, battle/end.updated_progression, hoặc
+        /// resync battle/progression) — nguồn sự thật duy nhất cho CurrentStage, không tự "++" cục bộ
+        /// nữa (xem Docs battle/end — HandleNextStageAsync không còn tăng CurrentStage thủ công).
+        /// Cũng ghi đè serverFrontierStage — dùng để nhận biết replay stage cũ qua Stage Selection.
+        /// </summary>
+        public void ApplyServerProgression(BattleProgression progression)
+        {
+            if (progression == null) return;
+            CurrentStage = Mathf.Max(1, progression.CurrentStage);
+            serverFrontierStage = CurrentStage;
+            CurrentStageService.SetCurrentStage(CurrentStage);
+        }
+
+        /// <summary>Resync current_stage thật từ server sau lỗi STAGE_MISMATCH/INVALID_STAGE của battle/end.</summary>
+        private async UniTask ResyncProgressionFromServerAsync()
+        {
+            try
+            {
+                BattleProgression progression = await NakamaClient.Instance.GetBattleProgressionAsync();
+                ApplyServerProgression(progression);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[PvE] battle/progression resync failed: {e.Message}");
+            }
+        }
+
+        private BattleEndRequest BuildBattleEndRequest(string result, int stage)
+        {
+            return new BattleEndRequest
+            {
+                Result = result,
+                Stage = stage,
+                CreepKills = deadCreepCount,
+                TotalCreeps = totalCreepsSpawnedThisStage,
+                HeroDeadCount = battleHeroSessionController != null ? battleHeroSessionController.DeadHeroCount : 0,
+                DurationSeconds = Time.time - stageStartTime,
+                HeroIds = userDataCache.InBattleHeroIdList.Select(id => id.ToString()).ToArray()
+            };
         }
 
         // ======================
@@ -100,58 +530,248 @@ namespace Scripts.Battle
 
         private void InitStage(int stage)
         {
+            stageStartTime = Time.time;
+            playCompletedStage = stage < HighestUnlockedStage;
             aliveCreepCount = 0;
             totalCreepsSpawnedThisStage = 0;
+            deadCreepCount = losingStage || playCompletedStage ? gameData.maxCreepsPerStage : 0;
+            CacheStageSpawnData(stage);
+
+            GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
+            GameEventManager.Trigger(GameEvents.OnInitNewStage, playCompletedStage, losingStage, stageRuntimeData);
 
             isBossAlive = false;
-            if (boss != null) boss.gameObject.SetActive(false);
+            if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
+            {
+                AddressableSpawnService.ReleaseInstance(currentBoss);
+                currentBoss = null;
+            }
 
-            CacheStageSpawnData(stage);
+            CurrentStageService.SetCurrentStage(stage);
         }
 
         private void CacheStageSpawnData(int stage)
         {
-            patternId = GetPatternIdByStageLoop(stage, stagesPerPattern);
+            stageRuntimeData = stageDataResolver.Resolve(stage);
 
-            enemyIds = creepSpawnPatternCollection.GetSpawnPatternBaseOnId(patternId);
-            if (enemyIds == null || enemyIds.Length < 2 || enemyIds.Length > 4)
+            if (stageRuntimeData == null || !stageRuntimeData.IsValid)
             {
-                Debug.LogError($"[PvE] Invalid enemyIds. stage={stage} patternId={patternId}");
+                Debug.LogError($"[PvE] StageRuntimeData invalid. stage={stage}");
                 enemyIds = null;
                 rates = null;
                 return;
             }
 
-            rates = GetRandomRates(patternId, enemyIds.Length);
-            if (rates == null)
-            {
-                Debug.LogError($"[PvE] No rates found. patternId={patternId}, len={enemyIds.Length}");
-            }
+            RebuildStageStatCache();
+            rewardSyncService?.SetCurrentStageData(stageRuntimeData);
+            offlineAfkRewardService?.SetCurrentAfkStage(stageRuntimeData.GlobalStage);
+            patternId = 0;
+            enemyIds = stageRuntimeData.EnemyIds;
+            rates = stageRuntimeData.EnemyRates;
+
+            Debug.Log(
+                $"[PvE] Resolve Stage={stageRuntimeData.GlobalStage}, " +
+                $"Chapter={stageRuntimeData.ChapterName}, " +
+                $"LocalStage={stageRuntimeData.LocalStage}, " +
+                $"Element={stageRuntimeData.ChapterElement}, " +
+                $"EnemyPattern={stageRuntimeData.EnemyPatternId}, " +
+                $"BossId={stageRuntimeData.BossId}"
+            );
         }
 
-        // ======================
-        // Core flow
-        // ======================
-
-        private void SpawnNextCreepBatch()
+        private async UniTask<bool>
+            PrepareCreepPoolsForCurrentStageAsync(CancellationToken token)
         {
-            if (enemyIds == null || rates == null) return;
+            token.ThrowIfCancellationRequested();
+            if (creepPoolService == null)
+            {
+                Debug.LogError(
+                    "[PvE] BattleCreepPoolService is missing.",
+                    this
+                );
 
-            int remaining = maxCreepsPerStage - totalCreepsSpawnedThisStage;
-            if (remaining <= 0) return;
+                return false;
+            }
 
-            int spawnNow = Mathf.Min(creepBatchSize, remaining);
+            if (enemyIds == null ||
+                enemyIds.Length == 0)
+            {
+                Debug.LogError(
+                    $"[PvE] Cannot prepare creep pools. " +
+                    $"Stage={CurrentStage}, enemyIds are empty.",
+                    this
+                );
 
-            // Stable per-batch distribution
-            int[] counts = AllocateCounts(spawnNow, rates);
-            if (counts == null) return;
+                return false;
+            }
+
+            if (rates == null ||
+                rates.Length == 0)
+            {
+                Debug.LogError(
+                    $"[PvE] Cannot prepare creep pools. " +
+                    $"Stage={CurrentStage}, rates are empty.",
+                    this
+                );
+
+                return false;
+            }
+
+            float totalRate = 0f;
+
+            for (int i = 0; i < enemyIds.Length; i++)
+            {
+                float rate =
+                    i < rates.Length
+                        ? Mathf.Max(0f, rates[i])
+                        : 0f;
+
+                totalRate += rate;
+            }
+
+            if (totalRate <= 0f)
+            {
+                Debug.LogError(
+                    $"[PvE] Total enemy rate is zero. " +
+                    $"Stage={CurrentStage}",
+                    this
+                );
+
+                return false;
+            }
+
+            List<CreepPoolWarmupRequest> requests =
+                new List<CreepPoolWarmupRequest>(
+                    enemyIds.Length
+                );
+
+            int batchSize = Mathf.Max(
+                1,
+                gameData.creepBatchSize
+            );
 
             for (int i = 0; i < enemyIds.Length; i++)
             {
                 int enemyId = enemyIds[i];
-                int amount = counts[i];
 
-                if (!TryGetCreepPrefab(enemyId, out var prefab))
+                if (enemyId <= 0)
+                {
+                    continue;
+                }
+
+                float rate =
+                    i < rates.Length
+                        ? Mathf.Max(0f, rates[i])
+                        : 0f;
+
+                if (rate <= 0f)
+                {
+                    continue;
+                }
+
+                float normalizedRate =
+                    rate / totalRate;
+
+                int estimatedSimultaneousCount =
+                    Mathf.CeilToInt(
+                        batchSize * normalizedRate
+                    );
+
+                int warmupCount =
+                    Mathf.Max(
+                        minimumWarmupPerCreepType,
+                        estimatedSimultaneousCount
+                    );
+
+                requests.Add(
+                    new CreepPoolWarmupRequest(
+                        enemyId,
+                        warmupCount
+                    )
+                );
+            }
+
+            if (requests.Count == 0)
+            {
+                Debug.LogError(
+                    $"[PvE] No valid creep warmup requests. " +
+                    $"Stage={CurrentStage}",
+                    this
+                );
+
+                return false;
+            }
+
+            token.ThrowIfCancellationRequested();
+            return await creepPoolService.PrepareAsync(
+                requests,
+                $"PvE Stage {CurrentStage}"
+            );
+        }
+
+
+        private bool TryGetBossDataByStage(int stage, out BossDataSO bossSo)
+        {
+            bossSo = null;
+
+            return DatabaseManager.Instance.TryGetBossData(stageRuntimeData.BossId, out bossSo) && bossSo != null;
+        }
+
+        private void SpawnNextCreepBatch()
+        {
+            if (enemyIds == null || enemyIds.Length == 0 ||
+                rates == null || rates.Length == 0)
+            {
+                Debug.LogError("[PvE] Enemy ids or rates are empty.", this);
+                return;
+            }
+
+            int remaining = gameData.maxCreepsPerStage - totalCreepsSpawnedThisStage;
+            int spawnNow = Mathf.Min(
+                gameData.creepBatchSize,
+                losingStage || playCompletedStage
+                    ? gameData.creepBatchSize
+                    : remaining
+            );
+
+            if (spawnNow <= 0)
+                return;
+
+            int[] counts = AllocateCounts(spawnNow, rates);
+            if (counts == null)
+                return;
+
+            cachedSpawnFormationPositions.Clear();
+
+            bool formationGenerated =
+                spawnFormationService != null &&
+                spawnFormationService.GeneratePositions(
+                    spawnNow,
+                    spawnPoss,
+                    cachedSpawnFormationPositions
+                );
+
+            if (!formationGenerated)
+            {
+                Debug.LogError(
+                    "[PvE] Cannot generate creep formation positions.",
+                    this
+                );
+                return;
+            }
+
+            int spawnIndex = 0;
+
+            for (int i = 0; i < enemyIds.Length; i++)
+            {
+                int enemyId = enemyIds[i];
+                int amount = i < counts.Length ? counts[i] : 0;
+
+                if (amount <= 0)
+                    continue;
+
+                if (!DatabaseManager.Instance.TryGetCreepData(enemyId, out var creepData) ||
+                    creepData == null)
                 {
                     Debug.LogError($"[PvE] Missing CreepDataSo/Prefab for enemyId={enemyId}");
                     continue;
@@ -159,16 +779,66 @@ namespace Scripts.Battle
 
                 for (int k = 0; k < amount; k++)
                 {
-                    var basePos = spawnPoss[Random.Range(0, spawnPoss.Count)].position;
-                    var nPos = basePos + new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
+                    if (spawnIndex >= cachedSpawnFormationPositions.Count)
+                    {
+                        Debug.LogError(
+                            $"[PvE] Formation position is missing. " +
+                            $"Expected={spawnNow}, Actual={cachedSpawnFormationPositions.Count}",
+                            this
+                        );
+                        return;
+                    }
 
-                    var creep = PoolController.Instance.Get(prefab, nPos);
-                    //var creep = Instantiate(prefab, nPos, Quaternion.identity);
-                    int hid = creep.GetInstanceID();
+                    Vector3 spawnPosition = cachedSpawnFormationPositions[spawnIndex++];
+                    EnemyActor creep;
 
-                    // If you have an overload InitMonster(hid, enemyId, hero, battle) -> use it:
-                    // creep.InitMonster(hid, enemyId, playerHeroController, this);
-                    creep.InitMonster(hid, playerHeroController, this);
+                    if (cachedScaledCreepStats.TryGetValue(enemyId, out BaseStat cachedStat))
+                    {
+                        creep = enemySpawnService.SpawnCreep(
+                            creepData,
+                            spawnPosition,
+                            enemyTargetProvider,
+                            targetRegistry,
+                            cachedStat,
+                            NotifyMonsterDeath
+                        );
+                    }
+                    else
+                    {
+                        StageStatScale enemyScale = stageRuntimeData != null
+                            ? stageRuntimeData.EnemyScale
+                            : StageStatScale.Identity;
+
+                        creep = enemySpawnService.SpawnCreep(
+                            creepData,
+                            spawnPosition,
+                            enemyTargetProvider,
+                            targetRegistry,
+                            enemyScale,
+                            NotifyMonsterDeath
+                        );
+                    }
+
+                    if (creep == null)
+                    {
+                        Debug.LogError(
+                            $"[PvE] Failed to spawn creep. " +
+                            $"Stage={CurrentStage}, EnemyId={creepData.Id}",
+                            this
+                        );
+                        continue;
+                    }
+
+                    bool isLargeCreep = k % 5 == 0;
+                    creep.SetScale(isLargeCreep ? 1.5f : 1f);
+
+                    if (creep.HealthBarController != null)
+                    {
+                        creep.HealthBarController.SetOffsetPosition(
+                            isLargeCreep ? 0.5f : 0f,
+                            0f
+                        );
+                    }
 
                     creeps.Add(creep);
                     aliveCreepCount++;
@@ -177,173 +847,504 @@ namespace Scripts.Battle
             }
         }
 
-        private void SpawnBoss()
+        private void RebuildStageStatCache()
         {
-            if (boss == null)
+            cachedScaledCreepStats.Clear();
+            cachedScaledBossStats.Clear();
+
+            if (stageRuntimeData == null)
+                return;
+
+            CacheScaledCreepStats();
+            CacheScaledBossStats();
+        }
+
+        private void CacheScaledCreepStats()
+        {
+            if (stageRuntimeData.EnemyIds == null || stageRuntimeData.EnemyIds.Length == 0)
+                return;
+
+            StageStatScale scale = stageRuntimeData.EnemyScale;
+            scale.Normalize();
+
+            for (int i = 0; i < stageRuntimeData.EnemyIds.Length; i++)
             {
-                Debug.LogError("[PvE] Boss ref missing");
+                int enemyId = stageRuntimeData.EnemyIds[i];
+
+                if (cachedScaledCreepStats.ContainsKey(enemyId))
+                    continue;
+
+                if (!DatabaseManager.Instance.TryGetCreepData(enemyId, out CreepDataSo data) || data == null)
+                {
+                    Debug.LogError($"[PvE] Cannot cache creep stat. Missing CreepDataSo. enemyId={enemyId}");
+                    continue;
+                }
+
+                BaseStat stat = new BaseStat
+                {
+                    Health = data.BaseHp * scale.HpMultiplier,
+                    Attack = data.BaseAtk * scale.AtkMultiplier,
+                    Defense = data.BaseDef * scale.DefMultiplier,
+
+                    AttackSpeed = data.BaseAtkSpeed,
+                    AttackRange = data.BaseRange,
+                    MoveSpeed = data.BaseMoveSpeed,
+
+                    Element = data.Element
+                };
+
+                cachedScaledCreepStats.Add(enemyId, stat);
+            }
+        }
+
+        private void CacheScaledBossStats()
+        {
+            if (stageRuntimeData.BossId <= 0)
+                return;
+
+            StageStatScale scale = stageRuntimeData.BossScale;
+            scale.Normalize();
+
+            int bossId = stageRuntimeData.BossId;
+
+            if (!DatabaseManager.Instance.TryGetBossData(bossId, out BossDataSO data) || data == null)
+            {
+                Debug.LogError($"[PvE] Cannot cache boss stat. Missing BossDataSO. bossId={bossId}");
                 return;
             }
 
-            if (boss.gameObject.activeInHierarchy) return;
+            BaseStat stat = new BaseStat
+            {
+                Health = data.BaseHP * scale.HpMultiplier,
+                Attack = data.BaseAtk * scale.AtkMultiplier,
+                Defense = data.BaseDef * scale.DefMultiplier,
 
-            Debug.Log("[PvE] Spawn Boss");
+                AttackSpeed = data.AtkSpeed,
+                AttackRange = data.AttackRange,
+                MoveSpeed = data.MoveSpeed,
 
-            var pos = GroupFlashController.Instance.GetPosByIdx(2) + Vector3.forward * 30;
-            boss.transform.position = pos;
-            boss.gameObject.SetActive(true);
+                Element = data.Element
+            };
 
-            int hid = boss.GetInstanceID();
-            boss.InitMonster(hid, playerHeroController, this);
-            playerHeroController.SetTarget(boss);
-            TopMainView.Instance?.GetBattleTimerIntance()?.InitTimer(120, () => TopMainView.Instance?.GetBattleResultIntance()?.ShowBattleResult(false));
+            cachedScaledBossStats[bossId] = stat;
+        }
+
+        private async UniTask SpawnBoss()
+        {
+            if (!TryGetBossDataByStage(CurrentStage, out var bossSo))
+            {
+                Debug.LogError($"[PvE] Cannot resolve boss data for stage={CurrentStage}");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(bossSo.BossAddressKey))
+            {
+                Debug.LogError($"[PvE] Boss prefab missing for bossId={bossSo.Id}");
+                return;
+            }
+
+            if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
+                return;
+
+            Debug.Log($"[PvE] Spawn Boss - Stage={CurrentStage}, BossId={bossSo.Id}, BossName={bossSo.Name}");
+
+            Vector3 pos = GroupFlashController.Instance.GetPosByIdx(2);
+
+            if (cachedScaledBossStats.TryGetValue(bossSo.Id, out BaseStat cachedBossStat))
+            {
+                currentBoss = await enemySpawnService.SpawnBossAsync(
+                    bossSo,
+                    pos,
+                    enemyTargetProvider,
+                    targetRegistry,
+                    cachedBossStat,
+                    OnBossDead
+                );
+            }
+            else
+            {
+                StageStatScale bossScale = stageRuntimeData != null
+                    ? stageRuntimeData.BossScale
+                    : StageStatScale.Identity;
+
+                currentBoss = await enemySpawnService.SpawnBossAsync(
+                    bossSo,
+                    pos,
+                    enemyTargetProvider,
+                    targetRegistry,
+                    bossScale,
+                    OnBossDead
+                );
+            }
+
+            if (currentBoss == null)
+            {
+                Debug.LogError(
+                    $"[PvE] Failed to spawn boss. Stage={CurrentStage}, BossId={bossSo.Id}"
+                );
+                return;
+            }
+
+            ///---------------------------------------------------------
+
+            GameStatView.Instance.InitTimer(battleTime, 2f,() =>
+            {
+                if (State == BattleState.Ended)
+                {
+                    return;
+                }
+
+                GameEventManager.Trigger(GameEvents.OnStageLost);
+            }, battleFlowController.stageFlowCancellationTokenSource.Token).Forget();
+
             isBossAlive = true;
             SetState(BattleState.FightingBoss);
         }
 
-        private void OnStageCleared()
+        private void OnBossDead(BossActor boss)
         {
-            // TODO: you implement: rewards, stage++, InitStage(next), etc.
-            Debug.Log("[PvE] Stage Cleared");
+            if (boss != null)
+            {
+                targetRegistry.UnregisterHostile(boss);
+            }
+
+            if (State == BattleState.Ended)
+            {
+                return;
+            }
+
+            FarmingIdleScreenService.AddMonsterKill();
+            GameEventManager.Trigger(GameEvents.OnStageCleared, CurrentStage);
+        }
+
+        private void OnStageCleared(int stage)
+        {
+            OnStageClearedAsync(stage, battleFlowController.stageFlowCancellationTokenSource.Token).Forget();
+        }
+
+        private async UniTask OnStageClearedAsync(int stage, CancellationToken cancellationToken)
+        {
+            result = BattleResult.Victory;
+            SetState(BattleState.Ended);
+
+            if (currentBoss != null)
+            {
+                targetRegistry.UnregisterHostile(currentBoss);
+            }
+
+            currentBoss = null;
+            losingStage = false;
+
+            // Stage khác frontier server == player đang replay/farm 1 stage cũ qua Stage Selection
+            // (MoveToStage) — KHÔNG gọi battle/end (server sẽ luôn reject bằng STAGE_MISMATCH vì
+            // không có khái niệm replay trong spec hiện tại). Không có Clear reward, không resync,
+            // chỉ tăng CurrentStage cục bộ để tiếp tục chơi — giữ đúng hành vi cũ trước khi có RPC này.
+            cancellationToken.ThrowIfCancellationRequested();
+            if (stage != serverFrontierStage)
+            {
+                CurrentStage = stage + 1;
+                CurrentStageService.SetCurrentStage(CurrentStage);
+                NextStageCallback(cancellationToken).Forget();
+                return;
+            }
+
+            BattleEndRequest request = BuildBattleEndRequest("Victory", stage);
+            BattleEndResponse response = null;
+            try
+            {
+                response = await NakamaClient.Instance.BattleEndAsync(request);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[PvE] battle/end RPC failed: {e.Message}");
+            }
+
+            if (response != null && response.Success)
+            {
+                ApplyServerProgression(response.UpdatedProgression);
+
+                if (response.UpdatedResources != null)
+                {
+                    CurrencyManager.Instance.ApplyServerBalances(
+                        response.UpdatedResources.Gold,
+                        response.UpdatedResources.Diamonds,
+                        response.UpdatedResources.Energy,
+                        response.UpdatedResources.Items
+                    );
+                }
+
+                if (response.Rewards != null)
+                {
+                    foreach (var kv in response.Rewards)
+                        Debug.Log($"[PvE] battle/end clear reward: {kv.Key} = {kv.Value}");
+                }
+            }
+            else if (response != null && (response.Error == "STAGE_MISMATCH" || response.Error == "INVALID_STAGE"))
+            {
+                Debug.LogWarning($"[PvE] battle/end rejected ({response.Error}) — resyncing progression.");
+                await ResyncProgressionFromServerAsync();
+            }
+
+            // KHÔNG còn gọi rewardSyncService?.ClaimClearStageReward(stageRuntimeData) ở đây nữa —
+            // reward stage-clear giờ lấy từ response battle/end. SetCurrentStageData (Online Idle)
+            // vẫn chạy như cũ qua CacheStageSpawnData trong InitStage, không thuộc phạm vi RPC này.
+            NextStageCallback(cancellationToken).Forget();
+            cancellationToken.ThrowIfCancellationRequested();
+            GameEventManager.Trigger(GameEvents.OnStageSessionChange);
+        }
+
+        private void OnStageFailed()
+        {
+            OnStageFailedAsync(battleFlowController.stageFlowCancellationTokenSource.Token).Forget();
+        }
+
+        private async UniTask OnStageFailedAsync(CancellationToken cancellationToken)
+        {
+            /* Hero death state is owned by BattleHeroSessionController. */
+            SetState(BattleState.Ended);
+            result = BattleResult.Defeat;
+            losingStage = true;
+            DespawnCreepAndBoss();
+
+            // Defeat khi đang replay stage cũ (không phải frontier) — không cần báo server, không
+            // ảnh hưởng progression dù có gọi hay không, bỏ qua để tránh gọi RPC vô nghĩa.
+            if (CurrentStage == serverFrontierStage)
+            {
+                BattleEndRequest request = BuildBattleEndRequest("Defeat", CurrentStage);
+                try
+                {
+                    await NakamaClient.Instance.BattleEndAsync(request);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[PvE] battle/end RPC failed: {e.Message}");
+                }
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            PlayCurrentStage(cancellationToken,1).Forget();
+            GameEventManager.Trigger(GameEvents.OnStageSessionChange);
         }
 
         private void SetState(BattleState newState)
         {
-            if (state == newState) return;
-            state = newState;
-            // Debug.Log($"[PvE] State => {state}");
+            if (State == newState) return;
+            State = newState;
         }
-
-        // ======================
-        // Death notifications
-        // ======================
-
-        // Creep calls this when it dies
-        public void NotifyMonsterDeath(MonsterScrepController creep)
+        
+        private void NotifyMonsterDeath(EnemyActor enemy)
         {
-            if (creep == null) return;
-            if (!creep.gameObject.activeInHierarchy) return;
+            if (enemy == null)
+                return;
 
-            //creep.gameObject.SetActive(false);
-            PoolController.Instance.ReturnToPool(creep.gameObject);
-            creeps.Remove(creep);
+            targetRegistry.UnregisterHostile(enemy);
+            creeps.Remove(enemy);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
-
-            if (state != BattleState.FightingCreeps) return;
-            if (aliveCreepCount != 0) return;
-
-            // All creeps are dead
-            if (totalCreepsSpawnedThisStage < maxCreepsPerStage)
+            deadCreepCount = losingStage || playCompletedStage
+                ? GameData.Instance.maxCreepsPerStage
+                : deadCreepCount + 1;
+            GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
+            FarmingIdleScreenService.AddMonsterKill();
+            if (State != BattleState.FightingCreeps)
+                return;
+            if (aliveCreepCount != 0)
+                return;
+            if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage || playCompletedStage)
             {
                 SpawnNextCreepBatch();
                 return;
             }
 
-            // Reached stage cap => Condition A = spawn boss
             SpawnBoss();
         }
 
-        // Boss calls this when it dies
-        public void NotifyBossDeath()
+        private void RefreshEnemyHeroTargets()
         {
-            if (state != BattleState.FightingBoss) return;
-            if (!isBossAlive) return;
-
-            isBossAlive = false;
-            if (boss != null) boss.gameObject.SetActive(false);
-
-            SetState(BattleState.StageCleared);
-            OnStageCleared();
-        }
-
-        // ======================
-        // Target queries (skills)
-        // ======================
-
-        public MonsterScrepController GetNearestMonster(Vector3 pos)
-        {
-            float nearest = float.MaxValue;
-            MonsterScrepController target = null;
-
-            for (int i = 0; i < creeps.Count; i++)
+            for (int i = creeps.Count - 1; i >= 0; i--)
             {
-                var c = creeps[i];
-                float d = Vector3.Distance(c.transform.position, pos);
-                if (d < nearest)
+                EnemyActor creep = creeps[i];
+
+                if (creep == null || creep.IsDead)
                 {
-                    nearest = d;
-                    target = c;
+                    creeps.RemoveAt(i);
+                    continue;
                 }
+
+                creep.SetTargetProvider(enemyTargetProvider);
             }
 
-            return target;
-        }
-
-        public List<MonsterScrepController> GetNearestMonstesInRange(Vector3 pos, float range)
-        {
-            List<MonsterScrepController> targets = null;
-            if (state == BattleState.FightingBoss)
+            if (currentBoss != null && !currentBoss.IsDead)
             {
-                return new List<MonsterScrepController> { boss };
+                currentBoss.SetTargetProvider(enemyTargetProvider);
             }
-            if (creeps.Count == 0) return targets;
+        }
 
-            float sqrRange = range * range;
-
-            for (int i = 0; i < creeps.Count; i++)
+        public ICombatUnit GetNearestEnemy(Vector3 pos)
+        {
+            if (!isReadyBattle)
             {
-                var c = creeps[i];
-                if (c == null || !c.gameObject.activeInHierarchy) continue;
-
-                float sqrDist = (c.transform.position - pos).sqrMagnitude;
-                if (sqrDist <= sqrRange)
-                {
-                    targets ??= new List<MonsterScrepController>();
-                    targets.Add(c);
-                }
+                return null;
             }
 
-            return targets;
+            return targetRegistry.GetNearestHostile(pos);
         }
 
-        // ======================
-        // Helpers: pattern & rates
-        // ======================
-
-        private int GetPatternIdByStageLoop(int stage, int stageStep)
+        public ICombatUnit GetFarthestEnemy(Vector3 pos)
         {
-            var list = creepSpawnPatternCollection.ListSpawnPattern;
-            if (list == null || list.Length == 0) return 1;
-
-            int group = (stage - 1) / Mathf.Max(1, stageStep);
-            int idx = group % list.Length; // loop back to 0
-            return list[idx].Id;
-        }
-
-        private float[] GetRandomRates(int id, int length)
-        {
-            if (spawnRatePattern == null || spawnRatePattern.SpawnRatePatterns == null ||
-                spawnRatePattern.SpawnRatePatterns.Length == 0)
+            if (!isReadyBattle)
                 return null;
 
-            var matchedById = spawnRatePattern.SpawnRatePatterns
-                .Where(p => p.Id == id && p.SpawnRate != null && p.SpawnRate.Length == length)
-                .ToArray();
+            ICombatUnit farthest = null;
+            float farthestSqr = -1f;
 
-            if (matchedById.Length > 0)
-                return matchedById[Random.Range(0, matchedById.Length)].SpawnRate;
+            Vector3 selfPos = pos;
+            selfPos.y = 0f;
 
-            var matchedByLen = spawnRatePattern.SpawnRatePatterns
-                .Where(p => p.SpawnRate != null && p.SpawnRate.Length == length)
-                .ToArray();
+            for (int i = creeps.Count - 1; i >= 0; i--)
+            {
+                EnemyActor creep = creeps[i];
 
-            if (matchedByLen.Length > 0)
-                return matchedByLen[Random.Range(0, matchedByLen.Length)].SpawnRate;
+                if (creep == null || creep.IsDead || !creep.gameObject.activeInHierarchy)
+                {
+                    creeps.RemoveAt(i);
+                    continue;
+                }
 
-            return null;
+                Vector3 creepPos = creep.Position;
+                creepPos.y = 0f;
+
+                float sqr = (creepPos - selfPos).sqrMagnitude;
+
+                if (sqr > farthestSqr)
+                {
+                    farthestSqr = sqr;
+                    farthest = creep;
+                }
+            }
+
+            if (State == BattleState.FightingBoss &&
+                currentBoss != null &&
+                !currentBoss.IsDead &&
+                currentBoss.gameObject.activeInHierarchy)
+            {
+                Vector3 bossPos = currentBoss.Position;
+                bossPos.y = 0f;
+
+                float bossSqr = (bossPos - selfPos).sqrMagnitude;
+
+                if (bossSqr > farthestSqr)
+                {
+                    farthest = currentBoss;
+                }
+            }
+
+            return farthest;
         }
 
-        // weights -> int counts; remainder distributed randomly (your rule)
+        public ICombatUnit GetRandomEnemyAlive()
+        {
+            if (currentBoss != null && !currentBoss.IsDead)
+            {
+                return currentBoss;
+            }
+
+            int index = Random.Range(0, creeps.Count);
+            return creeps.Count <= 0 ? null : creeps[index];
+        }
+
+        private string FormatRewards(StageReward[] rewards)
+        {
+            if (rewards == null || rewards.Length == 0)
+                return "None";
+
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+            for (int i = 0; i < rewards.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(", ");
+
+                builder.Append(rewards[i].currencyType);
+                builder.Append(":");
+                builder.Append(rewards[i].Amount.ToString());
+            }
+
+            return builder.ToString();
+        }
+        
+        public Vector3 GetLowestHpEnemy(Vector3 pos, float range)
+        {
+            return Vector3.zero;
+        }
+
+        public ICombatUnit GetRandomFromFarthestEnemies(
+            Vector3 pos,
+            IReadOnlyList<ICombatUnit> excludedTargets,
+            int topCount = 5)
+        {
+            if (!isReadyBattle)
+                return null;
+
+            BossActor activeBoss =
+                State == BattleState.FightingBoss
+                    ? currentBoss
+                    : null;
+
+            return enemySelectionService.GetRandomFromFarthestEnemies(
+                pos,
+                creeps,
+                activeBoss,
+                excludedTargets,
+                topCount,
+                preferBoss: true
+            );
+        }
+
+        public void SpawnBossDirectly()
+        {
+            // Clear target hero đang giữ trước khi dispose creep.
+            ClearAllHeroTargets();
+
+            for (int i = creeps.Count - 1; i >= 0; i--)
+            {
+                EnemyActor creep = creeps[i];
+
+                if (creep == null)
+                {
+                    creeps.RemoveAt(i);
+                    continue;
+                }
+
+                targetRegistry.UnregisterHostile(creep);
+
+                creep.DespawnToPool(0f).Forget();
+
+                creeps.RemoveAt(i);
+            }
+
+            aliveCreepCount = 0;
+
+            SpawnBoss().Forget();
+        }
+
+        private void ClearAllHeroTargets()
+        {
+            HeroActor heroA =
+                userDataCache.GetInBattleHeroActorAt(0);
+
+            HeroActor heroB =
+                userDataCache.GetInBattleHeroActorAt(1);
+
+            heroA?.ClearTarget();
+            heroB?.ClearTarget();
+        }
+
+        //dung để lấy quái gần nhất cho hero đang cần, not in use
+        public List<EnemyActor> GetNearestEnemiesInRange(float range)
+        {
+            return null;
+        }
+        
         private int[] AllocateCounts(int total, float[] weights)
         {
             int n = weights.Length;
@@ -354,6 +1355,7 @@ namespace Scripts.Battle
                 if (weights[i] < 0) weights[i] = 0;
                 sum += weights[i];
             }
+
             if (sum <= 0f) return null;
 
             int[] counts = new int[n];
@@ -377,68 +1379,88 @@ namespace Scripts.Battle
             return counts;
         }
 
-        private List<Transform> BuildSpawnPositions()
+        private void BuildSpawnPositions()
         {
-            var list = new List<Transform>((leftSpawnPoss?.Count ?? 0) + (rightSpawnPoss?.Count ?? 0));
-            if (leftSpawnPoss != null) list.AddRange(leftSpawnPoss);
-            if (rightSpawnPoss != null) list.AddRange(rightSpawnPoss);
-
-            if (list.Count == 0)
+            if (spawnPoss.Count == 0)
                 Debug.LogError("[PvE] No spawn positions assigned");
-
-            return list;
+            else
+                spawnPoss = spawnPoss.OrderBy(_ => Random.value).ToList(); // shuffle
         }
 
-        // ======================
-        // Helpers: creep data lookup
-        // ======================
 
-        private void BuildCreepDataLookup()
+        private async UniTask NextStageCallback(CancellationToken cancellationToken)
         {
-            creepDataDict = new Dictionary<int, CreepDataSo>();
-
-            if (creepDataSo == null) return;
-
-            for (int i = 0; i < creepDataSo.Length; i++)
-            {
-                var data = creepDataSo[i];
-                if (data == null) continue;
-
-                // assumes CreepDataSo has int Id
-                creepDataDict[data.Id] = data;
-            }
-        }
-
-        private bool TryGetCreepPrefab(int enemyId, out MonsterScrepController prefab)
-        {
-            prefab = null;
-
-            if (creepDataDict == null || creepDataDict.Count == 0) return false;
-            if (!creepDataDict.TryGetValue(enemyId, out var data) || data == null) return false;
-
-            // IMPORTANT:
-            // Change this line if your CreepDataSo uses a different field/property name for prefab.
-            prefab = data.CreepPrefab;
-
-            return prefab != null;
-        }
-
-        [Button]
-        private void MakeEnemyDead()
-        {
-            var monster = creeps.Find(c => c.gameObject.activeInHierarchy);
-            NotifyMonsterDeath(monster);
-        }
-        
-        public async UniTask NextStageCallback()
-        {
+            await UniTask.Delay(TimeSpan.FromSeconds(5.7f), cancellationToken: cancellationToken);
             Debug.Log("[PvE] Next Stage");
-            await Transitioner.Instance.TransitionOutWithoutChangingScene();
-            HandleNextStage();
-            playerHeroController.ResetHeroData();
-            await UniTask.Delay(1000);
+            await Transitioner.Instance.TransitionOutWithoutChangingScene(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
+            {
+                Vector3 spawnPos = GetHeroSpawnPosition(i);
+                userDataCache.inBattleHeroes[i].ActiveHealthBar(false);
+                userDataCache.inBattleHeroes[i].ActiveVisual(false);
+                userDataCache.inBattleHeroes[i].ResetSpawnPosition(spawnPos);
+            }
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: cancellationToken);
             Transitioner.Instance.TransitionInWithoutChangingScene();
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
+            {
+                userDataCache.inBattleHeroes[i].ResetData();
+                await UniTask.Delay(800, cancellationToken: cancellationToken);
+            }
+
+            await HandleNextStageAsync(cancellationToken);
         }
 
+        private async UniTask PlayCurrentStage(CancellationToken cancellationToken, float delay = 0f)
+        {
+            if (delay > 0f)
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: cancellationToken);
+            }
+
+            Debug.Log("[PvE] Play Current Stage");
+            await Transitioner.Instance.TransitionOutWithoutChangingScene(cancellationToken);
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
+            {
+                Vector3 spawnPos = GetHeroSpawnPosition(i);
+                userDataCache.inBattleHeroes[i]?.ActiveHealthBar(false);
+                userDataCache.inBattleHeroes[i]?.ActiveVisual(false);
+                userDataCache.inBattleHeroes[i]?.ResetSpawnPosition(spawnPos);
+            }
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: cancellationToken);
+            Transitioner.Instance.TransitionInWithoutChangingScene();
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: cancellationToken);
+            for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
+            {
+                userDataCache.inBattleHeroes[i]?.ResetData();
+                await UniTask.Delay(800, cancellationToken: cancellationToken);
+            }
+
+            await HandleCurrentStageAsync();
+        }
+
+        public bool IsHeroCurrentlyActive(int heroId)
+        {
+            if (heroId <= 0) return false;
+            return userDataCache.InBattleHeroIdList.Contains(heroId);
+        }
+
+        private void NotifyIdleScreenStageChanged()
+        {
+            if (!FarmingIdleScreenService.IsActive)
+                return;
+
+            if (stageDataResolver == null)
+                return;
+
+            StageRuntimeData stageData = stageDataResolver.Resolve(CurrentStage);
+            if (stageData == null)
+                return;
+
+            FarmingIdleScreenService.UpdateStageData(stageData);
+        }
     }
 }

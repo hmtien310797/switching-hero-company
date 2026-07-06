@@ -1,0 +1,383 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c4f78eba5c4c02901c7be68acc0944, type: 3}
+  m_Name: HeroSummonConfig
+  m_EditorClassIdentifier: 
+  SummonOptions:
+  - OptionId: summon_30
+    DisplayName: 10 times
+    RollCount: 10
+    TicketCost: 10
+    GemCost: 50
+    Enabled: 1
+  - OptionId: summon_50
+    DisplayName: 20 times
+    RollCount: 20
+    TicketCost: 20
+    GemCost: 100
+    Enabled: 1
+  SummonLevels:
+  - SummonLevel: 1
+    TotalRollRequired: 10
+    CommonRate: 90
+    UnCommonRate: 10
+    RareRate: 0
+    EpicRate: 0
+    LegendaryRate: 0
+    MythicRate: 0
+  - SummonLevel: 2
+    TotalRollRequired: 20
+    CommonRate: 85
+    UnCommonRate: 10
+    RareRate: 5
+    EpicRate: 0
+    LegendaryRate: 0
+    MythicRate: 0
+  - SummonLevel: 3
+    TotalRollRequired: 50
+    CommonRate: 81
+    UnCommonRate: 11
+    RareRate: 7
+    EpicRate: 1
+    LegendaryRate: 0
+    MythicRate: 0
+  - SummonLevel: 4
+    TotalRollRequired: 100
+    CommonRate: 76.5
+    UnCommonRate: 12
+    RareRate: 9
+    EpicRate: 2.5
+    LegendaryRate: 0
+    MythicRate: 0
+  - SummonLevel: 5
+    TotalRollRequired: 200
+    CommonRate: 71.8
+    UnCommonRate: 13
+    RareRate: 11
+    EpicRate: 4
+    LegendaryRate: 0.2
+    MythicRate: 0
+  - SummonLevel: 6
+    TotalRollRequired: 350
+    CommonRate: 67.1
+    UnCommonRate: 14
+    RareRate: 13
+    EpicRate: 5.5
+    LegendaryRate: 0.3
+    MythicRate: 0.1
+  - SummonLevel: 7
+    TotalRollRequired: 500
+    CommonRate: 62.2
+    UnCommonRate: 15
+    RareRate: 15
+    EpicRate: 7
+    LegendaryRate: 0.6
+    MythicRate: 0.2
+  - SummonLevel: 8
+    TotalRollRequired: 750
+    CommonRate: 57.3
+    UnCommonRate: 16
+    RareRate: 16.5
+    EpicRate: 8.5
+    LegendaryRate: 1
+    MythicRate: 0.7
+  - SummonLevel: 9
+    TotalRollRequired: 1000
+    CommonRate: 52.4
+    UnCommonRate: 17
+    RareRate: 18
+    EpicRate: 10
+    LegendaryRate: 1.6
+    MythicRate: 1
+  - SummonLevel: 10
+    TotalRollRequired: 1500
+    CommonRate: 47
+    UnCommonRate: 18
+    RareRate: 20
+    EpicRate: 12
+    LegendaryRate: 2
+    MythicRate: 1
+  - SummonLevel: 11
+    TotalRollRequired: 2200
+    CommonRate: 43
+    UnCommonRate: 19
+    RareRate: 21
+    EpicRate: 13
+    LegendaryRate: 3
+    MythicRate: 1
+  - SummonLevel: 12
+    TotalRollRequired: 3000
+    CommonRate: 39
+    UnCommonRate: 20
+    RareRate: 22
+    EpicRate: 14
+    LegendaryRate: 3
+    MythicRate: 2
+  - SummonLevel: 13
+    TotalRollRequired: 4000
+    CommonRate: 34
+    UnCommonRate: 21
+    RareRate: 23
+    EpicRate: 16
+    LegendaryRate: 4
+    MythicRate: 2
+  - SummonLevel: 14
+    TotalRollRequired: 5500
+    CommonRate: 28
+    UnCommonRate: 22
+    RareRate: 23
+    EpicRate: 19
+    LegendaryRate: 5
+    MythicRate: 3
+  - SummonLevel: 15
+    TotalRollRequired: 8000
+    CommonRate: 22
+    UnCommonRate: 24
+    RareRate: 22
+    EpicRate: 23
+    LegendaryRate: 6
+    MythicRate: 3
+  LevelRewards:
+  - SummonLevel: 1
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 2
+      Description: 
+  - SummonLevel: 2
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 3
+      Description: 
+  - SummonLevel: 3
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 10
+      Description: 
+  - SummonLevel: 4
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 25
+      Description: 
+  - SummonLevel: 5
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 30
+      Description: 
+  - SummonLevel: 6
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 40
+      Description: 
+  - SummonLevel: 7
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 50
+      Description: 
+  - SummonLevel: 8
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 60
+      Description: 
+  - SummonLevel: 9
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 80
+      Description: 
+  - SummonLevel: 10
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 100
+      Description: 
+  - SummonLevel: 11
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 100
+      Description: 
+  - SummonLevel: 12
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 100
+      Description: 
+  - SummonLevel: 13
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 100
+      Description: 
+  - SummonLevel: 14
+    RewardItems:
+    - RewardType: 0
+      CurrencyType: 2
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 0
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 100
+      Description: 
+  - SummonLevel: 15
+    RewardItems:
+    - RewardType: 2
+      CurrencyType: 0
+      HeroId: 
+      HeroRarity: 0
+      SkillId: 
+      SkillGrade: 0
+      RandomHeroRarity: 4
+      PoolId: 
+      RandomSkillGrade: 0
+      SkillPoolId: 
+      Amount: 1
+      Description: 
+  EnablePity: 0
+  PityMode: 3
+  PityTargetRarity: 4
+  SoftStart: 40
+  HardPity: 70
+  SoftBonusPercentPerMiss: 1
+  HeroPool:
+  - {fileID: 11400000, guid: b695e4375a235d04b9f291059abb223e, type: 2}
+  - {fileID: 11400000, guid: f72145f5f142a4941b53ed5f4499ce15, type: 2}
+  - {fileID: 11400000, guid: 3136b54c5e7e28b4299640256372be57, type: 2}
+  - {fileID: 11400000, guid: 7af1b66462aa9cd468bbb89468a346c0, type: 2}
+  - {fileID: 11400000, guid: 86424ea8009e51744ab561946936087c, type: 2}
+  - {fileID: 11400000, guid: 06c79fc3b62943c4c8670f75185d5c64, type: 2}
+  - {fileID: 11400000, guid: 52b32860b3ce12e4daa73e9394ffdca4, type: 2}
+  - {fileID: 11400000, guid: 69b75e6ff07fb144ea0e5882225db0d6, type: 2}
+  - {fileID: 11400000, guid: ebaa54502824b9943bfdf89fb3f00d3c, type: 2}
+  - {fileID: 11400000, guid: 72a1c3a0cebae4e4eb6dc89e5550ae4a, type: 2}
+  - {fileID: 11400000, guid: cd55d517a7269c848b645a3716fbd381, type: 2}
+  - {fileID: 11400000, guid: d09bdd8f3e7dd614094968910f22ad45, type: 2}
+  - {fileID: 11400000, guid: c922b044c574a2648849984d6a4f3255, type: 2}
+  - {fileID: 11400000, guid: 5d7c0bb8f51badb4bbb1efe6bd06b385, type: 2}
+  - {fileID: 11400000, guid: ad8f30f0a9183b048942573f10fd33b1, type: 2}
+  - {fileID: 11400000, guid: 8343bb4f101a8b74db62e31a0d320989, type: 2}
+  - {fileID: 11400000, guid: 478e0fb71021d1c4680702c732835bd5, type: 2}

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Core
 {
@@ -9,10 +10,16 @@ namespace Immortal_Switch.Scripts.Core
         {
             get
             {
-                if (_instance != null) return _instance;
+                if (_instance != null)
+                {
+                    return _instance;
+                }
             
                 _instance = FindFirstObjectByType<T>();
-                if (_instance != null) return _instance;
+                if (_instance != null)
+                {
+                    return _instance;
+                }
             
                 var go = new GameObject(typeof(T).Name);
                 _instance = go.AddComponent<T>();
@@ -20,7 +27,8 @@ namespace Immortal_Switch.Scripts.Core
             }
         }
 
-        protected virtual bool DontDestroyOnLoadEnabled => true;
+        [SerializeField]
+        protected bool DontDestroyOnLoadEnabled;
 
         protected virtual void Awake()
         {
@@ -37,6 +45,9 @@ namespace Immortal_Switch.Scripts.Core
         
             if (_instance != this)
                 Destroy(gameObject);
+            
+            if (DontDestroyOnLoadEnabled)
+                DontDestroyOnLoad(gameObject);
         }
     
         protected virtual void OnSingletonAwake() { }
@@ -45,5 +56,7 @@ namespace Immortal_Switch.Scripts.Core
         {
             if (_instance == this) _instance = null;
         }
+
+        public abstract UniTask InitializeAsync();
     }
 }

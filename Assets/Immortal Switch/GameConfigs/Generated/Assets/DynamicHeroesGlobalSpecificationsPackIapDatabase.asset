@@ -1,0 +1,309 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3af0c27df1f3b98478aa2690c9be20d1, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsPackIapDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - iD: 1
+    productID: 2
+    nameEn: Beginner Pack
+    nameVi: "G\xF3i T\xE2n Th\u1EE7"
+    shopTab: special_tab
+    sortOrder: 3
+    itemId1: 3
+    quantity1: 300
+    itemId2: 8
+    quantity2: 10
+    itemId3: 1
+    quantity3: 200000
+    bonus: 3500%
+    limit: 1
+    iconId: icon_pack_beginner
+    isHot: 1
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: none
+  - iD: 2
+    productID: 3
+    nameEn: Daily Boost Pack
+    nameVi: "G\xF3i T\u0103ng T\u1ED1c"
+    shopTab: special_tab
+    sortOrder: 4
+    itemId1: 4
+    quantity1: 200
+    itemId2: 41
+    quantity2: 10
+    itemId3: 3
+    quantity3: 300
+    bonus: 500%
+    limit: 1
+    iconId: icon_pack_boost
+    isHot: 0
+    isBestValue: 0
+    enable: 0
+    packType: normal
+    dripDays: 0
+    limitReset: daily
+  - iD: 3
+    productID: 5
+    nameEn: Summon Pack
+    nameVi: "G\xF3i Tri\u1EC7u H\u1ED3i"
+    shopTab: special_tab
+    sortOrder: 5
+    itemId1: 8
+    quantity1: 10
+    itemId2: 11
+    quantity2: 50
+    itemId3: 3
+    quantity3: 200
+    bonus: 700%
+    limit: 3
+    iconId: icon_pack_summon
+    isHot: 0
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 4
+    productID: 5
+    nameEn: Growth Pack
+    nameVi: "G\xF3i Ph\xE1t Tri\u1EC3n"
+    shopTab: special_tab
+    sortOrder: 6
+    itemId1: 1
+    quantity1: 1500000
+    itemId2: 10
+    quantity2: 1000000
+    itemId3: 16
+    quantity3: 30
+    bonus: 600%
+    limit: 3
+    iconId: icon_pack_growth
+    isHot: 0
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 5
+    productID: 6
+    nameEn: Equipment Pack
+    nameVi: "G\xF3i Trang B\u1ECB"
+    shopTab: special_tab
+    sortOrder: 7
+    itemId1: 20
+    quantity1: 10
+    itemId2: 19
+    quantity2: 30
+    itemId3: 15
+    quantity3: 1000
+    bonus: 500%
+    limit: 3
+    iconId: icon_pack_equipment
+    isHot: 0
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 6
+    productID: 6
+    nameEn: Weekly Special
+    nameVi: "\u01AFu \u0110\xE3i Tu\u1EA7n"
+    shopTab: special_tab
+    sortOrder: 8
+    itemId1: 3
+    quantity1: 1500
+    itemId2: 8
+    quantity2: 15
+    itemId3: 12
+    quantity3: 30
+    bonus: 700%
+    limit: 1
+    iconId: icon_pack_weekly
+    isHot: 1
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: weekly
+  - iD: 7
+    productID: 6
+    nameEn: Relic Pack
+    nameVi: "G\xF3i Th\xE1nh T\xEDch"
+    shopTab: special_tab
+    sortOrder: 9
+    itemId1: 32
+    quantity1: 80
+    itemId2: 33
+    quantity2: 500
+    itemId3: 3
+    quantity3: 2000
+    bonus: 500%
+    limit: 3
+    iconId: icon_pack_relic
+    isHot: 0
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 8
+    productID: 8
+    nameEn: Epic Hero Pack
+    nameVi: "G\xF3i Anh H\xF9ng Epic"
+    shopTab: special_tab
+    sortOrder: 10
+    itemId1: 12
+    quantity1: 80
+    itemId2: 47
+    quantity2: 20
+    itemId3: 3
+    quantity3: 2000
+    bonus: 500%
+    limit: 2
+    iconId: icon_pack_epic_hero
+    isHot: 0
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 9
+    productID: 8
+    nameEn: Weapon Master Pack
+    nameVi: "G\xF3i V\u0169 Kh\xED"
+    shopTab: special_tab
+    sortOrder: 11
+    itemId1: 9
+    quantity1: 20
+    itemId2: 45
+    quantity2: 250
+    itemId3: 43
+    quantity3: 3000
+    bonus: 500%
+    limit: 2
+    iconId: icon_pack_weapon
+    isHot: 0
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 10
+    productID: 12
+    nameEn: Legendary Pack
+    nameVi: "G\xF3i Huy\u1EC1n Tho\u1EA1i"
+    shopTab: special_tab
+    sortOrder: 12
+    itemId1: 21
+    quantity1: 15
+    itemId2: 12
+    quantity2: 200
+    itemId3: 3
+    quantity3: 7500
+    bonus: 400%
+    limit: 1
+    iconId: icon_pack_legendary
+    isHot: 0
+    isBestValue: 1
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 11
+    productID: 12
+    nameEn: Transcendence Pack
+    nameVi: "G\xF3i Si\xEAu Vi\u1EC7t"
+    shopTab: special_tab
+    sortOrder: 13
+    itemId1: 17
+    quantity1: 80
+    itemId2: 42
+    quantity2: 60
+    itemId3: 3
+    quantity3: 6000
+    bonus: 400%
+    limit: 1
+    iconId: icon_pack_transcend
+    isHot: 0
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 12
+    productID: 13
+    nameEn: Supreme Value Pack
+    nameVi: "G\xF3i T\u1ED1i Th\u01B0\u1EE3ng"
+    shopTab: special_tab
+    sortOrder: 14
+    itemId1: 3
+    quantity1: 15000
+    itemId2: 21
+    quantity2: 20
+    itemId3: 47
+    quantity3: 50
+    bonus: 400%
+    limit: 1
+    iconId: icon_pack_supreme
+    isHot: 1
+    isBestValue: 1
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: monthly
+  - iD: 13
+    productID: 5
+    nameEn: Weekly Energy Pass
+    nameVi: "G\xF3i Th\u1EC3 L\u1EF1c 7 Ng\xE0y"
+    shopTab: special_tab
+    sortOrder: 1
+    itemId1: 4
+    quantity1: 2000
+    itemId2: 41
+    quantity2: 20
+    itemId3: 4
+    quantity3: 1500
+    bonus: 2400%
+    limit: 1
+    iconId: icon_pack_energy_week
+    isHot: 1
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: weekly
+  - iD: 14
+    productID: 2
+    nameEn: Daily Energy Pack
+    nameVi: "G\xF3i Th\u1EC3 L\u1EF1c Ng\xE0y"
+    shopTab: special_tab
+    sortOrder: 2
+    itemId1: 4
+    quantity1: 800
+    itemId2: 41
+    quantity2: 6
+    itemId3: 0
+    quantity3: 0
+    bonus: 1100%
+    limit: 1
+    iconId: icon_pack_energy_day
+    isHot: 0
+    isBestValue: 0
+    enable: 1
+    packType: normal
+    dripDays: 0
+    limitReset: daily

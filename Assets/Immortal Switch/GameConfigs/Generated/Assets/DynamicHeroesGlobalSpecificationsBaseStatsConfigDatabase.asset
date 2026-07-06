@@ -1,0 +1,223 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46b1d24400677214f92c923c3e1243e0, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsBaseStatsConfigDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - statId: HP
+    statName: Health Point
+    group: Base/Core
+    valueType: Flat
+    calcLayer: Base
+    baseValue: 0
+    minValue: 0
+    maxValue: 1e+9
+    formula: "FinalHP = (BaseHP + FlatHP) \xD7 (1 + HP_PCT)"
+    serverKey: hp
+    clientKey: hp
+    isCombatStat: 1
+    allowPercent: 1
+  - statId: ATK
+    statName: Attack
+    group: Base/Core
+    valueType: Flat
+    calcLayer: Base
+    baseValue: 0
+    minValue: 0
+    maxValue: 1e+9
+    formula: "FinalATK = (BaseATK + FlatATK) \xD7 (1 + ATK_PCT)"
+    serverKey: atk
+    clientKey: atk
+    isCombatStat: 1
+    allowPercent: 1
+  - statId: DEF
+    statName: Defense
+    group: Base/Core
+    valueType: Flat
+    calcLayer: Base
+    baseValue: 0
+    minValue: 0
+    maxValue: 1e+9
+    formula: "FinalDEF = (BaseDEF + FlatDEF) \xD7 (1 + DEF_PCT)"
+    serverKey: def
+    clientKey: def
+    isCombatStat: 1
+    allowPercent: 1
+  - statId: SPD
+    statName: Attack Speed
+    group: Base/Core
+    valueType: Flat
+    calcLayer: Base
+    baseValue: 1
+    minValue: 0.1
+    maxValue: 10
+    formula: "FinalSPD = BaseSPD \xD7 (1 + SPD_PCT)"
+    serverKey: spd
+    clientKey: spd
+    isCombatStat: 1
+    allowPercent: 1
+  - statId: HP_PCT
+    statName: HP Percent Bonus
+    group: Base Modifier
+    valueType: Percent
+    calcLayer: Modifier
+    baseValue: 0
+    minValue: -0.9
+    maxValue: 10
+    formula: "HPBonus = \u03A3HP_PCT"
+    serverKey: hp_pct
+    clientKey: hpPct
+    isCombatStat: 0
+    allowPercent: 0
+  - statId: ATK_PCT
+    statName: Attack Percent Bonus
+    group: Base Modifier
+    valueType: Percent
+    calcLayer: Modifier
+    baseValue: 0
+    minValue: -0.9
+    maxValue: 10
+    formula: "ATKBonus = \u03A3ATK_PCT"
+    serverKey: atk_pct
+    clientKey: atkPct
+    isCombatStat: 0
+    allowPercent: 0
+  - statId: DEF_PCT
+    statName: Defense Percent Bonus
+    group: Base Modifier
+    valueType: Percent
+    calcLayer: Modifier
+    baseValue: 0
+    minValue: -0.9
+    maxValue: 10
+    formula: "DEFBonus = \u03A3DEF_PCT"
+    serverKey: def_pct
+    clientKey: defPct
+    isCombatStat: 0
+    allowPercent: 0
+  - statId: SPD_PCT
+    statName: Speed Percent Bonus
+    group: Base Modifier
+    valueType: Percent
+    calcLayer: Modifier
+    baseValue: 0
+    minValue: -0.9
+    maxValue: 5
+    formula: "SPDBonus = \u03A3SPD_PCT"
+    serverKey: spd_pct
+    clientKey: spdPct
+    isCombatStat: 0
+    allowPercent: 0
+  - statId: CRIT_RATE
+    statName: Critical Rate
+    group: Core
+    valueType: Percent
+    calcLayer: Combat
+    baseValue: 0.05
+    minValue: 0
+    maxValue: 1
+    formula: FinalCritRate = CRIT_RATE - TargetCritResist
+    serverKey: crit_rate
+    clientKey: critRate
+    isCombatStat: 1
+    allowPercent: 0
+  - statId: CRIT_DMG
+    statName: Critical Damage
+    group: Core
+    valueType: Percent
+    calcLayer: Combat
+    baseValue: 1.5
+    minValue: 1
+    maxValue: 10
+    formula: "CritDamage = Damage \xD7 CRIT_DMG"
+    serverKey: crit_dmg
+    clientKey: critDmg
+    isCombatStat: 1
+    allowPercent: 0
+  - statId: ACC
+    statName: Accuracy
+    group: Core
+    valueType: Percent
+    calcLayer: Combat
+    baseValue: 1
+    minValue: 0
+    maxValue: 999
+    formula: HitChance = ACC / (ACC + EVA)
+    serverKey: acc
+    clientKey: accuracy
+    isCombatStat: 1
+    allowPercent: 0
+  - statId: EVA
+    statName: Evasion
+    group: Core
+    valueType: Percent
+    calcLayer: Combat
+    baseValue: 0
+    minValue: 0
+    maxValue: 999
+    formula: HitChance = ACC / (ACC + EVA)
+    serverKey: eva
+    clientKey: evasion
+    isCombatStat: 1
+    allowPercent: 0
+  - statId: DMG_BONUS
+    statName: Damage Bonus
+    group: Offensive
+    valueType: Percent
+    calcLayer: DamageCalc
+    baseValue: 0
+    minValue: -1
+    maxValue: 10
+    formula: "Damage = BaseDamage \xD7 (1 + DMG_BONUS)"
+    serverKey: dmg_bonus
+    clientKey: dmgBonus
+    isCombatStat: 1
+    allowPercent: 0
+  - statId: BASIC_DMG_BONUS
+    statName: Basic Attack Damage Bonus
+    group: Offensive
+    valueType: Percent
+    calcLayer: DamageCalc
+    baseValue: 0
+    minValue: -1
+    maxValue: 10
+    formula: "BasicDamage = Damage \xD7 (1 + BASIC_DMG_BONUS)"
+    serverKey: basic_dmg_bonus
+    clientKey: basicDmgBonus
+    isCombatStat: 1
+    allowPercent: 0
+  - statId: SKILL_DMG_BONUS
+    statName: Skill Damage Bonus
+    group: Offensive
+    valueType: Percent
+    calcLayer: DamageCalc
+    baseValue: 0
+    minValue: -1
+    maxValue: 10
+    formula: "SkillDamage = Damage \xD7 (1 + SKILL_DMG_BONUS)"
+    serverKey: skill_dmg_bonus
+    clientKey: skillDmgBonus
+    isCombatStat: 1
+    allowPercent: 0
+  - statId: FINAL_DMG_BONUS
+    statName: Final Damage Bonus
+    group: Offensive
+    valueType: Percent
+    calcLayer: FinalLayer
+    baseValue: 0
+    minValue: -1
+    maxValue: 5
+    formula: "FinalDamage = DamageAfterMitigation \xD7 (1 + FINAL_DMG_BONUS)"
+    serverKey: final_dmg_bonus
+    clientKey: finalDmgBonus
+    isCombatStat: 1
+    allowPercent: 0

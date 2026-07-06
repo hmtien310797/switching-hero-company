@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 
-namespace Immortal_Switch.Scripts
+namespace Immortal_Switch.Scripts.Level.Pattern
 {
-    //each chapter has different stage
+    [CreateAssetMenu(fileName = "ChapterStage", menuName = "ScriptableObjects/ChapterStage")]
     public class ChapterStageSO : ScriptableObject
     {
-        //total stage in chaper
-        public int[] TotalStage;
+        //total stage in chaper, each chapter can have different total stage 
+        public int TotalStage;
         public int BossId;
+        public int Exp;
     }
 }

@@ -1,0 +1,598 @@
+mission_id,type,nextMission,title,description,event_key,target,points,rewards,unlock_min_level,unlock_feature,unlock_prev_mission,tier_group,tier_index,sort_order
+MAIN_0001,MAIN,MAIN_0002,Đánh bại boss Stage 1-5,1-5 -> 105,CLEAR_STAGE,5.00,0,gold:500;exp:50,0,,,,0,1
+MAIN_0002,MAIN,MAIN_0003,Triệu hồi anh hùng 1 lần,,HERO_SUMMON,1.00,0,diamond:30,0,SUMMON,MAIN_0001,,0,2
+MAIN_0003,MAIN,MAIN_0004,Trang bị 1 vũ khí cho anh hùng,,EQUIP_ITEM,1.00,0,gold:1000,0,INVENTORY,MAIN_0002,,0,3
+MAIN_0004,MAIN,MAIN_0005,Cường hóa trang bị tới Lv.5,,ENHANCE_GEAR,5.00,0,diamond:20,0,ENHANCE,MAIN_0003,,0,4
+MAIN_0005,MAIN,MAIN_0006,Lên cấp anh hùng 5 lần,,HERO_LEVELUP,5.00,0,gold:2000,0,,MAIN_0004,,0,5
+MAIN_0006,MAIN,MAIN_0007,Thắng 1 trận Đấu trường,,ARENA_WIN,1.00,0,diamond:50,0,ARENA,MAIN_0005,,0,6
+MAIN_0007,MAIN,MAIN_0008,Hoàn thành 1 lượt Dungeon,,DUNGEON_CLEAR,1.00,0,dungeon_key:2,0,DUNGEON,MAIN_0006,,0,7
+MAIN_0008,MAIN,MAIN_0009,Nâng cấp 1 kỹ năng,,SKILL_UPGRADE,1.00,0,gold:2000,0,SKILL,MAIN_0007,,0,8
+MAIN_0009,MAIN,MAIN_0010,Nhận Idle Reward 1 lần,,CLAIM_IDLE,1.00,0,gold:1500,0,IDLE_REWARD,MAIN_0008,,0,9
+MAIN_0010,MAIN,MAIN_0011,Vượt Chapter 1 - Stage 10,"Ch1, stage toàn cục 10",CLEAR_STAGE,10.00,0,gold:1000;diamond:30,0,,MAIN_0009,,0,10
+MAIN_0011,MAIN,MAIN_0012,Vượt Chapter 1 - Stage 15,"Ch1, stage toàn cục 15",CLEAR_STAGE,15.00,0,gold:1000;diamond:35,0,,MAIN_0010,,0,11
+MAIN_0012,MAIN,MAIN_0013,Vượt Chapter 1 - Stage 20,"Ch1, stage toàn cục 20",CLEAR_STAGE,20.00,0,gold:1000;diamond:40;chest_rare:1,0,,MAIN_0011,,0,12
+MAIN_0013,MAIN,MAIN_0014,Vượt Chapter 2 - Stage 25,"Ch2, stage toàn cục 25",CLEAR_STAGE,25.00,0,gold:2000;diamond:35,0,,MAIN_0012,,0,13
+MAIN_0014,MAIN,MAIN_0015,Vượt Chapter 2 - Stage 30,"Ch2, stage toàn cục 30",CLEAR_STAGE,30.00,0,gold:2000;diamond:40,0,,MAIN_0013,,0,14
+MAIN_0015,MAIN,MAIN_0016,Vượt Chapter 2 - Stage 35,"Ch2, stage toàn cục 35",CLEAR_STAGE,35.00,0,gold:2000;diamond:45,0,,MAIN_0014,,0,15
+MAIN_0016,MAIN,MAIN_0017,Vượt Chapter 2 - Stage 40,"Ch2, stage toàn cục 40",CLEAR_STAGE,40.00,0,gold:2000;diamond:50;chest_rare:1;summon_ticket:1,0,,MAIN_0015,,0,16
+MAIN_0017,MAIN,MAIN_0018,Vượt Chapter 3 - Stage 45,"Ch3, stage toàn cục 45",CLEAR_STAGE,45.00,0,gold:3000;diamond:45,0,,MAIN_0016,,0,17
+MAIN_0018,MAIN,MAIN_0019,Vượt Chapter 3 - Stage 50,"Ch3, stage toàn cục 50",CLEAR_STAGE,50.00,0,gold:3000;diamond:50,0,,MAIN_0017,,0,18
+MAIN_0019,MAIN,MAIN_0020,Vượt Chapter 3 - Stage 55,"Ch3, stage toàn cục 55",CLEAR_STAGE,55.00,0,gold:3000;diamond:55,0,,MAIN_0018,,0,19
+MAIN_0020,MAIN,MAIN_0021,MAIN,"Ch3, stage toàn cục 60",CLEAR_STAGE,60.00,0,gold:3000;diamond:60;chest_rare:1,0,,MAIN_0019,,0,20
+MAIN_0021,MAIN,MAIN_0022,Vượt Chapter 4 - Stage 65,"Ch4, stage toàn cục 65",CLEAR_STAGE,65.00,0,gold:4000;diamond:55,0,,MAIN_0020,,0,21
+MAIN_0022,MAIN,MAIN_0023,Vượt Chapter 4 - Stage 70,"Ch4, stage toàn cục 70",CLEAR_STAGE,70.00,0,gold:4000;diamond:60,0,,MAIN_0021,,0,22
+MAIN_0023,MAIN,MAIN_0024,Vượt Chapter 4 - Stage 75,"Ch4, stage toàn cục 75",CLEAR_STAGE,75.00,0,gold:4000;diamond:65,0,,MAIN_0022,,0,23
+MAIN_0024,MAIN,MAIN_0025,Vượt Chapter 4 - Stage 80,"Ch4, stage toàn cục 80",CLEAR_STAGE,80.00,0,gold:4000;diamond:70;chest_rare:1;summon_ticket:1,0,,MAIN_0023,,0,24
+MAIN_0025,MAIN,MAIN_0026,Vượt Chapter 5 - Stage 85,"Ch5, stage toàn cục 85",CLEAR_STAGE,85.00,0,gold:5000;diamond:65,0,,MAIN_0024,,0,25
+MAIN_0026,MAIN,MAIN_0027,Vượt Chapter 5 - Stage 90,"Ch5, stage toàn cục 90",CLEAR_STAGE,90.00,0,gold:5000;diamond:70,0,,MAIN_0025,,0,26
+MAIN_0027,MAIN,MAIN_0028,Vượt Chapter 5 - Stage 95,"Ch5, stage toàn cục 95",CLEAR_STAGE,95.00,0,gold:5000;diamond:75,0,,MAIN_0026,,0,27
+MAIN_0028,MAIN,MAIN_0029,Vượt Chapter 5 - Stage 100,"Ch5, stage toàn cục 100",CLEAR_STAGE,100.00,0,gold:5000;diamond:80;chest_rare:1,0,,MAIN_0027,,0,28
+MAIN_0029,MAIN,MAIN_0030,Vượt Chapter 6 - Stage 105,"Ch6, stage toàn cục 105",CLEAR_STAGE,105.00,0,gold:6000;diamond:75,0,,MAIN_0028,,0,29
+MAIN_0030,MAIN,MAIN_0031,Vượt Chapter 6 - Stage 110,"Ch6, stage toàn cục 110",CLEAR_STAGE,110.00,0,gold:6000;diamond:80,0,,MAIN_0029,,0,30
+MAIN_0031,MAIN,MAIN_0032,Vượt Chapter 6 - Stage 115,"Ch6, stage toàn cục 115",CLEAR_STAGE,115.00,0,gold:6000;diamond:85,0,,MAIN_0030,,0,31
+MAIN_0032,MAIN,MAIN_0033,Vượt Chapter 6 - Stage 120,"Ch6, stage toàn cục 120",CLEAR_STAGE,120.00,0,gold:6000;diamond:90;chest_rare:1;summon_ticket:1,0,,MAIN_0031,,0,32
+MAIN_0033,MAIN,MAIN_0034,Vượt Chapter 7 - Stage 125,"Ch7, stage toàn cục 125",CLEAR_STAGE,125.00,0,gold:7000;diamond:85,0,,MAIN_0032,,0,33
+MAIN_0034,MAIN,MAIN_0035,Vượt Chapter 7 - Stage 130,"Ch7, stage toàn cục 130",CLEAR_STAGE,130.00,0,gold:7000;diamond:90,0,,MAIN_0033,,0,34
+MAIN_0035,MAIN,MAIN_0036,Vượt Chapter 7 - Stage 135,"Ch7, stage toàn cục 135",CLEAR_STAGE,135.00,0,gold:7000;diamond:95,0,,MAIN_0034,,0,35
+MAIN_0036,MAIN,MAIN_0037,Vượt Chapter 7 - Stage 140,"Ch7, stage toàn cục 140",CLEAR_STAGE,140.00,0,gold:7000;diamond:100;chest_rare:1,0,,MAIN_0035,,0,36
+MAIN_0037,MAIN,MAIN_0038,Vượt Chapter 8 - Stage 145,"Ch8, stage toàn cục 145",CLEAR_STAGE,145.00,0,gold:8000;diamond:95,0,,MAIN_0036,,0,37
+MAIN_0038,MAIN,MAIN_0039,Vượt Chapter 8 - Stage 150,"Ch8, stage toàn cục 150",CLEAR_STAGE,150.00,0,gold:8000;diamond:100,0,,MAIN_0037,,0,38
+MAIN_0039,MAIN,MAIN_0040,Vượt Chapter 8 - Stage 155,"Ch8, stage toàn cục 155",CLEAR_STAGE,155.00,0,gold:8000;diamond:105,0,,MAIN_0038,,0,39
+MAIN_0040,MAIN,MAIN_0041,Vượt Chapter 8 - Stage 160,"Ch8, stage toàn cục 160",CLEAR_STAGE,160.00,0,gold:8000;diamond:110;chest_rare:1;summon_ticket:1,0,,MAIN_0039,,0,40
+MAIN_0041,MAIN,MAIN_0042,Vượt Chapter 9 - Stage 165,"Ch9, stage toàn cục 165",CLEAR_STAGE,165.00,0,gold:9000;diamond:105,0,,MAIN_0040,,0,41
+MAIN_0042,MAIN,MAIN_0043,Vượt Chapter 9 - Stage 170,"Ch9, stage toàn cục 170",CLEAR_STAGE,170.00,0,gold:9000;diamond:110,0,,MAIN_0041,,0,42
+MAIN_0043,MAIN,MAIN_0044,Vượt Chapter 9 - Stage 175,"Ch9, stage toàn cục 175",CLEAR_STAGE,175.00,0,gold:9000;diamond:115,0,,MAIN_0042,,0,43
+MAIN_0044,MAIN,MAIN_0045,Vượt Chapter 9 - Stage 180,"Ch9, stage toàn cục 180",CLEAR_STAGE,180.00,0,gold:9000;diamond:120;chest_rare:1,0,,MAIN_0043,,0,44
+MAIN_0045,MAIN,MAIN_0046,Vượt Chapter 10 - Stage 185,"Ch10, stage toàn cục 185",CLEAR_STAGE,185.00,0,gold:10000;diamond:115,0,,MAIN_0044,,0,45
+MAIN_0046,MAIN,MAIN_0047,Vượt Chapter 10 - Stage 190,"Ch10, stage toàn cục 190",CLEAR_STAGE,190.00,0,gold:10000;diamond:120,0,,MAIN_0045,,0,46
+MAIN_0047,MAIN,MAIN_0048,Vượt Chapter 10 - Stage 195,"Ch10, stage toàn cục 195",CLEAR_STAGE,195.00,0,gold:10000;diamond:125,0,,MAIN_0046,,0,47
+MAIN_0048,MAIN,,Vượt Chapter 10 - Stage 200,"Ch10, stage toàn cục 200",CLEAR_STAGE,200.00,0,gold:10000;diamond:130;chest_rare:1;summon_ticket:1,0,,MAIN_0047,,0,48
+DAILY_LOGIN,DAILY,DAILY_KILL150,Đăng nhập game,,LOGIN,1.00,10,gold:1000,0,,,,0,1
+DAILY_KILL150,DAILY,DAILY_BOSS3,Tiêu diệt 150 quái,,KILL_MONSTER,150.00,10,exp:300,0,,,,0,2
+DAILY_BOSS3,DAILY,DAILY_SUMMON5,Tiêu diệt 3 boss,,KILL_BOSS,3.00,10,gold:2000,0,,,,0,3
+DAILY_SUMMON5,DAILY,DAILY_ENHANCE5,Triệu hồi 5 lần,,HERO_SUMMON,5.00,20,diamond:30,0,SUMMON,,,0,4
+DAILY_ENHANCE5,DAILY,DAILY_LEVELUP5,Cường hóa trang bị 5 lần,,ENHANCE_GEAR,5.00,10,forge_mat:5,0,ENHANCE,,,0,5
+DAILY_LEVELUP5,DAILY,DAILY_IDLE2,Lên cấp anh hùng 5 lần,,HERO_LEVELUP,5.00,10,gold:1500,0,,,,0,6
+DAILY_IDLE2,DAILY,DAILY_ARENA3,Nhận Idle Reward 2 lần,,CLAIM_IDLE,2.00,10,gold:500,0,IDLE_REWARD,,,0,7
+DAILY_ARENA3,DAILY,DAILY_DUNGEON2,Đấu Arena 3 trận,,ARENA_FIGHT,3.00,20,arena_badge:10,0,ARENA,,,0,8
+DAILY_DUNGEON2,DAILY,DAILY_SKILL3,Vào Dungeon 2 lần,,DUNGEON_CLEAR,2.00,20,dungeon_key:1,0,DUNGEON,,,0,9
+DAILY_SKILL3,DAILY,,Nâng cấp kỹ năng 3 lần,,SKILL_UPGRADE,3.00,10,gold:2000,0,SKILL,,,0,10
+WEEKLY_DAILY30,WEEKLY,WEEKLY_KILL3000,Hoàn thành 30 nhiệm vụ ngày,,COMPLETE_DAILY,30.00,30,chest_epic:1,0,,,,0,1
+WEEKLY_KILL3000,WEEKLY,WEEKLY_BOSS50,Tiêu diệt 3.000 quái,,KILL_MONSTER,3000.00,20,gold:30000,0,,,,0,2
+WEEKLY_BOSS50,WEEKLY,WEEKLY_SUMMON100,Tiêu diệt 50 boss,,KILL_BOSS,50.00,20,hero_shard_rare:10,0,,,,0,3
+WEEKLY_SUMMON100,WEEKLY,WEEKLY_ARENA30,Triệu hồi 100 lần,,HERO_SUMMON,100.00,20,diamond:100,0,SUMMON,,,0,4
+WEEKLY_ARENA30,WEEKLY,WEEKLY_DUNGEON14,Thắng 30 trận Arena,,ARENA_WIN,30.00,20,arena_badge:50,0,ARENA,,,0,5
+WEEKLY_DUNGEON14,WEEKLY,WEEKLY_ENHANCE70,Vào Dungeon 14 lần,,DUNGEON_CLEAR,14.00,20,forge_mat_hi:5,0,DUNGEON,,,0,6
+WEEKLY_ENHANCE70,WEEKLY,WEEKLY_SKILL30,Cường hóa trang bị 70 lần,,ENHANCE_GEAR,70.00,20,chest_rare:1,0,ENHANCE,,,0,7
+WEEKLY_SKILL30,WEEKLY,WEEKLYR_HERO_SUMMON_1,Nâng cấp kỹ năng 30 lần,,SKILL_UPGRADE,30.00,20,gold:40000,0,SKILL,,,0,8
+WEEKLYR_HERO_SUMMON_1,WEEKLY,WEEKLYR_HERO_SUMMON_2,Triệu hồi 50 lần trong tuần,Bộ weekly luân phiên (rotation),HERO_SUMMON,50.00,20,diamond:60;gold:5000,0,SUMMON,,WROT_HERO_SUMMON,1,101
+WEEKLYR_HERO_SUMMON_2,WEEKLY,WEEKLYR_HERO_SUMMON_3,Triệu hồi 80 lần trong tuần,Bộ weekly luân phiên (rotation),HERO_SUMMON,80.00,20,diamond:80;gold:10000,0,SUMMON,,WROT_HERO_SUMMON,2,102
+WEEKLYR_HERO_SUMMON_3,WEEKLY,WEEKLYR_HERO_SUMMON_4,Triệu hồi 120 lần trong tuần,Bộ weekly luân phiên (rotation),HERO_SUMMON,120.00,20,diamond:100;gold:15000,0,SUMMON,,WROT_HERO_SUMMON,3,103
+WEEKLYR_HERO_SUMMON_4,WEEKLY,WEEKLYR_HERO_SUMMON_5,Triệu hồi 150 lần trong tuần,Bộ weekly luân phiên (rotation),HERO_SUMMON,150.00,20,diamond:120;gold:20000;chest_rare:1,0,SUMMON,,WROT_HERO_SUMMON,4,104
+WEEKLYR_HERO_SUMMON_5,WEEKLY,,Triệu hồi 200 lần trong tuần,Bộ weekly luân phiên (rotation),HERO_SUMMON,200.00,20,diamond:140;gold:25000;chest_rare:1;chest_epic:1,0,SUMMON,,WROT_HERO_SUMMON,5,105
+WEEKLYR_KILL_MONSTER_1,WEEKLY,WEEKLYR_KILL_MONSTER_2,Tiêu diệt 2.000 quái trong tuần,Bộ weekly luân phiên (rotation),KILL_MONSTER,2000.00,20,diamond:60;gold:5000,0,,,WROT_KILL_MONSTER,1,106
+WEEKLYR_KILL_MONSTER_2,WEEKLY,WEEKLYR_KILL_MONSTER_3,Tiêu diệt 3.500 quái trong tuần,Bộ weekly luân phiên (rotation),KILL_MONSTER,3500.00,20,diamond:80;gold:10000,0,,,WROT_KILL_MONSTER,2,107
+WEEKLYR_KILL_MONSTER_3,WEEKLY,WEEKLYR_KILL_MONSTER_4,Tiêu diệt 5.000 quái trong tuần,Bộ weekly luân phiên (rotation),KILL_MONSTER,5000.00,20,diamond:100;gold:15000,0,,,WROT_KILL_MONSTER,3,108
+WEEKLYR_KILL_MONSTER_4,WEEKLY,WEEKLYR_KILL_MONSTER_5,Tiêu diệt 8.000 quái trong tuần,Bộ weekly luân phiên (rotation),KILL_MONSTER,8000.00,20,diamond:120;gold:20000;chest_rare:1,0,,,WROT_KILL_MONSTER,4,109
+WEEKLYR_KILL_MONSTER_5,WEEKLY,,Tiêu diệt 12.000 quái trong tuần,Bộ weekly luân phiên (rotation),KILL_MONSTER,12000.00,20,diamond:140;gold:25000;chest_rare:1;chest_epic:1,0,,,WROT_KILL_MONSTER,5,110
+WEEKLYR_KILL_BOSS_1,WEEKLY,WEEKLYR_KILL_BOSS_2,Hạ 20 boss trong tuần,Bộ weekly luân phiên (rotation),KILL_BOSS,20.00,20,diamond:60;gold:5000,0,,,WROT_KILL_BOSS,1,111
+WEEKLYR_KILL_BOSS_2,WEEKLY,WEEKLYR_KILL_BOSS_3,Hạ 35 boss trong tuần,Bộ weekly luân phiên (rotation),KILL_BOSS,35.00,20,diamond:80;gold:10000,0,,,WROT_KILL_BOSS,2,112
+WEEKLYR_KILL_BOSS_3,WEEKLY,WEEKLYR_KILL_BOSS_4,Hạ 50 boss trong tuần,Bộ weekly luân phiên (rotation),KILL_BOSS,50.00,20,diamond:100;gold:15000,0,,,WROT_KILL_BOSS,3,113
+WEEKLYR_KILL_BOSS_4,WEEKLY,WEEKLYR_KILL_BOSS_5,Hạ 75 boss trong tuần,Bộ weekly luân phiên (rotation),KILL_BOSS,75.00,20,diamond:120;gold:20000;chest_rare:1,0,,,WROT_KILL_BOSS,4,114
+WEEKLYR_KILL_BOSS_5,WEEKLY,,Hạ 100 boss trong tuần,Bộ weekly luân phiên (rotation),KILL_BOSS,100.00,20,diamond:140;gold:25000;chest_rare:1;chest_epic:1,0,,,WROT_KILL_BOSS,5,115
+WEEKLYR_ARENA_WIN_1,WEEKLY,WEEKLYR_ARENA_WIN_2,Thắng 15 trận Arena trong tuần,Bộ weekly luân phiên (rotation),ARENA_WIN,15.00,20,diamond:60;gold:5000,0,ARENA,,WROT_ARENA_WIN,1,116
+WEEKLYR_ARENA_WIN_2,WEEKLY,WEEKLYR_ARENA_WIN_3,Thắng 25 trận Arena trong tuần,Bộ weekly luân phiên (rotation),ARENA_WIN,25.00,20,diamond:80;gold:10000,0,ARENA,,WROT_ARENA_WIN,2,117
+WEEKLYR_ARENA_WIN_3,WEEKLY,WEEKLYR_ARENA_WIN_4,Thắng 40 trận Arena trong tuần,Bộ weekly luân phiên (rotation),ARENA_WIN,40.00,20,diamond:100;gold:15000,0,ARENA,,WROT_ARENA_WIN,3,118
+WEEKLYR_ARENA_WIN_4,WEEKLY,WEEKLYR_ARENA_WIN_5,Thắng 60 trận Arena trong tuần,Bộ weekly luân phiên (rotation),ARENA_WIN,60.00,20,diamond:120;gold:20000;chest_rare:1,0,ARENA,,WROT_ARENA_WIN,4,119
+WEEKLYR_ARENA_WIN_5,WEEKLY,,Thắng 80 trận Arena trong tuần,Bộ weekly luân phiên (rotation),ARENA_WIN,80.00,20,diamond:140;gold:25000;chest_rare:1;chest_epic:1,0,ARENA,,WROT_ARENA_WIN,5,120
+WEEKLYR_DUNGEON_CLEAR_1,WEEKLY,WEEKLYR_DUNGEON_CLEAR_2,Hoàn thành 7 Dungeon trong tuần,Bộ weekly luân phiên (rotation),DUNGEON_CLEAR,7.00,20,diamond:60;gold:5000,0,DUNGEON,,WROT_DUNGEON_CLEAR,1,121
+WEEKLYR_DUNGEON_CLEAR_2,WEEKLY,WEEKLYR_DUNGEON_CLEAR_3,Hoàn thành 12 Dungeon trong tuần,Bộ weekly luân phiên (rotation),DUNGEON_CLEAR,12.00,20,diamond:80;gold:10000,0,DUNGEON,,WROT_DUNGEON_CLEAR,2,122
+WEEKLYR_DUNGEON_CLEAR_3,WEEKLY,WEEKLYR_DUNGEON_CLEAR_4,Hoàn thành 18 Dungeon trong tuần,Bộ weekly luân phiên (rotation),DUNGEON_CLEAR,18.00,20,diamond:100;gold:15000,0,DUNGEON,,WROT_DUNGEON_CLEAR,3,123
+WEEKLYR_DUNGEON_CLEAR_4,WEEKLY,WEEKLYR_DUNGEON_CLEAR_5,Hoàn thành 25 Dungeon trong tuần,Bộ weekly luân phiên (rotation),DUNGEON_CLEAR,25.00,20,diamond:120;gold:20000;chest_rare:1,0,DUNGEON,,WROT_DUNGEON_CLEAR,4,124
+WEEKLYR_DUNGEON_CLEAR_5,WEEKLY,,Hoàn thành 35 Dungeon trong tuần,Bộ weekly luân phiên (rotation),DUNGEON_CLEAR,35.00,20,diamond:140;gold:25000;chest_rare:1;chest_epic:1,0,DUNGEON,,WROT_DUNGEON_CLEAR,5,125
+WEEKLYR_ENHANCE_GEAR_1,WEEKLY,WEEKLYR_ENHANCE_GEAR_2,Cường hóa 40 lần trong tuần,Bộ weekly luân phiên (rotation),ENHANCE_GEAR,40.00,20,diamond:60;gold:5000,0,ENHANCE,,WROT_ENHANCE_GEAR,1,126
+WEEKLYR_ENHANCE_GEAR_2,WEEKLY,WEEKLYR_ENHANCE_GEAR_3,Cường hóa 60 lần trong tuần,Bộ weekly luân phiên (rotation),ENHANCE_GEAR,60.00,20,diamond:80;gold:10000,0,ENHANCE,,WROT_ENHANCE_GEAR,2,127
+WEEKLYR_ENHANCE_GEAR_3,WEEKLY,WEEKLYR_ENHANCE_GEAR_4,Cường hóa 90 lần trong tuần,Bộ weekly luân phiên (rotation),ENHANCE_GEAR,90.00,20,diamond:100;gold:15000,0,ENHANCE,,WROT_ENHANCE_GEAR,3,128
+WEEKLYR_ENHANCE_GEAR_4,WEEKLY,WEEKLYR_ENHANCE_GEAR_5,Cường hóa 120 lần trong tuần,Bộ weekly luân phiên (rotation),ENHANCE_GEAR,120.00,20,diamond:120;gold:20000;chest_rare:1,0,ENHANCE,,WROT_ENHANCE_GEAR,4,129
+WEEKLYR_ENHANCE_GEAR_5,WEEKLY,,Cường hóa 160 lần trong tuần,Bộ weekly luân phiên (rotation),ENHANCE_GEAR,160.00,20,diamond:140;gold:25000;chest_rare:1;chest_epic:1,0,ENHANCE,,WROT_ENHANCE_GEAR,5,130
+ACH_STAGE_T1,ACHIEVEMENT,ACH_STAGE_T2,Chinh phục: Chapter 1 - Stage 1,"Ch1, stage toàn cục 1",CLEAR_STAGE,1.00,0,diamond:21,0,,,ACH_STAGE,1,1
+ACH_STAGE_T2,ACHIEVEMENT,ACH_STAGE_T3,Chinh phục: Chapter 1 - Stage 2,"Ch1, stage toàn cục 2",CLEAR_STAGE,2.00,0,diamond:22,0,,,ACH_STAGE,2,2
+ACH_STAGE_T3,ACHIEVEMENT,ACH_STAGE_T4,Chinh phục: Chapter 1 - Stage 3,"Ch1, stage toàn cục 3",CLEAR_STAGE,3.00,0,diamond:23,0,,,ACH_STAGE,3,3
+ACH_STAGE_T4,ACHIEVEMENT,ACH_STAGE_T5,Chinh phục: Chapter 1 - Stage 4,"Ch1, stage toàn cục 4",CLEAR_STAGE,4.00,0,diamond:24,0,,,ACH_STAGE,4,4
+ACH_STAGE_T5,ACHIEVEMENT,ACH_STAGE_T6,Chinh phục: Chapter 1 - Stage 5,"Ch1, stage toàn cục 5",CLEAR_STAGE,5.00,0,diamond:25;gold:1000,0,,,ACH_STAGE,5,5
+ACH_STAGE_T6,ACHIEVEMENT,ACH_STAGE_T7,Chinh phục: Chapter 1 - Stage 6,"Ch1, stage toàn cục 6",CLEAR_STAGE,6.00,0,diamond:26,0,,,ACH_STAGE,6,6
+ACH_STAGE_T7,ACHIEVEMENT,ACH_STAGE_T8,Chinh phục: Chapter 1 - Stage 7,"Ch1, stage toàn cục 7",CLEAR_STAGE,7.00,0,diamond:27,0,,,ACH_STAGE,7,7
+ACH_STAGE_T8,ACHIEVEMENT,ACH_STAGE_T9,Chinh phục: Chapter 1 - Stage 8,"Ch1, stage toàn cục 8",CLEAR_STAGE,8.00,0,diamond:28,0,,,ACH_STAGE,8,8
+ACH_STAGE_T9,ACHIEVEMENT,ACH_STAGE_T10,Chinh phục: Chapter 1 - Stage 9,"Ch1, stage toàn cục 9",CLEAR_STAGE,9.00,0,diamond:29,0,,,ACH_STAGE,9,9
+ACH_STAGE_T10,ACHIEVEMENT,ACH_STAGE_T11,Chinh phục: Chapter 1 - Stage 10,"Ch1, stage toàn cục 10",CLEAR_STAGE,10.00,0,diamond:30;gold:1000;forge_mat:3,0,,,ACH_STAGE,10,10
+ACH_STAGE_T11,ACHIEVEMENT,ACH_STAGE_T12,Chinh phục: Chapter 1 - Stage 11,"Ch1, stage toàn cục 11",CLEAR_STAGE,11.00,0,diamond:31,0,,,ACH_STAGE,11,11
+ACH_STAGE_T12,ACHIEVEMENT,ACH_STAGE_T13,Chinh phục: Chapter 1 - Stage 12,"Ch1, stage toàn cục 12",CLEAR_STAGE,12.00,0,diamond:32,0,,,ACH_STAGE,12,12
+ACH_STAGE_T13,ACHIEVEMENT,ACH_STAGE_T14,Chinh phục: Chapter 1 - Stage 13,"Ch1, stage toàn cục 13",CLEAR_STAGE,13.00,0,diamond:33,0,,,ACH_STAGE,13,13
+ACH_STAGE_T14,ACHIEVEMENT,ACH_STAGE_T15,Chinh phục: Chapter 1 - Stage 14,"Ch1, stage toàn cục 14",CLEAR_STAGE,14.00,0,diamond:34,0,,,ACH_STAGE,14,14
+ACH_STAGE_T15,ACHIEVEMENT,ACH_STAGE_T16,Chinh phục: Chapter 1 - Stage 15,"Ch1, stage toàn cục 15",CLEAR_STAGE,15.00,0,diamond:35;gold:1000,0,,,ACH_STAGE,15,15
+ACH_STAGE_T16,ACHIEVEMENT,ACH_STAGE_T17,Chinh phục: Chapter 1 - Stage 16,"Ch1, stage toàn cục 16",CLEAR_STAGE,16.00,0,diamond:36,0,,,ACH_STAGE,16,16
+ACH_STAGE_T17,ACHIEVEMENT,ACH_STAGE_T18,Chinh phục: Chapter 1 - Stage 17,"Ch1, stage toàn cục 17",CLEAR_STAGE,17.00,0,diamond:37,0,,,ACH_STAGE,17,17
+ACH_STAGE_T18,ACHIEVEMENT,ACH_STAGE_T19,Chinh phục: Chapter 1 - Stage 18,"Ch1, stage toàn cục 18",CLEAR_STAGE,18.00,0,diamond:38,0,,,ACH_STAGE,18,18
+ACH_STAGE_T19,ACHIEVEMENT,ACH_STAGE_T20,Chinh phục: Chapter 1 - Stage 19,"Ch1, stage toàn cục 19",CLEAR_STAGE,19.00,0,diamond:39,0,,,ACH_STAGE,19,19
+ACH_STAGE_T20,ACHIEVEMENT,ACH_STAGE_T21,Chinh phục: Chapter 1 - Stage 20,"Ch1, stage toàn cục 20",CLEAR_STAGE,20.00,0,diamond:40;gold:1000;chest_rare:1,0,,,ACH_STAGE,20,20
+ACH_STAGE_T21,ACHIEVEMENT,ACH_STAGE_T22,Chinh phục: Chapter 2 - Stage 21,"Ch2, stage toàn cục 21",CLEAR_STAGE,21.00,0,diamond:33,0,,,ACH_STAGE,21,21
+ACH_STAGE_T22,ACHIEVEMENT,ACH_STAGE_T23,Chinh phục: Chapter 2 - Stage 22,"Ch2, stage toàn cục 22",CLEAR_STAGE,22.00,0,diamond:34,0,,,ACH_STAGE,22,22
+ACH_STAGE_T23,ACHIEVEMENT,ACH_STAGE_T24,Chinh phục: Chapter 2 - Stage 23,"Ch2, stage toàn cục 23",CLEAR_STAGE,23.00,0,diamond:35,0,,,ACH_STAGE,23,23
+ACH_STAGE_T24,ACHIEVEMENT,ACH_STAGE_T25,Chinh phục: Chapter 2 - Stage 24,"Ch2, stage toàn cục 24",CLEAR_STAGE,24.00,0,diamond:36,0,,,ACH_STAGE,24,24
+ACH_STAGE_T25,ACHIEVEMENT,ACH_STAGE_T26,Chinh phục: Chapter 2 - Stage 25,"Ch2, stage toàn cục 25",CLEAR_STAGE,25.00,0,diamond:37;gold:2000,0,,,ACH_STAGE,25,25
+ACH_STAGE_T26,ACHIEVEMENT,ACH_STAGE_T27,Chinh phục: Chapter 2 - Stage 26,"Ch2, stage toàn cục 26",CLEAR_STAGE,26.00,0,diamond:38,0,,,ACH_STAGE,26,26
+ACH_STAGE_T27,ACHIEVEMENT,ACH_STAGE_T28,Chinh phục: Chapter 2 - Stage 27,"Ch2, stage toàn cục 27",CLEAR_STAGE,27.00,0,diamond:39,0,,,ACH_STAGE,27,27
+ACH_STAGE_T28,ACHIEVEMENT,ACH_STAGE_T29,Chinh phục: Chapter 2 - Stage 28,"Ch2, stage toàn cục 28",CLEAR_STAGE,28.00,0,diamond:40,0,,,ACH_STAGE,28,28
+ACH_STAGE_T29,ACHIEVEMENT,ACH_STAGE_T30,Chinh phục: Chapter 2 - Stage 29,"Ch2, stage toàn cục 29",CLEAR_STAGE,29.00,0,diamond:41,0,,,ACH_STAGE,29,29
+ACH_STAGE_T30,ACHIEVEMENT,ACH_STAGE_T31,Chinh phục: Chapter 2 - Stage 30,"Ch2, stage toàn cục 30",CLEAR_STAGE,30.00,0,diamond:42;gold:2000;forge_mat:6,0,,,ACH_STAGE,30,30
+ACH_STAGE_T31,ACHIEVEMENT,ACH_STAGE_T32,Chinh phục: Chapter 2 - Stage 31,"Ch2, stage toàn cục 31",CLEAR_STAGE,31.00,0,diamond:43,0,,,ACH_STAGE,31,31
+ACH_STAGE_T32,ACHIEVEMENT,ACH_STAGE_T33,Chinh phục: Chapter 2 - Stage 32,"Ch2, stage toàn cục 32",CLEAR_STAGE,32.00,0,diamond:44,0,,,ACH_STAGE,32,32
+ACH_STAGE_T33,ACHIEVEMENT,ACH_STAGE_T34,Chinh phục: Chapter 2 - Stage 33,"Ch2, stage toàn cục 33",CLEAR_STAGE,33.00,0,diamond:45,0,,,ACH_STAGE,33,33
+ACH_STAGE_T34,ACHIEVEMENT,ACH_STAGE_T35,Chinh phục: Chapter 2 - Stage 34,"Ch2, stage toàn cục 34",CLEAR_STAGE,34.00,0,diamond:46,0,,,ACH_STAGE,34,34
+ACH_STAGE_T35,ACHIEVEMENT,ACH_STAGE_T36,Chinh phục: Chapter 2 - Stage 35,"Ch2, stage toàn cục 35",CLEAR_STAGE,35.00,0,diamond:47;gold:2000,0,,,ACH_STAGE,35,35
+ACH_STAGE_T36,ACHIEVEMENT,ACH_STAGE_T37,Chinh phục: Chapter 2 - Stage 36,"Ch2, stage toàn cục 36",CLEAR_STAGE,36.00,0,diamond:48,0,,,ACH_STAGE,36,36
+ACH_STAGE_T37,ACHIEVEMENT,ACH_STAGE_T38,Chinh phục: Chapter 2 - Stage 37,"Ch2, stage toàn cục 37",CLEAR_STAGE,37.00,0,diamond:49,0,,,ACH_STAGE,37,37
+ACH_STAGE_T38,ACHIEVEMENT,ACH_STAGE_T39,Chinh phục: Chapter 2 - Stage 38,"Ch2, stage toàn cục 38",CLEAR_STAGE,38.00,0,diamond:50,0,,,ACH_STAGE,38,38
+ACH_STAGE_T39,ACHIEVEMENT,ACH_STAGE_T40,Chinh phục: Chapter 2 - Stage 39,"Ch2, stage toàn cục 39",CLEAR_STAGE,39.00,0,diamond:51,0,,,ACH_STAGE,39,39
+ACH_STAGE_T40,ACHIEVEMENT,ACH_STAGE_T41,Chinh phục: Chapter 2 - Stage 40,"Ch2, stage toàn cục 40",CLEAR_STAGE,40.00,0,diamond:52;gold:2000;chest_rare:1,0,,,ACH_STAGE,40,40
+ACH_STAGE_T41,ACHIEVEMENT,ACH_STAGE_T42,Chinh phục: Chapter 3 - Stage 41,"Ch3, stage toàn cục 41",CLEAR_STAGE,41.00,0,diamond:45,0,,,ACH_STAGE,41,41
+ACH_STAGE_T42,ACHIEVEMENT,ACH_STAGE_T43,Chinh phục: Chapter 3 - Stage 42,"Ch3, stage toàn cục 42",CLEAR_STAGE,42.00,0,diamond:46,0,,,ACH_STAGE,42,42
+ACH_STAGE_T43,ACHIEVEMENT,ACH_STAGE_T44,Chinh phục: Chapter 3 - Stage 43,"Ch3, stage toàn cục 43",CLEAR_STAGE,43.00,0,diamond:47,0,,,ACH_STAGE,43,43
+ACH_STAGE_T44,ACHIEVEMENT,ACH_STAGE_T45,Chinh phục: Chapter 3 - Stage 44,"Ch3, stage toàn cục 44",CLEAR_STAGE,44.00,0,diamond:48,0,,,ACH_STAGE,44,44
+ACH_STAGE_T45,ACHIEVEMENT,ACH_STAGE_T46,Chinh phục: Chapter 3 - Stage 45,"Ch3, stage toàn cục 45",CLEAR_STAGE,45.00,0,diamond:49;gold:3000,0,,,ACH_STAGE,45,45
+ACH_STAGE_T46,ACHIEVEMENT,ACH_STAGE_T47,Chinh phục: Chapter 3 - Stage 46,"Ch3, stage toàn cục 46",CLEAR_STAGE,46.00,0,diamond:50,0,,,ACH_STAGE,46,46
+ACH_STAGE_T47,ACHIEVEMENT,ACH_STAGE_T48,Chinh phục: Chapter 3 - Stage 47,"Ch3, stage toàn cục 47",CLEAR_STAGE,47.00,0,diamond:51,0,,,ACH_STAGE,47,47
+ACH_STAGE_T48,ACHIEVEMENT,ACH_STAGE_T49,Chinh phục: Chapter 3 - Stage 48,"Ch3, stage toàn cục 48",CLEAR_STAGE,48.00,0,diamond:52,0,,,ACH_STAGE,48,48
+ACH_STAGE_T49,ACHIEVEMENT,ACH_STAGE_T50,Chinh phục: Chapter 3 - Stage 49,"Ch3, stage toàn cục 49",CLEAR_STAGE,49.00,0,diamond:53,0,,,ACH_STAGE,49,49
+ACH_STAGE_T50,ACHIEVEMENT,ACH_STAGE_T51,Chinh phục: Chapter 3 - Stage 50,"Ch3, stage toàn cục 50",CLEAR_STAGE,50.00,0,diamond:54;gold:3000;forge_mat:9,0,,,ACH_STAGE,50,50
+ACH_STAGE_T51,ACHIEVEMENT,ACH_STAGE_T52,Chinh phục: Chapter 3 - Stage 51,"Ch3, stage toàn cục 51",CLEAR_STAGE,51.00,0,diamond:55,0,,,ACH_STAGE,51,51
+ACH_STAGE_T52,ACHIEVEMENT,ACH_STAGE_T53,Chinh phục: Chapter 3 - Stage 52,"Ch3, stage toàn cục 52",CLEAR_STAGE,52.00,0,diamond:56,0,,,ACH_STAGE,52,52
+ACH_STAGE_T53,ACHIEVEMENT,ACH_STAGE_T54,Chinh phục: Chapter 3 - Stage 53,"Ch3, stage toàn cục 53",CLEAR_STAGE,53.00,0,diamond:57,0,,,ACH_STAGE,53,53
+ACH_STAGE_T54,ACHIEVEMENT,ACH_STAGE_T55,Chinh phục: Chapter 3 - Stage 54,"Ch3, stage toàn cục 54",CLEAR_STAGE,54.00,0,diamond:58,0,,,ACH_STAGE,54,54
+ACH_STAGE_T55,ACHIEVEMENT,ACH_STAGE_T56,Chinh phục: Chapter 3 - Stage 55,"Ch3, stage toàn cục 55",CLEAR_STAGE,55.00,0,diamond:59;gold:3000,0,,,ACH_STAGE,55,55
+ACH_STAGE_T56,ACHIEVEMENT,ACH_STAGE_T57,Chinh phục: Chapter 3 - Stage 56,"Ch3, stage toàn cục 56",CLEAR_STAGE,56.00,0,diamond:60,0,,,ACH_STAGE,56,56
+ACH_STAGE_T57,ACHIEVEMENT,ACH_STAGE_T58,Chinh phục: Chapter 3 - Stage 57,"Ch3, stage toàn cục 57",CLEAR_STAGE,57.00,0,diamond:61,0,,,ACH_STAGE,57,57
+ACH_STAGE_T58,ACHIEVEMENT,ACH_STAGE_T59,Chinh phục: Chapter 3 - Stage 58,"Ch3, stage toàn cục 58",CLEAR_STAGE,58.00,0,diamond:62,0,,,ACH_STAGE,58,58
+ACH_STAGE_T59,ACHIEVEMENT,ACH_STAGE_T60,Chinh phục: Chapter 3 - Stage 59,"Ch3, stage toàn cục 59",CLEAR_STAGE,59.00,0,diamond:63,0,,,ACH_STAGE,59,59
+ACH_STAGE_T60,ACHIEVEMENT,ACH_STAGE_T61,Chinh phục: Chapter 3 - Stage 60,"Ch3, stage toàn cục 60",CLEAR_STAGE,60.00,0,diamond:64;gold:3000;chest_rare:1,0,,,ACH_STAGE,60,60
+ACH_STAGE_T61,ACHIEVEMENT,ACH_STAGE_T62,Chinh phục: Chapter 4 - Stage 61,"Ch4, stage toàn cục 61",CLEAR_STAGE,61.00,0,diamond:57,0,,,ACH_STAGE,61,61
+ACH_STAGE_T62,ACHIEVEMENT,ACH_STAGE_T63,Chinh phục: Chapter 4 - Stage 62,"Ch4, stage toàn cục 62",CLEAR_STAGE,62.00,0,diamond:58,0,,,ACH_STAGE,62,62
+ACH_STAGE_T63,ACHIEVEMENT,ACH_STAGE_T64,Chinh phục: Chapter 4 - Stage 63,"Ch4, stage toàn cục 63",CLEAR_STAGE,63.00,0,diamond:59,0,,,ACH_STAGE,63,63
+ACH_STAGE_T64,ACHIEVEMENT,ACH_STAGE_T65,Chinh phục: Chapter 4 - Stage 64,"Ch4, stage toàn cục 64",CLEAR_STAGE,64.00,0,diamond:60,0,,,ACH_STAGE,64,64
+ACH_STAGE_T65,ACHIEVEMENT,ACH_STAGE_T66,Chinh phục: Chapter 4 - Stage 65,"Ch4, stage toàn cục 65",CLEAR_STAGE,65.00,0,diamond:61;gold:4000,0,,,ACH_STAGE,65,65
+ACH_STAGE_T66,ACHIEVEMENT,ACH_STAGE_T67,Chinh phục: Chapter 4 - Stage 66,"Ch4, stage toàn cục 66",CLEAR_STAGE,66.00,0,diamond:62,0,,,ACH_STAGE,66,66
+ACH_STAGE_T67,ACHIEVEMENT,ACH_STAGE_T68,Chinh phục: Chapter 4 - Stage 67,"Ch4, stage toàn cục 67",CLEAR_STAGE,67.00,0,diamond:63,0,,,ACH_STAGE,67,67
+ACH_STAGE_T68,ACHIEVEMENT,ACH_STAGE_T69,Chinh phục: Chapter 4 - Stage 68,"Ch4, stage toàn cục 68",CLEAR_STAGE,68.00,0,diamond:64,0,,,ACH_STAGE,68,68
+ACH_STAGE_T69,ACHIEVEMENT,ACH_STAGE_T70,Chinh phục: Chapter 4 - Stage 69,"Ch4, stage toàn cục 69",CLEAR_STAGE,69.00,0,diamond:65,0,,,ACH_STAGE,69,69
+ACH_STAGE_T70,ACHIEVEMENT,ACH_STAGE_T71,Chinh phục: Chapter 4 - Stage 70,"Ch4, stage toàn cục 70",CLEAR_STAGE,70.00,0,diamond:66;gold:4000;forge_mat:12,0,,,ACH_STAGE,70,70
+ACH_STAGE_T71,ACHIEVEMENT,ACH_STAGE_T72,Chinh phục: Chapter 4 - Stage 71,"Ch4, stage toàn cục 71",CLEAR_STAGE,71.00,0,diamond:67,0,,,ACH_STAGE,71,71
+ACH_STAGE_T72,ACHIEVEMENT,ACH_STAGE_T73,Chinh phục: Chapter 4 - Stage 72,"Ch4, stage toàn cục 72",CLEAR_STAGE,72.00,0,diamond:68,0,,,ACH_STAGE,72,72
+ACH_STAGE_T73,ACHIEVEMENT,ACH_STAGE_T74,Chinh phục: Chapter 4 - Stage 73,"Ch4, stage toàn cục 73",CLEAR_STAGE,73.00,0,diamond:69,0,,,ACH_STAGE,73,73
+ACH_STAGE_T74,ACHIEVEMENT,ACH_STAGE_T75,Chinh phục: Chapter 4 - Stage 74,"Ch4, stage toàn cục 74",CLEAR_STAGE,74.00,0,diamond:70,0,,,ACH_STAGE,74,74
+ACH_STAGE_T75,ACHIEVEMENT,ACH_STAGE_T76,Chinh phục: Chapter 4 - Stage 75,"Ch4, stage toàn cục 75",CLEAR_STAGE,75.00,0,diamond:71;gold:4000,0,,,ACH_STAGE,75,75
+ACH_STAGE_T76,ACHIEVEMENT,ACH_STAGE_T77,Chinh phục: Chapter 4 - Stage 76,"Ch4, stage toàn cục 76",CLEAR_STAGE,76.00,0,diamond:72,0,,,ACH_STAGE,76,76
+ACH_STAGE_T77,ACHIEVEMENT,ACH_STAGE_T78,Chinh phục: Chapter 4 - Stage 77,"Ch4, stage toàn cục 77",CLEAR_STAGE,77.00,0,diamond:73,0,,,ACH_STAGE,77,77
+ACH_STAGE_T78,ACHIEVEMENT,ACH_STAGE_T79,Chinh phục: Chapter 4 - Stage 78,"Ch4, stage toàn cục 78",CLEAR_STAGE,78.00,0,diamond:74,0,,,ACH_STAGE,78,78
+ACH_STAGE_T79,ACHIEVEMENT,ACH_STAGE_T80,Chinh phục: Chapter 4 - Stage 79,"Ch4, stage toàn cục 79",CLEAR_STAGE,79.00,0,diamond:75,0,,,ACH_STAGE,79,79
+ACH_STAGE_T80,ACHIEVEMENT,ACH_STAGE_T81,Chinh phục: Chapter 4 - Stage 80,"Ch4, stage toàn cục 80",CLEAR_STAGE,80.00,0,diamond:76;gold:4000;chest_rare:1,0,,,ACH_STAGE,80,80
+ACH_STAGE_T81,ACHIEVEMENT,ACH_STAGE_T82,Chinh phục: Chapter 5 - Stage 81,"Ch5, stage toàn cục 81",CLEAR_STAGE,81.00,0,diamond:69,0,,,ACH_STAGE,81,81
+ACH_STAGE_T82,ACHIEVEMENT,ACH_STAGE_T83,Chinh phục: Chapter 5 - Stage 82,"Ch5, stage toàn cục 82",CLEAR_STAGE,82.00,0,diamond:70,0,,,ACH_STAGE,82,82
+ACH_STAGE_T83,ACHIEVEMENT,ACH_STAGE_T84,Chinh phục: Chapter 5 - Stage 83,"Ch5, stage toàn cục 83",CLEAR_STAGE,83.00,0,diamond:71,0,,,ACH_STAGE,83,83
+ACH_STAGE_T84,ACHIEVEMENT,ACH_STAGE_T85,Chinh phục: Chapter 5 - Stage 84,"Ch5, stage toàn cục 84",CLEAR_STAGE,84.00,0,diamond:72,0,,,ACH_STAGE,84,84
+ACH_STAGE_T85,ACHIEVEMENT,ACH_STAGE_T86,Chinh phục: Chapter 5 - Stage 85,"Ch5, stage toàn cục 85",CLEAR_STAGE,85.00,0,diamond:73;gold:5000,0,,,ACH_STAGE,85,85
+ACH_STAGE_T86,ACHIEVEMENT,ACH_STAGE_T87,Chinh phục: Chapter 5 - Stage 86,"Ch5, stage toàn cục 86",CLEAR_STAGE,86.00,0,diamond:74,0,,,ACH_STAGE,86,86
+ACH_STAGE_T87,ACHIEVEMENT,ACH_STAGE_T88,Chinh phục: Chapter 5 - Stage 87,"Ch5, stage toàn cục 87",CLEAR_STAGE,87.00,0,diamond:75,0,,,ACH_STAGE,87,87
+ACH_STAGE_T88,ACHIEVEMENT,ACH_STAGE_T89,Chinh phục: Chapter 5 - Stage 88,"Ch5, stage toàn cục 88",CLEAR_STAGE,88.00,0,diamond:76,0,,,ACH_STAGE,88,88
+ACH_STAGE_T89,ACHIEVEMENT,ACH_STAGE_T90,Chinh phục: Chapter 5 - Stage 89,"Ch5, stage toàn cục 89",CLEAR_STAGE,89.00,0,diamond:77,0,,,ACH_STAGE,89,89
+ACH_STAGE_T90,ACHIEVEMENT,ACH_STAGE_T91,Chinh phục: Chapter 5 - Stage 90,"Ch5, stage toàn cục 90",CLEAR_STAGE,90.00,0,diamond:78;gold:5000;forge_mat:15,0,,,ACH_STAGE,90,90
+ACH_STAGE_T91,ACHIEVEMENT,ACH_STAGE_T92,Chinh phục: Chapter 5 - Stage 91,"Ch5, stage toàn cục 91",CLEAR_STAGE,91.00,0,diamond:79,0,,,ACH_STAGE,91,91
+ACH_STAGE_T92,ACHIEVEMENT,ACH_STAGE_T93,Chinh phục: Chapter 5 - Stage 92,"Ch5, stage toàn cục 92",CLEAR_STAGE,92.00,0,diamond:80,0,,,ACH_STAGE,92,92
+ACH_STAGE_T93,ACHIEVEMENT,ACH_STAGE_T94,Chinh phục: Chapter 5 - Stage 93,"Ch5, stage toàn cục 93",CLEAR_STAGE,93.00,0,diamond:81,0,,,ACH_STAGE,93,93
+ACH_STAGE_T94,ACHIEVEMENT,ACH_STAGE_T95,Chinh phục: Chapter 5 - Stage 94,"Ch5, stage toàn cục 94",CLEAR_STAGE,94.00,0,diamond:82,0,,,ACH_STAGE,94,94
+ACH_STAGE_T95,ACHIEVEMENT,ACH_STAGE_T96,Chinh phục: Chapter 5 - Stage 95,"Ch5, stage toàn cục 95",CLEAR_STAGE,95.00,0,diamond:83;gold:5000,0,,,ACH_STAGE,95,95
+ACH_STAGE_T96,ACHIEVEMENT,ACH_STAGE_T97,Chinh phục: Chapter 5 - Stage 96,"Ch5, stage toàn cục 96",CLEAR_STAGE,96.00,0,diamond:84,0,,,ACH_STAGE,96,96
+ACH_STAGE_T97,ACHIEVEMENT,ACH_STAGE_T98,Chinh phục: Chapter 5 - Stage 97,"Ch5, stage toàn cục 97",CLEAR_STAGE,97.00,0,diamond:85,0,,,ACH_STAGE,97,97
+ACH_STAGE_T98,ACHIEVEMENT,ACH_STAGE_T99,Chinh phục: Chapter 5 - Stage 98,"Ch5, stage toàn cục 98",CLEAR_STAGE,98.00,0,diamond:86,0,,,ACH_STAGE,98,98
+ACH_STAGE_T99,ACHIEVEMENT,ACH_STAGE_T100,Chinh phục: Chapter 5 - Stage 99,"Ch5, stage toàn cục 99",CLEAR_STAGE,99.00,0,diamond:87,0,,,ACH_STAGE,99,99
+ACH_STAGE_T100,ACHIEVEMENT,ACH_STAGE_T101,Chinh phục: Chapter 5 - Stage 100,"Ch5, stage toàn cục 100",CLEAR_STAGE,100.00,0,diamond:88;gold:5000;chest_rare:1;chest_epic:1,0,,,ACH_STAGE,100,100
+ACH_STAGE_T101,ACHIEVEMENT,ACH_STAGE_T102,Chinh phục: Chapter 6 - Stage 101,"Ch6, stage toàn cục 101",CLEAR_STAGE,101.00,0,diamond:81,0,,,ACH_STAGE,101,101
+ACH_STAGE_T102,ACHIEVEMENT,ACH_STAGE_T103,Chinh phục: Chapter 6 - Stage 102,"Ch6, stage toàn cục 102",CLEAR_STAGE,102.00,0,diamond:82,0,,,ACH_STAGE,102,102
+ACH_STAGE_T103,ACHIEVEMENT,ACH_STAGE_T104,Chinh phục: Chapter 6 - Stage 103,"Ch6, stage toàn cục 103",CLEAR_STAGE,103.00,0,diamond:83,0,,,ACH_STAGE,103,103
+ACH_STAGE_T104,ACHIEVEMENT,ACH_STAGE_T105,Chinh phục: Chapter 6 - Stage 104,"Ch6, stage toàn cục 104",CLEAR_STAGE,104.00,0,diamond:84,0,,,ACH_STAGE,104,104
+ACH_STAGE_T105,ACHIEVEMENT,ACH_STAGE_T106,Chinh phục: Chapter 6 - Stage 105,"Ch6, stage toàn cục 105",CLEAR_STAGE,105.00,0,diamond:85;gold:6000,0,,,ACH_STAGE,105,105
+ACH_STAGE_T106,ACHIEVEMENT,ACH_STAGE_T107,Chinh phục: Chapter 6 - Stage 106,"Ch6, stage toàn cục 106",CLEAR_STAGE,106.00,0,diamond:86,0,,,ACH_STAGE,106,106
+ACH_STAGE_T107,ACHIEVEMENT,ACH_STAGE_T108,Chinh phục: Chapter 6 - Stage 107,"Ch6, stage toàn cục 107",CLEAR_STAGE,107.00,0,diamond:87,0,,,ACH_STAGE,107,107
+ACH_STAGE_T108,ACHIEVEMENT,ACH_STAGE_T109,Chinh phục: Chapter 6 - Stage 108,"Ch6, stage toàn cục 108",CLEAR_STAGE,108.00,0,diamond:88,0,,,ACH_STAGE,108,108
+ACH_STAGE_T109,ACHIEVEMENT,ACH_STAGE_T110,Chinh phục: Chapter 6 - Stage 109,"Ch6, stage toàn cục 109",CLEAR_STAGE,109.00,0,diamond:89,0,,,ACH_STAGE,109,109
+ACH_STAGE_T110,ACHIEVEMENT,ACH_STAGE_T111,Chinh phục: Chapter 6 - Stage 110,"Ch6, stage toàn cục 110",CLEAR_STAGE,110.00,0,diamond:90;gold:6000;forge_mat:18,0,,,ACH_STAGE,110,110
+ACH_STAGE_T111,ACHIEVEMENT,ACH_STAGE_T112,Chinh phục: Chapter 6 - Stage 111,"Ch6, stage toàn cục 111",CLEAR_STAGE,111.00,0,diamond:91,0,,,ACH_STAGE,111,111
+ACH_STAGE_T112,ACHIEVEMENT,ACH_STAGE_T113,Chinh phục: Chapter 6 - Stage 112,"Ch6, stage toàn cục 112",CLEAR_STAGE,112.00,0,diamond:92,0,,,ACH_STAGE,112,112
+ACH_STAGE_T113,ACHIEVEMENT,ACH_STAGE_T114,Chinh phục: Chapter 6 - Stage 113,"Ch6, stage toàn cục 113",CLEAR_STAGE,113.00,0,diamond:93,0,,,ACH_STAGE,113,113
+ACH_STAGE_T114,ACHIEVEMENT,ACH_STAGE_T115,Chinh phục: Chapter 6 - Stage 114,"Ch6, stage toàn cục 114",CLEAR_STAGE,114.00,0,diamond:94,0,,,ACH_STAGE,114,114
+ACH_STAGE_T115,ACHIEVEMENT,ACH_STAGE_T116,Chinh phục: Chapter 6 - Stage 115,"Ch6, stage toàn cục 115",CLEAR_STAGE,115.00,0,diamond:95;gold:6000,0,,,ACH_STAGE,115,115
+ACH_STAGE_T116,ACHIEVEMENT,ACH_STAGE_T117,Chinh phục: Chapter 6 - Stage 116,"Ch6, stage toàn cục 116",CLEAR_STAGE,116.00,0,diamond:96,0,,,ACH_STAGE,116,116
+ACH_STAGE_T117,ACHIEVEMENT,ACH_STAGE_T118,Chinh phục: Chapter 6 - Stage 117,"Ch6, stage toàn cục 117",CLEAR_STAGE,117.00,0,diamond:97,0,,,ACH_STAGE,117,117
+ACH_STAGE_T118,ACHIEVEMENT,ACH_STAGE_T119,Chinh phục: Chapter 6 - Stage 118,"Ch6, stage toàn cục 118",CLEAR_STAGE,118.00,0,diamond:98,0,,,ACH_STAGE,118,118
+ACH_STAGE_T119,ACHIEVEMENT,ACH_STAGE_T120,Chinh phục: Chapter 6 - Stage 119,"Ch6, stage toàn cục 119",CLEAR_STAGE,119.00,0,diamond:99,0,,,ACH_STAGE,119,119
+ACH_STAGE_T120,ACHIEVEMENT,ACH_STAGE_T121,Chinh phục: Chapter 6 - Stage 120,"Ch6, stage toàn cục 120",CLEAR_STAGE,120.00,0,diamond:100;gold:6000;chest_rare:1;chest_epic:1,0,,,ACH_STAGE,120,120
+ACH_STAGE_T121,ACHIEVEMENT,ACH_STAGE_T122,Chinh phục: Chapter 7 - Stage 121,"Ch7, stage toàn cục 121",CLEAR_STAGE,121.00,0,diamond:93,0,,,ACH_STAGE,121,121
+ACH_STAGE_T122,ACHIEVEMENT,ACH_STAGE_T123,Chinh phục: Chapter 7 - Stage 122,"Ch7, stage toàn cục 122",CLEAR_STAGE,122.00,0,diamond:94,0,,,ACH_STAGE,122,122
+ACH_STAGE_T123,ACHIEVEMENT,ACH_STAGE_T124,Chinh phục: Chapter 7 - Stage 123,"Ch7, stage toàn cục 123",CLEAR_STAGE,123.00,0,diamond:95,0,,,ACH_STAGE,123,123
+ACH_STAGE_T124,ACHIEVEMENT,ACH_STAGE_T125,Chinh phục: Chapter 7 - Stage 124,"Ch7, stage toàn cục 124",CLEAR_STAGE,124.00,0,diamond:96,0,,,ACH_STAGE,124,124
+ACH_STAGE_T125,ACHIEVEMENT,ACH_STAGE_T126,Chinh phục: Chapter 7 - Stage 125,"Ch7, stage toàn cục 125",CLEAR_STAGE,125.00,0,diamond:97;gold:7000,0,,,ACH_STAGE,125,125
+ACH_STAGE_T126,ACHIEVEMENT,ACH_STAGE_T127,Chinh phục: Chapter 7 - Stage 126,"Ch7, stage toàn cục 126",CLEAR_STAGE,126.00,0,diamond:98,0,,,ACH_STAGE,126,126
+ACH_STAGE_T127,ACHIEVEMENT,ACH_STAGE_T128,Chinh phục: Chapter 7 - Stage 127,"Ch7, stage toàn cục 127",CLEAR_STAGE,127.00,0,diamond:99,0,,,ACH_STAGE,127,127
+ACH_STAGE_T128,ACHIEVEMENT,ACH_STAGE_T129,Chinh phục: Chapter 7 - Stage 128,"Ch7, stage toàn cục 128",CLEAR_STAGE,128.00,0,diamond:100,0,,,ACH_STAGE,128,128
+ACH_STAGE_T129,ACHIEVEMENT,ACH_STAGE_T130,Chinh phục: Chapter 7 - Stage 129,"Ch7, stage toàn cục 129",CLEAR_STAGE,129.00,0,diamond:101,0,,,ACH_STAGE,129,129
+ACH_STAGE_T130,ACHIEVEMENT,ACH_STAGE_T131,Chinh phục: Chapter 7 - Stage 130,"Ch7, stage toàn cục 130",CLEAR_STAGE,130.00,0,diamond:102;gold:7000;forge_mat:21,0,,,ACH_STAGE,130,130
+ACH_STAGE_T131,ACHIEVEMENT,ACH_STAGE_T132,Chinh phục: Chapter 7 - Stage 131,"Ch7, stage toàn cục 131",CLEAR_STAGE,131.00,0,diamond:103,0,,,ACH_STAGE,131,131
+ACH_STAGE_T132,ACHIEVEMENT,ACH_STAGE_T133,Chinh phục: Chapter 7 - Stage 132,"Ch7, stage toàn cục 132",CLEAR_STAGE,132.00,0,diamond:104,0,,,ACH_STAGE,132,132
+ACH_STAGE_T133,ACHIEVEMENT,ACH_STAGE_T134,Chinh phục: Chapter 7 - Stage 133,"Ch7, stage toàn cục 133",CLEAR_STAGE,133.00,0,diamond:105,0,,,ACH_STAGE,133,133
+ACH_STAGE_T134,ACHIEVEMENT,ACH_STAGE_T135,Chinh phục: Chapter 7 - Stage 134,"Ch7, stage toàn cục 134",CLEAR_STAGE,134.00,0,diamond:106,0,,,ACH_STAGE,134,134
+ACH_STAGE_T135,ACHIEVEMENT,ACH_STAGE_T136,Chinh phục: Chapter 7 - Stage 135,"Ch7, stage toàn cục 135",CLEAR_STAGE,135.00,0,diamond:107;gold:7000,0,,,ACH_STAGE,135,135
+ACH_STAGE_T136,ACHIEVEMENT,ACH_STAGE_T137,Chinh phục: Chapter 7 - Stage 136,"Ch7, stage toàn cục 136",CLEAR_STAGE,136.00,0,diamond:108,0,,,ACH_STAGE,136,136
+ACH_STAGE_T137,ACHIEVEMENT,ACH_STAGE_T138,Chinh phục: Chapter 7 - Stage 137,"Ch7, stage toàn cục 137",CLEAR_STAGE,137.00,0,diamond:109,0,,,ACH_STAGE,137,137
+ACH_STAGE_T138,ACHIEVEMENT,ACH_STAGE_T139,Chinh phục: Chapter 7 - Stage 138,"Ch7, stage toàn cục 138",CLEAR_STAGE,138.00,0,diamond:110,0,,,ACH_STAGE,138,138
+ACH_STAGE_T139,ACHIEVEMENT,ACH_STAGE_T140,Chinh phục: Chapter 7 - Stage 139,"Ch7, stage toàn cục 139",CLEAR_STAGE,139.00,0,diamond:111,0,,,ACH_STAGE,139,139
+ACH_STAGE_T140,ACHIEVEMENT,ACH_STAGE_T141,Chinh phục: Chapter 7 - Stage 140,"Ch7, stage toàn cục 140",CLEAR_STAGE,140.00,0,diamond:112;gold:7000;chest_rare:1;chest_epic:1,0,,,ACH_STAGE,140,140
+ACH_STAGE_T141,ACHIEVEMENT,ACH_STAGE_T142,Chinh phục: Chapter 8 - Stage 141,"Ch8, stage toàn cục 141",CLEAR_STAGE,141.00,0,diamond:105,0,,,ACH_STAGE,141,141
+ACH_STAGE_T142,ACHIEVEMENT,ACH_STAGE_T143,Chinh phục: Chapter 8 - Stage 142,"Ch8, stage toàn cục 142",CLEAR_STAGE,142.00,0,diamond:106,0,,,ACH_STAGE,142,142
+ACH_STAGE_T143,ACHIEVEMENT,ACH_STAGE_T144,Chinh phục: Chapter 8 - Stage 143,"Ch8, stage toàn cục 143",CLEAR_STAGE,143.00,0,diamond:107,0,,,ACH_STAGE,143,143
+ACH_STAGE_T144,ACHIEVEMENT,ACH_STAGE_T145,Chinh phục: Chapter 8 - Stage 144,"Ch8, stage toàn cục 144",CLEAR_STAGE,144.00,0,diamond:108,0,,,ACH_STAGE,144,144
+ACH_STAGE_T145,ACHIEVEMENT,ACH_STAGE_T146,Chinh phục: Chapter 8 - Stage 145,"Ch8, stage toàn cục 145",CLEAR_STAGE,145.00,0,diamond:109;gold:8000,0,,,ACH_STAGE,145,145
+ACH_STAGE_T146,ACHIEVEMENT,ACH_STAGE_T147,Chinh phục: Chapter 8 - Stage 146,"Ch8, stage toàn cục 146",CLEAR_STAGE,146.00,0,diamond:110,0,,,ACH_STAGE,146,146
+ACH_STAGE_T147,ACHIEVEMENT,ACH_STAGE_T148,Chinh phục: Chapter 8 - Stage 147,"Ch8, stage toàn cục 147",CLEAR_STAGE,147.00,0,diamond:111,0,,,ACH_STAGE,147,147
+ACH_STAGE_T148,ACHIEVEMENT,ACH_STAGE_T149,Chinh phục: Chapter 8 - Stage 148,"Ch8, stage toàn cục 148",CLEAR_STAGE,148.00,0,diamond:112,0,,,ACH_STAGE,148,148
+ACH_STAGE_T149,ACHIEVEMENT,ACH_STAGE_T150,Chinh phục: Chapter 8 - Stage 149,"Ch8, stage toàn cục 149",CLEAR_STAGE,149.00,0,diamond:113,0,,,ACH_STAGE,149,149
+ACH_STAGE_T150,ACHIEVEMENT,ACH_STAGE_T151,Chinh phục: Chapter 8 - Stage 150,"Ch8, stage toàn cục 150",CLEAR_STAGE,150.00,0,diamond:114;gold:8000;forge_mat:24,0,,,ACH_STAGE,150,150
+ACH_STAGE_T151,ACHIEVEMENT,ACH_STAGE_T152,Chinh phục: Chapter 8 - Stage 151,"Ch8, stage toàn cục 151",CLEAR_STAGE,151.00,0,diamond:115,0,,,ACH_STAGE,151,151
+ACH_STAGE_T152,ACHIEVEMENT,ACH_STAGE_T153,Chinh phục: Chapter 8 - Stage 152,"Ch8, stage toàn cục 152",CLEAR_STAGE,152.00,0,diamond:116,0,,,ACH_STAGE,152,152
+ACH_STAGE_T153,ACHIEVEMENT,ACH_STAGE_T154,Chinh phục: Chapter 8 - Stage 153,"Ch8, stage toàn cục 153",CLEAR_STAGE,153.00,0,diamond:117,0,,,ACH_STAGE,153,153
+ACH_STAGE_T154,ACHIEVEMENT,ACH_STAGE_T155,Chinh phục: Chapter 8 - Stage 154,"Ch8, stage toàn cục 154",CLEAR_STAGE,154.00,0,diamond:118,0,,,ACH_STAGE,154,154
+ACH_STAGE_T155,ACHIEVEMENT,ACH_STAGE_T156,Chinh phục: Chapter 8 - Stage 155,"Ch8, stage toàn cục 155",CLEAR_STAGE,155.00,0,diamond:119;gold:8000,0,,,ACH_STAGE,155,155
+ACH_STAGE_T156,ACHIEVEMENT,ACH_STAGE_T157,Chinh phục: Chapter 8 - Stage 156,"Ch8, stage toàn cục 156",CLEAR_STAGE,156.00,0,diamond:120,0,,,ACH_STAGE,156,156
+ACH_STAGE_T157,ACHIEVEMENT,ACH_STAGE_T158,Chinh phục: Chapter 8 - Stage 157,"Ch8, stage toàn cục 157",CLEAR_STAGE,157.00,0,diamond:121,0,,,ACH_STAGE,157,157
+ACH_STAGE_T158,ACHIEVEMENT,ACH_STAGE_T159,Chinh phục: Chapter 8 - Stage 158,"Ch8, stage toàn cục 158",CLEAR_STAGE,158.00,0,diamond:122,0,,,ACH_STAGE,158,158
+ACH_STAGE_T159,ACHIEVEMENT,ACH_STAGE_T160,Chinh phục: Chapter 8 - Stage 159,"Ch8, stage toàn cục 159",CLEAR_STAGE,159.00,0,diamond:123,0,,,ACH_STAGE,159,159
+ACH_STAGE_T160,ACHIEVEMENT,ACH_STAGE_T161,Chinh phục: Chapter 8 - Stage 160,"Ch8, stage toàn cục 160",CLEAR_STAGE,160.00,0,diamond:124;gold:8000;chest_rare:1;chest_epic:1,0,,,ACH_STAGE,160,160
+ACH_STAGE_T161,ACHIEVEMENT,ACH_STAGE_T162,Chinh phục: Chapter 9 - Stage 161,"Ch9, stage toàn cục 161",CLEAR_STAGE,161.00,0,diamond:117,0,,,ACH_STAGE,161,161
+ACH_STAGE_T162,ACHIEVEMENT,ACH_STAGE_T163,Chinh phục: Chapter 9 - Stage 162,"Ch9, stage toàn cục 162",CLEAR_STAGE,162.00,0,diamond:118,0,,,ACH_STAGE,162,162
+ACH_STAGE_T163,ACHIEVEMENT,ACH_STAGE_T164,Chinh phục: Chapter 9 - Stage 163,"Ch9, stage toàn cục 163",CLEAR_STAGE,163.00,0,diamond:119,0,,,ACH_STAGE,163,163
+ACH_STAGE_T164,ACHIEVEMENT,ACH_STAGE_T165,Chinh phục: Chapter 9 - Stage 164,"Ch9, stage toàn cục 164",CLEAR_STAGE,164.00,0,diamond:120,0,,,ACH_STAGE,164,164
+ACH_STAGE_T165,ACHIEVEMENT,ACH_STAGE_T166,Chinh phục: Chapter 9 - Stage 165,"Ch9, stage toàn cục 165",CLEAR_STAGE,165.00,0,diamond:121;gold:9000,0,,,ACH_STAGE,165,165
+ACH_STAGE_T166,ACHIEVEMENT,ACH_STAGE_T167,Chinh phục: Chapter 9 - Stage 166,"Ch9, stage toàn cục 166",CLEAR_STAGE,166.00,0,diamond:122,0,,,ACH_STAGE,166,166
+ACH_STAGE_T167,ACHIEVEMENT,ACH_STAGE_T168,Chinh phục: Chapter 9 - Stage 167,"Ch9, stage toàn cục 167",CLEAR_STAGE,167.00,0,diamond:123,0,,,ACH_STAGE,167,167
+ACH_STAGE_T168,ACHIEVEMENT,ACH_STAGE_T169,Chinh phục: Chapter 9 - Stage 168,"Ch9, stage toàn cục 168",CLEAR_STAGE,168.00,0,diamond:124,0,,,ACH_STAGE,168,168
+ACH_STAGE_T169,ACHIEVEMENT,ACH_STAGE_T170,Chinh phục: Chapter 9 - Stage 169,"Ch9, stage toàn cục 169",CLEAR_STAGE,169.00,0,diamond:125,0,,,ACH_STAGE,169,169
+ACH_STAGE_T170,ACHIEVEMENT,ACH_STAGE_T171,Chinh phục: Chapter 9 - Stage 170,"Ch9, stage toàn cục 170",CLEAR_STAGE,170.00,0,diamond:126;gold:9000;forge_mat:27,0,,,ACH_STAGE,170,170
+ACH_STAGE_T171,ACHIEVEMENT,ACH_STAGE_T172,Chinh phục: Chapter 9 - Stage 171,"Ch9, stage toàn cục 171",CLEAR_STAGE,171.00,0,diamond:127,0,,,ACH_STAGE,171,171
+ACH_STAGE_T172,ACHIEVEMENT,ACH_STAGE_T173,Chinh phục: Chapter 9 - Stage 172,"Ch9, stage toàn cục 172",CLEAR_STAGE,172.00,0,diamond:128,0,,,ACH_STAGE,172,172
+ACH_STAGE_T173,ACHIEVEMENT,ACH_STAGE_T174,Chinh phục: Chapter 9 - Stage 173,"Ch9, stage toàn cục 173",CLEAR_STAGE,173.00,0,diamond:129,0,,,ACH_STAGE,173,173
+ACH_STAGE_T174,ACHIEVEMENT,ACH_STAGE_T175,Chinh phục: Chapter 9 - Stage 174,"Ch9, stage toàn cục 174",CLEAR_STAGE,174.00,0,diamond:130,0,,,ACH_STAGE,174,174
+ACH_STAGE_T175,ACHIEVEMENT,ACH_STAGE_T176,Chinh phục: Chapter 9 - Stage 175,"Ch9, stage toàn cục 175",CLEAR_STAGE,175.00,0,diamond:131;gold:9000,0,,,ACH_STAGE,175,175
+ACH_STAGE_T176,ACHIEVEMENT,ACH_STAGE_T177,Chinh phục: Chapter 9 - Stage 176,"Ch9, stage toàn cục 176",CLEAR_STAGE,176.00,0,diamond:132,0,,,ACH_STAGE,176,176
+ACH_STAGE_T177,ACHIEVEMENT,ACH_STAGE_T178,Chinh phục: Chapter 9 - Stage 177,"Ch9, stage toàn cục 177",CLEAR_STAGE,177.00,0,diamond:133,0,,,ACH_STAGE,177,177
+ACH_STAGE_T178,ACHIEVEMENT,ACH_STAGE_T179,Chinh phục: Chapter 9 - Stage 178,"Ch9, stage toàn cục 178",CLEAR_STAGE,178.00,0,diamond:134,0,,,ACH_STAGE,178,178
+ACH_STAGE_T179,ACHIEVEMENT,ACH_STAGE_T180,Chinh phục: Chapter 9 - Stage 179,"Ch9, stage toàn cục 179",CLEAR_STAGE,179.00,0,diamond:135,0,,,ACH_STAGE,179,179
+ACH_STAGE_T180,ACHIEVEMENT,ACH_STAGE_T181,Chinh phục: Chapter 9 - Stage 180,"Ch9, stage toàn cục 180",CLEAR_STAGE,180.00,0,diamond:136;gold:9000;chest_rare:1;chest_epic:1,0,,,ACH_STAGE,180,180
+ACH_STAGE_T181,ACHIEVEMENT,ACH_STAGE_T182,Chinh phục: Chapter 10 - Stage 181,"Ch10, stage toàn cục 181",CLEAR_STAGE,181.00,0,diamond:129,0,,,ACH_STAGE,181,181
+ACH_STAGE_T182,ACHIEVEMENT,ACH_STAGE_T183,Chinh phục: Chapter 10 - Stage 182,"Ch10, stage toàn cục 182",CLEAR_STAGE,182.00,0,diamond:130,0,,,ACH_STAGE,182,182
+ACH_STAGE_T183,ACHIEVEMENT,ACH_STAGE_T184,Chinh phục: Chapter 10 - Stage 183,"Ch10, stage toàn cục 183",CLEAR_STAGE,183.00,0,diamond:131,0,,,ACH_STAGE,183,183
+ACH_STAGE_T184,ACHIEVEMENT,ACH_STAGE_T185,Chinh phục: Chapter 10 - Stage 184,"Ch10, stage toàn cục 184",CLEAR_STAGE,184.00,0,diamond:132,0,,,ACH_STAGE,184,184
+ACH_STAGE_T185,ACHIEVEMENT,ACH_STAGE_T186,Chinh phục: Chapter 10 - Stage 185,"Ch10, stage toàn cục 185",CLEAR_STAGE,185.00,0,diamond:133;gold:10000,0,,,ACH_STAGE,185,185
+ACH_STAGE_T186,ACHIEVEMENT,ACH_STAGE_T187,Chinh phục: Chapter 10 - Stage 186,"Ch10, stage toàn cục 186",CLEAR_STAGE,186.00,0,diamond:134,0,,,ACH_STAGE,186,186
+ACH_STAGE_T187,ACHIEVEMENT,ACH_STAGE_T188,Chinh phục: Chapter 10 - Stage 187,"Ch10, stage toàn cục 187",CLEAR_STAGE,187.00,0,diamond:135,0,,,ACH_STAGE,187,187
+ACH_STAGE_T188,ACHIEVEMENT,ACH_STAGE_T189,Chinh phục: Chapter 10 - Stage 188,"Ch10, stage toàn cục 188",CLEAR_STAGE,188.00,0,diamond:136,0,,,ACH_STAGE,188,188
+ACH_STAGE_T189,ACHIEVEMENT,ACH_STAGE_T190,Chinh phục: Chapter 10 - Stage 189,"Ch10, stage toàn cục 189",CLEAR_STAGE,189.00,0,diamond:137,0,,,ACH_STAGE,189,189
+ACH_STAGE_T190,ACHIEVEMENT,ACH_STAGE_T191,Chinh phục: Chapter 10 - Stage 190,"Ch10, stage toàn cục 190",CLEAR_STAGE,190.00,0,diamond:138;gold:10000;forge_mat:30,0,,,ACH_STAGE,190,190
+ACH_STAGE_T191,ACHIEVEMENT,ACH_STAGE_T192,Chinh phục: Chapter 10 - Stage 191,"Ch10, stage toàn cục 191",CLEAR_STAGE,191.00,0,diamond:139,0,,,ACH_STAGE,191,191
+ACH_STAGE_T192,ACHIEVEMENT,ACH_STAGE_T193,Chinh phục: Chapter 10 - Stage 192,"Ch10, stage toàn cục 192",CLEAR_STAGE,192.00,0,diamond:140,0,,,ACH_STAGE,192,192
+ACH_STAGE_T193,ACHIEVEMENT,ACH_STAGE_T194,Chinh phục: Chapter 10 - Stage 193,"Ch10, stage toàn cục 193",CLEAR_STAGE,193.00,0,diamond:141,0,,,ACH_STAGE,193,193
+ACH_STAGE_T194,ACHIEVEMENT,ACH_STAGE_T195,Chinh phục: Chapter 10 - Stage 194,"Ch10, stage toàn cục 194",CLEAR_STAGE,194.00,0,diamond:142,0,,,ACH_STAGE,194,194
+ACH_STAGE_T195,ACHIEVEMENT,ACH_STAGE_T196,Chinh phục: Chapter 10 - Stage 195,"Ch10, stage toàn cục 195",CLEAR_STAGE,195.00,0,diamond:143;gold:10000,0,,,ACH_STAGE,195,195
+ACH_STAGE_T196,ACHIEVEMENT,ACH_STAGE_T197,Chinh phục: Chapter 10 - Stage 196,"Ch10, stage toàn cục 196",CLEAR_STAGE,196.00,0,diamond:144,0,,,ACH_STAGE,196,196
+ACH_STAGE_T197,ACHIEVEMENT,ACH_STAGE_T198,Chinh phục: Chapter 10 - Stage 197,"Ch10, stage toàn cục 197",CLEAR_STAGE,197.00,0,diamond:145,0,,,ACH_STAGE,197,197
+ACH_STAGE_T198,ACHIEVEMENT,ACH_STAGE_T199,Chinh phục: Chapter 10 - Stage 198,"Ch10, stage toàn cục 198",CLEAR_STAGE,198.00,0,diamond:146,0,,,ACH_STAGE,198,198
+ACH_STAGE_T199,ACHIEVEMENT,ACH_STAGE_T200,Chinh phục: Chapter 10 - Stage 199,"Ch10, stage toàn cục 199",CLEAR_STAGE,199.00,0,diamond:147,0,,,ACH_STAGE,199,199
+ACH_STAGE_T200,ACHIEVEMENT,ACH_COLLECT_T1,Chinh phục: Chapter 10 - Stage 200,"Ch10, stage toàn cục 200",CLEAR_STAGE,200.00,0,diamond:148;gold:10000;chest_rare:1;chest_epic:1,0,,,ACH_STAGE,200,200
+ACH_COLLECT_T1,ACHIEVEMENT,ACH_COLLECT_T2,Sưu tập: Sở hữu 5 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,5.00,0,diamond:40,0,,,ACH_COLLECT,1,1
+ACH_COLLECT_T2,ACHIEVEMENT,ACH_COLLECT_T3,Sưu tập: Sở hữu 10 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,10.00,0,diamond:50,0,,,ACH_COLLECT,2,2
+ACH_COLLECT_T3,ACHIEVEMENT,ACH_COLLECT_T4,Sưu tập: Sở hữu 15 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,15.00,0,diamond:60,0,,,ACH_COLLECT,3,3
+ACH_COLLECT_T4,ACHIEVEMENT,ACH_COLLECT_T5,Sưu tập: Sở hữu 20 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,20.00,0,diamond:70;hero_shard_rare:8,0,,,ACH_COLLECT,4,4
+ACH_COLLECT_T5,ACHIEVEMENT,ACH_COLLECT_T6,Sưu tập: Sở hữu 25 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,25.00,0,diamond:80;hero_shard_rare:10,0,,,ACH_COLLECT,5,5
+ACH_COLLECT_T6,ACHIEVEMENT,ACH_COLLECT_T7,Sưu tập: Sở hữu 30 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,30.00,0,diamond:90;hero_shard_rare:12,0,,,ACH_COLLECT,6,6
+ACH_COLLECT_T7,ACHIEVEMENT,ACH_COLLECT_T8,Sưu tập: Sở hữu 35 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,35.00,0,diamond:100;hero_shard_rare:14,0,,,ACH_COLLECT,7,7
+ACH_COLLECT_T8,ACHIEVEMENT,ACH_COLLECT_T9,Sưu tập: Sở hữu 40 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,40.00,0,diamond:110;hero_shard_rare:16,0,,,ACH_COLLECT,8,8
+ACH_COLLECT_T9,ACHIEVEMENT,ACH_COLLECT_T10,Sưu tập: Sở hữu 45 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,45.00,0,diamond:120;hero_shard_rare:18,0,,,ACH_COLLECT,9,9
+ACH_COLLECT_T10,ACHIEVEMENT,ACH_COLLECT_T11,Sưu tập: Sở hữu 50 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,50.00,0,diamond:130;hero_shard_rare:20;avatar_frame:1,0,,,ACH_COLLECT,10,10
+ACH_COLLECT_T11,ACHIEVEMENT,ACH_COLLECT_T12,Sưu tập: Sở hữu 55 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,55.00,0,diamond:140;hero_shard_rare:22,0,,,ACH_COLLECT,11,11
+ACH_COLLECT_T12,ACHIEVEMENT,ACH_COLLECT_T13,Sưu tập: Sở hữu 60 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,60.00,0,diamond:150;hero_shard_rare:24,0,,,ACH_COLLECT,12,12
+ACH_COLLECT_T13,ACHIEVEMENT,ACH_COLLECT_T14,Sưu tập: Sở hữu 65 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,65.00,0,diamond:160;hero_shard_rare:26,0,,,ACH_COLLECT,13,13
+ACH_COLLECT_T14,ACHIEVEMENT,ACH_COLLECT_T15,Sưu tập: Sở hữu 70 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,70.00,0,diamond:170;hero_shard_rare:28,0,,,ACH_COLLECT,14,14
+ACH_COLLECT_T15,ACHIEVEMENT,ACH_COLLECT_T16,Sưu tập: Sở hữu 75 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,75.00,0,diamond:180;hero_shard_rare:30,0,,,ACH_COLLECT,15,15
+ACH_COLLECT_T16,ACHIEVEMENT,ACH_COLLECT_T17,Sưu tập: Sở hữu 80 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,80.00,0,diamond:190;hero_shard_rare:32,0,,,ACH_COLLECT,16,16
+ACH_COLLECT_T17,ACHIEVEMENT,ACH_COLLECT_T18,Sưu tập: Sở hữu 85 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,85.00,0,diamond:200;hero_shard_rare:34,0,,,ACH_COLLECT,17,17
+ACH_COLLECT_T18,ACHIEVEMENT,ACH_COLLECT_T19,Sưu tập: Sở hữu 90 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,90.00,0,diamond:210;hero_shard_rare:36,0,,,ACH_COLLECT,18,18
+ACH_COLLECT_T19,ACHIEVEMENT,ACH_COLLECT_T20,Sưu tập: Sở hữu 95 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,95.00,0,diamond:220;hero_shard_rare:38,0,,,ACH_COLLECT,19,19
+ACH_COLLECT_T20,ACHIEVEMENT,ACH_COLLECT_T21,Sưu tập: Sở hữu 100 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,100.00,0,diamond:230;hero_shard_rare:40;avatar_frame:1,0,,,ACH_COLLECT,20,20
+ACH_COLLECT_T21,ACHIEVEMENT,ACH_COLLECT_T22,Sưu tập: Sở hữu 105 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,105.00,0,diamond:240;hero_shard_rare:42,0,,,ACH_COLLECT,21,21
+ACH_COLLECT_T22,ACHIEVEMENT,ACH_COLLECT_T23,Sưu tập: Sở hữu 110 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,110.00,0,diamond:250;hero_shard_rare:44,0,,,ACH_COLLECT,22,22
+ACH_COLLECT_T23,ACHIEVEMENT,ACH_COLLECT_T24,Sưu tập: Sở hữu 115 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,115.00,0,diamond:260;hero_shard_rare:46,0,,,ACH_COLLECT,23,23
+ACH_COLLECT_T24,ACHIEVEMENT,ACH_COLLECT_T25,Sưu tập: Sở hữu 120 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,120.00,0,diamond:270;hero_shard_rare:48,0,,,ACH_COLLECT,24,24
+ACH_COLLECT_T25,ACHIEVEMENT,ACH_COLLECT_T26,Sưu tập: Sở hữu 125 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,125.00,0,diamond:280;hero_shard_rare:50,0,,,ACH_COLLECT,25,25
+ACH_COLLECT_T26,ACHIEVEMENT,ACH_COLLECT_T27,Sưu tập: Sở hữu 130 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,130.00,0,diamond:290;hero_shard_rare:52,0,,,ACH_COLLECT,26,26
+ACH_COLLECT_T27,ACHIEVEMENT,ACH_COLLECT_T28,Sưu tập: Sở hữu 135 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,135.00,0,diamond:300;hero_shard_rare:54,0,,,ACH_COLLECT,27,27
+ACH_COLLECT_T28,ACHIEVEMENT,ACH_COLLECT_T29,Sưu tập: Sở hữu 140 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,140.00,0,diamond:310;hero_shard_rare:56,0,,,ACH_COLLECT,28,28
+ACH_COLLECT_T29,ACHIEVEMENT,ACH_COLLECT_T30,Sưu tập: Sở hữu 145 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,145.00,0,diamond:320;hero_shard_rare:58,0,,,ACH_COLLECT,29,29
+ACH_COLLECT_T30,ACHIEVEMENT,ACH_SUMMON_T1,Sưu tập: Sở hữu 150 anh hùng,Không reset - cộng dồn vĩnh viễn,OWN_HERO,150.00,0,diamond:330;hero_shard_rare:60;avatar_frame:1,0,,,ACH_COLLECT,30,30
+ACH_SUMMON_T1,ACHIEVEMENT,ACH_SUMMON_T2,Triệu hồi tổng 10 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,10.00,0,diamond:70,0,,,ACH_SUMMON,1,1
+ACH_SUMMON_T2,ACHIEVEMENT,ACH_SUMMON_T3,Triệu hồi tổng 25 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,25.00,0,diamond:90,0,,,ACH_SUMMON,2,2
+ACH_SUMMON_T3,ACHIEVEMENT,ACH_SUMMON_T4,Triệu hồi tổng 50 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,50.00,0,diamond:110,0,,,ACH_SUMMON,3,3
+ACH_SUMMON_T4,ACHIEVEMENT,ACH_SUMMON_T5,Triệu hồi tổng 100 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,100.00,0,diamond:130,0,,,ACH_SUMMON,4,4
+ACH_SUMMON_T5,ACHIEVEMENT,ACH_SUMMON_T6,Triệu hồi tổng 150 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,150.00,0,diamond:150,0,,,ACH_SUMMON,5,5
+ACH_SUMMON_T6,ACHIEVEMENT,ACH_SUMMON_T7,Triệu hồi tổng 200 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,200.00,0,diamond:170,0,,,ACH_SUMMON,6,6
+ACH_SUMMON_T7,ACHIEVEMENT,ACH_SUMMON_T8,Triệu hồi tổng 300 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,300.00,0,diamond:190,0,,,ACH_SUMMON,7,7
+ACH_SUMMON_T8,ACHIEVEMENT,ACH_SUMMON_T9,Triệu hồi tổng 400 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,400.00,0,diamond:210,0,,,ACH_SUMMON,8,8
+ACH_SUMMON_T9,ACHIEVEMENT,ACH_SUMMON_T10,Triệu hồi tổng 500 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,500.00,0,diamond:230;summon_ticket:3,0,,,ACH_SUMMON,9,9
+ACH_SUMMON_T10,ACHIEVEMENT,ACH_SUMMON_T11,Triệu hồi tổng 650 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,650.00,0,diamond:250;summon_ticket:3,0,,,ACH_SUMMON,10,10
+ACH_SUMMON_T11,ACHIEVEMENT,ACH_SUMMON_T12,Triệu hồi tổng 800 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,800.00,0,diamond:270;summon_ticket:3,0,,,ACH_SUMMON,11,11
+ACH_SUMMON_T12,ACHIEVEMENT,ACH_SUMMON_T13,Triệu hồi tổng 1.000 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,1000.00,0,diamond:290;summon_ticket:4,0,,,ACH_SUMMON,12,12
+ACH_SUMMON_T13,ACHIEVEMENT,ACH_SUMMON_T14,Triệu hồi tổng 1.250 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,1250.00,0,diamond:310;summon_ticket:4,0,,,ACH_SUMMON,13,13
+ACH_SUMMON_T14,ACHIEVEMENT,ACH_SUMMON_T15,Triệu hồi tổng 1.500 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,1500.00,0,diamond:330;summon_ticket:4;summon_ticket_hi:1,0,,,ACH_SUMMON,14,14
+ACH_SUMMON_T15,ACHIEVEMENT,ACH_SUMMON_T16,Triệu hồi tổng 2.000 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,2000.00,0,diamond:350;summon_ticket:4;summon_ticket_hi:1,0,,,ACH_SUMMON,15,15
+ACH_SUMMON_T16,ACHIEVEMENT,ACH_SUMMON_T17,Triệu hồi tổng 2.500 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,2500.00,0,diamond:370;summon_ticket:5;summon_ticket_hi:1,0,,,ACH_SUMMON,16,16
+ACH_SUMMON_T17,ACHIEVEMENT,ACH_SUMMON_T18,Triệu hồi tổng 3.000 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,3000.00,0,diamond:390;summon_ticket:5;summon_ticket_hi:1,0,,,ACH_SUMMON,17,17
+ACH_SUMMON_T18,ACHIEVEMENT,ACH_SUMMON_T19,Triệu hồi tổng 4.000 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,4000.00,0,diamond:410;summon_ticket:5;summon_ticket_hi:1,0,,,ACH_SUMMON,18,18
+ACH_SUMMON_T19,ACHIEVEMENT,ACH_KILL_T1,Triệu hồi tổng 5.000 lần,Không reset - cộng dồn vĩnh viễn,HERO_SUMMON,5000.00,0,diamond:430;summon_ticket:5;summon_ticket_hi:1,0,,,ACH_SUMMON,19,19
+ACH_KILL_T1,ACHIEVEMENT,ACH_KILL_T2,Đồ tể: Tiêu diệt 100 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,100.00,0,gold:2000,0,,,ACH_KILL,1,1
+ACH_KILL_T2,ACHIEVEMENT,ACH_KILL_T3,Đồ tể: Tiêu diệt 250 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,250.00,0,gold:4000,0,,,ACH_KILL,2,2
+ACH_KILL_T3,ACHIEVEMENT,ACH_KILL_T4,Đồ tể: Tiêu diệt 500 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,500.00,0,gold:6000,0,,,ACH_KILL,3,3
+ACH_KILL_T4,ACHIEVEMENT,ACH_KILL_T5,Đồ tể: Tiêu diệt 1.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,1000.00,0,gold:8000,0,,,ACH_KILL,4,4
+ACH_KILL_T5,ACHIEVEMENT,ACH_KILL_T6,Đồ tể: Tiêu diệt 2.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,2000.00,0,gold:10000,0,,,ACH_KILL,5,5
+ACH_KILL_T6,ACHIEVEMENT,ACH_KILL_T7,Đồ tể: Tiêu diệt 3.500 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,3500.00,0,gold:12000,0,,,ACH_KILL,6,6
+ACH_KILL_T7,ACHIEVEMENT,ACH_KILL_T8,Đồ tể: Tiêu diệt 5.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,5000.00,0,gold:14000,0,,,ACH_KILL,7,7
+ACH_KILL_T8,ACHIEVEMENT,ACH_KILL_T9,Đồ tể: Tiêu diệt 7.500 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,7500.00,0,gold:16000,0,,,ACH_KILL,8,8
+ACH_KILL_T9,ACHIEVEMENT,ACH_KILL_T10,Đồ tể: Tiêu diệt 10.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,10000.00,0,gold:18000;chest_rare:1,0,,,ACH_KILL,9,9
+ACH_KILL_T10,ACHIEVEMENT,ACH_KILL_T11,Đồ tể: Tiêu diệt 15.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,15000.00,0,gold:20000;chest_rare:1,0,,,ACH_KILL,10,10
+ACH_KILL_T11,ACHIEVEMENT,ACH_KILL_T12,Đồ tể: Tiêu diệt 25.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,25000.00,0,gold:22000;chest_rare:1,0,,,ACH_KILL,11,11
+ACH_KILL_T12,ACHIEVEMENT,ACH_KILL_T13,Đồ tể: Tiêu diệt 50.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,50000.00,0,gold:24000;chest_rare:1,0,,,ACH_KILL,12,12
+ACH_KILL_T13,ACHIEVEMENT,ACH_KILL_T14,Đồ tể: Tiêu diệt 75.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,75000.00,0,gold:26000;chest_rare:1,0,,,ACH_KILL,13,13
+ACH_KILL_T14,ACHIEVEMENT,ACH_KILL_T15,Đồ tể: Tiêu diệt 100.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,100000.00,0,gold:28000;chest_rare:1;chest_epic:1,0,,,ACH_KILL,14,14
+ACH_KILL_T15,ACHIEVEMENT,ACH_KILL_T16,Đồ tể: Tiêu diệt 250.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,250000.00,0,gold:30000;chest_rare:1;chest_epic:1,0,,,ACH_KILL,15,15
+ACH_KILL_T16,ACHIEVEMENT,ACH_KILL_T17,Đồ tể: Tiêu diệt 500.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,500000.00,0,gold:32000;chest_rare:1;chest_epic:1,0,,,ACH_KILL,16,16
+ACH_KILL_T17,ACHIEVEMENT,ACH_KILL_T18,Đồ tể: Tiêu diệt 750.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,750000.00,0,gold:34000;chest_rare:1;chest_epic:1,0,,,ACH_KILL,17,17
+ACH_KILL_T18,ACHIEVEMENT,ACH_KILL_T19,Đồ tể: Tiêu diệt 1.000.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,1000000.00,0,gold:36000;chest_rare:1;chest_epic:1;chest_legendary:1,0,,,ACH_KILL,18,18
+ACH_KILL_T19,ACHIEVEMENT,ACH_BOSS_T1,Đồ tể: Tiêu diệt 2.000.000 quái,Không reset - cộng dồn vĩnh viễn,KILL_MONSTER,2000000.00,0,gold:38000;chest_rare:1;chest_epic:1;chest_legendary:1,0,,,ACH_KILL,19,19
+ACH_BOSS_T1,ACHIEVEMENT,ACH_BOSS_T2,Diệt trùm: Hạ 5 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,5.00,0,diamond:60,0,,,ACH_BOSS,1,1
+ACH_BOSS_T2,ACHIEVEMENT,ACH_BOSS_T3,Diệt trùm: Hạ 15 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,15.00,0,diamond:80,0,,,ACH_BOSS,2,2
+ACH_BOSS_T3,ACHIEVEMENT,ACH_BOSS_T4,Diệt trùm: Hạ 25 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,25.00,0,diamond:100,0,,,ACH_BOSS,3,3
+ACH_BOSS_T4,ACHIEVEMENT,ACH_BOSS_T5,Diệt trùm: Hạ 50 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,50.00,0,diamond:120,0,,,ACH_BOSS,4,4
+ACH_BOSS_T5,ACHIEVEMENT,ACH_BOSS_T6,Diệt trùm: Hạ 75 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,75.00,0,diamond:140,0,,,ACH_BOSS,5,5
+ACH_BOSS_T6,ACHIEVEMENT,ACH_BOSS_T7,Diệt trùm: Hạ 100 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,100.00,0,diamond:160,0,,,ACH_BOSS,6,6
+ACH_BOSS_T7,ACHIEVEMENT,ACH_BOSS_T8,Diệt trùm: Hạ 150 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,150.00,0,diamond:180,0,,,ACH_BOSS,7,7
+ACH_BOSS_T8,ACHIEVEMENT,ACH_BOSS_T9,Diệt trùm: Hạ 250 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,250.00,0,diamond:200;hero_shard_rare:24,0,,,ACH_BOSS,8,8
+ACH_BOSS_T9,ACHIEVEMENT,ACH_BOSS_T10,Diệt trùm: Hạ 400 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,400.00,0,diamond:220;hero_shard_rare:27,0,,,ACH_BOSS,9,9
+ACH_BOSS_T10,ACHIEVEMENT,ACH_BOSS_T11,Diệt trùm: Hạ 500 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,500.00,0,diamond:240;hero_shard_rare:30,0,,,ACH_BOSS,10,10
+ACH_BOSS_T11,ACHIEVEMENT,ACH_BOSS_T12,Diệt trùm: Hạ 750 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,750.00,0,diamond:260;hero_shard_rare:33,0,,,ACH_BOSS,11,11
+ACH_BOSS_T12,ACHIEVEMENT,ACH_BOSS_T13,Diệt trùm: Hạ 1.000 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,1000.00,0,diamond:280;hero_shard_rare:36;hero_shard_epic:5,0,,,ACH_BOSS,12,12
+ACH_BOSS_T13,ACHIEVEMENT,ACH_BOSS_T14,Diệt trùm: Hạ 1.500 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,1500.00,0,diamond:300;hero_shard_rare:39;hero_shard_epic:5,0,,,ACH_BOSS,13,13
+ACH_BOSS_T14,ACHIEVEMENT,ACH_BOSS_T15,Diệt trùm: Hạ 2.000 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,2000.00,0,diamond:320;hero_shard_rare:42;hero_shard_epic:5,0,,,ACH_BOSS,14,14
+ACH_BOSS_T15,ACHIEVEMENT,ACH_BOSS_T16,Diệt trùm: Hạ 3.000 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,3000.00,0,diamond:340;hero_shard_rare:45;hero_shard_epic:5,0,,,ACH_BOSS,15,15
+ACH_BOSS_T16,ACHIEVEMENT,ACH_ENHANCE_T1,Diệt trùm: Hạ 5.000 boss,Không reset - cộng dồn vĩnh viễn,KILL_BOSS,5000.00,0,diamond:360;hero_shard_rare:48;hero_shard_epic:5,0,,,ACH_BOSS,16,16
+ACH_ENHANCE_T1,ACHIEVEMENT,ACH_ENHANCE_T2,Thợ rèn: Cường hóa 10 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,10.00,0,forge_mat:10,0,,,ACH_ENHANCE,1,1
+ACH_ENHANCE_T2,ACHIEVEMENT,ACH_ENHANCE_T3,Thợ rèn: Cường hóa 25 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,25.00,0,forge_mat:20,0,,,ACH_ENHANCE,2,2
+ACH_ENHANCE_T3,ACHIEVEMENT,ACH_ENHANCE_T4,Thợ rèn: Cường hóa 50 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,50.00,0,forge_mat:30,0,,,ACH_ENHANCE,3,3
+ACH_ENHANCE_T4,ACHIEVEMENT,ACH_ENHANCE_T5,Thợ rèn: Cường hóa 100 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,100.00,0,forge_mat:40,0,,,ACH_ENHANCE,4,4
+ACH_ENHANCE_T5,ACHIEVEMENT,ACH_ENHANCE_T6,Thợ rèn: Cường hóa 200 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,200.00,0,forge_mat:50,0,,,ACH_ENHANCE,5,5
+ACH_ENHANCE_T6,ACHIEVEMENT,ACH_ENHANCE_T7,Thợ rèn: Cường hóa 350 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,350.00,0,forge_mat:60,0,,,ACH_ENHANCE,6,6
+ACH_ENHANCE_T7,ACHIEVEMENT,ACH_ENHANCE_T8,Thợ rèn: Cường hóa 500 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,500.00,0,forge_mat:70;forge_mat_hi:12,0,,,ACH_ENHANCE,7,7
+ACH_ENHANCE_T8,ACHIEVEMENT,ACH_ENHANCE_T9,Thợ rèn: Cường hóa 750 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,750.00,0,forge_mat:80;forge_mat_hi:13,0,,,ACH_ENHANCE,8,8
+ACH_ENHANCE_T9,ACHIEVEMENT,ACH_ENHANCE_T10,Thợ rèn: Cường hóa 1.000 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,1000.00,0,forge_mat:90;forge_mat_hi:14,0,,,ACH_ENHANCE,9,9
+ACH_ENHANCE_T10,ACHIEVEMENT,ACH_ENHANCE_T11,Thợ rèn: Cường hóa 1.500 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,1500.00,0,forge_mat:100;forge_mat_hi:15,0,,,ACH_ENHANCE,10,10
+ACH_ENHANCE_T11,ACHIEVEMENT,ACH_ENHANCE_T12,Thợ rèn: Cường hóa 2.000 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,2000.00,0,forge_mat:110;forge_mat_hi:16;chest_rare:1,0,,,ACH_ENHANCE,11,11
+ACH_ENHANCE_T12,ACHIEVEMENT,ACH_ENHANCE_T13,Thợ rèn: Cường hóa 3.000 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,3000.00,0,forge_mat:120;forge_mat_hi:17;chest_rare:1,0,,,ACH_ENHANCE,12,12
+ACH_ENHANCE_T13,ACHIEVEMENT,ACH_POWER_T1,Thợ rèn: Cường hóa 5.000 lần,Không reset - cộng dồn vĩnh viễn,ENHANCE_GEAR,5000.00,0,forge_mat:130;forge_mat_hi:18;chest_rare:1,0,,,ACH_ENHANCE,13,13
+ACH_POWER_T1,ACHIEVEMENT,ACH_POWER_T2,Sức mạnh: Đạt 10.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,10000.00,0,diamond:80,0,,,ACH_POWER,1,1
+ACH_POWER_T2,ACHIEVEMENT,ACH_POWER_T3,Sức mạnh: Đạt 25.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,25000.00,0,diamond:110,0,,,ACH_POWER,2,2
+ACH_POWER_T3,ACHIEVEMENT,ACH_POWER_T4,Sức mạnh: Đạt 50.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,50000.00,0,diamond:140,0,,,ACH_POWER,3,3
+ACH_POWER_T4,ACHIEVEMENT,ACH_POWER_T5,Sức mạnh: Đạt 100.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,100000.00,0,diamond:170,0,,,ACH_POWER,4,4
+ACH_POWER_T5,ACHIEVEMENT,ACH_POWER_T6,Sức mạnh: Đạt 250.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,250000.00,0,diamond:200,0,,,ACH_POWER,5,5
+ACH_POWER_T6,ACHIEVEMENT,ACH_POWER_T7,Sức mạnh: Đạt 500.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,500000.00,0,diamond:230,0,,,ACH_POWER,6,6
+ACH_POWER_T7,ACHIEVEMENT,ACH_POWER_T8,Sức mạnh: Đạt 750.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,750000.00,0,diamond:260,0,,,ACH_POWER,7,7
+ACH_POWER_T8,ACHIEVEMENT,ACH_POWER_T9,Sức mạnh: Đạt 1.000.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,1000000.00,0,diamond:290;avatar_frame:1,0,,,ACH_POWER,8,8
+ACH_POWER_T9,ACHIEVEMENT,ACH_POWER_T10,Sức mạnh: Đạt 2.000.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,2000000.00,0,diamond:320;avatar_frame:1,0,,,ACH_POWER,9,9
+ACH_POWER_T10,ACHIEVEMENT,ACH_POWER_T11,Sức mạnh: Đạt 3.500.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,3500000.00,0,diamond:350;avatar_frame:1,0,,,ACH_POWER,10,10
+ACH_POWER_T11,ACHIEVEMENT,ACH_POWER_T12,Sức mạnh: Đạt 5.000.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,5000000.00,0,diamond:380;avatar_frame:1;title:1,0,,,ACH_POWER,11,11
+ACH_POWER_T12,ACHIEVEMENT,ACH_POWER_T13,Sức mạnh: Đạt 7.500.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,7500000.00,0,diamond:410;avatar_frame:1;title:1,0,,,ACH_POWER,12,12
+ACH_POWER_T13,ACHIEVEMENT,ACH_POWER_T14,Sức mạnh: Đạt 10.000.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,10000000.00,0,diamond:440;avatar_frame:1;title:1,0,,,ACH_POWER,13,13
+ACH_POWER_T14,ACHIEVEMENT,ACH_LEVEL_T1,Sức mạnh: Đạt 25.000.000 Lực chiến,Không reset - cộng dồn vĩnh viễn,REACH_POWER,25000000.00,0,diamond:470;avatar_frame:1;title:1,0,,,ACH_POWER,14,14
+ACH_LEVEL_T1,ACHIEVEMENT,ACH_LEVEL_T2,Cấp độ: Đạt cấp 5,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,5.00,0,gold:5000;diamond:25,0,,,ACH_LEVEL,1,1
+ACH_LEVEL_T2,ACHIEVEMENT,ACH_LEVEL_T3,Cấp độ: Đạt cấp 10,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,10.00,0,gold:10000;diamond:30,0,,,ACH_LEVEL,2,2
+ACH_LEVEL_T3,ACHIEVEMENT,ACH_LEVEL_T4,Cấp độ: Đạt cấp 15,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,15.00,0,gold:15000;diamond:35,0,,,ACH_LEVEL,3,3
+ACH_LEVEL_T4,ACHIEVEMENT,ACH_LEVEL_T5,Cấp độ: Đạt cấp 20,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,20.00,0,gold:20000;diamond:40,0,,,ACH_LEVEL,4,4
+ACH_LEVEL_T5,ACHIEVEMENT,ACH_LEVEL_T6,Cấp độ: Đạt cấp 25,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,25.00,0,gold:25000;diamond:45,0,,,ACH_LEVEL,5,5
+ACH_LEVEL_T6,ACHIEVEMENT,ACH_LEVEL_T7,Cấp độ: Đạt cấp 30,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,30.00,0,gold:30000;diamond:50,0,,,ACH_LEVEL,6,6
+ACH_LEVEL_T7,ACHIEVEMENT,ACH_LEVEL_T8,Cấp độ: Đạt cấp 35,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,35.00,0,gold:35000;diamond:55,0,,,ACH_LEVEL,7,7
+ACH_LEVEL_T8,ACHIEVEMENT,ACH_LEVEL_T9,Cấp độ: Đạt cấp 40,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,40.00,0,gold:40000;diamond:60,0,,,ACH_LEVEL,8,8
+ACH_LEVEL_T9,ACHIEVEMENT,ACH_LEVEL_T10,Cấp độ: Đạt cấp 45,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,45.00,0,gold:45000;diamond:65,0,,,ACH_LEVEL,9,9
+ACH_LEVEL_T10,ACHIEVEMENT,ACH_LEVEL_T11,Cấp độ: Đạt cấp 50,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,50.00,0,gold:50000;diamond:70;chest_rare:1,0,,,ACH_LEVEL,10,10
+ACH_LEVEL_T11,ACHIEVEMENT,ACH_LEVEL_T12,Cấp độ: Đạt cấp 55,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,55.00,0,gold:55000;diamond:75,0,,,ACH_LEVEL,11,11
+ACH_LEVEL_T12,ACHIEVEMENT,ACH_LEVEL_T13,Cấp độ: Đạt cấp 60,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,60.00,0,gold:60000;diamond:80,0,,,ACH_LEVEL,12,12
+ACH_LEVEL_T13,ACHIEVEMENT,ACH_LEVEL_T14,Cấp độ: Đạt cấp 65,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,65.00,0,gold:65000;diamond:85,0,,,ACH_LEVEL,13,13
+ACH_LEVEL_T14,ACHIEVEMENT,ACH_LEVEL_T15,Cấp độ: Đạt cấp 70,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,70.00,0,gold:70000;diamond:90,0,,,ACH_LEVEL,14,14
+ACH_LEVEL_T15,ACHIEVEMENT,ACH_LEVEL_T16,Cấp độ: Đạt cấp 75,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,75.00,0,gold:75000;diamond:95,0,,,ACH_LEVEL,15,15
+ACH_LEVEL_T16,ACHIEVEMENT,ACH_LEVEL_T17,Cấp độ: Đạt cấp 80,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,80.00,0,gold:80000;diamond:100,0,,,ACH_LEVEL,16,16
+ACH_LEVEL_T17,ACHIEVEMENT,ACH_LEVEL_T18,Cấp độ: Đạt cấp 85,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,85.00,0,gold:85000;diamond:105,0,,,ACH_LEVEL,17,17
+ACH_LEVEL_T18,ACHIEVEMENT,ACH_LEVEL_T19,Cấp độ: Đạt cấp 90,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,90.00,0,gold:90000;diamond:110,0,,,ACH_LEVEL,18,18
+ACH_LEVEL_T19,ACHIEVEMENT,ACH_LEVEL_T20,Cấp độ: Đạt cấp 95,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,95.00,0,gold:95000;diamond:115,0,,,ACH_LEVEL,19,19
+ACH_LEVEL_T20,ACHIEVEMENT,ACH_LEVEL_T21,Cấp độ: Đạt cấp 100,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,100.00,0,gold:100000;diamond:120;chest_rare:1,0,,,ACH_LEVEL,20,20
+ACH_LEVEL_T21,ACHIEVEMENT,ACH_LEVEL_T22,Cấp độ: Đạt cấp 105,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,105.00,0,gold:105000;diamond:125,0,,,ACH_LEVEL,21,21
+ACH_LEVEL_T22,ACHIEVEMENT,ACH_LEVEL_T23,Cấp độ: Đạt cấp 110,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,110.00,0,gold:110000;diamond:130,0,,,ACH_LEVEL,22,22
+ACH_LEVEL_T23,ACHIEVEMENT,ACH_LEVEL_T24,Cấp độ: Đạt cấp 115,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,115.00,0,gold:115000;diamond:135,0,,,ACH_LEVEL,23,23
+ACH_LEVEL_T24,ACHIEVEMENT,ACH_LEVEL_T25,Cấp độ: Đạt cấp 120,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,120.00,0,gold:120000;diamond:140,0,,,ACH_LEVEL,24,24
+ACH_LEVEL_T25,ACHIEVEMENT,ACH_LEVEL_T26,Cấp độ: Đạt cấp 125,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,125.00,0,gold:125000;diamond:145,0,,,ACH_LEVEL,25,25
+ACH_LEVEL_T26,ACHIEVEMENT,ACH_LEVEL_T27,Cấp độ: Đạt cấp 130,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,130.00,0,gold:130000;diamond:150,0,,,ACH_LEVEL,26,26
+ACH_LEVEL_T27,ACHIEVEMENT,ACH_LEVEL_T28,Cấp độ: Đạt cấp 135,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,135.00,0,gold:135000;diamond:155,0,,,ACH_LEVEL,27,27
+ACH_LEVEL_T28,ACHIEVEMENT,ACH_LEVEL_T29,Cấp độ: Đạt cấp 140,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,140.00,0,gold:140000;diamond:160,0,,,ACH_LEVEL,28,28
+ACH_LEVEL_T29,ACHIEVEMENT,ACH_LEVEL_T30,Cấp độ: Đạt cấp 145,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,145.00,0,gold:145000;diamond:165,0,,,ACH_LEVEL,29,29
+ACH_LEVEL_T30,ACHIEVEMENT,ACH_LEVEL_T31,Cấp độ: Đạt cấp 150,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,150.00,0,gold:150000;diamond:170;chest_rare:1,0,,,ACH_LEVEL,30,30
+ACH_LEVEL_T31,ACHIEVEMENT,ACH_LEVEL_T32,Cấp độ: Đạt cấp 155,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,155.00,0,gold:155000;diamond:175,0,,,ACH_LEVEL,31,31
+ACH_LEVEL_T32,ACHIEVEMENT,ACH_LEVEL_T33,Cấp độ: Đạt cấp 160,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,160.00,0,gold:160000;diamond:180,0,,,ACH_LEVEL,32,32
+ACH_LEVEL_T33,ACHIEVEMENT,ACH_LEVEL_T34,Cấp độ: Đạt cấp 165,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,165.00,0,gold:165000;diamond:185,0,,,ACH_LEVEL,33,33
+ACH_LEVEL_T34,ACHIEVEMENT,ACH_LEVEL_T35,Cấp độ: Đạt cấp 170,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,170.00,0,gold:170000;diamond:190,0,,,ACH_LEVEL,34,34
+ACH_LEVEL_T35,ACHIEVEMENT,ACH_LEVEL_T36,Cấp độ: Đạt cấp 175,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,175.00,0,gold:175000;diamond:195,0,,,ACH_LEVEL,35,35
+ACH_LEVEL_T36,ACHIEVEMENT,ACH_LEVEL_T37,Cấp độ: Đạt cấp 180,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,180.00,0,gold:180000;diamond:200,0,,,ACH_LEVEL,36,36
+ACH_LEVEL_T37,ACHIEVEMENT,ACH_LEVEL_T38,Cấp độ: Đạt cấp 185,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,185.00,0,gold:185000;diamond:205,0,,,ACH_LEVEL,37,37
+ACH_LEVEL_T38,ACHIEVEMENT,ACH_LEVEL_T39,Cấp độ: Đạt cấp 190,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,190.00,0,gold:190000;diamond:210,0,,,ACH_LEVEL,38,38
+ACH_LEVEL_T39,ACHIEVEMENT,ACH_LEVEL_T40,Cấp độ: Đạt cấp 195,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,195.00,0,gold:195000;diamond:215,0,,,ACH_LEVEL,39,39
+ACH_LEVEL_T40,ACHIEVEMENT,ACH_ARENA_T1,Cấp độ: Đạt cấp 200,Không reset - cộng dồn vĩnh viễn,REACH_LEVEL,200.00,0,gold:200000;diamond:220;chest_rare:1,0,,,ACH_LEVEL,40,40
+ACH_ARENA_T1,ACHIEVEMENT,ACH_ARENA_T2,Đấu sĩ: Thắng 1 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,1.00,0,arena_badge:20,0,,,ACH_ARENA,1,1
+ACH_ARENA_T2,ACHIEVEMENT,ACH_ARENA_T3,Đấu sĩ: Thắng 5 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,5.00,0,arena_badge:40,0,,,ACH_ARENA,2,2
+ACH_ARENA_T3,ACHIEVEMENT,ACH_ARENA_T4,Đấu sĩ: Thắng 10 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,10.00,0,arena_badge:60,0,,,ACH_ARENA,3,3
+ACH_ARENA_T4,ACHIEVEMENT,ACH_ARENA_T5,Đấu sĩ: Thắng 25 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,25.00,0,arena_badge:80,0,,,ACH_ARENA,4,4
+ACH_ARENA_T5,ACHIEVEMENT,ACH_ARENA_T6,Đấu sĩ: Thắng 50 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,50.00,0,arena_badge:100,0,,,ACH_ARENA,5,5
+ACH_ARENA_T6,ACHIEVEMENT,ACH_ARENA_T7,Đấu sĩ: Thắng 75 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,75.00,0,arena_badge:120,0,,,ACH_ARENA,6,6
+ACH_ARENA_T7,ACHIEVEMENT,ACH_ARENA_T8,Đấu sĩ: Thắng 100 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,100.00,0,arena_badge:140;diamond:120,0,,,ACH_ARENA,7,7
+ACH_ARENA_T8,ACHIEVEMENT,ACH_ARENA_T9,Đấu sĩ: Thắng 150 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,150.00,0,arena_badge:160;diamond:130,0,,,ACH_ARENA,8,8
+ACH_ARENA_T9,ACHIEVEMENT,ACH_ARENA_T10,Đấu sĩ: Thắng 250 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,250.00,0,arena_badge:180;diamond:140,0,,,ACH_ARENA,9,9
+ACH_ARENA_T10,ACHIEVEMENT,ACH_ARENA_T11,Đấu sĩ: Thắng 400 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,400.00,0,arena_badge:200;diamond:150,0,,,ACH_ARENA,10,10
+ACH_ARENA_T11,ACHIEVEMENT,ACH_ARENA_T12,Đấu sĩ: Thắng 500 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,500.00,0,arena_badge:220;diamond:160,0,,,ACH_ARENA,11,11
+ACH_ARENA_T12,ACHIEVEMENT,ACH_ARENA_T13,Đấu sĩ: Thắng 750 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,750.00,0,arena_badge:240;diamond:170,0,,,ACH_ARENA,12,12
+ACH_ARENA_T13,ACHIEVEMENT,ACH_ARENA_T14,Đấu sĩ: Thắng 1.000 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,1000.00,0,arena_badge:260;diamond:180,0,,,ACH_ARENA,13,13
+ACH_ARENA_T14,ACHIEVEMENT,ACH_ARENA_T15,Đấu sĩ: Thắng 1.500 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,1500.00,0,arena_badge:280;diamond:190,0,,,ACH_ARENA,14,14
+ACH_ARENA_T15,ACHIEVEMENT,ACH_ARENA_T16,Đấu sĩ: Thắng 2.000 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,2000.00,0,arena_badge:300;diamond:200,0,,,ACH_ARENA,15,15
+ACH_ARENA_T16,ACHIEVEMENT,ACH_DUNGEON_T1,Đấu sĩ: Thắng 3.000 trận Arena,Không reset - cộng dồn vĩnh viễn,ARENA_WIN,3000.00,0,arena_badge:320;diamond:210,0,,,ACH_ARENA,16,16
+ACH_DUNGEON_T1,ACHIEVEMENT,ACH_DUNGEON_T2,Thám hiểm: Hoàn thành 1 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,1.00,0,dungeon_key:2;forge_mat_hi:1,0,,,ACH_DUNGEON,1,1
+ACH_DUNGEON_T2,ACHIEVEMENT,ACH_DUNGEON_T3,Thám hiểm: Hoàn thành 5 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,5.00,0,dungeon_key:4;forge_mat_hi:2,0,,,ACH_DUNGEON,2,2
+ACH_DUNGEON_T3,ACHIEVEMENT,ACH_DUNGEON_T4,Thám hiểm: Hoàn thành 10 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,10.00,0,dungeon_key:6;forge_mat_hi:3,0,,,ACH_DUNGEON,3,3
+ACH_DUNGEON_T4,ACHIEVEMENT,ACH_DUNGEON_T5,Thám hiểm: Hoàn thành 25 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,25.00,0,dungeon_key:8;forge_mat_hi:4,0,,,ACH_DUNGEON,4,4
+ACH_DUNGEON_T5,ACHIEVEMENT,ACH_DUNGEON_T6,Thám hiểm: Hoàn thành 50 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,50.00,0,dungeon_key:10;forge_mat_hi:5,0,,,ACH_DUNGEON,5,5
+ACH_DUNGEON_T6,ACHIEVEMENT,ACH_DUNGEON_T7,Thám hiểm: Hoàn thành 75 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,75.00,0,dungeon_key:12;forge_mat_hi:6,0,,,ACH_DUNGEON,6,6
+ACH_DUNGEON_T7,ACHIEVEMENT,ACH_DUNGEON_T8,Thám hiểm: Hoàn thành 100 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,100.00,0,dungeon_key:14;forge_mat_hi:7;chest_rare:1,0,,,ACH_DUNGEON,7,7
+ACH_DUNGEON_T8,ACHIEVEMENT,ACH_DUNGEON_T9,Thám hiểm: Hoàn thành 150 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,150.00,0,dungeon_key:16;forge_mat_hi:8;chest_rare:1,0,,,ACH_DUNGEON,8,8
+ACH_DUNGEON_T9,ACHIEVEMENT,ACH_DUNGEON_T10,Thám hiểm: Hoàn thành 250 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,250.00,0,dungeon_key:18;forge_mat_hi:9;chest_rare:1,0,,,ACH_DUNGEON,9,9
+ACH_DUNGEON_T10,ACHIEVEMENT,ACH_DUNGEON_T11,Thám hiểm: Hoàn thành 400 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,400.00,0,dungeon_key:20;forge_mat_hi:10;chest_rare:1,0,,,ACH_DUNGEON,10,10
+ACH_DUNGEON_T11,ACHIEVEMENT,ACH_DUNGEON_T12,Thám hiểm: Hoàn thành 500 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,500.00,0,dungeon_key:22;forge_mat_hi:11;chest_rare:1,0,,,ACH_DUNGEON,11,11
+ACH_DUNGEON_T12,ACHIEVEMENT,ACH_DUNGEON_T13,Thám hiểm: Hoàn thành 750 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,750.00,0,dungeon_key:24;forge_mat_hi:12;chest_rare:1,0,,,ACH_DUNGEON,12,12
+ACH_DUNGEON_T13,ACHIEVEMENT,ACH_DUNGEON_T14,Thám hiểm: Hoàn thành 1.000 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,1000.00,0,dungeon_key:26;forge_mat_hi:13;chest_rare:1,0,,,ACH_DUNGEON,13,13
+ACH_DUNGEON_T14,ACHIEVEMENT,ACH_SKILL_T1,Thám hiểm: Hoàn thành 1.500 lượt Dungeon,Không reset - cộng dồn vĩnh viễn,DUNGEON_CLEAR,1500.00,0,dungeon_key:28;forge_mat_hi:14;chest_rare:1,0,,,ACH_DUNGEON,14,14
+ACH_SKILL_T1,ACHIEVEMENT,ACH_SKILL_T2,Bậc thầy kỹ năng: Nâng cấp 10 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,10.00,0,gold:5000,0,,,ACH_SKILL,1,1
+ACH_SKILL_T2,ACHIEVEMENT,ACH_SKILL_T3,Bậc thầy kỹ năng: Nâng cấp 25 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,25.00,0,gold:10000,0,,,ACH_SKILL,2,2
+ACH_SKILL_T3,ACHIEVEMENT,ACH_SKILL_T4,Bậc thầy kỹ năng: Nâng cấp 50 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,50.00,0,gold:15000,0,,,ACH_SKILL,3,3
+ACH_SKILL_T4,ACHIEVEMENT,ACH_SKILL_T5,Bậc thầy kỹ năng: Nâng cấp 100 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,100.00,0,gold:20000,0,,,ACH_SKILL,4,4
+ACH_SKILL_T5,ACHIEVEMENT,ACH_SKILL_T6,Bậc thầy kỹ năng: Nâng cấp 200 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,200.00,0,gold:25000,0,,,ACH_SKILL,5,5
+ACH_SKILL_T6,ACHIEVEMENT,ACH_SKILL_T7,Bậc thầy kỹ năng: Nâng cấp 350 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,350.00,0,gold:30000,0,,,ACH_SKILL,6,6
+ACH_SKILL_T7,ACHIEVEMENT,ACH_SKILL_T8,Bậc thầy kỹ năng: Nâng cấp 500 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,500.00,0,gold:35000;diamond:210,0,,,ACH_SKILL,7,7
+ACH_SKILL_T8,ACHIEVEMENT,ACH_SKILL_T9,Bậc thầy kỹ năng: Nâng cấp 750 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,750.00,0,gold:40000;diamond:240,0,,,ACH_SKILL,8,8
+ACH_SKILL_T9,ACHIEVEMENT,ACH_SKILL_T10,Bậc thầy kỹ năng: Nâng cấp 1.000 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,1000.00,0,gold:45000;diamond:270,0,,,ACH_SKILL,9,9
+ACH_SKILL_T10,ACHIEVEMENT,ACH_SKILL_T11,Bậc thầy kỹ năng: Nâng cấp 1.500 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,1500.00,0,gold:50000;diamond:300,0,,,ACH_SKILL,10,10
+ACH_SKILL_T11,ACHIEVEMENT,ACH_SKILL_T12,Bậc thầy kỹ năng: Nâng cấp 2.000 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,2000.00,0,gold:55000;diamond:330,0,,,ACH_SKILL,11,11
+ACH_SKILL_T12,ACHIEVEMENT,ACH_HEROLV_T1,Bậc thầy kỹ năng: Nâng cấp 3.000 lần,Không reset - cộng dồn vĩnh viễn,SKILL_UPGRADE,3000.00,0,gold:60000;diamond:360,0,,,ACH_SKILL,12,12
+ACH_HEROLV_T1,ACHIEVEMENT,ACH_HEROLV_T2,Huấn luyện: Lên cấp anh hùng 10 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,10.00,0,gold:3000;exp:500,0,,,ACH_HEROLV,1,1
+ACH_HEROLV_T2,ACHIEVEMENT,ACH_HEROLV_T3,Huấn luyện: Lên cấp anh hùng 25 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,25.00,0,gold:6000;exp:1000,0,,,ACH_HEROLV,2,2
+ACH_HEROLV_T3,ACHIEVEMENT,ACH_HEROLV_T4,Huấn luyện: Lên cấp anh hùng 50 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,50.00,0,gold:9000;exp:1500,0,,,ACH_HEROLV,3,3
+ACH_HEROLV_T4,ACHIEVEMENT,ACH_HEROLV_T5,Huấn luyện: Lên cấp anh hùng 100 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,100.00,0,gold:12000;exp:2000,0,,,ACH_HEROLV,4,4
+ACH_HEROLV_T5,ACHIEVEMENT,ACH_HEROLV_T6,Huấn luyện: Lên cấp anh hùng 250 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,250.00,0,gold:15000;exp:2500,0,,,ACH_HEROLV,5,5
+ACH_HEROLV_T6,ACHIEVEMENT,ACH_HEROLV_T7,Huấn luyện: Lên cấp anh hùng 500 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,500.00,0,gold:18000;exp:3000,0,,,ACH_HEROLV,6,6
+ACH_HEROLV_T7,ACHIEVEMENT,ACH_HEROLV_T8,Huấn luyện: Lên cấp anh hùng 750 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,750.00,0,gold:21000;exp:3500,0,,,ACH_HEROLV,7,7
+ACH_HEROLV_T8,ACHIEVEMENT,ACH_HEROLV_T9,Huấn luyện: Lên cấp anh hùng 1.000 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,1000.00,0,gold:24000;exp:4000;chest_rare:1,0,,,ACH_HEROLV,8,8
+ACH_HEROLV_T9,ACHIEVEMENT,ACH_HEROLV_T10,Huấn luyện: Lên cấp anh hùng 1.500 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,1500.00,0,gold:27000;exp:4500;chest_rare:1,0,,,ACH_HEROLV,9,9
+ACH_HEROLV_T10,ACHIEVEMENT,ACH_HEROLV_T11,Huấn luyện: Lên cấp anh hùng 2.500 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,2500.00,0,gold:30000;exp:5000;chest_rare:1,0,,,ACH_HEROLV,10,10
+ACH_HEROLV_T11,ACHIEVEMENT,ACH_HEROLV_T12,Huấn luyện: Lên cấp anh hùng 5.000 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,5000.00,0,gold:33000;exp:5500;chest_rare:1,0,,,ACH_HEROLV,11,11
+ACH_HEROLV_T12,ACHIEVEMENT,ACH_HEROLV_T13,Huấn luyện: Lên cấp anh hùng 7.500 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,7500.00,0,gold:36000;exp:6000;chest_rare:1,0,,,ACH_HEROLV,12,12
+ACH_HEROLV_T13,ACHIEVEMENT,ACH_IDLE_T1,Huấn luyện: Lên cấp anh hùng 10.000 lần,Không reset - cộng dồn vĩnh viễn,HERO_LEVELUP,10000.00,0,gold:39000;exp:6500;chest_rare:1,0,,,ACH_HEROLV,13,13
+ACH_IDLE_T1,ACHIEVEMENT,ACH_IDLE_T2,Nhàn rỗi: Nhận Idle Reward 5 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,5.00,0,gold:2000;diamond:10,0,,,ACH_IDLE,1,1
+ACH_IDLE_T2,ACHIEVEMENT,ACH_IDLE_T3,Nhàn rỗi: Nhận Idle Reward 15 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,15.00,0,gold:4000;diamond:20,0,,,ACH_IDLE,2,2
+ACH_IDLE_T3,ACHIEVEMENT,ACH_IDLE_T4,Nhàn rỗi: Nhận Idle Reward 25 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,25.00,0,gold:6000;diamond:30,0,,,ACH_IDLE,3,3
+ACH_IDLE_T4,ACHIEVEMENT,ACH_IDLE_T5,Nhàn rỗi: Nhận Idle Reward 50 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,50.00,0,gold:8000;diamond:40,0,,,ACH_IDLE,4,4
+ACH_IDLE_T5,ACHIEVEMENT,ACH_IDLE_T6,Nhàn rỗi: Nhận Idle Reward 100 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,100.00,0,gold:10000;diamond:50,0,,,ACH_IDLE,5,5
+ACH_IDLE_T6,ACHIEVEMENT,ACH_IDLE_T7,Nhàn rỗi: Nhận Idle Reward 200 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,200.00,0,gold:12000;diamond:60,0,,,ACH_IDLE,6,6
+ACH_IDLE_T7,ACHIEVEMENT,ACH_IDLE_T8,Nhàn rỗi: Nhận Idle Reward 350 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,350.00,0,gold:14000;diamond:70,0,,,ACH_IDLE,7,7
+ACH_IDLE_T8,ACHIEVEMENT,ACH_IDLE_T9,Nhàn rỗi: Nhận Idle Reward 500 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,500.00,0,gold:16000;diamond:80,0,,,ACH_IDLE,8,8
+ACH_IDLE_T9,ACHIEVEMENT,ACH_IDLE_T10,Nhàn rỗi: Nhận Idle Reward 750 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,750.00,0,gold:18000;diamond:90,0,,,ACH_IDLE,9,9
+ACH_IDLE_T10,ACHIEVEMENT,ACH_IDLE_T11,Nhàn rỗi: Nhận Idle Reward 1.000 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,1000.00,0,gold:20000;diamond:100,0,,,ACH_IDLE,10,10
+ACH_IDLE_T11,ACHIEVEMENT,ACH_FORGE_T1,Nhàn rỗi: Nhận Idle Reward 1.500 lần,Không reset - cộng dồn vĩnh viễn,CLAIM_IDLE,1500.00,0,gold:22000;diamond:110,0,,,ACH_IDLE,11,11
+ACH_FORGE_T1,ACHIEVEMENT,ACH_FORGE_T2,Chế tác: Rèn 10 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,10.00,0,forge_mat:10,0,,,ACH_FORGE,1,1
+ACH_FORGE_T2,ACHIEVEMENT,ACH_FORGE_T3,Chế tác: Rèn 25 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,25.00,0,forge_mat:20,0,,,ACH_FORGE,2,2
+ACH_FORGE_T3,ACHIEVEMENT,ACH_FORGE_T4,Chế tác: Rèn 50 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,50.00,0,forge_mat:30,0,,,ACH_FORGE,3,3
+ACH_FORGE_T4,ACHIEVEMENT,ACH_FORGE_T5,Chế tác: Rèn 100 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,100.00,0,forge_mat:40,0,,,ACH_FORGE,4,4
+ACH_FORGE_T5,ACHIEVEMENT,ACH_FORGE_T6,Chế tác: Rèn 200 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,200.00,0,forge_mat:50,0,,,ACH_FORGE,5,5
+ACH_FORGE_T6,ACHIEVEMENT,ACH_FORGE_T7,Chế tác: Rèn 350 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,350.00,0,forge_mat:60,0,,,ACH_FORGE,6,6
+ACH_FORGE_T7,ACHIEVEMENT,ACH_FORGE_T8,Chế tác: Rèn 500 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,500.00,0,forge_mat:70;forge_mat_hi:35,0,,,ACH_FORGE,7,7
+ACH_FORGE_T8,ACHIEVEMENT,ACH_FORGE_T9,Chế tác: Rèn 750 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,750.00,0,forge_mat:80;forge_mat_hi:40,0,,,ACH_FORGE,8,8
+ACH_FORGE_T9,ACHIEVEMENT,ACH_FORGE_T10,Chế tác: Rèn 1.000 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,1000.00,0,forge_mat:90;forge_mat_hi:45,0,,,ACH_FORGE,9,9
+ACH_FORGE_T10,ACHIEVEMENT,ACH_FORGE_T11,Chế tác: Rèn 1.500 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,1500.00,0,forge_mat:100;forge_mat_hi:50,0,,,ACH_FORGE,10,10
+ACH_FORGE_T11,ACHIEVEMENT,ACH_TRANSMUTE_T1,Chế tác: Rèn 2.000 trang bị,Không reset - cộng dồn vĩnh viễn,FORGE_GEAR,2000.00,0,forge_mat:110;forge_mat_hi:55,0,,,ACH_FORGE,11,11
+ACH_TRANSMUTE_T1,ACHIEVEMENT,ACH_TRANSMUTE_T2,Luyện hóa: Transmute 5 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,5.00,0,forge_mat_hi:5,0,,,ACH_TRANSMUTE,1,1
+ACH_TRANSMUTE_T2,ACHIEVEMENT,ACH_TRANSMUTE_T3,Luyện hóa: Transmute 15 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,15.00,0,forge_mat_hi:10,0,,,ACH_TRANSMUTE,2,2
+ACH_TRANSMUTE_T3,ACHIEVEMENT,ACH_TRANSMUTE_T4,Luyện hóa: Transmute 25 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,25.00,0,forge_mat_hi:15,0,,,ACH_TRANSMUTE,3,3
+ACH_TRANSMUTE_T4,ACHIEVEMENT,ACH_TRANSMUTE_T5,Luyện hóa: Transmute 50 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,50.00,0,forge_mat_hi:20,0,,,ACH_TRANSMUTE,4,4
+ACH_TRANSMUTE_T5,ACHIEVEMENT,ACH_TRANSMUTE_T6,Luyện hóa: Transmute 100 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,100.00,0,forge_mat_hi:25;chest_rare:1,0,,,ACH_TRANSMUTE,5,5
+ACH_TRANSMUTE_T6,ACHIEVEMENT,ACH_TRANSMUTE_T7,Luyện hóa: Transmute 200 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,200.00,0,forge_mat_hi:30;chest_rare:1,0,,,ACH_TRANSMUTE,6,6
+ACH_TRANSMUTE_T7,ACHIEVEMENT,ACH_TRANSMUTE_T8,Luyện hóa: Transmute 350 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,350.00,0,forge_mat_hi:35;chest_rare:1,0,,,ACH_TRANSMUTE,7,7
+ACH_TRANSMUTE_T8,ACHIEVEMENT,ACH_TRANSMUTE_T9,Luyện hóa: Transmute 500 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,500.00,0,forge_mat_hi:40;chest_rare:1,0,,,ACH_TRANSMUTE,8,8
+ACH_TRANSMUTE_T9,ACHIEVEMENT,ACH_DAILYDONE_T1,Luyện hóa: Transmute 750 lần,Không reset - cộng dồn vĩnh viễn,TRANSMUTE_GEAR,750.00,0,forge_mat_hi:45;chest_rare:1,0,,,ACH_TRANSMUTE,9,9
+ACH_DAILYDONE_T1,ACHIEVEMENT,ACH_DAILYDONE_T2,Chăm chỉ: Hoàn thành 10 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,10.00,0,diamond:50,0,,,ACH_DAILYDONE,1,1
+ACH_DAILYDONE_T2,ACHIEVEMENT,ACH_DAILYDONE_T3,Chăm chỉ: Hoàn thành 25 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,25.00,0,diamond:100,0,,,ACH_DAILYDONE,2,2
+ACH_DAILYDONE_T3,ACHIEVEMENT,ACH_DAILYDONE_T4,Chăm chỉ: Hoàn thành 50 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,50.00,0,diamond:150,0,,,ACH_DAILYDONE,3,3
+ACH_DAILYDONE_T4,ACHIEVEMENT,ACH_DAILYDONE_T5,Chăm chỉ: Hoàn thành 100 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,100.00,0,diamond:200,0,,,ACH_DAILYDONE,4,4
+ACH_DAILYDONE_T5,ACHIEVEMENT,ACH_DAILYDONE_T6,Chăm chỉ: Hoàn thành 200 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,200.00,0,diamond:250,0,,,ACH_DAILYDONE,5,5
+ACH_DAILYDONE_T6,ACHIEVEMENT,ACH_DAILYDONE_T7,Chăm chỉ: Hoàn thành 350 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,350.00,0,diamond:300,0,,,ACH_DAILYDONE,6,6
+ACH_DAILYDONE_T7,ACHIEVEMENT,ACH_DAILYDONE_T8,Chăm chỉ: Hoàn thành 500 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,500.00,0,diamond:350;chest_epic:1,0,,,ACH_DAILYDONE,7,7
+ACH_DAILYDONE_T8,ACHIEVEMENT,ACH_DAILYDONE_T9,Chăm chỉ: Hoàn thành 750 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,750.00,0,diamond:400;chest_epic:1,0,,,ACH_DAILYDONE,8,8
+ACH_DAILYDONE_T9,ACHIEVEMENT,ACH_USEGOLD_T1,Chăm chỉ: Hoàn thành 1.000 nhiệm vụ ngày,Không reset - cộng dồn vĩnh viễn,COMPLETE_DAILY,1000.00,0,diamond:450;chest_epic:1,0,,,ACH_DAILYDONE,9,9
+ACH_USEGOLD_T1,ACHIEVEMENT,ACH_USEGOLD_T2,Tiêu xài: Dùng 10.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,10000.00,0,diamond:30,0,,,ACH_USEGOLD,1,1
+ACH_USEGOLD_T2,ACHIEVEMENT,ACH_USEGOLD_T3,Tiêu xài: Dùng 50.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,50000.00,0,diamond:60,0,,,ACH_USEGOLD,2,2
+ACH_USEGOLD_T3,ACHIEVEMENT,ACH_USEGOLD_T4,Tiêu xài: Dùng 100.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,100000.00,0,diamond:90,0,,,ACH_USEGOLD,3,3
+ACH_USEGOLD_T4,ACHIEVEMENT,ACH_USEGOLD_T5,Tiêu xài: Dùng 500.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,500000.00,0,diamond:120,0,,,ACH_USEGOLD,4,4
+ACH_USEGOLD_T5,ACHIEVEMENT,ACH_USEGOLD_T6,Tiêu xài: Dùng 1.000.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,1000000.00,0,diamond:150,0,,,ACH_USEGOLD,5,5
+ACH_USEGOLD_T6,ACHIEVEMENT,ACH_USEGOLD_T7,Tiêu xài: Dùng 2.500.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,2500000.00,0,diamond:180,0,,,ACH_USEGOLD,6,6
+ACH_USEGOLD_T7,ACHIEVEMENT,ACH_USEGOLD_T8,Tiêu xài: Dùng 5.000.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,5000000.00,0,diamond:210,0,,,ACH_USEGOLD,7,7
+ACH_USEGOLD_T8,ACHIEVEMENT,ACH_USEGOLD_T9,Tiêu xài: Dùng 10.000.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,10000000.00,0,diamond:240,0,,,ACH_USEGOLD,8,8
+ACH_USEGOLD_T9,ACHIEVEMENT,ACH_USEGOLD_T10,Tiêu xài: Dùng 25.000.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,25000000.00,0,diamond:270,0,,,ACH_USEGOLD,9,9
+ACH_USEGOLD_T10,ACHIEVEMENT,ACH_USEGOLD_T11,Tiêu xài: Dùng 50.000.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,50000000.00,0,diamond:300,0,,,ACH_USEGOLD,10,10
+ACH_USEGOLD_T11,ACHIEVEMENT,ACH_EQUIP_T1,Tiêu xài: Dùng 100.000.000 Vàng,Không reset - cộng dồn vĩnh viễn,USE_GOLD,100000000.00,0,diamond:330,0,,,ACH_USEGOLD,11,11
+ACH_EQUIP_T1,ACHIEVEMENT,ACH_EQUIP_T2,Vũ trang: Trang bị 1 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,1.00,0,gold:1000,0,,,ACH_EQUIP,1,1
+ACH_EQUIP_T2,ACHIEVEMENT,ACH_EQUIP_T3,Vũ trang: Trang bị 5 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,5.00,0,gold:2000,0,,,ACH_EQUIP,2,2
+ACH_EQUIP_T3,ACHIEVEMENT,ACH_EQUIP_T4,Vũ trang: Trang bị 10 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,10.00,0,gold:3000,0,,,ACH_EQUIP,3,3
+ACH_EQUIP_T4,ACHIEVEMENT,ACH_EQUIP_T5,Vũ trang: Trang bị 25 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,25.00,0,gold:4000,0,,,ACH_EQUIP,4,4
+ACH_EQUIP_T5,ACHIEVEMENT,ACH_EQUIP_T6,Vũ trang: Trang bị 50 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,50.00,0,gold:5000,0,,,ACH_EQUIP,5,5
+ACH_EQUIP_T6,ACHIEVEMENT,ACH_EQUIP_T7,Vũ trang: Trang bị 100 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,100.00,0,gold:6000;forge_mat:60,0,,,ACH_EQUIP,6,6
+ACH_EQUIP_T7,ACHIEVEMENT,ACH_EQUIP_T8,Vũ trang: Trang bị 200 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,200.00,0,gold:7000;forge_mat:70,0,,,ACH_EQUIP,7,7
+ACH_EQUIP_T8,ACHIEVEMENT,ACH_EQUIP_T9,Vũ trang: Trang bị 350 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,350.00,0,gold:8000;forge_mat:80,0,,,ACH_EQUIP,8,8
+ACH_EQUIP_T9,ACHIEVEMENT,ACH_WEEKLYDONE_T1,Vũ trang: Trang bị 500 lần,Không reset - cộng dồn vĩnh viễn,EQUIP_ITEM,500.00,0,gold:9000;forge_mat:90,0,,,ACH_EQUIP,9,9
+ACH_WEEKLYDONE_T1,ACHIEVEMENT,ACH_WEEKLYDONE_T2,Bền bỉ: Hoàn thành 1 nhiệm vụ tuần,Không reset - cộng dồn vĩnh viễn,COMPLETE_WEEKLY,1.00,0,diamond:100,0,,,ACH_WEEKLYDONE,1,1
+ACH_WEEKLYDONE_T2,ACHIEVEMENT,ACH_WEEKLYDONE_T3,Bền bỉ: Hoàn thành 5 nhiệm vụ tuần,Không reset - cộng dồn vĩnh viễn,COMPLETE_WEEKLY,5.00,0,diamond:200,0,,,ACH_WEEKLYDONE,2,2
+ACH_WEEKLYDONE_T3,ACHIEVEMENT,ACH_WEEKLYDONE_T4,Bền bỉ: Hoàn thành 10 nhiệm vụ tuần,Không reset - cộng dồn vĩnh viễn,COMPLETE_WEEKLY,10.00,0,diamond:300,0,,,ACH_WEEKLYDONE,3,3
+ACH_WEEKLYDONE_T4,ACHIEVEMENT,ACH_WEEKLYDONE_T5,Bền bỉ: Hoàn thành 25 nhiệm vụ tuần,Không reset - cộng dồn vĩnh viễn,COMPLETE_WEEKLY,25.00,0,diamond:400,0,,,ACH_WEEKLYDONE,4,4
+ACH_WEEKLYDONE_T5,ACHIEVEMENT,ACH_WEEKLYDONE_T6,Bền bỉ: Hoàn thành 50 nhiệm vụ tuần,Không reset - cộng dồn vĩnh viễn,COMPLETE_WEEKLY,50.00,0,diamond:500;chest_epic:1,0,,,ACH_WEEKLYDONE,5,5
+ACH_WEEKLYDONE_T6,ACHIEVEMENT,ACH_WEEKLYDONE_T7,Bền bỉ: Hoàn thành 100 nhiệm vụ tuần,Không reset - cộng dồn vĩnh viễn,COMPLETE_WEEKLY,100.00,0,diamond:600;chest_epic:1,0,,,ACH_WEEKLYDONE,6,6
+ACH_WEEKLYDONE_T7,ACHIEVEMENT,RPT_SUMMON_HERO_100,Bền bỉ: Hoàn thành 200 nhiệm vụ tuần,Không reset - cộng dồn vĩnh viễn,COMPLETE_WEEKLY,200.00,0,diamond:700;chest_epic:1;chest_legendary:1,0,,,ACH_WEEKLYDONE,7,7
+RPT_SUMMON_HERO_100,REPEAT,,Triệu hồi Anh hùng 100 lần,Lặp vô hạn - thưởng cố định mỗi vòng,HERO_SUMMON,100,0,diamond:100,0,SUMMON,,,0,1
+RPT_SUMMON_HERO_500,REPEAT,,Triệu hồi Anh hùng 500 lần,Lặp vô hạn - thưởng cố định mỗi vòng,HERO_SUMMON,500,0,diamond:500,0,SUMMON,,,0,2
+RPT_SUMMON_WEAPON_100,REPEAT,,Triệu hồi Vũ khí 100 lần,Lặp vô hạn - thưởng cố định mỗi vòng,HERO_SUMMON,100,0,diamond:100,0,SUMMON,,,0,3
+RPT_SUMMON_WEAPON_500,REPEAT,,Triệu hồi Vũ khí 500 lần,Lặp vô hạn - thưởng cố định mỗi vòng,HERO_SUMMON,500,0,diamond:500,0,SUMMON,,,0,4
+RPT_SUMMON_SKILL_100,REPEAT,,Triệu hồi Kỹ năng 100 lần,Lặp vô hạn - thưởng cố định mỗi vòng,SKILL_UPGRADE,100,0,diamond:100,0,SKILL,,,0,5
+RPT_SUMMON_SKILL_500,REPEAT,,Triệu hồi Kỹ năng 500 lần,Lặp vô hạn - thưởng cố định mỗi vòng,SKILL_UPGRADE,500,0,diamond:500,0,SKILL,,,0,6
+RPT_TRANSMUTE_1000,REPEAT,,Transmute 1.000 lần,Lặp vô hạn - thưởng cố định mỗi vòng,TRANSMUTE_GEAR,1000,0,diamond:50,0,ENHANCE,,,0,7
+RPT_TRANSMUTE_5000,REPEAT,,Transmute 5.000 lần,Lặp vô hạn - thưởng cố định mỗi vòng,TRANSMUTE_GEAR,5000,0,diamond:250,0,ENHANCE,,,0,8
+RPT_DUNGEON_4,REPEAT,,Hoàn thành Dungeon 4 lần,Lặp vô hạn - thưởng cố định mỗi vòng,DUNGEON_CLEAR,4,0,diamond:50,0,DUNGEON,,,0,9
+RPT_DUNGEON_20,REPEAT,,Hoàn thành Dungeon 20 lần,Lặp vô hạn - thưởng cố định mỗi vòng,DUNGEON_CLEAR,20,0,diamond:250,0,DUNGEON,,,0,10
+RPT_PLAY_30,REPEAT,,Chơi 30 phút,Lặp vô hạn - thưởng cố định mỗi vòng,PLAY_TIME,30,0,diamond:10,0,,,,0,11
+RPT_PLAY_120,REPEAT,,Chơi 120 phút,Lặp vô hạn - thưởng cố định mỗi vòng,PLAY_TIME,120,0,diamond:50,0,,,,0,12
+RPT_KILL_1000,REPEAT,,Tiêu diệt 1.000 quái,Lặp vô hạn - thưởng cố định mỗi vòng,KILL_MONSTER,1000,0,diamond:30,0,,,,0,13
+RPT_KILL_10000,REPEAT,,Tiêu diệt 10.000 quái,Lặp vô hạn - thưởng cố định mỗi vòng,KILL_MONSTER,10000,0,diamond:150,0,,,,0,14
+RPT_BOSS_50,REPEAT,,Hạ 50 boss,Lặp vô hạn - thưởng cố định mỗi vòng,KILL_BOSS,50,0,diamond:50,0,,,,0,15
+RPT_BOSS_200,REPEAT,,Hạ 200 boss,Lặp vô hạn - thưởng cố định mỗi vòng,KILL_BOSS,200,0,diamond:200,0,,,,0,16
+RPT_ENHANCE_100,REPEAT,,Cường hóa trang bị 100 lần,Lặp vô hạn - thưởng cố định mỗi vòng,ENHANCE_GEAR,100,0,diamond:50,0,ENHANCE,,,0,17
+RPT_ENHANCE_500,REPEAT,,Cường hóa trang bị 500 lần,Lặp vô hạn - thưởng cố định mỗi vòng,ENHANCE_GEAR,500,0,diamond:250,0,ENHANCE,,,0,18
+RPT_FORGE_100,REPEAT,,Rèn trang bị 100 lần,Lặp vô hạn - thưởng cố định mỗi vòng,FORGE_GEAR,100,0,diamond:50,0,ENHANCE,,,0,19
+RPT_FORGE_500,REPEAT,,Rèn trang bị 500 lần,Lặp vô hạn - thưởng cố định mỗi vòng,FORGE_GEAR,500,0,diamond:250,0,ENHANCE,,,0,20
+RPT_ARENA_30,REPEAT,,Thắng Arena 30 trận,Lặp vô hạn - thưởng cố định mỗi vòng,ARENA_WIN,30,0,diamond:50,0,ARENA,,,0,21
+RPT_ARENA_100,REPEAT,,Thắng Arena 100 trận,Lặp vô hạn - thưởng cố định mỗi vòng,ARENA_WIN,100,0,diamond:200,0,ARENA,,,0,22
+RPT_HEROLV_100,REPEAT,,Lên cấp Anh hùng 100 lần,Lặp vô hạn - thưởng cố định mỗi vòng,HERO_LEVELUP,100,0,diamond:50,0,,,,0,23
+RPT_HEROLV_500,REPEAT,,Lên cấp Anh hùng 500 lần,Lặp vô hạn - thưởng cố định mỗi vòng,HERO_LEVELUP,500,0,diamond:250,0,,,,0,24
+RPT_IDLE_20,REPEAT,,Nhận Idle Reward 20 lần,Lặp vô hạn - thưởng cố định mỗi vòng,CLAIM_IDLE,20,0,diamond:30,0,IDLE_REWARD,,,0,25
+RPT_IDLE_100,REPEAT,,Nhận Idle Reward 100 lần,Lặp vô hạn - thưởng cố định mỗi vòng,CLAIM_IDLE,100,0,diamond:150,0,IDLE_REWARD,,,0,26
+RPT_USEGOLD_100K,REPEAT,,Tiêu 100.000 Vàng,Lặp vô hạn - thưởng cố định mỗi vòng,USE_GOLD,100000,0,diamond:30,0,,,,0,27
+RPT_USEGOLD_1M,REPEAT,,Tiêu 1.000.000 Vàng,Lặp vô hạn - thưởng cố định mỗi vòng,USE_GOLD,1000000,0,diamond:150,0,,,,0,28

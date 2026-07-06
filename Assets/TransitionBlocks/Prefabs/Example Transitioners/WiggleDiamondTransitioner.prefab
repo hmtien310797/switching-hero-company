@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 448202}
   - component: {fileID: 11405446}
-  - component: {fileID: 1723229719824111993}
   m_Layer: 0
   m_Name: WiggleDiamondTransitioner
   m_TagString: Untagged
@@ -48,7 +47,6 @@ MonoBehaviour:
   _widthOfTransitionInBlocks: 9
   _automaticallyTransitionIn: 0
   dontDestroyOnLoad: 1
-  _transitionCamera: {fileID: 0}
   _transitionBlockPrefab: {fileID: 181284, guid: d712b27318a77ba4ca763cb7e93b1909, type: 3}
   _transitionBlockSprite: {fileID: 21300000, guid: 6d8c22afbe0d24346a57bb4f12ed863b, type: 3}
   _transitionBlockColor: {r: 0.3019608, g: 0.2509804, b: 0.2509804, a: 1}
@@ -59,20 +57,3 @@ MonoBehaviour:
   _canTransition: 1
   _transitionInTriggered: 0
   _transitionOrdererObject: {fileID: 0}
---- !u!114 &1723229719824111993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 130642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b13669b9c89dcea468ae7cd0351ea4a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelToLoad: Transition Block Demo
-  _transitionOutKey: 116
-  _transitionInKey: 121
-  _transitionOutNoSceneSwitchKey: 103
-  _transitionInNoSceneSwitchKey: 104

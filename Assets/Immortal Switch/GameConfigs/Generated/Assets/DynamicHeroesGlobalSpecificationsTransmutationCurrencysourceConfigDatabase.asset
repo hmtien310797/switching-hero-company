@@ -1,0 +1,327 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91cb938bc28d0174092b11d35b5d2558, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsTransmutationCurrencysourceConfigDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - sourceId: TC_IDLE_001
+    sourceType: IDLE
+    sourceName: Idle Reward Stage 1
+    unlockCondition: Clear Stage 1
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 20
+    rewardInterval: 60s
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Reward t\u1EF1 sinh theo th\u1EDDi gian AFK"
+  - sourceId: TC_IDLE_002
+    sourceType: IDLE
+    sourceName: Idle Reward Stage 20
+    unlockCondition: Clear Stage 20
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 2500
+    rewardInterval: 60s
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Stage c\xE0ng cao l\u01B0\u1EE3ng ng\u1ECDc t\xEDm/ph\xFAt c\xE0ng cao"
+  - sourceId: TC_IDLE_003
+    sourceType: IDLE
+    sourceName: Idle Reward Stage 50
+    unlockCondition: Clear Stage 50
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 120000
+    rewardInterval: 60s
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: Main source mid game
+  - sourceId: TC_IDLE_004
+    sourceType: IDLE
+    sourceName: Idle Reward Stage 80
+    unlockCondition: Clear Stage 80
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 15000000
+    rewardInterval: 60s
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: Main source late game
+  - sourceId: TC_KILL_NORMAL
+    sourceType: KILL
+    sourceName: Normal Enemy Kill
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 1
+    rewardInterval: OnKill
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Drop nh\u1ECF t\u1EEB qu\xE1i th\u01B0\u1EDDng"
+  - sourceId: TC_KILL_ELITE
+    sourceType: KILL
+    sourceName: Elite Enemy Kill
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 5
+    rewardInterval: OnKill
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Drop t\u1EEB elite enemy"
+  - sourceId: TC_KILL_BOSS
+    sourceType: KILL
+    sourceName: Boss Kill
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 20
+    rewardInterval: OnKill
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Drop t\u1EEB boss/stage boss"
+  - sourceId: TC_STAGE_CLEAR_001
+    sourceType: STAGE_CLEAR
+    sourceName: Clear Stage 10
+    unlockCondition: Clear Stage 10
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 5000
+    rewardInterval: Once
+    dailyLimit: 1
+    isRepeatable: 0
+    isActive: 1
+    note: "Reward 1 l\u1EA7n khi clear m\u1ED1c stage"
+  - sourceId: TC_STAGE_CLEAR_002
+    sourceType: STAGE_CLEAR
+    sourceName: Clear Stage 20
+    unlockCondition: Clear Stage 20
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 25000
+    rewardInterval: Once
+    dailyLimit: 1
+    isRepeatable: 0
+    isActive: 1
+    note: "Reward 1 l\u1EA7n khi clear m\u1ED1c stage"
+  - sourceId: TC_STAGE_CLEAR_003
+    sourceType: STAGE_CLEAR
+    sourceName: Clear Stage 50
+    unlockCondition: Clear Stage 50
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 1000000
+    rewardInterval: Once
+    dailyLimit: 1
+    isRepeatable: 0
+    isActive: 1
+    note: "Reward 1 l\u1EA7n khi clear m\u1ED1c stage"
+  - sourceId: TC_STAGE_CLEAR_004
+    sourceType: STAGE_CLEAR
+    sourceName: Clear Stage 80
+    unlockCondition: Clear Stage 80
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 50000000
+    rewardInterval: Once
+    dailyLimit: 1
+    isRepeatable: 0
+    isActive: 1
+    note: "Reward 1 l\u1EA7n khi clear m\u1ED1c stage"
+  - sourceId: TC_DUNGEON_001
+    sourceType: DUNGEON
+    sourceName: Artifact Dungeon 1
+    unlockCondition: Clear Stage 20
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 50000
+    rewardInterval: OnClear
+    dailyLimit: 3
+    isRepeatable: 1
+    isActive: 1
+    note: "Dungeon chuy\xEAn farm ng\u1ECDc t\xEDm"
+  - sourceId: TC_DUNGEON_002
+    sourceType: DUNGEON
+    sourceName: Artifact Dungeon 2
+    unlockCondition: Clear Stage 40
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 300000
+    rewardInterval: OnClear
+    dailyLimit: 3
+    isRepeatable: 1
+    isActive: 1
+    note: "Dungeon chuy\xEAn farm ng\u1ECDc t\xEDm"
+  - sourceId: TC_DUNGEON_003
+    sourceType: DUNGEON
+    sourceName: Artifact Dungeon 3
+    unlockCondition: Clear Stage 60
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 2000000
+    rewardInterval: OnClear
+    dailyLimit: 3
+    isRepeatable: 1
+    isActive: 1
+    note: "Dungeon chuy\xEAn farm ng\u1ECDc t\xEDm"
+  - sourceId: TC_SALVAGE_D
+    sourceType: SALVAGE
+    sourceName: Salvage D Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 80
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_SALVAGE_C
+    sourceType: SALVAGE
+    sourceName: Salvage C Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 150
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_SALVAGE_B
+    sourceType: SALVAGE
+    sourceName: Salvage B Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 300
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_SALVAGE_A
+    sourceType: SALVAGE
+    sourceName: Salvage A Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 800
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_SALVAGE_S
+    sourceType: SALVAGE
+    sourceName: Salvage S Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 2500
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_SALVAGE_SS
+    sourceType: SALVAGE
+    sourceName: Salvage SS Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 8000
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_SALVAGE_SSS
+    sourceType: SALVAGE
+    sourceName: Salvage SSS Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 25000
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_SALVAGE_R
+    sourceType: SALVAGE
+    sourceName: Salvage R Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 80000
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_SALVAGE_SR
+    sourceType: SALVAGE
+    sourceName: Salvage SR Artifact
+    unlockCondition: Unlock Transmutation
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 250000
+    rewardInterval: OnSalvage
+    dailyLimit: 0
+    isRepeatable: 1
+    isActive: 1
+    note: "Ho\xE0n tr\u1EA3 m\u1ED9t ph\u1EA7n cost"
+  - sourceId: TC_EVENT_001
+    sourceType: EVENT
+    sourceName: Event Reward Small
+    unlockCondition: Event Active
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 50000
+    rewardInterval: Once
+    dailyLimit: 5
+    isRepeatable: 1
+    isActive: 1
+    note: Event limited reward
+  - sourceId: TC_EVENT_002
+    sourceType: EVENT
+    sourceName: Event Reward Medium
+    unlockCondition: Event Active
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 500000
+    rewardInterval: Once
+    dailyLimit: 3
+    isRepeatable: 1
+    isActive: 1
+    note: Event limited reward
+  - sourceId: TC_EVENT_003
+    sourceType: EVENT
+    sourceName: Event Reward Large
+    unlockCondition: Event Active
+    rewardType: ITEM
+    rewardItemId: TRANSMUTE_CRYSTAL
+    rewardAmount: 5000000
+    rewardInterval: Once
+    dailyLimit: 1
+    isRepeatable: 1
+    isActive: 1
+    note: Event limited reward
