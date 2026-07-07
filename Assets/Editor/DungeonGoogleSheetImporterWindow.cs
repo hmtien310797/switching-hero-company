@@ -227,11 +227,11 @@ namespace Battle.Dungeon.Editor
                 SetPrivateField(data, "enemyHp", ParseFormula(row, "enemy_hp"));
                 SetPrivateField(data, "enemyAtk", ParseFormula(row, "enemy_atk"));
                 SetPrivateField(data, "enemyDef", ParseFormula(row, "enemy_def"));
-                SetPrivateField(data, "reward1ItemId", ReadInt(row, "reward1_item_id"));
+                SetPrivateField(data, "reward1ItemId", ReadString(row, "reward1_item_id"));
                 SetPrivateField(data, "reward1", ParseFormula(row, "reward1"));
-                SetPrivateField(data, "reward2ItemId", ReadInt(row, "reward2_item_id"));
+                SetPrivateField(data, "reward2ItemId", ReadString(row, "reward2_item_id"));
                 SetPrivateField(data, "reward2", ParseFormula(row, "reward2"));
-                SetPrivateField(data, "reward3ItemId", ReadInt(row, "reward3_item_id"));
+                SetPrivateField(data, "reward3ItemId", ReadString(row, "reward3_item_id"));
                 SetPrivateField(data, "reward3", ParseFormula(row, "reward3"));
                 SetPrivateField(data, "enemyCount", ParseFormula(row, "enemy_count"));
                 SetPrivateField(data, "enemyPerBatch", Mathf.Max(1, ReadInt(row, "enemy_per_batch", 1)));

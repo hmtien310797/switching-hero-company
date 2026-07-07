@@ -9,14 +9,16 @@ namespace Immortal_Switch.Scripts.Skill
     /// Default runtime for skill objects rendered by Spine.
     /// Spine events are treated as generic RuntimeObjectEvent and execute phases from SkillDataSO.
     /// </summary>
-    public sealed class SpineSkillRuntimeObject : SkillRuntimeObject
+    public class SpineSkillRuntimeObject : SkillRuntimeObject
     {
-        [SerializeField] private SkeletonAnimation skeletonAnimation;
-        [SerializeField] private string fallbackAnimationName;
-        [SerializeField] private bool fallbackLoop;
+        [SerializeField] protected SkeletonAnimation skeletonAnimation;
+        [SerializeField] protected string fallbackAnimationName;
+        [SerializeField] protected bool fallbackLoop;
 
         protected override void OnRuntimeInitialized(object arg)
         {
+            base.OnRuntimeInitialized(arg);
+            
             if (skeletonAnimation == null)
             {
                 Debug.LogError($"[{nameof(SpineSkillRuntimeObject)}] Missing SkeletonAnimation on {name}.");
@@ -51,7 +53,7 @@ namespace Immortal_Switch.Scripts.Skill
             }
         }
 
-        private void OnSpineComplete(TrackEntry trackEntry)
+        protected void OnSpineComplete(TrackEntry trackEntry)
         {
             if (Config != null && Config.DespawnOnAnimationComplete && !Config.LoopAnimation)
                 ForceDespawn();

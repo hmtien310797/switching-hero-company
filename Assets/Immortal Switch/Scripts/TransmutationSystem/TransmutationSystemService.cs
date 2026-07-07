@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Helper;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
-using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
 using UnityEngine;
@@ -38,13 +38,23 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
             _storage.Data.StuckEquip = TransmutationSystemHelper.ToPlayerEquipItem(response.Pending);
 
+            if (response.AutoSetting != null &&
+                Enum.TryParse<EItemTier>(response.AutoSetting.Tier, out var tier))
+            {
+                _storage.Data.Setting.Enabled       = response.AutoSetting.Enabled;
+                _storage.Data.Setting.Count         = response.AutoSetting.Count;
+                _storage.Data.Setting.Tier          = tier;
+                _storage.Data.Setting.IsWaiting     = response.AutoSetting.IsWaiting;
+                _storage.Data.Setting.UniqueOptions = response.AutoSetting.UniqueOptions ?? new List<List<string>>();
+            }
+
             _storage.Save();
         }
 
         public void ApplyFuseResult(TransmutationFuseResponse response)
         {
             _storage.Data.Energy = response.EnergyBalance;
-            _storage.Data.Exp += response.ExpGained;
+            _storage.Data.Exp = response.ExpBalance;
             _storage.Data.Level = response.Level;
             _storage.Data.StuckEquip = TransmutationSystemHelper.ToPlayerEquipItem(response.Pending);
 
@@ -63,7 +73,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public void ApplyDismantleResult(TransmutationDismantleResponse response)
         {
             _storage.Data.Energy = response.EnergyBalance;
-            _storage.Data.Exp += response.ExpGained;
+            _storage.Data.Exp = response.ExpBalance;
             _storage.Data.Level = response.Level;
             _storage.Data.StuckEquip = null;
 
@@ -173,6 +183,12 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return _storage.Data.Equips.GetValueOrDefault(itemType);
         }
 
+        public void ChangeStuck(PlayerEquipItem newStuck)
+        {
+            _storage.Data.StuckEquip = newStuck;
+            _storage.Save();
+        }
+
         public IEnumerable<PlayerEquipItem> GetEquips()
         {
             return _storage.Data.Equips.Values;
@@ -191,11 +207,12 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return _storage.Data.Setting.IsWaiting;
         }
 
-        public void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool enabled)
+        public void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool isWaiting, bool enabled)
         {
             _storage.Data.Setting.Enabled = enabled;
             _storage.Data.Setting.Count = count;
             _storage.Data.Setting.Tier = tier;
+            _storage.Data.Setting.IsWaiting = isWaiting;
             _storage.Data.Setting.UniqueOptions = new List<List<string>>(uniqueOptions);
             _storage.Save();
         }

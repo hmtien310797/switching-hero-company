@@ -27,11 +27,13 @@ public sealed class HitEffectObject : PoolableBehaviour
     [Button]
     private void PlayParticles()
     {
-        particle.Play(true);
+        if(particle)
+            particle.Play(true);
     }
 
     private void StopParticles()
     {
-        particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if(particle)
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 }

@@ -57,13 +57,13 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             if (Row == null)
             {
-                Debug.LogError("Row is null");
+                //Debug.LogError("Row is null");
                 return;
             }
 
             if (Row.missionId != arg3)
             {
-                Debug.Log($"Row not match with {arg3}");
+                //Debug.Log($"Row not match with {arg3}");
                 return;
             }
 
@@ -75,13 +75,13 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             if (Row == null)
             {
-                Debug.LogError("Row is null");
+                //Debug.LogError("Row is null");
                 return;
             }
 
             if (Row.missionId != arg1)
             {
-                Debug.Log($"Row not match with {arg1}");
+                //Debug.Log($"Row not match with {arg1}");
                 return;
             }
 

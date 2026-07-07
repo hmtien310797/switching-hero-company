@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
-using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
@@ -43,6 +43,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
             IReadOnlyList<DynamicHeroesGlobalSpecificationsTransmutationItemUniqueRow> rows,
             int count
         );
+
         /// <summary>Apply kết quả huỷ pending từ transmutation/dismantle (energy refund/exp/level mới).</summary>
         void ApplyDismantleResult(TransmutationDismantleResponse response);
 
@@ -50,6 +51,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
         /// lay ra equip hien tai theo type
         /// </summary>
         PlayerEquipItem GetEquip(string itemType);
+
+        /// <summary>
+        /// thay doi stuck item
+        /// </summary>
+        void ChangeStuck(PlayerEquipItem newStuck);
 
         /// <summary>
         /// lay ra ds equip dang mac.
@@ -69,6 +75,6 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces
         /// <summary>
         /// luu cai dat
         /// </summary>
-        void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool enabled);
+        void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool isWaiting, bool enabled);
     }
 }

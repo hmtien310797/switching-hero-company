@@ -19,12 +19,22 @@
         public const string OnSpawnNextStage = "OnSpawnNextStage";
         public const string OnMoveStageRequested = "OnMoveStageRequested";
         public const string OnToggleMainView = "OnToggleMainView";
-        
+        public const string OnUserLogOut = "OnUserLogOut";
         public const string OnAppPaused = "OnAppPaused";
         public const string OnAppResumed = "OnAppResumed";
         public const string OnAppQuit = "OnAppQuit";
         public const string OnActiveLineupChanged = "OnActiveLineupChanged";
         public const string OnInitSceneDataComplete = "OnInitSceneDataComplete";
-        public const string OnStageChange = "OnStageChange";
+        public const string OnStageSessionChange = "OnStageSessionChange";
+        public const string OnStageSessionEnd = "OnStageSessionEnd";
+        public const string OnPlayDungeon = "OnPlayDungeon";
+        
+        public const string OnKillAllDungeonInit = "OnKillAllDungeonInit";
+        public const string OnKillAllDungeonEnemyCountChanged = "OnKillAllDungeonInit";
+        
+        public const string OnDefenseDungeonInit = "OnDefenseDungeonInit";
+        public const string OnDefenseDungeonDataChanged = "OnDefenseDungeonDataChanged";
+        
+        public const string OnSelectedDungeonStage = "OnSelectedDungeonStage";
     }
 }

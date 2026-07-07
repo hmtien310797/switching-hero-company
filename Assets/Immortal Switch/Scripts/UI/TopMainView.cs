@@ -3,16 +3,21 @@ using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Addressable;
+using Immortal_Switch.Scripts.Bag.Views;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.Reward;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shop.Views;
 using Immortal_Switch.Scripts.StageSelection;
 using Immortal_Switch.Scripts.Tutorial;
 using Sirenix.OdinInspector;
 using Spine.Unity;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,40 +27,93 @@ namespace Immortal_Switch.Scripts.UI
     {
         public static TopMainView Instance;
 
-        [SerializeField] HeroSkillBarUI heroSkillBarUI;
-        [SerializeField] private Button switchMainSubHeroButton;
-        [SerializeField] private Button moveButton;
-        [SerializeField] CurrencyView currencyView;
-        [SerializeField] HeroJoystick heroJostick;
-        [SerializeField] private Button autoSkillButton;
-        [SerializeField] private Button autoSwitchButton;
-        [SerializeField] private Button profileBtn;
-        [SerializeField] private GameObject rotateObject;
-        [SerializeField] private GameObject[] hideAbleObjects;
-        [SerializeField] private SkeletonGraphic skeletonGraphic;
+        [SerializeField]
+        HeroSkillBarUI heroSkillBarUI;
 
-        [Header("Hero Icon Switch Animation")] [SerializeField]
+        [SerializeField]
+        private Button switchMainSubHeroButton;
+
+        [SerializeField]
+        private Button moveButton;
+
+        [SerializeField]
+        private Button btnBag;
+
+        [SerializeField]
+        private Button btnShop;
+
+        [SerializeField]
+        CurrencyView currencyView;
+
+        [SerializeField]
+        HeroJoystick heroJostick;
+
+        [SerializeField]
+        private Button autoSkillButton;
+
+        [SerializeField]
+        private Button autoSwitchButton;
+
+        [SerializeField]
+        private Button profileBtn;
+
+        [Header("Player references")]
+        [SerializeField]
+        private TMP_Text txtPlayerName;
+
+        [SerializeField]
+        private TMP_Text txtPlayerLevel;
+
+        [SerializeField]
+        private Image imgPlayerProgress;
+
+        [SerializeField]
+        private GameObject rotateObject;
+
+        [SerializeField]
+        private GameObject[] hideAbleObjects;
+
+        [SerializeField]
+        private SkeletonGraphic skeletonGraphic;
+
+        [SerializeField]
+        private Button btnActiveFramingClaim;
+
+        [SerializeField]
+        private RewardSyncService rewardSyncService;
+
+        [SerializeField]
+        private GameObject[] disableObjectsWhenPlayDungeon;
+
+        [SerializeField]
+        private GameObject[] enableObjectsWhenPlayDungeon;
+
+        [Header("Hero Icon Switch Animation")]
+        [SerializeField]
         private Image[] iconHeroImage;
 
-        [SerializeField] private RectTransform[] heroIconAnchors;
-        [SerializeField] private RectTransform heroIconAnimationRoot;
+        [SerializeField]
+        private RectTransform[] heroIconAnchors;
 
-        [SerializeField, Min(0.01f)] private float heroIconSwitchDuration = 0.25f;
+        [SerializeField]
+        private RectTransform heroIconAnimationRoot;
 
-        [SerializeField] private Ease heroIconSwitchEase = Ease.OutCubic;
+        [SerializeField, Min(0.01f)]
+        private float heroIconSwitchDuration = 0.25f;
+
+        [SerializeField]
+        private Ease heroIconSwitchEase = Ease.OutCubic;
+        
+        [SerializeField]
+        private Button buttonSetting;
+
         private readonly Tween[] heroIconTweens = new Tween[2];
         private bool isHeroIconSwapped;
         private int heroIconSwitchVersion;
-        
-        [Header("Hero Icon Slot Visual")]
-        [SerializeField] private Vector2 firstPlaceAnchoredPosition = Vector2.zero;
-        [SerializeField] private Vector2 secondPlaceAnchoredPosition = new Vector2(0f, -60f);
 
-        [SerializeField] private Vector3 firstPlaceScale = Vector3.one;
-        [SerializeField] private Vector3 secondPlaceScale = Vector3.one * 0.9f;
-        
         public HeroSkillBarUI HeroSkillBarUI => heroSkillBarUI;
         private bool isAutoActived = false;
+        private HeroDataSO currentSelectedHeroData;
 
         private void Awake()
         {
@@ -63,12 +121,15 @@ namespace Immortal_Switch.Scripts.UI
             TutorialManager.Instance.OnClick += OnClickTutorial;
             Instance = this;
 
+            btnShop.onClick.AddListener(OnClickShop);
+            btnBag.onClick.AddListener(OnClickBag);
             profileBtn.onClick.AddListener(OnClickProfile);
             switchMainSubHeroButton.onClick.AddListener(OnSwitchMainSubHeroButtonClicked);
 
             HideAbleObjects();
             skeletonGraphic.gameObject.SetActive(false);
         }
+
         private UniTask OnClickTutorial(string arg1, int arg2)
         {
             switch (arg2)
@@ -83,7 +144,7 @@ namespace Immortal_Switch.Scripts.UI
                 case 7:
                     OnSwitchMainSubHeroButtonClicked();
                     break;
-                
+
                 case 8:
                     OnClickAutoSkill();
                     break;
@@ -103,7 +164,7 @@ namespace Immortal_Switch.Scripts.UI
 
                 case 8:
                     return autoSkillButton.transform as RectTransform;
-                
+
                 case 10:
                     return autoSwitchButton.transform as RectTransform;
 
@@ -111,11 +172,22 @@ namespace Immortal_Switch.Scripts.UI
                     return null;
             }
         }
+
+        private void OnClickBag()
+        {
+            var items = ItemsManager.Instance.GetItems();
+            UIManager.Instance.TogglePopupAsync<BagView>(items, false).Forget();
+        }
+
+        private void OnClickShop()
+        {
+            UIManager.Instance.TogglePopupAsync<ShopView>(false).Forget();
+        }
+
         private void OnClickProfile()
         {
             UIManager.Instance.OpenPopupAsync<ProfileView>().Forget();
         }
-
 
         [Button]
         private void OpenIdleFarmingScreen()
@@ -130,33 +202,56 @@ namespace Immortal_Switch.Scripts.UI
             FarmingIdleScreenService.Close();
         }
 
+        private void OnActiveFramingClaimClicked()
+        {
+            rewardSyncService?.ClaimRewardAsync().Forget();
+        }
+
         private void OnClickAutoSkill()
         {
             isAutoActived = !isAutoActived;
             UserDataCache.Instance.SetAutoSkill(isAutoActived);
+
             rotateObject.transform
                 .DOLocalRotate(new Vector3(0, 0, isAutoActived ? 180 : 0), 0.2f, RotateMode.FastBeyond360)
-                .SetEase(Ease.Linear).SetLoops(-1, LoopType.Incremental);
+                .SetEase(Ease.Linear)
+                .SetLoops(-1, LoopType.Incremental);
         }
+
         private void Start()
         {
+            var cachedName = UserDataCache.Instance?.DisplayName;
+
+            if (!string.IsNullOrEmpty(cachedName))
+                SetDisplayName(cachedName);
+
+            RefreshPlayerInfo();
             autoSkillButton.onClick.AddListener(OnClickAutoSkill);
+            btnActiveFramingClaim.onClick.AddListener(OnActiveFramingClaimClicked);
             SetHeroTeamController(HeroTeamController.Instance);
+
             moveButton.onClick.AddListener(() =>
             {
                 UIManager.Instance.TogglePopupAsync<StageSelectionView>(new StageSelectionOpenArgs
-                {
-                    CurrentStage = PvEBattleController.Instance.CurrentStage,
-                    HighestUnlockedStage = PvEBattleController.Instance.HighestUnlockedStage
-                }).Forget();
+                    {
+                        CurrentStage = PvEBattleController.Instance.CurrentStage,
+                        HighestUnlockedStage = PvEBattleController.Instance.HighestUnlockedStage
+                    })
+                    .Forget();
             });
             
+            buttonSetting.onClick.AddListener(() =>
+            {
+                UIManager.Instance.TogglePopupAsync<SettingView>();
+            });
+
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
             GameEventManager.Subscribe(GameEvents.OnWaveStart, OnStageStart);
             GameEventManager.Subscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
+            GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
         }
-        
+
         private void OnDestroy()
         {
             TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
@@ -165,6 +260,8 @@ namespace Immortal_Switch.Scripts.UI
             GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLost);
             GameEventManager.Unsubscribe(GameEvents.OnWaveStart, OnStageStart);
             GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
+            GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
+
             for (int i = 0; i < heroIconTweens.Length; i++)
             {
                 heroIconTweens[i]?.Kill(false);
@@ -221,10 +318,12 @@ namespace Immortal_Switch.Scripts.UI
             for (int i = 0; i < UserDataCache.Instance.inBattleHeroes.Length; i++)
             {
                 HeroActor currentHero = UserDataCache.Instance.inBattleHeroes[i];
+
                 if (currentHero == null)
                 {
                     continue;
                 }
+
                 HeroDataSO heroDataSo = currentHero.HeroData;
                 iconHeroImage[i].sprite = HeroImageService.GetHeroIcon(heroDataSo);
             }
@@ -234,12 +333,30 @@ namespace Immortal_Switch.Scripts.UI
         {
             // Chuyển Hero gameplay ngay lập tức.
             // Animation icon hoàn toàn không block logic này.
-            HeroDataSO currentHeroData =
+            currentSelectedHeroData =
                 PvEBattleController.Instance?.OnSwitchMainSubHeroButtonClicked();
 
-            SetHeroSkeletonAnimationGraphic(currentHeroData);
+            SetHeroSkeletonAnimationGraphic(currentSelectedHeroData);
 
             SwitchHeroIconVisual();
+        }
+
+        private void OnPlayDungeon(bool result)
+        {
+            for (int i = 0; i < disableObjectsWhenPlayDungeon.Length; i++)
+            {
+                GameObject currentGameObject = disableObjectsWhenPlayDungeon[i];
+                currentGameObject.SetActive(!result);
+            }
+
+            if (!result)
+                return;
+
+            for (int i = 0; i < enableObjectsWhenPlayDungeon.Length; i++)
+            {
+                GameObject currentGameObject = enableObjectsWhenPlayDungeon[i];
+                currentGameObject.SetActive(result);
+            }
         }
 
         private void SwitchHeroIconVisual()
@@ -284,7 +401,8 @@ namespace Immortal_Switch.Scripts.UI
             RectTransform targetAnchor,
             int switchVersion)
         {
-            if (iconRect == null || targetAnchor == null)
+            if (iconRect == null ||
+                targetAnchor == null)
             {
                 return;
             }
@@ -341,7 +459,7 @@ namespace Immortal_Switch.Scripts.UI
 
             heroIconTweens[iconIndex] = sequence;
         }
-        
+
         private static Vector3 ConvertWorldScaleToLocalScale(
             Transform parent,
             Vector3 desiredWorldScale)
@@ -358,8 +476,7 @@ namespace Immortal_Switch.Scripts.UI
                 SafeDivide(desiredWorldScale.y, parentWorldScale.y),
                 SafeDivide(desiredWorldScale.z, parentWorldScale.z));
         }
-        
-        
+
         private static void AttachIconToAnchor(
             RectTransform iconRect,
             RectTransform targetAnchor)
@@ -378,7 +495,6 @@ namespace Immortal_Switch.Scripts.UI
             iconRect.localRotation = Quaternion.identity;
             iconRect.localScale = Vector3.one;
         }
-        
 
         private bool CanSwitchHeroIcon()
         {
@@ -398,11 +514,23 @@ namespace Immortal_Switch.Scripts.UI
                 ? value
                 : value / divisor;
         }
-        
 
         private void SetHeroTeamController(HeroTeamController heroTeamController)
         {
             heroJostick.SetTarget(heroTeamController);
+        }
+
+        public void SetDisplayName(string displayName)
+        {
+            if (txtPlayerName != null)
+                txtPlayerName.text = displayName;
+        }
+
+        public void RefreshPlayerInfo()
+        {
+            var playerLevelInfo = DatabaseManager.Instance.GetLevelByTotalExp(UserDataCache.Instance.Exp);
+            txtPlayerLevel.text = $"Lv.{playerLevelInfo.level:00}";
+            imgPlayerProgress.fillAmount = playerLevelInfo.progress;
         }
 
         public CurrencyView CurrencyView => currencyView;
@@ -414,11 +542,21 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnStageEnd(int _)
         {
+            if (BattleFlowController.Instance.IsDungeonLocked)
+            {
+                return;
+            }
+
             HideAbleObjects();
         }
 
         private void HideAbleObjects()
         {
+            if (BattleFlowController.Instance.IsDungeonLocked)
+            {
+                return;
+            }
+
             for (int i = 0; i < hideAbleObjects.Length; i++)
             {
                 hideAbleObjects[i].SetActive(false);

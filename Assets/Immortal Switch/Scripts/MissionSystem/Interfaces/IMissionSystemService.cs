@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Game.Configs.Generated;
-using Immortal_Switch.Scripts.ItemSystem.Models;
+using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 
 namespace Immortal_Switch.Scripts.MissionSystem.Interfaces

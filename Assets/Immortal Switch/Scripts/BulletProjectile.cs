@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading;
+using Battle;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pooling;
@@ -25,6 +28,7 @@ public class BulletProjectile :
     private float damage;
 
     private ICombatUnit sourceCombatUnit;
+    private CancellationTokenRegistration _endStageCancelRegistration;
 
     private void Awake()
     {
@@ -76,6 +80,15 @@ public class BulletProjectile :
                     Vector3.up
                 );
         }
+        
+        if (BattleFlowController.Instance.endStageSessionCancellationTokenSource != null)
+        {
+            _endStageCancelRegistration =
+                BattleFlowController.Instance
+                    .endStageSessionCancellationTokenSource
+                    .Token
+                    .Register(DespawnSelf);
+        }
     }
 
     public void OnProjectileSpawnedFromPool()
@@ -87,22 +100,7 @@ public class BulletProjectile :
     {
         ResetRuntimeData();
     }
-
-    private void OnEnable()
-    {
-        GameEventManager.Subscribe(GameEvents.OnStageChange, DespawnSelf);
-    }
     
-    private void OnDisable()
-    {
-        GameEventManager.Unsubscribe(GameEvents.OnStageChange, DespawnSelf);
-    }
-
-    private void OnDestroy()
-    {
-        GameEventManager.Unsubscribe(GameEvents.OnStageChange, DespawnSelf);
-    }
-
     private void Update()
     {
         if (!isInitialized)
@@ -188,6 +186,7 @@ public class BulletProjectile :
             return;
         }
 
+        _endStageCancelRegistration.Dispose();
         addressablePoolable.Despawn();
     }
 

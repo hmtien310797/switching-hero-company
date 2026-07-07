@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Immortal_Switch.Scripts.ItemSystem;
+using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         private static readonly Dictionary<string, ModifierStatMapping> ModifierToStatTypeMap = new()
         {
             {
-                StatSystemModifierConstants.MODIFIER_HP,
+                StatModifierConstants.MODIFIER_HP,
                 new ModifierStatMapping
                 {
                     StatType = StatType.MaxHp,
@@ -24,7 +24,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_HP_PCT,
+                StatModifierConstants.MODIFIER_HP_PCT,
                 new ModifierStatMapping
                 {
                     StatType = StatType.MaxHp,
@@ -32,7 +32,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_ATK,
+                StatModifierConstants.MODIFIER_ATK,
                 new ModifierStatMapping
                 {
                     StatType = StatType.Atk,
@@ -40,7 +40,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_ATK_PCT,
+                StatModifierConstants.MODIFIER_ATK_PCT,
                 new ModifierStatMapping
                 {
                     StatType = StatType.Atk,
@@ -48,7 +48,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_DEF,
+                StatModifierConstants.MODIFIER_DEF,
                 new ModifierStatMapping
                 {
                     StatType = StatType.Def,
@@ -56,7 +56,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_DEF_PCT,
+                StatModifierConstants.MODIFIER_DEF_PCT,
                 new ModifierStatMapping
                 {
                     StatType = StatType.Def,
@@ -64,7 +64,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_SPD,
+                StatModifierConstants.MODIFIER_SPD,
                 new ModifierStatMapping
                 {
                     StatType = StatType.AttackSpeed,
@@ -72,7 +72,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_SPD_PCT,
+                StatModifierConstants.MODIFIER_SPD_PCT,
                 new ModifierStatMapping
                 {
                     StatType = StatType.AttackSpeed,
@@ -80,7 +80,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_CRIT_RATE,
+                StatModifierConstants.MODIFIER_CRIT_RATE,
                 new ModifierStatMapping
                 {
                     StatType = StatType.CritChance,
@@ -88,7 +88,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_CRIT_DMG,
+                StatModifierConstants.MODIFIER_CRIT_DMG,
                 new ModifierStatMapping
                 {
                     StatType = StatType.CritDamage,
@@ -96,7 +96,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_ACC,
+                StatModifierConstants.MODIFIER_ACC,
                 new ModifierStatMapping
                 {
                     StatType = StatType.Accuracy,
@@ -104,7 +104,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_DMG_BONUS,
+                StatModifierConstants.MODIFIER_DMG_BONUS,
                 new ModifierStatMapping
                 {
                     StatType = StatType.DamageToNormalMonster,
@@ -112,7 +112,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_BASIC_DMG_BONUS,
+                StatModifierConstants.MODIFIER_BASIC_DMG_BONUS,
                 new ModifierStatMapping
                 {
                     StatType = StatType.ClassSkillDamage,
@@ -120,7 +120,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_SKILL_DMG_BONUS,
+                StatModifierConstants.MODIFIER_SKILL_DMG_BONUS,
                 new ModifierStatMapping
                 {
                     StatType = StatType.ExclusiveSkillDamage,
@@ -128,7 +128,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 }
             },
             {
-                StatSystemModifierConstants.MODIFIER_FINAL_DMG_BONUS,
+                StatModifierConstants.MODIFIER_FINAL_DMG_BONUS,
                 new ModifierStatMapping
                 {
                     StatType = StatType.SwitchSkillDamage,
@@ -151,7 +151,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         /// </summary>
         public static ModifierStatMapping ToStatMapping(string modifier)
         {
-            return ModifierToStatTypeMap.GetValueOrDefault(modifier);
+            return ModifierToStatTypeMap.GetValueOrDefault(modifier.ToUpper());
         }
 
         /// <summary>
@@ -191,7 +191,9 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
             foreach (var dto in dtos)
             {
-                if (!Enum.TryParse<StatType>(dto.StatType, true, out var statType))
+                var mapping = ToStatMapping(dto.StatType);
+
+                if (mapping == null)
                 {
                     Debug.LogError($"Transmutation: unknown stat_type from server: {dto.StatType}");
                     continue;
@@ -203,7 +205,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                     continue;
                 }
 
-                result.Add(new StatModifier(statType, op, dto.Value, string.Empty, dto.IsUnique));
+                result.Add(new StatModifier(mapping.StatType, op, (float)dto.Value, string.Empty, dto.IsUnique));
             }
 
             return result;

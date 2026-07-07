@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Shared;
-using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.Tutorial;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,7 +31,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         [Header("Reward Preview")] [SerializeField]
         private SummonLevelRewardPreviewUI levelRewardPreviewUI;
 
-        [Header("Popup")] [SerializeField] private SummonConfirmPopup confirmPopup;
+        [Header("Popup")]
         [SerializeField] private WeaponSummonProbabilityPopup probabilityPopup;
         [SerializeField] private WeaponSummonSequencePopup sequencePopup;
 
@@ -237,13 +239,20 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         private void ShowGemConfirm(string optionId, int gemCost)
         {
-            if (confirmPopup == null)
+            /*if (confirmPopup == null)
             {
                 ExecuteSummonAsync(optionId).Forget();
                 return;
             }
 
-            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());
+            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());*/
+            UIManager.Instance
+                .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
+                    "Cảnh báo",
+                    $"Không đủ Vé Anh hùng.\nLần triệu hồi này sẽ tiêu tốn {gemCost} Kim cương.\nXác nhận?",
+                    () => ExecuteSummonAsync(optionId).Forget()
+                ))
+                .Forget();
         }
 
         private async UniTaskVoid ExecuteSummonAsync(string optionId)

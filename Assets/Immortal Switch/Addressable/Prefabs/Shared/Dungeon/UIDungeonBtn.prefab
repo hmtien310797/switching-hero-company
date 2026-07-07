@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 5680831410110224071}
   - component: {fileID: 3836678300427957383}
   - component: {fileID: 3541751933044832465}
+  - component: {fileID: 8553754618608205383}
   m_Layer: 5
   m_Name: UIDungeonBtn
   m_TagString: Untagged
@@ -218,6 +219,23 @@ MonoBehaviour:
   goNormal: {fileID: 8864613806403577701}
   goLock: {fileID: 0}
   <Type>k__BackingField: 2
+--- !u!114 &8553754618608205383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5174711071722057691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d75ec3c4a424c4292d5fc2338ada1c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 2143634164770256177}
+  pressedScale: 0.9
+  bounceScale: 1.1
+  pressDuration: 0.08
+  bounceDuration: 0.15
 --- !u!1 &5922164854481720162
 GameObject:
   m_ObjectHideFlags: 0

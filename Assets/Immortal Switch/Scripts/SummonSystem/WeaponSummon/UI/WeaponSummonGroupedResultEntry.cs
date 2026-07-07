@@ -1,6 +1,6 @@
 ﻿using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
-using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI

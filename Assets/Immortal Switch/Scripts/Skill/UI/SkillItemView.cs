@@ -1,5 +1,5 @@
 ﻿using System;
-using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,13 +52,17 @@ namespace Immortal_Switch.Scripts.Skill.UI
             if (selectedObject != null)
                 selectedObject.SetActive(isSelected);
 
-            if (bgImg != null)
-                bgImg.sprite = tierInfo.background;
-            
-            if (frameImg != null)
-                frameImg.sprite = tierInfo.border;
-            if (tierImg != null)
-                tierImg.sprite = tierInfo.tier;
+            if (tierInfo != null)
+            {
+                if (bgImg != null)
+                    bgImg.sprite = tierInfo.background;
+
+                if (frameImg != null)
+                    frameImg.sprite = tierInfo.border;
+
+                if (tierImg != null)
+                    tierImg.sprite = tierInfo.tierIcon;
+            }
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() => clickCallback?.Invoke(skillData));

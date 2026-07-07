@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Common;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -301,7 +302,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         public HeroDataSO GetRandomHeroByRarity(SummonRarity rarity)
         {
-            var pool = MasterDataCache.Instance.GetAllHeroData()
+            var pool = DatabaseManager.Instance.GetAllHeroData()
                 .Where(x => x != null && x.IsAvailableInSummon && x.SummonRarity == rarity)
                 .ToList();
 
@@ -438,7 +439,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         private HeroDataSO RollHeroByRarity(SummonRarity rarity)
         {
-            var pool = MasterDataCache.Instance.GetAllHeroData()
+            var pool = DatabaseManager.Instance.GetAllHeroData()
                 .Where(x => x != null && x.IsAvailableInSummon && x.SummonRarity == rarity)
                 .ToList();
 

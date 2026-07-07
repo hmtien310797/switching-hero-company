@@ -2,6 +2,7 @@
 using System.Linq;
 using Common;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using UnityEditor;
 using UnityEngine;
 
@@ -144,13 +145,13 @@ namespace Editor
         {
             validHeroes.Clear();
 
-            if (database == null || MasterDataCache.Instance.GetAllHeroData() == null)
+            if (database == null || DatabaseManager.Instance.GetAllHeroData() == null)
             {
                 heroOptions = new string[0];
                 return;
             }
 
-            validHeroes.AddRange(MasterDataCache.Instance.GetAllHeroData().Where(x => x != null).OrderBy(x => x.Id));
+            validHeroes.AddRange(DatabaseManager.Instance.GetAllHeroData().Where(x => x != null).OrderBy(x => x.Id));
             heroOptions = validHeroes.Select(x => $"{x.Id} - {x.Name}").ToArray();
         }
 

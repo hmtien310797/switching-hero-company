@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.MissionSystem.Views.UI;
+using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
@@ -78,10 +79,10 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
             }
         }
 
-        private async UniTask JumpTo(string eventKey)
+        private UniTask JumpTo(string eventKey)
         {
-            await UIManager.Instance.TogglePopupAsync<MissionSystemView>();
-            await ViewHelper.JumpTo(eventKey);
+            UIManager.Instance.TogglePopupAsync<MissionSystemView>().Forget();
+            return UniTask.CompletedTask;
         }
 
         private void RefreshVisual(string missionType)

@@ -2,6 +2,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.UI;
 using Spine.Unity;
@@ -115,7 +116,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void OnChangeHero(int direction)
         {
-            var allHeroes = MasterDataCache.Instance.GetAllHeroData();
+            var allHeroes = DatabaseManager.Instance.GetAllHeroData();
             var heroCount = allHeroes.Count;
             _currentHeroIdx = (Mathf.Max(0, _currentHeroIdx + direction)) % heroCount;
             RefreshBtnDirection();
@@ -132,7 +133,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         public void Bind(int heroId)
         {
-            var allHeroes = MasterDataCache.Instance.GetAllHeroData();
+            var allHeroes = DatabaseManager.Instance.GetAllHeroData();
             _currentHeroIdx = allHeroes.FindIndex(v => v.Id == heroId);
             this.heroId = heroId;
 
@@ -154,7 +155,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void RefreshBtnDirection()
         {
-            var allHeroes = MasterDataCache.Instance.GetAllHeroData();
+            var allHeroes = DatabaseManager.Instance.GetAllHeroData();
             var heroCount = allHeroes.Count;
 
             if (_currentHeroIdx >= heroCount - 1)
@@ -224,9 +225,19 @@ namespace Immortal_Switch.Scripts.HeroUIView
             imgShard.sprite = hero.ShardIcon;
             txtHeroName.text = hero.Name;
             heroStatSnapshot = HeroProgressionManager.Instance.Service.GetCurrentStats(heroId);
-            statAtk.Bind(heroStatSnapshot.Attack);
-            statHp.Bind(heroStatSnapshot.Health);
-            statSpd.Bind(heroStatSnapshot.AttackSpeed);
+
+            if (heroStatSnapshot != null)
+            {
+                statAtk.Bind(heroStatSnapshot.Attack);
+                statHp.Bind(heroStatSnapshot.Health);
+                statSpd.Bind(heroStatSnapshot.AttackSpeed);
+            }
+            else
+            {
+                statAtk.Bind(0);
+                statHp.Bind(0);
+                statSpd.Bind(0);
+            }
         }
     }
 }

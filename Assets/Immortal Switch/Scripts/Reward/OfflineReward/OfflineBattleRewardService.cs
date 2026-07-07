@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
@@ -13,16 +13,8 @@ namespace Immortal_Switch.Scripts.Reward
     {
         public static OfflineBattleRewardService Instance { get; private set; }
 
-        private const string LastExitStageKey = "OfflineBattle.LastExitStage";
-        private const string LastExitTimeKey = "OfflineBattle.LastExitTime";
-
-        [Header("Data")]
-        [SerializeField] private StageDataResolverSO stageDataResolver;
-
         [Header("Config")]
-        [SerializeField] private bool baseRewardIsPerMinute = true;
-        [SerializeField] private int minOfflineSecondsToShow = 60;
-        [SerializeField] private int maxOfflineSeconds = 12 * 60 * 60;
+        [Tooltip("Fallback nếu server không trả defeats_per_minute.")]
         [SerializeField] private int defeatsPerMinute = 200;
 
         [Header("Debug")]
@@ -37,212 +29,143 @@ namespace Immortal_Switch.Scripts.Reward
             currentResult.Rewards != null &&
             currentResult.Rewards.Count > 0;
 
-        private void Awake()
-        {
-            Instance = this;
-        }
+        private void Awake() { Instance = this; }
 
         private void OnEnable()
         {
-            GameEventManager.Subscribe(GameEvents.OnAppPaused, HandleAppPaused);
-            GameEventManager.Subscribe(GameEvents.OnAppQuit, HandleAppQuit);
+            GameEventManager.Subscribe(GameEvents.OnAppPaused,  HandleAppPaused);
+            GameEventManager.Subscribe(GameEvents.OnAppQuit,    HandleAppQuit);
             GameEventManager.Subscribe(GameEvents.OnAppResumed, HandleAppResumed);
         }
 
         private void OnDisable()
         {
-            GameEventManager.Unsubscribe(GameEvents.OnAppPaused, HandleAppPaused);
-            GameEventManager.Unsubscribe(GameEvents.OnAppQuit, HandleAppQuit);
+            GameEventManager.Unsubscribe(GameEvents.OnAppPaused,  HandleAppPaused);
+            GameEventManager.Unsubscribe(GameEvents.OnAppQuit,    HandleAppQuit);
             GameEventManager.Unsubscribe(GameEvents.OnAppResumed, HandleAppResumed);
         }
 
-        private void HandleAppPaused()
-        {
-            SaveExitState(CurrentStageService.CurrentStage);
-        }
+        private void HandleAppPaused()  => SaveExitState(CurrentStageService.CurrentStage);
+        private void HandleAppQuit()    => SaveExitState(CurrentStageService.CurrentStage);
+        private void HandleAppResumed() => CalculateAndShowOnReturn();
 
-        private void HandleAppQuit()
-        {
-            SaveExitState(CurrentStageService.CurrentStage);
-        }
-
-        private void HandleAppResumed()
-        {
-            CalculateAndShowOnReturn();
-        }
+        // ── Checkpoint ────────────────────────────────────────────────────────
 
         public void SaveExitState(int currentStage)
         {
-            currentStage = Mathf.Max(1, currentStage);
+            if (!IsClientReady()) return;
 
-            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            PlayerPrefs.SetInt(LastExitStageKey, currentStage);
-            PlayerPrefs.SetString(LastExitTimeKey, now.ToString());
-            PlayerPrefs.Save();
+            SaveCheckpointAsync(currentStage).Forget();
 
             if (enableDebugLog)
-                Debug.Log($"[OfflineBattle] Save exit. Stage={currentStage}, Time={now}");
+                Debug.Log($"[OfflineBattle] Save checkpoint stage={currentStage}");
         }
+
+        private static async UniTaskVoid SaveCheckpointAsync(int stage)
+        {
+            try
+            {
+                await NakamaClient.Instance.SaveAfkCheckpointAsync(Mathf.Max(1, stage));
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[OfflineBattle] SaveAfkCheckpointAsync failed: {e.Message}");
+            }
+        }
+
+        // ── Claim ─────────────────────────────────────────────────────────────
 
         public void CalculateAndShowOnReturn()
         {
-            currentResult = CalculateReward();
+            CalculateAndShowAsync().Forget();
+        }
 
-            if (!HasReward)
+        private async UniTaskVoid CalculateAndShowAsync()
+        {
+            if (!IsClientReady()) return;
+
+            AfkClaimResponse response;
+            try
+            {
+                response = await NakamaClient.Instance.ClaimAfkRewardAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[OfflineBattle] ClaimAfkRewardAsync failed: {e.Message}");
                 return;
+            }
+
+            if (response == null || !response.Success || !response.HasReward)
+            {
+                if (enableDebugLog) Debug.Log("[OfflineBattle] No offline reward.");
+                return;
+            }
+
+            if (enableDebugLog)
+                Debug.Log($"[OfflineBattle] Reward claimed: stage={response.AfkStage}, elapsed={response.ElapsedSeconds}s, monsters={response.MonstersDefeated}");
+
+            // Áp dụng balance ngay để UI hiển thị đúng trước khi player bấm Claim
+            if (response.Balances != null && CurrencyManager.Instance != null)
+                CurrencyManager.Instance.ApplyServerBalances(response.Balances);
+
+            currentResult = BuildResult(response);
 
             UIManager.Instance.TogglePopupAsync<OfflineBattleRewardPopupView>(
-                new OfflineBattleRewardOpenParam
-                {
-                    Result = currentResult
-                },
+                new OfflineBattleRewardOpenParam { Result = currentResult },
                 false
             );
         }
 
-        private OfflineBattleRewardResult CalculateReward()
-        {
-            int stage = PlayerPrefs.GetInt(LastExitStageKey, 0);
-            string timeString = PlayerPrefs.GetString(LastExitTimeKey, string.Empty);
-
-            if (stage <= 0)
-                return null;
-
-            if (!long.TryParse(timeString, out long lastExitTime))
-                return null;
-
-            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            int elapsedSeconds = Mathf.Max(0, (int)(now - lastExitTime));
-            elapsedSeconds = Mathf.Min(elapsedSeconds, maxOfflineSeconds);
-
-            if (elapsedSeconds < minOfflineSecondsToShow)
-                return null;
-
-            if (stageDataResolver == null)
-            {
-                Debug.LogError("[OfflineBattle] Missing StageDataResolverSO.");
-                return null;
-            }
-
-            StageRuntimeData stageData = stageDataResolver.Resolve(stage);
-            if (stageData == null)
-            {
-                Debug.LogError($"[OfflineBattle] Missing stage data: {stage}");
-                return null;
-            }
-
-            OfflineBattleRewardResult result = new OfflineBattleRewardResult
-            {
-                Stage = stage,
-                OfflineSeconds = elapsedSeconds,
-                MaxOfflineSeconds = maxOfflineSeconds,
-                DefeatsPerMinute = defeatsPerMinute,
-                MonstersDefeated = Mathf.FloorToInt(defeatsPerMinute * (elapsedSeconds / 60f)),
-                Rewards = new List<StageReward>()
-            };
-
-            CalculateRewards(stageData, elapsedSeconds, result);
-
-            if (enableDebugLog)
-            {
-                Debug.Log(
-                    $"[OfflineBattle] Calculated. Stage={stage}, Seconds={elapsedSeconds}, Rewards={result.Rewards.Count}"
-                );
-            }
-
-            return result;
-        }
-
-        private void CalculateRewards(
-            StageRuntimeData stageData,
-            int seconds,
-            OfflineBattleRewardResult result
-        )
-        {
-            if (stageData.BaseRewards == null)
-                return;
-
-            double timeMultiplier = baseRewardIsPerMinute
-                ? seconds / 60d
-                : seconds;
-
-            for (int i = 0; i < stageData.BaseRewards.Length; i++)
-            {
-                StageReward baseReward = stageData.BaseRewards[i];
-
-                if (baseReward == null || !baseReward.IsValid)
-                    continue;
-
-                BigNumber amount = baseReward.Amount * timeMultiplier;
-
-                if (amount <= BigNumber.Zero)
-                    continue;
-
-                AddOrMergeReward(
-                    result.Rewards,
-                    baseReward.currencyType,
-                    amount
-                );
-            }
-        }
-
-        private void AddOrMergeReward(
-            List<StageReward> rewards,
-            CurrencyType currencyType,
-            BigNumber amount
-        )
-        {
-            for (int i = 0; i < rewards.Count; i++)
-            {
-                if (rewards[i].currencyType == currencyType)
-                {
-                    rewards[i].Amount += amount;
-                    return;
-                }
-            }
-
-            rewards.Add(new StageReward(currencyType, amount));
-        }
-
         public async UniTask ClaimCurrentReward()
         {
-            if (!HasReward)
-                return;
+            // Server đã cộng reward khi afk/claim được gọi.
+            // Balance đã apply lên CurrencyManager khi popup mở.
+            // Popup gọi method này chỉ để clear state.
+            currentResult = null;
+            await UniTask.CompletedTask;
+        }
 
-            if (CurrencyLedgerService.Instance == null)
+        // Giữ lại để không break caller cũ — giờ là no-op vì server quản lý state.
+        public void ClearSavedExitState() { }
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+
+        private OfflineBattleRewardResult BuildResult(AfkClaimResponse response)
+        {
+            return new OfflineBattleRewardResult
             {
-                Debug.LogError("[OfflineBattle] Missing CurrencyLedgerService.");
-                return;
-            }
+                Stage             = response.AfkStage,
+                OfflineSeconds    = response.ElapsedSeconds,
+                MaxOfflineSeconds = response.MaxOfflineSeconds > 0 ? response.MaxOfflineSeconds : 43200,
+                DefeatsPerMinute  = response.DefeatsPerMinute  > 0 ? response.DefeatsPerMinute  : defeatsPerMinute,
+                MonstersDefeated  = response.MonstersDefeated,
+                Rewards           = ConvertRewards(response.Rewards)
+            };
+        }
 
-            for (int i = 0; i < currentResult.Rewards.Count; i++)
+        private static List<StageReward> ConvertRewards(List<RewardDto> dtos)
+        {
+            var list = new List<StageReward>();
+            if (dtos == null) return list;
+
+            for (int i = 0; i < dtos.Count; i++)
             {
-                StageReward reward = currentResult.Rewards[i];
-
-                if (reward == null || !reward.IsValid)
+                RewardDto dto = dtos[i];
+                if (!Enum.TryParse(dto.CurrencyType, true, out CurrencyType type))
+                    continue;
+                if (!double.TryParse(dto.Amount,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out double amount) || amount <= 0)
                     continue;
 
-                CurrencyLedgerService.Instance.AddOrMergeIncome(
-                    reward.currencyType,
-                    reward.Amount,
-                    CurrencyTransactionReason.OfflineAfkReward
-                );
+                list.Add(new StageReward(type, BigNumber.FromDouble(amount)));
             }
 
-            ClearSavedExitState();
-
-            currentResult = null;
-
-            await CurrencyLedgerService.Instance.SyncPendingTransactions();
+            return list;
         }
 
-        public void ClearSavedExitState()
-        {
-            PlayerPrefs.DeleteKey(LastExitStageKey);
-            PlayerPrefs.DeleteKey(LastExitTimeKey);
-            PlayerPrefs.Save();
-        }
+        private static bool IsClientReady()
+            => NakamaClient.Instance != null && NakamaClient.Instance.IsLoggedIn;
     }
 }

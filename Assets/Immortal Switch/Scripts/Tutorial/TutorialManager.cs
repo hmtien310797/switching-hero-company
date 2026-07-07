@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Shared;
-using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Tutorial.Interfaces;
 using Immortal_Switch.Scripts.Tutorial.Views;
 using Immortal_Switch.Scripts.UI;
@@ -75,14 +73,70 @@ namespace Immortal_Switch.Scripts.Tutorial
         }
 
         /// <summary>
-        /// check complete truoc khi start 1 guide
+        /// check complete truoc khi start 1 guide. Đối soát với server trước: nếu bước
+        /// cuối của guide đã có trong completed_step_ids server (vd hoàn thành ở thiết bị
+        /// khác rồi cài lại app — ES3 local là fresh) nhưng local chưa đánh dấu complete,
+        /// tự đánh dấu complete thay vì bắt người chơi làm lại toàn bộ tutorial.
         /// </summary>
-        public void TryGuide(int guideId)
+        public async UniTask TryGuide(int guideId)
         {
-            // if (!IsComplete(guideId))
-            // {
-            //     StartAt(guideId);
-            // }
+            if (!IsComplete(guideId))
+            {
+                await ReconcileGuideFromServerAsync(guideId);
+            }
+
+            if (!IsComplete(guideId))
+            {
+                StartAt(guideId);
+            }
+        }
+
+        private async UniTask ReconcileGuideFromServerAsync(int guideId)
+        {
+            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+
+            try
+            {
+                var state = await NakamaClient.Instance.GetTutorialStateAsync();
+                if (state?.CompletedStepIds == null) return;
+
+                var tutorials = DatabaseManager.Instance.TutorialDb.GetTutorials(guideId);
+                var lastStep  = tutorials.LastOrDefault();
+                if (lastStep != null && state.CompletedStepIds.Contains(lastStep.stepId))
+                {
+                    Service.Complete(guideId);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[Tutorial] ReconcileGuideFromServerAsync failed: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Báo server 1 step đã hoàn thành (fire-and-forget). Nếu step có reward, server trả
+        /// balances tuyệt đối — clear phần ledger tạm (đã cộng optimistic trong PresentRewards)
+        /// rồi áp balances thật, tránh double-count (cùng convention với RewardSyncService).
+        /// </summary>
+        private async UniTask SyncStepCompletionAsync(DynamicHeroesGlobalSpecificationsTutConfigRow step)
+        {
+            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+
+            try
+            {
+                var response = await NakamaClient.Instance.CompleteTutorialStepAsync(step.stepId);
+                if (response == null || !response.Success) return;
+
+                if (response.Balances != null && response.Balances.Count > 0)
+                {
+                    CurrencyLedgerService.Instance?.ClearPendingByReason(CurrencyTransactionReason.TutorialReward);
+                    CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[Tutorial] SyncStepCompletionAsync failed step={step.stepId}: {e.Message}");
+            }
         }
 
         /// <summary>
@@ -111,6 +165,42 @@ namespace Immortal_Switch.Scripts.Tutorial
             ShowTutorial(step);
         }
 
+        public void OnSkip()
+        {
+            if (_rows.Count < _currentStep)
+            {
+                Debug.LogError($"[Tutorial] current step: {_currentStep} must smaller rows: {_rows.Count}");
+                return;
+            }
+
+            var step = _rows[_currentStep];
+            SyncStepCompletionAsync(step).Forget();
+
+            if (step.nextStepId == 0)
+            {
+                CompleteCurrentGuide();
+            }
+            else
+            {
+                void ContinueTutorial()
+                {
+                    _currentStep++;
+                    OnSkip();
+                }
+
+                var hasReward = HasRewards(step);
+
+                if (hasReward)
+                {
+                    PresentRewards(step, ContinueTutorial);
+                }
+                else
+                {
+                    ContinueTutorial();
+                }
+            }
+        }
+
         public async UniTask FireOnClick()
         {
             if (_rows.Count < _currentStep)
@@ -120,6 +210,7 @@ namespace Immortal_Switch.Scripts.Tutorial
             }
 
             var step = _rows[_currentStep];
+            SyncStepCompletionAsync(step).Forget();
 
             if (OnClick != null)
             {
@@ -128,9 +219,7 @@ namespace Immortal_Switch.Scripts.Tutorial
 
             if (step.nextStepId == 0)
             {
-                Service.Complete(_guideId);
-                ClearTutorial();
-                OnCompleteTutorial?.Invoke();
+                CompleteCurrentGuide();
             }
             else
             {
@@ -144,13 +233,20 @@ namespace Immortal_Switch.Scripts.Tutorial
 
                 if (hasReward)
                 {
-                    PresentRewards(step, ContinueTutorial).Forget();
+                    PresentRewards(step, ContinueTutorial);
                 }
                 else
                 {
                     ContinueTutorial();
                 }
             }
+        }
+
+        private void CompleteCurrentGuide()
+        {
+            Service.Complete(_guideId);
+            ClearTutorial();
+            OnCompleteTutorial?.Invoke();
         }
 
         private void ShowTutorial(DynamicHeroesGlobalSpecificationsTutConfigRow row)
@@ -177,7 +273,7 @@ namespace Immortal_Switch.Scripts.Tutorial
             }
             else
             {
-                UIManager.Instance.OpenPopupAsync<TutorialView>(tutorialData).Forget();
+                UIManager.Instance.OpenPopupAsync<TutorialView>(tutorialData, false).Forget();
             }
         }
 
@@ -196,16 +292,16 @@ namespace Immortal_Switch.Scripts.Tutorial
         {
             if (string.IsNullOrWhiteSpace(row.rewardItems))
             {
-                Debug.LogError($"[Tutorial] {row.stepId} - {row.rewardItems} is empty");
+                Debug.LogWarning($"[Tutorial] {row.stepId} - {row.rewardItems} is empty");
                 return false;
             }
 
             return true;
         }
 
-        private async UniTask PresentRewards(DynamicHeroesGlobalSpecificationsTutConfigRow row, Action onContinueTutorial)
+        private void PresentRewards(DynamicHeroesGlobalSpecificationsTutConfigRow row, Action onContinueTutorial)
         {
-            var rewards = await DatabaseManager.Instance.GetRewards(row.rewardItems);
+            var rewards = DatabaseManager.Instance.GetRewards(row.rewardItems);
 
             if (rewards == null)
             {

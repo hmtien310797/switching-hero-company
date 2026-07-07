@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
@@ -15,19 +14,22 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 {
     public class UIMissionSystemRepeatView : MonoBehaviour
     {
-        [Header("References prefab")] [SerializeField]
+        [Header("References prefab")]
+        [SerializeField]
         private RectTransform taskContainer;
 
-        [SerializeField] private UIMissionRepeatEntry taskPrefab;
+        [SerializeField]
+        private UIMissionRepeatEntry taskPrefab;
 
-        [Header("References button claim all")] [SerializeField]
+        [Header("References button claim all")]
+        [SerializeField]
         private Button btnClaimAll;
 
-        [SerializeField] private GameObject goBtnClaimAllRedDot;
+        [SerializeField]
+        private GameObject goBtnClaimAllRedDot;
 
         // --- Private Fields ---
         private readonly List<UIMissionRepeatEntry> _taskObjects = new();
-
         private string _missionType;
 
         private void Awake()
@@ -95,10 +97,10 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             // check btn claim trang thai
             var anyCompleted = MissionSystemManager.Instance.AnyCompleted(_missionType);
             RefreshBtnClaimAll(anyCompleted);
-            CreateMissions(rows, tasks, missionType, onJump).Forget();
+            CreateMissions(rows, tasks, missionType, onJump);
         }
 
-        private async UniTask CreateMissions(
+        private void CreateMissions(
             List<DynamicHeroesGlobalSpecificationsMissionConfigRow> rows,
             List<MissionSystemEntry> tasks,
             string missionType,
@@ -121,8 +123,8 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                 if (rewards.Count > 0)
                 {
                     var reward = rewards[0];
-                    sprite = await DatabaseManager.Instance.ItemDb.LoadCurrencyIconByKey(reward.itemKey);
-                    quantityFormat = BigIntegerHelper.Format(reward.quantity);
+                    sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemKey(reward.itemKey);
+                    quantityFormat = BigNumberHelper.Format(reward.quantity);
                 }
 
                 if (_taskObjects.Count > i)

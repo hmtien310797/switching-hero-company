@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Nakama;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -58,7 +59,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
         public override async UniTask InitializeAsync()
         {
-            allSkills = MasterDataCache.Instance.GetAllSkillData();
+            allSkills = DatabaseManager.Instance.GetAllSkillData();
             BuildPoolLookup();
             BuildCacheIfNeeded();
             userDataCache = UserDataCache.Instance;
@@ -76,9 +77,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private void OnDisable()
         {
             GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, HandleBattleLineupChanged);
-
-            if (UserDataCache.Instance != null)
-                UserDataCache.Instance.OnHeroSkillChanged -= HandleHeroSkillChanged;
         }
 
         public void NotifyDataChanged()
@@ -187,8 +185,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
             if (skillCache != null && skillCache.TryGetValue(skillId, out var localData))
                 return localData;
 
-            var masterData = MasterDataCache.Instance != null
-                ? MasterDataCache.Instance.GetSkillDataById(skillId)
+            var masterData = DatabaseManager.Instance != null
+                ? DatabaseManager.Instance.GetSkillDataById(skillId)
                 : null;
 
             if (masterData != null)
@@ -278,6 +276,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             // Gỡ những skill đang trang bị nhưng không còn nằm trong target — theo skill_id, không
             // theo vị trí, để không động vào slot của skill vẫn còn hợp lệ.
+            // Áp dụng CỤC BỘ trước để UI phản hồi tức thì. Việc đồng bộ lên server được gộp thành
+            // MỘT lệnh gọi duy nhất (SyncAutoEquipAsync) sau khi đã xử lý xong toàn bộ danh sách —
+            // trước đây mỗi lần gỡ/trang bị bắn 1 RPC riêng kiểu fire-and-forget, nhiều RPC chạy
+            // song song có thể ghi đè lẫn nhau trên server (skill.js không dùng version check) và
+            // các response về không đúng thứ tự có thể làm UI hiển thị lệch với server.
             foreach (int currentSkillId in currentSkillIds)
             {
                 if (currentSkillId <= 0)
@@ -303,11 +306,9 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 }
 
                 hasChanged = true;
-                SyncUnequipAsync(currentSkillId).Forget();
             }
 
-            // Trang bị các skill còn thiếu vào slot trống thật (HeroSkillController tự tìm slot,
-            // trả về slot thật để gửi đúng lên server — không suy ra slot từ vị trí trong target).
+            // Trang bị các skill còn thiếu vào slot trống thật (HeroSkillController tự tìm slot).
             foreach (int targetSkillId in targetSkillIds)
             {
                 if (keptSkillIds.Contains(targetSkillId))
@@ -329,11 +330,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 hasChanged = true;
                 keptSkillIds.Add(targetSkillId);
-
-                SyncEquipAsync(
-                    heroContext.HeroId,
-                    targetSkillId,
-                    equippedSlotIndex).Forget();
             }
 
             result.Success = true;
@@ -345,6 +341,9 @@ namespace Immortal_Switch.Scripts.Skill.UI
             {
                 heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
                 OnDataChanged?.Invoke();
+
+                // Một RPC duy nhất, atomic ở server (skill/auto_equip) thay cho N+M RPC rời rạc.
+                await SyncAutoEquipAsync(heroContext.HeroId, targetSkillIds);
             }
 
             Log(
@@ -694,6 +693,48 @@ namespace Immortal_Switch.Scripts.Skill.UI
             catch (ApiResponseException ex)
             {
                 LogError($"SyncEquipAsync failed: {ex.StatusCode} {ex.Message}");
+            }
+        }
+
+        private async UniTask SyncAutoEquipAsync(int heroId, List<int> targetSkillIds)
+        {
+            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+
+            string heroUid = UserDataCache.Instance?.GetHeroUid(heroId);
+            if (heroUid == null)
+            {
+                LogError($"SyncAutoEquipAsync aborted — heroUid not found. heroId={heroId}");
+                return;
+            }
+
+            var skillUids = new List<string>();
+            foreach (int skillId in targetSkillIds)
+            {
+                string skillUid = UserDataCache.Instance?.GetSkillUid(skillId);
+                if (skillUid != null)
+                    skillUids.Add(skillUid);
+            }
+
+            try
+            {
+                var response = await NakamaClient.Instance.SkillAutoEquipAsync(heroUid, skillUids);
+                if (response != null && response.Updated)
+                {
+                    UserDataCache.Instance?.ReconcileEquippedFromServer(response.Equipped);
+                    Log($"SyncAutoEquipAsync done — heroUid={heroUid}, skills=[{string.Join(",", skillUids)}]");
+                }
+                else
+                {
+                    LogWarning($"SyncAutoEquipAsync not updated — heroUid={heroUid}");
+                }
+            }
+            catch (ApiResponseException ex) when (ex.StatusCode == 16)
+            {
+                LogWarning($"SyncAutoEquipAsync session expired (UNAUTHENTICATED).");
+            }
+            catch (ApiResponseException ex)
+            {
+                LogError($"SyncAutoEquipAsync failed: {ex.StatusCode} {ex.Message}");
             }
         }
 

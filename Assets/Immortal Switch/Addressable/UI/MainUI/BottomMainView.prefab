@@ -202,7 +202,11 @@ MonoBehaviour:
   ButtonGem: {fileID: 5093349761795596883}
   ButtonClose: {fileID: 8675480270899206813}
   Gem: {fileID: 5280627501363879808}
-  txtEnergy: {fileID: 1738874172663529025}
+  disableObjectsWhenPlayDungeon:
+  - {fileID: 7255389371880983864}
+  - {fileID: 3408612749526569910}
+  - {fileID: 6504881102247835323}
+  - {fileID: 6723028834268703099}
 --- !u!1 &3408612749526569910
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,6 +413,7 @@ GameObject:
   - component: {fileID: 8640281882647319932}
   - component: {fileID: 2748896487947276340}
   - component: {fileID: 1486832274531858894}
+  - component: {fileID: 7531407378993575498}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -474,6 +479,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7531407378993575498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5377118596439286894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe9e3f9d26c48238d8ee8f9a35b8087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currencyType: 2
+  amountText: {fileID: 1738874172663529025}
+  includeOnlineIdlePreview: 1
 --- !u!1 &6089867039324092750
 GameObject:
   m_ObjectHideFlags: 0
@@ -969,6 +989,8 @@ MonoBehaviour:
   changePosY: 0
   yPosPortrait: 1
   yPosLandscape: 1
+  useScaleReduction: 1
+  scaleReductionPercent: 25
 --- !u!1 &7255389371880983864
 GameObject:
   m_ObjectHideFlags: 0
@@ -1771,9 +1793,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3297855998782511775, guid: ebba5167c7774a0419b7f459aad66aa9, type: 3}
+      propertyPath: m_text
+      value: "Tri\u1EC7u h\u1ED3i"
+      objectReference: {fileID: 0}
     - target: {fileID: 5442047858419528063, guid: ebba5167c7774a0419b7f459aad66aa9, type: 3}
       propertyPath: m_Name
-      value: ButtonShop
+      value: ButtonSummon
+      objectReference: {fileID: 0}
+    - target: {fileID: 6826827766328024567, guid: ebba5167c7774a0419b7f459aad66aa9, type: 3}
+      propertyPath: m_text
+      value: "Tri\u1EC7u h\u1ED3i"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -47,6 +47,7 @@ Shader "Custom/TeleportGateCurvedWorld"
         {
             "Queue"             = "Transparent"
             "RenderType"        = "Transparent"
+            "IgnoreProjector"   = "True"
             "RenderPipeline"    = "UniversalPipeline"
             "CanUseSpriteAtlas" = "True"
         }
@@ -60,6 +61,7 @@ Shader "Custom/TeleportGateCurvedWorld"
             HLSLPROGRAM
             #pragma vertex   vert
             #pragma fragment frag
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             struct Attributes
@@ -90,10 +92,35 @@ Shader "Custom/TeleportGateCurvedWorld"
                 float  _RimIntensity;
                 float  _NoiseScale, _NoiseSpeed, _DistortStrength;
                 float  _InteriorCenterY, _InteriorBlend;
-                float  _HorizontalCurvature, _ForwardCurvature;
-                float  _CurveStartDistance, _HorizontalStartDistance;
+
+                float  _HorizontalCurvature;
+                float  _ForwardCurvature;
+                float  _CurveStartDistance;
+                float  _HorizontalStartDistance;
                 float  _CurveOffsetY;
             CBUFFER_END
+
+            // ── Curved World ────────────────────────────────────────────────
+
+            float3 ApplyCurvedWorld(float3 worldPos)
+            {
+                float3 camPos = _WorldSpaceCameraPos;
+
+                float xDistance = abs(worldPos.x - camPos.x);
+                float zDistance = abs(worldPos.z - camPos.z);
+
+                xDistance = max(0.0, xDistance - _HorizontalStartDistance);
+                zDistance = max(0.0, zDistance - _CurveStartDistance);
+
+                float horizontalCurve = xDistance * xDistance * _HorizontalCurvature;
+                float forwardCurve    = zDistance * zDistance * _ForwardCurvature;
+
+                worldPos.y -= horizontalCurve;
+                worldPos.y -= forwardCurve;
+                worldPos.y += _CurveOffsetY;
+
+                return worldPos;
+            }
 
             // ── Noise ────────────────────────────────────────────────────────
 
@@ -109,7 +136,7 @@ Shader "Custom/TeleportGateCurvedWorld"
                 float2 f = frac(p);
                 float2 u = f * f * (3.0 - 2.0 * f);
 
-                float a = dot(_Hash2(i),                   f);
+                float a = dot(_Hash2(i),                f);
                 float b = dot(_Hash2(i + float2(1, 0)), f - float2(1, 0));
                 float c = dot(_Hash2(i + float2(0, 1)), f - float2(0, 1));
                 float d = dot(_Hash2(i + float2(1, 1)), f - float2(1, 1));
@@ -123,6 +150,7 @@ Shader "Custom/TeleportGateCurvedWorld"
                 float  v   = 0.0;
                 float  amp = 0.5;
                 float2x2 rot = float2x2(1.6, 1.2, -1.2, 1.6);
+
                 UNITY_UNROLL
                 for (int i = 0; i < 4; i++)
                 {
@@ -130,29 +158,8 @@ Shader "Custom/TeleportGateCurvedWorld"
                     p    = mul(rot, p);
                     amp *= 0.5;
                 }
+
                 return v;
-            }
-
-            // ── Curved World ─────────────────────────────────────────────────
-
-            float3 ApplyCurvedWorld(float3 worldPos)
-            {
-                float3 cameraPos = GetCameraPositionWS();
-
-                float xDistance = abs(worldPos.x - cameraPos.x);
-                float zDistance = abs(worldPos.z - cameraPos.z);
-
-                xDistance = max(0.0, xDistance - _HorizontalStartDistance);
-                zDistance = max(0.0, zDistance - _CurveStartDistance);
-
-                float horizontalCurve = xDistance * xDistance * _HorizontalCurvature;
-                float forwardCurve    = zDistance * zDistance * _ForwardCurvature;
-
-                worldPos.y -= horizontalCurve;
-                worldPos.y -= forwardCurve;
-                worldPos.y += _CurveOffsetY;
-
-                return worldPos;
             }
 
             // ── Vertex ───────────────────────────────────────────────────────
@@ -167,6 +174,7 @@ Shader "Custom/TeleportGateCurvedWorld"
                 OUT.positionHCS = TransformWorldToHClip(worldPos);
                 OUT.uv          = TRANSFORM_TEX(IN.uv, _MainTex);
                 OUT.color       = IN.color * _Color;
+
                 return OUT;
             }
 
@@ -203,11 +211,11 @@ Shader "Custom/TeleportGateCurvedWorld"
 
                 half4 portalColor;
                 if (n < 0.35)
-                    portalColor = lerp(_ColorOuter, _ColorMid,   n / 0.35);
+                    portalColor = lerp(_ColorOuter, _ColorMid, n / 0.35);
                 else if (n < 0.65)
-                    portalColor = lerp(_ColorMid,   _ColorInner, (n - 0.35) / 0.30);
+                    portalColor = lerp(_ColorMid, _ColorInner, (n - 0.35) / 0.30);
                 else
-                    portalColor = lerp(_ColorInner, half4(1,1,1,1), (n - 0.65) / 0.35);
+                    portalColor = lerp(_ColorInner, half4(1, 1, 1, 1), (n - 0.65) / 0.35);
 
                 // 6. Pulse rings emanating from center
                 float ring = sin(dist * _RingCount * PI - t * _PulseSpeed) * 0.5 + 0.5;
@@ -221,11 +229,11 @@ Shader "Custom/TeleportGateCurvedWorld"
                 // 8. Interior vs frame detection
                 //    Dark saturated pixels = arch frame border
                 //    Bright/light pixels   = interior glow area → show more portal
-                float luma       = dot(sprite.rgb, float3(0.299, 0.587, 0.114));
-                float interiorW  = saturate((1.0 - luma) * sprite.a * 2.0);
+                float luma      = dot(sprite.rgb, float3(0.299, 0.587, 0.114));
+                float interiorW = saturate((1.0 - luma) * sprite.a * 2.0);
 
-                half4 final;
-                final.rgb = lerp(sprite.rgb * _GlowIntensity, portalColor.rgb, interiorW * _InteriorBlend);
+                half4 finalColor;
+                finalColor.rgb = lerp(sprite.rgb * _GlowIntensity, portalColor.rgb, interiorW * _InteriorBlend);
 
                 // 9. Rim / edge glow — detects alpha gradient along the arch border
                 float2 ts = float2(0.003, 0.003);
@@ -233,17 +241,19 @@ Shader "Custom/TeleportGateCurvedWorld"
                 float aD  = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv - float2(ts.x, 0)).a;
                 float aL  = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + float2(0, ts.y)).a;
                 float aR  = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv - float2(0, ts.y)).a;
+
                 float edge     = saturate((abs(aU - aD) + abs(aL - aR)) * 5.0);
                 float rimPulse = sin(t * 2.5) * 0.3 + 0.7;
-                final.rgb += edge * _RimColor.rgb * _RimIntensity * rimPulse;
+                finalColor.rgb += edge * _RimColor.rgb * _RimIntensity * rimPulse;
 
                 // 10. Sparkles — random bright flickers
                 float sparkSeed = _SmoothNoise(uv * 28.0 + float2(floor(t * 5.0) * 7.3, floor(t * 4.0) * 5.1));
                 float sparkle   = pow(max(0.0, sparkSeed - 0.80), 2.0) * 18.0 * sprite.a;
-                final.rgb += sparkle * half3(1.0, 0.95, 0.6);
+                finalColor.rgb += sparkle * half3(1.0, 0.95, 0.6);
 
-                final.a = sprite.a;
-                return final * IN.color;
+                finalColor.a = sprite.a;
+
+                return finalColor * IN.color;
             }
 
             ENDHLSL

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,7 +34,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         [SerializeField] private SummonLevelRewardPreviewUI levelRewardPreviewUI;
 
         [Header("Popup")]
-        [SerializeField] private SummonConfirmPopup confirmPopup;
         [SerializeField] private SkillSummonSequencePopup sequencePopup;
         [SerializeField] private SkillSummonProbabilityPopup probabilityPopup;
 
@@ -194,13 +196,20 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
         private void ShowGemConfirm(string optionId, int gemCost)
         {
-            if (confirmPopup == null)
+            /*if (confirmPopup == null)
             {
                 ExecuteSummonAsync(optionId).Forget();
                 return;
             }
 
-            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());
+            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());*/
+            UIManager.Instance
+                .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
+                    "Cảnh báo",
+                    $"Không đủ Vé Anh hùng.\nLần triệu hồi này sẽ tiêu tốn {gemCost} Kim cương.\nXác nhận?",
+                    () => ExecuteSummonAsync(optionId).Forget()
+                ))
+                .Forget();
         }
 
         private async UniTaskVoid ExecuteSummonAsync(string optionId)
@@ -252,7 +261,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
                 foreach (var entry in response.Entries)
                 {
-                    var skillData = MasterDataCache.Instance.GetSkillDataById(entry.SkillId);
+                    var skillData = DatabaseManager.Instance.GetSkillDataById(entry.SkillId);
                     Enum.TryParse<SkillSummonGrade>(entry.Grade, true, out var grade);
 
                     result.Entries.Add(new SkillSummonResultEntry

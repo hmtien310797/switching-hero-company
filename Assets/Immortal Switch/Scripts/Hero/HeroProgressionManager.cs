@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Hero
@@ -103,7 +104,7 @@ namespace Immortal_Switch.Scripts.Hero
                 {
                     ownedHeroIds.Add(heroInstance.HeroId);
 
-                    var heroData = MasterDataCache.Instance.GetHeroDataById(heroInstance.HeroId);
+                    var heroData = DatabaseManager.Instance.GetHeroDataById(heroInstance.HeroId);
                     if (heroData == null) continue;
 
                     AcquireHeroIfNeeded(heroData);
@@ -206,7 +207,7 @@ namespace Immortal_Switch.Scripts.Hero
         {
             if (service == null) return;
 
-            List<HeroDataSO> allHeroData = MasterDataCache.Instance.GetAllHeroData();
+            List<HeroDataSO> allHeroData = DatabaseManager.Instance.GetAllHeroData();
             for (int i = 0; i < allHeroData.Count; i++)
             {
                 int currentHeroId = allHeroData[i].Id;

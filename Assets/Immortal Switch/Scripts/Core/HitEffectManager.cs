@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using System;
+using Common;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -35,5 +36,10 @@ public sealed class HitEffectManager : MonoBehaviour
             spawnPosition,
             Quaternion.identity
         );
+    }
+
+    private void OnDestroy()
+    {
+        Instance = null;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
@@ -13,8 +14,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
         public MissionSystemData Data { get; private set; }
 
         /// <summary>
-        /// save key localstorage.
+        /// Callback fired after every Save(). Manager sets this to fire-and-forget server sync.
         /// </summary>
+        public Action OnAfterSave { get; set; }
+
         private const string SAVE_KEY = nameof(MissionSystem);
 
         public MissionSystemStorage(MissionSystemDatabaseSO db)
@@ -25,13 +28,23 @@ namespace Immortal_Switch.Scripts.MissionSystem
         public void Save()
         {
             ES3.Save(SAVE_KEY, Data);
-            Debug.Log($"{SAVE_KEY}: Save {JsonConvert.SerializeObject(Data)}");
+            //Debug.Log($"{SAVE_KEY}: Save {JsonConvert.SerializeObject(Data)}");
+            OnAfterSave?.Invoke();
         }
 
         public void Load()
         {
             Data = ES3.KeyExists(SAVE_KEY) ? ES3.Load<MissionSystemData>(SAVE_KEY) : new MissionSystemData();
             Debug.Log($"{SAVE_KEY}: Load {JsonConvert.SerializeObject(Data)}");
+        }
+
+        /// <summary>
+        /// Overrides Data with server-loaded state without writing to ES3.
+        /// The next Save() call will persist it locally.
+        /// </summary>
+        public void LoadFromData(MissionSystemData data)
+        {
+            Data = data;
         }
 
         public void ResetDaily()

@@ -85,7 +85,8 @@ namespace Immortal_Switch.Scripts.Skill
                 }
 
                 case SkillTargetType.AreaAroundCastPosition:
-                    ResolveEnemiesInArea(context, context.CastPosition, areaData);
+                    if(context.RuntimeObject != null)
+                        ResolveEnemiesInArea(context, context.RuntimeObject.transform.position, areaData);
                     break;
 
                 case SkillTargetType.AllEnemies:

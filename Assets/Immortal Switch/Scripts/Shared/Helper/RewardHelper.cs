@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
-using Immortal_Switch.Scripts.ItemSystem.Models;
+using Immortal_Switch.Scripts.Items.Models;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shared.Helper

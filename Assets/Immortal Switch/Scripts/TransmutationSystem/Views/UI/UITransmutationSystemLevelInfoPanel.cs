@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Shared;
-using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.TransmutationSystem.Models;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -130,12 +130,12 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
                     var clone = _levelInfos[i];
                     clone.gameObject.SetActive(true);
                     clone.transform.SetParent(levelInfoContainer);
-                    clone.Bind(cfgTier.tier, item.Value);
+                    clone.Bind(cfgTier.tierIcon, item.Value);
                 }
                 else
                 {
                     var clone = Instantiate(levelInfoPrefab, levelInfoContainer);
-                    clone.Bind(cfgTier.tier, item.Value);
+                    clone.Bind(cfgTier.tierIcon, item.Value);
                     _levelInfos.Add(clone);
                 }
             }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Battle;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.Tutorial;
@@ -223,6 +224,11 @@ namespace Immortal_Switch.Scripts.UI.Skill
 
             if (display.IsEmptyClassSlot)
             {
+                if (BattleFlowController.Instance.IsDungeonLocked)
+                {
+                    return;
+                }
+                
                 RequestEquipClassSkill?.Invoke(currentHero, slotIndex);
                 onRequestEquipClassSkill?.Invoke(currentHero, slotIndex);
 

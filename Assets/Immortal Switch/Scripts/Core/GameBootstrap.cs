@@ -7,11 +7,14 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.MissionSystem;
 using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shop;
+using Immortal_Switch.Scripts.Shop.IAP;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
@@ -40,8 +43,8 @@ namespace Immortal_Switch.Scripts.Core
 
                 // init dau tien. có các manager khác sử dụng tới. tránh lỗi.
                 await DatabaseManager.Instance.InitializeAsync();
-                await MasterDataCache.Instance.InitializeAsync();
                 await PlayerSystemManager.Instance.InitializeAsync();
+                await ShopManager.Instance.InitializeAsync();
                 await MissionSystemManager.Instance.InitializeAsync();
 
                 // Fetch player data — includes heroes/skills/weapons inventory
@@ -85,17 +88,40 @@ namespace Immortal_Switch.Scripts.Core
                 {
                     Debug.LogWarning($"[Bootstrap] Failed to fetch summon state: {ex.Message}");
                 }
+                
+                // Đồng bộ bag
+                try
+                {
+                    var bag = await NakamaClient.Instance.GetBagAsync();
+                    ItemsManager.Instance.SyncFromServer(bag);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[Bootstrap] Failed to fetch bag state: {ex.Message}");
+                }
 
                 await UserDataCache.Instance.InitializeAsync();
                 await GrowthManager.Instance.InitializeAsync();
                 SyncGrowthToManager(player?.growth);
                 await PowerUpManager.Instance.InitializeAsync();
+
+                // IAP không chặn bootstrap nếu store không khả dụng (vd: chạy trong Editor không
+                // có store thật) — shop vẫn mở được, chỉ nút mua sẽ báo lỗi khi bấm.
+                try
+                {
+                    await IAPManager.Instance.InitializeAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[Bootstrap] Failed to initialize IAP: {ex.Message}");
+                }
+
                 await SkillViewDataProvider.Instance.InitializeAsync();
                 await AddressablePoolService.Instance.InitializeAsync();
                 await UIManager.Instance.InitializeAsync();
                 await HeroImageService.InitializeAsync();
                 await PvEBattleController.Instance.InitializeAsync();
-                TutorialManager.Instance.TryGuide(TutorialGuideIds.NEW_USER_GUIDE);
+                await TutorialManager.Instance.TryGuide(TutorialGuideIds.NEW_USER_GUIDE);
 
                 Debug.Log("Bootstrap completed");
             }
@@ -154,6 +180,11 @@ namespace Immortal_Switch.Scripts.Core
 
         private void ApplyPlayerData(PlayerMeResponse player)
         {
+            UserDataCache.Instance.DisplayName = player.display_name ?? string.Empty;
+            TopMainView.Instance?.SetDisplayName(UserDataCache.Instance.DisplayName);
+
+            UserDataCache.Instance.Exp = player.exp;
+            
             CurrencyManager.Instance.Set(CurrencyType.gold, player.coins);
             CurrencyManager.Instance.Set(CurrencyType.diamond, player.gems);
             CurrencyManager.Instance.Set(CurrencyType.HeroTicket, player.hero_ticket);

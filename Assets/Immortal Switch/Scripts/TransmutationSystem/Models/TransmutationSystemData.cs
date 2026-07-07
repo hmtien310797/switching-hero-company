@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
-using Immortal_Switch.Scripts.Shared.Database;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Models
 {

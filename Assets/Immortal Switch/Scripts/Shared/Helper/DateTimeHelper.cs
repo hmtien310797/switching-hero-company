@@ -1,6 +1,6 @@
 using System;
 
-namespace Immortal_Switch.Scripts.Helper
+namespace Immortal_Switch.Scripts.Shared.Helper
 {
     public static class DateTimeHelper
     {

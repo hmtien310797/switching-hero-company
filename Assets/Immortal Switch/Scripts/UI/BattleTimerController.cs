@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -17,28 +19,98 @@ namespace Immortal_Switch.Scripts.UI
         private float lastTime = 0;
         private Tween timerTween;
 
-        public void InitTimer(float dur, Action rAct)
-        {
-            oTime = dur;
-            curTime = oTime;
-            timeOutAct = rAct;
+        private CancellationTokenRegistration timerCancellationRegistration;
 
-            timerTween?.Kill();
+        public void InitTimer(
+            float duration,
+            Action timeoutAction,
+            CancellationToken cancellationToken)
+        {
+            StopTimer();
+
+            oTime = Mathf.Max(0f, duration);
+            curTime = oTime;
+            timeOutAct = timeoutAction;
 
             UpDateTimerSlide(curTime);
             ShowTimer();
 
-            timerTween = DOVirtual.Float(oTime, 0, oTime, value =>
-                {
-                    curTime = value;
-                    UpDateTimerSlide(curTime);
-                })
+            if (cancellationToken.IsCancellationRequested)
+            {
+                timeOutAct = null;
+                return;
+            }
+
+            if (oTime <= 0f)
+            {
+                CompleteTimer();
+                return;
+            }
+
+            timerTween = DOVirtual.Float(
+                    oTime,
+                    0f,
+                    oTime,
+                    value =>
+                    {
+                        curTime = value;
+                        UpDateTimerSlide(curTime);
+                    })
                 .SetEase(Ease.Linear)
-                .OnComplete(() =>
+                .OnComplete(CompleteTimer)
+                .OnKill(() =>
                 {
-                    oTime = 0;
-                    timeOutAct?.Invoke();
+                    timerCancellationRegistration.Dispose();
+                    timerTween = null;
                 });
+
+            if (cancellationToken.CanBeCanceled)
+            {
+                timerCancellationRegistration =
+                    cancellationToken.Register(HideTimer);
+            }
+        }
+
+        private void CompleteTimer()
+        {
+            timerCancellationRegistration.Dispose();
+
+            timerTween = null;
+            oTime = 0f;
+            curTime = 0f;
+
+            UpDateTimerSlide(curTime);
+
+            Action callback = timeOutAct;
+            timeOutAct = null;
+
+            callback?.Invoke();
+        }
+
+        private void CancelTimer()
+        {
+            timeOutAct = null;
+
+            if (timerTween != null &&
+                timerTween.IsActive())
+            {
+                timerTween.Kill();
+            }
+        }
+
+        private void StopTimer()
+        {
+            timerCancellationRegistration.Dispose();
+
+            timeOutAct = null;
+
+            if (timerTween != null &&
+                timerTween.IsActive())
+            {
+                timerTween.Kill();
+            }
+
+            timerTween = null;
         }
 
         private void UpDateTimerSlide(float dur)
@@ -70,8 +142,15 @@ namespace Immortal_Switch.Scripts.UI
 
         public void HideTimer()
         {
-            timerTween?.Kill();
-            SetTimerState(false);
+            try
+            {
+                StopTimer();
+                SetTimerState(false);
+            }
+            catch (Exception e)
+            {
+                //stop timer by CTS
+            }
         }
     }
 }

@@ -4,9 +4,12 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -19,34 +22,49 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         public override SummonCategory Category => SummonCategory.Hero;
 
         [Header("Buttons")]
-        [SerializeField] private SummonButtonUI summonButtonA;
-        [SerializeField] private SummonButtonUI summonButtonB;
+        [SerializeField]
+        private SummonButtonUI summonButtonA;
+
+        [SerializeField]
+        private SummonButtonUI summonButtonB;
 
         [Header("Texts")]
-        [SerializeField] private TMP_Text summonLevelText;
+        [SerializeField]
+        private TMP_Text summonLevelText;
 
         [Header("Progress")]
-        [SerializeField] private Image summonLevelProgressFill;
+        [SerializeField]
+        private Image summonLevelProgressFill;
 
         [Header("Reward Preview")]
-        [SerializeField] private SummonLevelRewardPreviewUI levelRewardPreviewUI;
+        [SerializeField]
+        private SummonLevelRewardPreviewUI levelRewardPreviewUI;
 
         [Header("Popup")]
-        [SerializeField] private SummonConfirmPopup confirmPopup;
-        [SerializeField] private HeroSummonSequencePopup sequencePopup;
-        [SerializeField] private HeroSummonProbabilityPopup probabilityPopup;
+        [SerializeField]
+        private HeroSummonSequencePopup sequencePopup;
+
+        [SerializeField]
+        private HeroSummonProbabilityPopup probabilityPopup;
 
         [Header("Achievement")]
-        [SerializeField] private SummonAchievementRewardView summonAchievementRewardView;
-        [SerializeField] private Button summonAchievementButton;
+        [SerializeField]
+        private SummonAchievementRewardView summonAchievementRewardView;
+
+        [SerializeField]
+        private Button summonAchievementButton;
 
         [Header("Probability")]
-        [SerializeField] private Button probabilityInfoButton;
+        [SerializeField]
+        private Button probabilityInfoButton;
 
         [Header("Option Id")]
-        [SerializeField] private string optionAId = "summon_30";
-        [SerializeField] private string optionBId = "summon_50";
-        
+        [SerializeField]
+        private string optionAId = "summon_30";
+
+        [SerializeField]
+        private string optionBId = "summon_50";
+
         private SpriteAtlas heroSpriteAtlas;
         private bool isBound;
         private bool isSummoning;
@@ -73,7 +91,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         public override bool HasNotification()
         {
-            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
+            if (HeroSummonManager.Instance == null ||
+                HeroSummonManager.Instance.Service == null)
                 return false;
 
             var claimables = HeroSummonManager.Instance.Service.GetClaimableRewardLevels();
@@ -82,7 +101,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         public override void RefreshView()
         {
-            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
+            if (HeroSummonManager.Instance == null ||
+                HeroSummonManager.Instance.Service == null)
                 return;
 
             RefreshSummonLevel();
@@ -116,7 +136,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 HeroSummonManager.Instance.OnSummonDataChanged -= RefreshView;
 
             if (CurrencyManager.Instance != null)
-                CurrencyLedgerService.Instance.OnAnyLedgerChanged  -= RefreshView;
+                CurrencyLedgerService.Instance.OnAnyLedgerChanged -= RefreshView;
         }
 
         private void BindButtonsIfNeeded()
@@ -163,7 +183,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         private void OpenProbabilityPopup()
         {
-            if (probabilityPopup == null || HeroSummonManager.Instance == null)
+            if (probabilityPopup == null ||
+                HeroSummonManager.Instance == null)
                 return;
 
             probabilityPopup.Show(HeroSummonManager.Instance.GetCurrentSummonLevel());
@@ -192,6 +213,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             if (paymentType == SummonPaymentType.Gem)
             {
                 bool skipConfirm = HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
+
                 if (skipConfirm)
                 {
                     ExecuteSummonAsync(optionId).Forget();
@@ -207,13 +229,20 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         private void ShowGemConfirm(string optionId, int gemCost)
         {
-            if (confirmPopup == null)
+            /*if (confirmPopup == null)
             {
                 ExecuteSummonAsync(optionId).Forget();
                 return;
             }
 
-            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());
+            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());*/
+            UIManager.Instance
+                .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
+                    "Cảnh báo",
+                    $"Không đủ Vé Anh hùng.\nLần triệu hồi này sẽ tiêu tốn {gemCost} Kim cương.\nXác nhận?",
+                    () => ExecuteSummonAsync(optionId).Forget()
+                ))
+                .Forget();
         }
 
         private async UniTaskVoid ExecuteSummonAsync(string optionId)
@@ -250,14 +279,15 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
                 // Map server entries → HeroSummonResult để drive animation
                 Enum.TryParse<SummonPaymentType>(response.PaymentType, true, out var parsedPayment);
+
                 var result = new HeroSummonResult
                 {
-                    PaymentType              = parsedPayment,
-                    PaidAmount               = response.PaidAmount,
-                    OldTotalRoll             = response.OldTotalRoll,
-                    NewTotalRoll             = response.NewTotalRoll,
-                    OldSummonLevel           = response.OldSummonLevel,
-                    NewSummonLevel           = response.NewSummonLevel,
+                    PaymentType = parsedPayment,
+                    PaidAmount = response.PaidAmount,
+                    OldTotalRoll = response.OldTotalRoll,
+                    NewTotalRoll = response.NewTotalRoll,
+                    OldSummonLevel = response.OldSummonLevel,
+                    NewSummonLevel = response.NewSummonLevel,
                     NewlyUnlockedRewardLevels = response.NewlyUnlockedRewardLevels != null
                         ? new List<int>(response.NewlyUnlockedRewardLevels)
                         : new List<int>()
@@ -265,18 +295,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
                 foreach (var entry in response.Entries)
                 {
-                    var heroData = MasterDataCache.Instance.GetHeroDataById(entry.HeroId);
+                    var heroData = DatabaseManager.Instance.GetHeroDataById(entry.HeroId);
                     Enum.TryParse<SummonRarity>(entry.Rarity, true, out var rarity);
 
                     result.Entries.Add(new HeroSummonResultEntry
                     {
-                        RollIndex   = entry.RollIndex,
-                        HeroAsset   = heroData,
-                        HeroName    = entry.HeroName,
-                        IsNewHero   = entry.IsNew,
+                        RollIndex = entry.RollIndex,
+                        HeroAsset = heroData,
+                        HeroName = entry.HeroName,
+                        IsNewHero = entry.IsNew,
                         ShardGained = entry.ShardGained,
-                        IsPityHit   = entry.IsPityHit,
-                        Rarity      = rarity
+                        IsPityHit = entry.IsPityHit,
+                        Rarity = rarity
                     });
                 }
 

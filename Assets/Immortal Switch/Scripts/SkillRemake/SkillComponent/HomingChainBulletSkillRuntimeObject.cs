@@ -175,7 +175,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 Context.Caster,
                 spawnPosition,
                 initialDirection,
-                config
+                config, Context.BattleContext
             );
         }
 

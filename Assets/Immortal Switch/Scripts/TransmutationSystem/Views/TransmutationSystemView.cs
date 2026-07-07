@@ -4,13 +4,12 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.ItemSystem;
+using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.TransmutationSystem.Models;
 using Immortal_Switch.Scripts.TransmutationSystem.Views.UI;
 using Immortal_Switch.Scripts.UI;
-using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,37 +18,66 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 {
     public class TransmutationSystemView : AnimatedUIView
     {
-        [Header("Progress")] [SerializeField] private Image imgProgress;
-        [SerializeField] private TextMeshProUGUI txtProgress;
-        [SerializeField] private TextMeshProUGUI txtLevel;
+        [Header("Progress")]
+        [SerializeField]
+        private Image imgProgress;
 
-        [Header("Energy")] [Required(InfoMessageType.Error)] [SerializeField]
-        private TextMeshProUGUI txtEnergy;
+        [SerializeField]
+        private TextMeshProUGUI txtProgress;
 
-        [Header("Main layout")] [SerializeField]
+        [SerializeField]
+        private TextMeshProUGUI txtLevel;
+
+        [Header("Main layout")]
+        [SerializeField]
         private Button btnTransmutation;
 
-        [SerializeField] private Button btnTotalStat;
-        [SerializeField] private Button btnAuto;
-        [SerializeField] private Button btnHelp;
+        [SerializeField]
+        private Button btnTotalStat;
 
-        [Header("Auto rotate config")] [SerializeField]
+        [SerializeField]
+        private Button btnAuto;
+
+        [SerializeField]
+        private Button btnHelp;
+
+        [Header("Auto rotate config")]
+        [SerializeField]
         private RectTransform rtAutoRotate;
 
-        [SerializeField] private float autoRotateDuration;
+        [SerializeField]
+        private float autoRotateDuration;
 
-        [Header("Slot layout")] [SerializeField]
+        [Header("Slot layout")]
+        [SerializeField]
         private UITransmutationEquipment slotWeapon;
 
-        [SerializeField] private UITransmutationEquipment slotGloves;
-        [SerializeField] private UITransmutationEquipment slotShield;
-        [SerializeField] private UITransmutationEquipment slotHelmet;
-        [SerializeField] private UITransmutationEquipment slotArmor;
-        [SerializeField] private UITransmutationEquipment slotBoots;
-        [SerializeField] private UITransmutationEquipment slotRing;
-        [SerializeField] private UITransmutationEquipment slotNecklace;
-        [SerializeField] private UITransmutationEquipment slotRelic;
-        [SerializeField] private UITransmutationEquipment slotPendant;
+        [SerializeField]
+        private UITransmutationEquipment slotGloves;
+
+        [SerializeField]
+        private UITransmutationEquipment slotShield;
+
+        [SerializeField]
+        private UITransmutationEquipment slotHelmet;
+
+        [SerializeField]
+        private UITransmutationEquipment slotArmor;
+
+        [SerializeField]
+        private UITransmutationEquipment slotBoots;
+
+        [SerializeField]
+        private UITransmutationEquipment slotRing;
+
+        [SerializeField]
+        private UITransmutationEquipment slotNecklace;
+
+        [SerializeField]
+        private UITransmutationEquipment slotRelic;
+
+        [SerializeField]
+        private UITransmutationEquipment slotPendant;
 
         // --- Private Fields ---
         private Dictionary<string, UITransmutationEquipment> _equipments = new();
@@ -68,16 +96,16 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
             _equipments = new Dictionary<string, UITransmutationEquipment>
             {
-                { ItemSystemTypeConstants.WEAPON, slotWeapon },
-                { ItemSystemTypeConstants.GLOVES, slotGloves },
-                { ItemSystemTypeConstants.SHIELD, slotShield },
-                { ItemSystemTypeConstants.HELMET, slotHelmet },
-                { ItemSystemTypeConstants.ARMOR, slotArmor },
-                { ItemSystemTypeConstants.BOOTS, slotBoots },
-                { ItemSystemTypeConstants.RING, slotRing },
-                { ItemSystemTypeConstants.NECKLACE, slotNecklace },
-                { ItemSystemTypeConstants.RELIC, slotRelic },
-                { ItemSystemTypeConstants.PENDANT, slotPendant },
+                { ItemsTypeConstants.WEAPON, slotWeapon },
+                { ItemsTypeConstants.GLOVES, slotGloves },
+                { ItemsTypeConstants.SHIELD, slotShield },
+                { ItemsTypeConstants.HELMET, slotHelmet },
+                { ItemsTypeConstants.ARMOR, slotArmor },
+                { ItemsTypeConstants.BOOTS, slotBoots },
+                { ItemsTypeConstants.RING, slotRing },
+                { ItemsTypeConstants.NECKLACE, slotNecklace },
+                { ItemsTypeConstants.RELIC, slotRelic },
+                { ItemsTypeConstants.PENDANT, slotPendant },
             };
         }
 
@@ -112,9 +140,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
         private void OnTransmutationSystemChanged(TransmutationSystemChanged arg)
         {
             imgProgress.fillAmount = arg.Progress;
-            txtProgress.SetText($"{BigIntegerHelper.Format(arg.Data.Exp)} / {BigIntegerHelper.Format(arg.TargetExp)}");
+            txtProgress.SetText($"{BigNumberHelper.Format(arg.Data.Exp)} / {BigNumberHelper.Format(arg.TargetExp)}");
             txtLevel.SetText($"Cấp Độ Dung Hợp {arg.Data.Level:00}");
-            txtEnergy.SetText(BigIntegerHelper.Format(arg.Data.Energy));
         }
 
         private async UniTask OnClickHelp()
@@ -134,7 +161,10 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
             }
             else
             {
-                TransmutationSystemManager.Instance.SaveSetting(setting.UniqueOptions, setting.Count, setting.Tier, false);
+                TransmutationSystemManager.Instance.SaveSetting(
+                    setting.UniqueOptions, setting.Count, setting.Tier,
+                    setting.IsWaiting, false
+                );
             }
         }
 
@@ -171,16 +201,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
             if (newEquip != null)
             {
                 var oldEquip = TransmutationSystemManager.Instance.GetEquip(newEquip.ItemType);
-
-                if (oldEquip != null)
-                {
-                    var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationSystemReplaceStuckPanel>();
-                    ui.Setup(newEquip, oldEquip);
-                }
-                else
-                {
-                    await TransmutationSystemManager.Instance.EquipAsync();
-                }
+                var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationSystemReplaceStuckPanel>();
+                ui.Setup(newEquip, oldEquip);
             }
         }
 

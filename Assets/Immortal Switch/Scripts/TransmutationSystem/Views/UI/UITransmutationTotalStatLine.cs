@@ -22,7 +22,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             txtValue.color = color;
 
             txtTitle.text = entry.Title;
-            txtValue.text = BigIntegerHelper.Format(entry.Value);
+            txtValue.text = BigNumberHelper.Format(entry.Value);
         }
     }
 }

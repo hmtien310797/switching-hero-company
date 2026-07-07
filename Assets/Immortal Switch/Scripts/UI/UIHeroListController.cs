@@ -17,7 +17,7 @@ namespace Immortal_Switch.Scripts.UI
         //     {
         //         var hid = heroIds.OwnedHeros[i].Id;
         //         var hn = Instantiate(node, transform);
-        //         var hd = MasterDataCache.Instance.GetHeroDataById(hid);
+        //         var hd = DatabaseManager.Instance.GetHeroDataById(hid);
         //         var isSelected = selectedId == hid;
         //         if (isSelected)
         //         {

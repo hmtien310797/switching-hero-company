@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Game.Configs.Generated;
-using Immortal_Switch.Scripts.Helper;
-using Immortal_Switch.Scripts.ItemSystem.Models;
+using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using Immortal_Switch.Scripts.Shared.Helper;
-using Newtonsoft.Json;
-using UnityEngine;
 
 namespace Immortal_Switch.Scripts.MissionSystem
 {
@@ -88,7 +85,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                 _storage.Save();
             }
 
-            Debug.Log($"MatchesChangeProgress: {JsonConvert.SerializeObject(matches)} - {eventKey}");
+            //Debug.Log($"MatchesChangeProgress: {JsonConvert.SerializeObject(matches)} - {eventKey}");
             return matches;
         }
 

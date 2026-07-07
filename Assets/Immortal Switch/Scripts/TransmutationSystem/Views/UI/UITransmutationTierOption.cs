@@ -1,5 +1,5 @@
 using System;
-using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Shared.UI;
 using UnityEngine;
 using UnityEngine.UI;

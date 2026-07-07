@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.DungeonSystem.Models;
 using Immortal_Switch.Scripts.DungeonSystem.Views.UI;
+using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -13,23 +14,40 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 {
     public class DungeonView : AnimatedUIView
     {
-        [Header("View references")] [SerializeField]
+        [Header("View references")]
+        [SerializeField]
         private TextMeshProUGUI txtTitle;
 
-        [SerializeField] private TextMeshProUGUI txtDescription;
-        [SerializeField] private TextMeshProUGUI txtStage;
-        [SerializeField] private TextMeshProUGUI txtHighestStage;
-        [SerializeField] private TextMeshProUGUI txtTicket;
+        [SerializeField]
+        private TextMeshProUGUI txtDescription;
 
-        [SerializeField] private Button btnStart;
-        [SerializeField] private Button btnSweep;
-        [SerializeField] private Button btnNext;
-        [SerializeField] private Button btnPrev;
+        [SerializeField]
+        private TextMeshProUGUI txtStage;
 
-        [Header("Reward references")] [SerializeField]
+        [SerializeField]
+        private TextMeshProUGUI txtHighestStage;
+
+        [SerializeField]
+        private TextMeshProUGUI txtTicket;
+
+        [SerializeField]
+        private Button btnStart;
+
+        [SerializeField]
+        private Button btnSweep;
+
+        [SerializeField]
+        private Button btnNext;
+
+        [SerializeField]
+        private Button btnPrev;
+
+        [Header("Reward references")]
+        [SerializeField]
         private RectTransform rewardContainer;
 
-        [SerializeField] private UIDungeonReward rewardPrefab;
+        [SerializeField]
+        private UIDungeonReward rewardPrefab;
 
         // --- Private Fields ---
         private List<UIDungeonReward> _rewards = new();
@@ -39,10 +57,10 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         /// 1: type dungeon
         /// 2: huong toi truoc hay sau
         /// </summary>
-        private Func<EDungeonType, int, UniTask<List<ItemRewardSet>>> _onStageChanged;
+        private Func<int, int, IReadOnlyList<ItemRewardData>> _onStageChanged;
 
-        private EDungeonType _type;
-        private Action _onStart;
+        private int _dungeonId;
+        private Action<int, int> _onStart;
 
         private int _currentStageIdx;
         private int _maxStageIdx;
@@ -56,15 +74,18 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
         private void OnClickStart()
         {
-            _onStart?.Invoke();
+            _onStart?.Invoke(_dungeonId ,_currentStageIdx + 1);
+            //for testing dungeon temporarily
+            UIManager.Instance.TogglePopupAsync<DungeonView>();
+            UIManager.Instance.TogglePopupAsync<DungeonMainView>();
         }
 
         private void OnClickNext()
         {
-            OnStageChange(1).Forget();
+            OnStageChange(1);
         }
 
-        private async UniTask OnStageChange(int direction)
+        private void OnStageChange(int direction)
         {
             _currentStageIdx = (Mathf.Max(0, _currentStageIdx + direction)) % _maxStageIdx;
             txtStage.SetText($"{_currentStageIdx + 1}");
@@ -72,14 +93,14 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
             if (_onStageChanged != null)
             {
-                var rewards = await _onStageChanged.Invoke(_type, _currentStageIdx + 1);
+                var rewards = _onStageChanged.Invoke(_dungeonId, _currentStageIdx + 1);
                 RefreshRewards(rewards);
             }
         }
 
         private void OnClickPrev()
         {
-            OnStageChange(-1).Forget();
+            OnStageChange(-1);
         }
 
         private void RefreshBtnDirection()
@@ -101,10 +122,10 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             }
         }
 
-        public void Bind(EDungeonType type, int ticket, string title, int currentStageIdx, int maxStageIdx, Action onStart,
-            Func<EDungeonType, int, UniTask<List<ItemRewardSet>>> onStageChanged)
+        public void Bind(int dungeonId, int ticket, string title, int currentStageIdx, int maxStageIdx, Action<int, int> onStart,
+            Func<int, int, IReadOnlyList<ItemRewardData>> onStageChanged)
         {
-            _type = type;
+            _dungeonId = dungeonId;
             _onStart = onStart;
             _currentStageIdx = currentStageIdx;
             _maxStageIdx = maxStageIdx;
@@ -114,11 +135,11 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             txtTicket.SetText($"{ticket}");
             txtHighestStage.SetText($"Cửa ải {_currentStageIdx + 1}");
 
-            OnStageChange(0).Forget();
+            OnStageChange(0);
             RefreshBtnDirection();
         }
 
-        private void RefreshRewards(List<ItemRewardSet> rewards)
+        private void RefreshRewards(IReadOnlyList<ItemRewardData> rewards)
         {
             for (var index = 0; index < rewards.Count; index++)
             {
@@ -128,13 +149,13 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
                 {
                     var clone = _rewards[index];
                     clone.gameObject.SetActive(true);
-                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background, entry.TierInfo.tier);
+                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background, entry.TierInfo.tierIcon);
                     clone.BindQuantity(entry.Quantity);
                 }
                 else
                 {
                     var clone = Instantiate(rewardPrefab, rewardContainer);
-                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background, entry.TierInfo.tier);
+                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background, entry.TierInfo.tierIcon);
                     clone.BindQuantity(entry.Quantity);
                     _rewards.Add(clone);
                 }

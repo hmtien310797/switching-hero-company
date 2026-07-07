@@ -50,13 +50,13 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             if (Row == null)
             {
-                Debug.LogError("Row is null");
+                //Debug.LogError("Row is null");
                 return;
             }
 
             if (Row.missionId != arg3)
             {
-                Debug.Log($"Row not match with {arg3}");
+                //Debug.Log($"Row not match with {arg3}");
                 return;
             }
 
@@ -68,13 +68,13 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             if (Row == null)
             {
-                Debug.LogError("Row is null");
+                //Debug.LogError("Row is null");
                 return;
             }
 
             if (Row.missionId != arg1)
             {
-                Debug.Log($"Row not match with {arg1}");
+                //Debug.Log($"Row not match with {arg1}");
                 return;
             }
 
@@ -88,7 +88,13 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void OnClickChallenge()
         {
-            Debug.Log("OnClickChallenge");
+            if (Row == null)
+            {
+                Debug.LogError("Row is null");
+                return;
+            }
+
+            _onJump?.Invoke(Row.eventKey);
         }
 
         public void Bind(DynamicHeroesGlobalSpecificationsMissionConfigRow row, int currentProgress, Sprite sprite,

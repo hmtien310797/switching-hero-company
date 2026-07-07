@@ -83,19 +83,12 @@ namespace Immortal_Switch.Scripts.UI
     {
         [Header("Backdrop Prefab (normal prefab, not Addressables)")] [SerializeField]
         private GameObject backdropPrefab;
-        
-        [SerializeField]
-        private CanvasGroup loadingSceneCanvasGroup;
-        
-        [SerializeField]
-        private GameObject tapeAnimator;
 
-        [SerializeField] 
-        private CanvasScaler canvasScaler;
-        
-        [Header("Toast")]
-        [SerializeField]
-        private ToastMessageView toastMessagePrefab;
+        [SerializeField] private GameObject tapeAnimator;
+
+        [SerializeField] private CanvasScaler canvasScaler;
+
+        [Header("Toast")] [SerializeField] private ToastMessageView toastMessagePrefab;
 
         private ToastMessageView _toastMessageInstance;
 
@@ -132,19 +125,17 @@ namespace Immortal_Switch.Scripts.UI
 
         private void Start()
         {
-            GameEventManager.Subscribe(GameEvents.OnInitSceneDataComplete, OnInitSceneDataComplete);
-
             canvasScaler.matchWidthOrHeight = ScreenOrientationTracker.Instance.CurrentMode ==
                                               ScreenOrientationTracker.ScreenViewMode.Landscape
                 ? 0.5f
                 : 0f;
 
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
+            CreateLayerRootsFromEnum();
         }
 
         protected override void OnDestroy()
         {
-            GameEventManager.Unsubscribe(GameEvents.OnInitSceneDataComplete, OnInitSceneDataComplete);
             ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
             base.OnDestroy();
         }
@@ -164,11 +155,11 @@ namespace Immortal_Switch.Scripts.UI
 
         public override async UniTask InitializeAsync()
         {
-            CreateLayerRootsFromEnum();
+            //CreateLayerRootsFromEnum();
             InitLayerLists();
             await InitMainScene();
         }
-        
+
         [Button]
         public void ShowToast(string message, float displayDuration = 1.5f)
         {
@@ -198,6 +189,103 @@ namespace Immortal_Switch.Scripts.UI
 
             _toastMessageInstance.transform.SetAsLastSibling();
             _toastMessageInstance.Show(message, displayDuration);
+        }
+
+        public async UniTask DespawnAllSessionViewsAsync(bool playHideIfVisible = true)
+        {
+            var entries = new List<Entry>();
+            var added = new HashSet<Entry>();
+
+            foreach (var cachedEntry in _cachedEntries.Values)
+            {
+                if (cachedEntry != null && added.Add(cachedEntry))
+                {
+                    entries.Add(cachedEntry);
+                }
+            }
+
+            foreach (var layerPair in _entriesByLayer)
+            {
+                var layerEntries = layerPair.Value;
+                if (layerEntries == null)
+                    continue;
+
+                for (int i = 0; i < layerEntries.Count; i++)
+                {
+                    var entry = layerEntries[i];
+                    if (entry != null && added.Add(entry))
+                    {
+                        entries.Add(entry);
+                    }
+                }
+            }
+
+            _activeMainPage = null;
+            _mainStack.Clear();
+            _globalPopupStack.Clear();
+
+            foreach (var layerPair in _entriesByLayer)
+            {
+                layerPair.Value.Clear();
+            }
+
+            _cachedEntries.Clear();
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                await DespawnEntryForceAsync(entries[i], playHideIfVisible);
+            }
+
+            if (_mainSharedBackdrop != null)
+            {
+                Destroy(_mainSharedBackdrop);
+                _mainSharedBackdrop = null;
+            }
+
+            if (_toastMessageInstance != null)
+            {
+                Destroy(_toastMessageInstance.gameObject);
+                _toastMessageInstance = null;
+            }
+
+            Debug.Log("[UIManager] Despawned all session UI entries.");
+        }
+
+        private async UniTask DespawnEntryForceAsync(Entry entry, bool playHideIfVisible)
+        {
+            if (entry == null)
+                return;
+
+            if (entry.backdropInstance != null)
+            {
+                Destroy(entry.backdropInstance);
+                entry.backdropInstance = null;
+            }
+
+            if (entry.view != null)
+            {
+                bool isVisible = entry.view.gameObject.activeSelf && !entry.closed;
+
+                if (playHideIfVisible && isVisible)
+                {
+                    await entry.view.PlayHideAsync();
+                }
+                else if (isVisible)
+                {
+                    entry.view.OnHide();
+                }
+
+                Destroy(entry.view.gameObject);
+                entry.view = null;
+            }
+
+            entry.closed = true;
+            entry.cacheOnClose = false;
+
+            if (entry.handle.IsValid())
+            {
+                Addressables.Release(entry.handle);
+            }
         }
 
         #region Layer Roots
@@ -482,7 +570,7 @@ namespace Immortal_Switch.Scripts.UI
                     closed = false,
                     cacheOnClose = typed.CacheOnClose || layer == UILayer.Main // main always cache by design
                 };
-                
+
                 // MAIN layer special
                 if (layer == UILayer.Main)
                 {
@@ -647,7 +735,9 @@ namespace Immortal_Switch.Scripts.UI
                 _activeMainPage = entry;
 
                 // order: backdrop under page
-                if (withBackdrop) if (_mainSharedBackdrop != null) _mainSharedBackdrop.transform.SetAsLastSibling();
+                if (withBackdrop)
+                    if (_mainSharedBackdrop != null)
+                        _mainSharedBackdrop.transform.SetAsLastSibling();
                 entry.view.transform.SetAsLastSibling();
             }
             else // Stackable
@@ -665,7 +755,7 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             await entry.view.PlayShowAsync(args);
-            
+
             if (withBackdrop)
             {
                 RefreshMainBackdrop();
@@ -774,13 +864,6 @@ namespace Immortal_Switch.Scripts.UI
             );
 
             tapeAnimator.transform.parent = GetLayerRoot(UILayer.Main);
-        }
-
-        private void OnInitSceneDataComplete()
-        {
-            loadingSceneCanvasGroup.DOFade(0f, 0.5f).SetEase(Ease.OutCubic);
-            loadingSceneCanvasGroup.blocksRaycasts = false;
-            loadingSceneCanvasGroup.interactable = false;
         }
 
         #endregion

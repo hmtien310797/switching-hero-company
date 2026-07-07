@@ -58,6 +58,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
                 },
                 _selectedCountTabPreset.Count,
                 _selectedTabTiers.Tier,
+                toggleWaitingMaterial.isOn,
                 true
             );
 
@@ -125,19 +126,19 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
             for (var i = 0; i < entries.Length; i++)
             {
-                var status = TransmutationSystemManager.Instance.IsUnlockGradeOption(entries[i].type);
+                var status = TransmutationSystemManager.Instance.IsUnlockGradeOption(entries[i].tier);
 
                 if (_tabTiers.Count > i)
                 {
                     var clone = _tabTiers[i];
                     clone.gameObject.SetActive(true);
-                    clone.Bind(entries[i].type, entries[i].tier, i, string.Empty, OnClickTabTiers);
+                    clone.Bind(entries[i].tier, entries[i].tierIcon, i, string.Empty, OnClickTabTiers);
                     clone.SetStatus(status);
                 }
                 else
                 {
                     var clone = Instantiate(tabTierPrefab, tabTierContainer);
-                    clone.Bind(entries[i].type, entries[i].tier, i, string.Empty, OnClickTabTiers);
+                    clone.Bind(entries[i].tier, entries[i].tierIcon, i, string.Empty, OnClickTabTiers);
                     clone.SetStatus(status);
                     _tabTiers.Add(clone);
                 }

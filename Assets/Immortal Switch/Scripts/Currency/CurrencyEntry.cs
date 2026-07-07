@@ -74,6 +74,12 @@ namespace Immortal_Switch.Scripts.Currency
         weapon_gem,
         weapon_essence,
 
+        // Appended at the end (not inserted mid-list) — CurrencyEntry.CurrencyType is persisted via
+        // ES3 by underlying int value, so inserting earlier would shift every later member's saved
+        // value and corrupt existing local currency saves on update.
+        summon_ticket_hero,
+        summon_ticket_weapon,
+
         // ===== Legacy =====
         HeroTicket = summon_ticket,
         WeaponTicket,

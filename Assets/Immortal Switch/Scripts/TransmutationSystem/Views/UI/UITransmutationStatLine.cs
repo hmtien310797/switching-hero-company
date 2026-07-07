@@ -30,7 +30,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             txtValue.color = color;
 
             txtTitle.text = title;
-            txtValue.text = BigIntegerHelper.Format(value);
+            txtValue.text = BigNumberHelper.Format(value);
 
             if (isUp == null)
             {

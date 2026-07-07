@@ -5,13 +5,9 @@ using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.MissionSystem.Views;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
-using Immortal_Switch.Scripts.TransmutationSystem;
-using Immortal_Switch.Scripts.TransmutationSystem.Models;
 using Immortal_Switch.Scripts.TransmutationSystem.Views;
 using Immortal_Switch.Scripts.Tutorial;
 using JetBrains.Annotations;
-using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,9 +24,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] private Button ButtonGem;
         [SerializeField] private Button ButtonClose;
         [SerializeField] private GameObject Gem;
-
-        [Header("Energy")] [Required(InfoMessageType.Error)] [SerializeField]
-        private TextMeshProUGUI txtEnergy;
+        [SerializeField] private GameObject[] disableObjectsWhenPlayDungeon;
 
         // --- Private Field ---
         private BottomMainButton _selectedBtn;
@@ -80,8 +74,25 @@ namespace Immortal_Switch.Scripts.UI
         {
             TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
             TutorialManager.Instance.OnClick += OnClickTutorial;
-            TransmutationSystemManager.Instance.OnChanged += OnTransmutationSystemChanged;
             GameEventManager.Subscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
+            GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
+        }
+        
+        private void OnDestroy()
+        {
+            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+            TutorialManager.Instance.OnClick -= OnClickTutorial;
+            GameEventManager.Unsubscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
+            GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
+        }
+        
+        private void OnPlayDungeon(bool result)
+        {
+            for (int i = 0; i < disableObjectsWhenPlayDungeon.Length; i++)
+            {
+                GameObject currentGameObject = disableObjectsWhenPlayDungeon[i];
+                currentGameObject.SetActive(!result);
+            }
         }
 
         private async UniTask OnClickTutorial(string arg1, int arg2)
@@ -137,19 +148,6 @@ namespace Immortal_Switch.Scripts.UI
                 default:
                     return null;
             }
-        }
-
-        private void OnDestroy()
-        {
-            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
-            TutorialManager.Instance.OnClick -= OnClickTutorial;
-            TransmutationSystemManager.Instance.OnChanged -= OnTransmutationSystemChanged;
-            GameEventManager.Unsubscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
-        }
-
-        private void OnTransmutationSystemChanged(TransmutationSystemChanged obj)
-        {
-            txtEnergy.SetText(BigIntegerHelper.Format(obj.Data.Energy));
         }
 
         private void OnEnable()

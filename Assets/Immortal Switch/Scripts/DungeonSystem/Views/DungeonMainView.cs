@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Battle.Dungeon;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.DungeonSystem.Models;
 using Immortal_Switch.Scripts.DungeonSystem.Views.UI;
+using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
@@ -22,13 +25,14 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         private List<UIDungeonBtn> btnDungeons;
 
         [Header("Reward references")] [SerializeField]
-        private UIBagSlot rewardPrefab;
+        private UIItemSlot rewardPrefab;
 
         [SerializeField] private RectTransform rewardContainer;
+
         [SerializeField] [Range(0f, 1f)] private float rewardScale;
 
         // --- Private Fields ---
-        private List<UIBagSlot> _slots = new();
+        private List<UIItemSlot> _slots = new();
         private UIDungeonBtn _selectedDungeon;
 
         private void Awake()
@@ -38,30 +42,34 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
         private async UniTask OnClickChallenge()
         {
-            if (_selectedDungeon != null)
-            {
-                var dungeonKey = GetDungeonKey(_selectedDungeon.Type);
-                var maxStage = DatabaseManager.Instance.GetDungeonRewardsMaxStage(dungeonKey);
-                var ui = await UIManager.Instance.OpenPopupAsync<DungeonView>();
-                var title = DatabaseManager.Instance.GetDungeonTitle(dungeonKey);
-                var ticket = DatabaseManager.Instance.GetDungeonTicketRequest(dungeonKey);
-                ui.Bind(_selectedDungeon.Type, ticket, title, 0, maxStage, OnClickStart, OnStageChangedAsync);
-            }
+            var dungeonId = _selectedDungeon.DungeonId;
+            await DatabaseManager.Instance.EnsureDungeonStageTableAsync(dungeonId); // no-op if already cached
+
+            var dungeonKey = DatabaseManager.Instance.GetDungeonKey(dungeonId);
+            var state = await NakamaClient.Instance.GetDungeonStateAsync();
+            DungeonInfo info = null;
+            state.Dungeons?.TryGetValue(dungeonKey ?? string.Empty, out info);
+
+            // maxStage/ticket owned are server truth now — GetDungeonMaxStage/GetDungeonTicketRequest
+            // (local DungeonDatabaseSO data) are only a fallback if dungeon/state failed (e.g. offline),
+            // since local StageCount is a stale placeholder (500) for every dungeon today.
+            var maxStage = info != null ? info.StageCount : DatabaseManager.Instance.GetDungeonMaxStage(dungeonId);
+            var startIdx = Mathf.Clamp(info?.HighestStageCleared ?? 0, 0, Mathf.Max(0, maxStage - 1));
+            var ticketOwned = info != null ? (int)state.TicketBalance : DatabaseManager.Instance.GetDungeonTicketRequest(dungeonId);
+
+            var ui = await UIManager.Instance.OpenPopupAsync<DungeonView>();
+            var title = DatabaseManager.Instance.GetDungeonTitle(dungeonId);
+            ui.Bind(dungeonId, ticketOwned, title, startIdx, maxStage, OnClickStart, OnStageChangedAsync);
         }
 
-        private async UniTask<List<ItemRewardSet>> OnStageChangedAsync(EDungeonType type, int stageIdx)
+        private IReadOnlyList<ItemRewardData> OnStageChangedAsync(int dungeonId, int stageIdx)
         {
-            var dungeonKey = GetDungeonKey(type);
-            var rewards = await DatabaseManager.Instance.GetDungeonRewards(dungeonKey, stageIdx);
-            return rewards;
+            return DatabaseManager.Instance.GetDungeonRewards(dungeonId, stageIdx);
         }
 
-        private void OnClickStart()
+        private void OnClickStart(int dungeonId, int stageIdx)
         {
-            if (_selectedDungeon != null)
-            {
-                DungeonSystemManager.Instance.NotifySelectedChallenge(_selectedDungeon.Type);
-            }
+            GameEventManager.Trigger(GameEvents.OnSelectedDungeonStage, dungeonId, stageIdx);
         }
 
         private void OnEnable()
@@ -72,16 +80,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
         private void AutoSelectFirstDungeon()
         {
-            for (int i = 0; i < btnDungeons.Count; i++)
-            {
-                var entry = btnDungeons[i];
-
-                if (entry.Type == EDungeonType.Treasure)
-                {
-                    OnClickDungeon(i);
-                    break;
-                }
-            }
+            OnClickDungeon(0);
         }
 
         private void InitDungeon()
@@ -105,14 +104,20 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             _selectedDungeon.SetStatus(ETabPresetStatus.Selected);
 
             // lay ra thong tin sprite
-            var spriteInfo = DatabaseManager.Instance.DungeonDb.Get(_selectedDungeon.Type);
+            var spriteInfo = DatabaseManager.Instance.DungeonDb.Get(_selectedDungeon.DungeonId);
 
             if (spriteInfo != null)
             {
                 RefreshBg(spriteInfo.background);
             }
 
-            RefreshRewards(_selectedDungeon.Type).Forget();
+            RefreshRewardsAsync(_selectedDungeon.DungeonId).Forget();
+        }
+
+        private async UniTaskVoid RefreshRewardsAsync(int dungeonId)
+        {
+            await DatabaseManager.Instance.EnsureDungeonStageTableAsync(dungeonId);
+            RefreshRewards(dungeonId);
         }
 
         private void RefreshBg(Sprite newBg)
@@ -121,10 +126,9 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             bgImg.SetNativeSize();
         }
 
-        private async UniTask RefreshRewards(EDungeonType dungeon)
+        private void RefreshRewards(int dungeonId)
         {
-            var dungeonKey = GetDungeonKey(dungeon);
-            var rewards = await DatabaseManager.Instance.GetDungeonRewards(dungeonKey);
+            var rewards = DatabaseManager.Instance.GetDungeonRewards(dungeonId);
 
             for (var index = 0; index < rewards.Count; index++)
             {
@@ -136,14 +140,16 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
                     clone.transform.localScale = Vector3.one * rewardScale;
 
                     clone.gameObject.SetActive(true);
-                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background, entry.TierInfo.tier);
+                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background,
+                        entry.TierInfo.tierIcon);
                 }
                 else
                 {
                     var clone = Instantiate(rewardPrefab, rewardContainer);
                     clone.transform.localScale = Vector3.one * rewardScale;
 
-                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background, entry.TierInfo.tier);
+                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background,
+                        entry.TierInfo.tierIcon);
                     _slots.Add(clone);
                 }
             }
@@ -153,18 +159,6 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             {
                 _slots[i].gameObject.SetActive(false);
             }
-        }
-
-        private string GetDungeonKey(EDungeonType dungeon)
-        {
-            return dungeon switch
-            {
-                EDungeonType.Treasure => "treasure",
-                EDungeonType.Artifact => "relic",
-                EDungeonType.Diamond => "awakening",
-                EDungeonType.Equipment => "weapon",
-                _ => throw new ArgumentOutOfRangeException(nameof(dungeon), dungeon, null),
-            };
         }
     }
 }

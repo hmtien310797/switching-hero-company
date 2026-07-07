@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Common;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Hero
@@ -11,7 +12,7 @@ namespace Immortal_Switch.Scripts.Hero
 
         public HeroDataSO GetHero(int heroId)
         {
-            return MasterDataCache.Instance.GetHeroDataById(heroId);
+            return DatabaseManager.Instance.GetHeroDataById(heroId);
         }
 
         public HeroProgressionConfigSO GetProgressionConfig(int heroId)

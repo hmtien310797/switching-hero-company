@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.PlayerSystem.Models

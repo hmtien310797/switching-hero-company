@@ -2,6 +2,7 @@
 using System.Linq;
 using Common;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
@@ -32,7 +33,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 if (rarityRate <= 0f)
                     continue;
 
-                var heroes = MasterDataCache.Instance.GetAllHeroData()
+                var heroes = DatabaseManager.Instance.GetAllHeroData()
                     .Where(x => x != null && x.IsAvailableInSummon && x.SummonRarity == rarity)
                     .ToList();
 

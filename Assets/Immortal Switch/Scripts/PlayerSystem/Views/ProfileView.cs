@@ -1,3 +1,4 @@
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.PlayerSystem.Views.UI;
 using Immortal_Switch.Scripts.UI;
@@ -9,21 +10,40 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Views
 {
     public class ProfileView : AnimatedUIView
     {
-        [Header("References")] [SerializeField]
+        [Header("References")]
+        [SerializeField]
         private TMP_Text txtName;
 
-        [SerializeField] private Button btnRename;
-        [SerializeField] private Button btnClose;
-        [SerializeField] private UIProfileRenamePopup uiRename;
+        [SerializeField]
+        private Button btnRename;
 
-        [Header("Options")] [SerializeField] private RectTransform optionContainer;
-        [SerializeField] private UIProfileTitleOption optionTitleFinal;
-        [SerializeField] private UIProfileRowOption optionRowFinal1;
-        [SerializeField] private UIProfileRowOption optionRowFinal2;
-        [SerializeField] private UIProfileRowOption optionRowFinal3;
+        [SerializeField]
+        private Button btnClose;
 
-        [SerializeField] private UIProfileTitleOption optionTitleAll;
-        [SerializeField] private UIProfileRowOption optionRowTemplate;
+        [SerializeField]
+        private UIProfileRenamePopup uiRename;
+
+        [Header("Options")]
+        [SerializeField]
+        private RectTransform optionContainer;
+
+        [SerializeField]
+        private UIProfileTitleOption optionTitleFinal;
+
+        [SerializeField]
+        private UIProfileRowOption optionRowFinal1;
+
+        [SerializeField]
+        private UIProfileRowOption optionRowFinal2;
+
+        [SerializeField]
+        private UIProfileRowOption optionRowFinal3;
+
+        [SerializeField]
+        private UIProfileTitleOption optionTitleAll;
+
+        [SerializeField]
+        private UIProfileRowOption optionRowTemplate;
 
         private void Awake()
         {
@@ -41,8 +61,15 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Views
             UIManager.Instance.TogglePopupAsync<ProfileView>().Forget();
         }
 
-        public void Bind()
+        public override void OnShow(object args)
         {
+            base.OnShow(args);
+            RefreshVisual();
+        }
+
+        public void RefreshVisual()
+        {
+            txtName.text = UserDataCache.Instance.DisplayName;
         }
     }
 }

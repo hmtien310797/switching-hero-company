@@ -40,14 +40,19 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             goEmptyLayout.SetActive(!anyUnique);
         }
 
-        private bool RebuildStats(PlayerEquipViewData equipment, [CanBeNull] PlayerEquipViewData oldEquip, bool hideUp)
+        public void HideUsedLayout()
+        {
+            goUsedLayout.SetActive(false);
+        }
+
+        private bool RebuildStats(PlayerEquipViewData showEquip, [CanBeNull] PlayerEquipViewData oldEquip, bool hideUp)
         {
             var anyUnique = false;
 
-            for (var idx = 0; idx < equipment.Modifiers.Count; idx++)
+            for (var idx = 0; idx < showEquip.Modifiers.Count; idx++)
             {
-                var modifier = equipment.Modifiers[idx];
-                var isUp = hideUp ? null : IsUp(equipment, oldEquip, modifier.StatType, modifier.IsUnique);
+                var modifier = showEquip.Modifiers[idx];
+                var isUp = hideUp ? null : IsUp(showEquip, oldEquip, modifier.StatType, modifier.IsUnique);
 
                 if (modifier.IsUnique &&
                     !anyUnique)
@@ -59,7 +64,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             }
 
             // an cac object con lại.
-            for (var i = equipment.Modifiers.Count; i < _statLines.Count; i++)
+            for (var i = showEquip.Modifiers.Count; i < _statLines.Count; i++)
             {
                 var clone = _statLines[i];
                 clone.gameObject.SetActive(false);
@@ -68,7 +73,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             return anyUnique;
         }
 
-        private bool? IsUp(PlayerEquipItem equipment, PlayerEquipItem oldEquip, StatType type, bool isUnique)
+        private bool? IsUp(PlayerEquipItem showEquip, PlayerEquipItem oldEquip, StatType type, bool isUnique)
         {
             if (oldEquip == null)
             {
@@ -76,7 +81,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             }
 
             var oldModifier = oldEquip.Modifiers.Find(v => v.StatType == type && v.IsUnique == isUnique);
-            var newModifier = equipment.Modifiers.Find(v => v.StatType == type && v.IsUnique == isUnique);
+            var newModifier = showEquip.Modifiers.Find(v => v.StatType == type && v.IsUnique == isUnique);
 
             if (oldModifier != null &&
                 newModifier != null)

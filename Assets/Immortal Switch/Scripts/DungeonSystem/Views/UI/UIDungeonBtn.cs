@@ -8,6 +8,6 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views.UI
     {
         [Header("Config")]
         [field: SerializeField]
-        public EDungeonType Type { get; private set; }
+        public int DungeonId { get; private set; }
     }
 }

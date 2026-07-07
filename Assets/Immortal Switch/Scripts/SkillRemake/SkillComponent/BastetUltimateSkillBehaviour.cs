@@ -136,7 +136,7 @@ namespace Immortal_Switch.Scripts.Skill
                 if (cancelled || Context.Caster == null || Context.Caster.IsDead)
                     break;
 
-                currentTarget = PvEBattleController.Instance.GetRandomEnemyAlive();
+                currentTarget = Context.BattleContext.GetRandomEnemyAlive();
                 if (currentTarget == null)
                 {
                     Debug.Log($"[BastetUltimate] Stop at jump {jumpIndex + 1}. No alive enemy found.", this);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Battle;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
@@ -23,8 +24,10 @@ public class HomingChainBulletProjectile : MonoBehaviour,
     private int hitTargetCount;
     private bool isInitialized;
     private bool isMovingToVirtualPoint;
+    private IHeroBattleContext iHeroBattleContext;
 
     private AddressableProjectilePoolable addressablePoolable;
+    private CancellationTokenRegistration _endStageCancelRegistration;
     private Transform pendingTarget;
     
     private void Awake()
@@ -40,6 +43,8 @@ public class HomingChainBulletProjectile : MonoBehaviour,
                 this
             );
         }
+        
+        
     }
     
 
@@ -47,7 +52,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
         ICombatUnit owner,
         Vector3 spawnPosition,
         Vector3 initialDirection,
-        HomingChainBulletConfig bulletConfig)
+        HomingChainBulletConfig bulletConfig, IHeroBattleContext battleContext)
     {
         KillMoveTween();
 
@@ -55,6 +60,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
         config = bulletConfig;
 
         transform.position = spawnPosition;
+        iHeroBattleContext = battleContext;
 
         visitedTargets.Clear();
 
@@ -73,11 +79,20 @@ public class HomingChainBulletProjectile : MonoBehaviour,
                 : transform.forward;
 
         StartFirstTarget();
+
+        if (BattleFlowController.Instance.endStageSessionCancellationTokenSource != null)
+        {
+            _endStageCancelRegistration =
+                BattleFlowController.Instance
+                    .endStageSessionCancellationTokenSource
+                    .Token
+                    .Register(DespawnSelf);
+        }
     }
 
     private void StartFirstTarget()
     {
-        currentTarget = PvEBattleController.Instance.GetRandomEnemyAlive();
+        currentTarget = iHeroBattleContext.GetRandomEnemyAlive();
 
         if (currentTarget == null)
         {
@@ -123,11 +138,8 @@ public class HomingChainBulletProjectile : MonoBehaviour,
             return;
         }
 
-        currentTarget = PvEBattleController.Instance.GetRandomFromFarthestEnemies(
-            transform.position,
-            visitedTargets,
-            5
-        );
+        currentTarget = iHeroBattleContext.GetRandomFromFarthestEnemies(transform.position,
+            visitedTargets);
 
         if (currentTarget == null)
         {
@@ -339,6 +351,8 @@ public class HomingChainBulletProjectile : MonoBehaviour,
             gameObject.SetActive(false);
             return;
         }
+
+        _endStageCancelRegistration.Dispose();
 
         addressablePoolable.Despawn();
     }
@@ -586,22 +600,5 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
         lastMoveDirection = Vector3.zero;
         previousPosition = Vector3.zero;
-    }
-
-    private void OnEnable()
-    {
-        GameEventManager.Subscribe(GameEvents.OnStageChange, DespawnSelf);
-    }
-
-    private void OnDisable()
-    {
-        KillMoveTween();
-        GameEventManager.Unsubscribe(GameEvents.OnStageChange, DespawnSelf);
-    }
-    
-
-    private void OnDestroy()
-    {
-        GameEventManager.Unsubscribe(GameEvents.OnStageChange, DespawnSelf);
     }
 }

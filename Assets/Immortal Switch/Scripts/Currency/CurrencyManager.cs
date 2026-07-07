@@ -113,6 +113,24 @@ namespace Immortal_Switch.Scripts.Currency
         }
 
         /// <summary>
+        /// Ghi đè balance tuyệt đối từ balances array của server (afk/claim, idle/flush).
+        /// currency_type trong RewardDto khớp tên CurrencyType enum (case-insensitive).
+        /// amount là string số nguyên.
+        /// </summary>
+        public void ApplyServerBalances(IReadOnlyList<RewardDto> balances)
+        {
+            if (balances == null) return;
+
+            for (int i = 0; i < balances.Count; i++)
+            {
+                RewardDto b = balances[i];
+                if (TryParseCurrencyType(b.CurrencyType, out CurrencyType type) &&
+                    TryParseAmount(b.Amount, out BigNumber amount))
+                    Set(type, amount);
+            }
+        }
+
+        /// <summary>
         /// Dùng cho debug/local demo. Server mode không nên gọi trực tiếp cho giao dịch thật.
         /// </summary>
         public bool SpendLocalDemo(CurrencyType currencyType, BigNumber amount)

@@ -3,8 +3,8 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Shared;
-using Immortal_Switch.Scripts.Shared.Database;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -342,8 +342,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (dataProvider ==null)
             {
-                LogErrorView("DataProvider is null.");
-                return;
+                dataProvider = SkillViewDataProvider.Instance;
             }
 
             RefreshClassButtons();
@@ -575,8 +574,16 @@ namespace Immortal_Switch.Scripts.Skill.UI
             var state = dataProvider.BuildSkillState(hero, skillData);
 
             if (detailIcon != null) detailIcon.sprite = skillData.SkillIcon;
-            if (bgImg != null) bgImg.sprite = tierInfo.background;
-            if (frameImg != null) frameImg.sprite = tierInfo.border;
+
+            if (tierInfo != null)
+            {
+                if (bgImg != null)
+                    bgImg.sprite = tierInfo.background;
+
+                if (frameImg != null)
+                    frameImg.sprite = tierInfo.border;
+            }
+
             if (detailLevelText != null) detailLevelText.text = $"Cấp.{state.Level}";
             if (detailNameText != null) detailNameText.text = skillData.SkillName;
             //if (detailTypeText != null) detailTypeText.text = $"{skillData.CastType} kỹ năng";

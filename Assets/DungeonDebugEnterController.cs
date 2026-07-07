@@ -1,5 +1,8 @@
+using System;
 using Battle;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.DungeonSystem;
+using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -24,6 +27,15 @@ namespace Immortal_Switch.Scripts.Battle
 
         [ShowInInspector, ReadOnly]
         private string currentFlowState;
+
+        // private void Start()
+        // {
+        //     //for testing dungeon temporarily
+        //     DungeonSystemManager.Instance.OnSelectedChallenge += _ =>
+        //     {
+        //         EnterDungeonAsync().Forget();
+        //     };
+        // }
 
         private void Update()
         {

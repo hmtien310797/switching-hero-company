@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Battle;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -17,16 +18,26 @@ public abstract class HeroStateBase : IHeroState
         this.stateMachine = stateMachine;
     }
 
-    public virtual async UniTask Enter() { }
-    public virtual void Tick(float deltaTime) { }
-    public virtual void Exit() { }
+    public virtual async UniTask Enter()
+    {
+    }
+
+    public virtual void Tick(float deltaTime)
+    {
+    }
+
+    public virtual void Exit()
+    {
+    }
 }
 
 public class HeroIdleState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.Idle;
 
-    public HeroIdleState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    public HeroIdleState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
 
     public override async UniTask Enter()
     {
@@ -58,7 +69,9 @@ public class HeroRunState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.Run;
 
-    public HeroRunState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    public HeroRunState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
 
     public override async UniTask Enter()
     {
@@ -217,7 +230,9 @@ public class HeroUltimateState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.Ultimate;
 
-    public HeroUltimateState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    public HeroUltimateState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
 
     public override UniTask Enter()
     {
@@ -239,7 +254,9 @@ public class HeroPassiveState : HeroStateBase
     private float timer;
     private bool hasTriggered;
 
-    public HeroPassiveState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    public HeroPassiveState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
 
     public override async UniTask Enter()
     {
@@ -285,7 +302,9 @@ public class HeroDeadState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.Dead;
 
-    public HeroDeadState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    public HeroDeadState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
 
     public override async UniTask Enter()
     {
@@ -303,7 +322,9 @@ public class HeroBossSpawnState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.BossSpawn;
 
-    public HeroBossSpawnState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    public HeroBossSpawnState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
 
     public override UniTask Enter()
     {
@@ -322,8 +343,10 @@ public class HeroManualMoveState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.ManualMove;
 
-    public HeroManualMoveState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
-    
+    public HeroManualMoveState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
+
     public override async UniTask Enter()
     {
         owner.Anim.PlayRun();
@@ -336,14 +359,15 @@ public class HeroManualMoveState : HeroStateBase
 
         owner.MoveTowards(owner.CurrentTarget.Position);
     }
-    
 }
 
 public class HeroSpawnState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.Spawn;
 
-    public HeroSpawnState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    public HeroSpawnState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
 
     public override async UniTask Enter()
     {
@@ -359,29 +383,85 @@ public class HeroWinState : HeroStateBase
 {
     public override HeroStateId Id => HeroStateId.Win;
 
-    public HeroWinState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine) { }
+    public HeroWinState(HeroActor owner, HeroStateMachine stateMachine) : base(owner, stateMachine)
+    {
+    }
 
     public override async UniTask Enter()
     {
-        owner.Anim.PlayIdle();
-        await UniTask.Delay(TimeSpan.FromSeconds(1.5f));
-        float duration = owner.Anim.PlayWin() - 0.5f;
-        await UniTask.Delay(TimeSpan.FromSeconds(duration));
-        owner.EnableWinFx(true);
-        Vector3[] path = new Vector3[] 
-        {
-            owner.transform.position - Vector3.forward * 20 - Vector3.right * 10,
-            owner.transform.position - Vector3.forward * 35 + Vector3.up *5,
-            owner.transform.position - Vector3.forward * 20 + Vector3.right * 10,
-            owner.transform.position + Vector3.forward * 0 + Vector3.right * 15,
-            PvEBattleController.Instance.GetEndMapPoint(),
-        };
+        if (owner == null)
+            return;
 
-        owner.transform.DOPath(path, 3f, PathType.CatmullRom).SetEase(Ease.InQuart).OnComplete(() =>
+        CancellationToken cancellationToken = BattleFlowController.Instance.stageFlowCancellationTokenSource.Token;
+
+        try
         {
-            owner.EnableWinFx(false);
-        });
+            cancellationToken.ThrowIfCancellationRequested();
+
+            owner.Anim.PlayIdle();
+
+            await UniTask.Delay(
+                TimeSpan.FromSeconds(1.5f),
+                cancellationToken: cancellationToken
+            );
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            float duration = Mathf.Max(
+                0f,
+                owner.Anim.PlayWin() - 0.5f
+            );
+
+            await UniTask.Delay(
+                TimeSpan.FromSeconds(duration),
+                cancellationToken: cancellationToken
+            );
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            owner.EnableWinFx(true);
+
+            Vector3 startPosition = owner.transform.position;
+
+            Vector3[] path =
+            {
+                startPosition
+                - Vector3.forward * 20f
+                - Vector3.right * 10f,
+
+                startPosition
+                - Vector3.forward * 35f
+                + Vector3.up * 5f,
+
+                startPosition
+                - Vector3.forward * 20f
+                + Vector3.right * 10f,
+
+                startPosition
+                + Vector3.right * 15f,
+
+                PvEBattleController.Instance.GetEndMapPoint()
+            };
+
+            await owner.transform
+                .DOPath(path, 3f, PathType.CatmullRom)
+                .SetEase(Ease.InQuart)
+                .ToUniTask(
+                    TweenCancelBehaviour.Kill,
+                    cancellationToken
+                );
+        }
+        catch (OperationCanceledException)
+        {
+            // Đây là cancellation hợp lệ:
+            // owner bị destroy hoặc flow bị hủy.
+        }
+        finally
+        {
+            if (owner != null)
+            {
+                owner.EnableWinFx(false);
+            }
+        }
     }
-    
-    
 }

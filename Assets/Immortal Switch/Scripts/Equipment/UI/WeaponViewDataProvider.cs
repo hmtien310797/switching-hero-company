@@ -7,6 +7,7 @@ using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -104,7 +105,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (WeaponManager.Instance == null || WeaponManager.Instance.Database == null)
                 return vm;
 
-            var hero = MasterDataCache.Instance != null ? MasterDataCache.Instance.GetHeroDataById(heroId) : null;
+            var hero = DatabaseManager.Instance != null ? DatabaseManager.Instance.GetHeroDataById(heroId) : null;
             if (hero != null)
                 vm.HeroName = hero.Name;
 

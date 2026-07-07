@@ -369,6 +369,7 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 1
+  anchoredY: 603.7875
   changePosY: 0
   yPosPortrait: 1
   yPosLandscape: 1
@@ -1470,6 +1471,7 @@ GameObject:
   - component: {fileID: 6260581608214004269}
   - component: {fileID: 5875309429059130743}
   - component: {fileID: 5681429250268295121}
+  - component: {fileID: 3281379801347472775}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -1536,6 +1538,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3281379801347472775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6219316518832729997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe9e3f9d26c48238d8ee8f9a35b8087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currencyType: 2
+  amountText: {fileID: 6105393397950290094}
+  includeOnlineIdlePreview: 1
 --- !u!1 &6582264826709599615
 GameObject:
   m_ObjectHideFlags: 0

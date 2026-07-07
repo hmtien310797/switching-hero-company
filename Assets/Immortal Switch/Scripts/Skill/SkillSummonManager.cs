@@ -1,5 +1,7 @@
 ﻿using System;
 using Common;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.SkillSummon;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
@@ -10,10 +12,8 @@ using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
 {
-    public class SkillSummonManager : MonoBehaviour
+    public class SkillSummonManager : Singleton<SkillSummonManager>
     {
-        public static SkillSummonManager Instance { get; private set; }
-
         [SerializeField] private SkillSummonConfigSO summonConfig;
         [SerializeField] private string saveKey = "skill_summon_save";
 
@@ -30,17 +30,15 @@ namespace Immortal_Switch.Scripts.Skill
 
         public event Action OnSummonDataChanged;
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            base.Awake();
             Load();
+        }
+
+        public override UniTask InitializeAsync()
+        {
+            return UniTask.CompletedTask;
         }
 
         private void Start()

@@ -1,5 +1,8 @@
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.MissionSystem.Models;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.UI;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
@@ -9,15 +12,21 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 {
     public class UIMissionRewardGroupEntry : MonoBehaviour
     {
-        [Header("References")] [SerializeField]
+        [Header("References")]
+        [SerializeField]
         private Button btnClaim;
 
-        [SerializeField] private Button btnAdsX2;
+        [SerializeField]
+        private Button btnAdsX2;
 
-        [SerializeField] private TextMeshProUGUI txtQuantity;
-        [SerializeField] private Image imgIcon;
-        [SerializeField] private Image imgTier;
-        [SerializeField] private GameObject goOverlayClaimed;
+        [SerializeField]
+        private TextMeshProUGUI txtQuantity;
+
+        [SerializeField]
+        private UIItemSlot itemSlot;
+
+        [SerializeField]
+        private GameObject goOverlayClaimed;
 
         // --- Private Fields ---
         public DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow Row { get; private set; }
@@ -63,6 +72,13 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             Row = row;
             txtQuantity.text = row.pointThreshold.ToString();
+
+            var display = DatabaseManager.Instance.GetDisplayData(row.itemId);
+
+            if (display != null)
+            {
+                itemSlot.Bind(display.ItemIcon, display.TierInfo.border, display.TierInfo.background, display.TierInfo.tierIcon);
+            }
         }
     }
 }

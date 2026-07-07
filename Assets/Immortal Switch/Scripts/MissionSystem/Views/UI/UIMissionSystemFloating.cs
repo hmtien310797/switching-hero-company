@@ -1,8 +1,6 @@
-using System;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Tutorial;
@@ -14,18 +12,25 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 {
     public class UIMissionSystemFloating : MonoBehaviour
     {
-        [Header("Reward panel")] [SerializeField]
+        [Header("Reward panel")]
+        [SerializeField]
         private TextMeshProUGUI txtRewardQuantity;
 
-        [SerializeField] private Image imgRewardIcon;
+        [SerializeField]
+        private Image imgRewardIcon;
 
-        [Header("Mission info")] [SerializeField]
+        [Header("Mission info")]
+        [SerializeField]
         private TextMeshProUGUI txtTitle;
 
-        [SerializeField] private TextMeshProUGUI txtDescription;
-        [SerializeField] private TextMeshProUGUI txtProgress;
+        [SerializeField]
+        private TextMeshProUGUI txtDescription;
 
-        [Header("Button claim")] [SerializeField]
+        [SerializeField]
+        private TextMeshProUGUI txtProgress;
+
+        [Header("Button claim")]
+        [SerializeField]
         private Button btnClaim;
 
         // --- Private Field ---
@@ -94,12 +99,12 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                     txtTitle.text = cfg.title;
                     txtDescription.text = cfg.description;
                     txtProgress.text = $"( {arg2} / {cfg.target:F0} )";
-                    RefreshVisual(cfg).Forget();
+                    RefreshVisual(cfg);
                 }
             }
         }
 
-        private async UniTask RefreshVisual(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
+        private void RefreshVisual(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
         {
             var isCompleted = MissionSystemManager.Instance.IsCompleted(cfg);
             btnClaim.interactable = isCompleted;
@@ -109,14 +114,14 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             if (rewards.Count > 0)
             {
                 var reward = rewards[0];
-                var sprite = await DatabaseManager.Instance.ItemDb.LoadCurrencyIconByKey(reward.itemKey);
+                var sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemKey(reward.itemKey);
 
                 if (sprite != null)
                 {
                     imgRewardIcon.sprite = sprite;
                 }
 
-                txtRewardQuantity.text = BigIntegerHelper.Format(reward.quantity);
+                txtRewardQuantity.text = BigNumberHelper.Format(reward.quantity);
             }
         }
 

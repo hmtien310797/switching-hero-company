@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEditor;
 using UnityEngine;
@@ -61,9 +62,9 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
                 return;
             }
 
-            if (MasterDataCache.Instance == null)
+            if (DatabaseManager.Instance == null)
             {
-                EditorGUILayout.HelpBox("MasterDataCache not found in scene.", MessageType.Warning);
+                EditorGUILayout.HelpBox("DatabaseManager not found in scene.", MessageType.Warning);
                 return;
             }
 
@@ -121,10 +122,10 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
         private void RefreshHeroSelection()
         {
-            if (MasterDataCache.Instance == null)
+            if (DatabaseManager.Instance == null)
                 return;
 
-            selectedHero = MasterDataCache.Instance.GetHeroDataById(selectedHeroId);
+            selectedHero = DatabaseManager.Instance.GetHeroDataById(selectedHeroId);
             if (selectedHero != null)
             {
                 selectedHeroClass = selectedHero.HeroClass;

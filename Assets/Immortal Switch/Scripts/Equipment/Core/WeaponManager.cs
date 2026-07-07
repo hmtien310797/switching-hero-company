@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
@@ -14,10 +15,8 @@ using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Equipment.Core
 {
-    public class WeaponManager : MonoBehaviour
+    public class WeaponManager : Singleton<WeaponManager>
     {
-        public static WeaponManager Instance { get; private set; }
-
         [SerializeField] private WeaponDatabaseSO database;
 
         private WeaponSaveData saveData;
@@ -42,20 +41,17 @@ namespace Immortal_Switch.Scripts.Equipment.Core
         
         private UserDataCache userDataCache;
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
+            base.Awake();
             Load();
             userDataCache = UserDataCache.Instance;
             BuildServices();
+        }
+
+        public override UniTask InitializeAsync()
+        {
+            return UniTask.CompletedTask;
         }
 
         private void BuildServices()

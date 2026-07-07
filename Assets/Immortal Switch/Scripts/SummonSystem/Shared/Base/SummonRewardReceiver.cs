@@ -1,4 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Skill;
@@ -103,6 +105,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
                     CurrencyManager.Instance.Set(CurrencyType.SkillTicket,  result.CurrencyBalances.SkillTicket);
                     CurrencyManager.Instance.Set(CurrencyType.WeaponTicket, result.CurrencyBalances.WeaponTicket);
                     CurrencyManager.Instance.Set(CurrencyType.diamond,      result.CurrencyBalances.Diamond);
+                }
+
+                if (category == SummonCategory.Skill && result.Rewards != null)
+                {
+                    var entries = new List<SummonEntry>();
+                    foreach (var r in result.Rewards)
+                    {
+                        if (r.SkillId > 0 && !string.IsNullOrEmpty(r.SkillUid))
+                            entries.Add(new SummonEntry { SkillId = r.SkillId, SkillUid = r.SkillUid, IsNew = r.IsNew, ShardGained = r.ShardGained });
+                    }
+                    if (entries.Count > 0)
+                        UserDataCache.Instance?.ApplySkillSummonEntries(entries.ToArray());
                 }
             }
             catch (System.Exception ex)

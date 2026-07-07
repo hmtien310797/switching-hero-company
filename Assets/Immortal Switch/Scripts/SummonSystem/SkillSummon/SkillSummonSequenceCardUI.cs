@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using TMPro;
@@ -57,8 +57,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
             if (rarityIcon != null)
             {
-                rarityIcon.sprite = tierInfo.tier;
-                rarityIcon.enabled = tierInfo.tier != null;
+                rarityIcon.sprite = tierInfo.tierIcon;
+                rarityIcon.enabled = tierInfo.tierIcon != null;
             }
 
             if (bgImg != null)

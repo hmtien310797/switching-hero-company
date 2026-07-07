@@ -4,6 +4,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -132,7 +133,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             ClearItems();
 
-            var allHeroes = MasterDataCache.Instance.GetAllHeroData();
+            var allHeroes = DatabaseManager.Instance.GetAllHeroData();
             var service = HeroProgressionManager.Instance.Service;
             var allData = new List<HeroCollectionItemViewData>();
 
@@ -198,7 +199,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (selectedSourceHeroId == selectedTargetHeroId) return false;
             if (!battleController.IsHeroCurrentlyActive(selectedSourceHeroId)) return false;
             if (battleController.IsHeroCurrentlyActive(selectedTargetHeroId)) return false;
-            HeroDataSO targetSourceHeroIdData = MasterDataCache.Instance.GetHeroDataById(selectedTargetHeroId);
+            HeroDataSO targetSourceHeroIdData = DatabaseManager.Instance.GetHeroDataById(selectedTargetHeroId);
             if (heroSwitchSlotUIIndex == 1)
             {
                 if (slot2UI.heroSlotClass != targetSourceHeroIdData.HeroClass) return true;

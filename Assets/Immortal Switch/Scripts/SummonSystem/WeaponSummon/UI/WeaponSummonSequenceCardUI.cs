@@ -94,7 +94,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
             if (tierIcon != null)
             {
-                tierIcon.sprite = entry.TierInfo.tier;
+                tierIcon.sprite = entry.TierInfo.tierIcon;
                 tierIcon.enabled = true;
             }
 

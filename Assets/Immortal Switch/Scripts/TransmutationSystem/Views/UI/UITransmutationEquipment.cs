@@ -1,4 +1,4 @@
-using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,12 +7,24 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 {
     public class UITransmutationEquipment : MonoBehaviour
     {
-        [Header("Item view")] [SerializeField] private Image imgTier;
-        [SerializeField] private Image imgIcon;
-        [SerializeField] private Image imgBorder;
-        [SerializeField] private Image imgBg;
-        [SerializeField] private TMP_Text txtLevel;
-        [SerializeField] private GameObject goEmpty;
+        [Header("Item view")]
+        [SerializeField]
+        private Image imgTier;
+
+        [SerializeField]
+        private Image imgIcon;
+
+        [SerializeField]
+        private Image imgBorder;
+
+        [SerializeField]
+        private Image imgBg;
+
+        [SerializeField]
+        private TMP_Text txtLevel;
+
+        [SerializeField]
+        private GameObject goEmpty;
 
         public void SetEmpty(bool value)
         {
@@ -28,7 +40,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             txtLevel.text = $"Lv {level:00}";
             imgBg.sprite = cfg.background;
             imgBorder.sprite = cfg.border;
-            imgTier.sprite = cfg.tier;
+            imgTier.sprite = cfg.tierIcon;
         }
     }
 }

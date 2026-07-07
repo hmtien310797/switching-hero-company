@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Game.Configs.Generated
 {
@@ -27,6 +28,11 @@ namespace Game.Configs.Generated
         /// CSV Column: note
         /// </summary>
         public string note;
+
+        /// <summary>
+        /// CSV Column: item_id
+        /// </summary>
+        public int itemId;
 
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.Tutorial;
 using Immortal_Switch.Scripts.UI;
@@ -52,7 +53,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
             TutorialManager.Instance.OnClick += OnClickTutorial;
-            allHeroData = MasterDataCache.Instance.GetAllHeroData();
+            allHeroData = DatabaseManager.Instance.GetAllHeroData();
         }
 
         private void OnDestroy()

@@ -76,6 +76,9 @@ namespace Immortal_Switch.Scripts.Currency
             [CurrencyType.weapon_ore] = "weapon_ore",
             [CurrencyType.weapon_gem] = "weapon_gem",
             [CurrencyType.weapon_essence] = "weapon_essence",
+
+            [CurrencyType.summon_ticket_hero] = "summon_ticket_hero",
+            [CurrencyType.summon_ticket_weapon] = "summon_ticket_weapon",
         };
 
         private static readonly Dictionary<string, CurrencyType> StringToEnum =

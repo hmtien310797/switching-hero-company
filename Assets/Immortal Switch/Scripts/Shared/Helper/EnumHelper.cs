@@ -1,4 +1,4 @@
-using Immortal_Switch.Scripts.Shared.Database;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Skill;
 
 namespace Immortal_Switch.Scripts.Helper

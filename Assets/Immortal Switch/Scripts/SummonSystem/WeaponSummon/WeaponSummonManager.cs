@@ -1,14 +1,14 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
 {
-    public class WeaponSummonManager : MonoBehaviour
+    public class WeaponSummonManager : Singleton<WeaponSummonManager>
     {
-        public static WeaponSummonManager Instance { get; private set; }
-
         [Header("Config")]
         [SerializeField] private WeaponSummonConfigSO config;
 
@@ -27,17 +27,16 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
 
         public event Action OnSummonDataChanged;
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
+            base.Awake();
             Load();
             InitService();
+        }
+
+        public override UniTask InitializeAsync()
+        {
+            return UniTask.CompletedTask;
         }
 
         private void InitService()

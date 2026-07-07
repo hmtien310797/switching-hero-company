@@ -13,27 +13,51 @@ namespace Immortal_Switch.Scripts.UI
             FitHeight
         }
 
-        [Required] [SerializeField] private RectTransform panelRoot;
+        [Required]
+        [SerializeField]
+        private RectTransform panelRoot;
 
-        [Header("Mode")] [SerializeField] private FitMode fitMode = FitMode.FitInside;
-        [SerializeField] private bool useSafeArea = true;
+        [Header("Mode")]
+        [SerializeField]
+        private FitMode fitMode = FitMode.FitInside;
+
+        [SerializeField]
+        private bool useSafeArea = true;
 
         /*[Header("Auto Detect Design Size")] [SerializeField]
         private bool autoDetectDesignSize = true;*/
 
         /*[SerializeField] private Vector2 designSize = new Vector2(1300, 2200);*/
 
-        [Header("Clamp")] [SerializeField] private float minScale = 0.35f;
-        [SerializeField] private float maxScale = 1f;
+        [Header("Clamp")]
+        [SerializeField]
+        private float minScale = 0.35f;
 
-        [Header("Fixed anchored position, unity auto fill value")] [ReadOnly] [SerializeField]
+        [SerializeField]
+        private float maxScale = 1f;
+
+        [Header("Fixed anchored position, unity auto fill value")]
+        [ReadOnly]
+        [SerializeField]
         private float anchoredY;
 
-        [Header("Optional Y Offset")] [SerializeField]
+        [Header("Optional Y Offset")]
+        [SerializeField]
         private bool changePosY = false;
 
-        [SerializeField] private float yPosPortrait = 0f;
-        [SerializeField] private float yPosLandscape = 0f;
+        [SerializeField]
+        private float yPosPortrait = 0f;
+
+        [SerializeField]
+        private float yPosLandscape = 0f;
+
+        [Header("Optional Scale Reduction")]
+        [SerializeField]
+        private bool useScaleReduction = false;
+
+        [SerializeField]
+        [Range(0f, 100f)]
+        private float scaleReductionPercent = 0f;
 
         private Vector2Int lastScreenSize;
         private Rect lastSafeArea;
@@ -172,6 +196,11 @@ namespace Immortal_Switch.Scripts.UI
                 case FitMode.FitHeight:
                     scale = heightRatio;
                     break;
+            }
+
+            if (useScaleReduction)
+            {
+                scale *= 1f - scaleReductionPercent / 100f;
             }
 
             return Mathf.Clamp(scale, minScale, maxScale);

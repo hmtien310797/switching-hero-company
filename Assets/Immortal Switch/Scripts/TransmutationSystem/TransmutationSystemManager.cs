@@ -4,8 +4,8 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
-using Immortal_Switch.Scripts.Shared.Database;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.TransmutationSystem.Interfaces;
@@ -26,7 +26,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         /// <summary>
         /// thoi gian fuse tu dong neu bat.
         /// </summary>
-        [SerializeField] private float autoFuseInterval = 2f;
+        [SerializeField]
+        private float autoFuseInterval = 2f;
 
         private ITransmutationSystemService Service { get; set; }
         public ITransmutationSystemStorage Storage { get; private set; }
@@ -79,6 +80,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public async UniTask<bool> SyncFromServerAsync()
         {
             TransmutationListResponse response;
+
             try
             {
                 response = await NakamaClient.Instance.GetTransmutationListAsync();
@@ -122,7 +124,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         {
             if (!Storage.Data.Setting.Enabled)
             {
-                Debug.Log("Transmutation: AutoFuse: Stop by disabled");
+                //Debug.Log("Transmutation: AutoFuse: Stop by disabled");
                 return;
             }
 
@@ -183,15 +185,17 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return Service.GetEquips();
         }
 
-        public void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool isEnabled)
+        public void SaveSetting(List<List<string>> uniqueOptions, int count, EItemTier tier, bool isWaiting, bool isEnabled)
         {
-            Service.SaveSetting(uniqueOptions, count, tier, isEnabled);
+            Service.SaveSetting(uniqueOptions, count, tier, isWaiting, isEnabled);
             OnSettingChanged?.Invoke(Storage.Data.Setting);
+            SaveSettingToServerAsync().Forget();
         }
 
         public void SetWaitingMaterial(bool value)
         {
             Service.SetWaitingMaterial(value);
+            SaveSettingToServerAsync().Forget();
         }
 
         public Dictionary<int, ETabPresetStatus> GetCounts()
@@ -293,7 +297,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         private void StopFuse()
         {
             // dung cau hinh tu dong.
-            SaveSetting(new List<List<string>>(), 0, EItemTier.D, false);
+            SaveSetting(new List<List<string>>(), 0, EItemTier.D, false, false);
         }
 
         private bool TryStopFuse(PlayerEquipViewData view)
@@ -355,6 +359,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             }
 
             TransmutationFuseResponse response;
+
             try
             {
                 response = await NakamaClient.Instance.FuseTransmutationAsync();
@@ -365,7 +370,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return null;
             }
 
-            if (response == null || !response.Success)
+            if (response == null ||
+                !response.Success)
             {
                 if (response != null)
                 {
@@ -391,6 +397,11 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             };
         }
 
+        public void ChangeStuck(PlayerEquipItem equip)
+        {
+            Service.ChangeStuck(equip);
+        }
+
         /// <summary>
         /// Chốt giữ item pending hiện tại qua RPC transmutation/equip — server tự biết pending của
         /// user, không cần truyền id (xem Docs/be-transmutation-rpc-spec.md mục 5).
@@ -398,6 +409,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public async UniTask<bool> EquipAsync()
         {
             TransmutationEquipResponse response;
+
             try
             {
                 response = await NakamaClient.Instance.EquipTransmutationAsync();
@@ -408,7 +420,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return false;
             }
 
-            if (response == null || !response.Success)
+            if (response == null ||
+                !response.Success)
             {
                 if (response != null)
                 {
@@ -431,6 +444,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public async UniTask<bool> DismantleAsync()
         {
             TransmutationDismantleResponse response;
+
             try
             {
                 response = await NakamaClient.Instance.DismantleTransmutationAsync();
@@ -441,7 +455,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return false;
             }
 
-            if (response == null || !response.Success)
+            if (response == null ||
+                !response.Success)
             {
                 if (response != null)
                 {
@@ -456,6 +471,31 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             return true;
         }
 
+        private async UniTaskVoid SaveSettingToServerAsync()
+        {
+            if (NakamaClient.Instance == null ||
+                !NakamaClient.Instance.IsLoggedIn)
+                return;
+
+            try
+            {
+                var s = Storage.Data.Setting;
+
+                await NakamaClient.Instance.SaveTransmutationSettingAsync(new TransmutationSaveSettingRequest
+                {
+                    Enabled = s.Enabled,
+                    Count = s.Count > 0 ? s.Count : 1,
+                    Tier = s.Tier.ToString(),
+                    IsWaiting = s.IsWaiting,
+                    UniqueOptions = s.UniqueOptions ?? new List<List<string>>(),
+                });
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[TransmutationSystem] SaveSetting server failed: {e.Message}");
+            }
+        }
+
         private void _DispatchChanged()
         {
             var cfg = Database.LevelConfig.rows.Find(v => v.level == Storage.Data.Level);
@@ -464,7 +504,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             var changed = new TransmutationSystemChanged
             {
                 Data = Storage.Data,
-                Progress = BigIntegerHelper.ClampProgress01(Storage.Data.Exp, targetExp),
+                Progress = BigNumberHelper.ClampProgress01(Storage.Data.Exp, targetExp),
                 TargetExp = targetExp,
             };
 

@@ -13,44 +13,73 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
     {
         public string LocalizeKey;
         public string ActionType;
-        [CanBeNull] public RectTransform Target;
+
+        [CanBeNull]
+        public RectTransform Target;
     }
 
     public class TutorialView : AnimatedUIView
     {
-        [Header("View references")] [SerializeField]
+        [Header("View references")]
+        [SerializeField]
         private RectTransform mask;
 
-        [SerializeField] private Image overlay;
+        [SerializeField]
+        private Image overlay;
 
-        [Header("Properties")] [SerializeField]
+        [SerializeField]
+        private Button btnSkip;
+
+        [Header("Properties")]
+        [SerializeField]
         private float cornerRadiusPx = 24f;
 
-        [SerializeField] private float softnessPx = 8f;
-        [SerializeField] private float padding = 20f;
+        [SerializeField]
+        private float softnessPx = 8f;
 
-        [Header("Finger references")] [SerializeField]
+        [SerializeField]
+        private float padding = 20f;
+
+        [Header("Finger references")]
+        [SerializeField]
         private RectTransform finger;
 
-        [SerializeField] private Vector2 fingerOffset = new(40f, -40f);
+        [SerializeField]
+        private Vector2 fingerOffset = new(40f, -40f);
 
-        [SerializeField] private float pullBackDistance = 24f;
-        [SerializeField] private float duration = 0.35f;
+        [SerializeField]
+        private float pullBackDistance = 24f;
 
-        [SerializeField] private float startScale = 1f;
-        [SerializeField] private float endScale = 1.2f;
+        [SerializeField]
+        private float duration = 0.35f;
 
-        [Header("Story references")] [SerializeField]
+        [SerializeField]
+        private float startScale = 1f;
+
+        [SerializeField]
+        private float endScale = 1.2f;
+
+        [Header("Story references")]
+        [SerializeField]
         private RectTransform rtStory;
 
-        [SerializeField] private TextMeshProUGUI txtStory;
-        [SerializeField] private TextEffect txtEffectStory;
+        [SerializeField]
+        private TextMeshProUGUI txtStory;
 
-        [SerializeField] private float storySpacing = 24f;
-        [SerializeField] private float screenPadding = 20f;
+        [SerializeField]
+        private TextEffect txtEffectStory;
 
-        [SerializeField] private Button btnStory;
-        [SerializeField] private Button btnMask;
+        [SerializeField]
+        private float storySpacing = 24f;
+
+        [SerializeField]
+        private float screenPadding = 20f;
+
+        [SerializeField]
+        private Button btnStory;
+
+        [SerializeField]
+        private Button btnMask;
 
         // --- Private Fields ---
         private Sequence _fingerSequence;
@@ -72,6 +101,13 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
             TutorialManager.Instance.OnCompleteTutorial += OnCompleteTutorial;
             TutorialManager.Instance.OnChangeStep += OnChangeStep;
 
+#if UNITY_EDITOR
+            btnSkip.gameObject.SetActive(true);
+            btnSkip.onClick.AddListener(OnClickSkip);
+#else
+            btnSkip.gameObject.SetActive(false);
+#endif
+
             btnStory.onClick.AddListener(OnClickFocus);
             btnMask.onClick.AddListener(OnClickFocus);
 
@@ -86,6 +122,11 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
             CacheCanvas();
         }
 
+        private void OnClickSkip()
+        {
+            TutorialManager.Instance.OnSkip();
+        }
+
         private void OnChangeStep(TutorialData obj)
         {
             RefreshVisual(obj);
@@ -98,6 +139,10 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         private void OnDestroy()
         {
+#if UNITY_EDITOR
+            btnSkip.onClick.RemoveListener(OnClickSkip);
+#endif
+
             btnStory.onClick.RemoveListener(OnClickFocus);
             btnMask.onClick.RemoveListener(OnClickFocus);
 

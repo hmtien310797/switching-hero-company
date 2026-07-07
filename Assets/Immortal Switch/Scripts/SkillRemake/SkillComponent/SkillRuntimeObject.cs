@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Battle;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pooling;
+using Immortal_Switch.Scripts.SkillRemake;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -37,8 +41,11 @@ namespace Immortal_Switch.Scripts.Skill
         
         private AddressablePoolHandle addressablePoolHandle;
         private bool hasAddressableInstanceHandle;
+        protected CancellationTokenRegistration _endStageCancelRegistration;
+        protected CancellationTokenSource cancellationTokenSource;
 
         private bool isDespawning;
+        
 
         public virtual void Init(
             SkillRuntimeContext context,
@@ -86,6 +93,21 @@ namespace Immortal_Switch.Scripts.Skill
 
         protected virtual void OnRuntimeInitialized(object arg)
         {
+            if (BattleFlowController.Instance.endStageSessionCancellationTokenSource != null)
+            {
+                _endStageCancelRegistration =
+                    BattleFlowController.Instance
+                        .endStageSessionCancellationTokenSource
+                        .Token
+                        .Register(ForceDespawn);
+                cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(
+                    this.GetCancellationTokenOnDestroy(), BattleFlowController.Instance.endStageSessionCancellationTokenSource.Token
+                );
+                return;
+            }
+            cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(
+                this.GetCancellationTokenOnDestroy()
+            );
         }
 
         protected virtual void Update()
@@ -135,7 +157,7 @@ namespace Immortal_Switch.Scripts.Skill
         /// Fired by this runtime object. For Spine objects, call this from Spine event callback.
         /// For particle/timeline objects later, call this from animation event or script.
         /// </summary>
-        protected void EmitRuntimeEvent(string eventName)
+        protected virtual void EmitRuntimeEvent(string eventName)
         {
             DebugCountRuntimeEvent(eventName);
 
@@ -182,22 +204,30 @@ namespace Immortal_Switch.Scripts.Skill
                     break;
             }
             
+            _endStageCancelRegistration.Dispose();
+            CancelSpawnTask();
+
             OnDespawnedToPool();
         }
-
-        private void OnEnable()
+        
+        private void CancelSpawnTask()
         {
-            GameEventManager.Subscribe(GameEvents.OnStageChange, ForceDespawn);
+            if (cancellationTokenSource == null)
+                return;
+
+            if (!cancellationTokenSource.IsCancellationRequested)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            cancellationTokenSource.Dispose();
+            cancellationTokenSource = null;
         }
+        
 
-        private void OnDisable()
+        protected void OnDestroy()
         {
-            GameEventManager.Unsubscribe(GameEvents.OnStageChange, ForceDespawn);
-        }
-
-        private void OnDestroy()
-        {
-            GameEventManager.Unsubscribe(GameEvents.OnStageChange, ForceDespawn);
+            _endStageCancelRegistration.Dispose();
         }
 
         public void NotifyAddressablePoolDespawned()

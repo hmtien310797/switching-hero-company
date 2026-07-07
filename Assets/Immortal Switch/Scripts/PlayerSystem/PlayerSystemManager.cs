@@ -4,13 +4,16 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.PlayerSystem.Interfaces;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Shared.Helper;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.PlayerSystem
 {
     public class PlayerSystemManager : Singleton<PlayerSystemManager>
     {
-        [Header("Config")] [SerializeField] private PlayerSystemDatabaseSO database;
+        [Header("Config")]
+        [SerializeField]
+        private PlayerSystemDatabaseSO database;
 
         private IPlayerSystemService Service { get; set; }
         private IPlayerSystemStorage Storage { get; set; }

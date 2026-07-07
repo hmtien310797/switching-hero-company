@@ -19,7 +19,7 @@ MonoBehaviour:
     tutorialGroup: OPENING
     triggerType: FirstLogin
     triggerValue: none
-    conditionKey: 1_1_main_done
+    conditionKey: 1_1_main
     actionType: Dialogue
     highlightType: None
     targetUI: none
@@ -37,7 +37,7 @@ MonoBehaviour:
     tutorialGroup: OPENING
     triggerType: AfterStep
     triggerValue: 1
-    conditionKey: 1_1_variant_done
+    conditionKey: 1_1_variant
     actionType: Dialogue
     highlightType: None
     targetUI: none
@@ -55,7 +55,7 @@ MonoBehaviour:
     tutorialGroup: OPENING
     triggerType: AfterStep
     triggerValue: 2
-    conditionKey: 1_2_main_done
+    conditionKey: 1_2_main
     actionType: Dialogue
     highlightType: None
     targetUI: none
@@ -73,7 +73,7 @@ MonoBehaviour:
     tutorialGroup: OPENING
     triggerType: AfterStep
     triggerValue: 3
-    conditionKey: 1_2_variant_done
+    conditionKey: 1_2_variant
     actionType: Dialogue
     highlightType: None
     targetUI: none
@@ -91,7 +91,7 @@ MonoBehaviour:
     tutorialGroup: SKILL_SWITCH
     triggerType: OnScreenOpen
     triggerValue: SkillScreen
-    conditionKey: 2_1_main_done
+    conditionKey: 2_1_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: HeroPortrait_Main
@@ -109,7 +109,7 @@ MonoBehaviour:
     tutorialGroup: SKILL_SWITCH
     triggerType: AfterStep
     triggerValue: 5
-    conditionKey: 2_1_variant_done
+    conditionKey: 2_1_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: HeroPortrait_Main
@@ -127,7 +127,7 @@ MonoBehaviour:
     tutorialGroup: SKILL_SWITCH
     triggerType: AfterStep
     triggerValue: 6
-    conditionKey: 2_2_main_done
+    conditionKey: 2_2_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: SwitchButton
@@ -145,7 +145,7 @@ MonoBehaviour:
     tutorialGroup: AUTO_MODE
     triggerType: OnScreenOpen
     triggerValue: AutoScreen
-    conditionKey: 3_1_main_done
+    conditionKey: 3_1_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: AutoAttackButton
@@ -163,12 +163,12 @@ MonoBehaviour:
     tutorialGroup: AUTO_MODE
     triggerType: AfterStep
     triggerValue: 8
-    conditionKey: 3_1_variant_done
-    actionType: FocusClick
+    conditionKey: 3_1_variant
+    actionType: Dialogue
     highlightType: Circle
-    targetUI: AutoAttackButton
-    arrowFrom: GuideNPC
-    arrowTo: AutoAttackButton
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
     isBlocking: 1
     nextStepId: 10
     narratorId: kata
@@ -181,7 +181,7 @@ MonoBehaviour:
     tutorialGroup: AUTO_MODE
     triggerType: AfterStep
     triggerValue: 9
-    conditionKey: 3_2_main_done
+    conditionKey: 3_2_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: AutoUltButton
@@ -199,12 +199,12 @@ MonoBehaviour:
     tutorialGroup: AUTO_MODE
     triggerType: AfterStep
     triggerValue: 10
-    conditionKey: 3_2_variant_done
-    actionType: FocusClick
+    conditionKey: 3_2_variant
+    actionType: Dialogue
     highlightType: Circle
-    targetUI: AutoUltButton
-    arrowFrom: GuideNPC
-    arrowTo: AutoUltButton
+    targetUI: none
+    arrowFrom: none
+    arrowTo: none
     isBlocking: 1
     nextStepId: 12
     narratorId: kata
@@ -217,7 +217,7 @@ MonoBehaviour:
     tutorialGroup: QUEST
     triggerType: OnScreenOpen
     triggerValue: QuestScreen
-    conditionKey: 4_1_main_done
+    conditionKey: 4_1_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: QuestButton
@@ -235,7 +235,7 @@ MonoBehaviour:
     tutorialGroup: QUEST
     triggerType: AfterStep
     triggerValue: 12
-    conditionKey: 4_1_variant_done
+    conditionKey: 4_1_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: QuestButton
@@ -253,7 +253,7 @@ MonoBehaviour:
     tutorialGroup: QUEST
     triggerType: AfterStep
     triggerValue: 13
-    conditionKey: 4_2_main_done
+    conditionKey: 4_2_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: QuestClaimButton
@@ -271,7 +271,7 @@ MonoBehaviour:
     tutorialGroup: QUEST
     triggerType: AfterStep
     triggerValue: 14
-    conditionKey: 4_2_variant_done
+    conditionKey: 4_2_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: QuestClaimButton
@@ -289,7 +289,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: OnScreenOpen
     triggerValue: TeamScreen
-    conditionKey: 5_1_main_done
+    conditionKey: 5_1_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: SummonEntryButton
@@ -307,7 +307,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 16
-    conditionKey: 5_1_variant_done
+    conditionKey: 5_1_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: SummonEntryButton
@@ -325,7 +325,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 17
-    conditionKey: 5_2_main_done
+    conditionKey: 5_2_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: SummonButton
@@ -343,7 +343,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 18
-    conditionKey: 5_2_variant_done
+    conditionKey: 5_2_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: SummonButton
@@ -361,7 +361,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 19
-    conditionKey: 5_3_main_done
+    conditionKey: 5_3_main
     actionType: TapContinue
     highlightType: None
     targetUI: none
@@ -379,7 +379,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 20
-    conditionKey: 5_3_variant_done
+    conditionKey: 5_3_variant
     actionType: TapContinue
     highlightType: None
     targetUI: none
@@ -397,7 +397,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 21
-    conditionKey: 5_4_main_done
+    conditionKey: 5_4_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: HeroAreaButton
@@ -415,7 +415,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 22
-    conditionKey: 5_4_variant_done
+    conditionKey: 5_4_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: HeroAreaButton
@@ -433,7 +433,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 23
-    conditionKey: 5_5_main_done
+    conditionKey: 5_5_main
     actionType: DragOrClick
     highlightType: Circle
     targetUI: TeamSlot_Empty
@@ -451,7 +451,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 24
-    conditionKey: 5_5_variant_done
+    conditionKey: 5_5_variant
     actionType: DragOrClick
     highlightType: Circle
     targetUI: TeamSlot_Empty
@@ -469,7 +469,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 25
-    conditionKey: 5_6_main_done
+    conditionKey: 5_6_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: ConfirmTeamButton
@@ -487,7 +487,7 @@ MonoBehaviour:
     tutorialGroup: TEAM_SETUP
     triggerType: AfterStep
     triggerValue: 26
-    conditionKey: 5_6_variant_done
+    conditionKey: 5_6_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: ConfirmTeamButton
@@ -505,7 +505,7 @@ MonoBehaviour:
     tutorialGroup: GROWTH_UPGRADE
     triggerType: OnScreenOpen
     triggerValue: GrowthScreen
-    conditionKey: 6_1_main_done
+    conditionKey: 6_1_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: GrowthEntryButton
@@ -523,7 +523,7 @@ MonoBehaviour:
     tutorialGroup: GROWTH_UPGRADE
     triggerType: AfterStep
     triggerValue: 28
-    conditionKey: 6_1_variant_done
+    conditionKey: 6_1_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: GrowthEntryButton
@@ -541,7 +541,7 @@ MonoBehaviour:
     tutorialGroup: GROWTH_UPGRADE
     triggerType: AfterStep
     triggerValue: 29
-    conditionKey: 6_2_main_done
+    conditionKey: 6_2_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: StatUpgradeButton
@@ -559,7 +559,7 @@ MonoBehaviour:
     tutorialGroup: GROWTH_UPGRADE
     triggerType: AfterStep
     triggerValue: 30
-    conditionKey: 6_2_variant_done
+    conditionKey: 6_2_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: StatUpgradeButton
@@ -577,7 +577,7 @@ MonoBehaviour:
     tutorialGroup: GROWTH_UPGRADE
     triggerType: AfterStep
     triggerValue: 31
-    conditionKey: 6_3_main_done
+    conditionKey: 6_3_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: ExitButton
@@ -595,7 +595,7 @@ MonoBehaviour:
     tutorialGroup: GROWTH_UPGRADE
     triggerType: AfterStep
     triggerValue: 32
-    conditionKey: 6_3_variant_done
+    conditionKey: 6_3_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: ExitButton
@@ -613,7 +613,7 @@ MonoBehaviour:
     tutorialGroup: GROWTH_UPGRADE
     triggerType: AfterStep
     triggerValue: 33
-    conditionKey: 6_4_main_done
+    conditionKey: 6_4_main
     actionType: Dialogue
     highlightType: None
     targetUI: none
@@ -631,7 +631,7 @@ MonoBehaviour:
     tutorialGroup: GROWTH_UPGRADE
     triggerType: AfterStep
     triggerValue: 34
-    conditionKey: 6_4_variant_done
+    conditionKey: 6_4_variant
     actionType: Dialogue
     highlightType: None
     targetUI: none
@@ -649,7 +649,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: OnScreenOpen
     triggerValue: EquipScreen
-    conditionKey: 7_1_main_done
+    conditionKey: 7_1_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: WeaponSummonEntry
@@ -667,7 +667,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 36
-    conditionKey: 7_1_variant_done
+    conditionKey: 7_1_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: WeaponSummonEntry
@@ -685,7 +685,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 37
-    conditionKey: 7_2_main_done
+    conditionKey: 7_2_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: WeaponSummonButton
@@ -703,7 +703,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 38
-    conditionKey: 7_2_variant_done
+    conditionKey: 7_2_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: WeaponSummonButton
@@ -721,7 +721,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 39
-    conditionKey: 7_3_main_done
+    conditionKey: 7_3_main
     actionType: TapContinue
     highlightType: None
     targetUI: none
@@ -739,7 +739,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 40
-    conditionKey: 7_3_variant_done
+    conditionKey: 7_3_variant
     actionType: TapContinue
     highlightType: None
     targetUI: none
@@ -757,7 +757,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 41
-    conditionKey: 7_4_main_done
+    conditionKey: 7_4_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: EquipAreaButton
@@ -775,7 +775,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 42
-    conditionKey: 7_4_variant_done
+    conditionKey: 7_4_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: EquipAreaButton
@@ -793,7 +793,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 43
-    conditionKey: 7_5_main_done
+    conditionKey: 7_5_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: WeaponSlot_Empty
@@ -811,7 +811,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 44
-    conditionKey: 7_5_variant_done
+    conditionKey: 7_5_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: WeaponSlot_Empty
@@ -829,7 +829,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 45
-    conditionKey: 7_6_main_done
+    conditionKey: 7_6_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: WeaponListItem
@@ -847,7 +847,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 46
-    conditionKey: 7_6_variant_done
+    conditionKey: 7_6_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: WeaponListItem
@@ -865,7 +865,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 47
-    conditionKey: 7_7_main_done
+    conditionKey: 7_7_main
     actionType: FocusClick
     highlightType: Circle
     targetUI: EquipConfirmButton
@@ -883,7 +883,7 @@ MonoBehaviour:
     tutorialGroup: EQUIP_WEAPON
     triggerType: AfterStep
     triggerValue: 48
-    conditionKey: 7_7_variant_done
+    conditionKey: 7_7_variant
     actionType: FocusClick
     highlightType: Circle
     targetUI: EquipConfirmButton

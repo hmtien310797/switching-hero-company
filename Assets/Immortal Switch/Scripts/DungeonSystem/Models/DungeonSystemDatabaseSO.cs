@@ -17,16 +17,16 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Models
         public List<DungeonSystemSpriteEntry> Entries { get; private set; }
 
         [CanBeNull]
-        public DungeonSystemSpriteEntry Get(EDungeonType type)
+        public DungeonSystemSpriteEntry Get(int type)
         {
-            return Entries.FirstOrDefault(v => v.type == type);
+            return Entries.FirstOrDefault(v => v.dungeonId == type);
         }
     }
 
     [Serializable]
     public class DungeonSystemSpriteEntry
     {
-        public EDungeonType type;
+        public int dungeonId;
         [PreviewField] public Sprite banner;
         [PreviewField] public Sprite background;
     }
@@ -52,5 +52,8 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Models
         /// ham trang bi
         /// </summary>
         Equipment = 3,
+        
+        //ham ba lang
+        Weapon = 4,
     }
 }

@@ -1,17 +1,22 @@
+using System;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 
 namespace Immortal_Switch.Scripts.MissionSystem.Interfaces
 {
     public interface IMissionSystemStorage
     {
-        /// <summary>
-        /// save data
-        /// </summary>
         MissionSystemData Data { get; }
 
         /// <summary>
-        /// save data
+        /// Callback sau mỗi lần Save() — Manager dùng để fire-and-forget sync lên server.
         /// </summary>
+        Action OnAfterSave { get; set; }
+
+        /// <summary>
+        /// Ghi đè Data từ server (không lưu ES3 ngay — chờ lần Save() tiếp theo).
+        /// </summary>
+        void LoadFromData(MissionSystemData data);
+
         void Save();
 
         /// <summary>

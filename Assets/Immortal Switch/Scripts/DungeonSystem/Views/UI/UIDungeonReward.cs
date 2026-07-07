@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Immortal_Switch.Scripts.DungeonSystem.Views.UI
 {
-    public class UIDungeonReward : UIBagSlot
+    public class UIDungeonReward : UIItemSlot
     {
         [Header("Reward references")] [SerializeField]
         private TextMeshProUGUI txtQuantity;

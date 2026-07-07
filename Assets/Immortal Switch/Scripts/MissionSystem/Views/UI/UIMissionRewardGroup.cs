@@ -29,8 +29,6 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void OnMissionSystemChangePoint(int arg1, string arg2)
         {
-            Debug.Log($"OnMissionSystemChangePoint: {arg1}, {arg2}");
-
             if (_missionType == arg2)
             {
                 RefreshPoint(arg1, arg2);
@@ -73,7 +71,6 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         private void RefreshPoint(int point, string missionType)
         {
             uiMissionTotalPoint.Bind(point, missionType);
-            Debug.Log($"Point: {point} / {_maxPoint}");
             imgProgress.fillAmount = Mathf.Clamp01(1f * point / _maxPoint);
         }
 

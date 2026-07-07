@@ -20,7 +20,8 @@ namespace Immortal_Switch.Scripts.StatSystem
         ExclusiveSkillDamage,
         SwitchSkillDamage,
         FlatAtkBonus,
-        AtkPercentBonus
+        AtkPercentBonus,
+        FinalDmgBonus = 17,
     }
 
     public enum ModifierOp
