@@ -7,6 +7,7 @@ using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.SkillRemake;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Skill
@@ -45,7 +46,7 @@ namespace Immortal_Switch.Scripts.Skill
         protected CancellationTokenSource cancellationTokenSource;
 
         private bool isDespawning;
-        
+        private int skillId;
 
         public virtual void Init(
             SkillRuntimeContext context,
@@ -68,8 +69,24 @@ namespace Immortal_Switch.Scripts.Skill
 
             debugRuntimeEventCount = 0;
             isDespawning = false;
+            skillId = context.SkillData.SkillId;
+
+            AddressableSkillSpawnService.OnSkillDespawned += OnDespawnSkill;
 
             OnRuntimeInitialized(arg);
+        }
+
+        private void OnDespawnSkill(int id)
+        {
+            if (id != skillId)
+            {
+                return;
+            }
+
+            if (runtimeSpawnMode == SkillRuntimeSpawnMode.AddressableInstance)
+            {
+                ForceDespawn();
+            }
         }
         
         public void BindAddressableInstanceSpawn()
@@ -176,6 +193,7 @@ namespace Immortal_Switch.Scripts.Skill
                 Executor.ExecutePhase(runtimeContext, PhaseBuffer[i]);
         }
 
+        [Button]
         public virtual void ForceDespawn()
         {
             if (isDespawning)
@@ -207,6 +225,11 @@ namespace Immortal_Switch.Scripts.Skill
             _endStageCancelRegistration.Dispose();
             CancelSpawnTask();
 
+            if (runtimeSpawnMode == SkillRuntimeSpawnMode.AddressableInstance)
+            {
+                AddressableSkillSpawnService.OnSkillDespawned -= OnDespawnSkill;
+            }
+
             OnDespawnedToPool();
         }
         
@@ -228,6 +251,11 @@ namespace Immortal_Switch.Scripts.Skill
         protected void OnDestroy()
         {
             _endStageCancelRegistration.Dispose();
+            
+            if (runtimeSpawnMode == SkillRuntimeSpawnMode.AddressableInstance)
+            {
+                AddressableSkillSpawnService.OnSkillDespawned -= OnDespawnSkill;
+            }
         }
 
         public void NotifyAddressablePoolDespawned()

@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using System;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
@@ -8,6 +9,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
 {
     public static class AddressableSkillSpawnService
     {
+        public static Action<int> OnSkillDespawned;
         public static async UniTask PrewarmSkillRuntimeAssetsAsync(SkillDataSO skillData)
         {
             int level = 1;
@@ -67,6 +69,8 @@ namespace Immortal_Switch.Scripts.SkillRemake
         
         public static void DisposeSkillComponent(SkillDataSO skillData)
         {
+            OnSkillDespawned?.Invoke(skillData.SkillId);
+            
             switch (skillData.RuntimeObjectConfig.RuntimeVisualType)
             {
                 case SkillRuntimeVisualType.SpawnedSkillObject:
