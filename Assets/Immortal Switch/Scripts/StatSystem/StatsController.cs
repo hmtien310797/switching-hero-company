@@ -33,7 +33,11 @@ namespace Immortal_Switch.Scripts.StatSystem
                 { StatType.DamageToHeroMonster, 0f },
                 { StatType.ClassSkillDamage, 0f },
                 { StatType.ExclusiveSkillDamage, 0f },
-                { StatType.SwitchSkillDamage, 0f }
+                { StatType.SwitchSkillDamage, 0f },
+                { StatType.DmgBonus, 0f },
+                { StatType.SkillDmgBonus, 0f },
+                { StatType.BasicDmgBonus, 0f },
+                { StatType.FinalDmgBonus, 0f },
             });
 
             HealthModule = new HealthModule(StatModule);

@@ -1,8 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
-using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Shared;
-using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Tutorial;
 using TMPro;
 using UnityEngine;
@@ -109,19 +107,19 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             var isCompleted = MissionSystemManager.Instance.IsCompleted(cfg);
             btnClaim.interactable = isCompleted;
 
-            var rewards = RewardHelper.ParseRewards(cfg.rewards);
+            var rewards = DatabaseManager.Instance.GetRewards(cfg.rewards);
 
             if (rewards.Count > 0)
             {
                 var reward = rewards[0];
-                var sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemKey(reward.itemKey);
+                var sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemKey(reward.ItemKey);
 
                 if (sprite != null)
                 {
                     imgRewardIcon.sprite = sprite;
                 }
 
-                txtRewardQuantity.text = BigNumberHelper.Format(reward.quantity);
+                txtRewardQuantity.text = reward.Quantity.ToInputString();
             }
         }
 

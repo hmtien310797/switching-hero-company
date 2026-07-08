@@ -4,6 +4,7 @@ using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
 
 namespace Immortal_Switch.Scripts.MissionSystem
@@ -211,9 +212,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
             return false;
         }
 
-        public List<RewardEntry> RewardGroupClaim(DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row, bool isAdsX2)
+        public List<ItemRewardData> RewardGroupClaim(DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row, bool isAdsX2)
         {
-            var rewards = new List<RewardEntry>();
+            var rewards = new List<ItemRewardData>();
 
             switch (row.scope)
             {
@@ -228,7 +229,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                             X2Claimed = false,
                         });
 
-                        rewards.AddRange(RewardHelper.ParseRewards(row.rewards));
+                        rewards.AddRange(DatabaseManager.Instance.GetRewards(row.rewards));
                         _storage.Save();
                     }
                     else if (isAdsX2)
@@ -242,13 +243,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                             // neu da nhan thuong roi moi cho nhan x2.
                             if (point != null)
                             {
-                                var rewardsMap = RewardHelper.ParseRewards(row.rewards);
-
-                                rewards.AddRange(rewardsMap.Select(entry => new RewardEntry
-                                {
-                                    itemKey = entry.itemKey,
-                                    quantity = entry.quantity * 2,
-                                }));
+                                rewards.AddRange(DatabaseManager.Instance.GetRewards(row.rewards));
                             }
 
                             _storage.Data.DailyTask.PointsClaimed[idx].X2Claimed = true;
@@ -269,7 +264,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                             X2Claimed = false,
                         });
 
-                        rewards.AddRange(RewardHelper.ParseRewards(row.rewards));
+                        rewards.AddRange(DatabaseManager.Instance.GetRewards(row.rewards));
                         _storage.Save();
                     }
                     else if (isAdsX2)
@@ -283,13 +278,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                             // neu da nhan thuong roi moi cho nhan x2.
                             if (point != null)
                             {
-                                var rewardsMap = RewardHelper.ParseRewards(row.rewards);
-
-                                rewards.AddRange(rewardsMap.Select(entry => new RewardEntry
-                                {
-                                    itemKey = entry.itemKey,
-                                    quantity = entry.quantity * 2,
-                                }));
+                                rewards.AddRange(DatabaseManager.Instance.GetRewards(row.rewards));
                             }
 
                             _storage.Data.WeeklyTask.PointsClaimed[idx].X2Claimed = true;

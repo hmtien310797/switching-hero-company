@@ -132,6 +132,11 @@ public class GameStatView : MonoBehaviour
         currentChapterStageNameText.text = string.Format(NormalChapterStageNameKey, stageRuntimeData.ChapterIndex + 1, stageRuntimeData.ChapterName);
         currentChapterStageDataText.text = string.Format(NormalChapterStageDataKey, stageRuntimeData.GlobalStage);
         buttonBoss.gameObject.SetActive(!playCompletedStage);
+        // Trước đây buttonBoss.interactable chỉ được mở qua sự kiện OnStageLost (lúc hero chết
+        // thật trong session) — không đủ cho case resume sau khi đóng/mở lại app với
+        // isLosingStage = true do server báo stage_creeps_cleared (không có OnStageLost nào
+        // xảy ra). Set trực tiếp ở đây theo đúng nguồn dữ liệu (isLosingStage) cho cả 2 case.
+        buttonBoss.interactable = isLosingStage && !playCompletedStage;
         shinyBossButton.gameObject.SetActive(isLosingStage && !playCompletedStage);
         buttonGiveUp.gameObject.SetActive(false);
     }

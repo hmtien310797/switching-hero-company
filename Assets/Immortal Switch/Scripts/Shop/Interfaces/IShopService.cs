@@ -13,5 +13,23 @@ namespace Immortal_Switch.Scripts.Shop.Interfaces
 
         /// <summary>Kiểm tra daily/weekly/monthly reset, xoá purchase count tương ứng.</summary>
         void CheckAndReset();
+
+        // ── Topup / GloryPass ────────────────────────────────────────────────
+
+        /// <summary>Tổng số lượt nạp (mỗi lần mua diamond +1).</summary>
+        int GetTopupCount();
+
+        /// <summary>Tăng 1 lượt nạp sau khi mua diamond thành công.</summary>
+        void RecordTopup();
+
+        /// <summary>Kiểm tra milestone đã nhận thưởng chưa.</summary>
+        bool IsGloryPassClaimed(int milestoneId);
+
+        /// <summary>Đánh dấu milestone đã nhận thưởng.</summary>
+        void ClaimGloryPass(int milestoneId);
+
+        /// <summary>Reset danh sách GloryPass đã nhận đầu tháng.</summary>
+        void ResetGloryPassClaims();
+
     }
 }

@@ -50,16 +50,20 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             DungeonInfo info = null;
             state.Dungeons?.TryGetValue(dungeonKey ?? string.Empty, out info);
 
-            // maxStage/ticket owned are server truth now — GetDungeonMaxStage/GetDungeonTicketRequest
-            // (local DungeonDatabaseSO data) are only a fallback if dungeon/state failed (e.g. offline),
-            // since local StageCount is a stale placeholder (500) for every dungeon today.
-            var maxStage = info != null ? info.StageCount : DatabaseManager.Instance.GetDungeonMaxStage(dungeonId);
-            var startIdx = Mathf.Clamp(info?.HighestStageCleared ?? 0, 0, Mathf.Max(0, maxStage - 1));
-            var ticketOwned = info != null ? (int)state.TicketBalance : DatabaseManager.Instance.GetDungeonTicketRequest(dungeonId);
+            // maxStage/ticketRequired are per-dungeon server truth — GetDungeonMaxStage/
+            // GetDungeonTicketRequest (local DungeonDatabaseSO data) are only a fallback for
+            // dungeons dungeon/state doesn't recognize yet (e.g. boss_dragon, not wired
+            // server-side), since local StageCount is a stale placeholder (500) otherwise.
+            // ticketOwned is a shared balance across all dungeons, not per-dungeon — it comes from
+            // state.TicketBalance regardless of whether this specific dungeonKey has an info entry.
+            var maxStage       = info != null ? info.StageCount    : DatabaseManager.Instance.GetDungeonMaxStage(dungeonId);
+            var ticketRequired = info != null ? info.TicketRequest : DatabaseManager.Instance.GetDungeonTicketRequest(dungeonId);
+            var startIdx       = Mathf.Clamp(info?.HighestStageCleared ?? 0, 0, Mathf.Max(0, maxStage - 1));
+            var ticketOwned    = (int)state.TicketBalance;
 
             var ui = await UIManager.Instance.OpenPopupAsync<DungeonView>();
             var title = DatabaseManager.Instance.GetDungeonTitle(dungeonId);
-            ui.Bind(dungeonId, ticketOwned, title, startIdx, maxStage, OnClickStart, OnStageChangedAsync);
+            ui.Bind(dungeonId, ticketOwned, ticketRequired, title, startIdx, maxStage, OnClickStart, OnStageChangedAsync);
         }
 
         private IReadOnlyList<ItemRewardData> OnStageChangedAsync(int dungeonId, int stageIdx)

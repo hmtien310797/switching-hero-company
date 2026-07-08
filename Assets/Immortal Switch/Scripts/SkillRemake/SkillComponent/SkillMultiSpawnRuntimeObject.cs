@@ -25,6 +25,7 @@ namespace Immortal_Switch.Scripts.Skill
                     : null;
             }
         }
+        protected CancellationTokenSource spawnCancellationTokenSource;
 
         protected override void OnRuntimeInitialized(object arg)
         {
@@ -53,9 +54,16 @@ namespace Immortal_Switch.Scripts.Skill
 
                 return;
             }
-            
+
+            CancelSpawnTask();
+
+            spawnCancellationTokenSource =
+                CancellationTokenSource.CreateLinkedTokenSource(
+                    this.GetCancellationTokenOnDestroy()
+                );
+
             SpawnChildrenAsync(
-                    cancellationTokenSource.Token
+                    spawnCancellationTokenSource.Token
                 )
                 .Forget();
         }
@@ -95,7 +103,6 @@ namespace Immortal_Switch.Scripts.Skill
                         cancellationToken
                     );
 
-                    cancellationToken.ThrowIfCancellationRequested();
                     if (multiSpawnConfig.SpawnInterval > 0f &&
                         i < spawnCount - 1)
                     {
@@ -105,7 +112,6 @@ namespace Immortal_Switch.Scripts.Skill
                             ),
                             cancellationToken: cancellationToken
                         );
-                        cancellationToken.ThrowIfCancellationRequested();
                     }
                 }
 
@@ -120,7 +126,6 @@ namespace Immortal_Switch.Scripts.Skill
                         ),
                         cancellationToken: cancellationToken
                     );
-                    cancellationToken.ThrowIfCancellationRequested();
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();
@@ -173,13 +178,13 @@ namespace Immortal_Switch.Scripts.Skill
             if (childConfig == null)
                 return;
 
-            SkillRuntimeObject child = await Spawner.SpawnRuntimeAsync(
-                childConfig,
-                spawnPosition,
-                rotation
-            );
+            SkillRuntimeObject child =
+                await Spawner.SpawnRuntimeAsync(
+                    childConfig,
+                    spawnPosition,
+                    rotation
+                );
 
-            cancellationToken.ThrowIfCancellationRequested();
             if (child == null)
                 return;
 
@@ -311,6 +316,34 @@ namespace Immortal_Switch.Scripts.Skill
             };
         }
         
+        protected void CancelSpawnTask()
+        {
+            if (spawnCancellationTokenSource == null)
+                return;
+
+            if (!spawnCancellationTokenSource.IsCancellationRequested)
+            {
+                spawnCancellationTokenSource.Cancel();
+            }
+
+            spawnCancellationTokenSource.Dispose();
+            spawnCancellationTokenSource = null;
+        }
+
+        public override void ForceDespawn()
+        {
+            CancelSpawnTask();
+
+            base.ForceDespawn();
+        }
+
+        protected override void OnDespawnedToPool()
+        {
+            CancelSpawnTask();
+
+            base.OnDespawnedToPool();
+        }
+
         private void OnDrawGizmosSelected()
         {
             SkillMultiSpawnConfig multiSpawnConfig =

@@ -23,7 +23,7 @@ namespace Battle
     /// BattleFlowController chỉ điều phối session; controller này quản lý spawn,
     /// controlled hero, hero chết, ultimate presentation và replace lineup.
     /// </summary>
-    public sealed class BattleHeroSessionController : MonoBehaviour
+    public sealed class BattleHeroSessionController : Singleton<BattleHeroSessionController>
     {
         [SerializeField] private HeroTeamController heroTeamController;
         [SerializeField, Min(0)] private int controlledHeroSlotIndex;
@@ -48,10 +48,16 @@ namespace Battle
         public event Action<HeroActor> HeroDied;
         public event Action AllHeroesDead;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             userDataCache = UserDataCache.Instance;
             gameCameraController = GameCameraController.Instance;
+        }
+
+        public override UniTask InitializeAsync()
+        {
+            throw new NotImplementedException();
         }
 
         private void OnEnable()

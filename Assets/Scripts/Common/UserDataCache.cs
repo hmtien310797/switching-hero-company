@@ -24,7 +24,7 @@ namespace Common
         public Dictionary<int, List<int>> EquippedSkillIdsByHero = new();
     }
 
-    public class UserDataCache : Singleton<UserDataCache>
+    public partial class UserDataCache : Singleton<UserDataCache>
     {
         [Header("Init Config")]
         [SerializeField] private UserLevelConfigSO userLevelConfigSO;

@@ -3,6 +3,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Addressable;
+using Immortal_Switch.Scripts.AFKReward.Views;
 using Immortal_Switch.Scripts.Bag.Views;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.UI.Skill;
@@ -103,7 +104,7 @@ namespace Immortal_Switch.Scripts.UI
 
         [SerializeField]
         private Ease heroIconSwitchEase = Ease.OutCubic;
-        
+
         [SerializeField]
         private Button buttonSetting;
 
@@ -114,6 +115,7 @@ namespace Immortal_Switch.Scripts.UI
         public HeroSkillBarUI HeroSkillBarUI => heroSkillBarUI;
         private bool isAutoActived = false;
         private HeroDataSO currentSelectedHeroData;
+        private int heroDeadCount = 0;
 
         private void Awake()
         {
@@ -204,7 +206,20 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnActiveFramingClaimClicked()
         {
-            rewardSyncService?.ClaimRewardAsync().Forget();
+            UIManager.Instance
+                .OpenPopupAsync<AFKRewardView>(new AFKRewardArgs
+                {
+                    OnClaim = OnClickClaim,
+                })
+                .Forget();
+        }
+
+        private void OnClickClaim(bool isClaimX2)
+        {
+            if (rewardSyncService != null)
+            {
+                rewardSyncService.ClaimRewardAsync().Forget();
+            }
         }
 
         private void OnClickAutoSkill()
@@ -239,17 +254,15 @@ namespace Immortal_Switch.Scripts.UI
                     })
                     .Forget();
             });
-            
-            buttonSetting.onClick.AddListener(() =>
-            {
-                UIManager.Instance.TogglePopupAsync<SettingView>();
-            });
+
+            buttonSetting.onClick.AddListener(() => { UIManager.Instance.TogglePopupAsync<SettingView>(); });
 
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
             GameEventManager.Subscribe(GameEvents.OnWaveStart, OnStageStart);
             GameEventManager.Subscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
             GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
+            BattleHeroSessionController.Instance.HeroDied += OnHeroDied;
         }
 
         private void OnDestroy()
@@ -350,13 +363,32 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             if (!result)
+            {
                 return;
+            }
+
+            switchMainSubHeroButton.interactable = true;
+            heroDeadCount = 0;
 
             for (int i = 0; i < enableObjectsWhenPlayDungeon.Length; i++)
             {
                 GameObject currentGameObject = enableObjectsWhenPlayDungeon[i];
                 currentGameObject.SetActive(result);
             }
+        }
+        
+        private void OnHeroDied(HeroActor actor)
+        {
+            heroDeadCount++;
+            if (heroDeadCount > 1)
+            {
+                return;
+            }
+            if (actor.IsChosen)
+            {
+                OnSwitchMainSubHeroButtonClicked();
+            }
+            switchMainSubHeroButton.interactable = false;
         }
 
         private void SwitchHeroIconVisual()
@@ -569,6 +601,9 @@ namespace Immortal_Switch.Scripts.UI
             {
                 hideAbleObjects[i].SetActive(true);
             }
+
+            switchMainSubHeroButton.interactable = true;
+            heroDeadCount = 0;
         }
     }
 }

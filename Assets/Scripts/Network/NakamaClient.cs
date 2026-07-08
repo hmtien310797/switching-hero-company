@@ -637,6 +637,26 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<IapPurchaseResponse>(response.Payload);
     }
 
+    // ── Recharge Milestone ────────────────────────────────────────────────────
+
+    /// <summary>Điểm tích nạp tháng hiện tại + trạng thái claimed từng mốc — nguồn sự thật, gọi
+    /// khi login và mỗi lần mở màn Shop/GloryPass (xem ShopManager.SyncRechargeStateAsync).</summary>
+    public async Task<RechargeStateResponse> RechargeStateAsync()
+    {
+        var response = await CallRpcAsync("recharge/state", "{}");
+        return JsonConvert.DeserializeObject<RechargeStateResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng 1 mốc tích nạp (game_recharge_milestone) — server tự kiểm tra số lượt
+    /// tích nạp trong tháng hiện tại (cộng +1 mỗi lần iap/purchase hoặc iap/pack_purchase thành
+    /// công) trước khi cộng thưởng; throw nếu chưa đủ điểm hoặc mốc đã nhận trong tháng này.</summary>
+    public async Task<RechargeClaimResponse> RechargeClaimAsync(int milestoneId)
+    {
+        var payload  = JsonConvert.SerializeObject(new RechargeClaimRequest { MilestoneId = milestoneId });
+        var response = await CallRpcAsync("recharge/claim", payload);
+        return JsonConvert.DeserializeObject<RechargeClaimResponse>(response.Payload);
+    }
+
     // ── Battle ────────────────────────────────────────────────────────────────
 
     /// <summary>Progression thật từ server (current_stage/current_chapter/highest_stage_cleared). Gọi sau login trước khi vào màn chọn stage.</summary>
@@ -652,6 +672,14 @@ public class NakamaClient : MonoBehaviour
         var payload  = JsonConvert.SerializeObject(request);
         var response = await CallRpcAsync("battle/end", payload);
         return JsonConvert.DeserializeObject<BattleEndResponse>(response.Payload);
+    }
+
+    /// <summary>Báo "đã giết hết creep của CurrentStage" — gọi ngay trước khi boss xuất hiện, để server nhớ giúp resume thẳng vào boss nếu app đóng/crash trước khi đánh xong.</summary>
+    public async Task<BattleCheckpointResponse> BattleCheckpointAsync(BattleCheckpointRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await CallRpcAsync("battle/checkpoint", payload);
+        return JsonConvert.DeserializeObject<BattleCheckpointResponse>(response.Payload);
     }
 
     // ── Dungeon ───────────────────────────────────────────────────────────────

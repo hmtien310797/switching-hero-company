@@ -1,4 +1,3 @@
-using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Shop.Views;
 using Immortal_Switch.Scripts.UI;

@@ -9,6 +9,7 @@ using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using Immortal_Switch.Scripts.PlayerSystem;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -17,7 +18,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
 {
     public class MissionSystemManager : Singleton<MissionSystemManager>
     {
-        [Header("Config")] [SerializeField] private MissionSystemDatabaseSO database;
+        [Header("Config")]
+        [SerializeField]
+        private MissionSystemDatabaseSO database;
 
         private IMissionSystemService Service { get; set; }
         private IMissionSystemStorage Storage { get; set; }
@@ -176,14 +179,14 @@ namespace Immortal_Switch.Scripts.MissionSystem
             NotifyIfAllMissionDailyCompleted();
         }
 
-        public List<RewardEntry> MissionClaim(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
+        public List<ItemRewardData> MissionClaim(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
         {
             var isCompleted = IsCompleted(cfg);
 
             if (!isCompleted)
             {
-                Debug.LogError("MissionSystem Claim Failed");
-                return new List<RewardEntry>();
+                Debug.LogError("Mission claim failed");
+                return new List<ItemRewardData>();
             }
 
             // xử lý logic cho các type mission
@@ -243,14 +246,14 @@ namespace Immortal_Switch.Scripts.MissionSystem
                 }
             }
 
-            var rewards = RewardHelper.ParseRewards(cfg.rewards);
+            var rewards = DatabaseManager.Instance.GetRewards(cfg.rewards);
             ClaimMissionOnServerAsync(cfg, rewards).Forget();
             return rewards;
         }
 
         public void ClaimAll(string missionType)
         {
-            var rewards = new List<RewardEntry>();
+            var rewards = new List<ItemRewardData>();
 
             switch (missionType)
             {
@@ -291,9 +294,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
             NotifyIfAllMissionDailyCompleted();
         }
 
-        public List<RewardEntry> RewardGroupClaim(DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row, bool isAdsX2)
+        public List<ItemRewardData> RewardGroupClaim(DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row, bool useAds)
         {
-            var rewards = Service.RewardGroupClaim(row, isAdsX2);
+            var rewards = Service.RewardGroupClaim(row, useAds);
 
             if (rewards.Count > 0)
             {
@@ -308,7 +311,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                         break;
                 }
 
-                ClaimMissionGroupOnServerAsync(row, isAdsX2).Forget();
+                ClaimMissionGroupOnServerAsync(row, useAds).Forget();
             }
 
             return rewards;
@@ -368,16 +371,22 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         private async UniTask SyncFromServerAsync()
         {
-            if (!IsClientReady()) return;
+            if (!IsClientReady())
+                return;
+
             try
             {
                 // Always send current local state so server can store it on first login (1 round-trip).
                 string localJson = JsonConvert.SerializeObject(Storage.Data);
                 MissionStateResponse response = await NakamaClient.Instance.GetMissionStateAsync(localJson);
 
-                if (response?.Success != true || !response.HasState || response.State == null) return;
+                if (response?.Success != true ||
+                    !response.HasState ||
+                    response.State == null)
+                    return;
 
                 MissionSystemData serverData = response.State.ToObject<MissionSystemData>();
+
                 if (serverData?.Main != null)
                     Storage.LoadFromData(serverData);
             }
@@ -389,7 +398,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         private async UniTaskVoid SyncToServerAsync()
         {
-            if (!IsClientReady()) return;
+            if (!IsClientReady())
+                return;
+
             try
             {
                 await NakamaClient.Instance.SyncMissionStateAsync(JsonConvert.SerializeObject(Storage.Data));
@@ -402,21 +413,24 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         private async UniTaskVoid ClaimMissionOnServerAsync(
             DynamicHeroesGlobalSpecificationsMissionConfigRow cfg,
-            List<RewardEntry> rewards)
+            List<ItemRewardData> rewards)
         {
-            if (!IsClientReady()) return;
+            if (!IsClientReady())
+                return;
+
             try
             {
                 MissionClaimResponse response = await NakamaClient.Instance.ClaimMissionAsync(
                     new MissionClaimRequest
                     {
-                        MissionId   = cfg.missionId,
+                        MissionId = cfg.missionId,
                         MissionType = cfg.type,
-                        Points      = cfg.points,
-                        Rewards     = ToRewardDtos(rewards)
+                        Points = cfg.points,
+                        Rewards = ToRewardDtos(rewards)
                     });
 
-                if (response?.Success == true && response.Balances != null)
+                if (response?.Success == true &&
+                    response.Balances != null)
                     CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
             }
             catch (Exception e)
@@ -429,21 +443,25 @@ namespace Immortal_Switch.Scripts.MissionSystem
             DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row,
             bool isAdsX2)
         {
-            if (!IsClientReady()) return;
+            if (!IsClientReady())
+                return;
+
             try
             {
                 // Always send base (undoubled) rewards; server doubles internally for x2.
-                List<RewardEntry> baseRewards = RewardHelper.ParseRewards(row.rewards);
+                var baseRewards = DatabaseManager.Instance.GetRewards(row.rewards);
+
                 MissionClaimResponse response = await NakamaClient.Instance.ClaimMissionGroupAsync(
                     new MissionClaimGroupRequest
                     {
-                        Scope          = row.scope,
+                        Scope = row.scope,
                         PointThreshold = row.pointThreshold,
-                        Rewards        = ToRewardDtos(baseRewards),
-                        IsAdsX2        = isAdsX2
+                        Rewards = ToRewardDtos(baseRewards),
+                        IsAdsX2 = isAdsX2
                     });
 
-                if (response?.Success == true && response.Balances != null)
+                if (response?.Success == true &&
+                    response.Balances != null)
                     CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
             }
             catch (Exception e)
@@ -452,16 +470,19 @@ namespace Immortal_Switch.Scripts.MissionSystem
             }
         }
 
-        private static List<MissionRewardDto> ToRewardDtos(List<RewardEntry> entries)
+        private static List<MissionRewardDto> ToRewardDtos(List<ItemRewardData> entries)
         {
             var list = new List<MissionRewardDto>();
-            if (entries == null) return list;
-            foreach (RewardEntry e in entries)
-                list.Add(new MissionRewardDto { ItemKey = e.itemKey, Quantity = (long)e.quantity });
+
+            if (entries == null)
+                return list;
+
+            foreach (var e in entries)
+                list.Add(new MissionRewardDto { ItemKey = e.ItemKey, Quantity = e.Quantity.FloorToIntSafe(), });
+
             return list;
         }
 
-        private static bool IsClientReady()
-            => NakamaClient.Instance != null && NakamaClient.Instance.IsLoggedIn;
+        private static bool IsClientReady() => NakamaClient.Instance != null && NakamaClient.Instance.IsLoggedIn;
     }
 }

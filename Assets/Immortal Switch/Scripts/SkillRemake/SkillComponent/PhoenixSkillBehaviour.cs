@@ -53,7 +53,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
 
             if (child == null)
                 return;
-            
+
             if (cancellationToken.IsCancellationRequested)
             {
                 child.ForceDespawn();
@@ -84,7 +84,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
             );
 
             await UniTask.Delay(
-                TimeSpan.FromSeconds(1.7f), cancellationToken: cancellationToken
+                TimeSpan.FromSeconds(1.7f)
             );
 
             /*
@@ -165,7 +165,6 @@ namespace Immortal_Switch.Scripts.SkillRemake
                             ),
                             cancellationToken: cancellationToken
                         );
-                        cancellationToken.ThrowIfCancellationRequested();
                     }
                 }
 
@@ -180,7 +179,6 @@ namespace Immortal_Switch.Scripts.SkillRemake
                         ),
                         cancellationToken: cancellationToken
                     );
-                    cancellationToken.ThrowIfCancellationRequested();
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();

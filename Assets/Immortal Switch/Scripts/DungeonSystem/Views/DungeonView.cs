@@ -5,6 +5,7 @@ using Immortal_Switch.Scripts.DungeonSystem.Models;
 using Immortal_Switch.Scripts.DungeonSystem.Views.UI;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -47,10 +48,11 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         private RectTransform rewardContainer;
 
         [SerializeField]
-        private UIDungeonReward rewardPrefab;
+        private UIReward rewardPrefab;
 
+        [SerializeField] private TextMeshProUGUI txtTicketDungeonPlayer;
         // --- Private Fields ---
-        private List<UIDungeonReward> _rewards = new();
+        private List<UIReward> _rewards = new();
 
         /// <summary>
         /// thong tin khi stage changed, type dungeon và hướng đi.
@@ -122,7 +124,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             }
         }
 
-        public void Bind(int dungeonId, int ticket, string title, int currentStageIdx, int maxStageIdx, Action<int, int> onStart,
+        public void Bind(int dungeonId, int ticketOwned, int ticketRequired, string title, int currentStageIdx, int maxStageIdx, Action<int, int> onStart,
             Func<int, int, IReadOnlyList<ItemRewardData>> onStageChanged)
         {
             _dungeonId = dungeonId;
@@ -132,7 +134,8 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             _onStageChanged = onStageChanged;
 
             txtTitle.SetText(title);
-            txtTicket.SetText($"{ticket}");
+            txtTicket.SetText($"{ticketRequired}");
+            txtTicketDungeonPlayer.SetText($"{ticketOwned}");
             txtHighestStage.SetText($"Cửa ải {_currentStageIdx + 1}");
 
             OnStageChange(0);

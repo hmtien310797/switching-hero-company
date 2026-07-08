@@ -35,6 +35,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         private Vector2 _orgShopTabHighlightAnchoredPos;
 
         private Action<string, int> _onBuyProduct;
+        private Action<int, EShopTab> _onClaim;
         private Action<EShopTab> _onChangeTab;
 
         private void DisableLayouts()
@@ -62,8 +63,10 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             RefreshTab();
         }
 
-        public void Bind(EShopTab defaultTab, Action<string, int> onBuyProduct, Action<EShopTab> onChangeTab)
+        public void Bind(EShopTab defaultTab, Action<string, int> onBuyProduct, Action<EShopTab> onChangeTab,
+            Action<int, EShopTab> onClaim)
         {
+            _onClaim = onClaim;
             _onBuyProduct = onBuyProduct;
             _onChangeTab = onChangeTab;
 
@@ -190,7 +193,11 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                     break;
 
                 case EShopTab.GloryPass:
+                {
+                    var packs = DatabaseManager.Instance.GetShopPacksGloryPass();
+                    _selectedLayout.GetComponent<UIShopGloryPassLayout>().Bind(packs, _onChangeTab, _onClaim);
                     break;
+                }
 
                 case EShopTab.Special:
                 {

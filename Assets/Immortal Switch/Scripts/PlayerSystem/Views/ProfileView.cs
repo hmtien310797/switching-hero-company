@@ -1,5 +1,7 @@
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Modules;
 using Immortal_Switch.Scripts.PlayerSystem.Views.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -13,6 +15,9 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Views
         [Header("References")]
         [SerializeField]
         private TMP_Text txtName;
+
+        [SerializeField]
+        private TMP_Text txtPower;
 
         [SerializeField]
         private Button btnRename;
@@ -69,7 +74,9 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Views
 
         public void RefreshVisual()
         {
+            var playerCp = ModuleManager.Instance.PowerService.CalculatePlayerCp();
             txtName.text = UserDataCache.Instance.DisplayName;
+            txtPower.text = BigNumber.FromDouble(playerCp).ToInputString();
         }
     }
 }

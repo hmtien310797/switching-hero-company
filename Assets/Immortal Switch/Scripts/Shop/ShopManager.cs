@@ -12,7 +12,11 @@ namespace Immortal_Switch.Scripts.Shop
         public IShopService Service { get; private set; }
         public IShopStorage Storage { get; private set; }
 
-        /// <summary>Fire khi purchase count thay đổi (mua mới hoặc reset).</summary>
+        /// <summary>Kết quả recharge/state gần nhất — nguồn sự thật cho số lượt tích nạp/milestone
+        /// đã nhận, không lưu local (xem <see cref="SyncRechargeStateAsync"/>).</summary>
+        public RechargeStateResponse RechargeState { get; private set; }
+
+        /// <summary>Fire khi purchase count hoặc recharge state thay đổi (mua mới, reset, hoặc sync lại từ server).</summary>
         public event Action OnDataChanged;
 
         protected override void OnSingletonAwake()
@@ -20,11 +24,11 @@ namespace Immortal_Switch.Scripts.Shop
             Load();
         }
 
-        public override UniTask InitializeAsync()
+        public override async UniTask InitializeAsync()
         {
             Service.CheckAndReset();
             SubscribeEvents();
-            return UniTask.CompletedTask;
+            await SyncRechargeStateAsync();
         }
 
         protected override void OnDestroy()
@@ -49,6 +53,46 @@ namespace Immortal_Switch.Scripts.Shop
         public int GetPurchasedCount(int packId)
         {
             return Service.GetPurchasedCount(packId);
+        }
+
+        // ── Topup / GloryPass (recharge/state — server là nguồn sự thật) ──────
+
+        /// <summary>Tổng số lượt nạp trong tháng hiện tại, lấy từ recharge/state — không đếm local
+        /// nữa vì server đã cộng điểm ngay khi iap/purchase hoặc iap/pack_purchase thành công.</summary>
+        public int GetTopupCount()
+        {
+            return RechargeState?.Points ?? 0;
+        }
+
+        /// <summary>Kiểm tra milestone đã nhận thưởng trong tháng hiện tại chưa (theo recharge/state).</summary>
+        public bool IsGloryPassClaimed(int milestoneId)
+        {
+            return RechargeState?.Milestones?.Find(m => m.Id == milestoneId)?.IsClaimed ?? false;
+        }
+
+        /// <summary>Gọi recharge/state và cache lại — dùng khi login (InitializeAsync) và mỗi lần mở
+        /// màn Shop/GloryPass, để điểm/trạng thái claimed luôn khớp server thay vì đếm local.</summary>
+        public async UniTask<bool> SyncRechargeStateAsync()
+        {
+            try
+            {
+                RechargeState = await NakamaClient.Instance.RechargeStateAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[ShopManager] recharge/state RPC failed: {e.Message}");
+                return false;
+            }
+
+            OnDataChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>Reset danh sách GloryPass đã nhận đầu tháng.</summary>
+        public void ResetGloryPassClaims()
+        {
+            Service.ResetGloryPassClaims();
+            OnDataChanged?.Invoke();
         }
 
         // ── Internal ──────────────────────────────────────────────────────────

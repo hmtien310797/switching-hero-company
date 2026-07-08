@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Shop.Interfaces;
@@ -106,6 +105,42 @@ namespace Immortal_Switch.Scripts.Shop
             var now = DateTime.UtcNow;
             var firstOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
             return date.Date < firstOfMonth;
+        }
+
+        // ── Topup / GloryPass ────────────────────────────────────────────────
+
+        public int GetTopupCount()
+        {
+            return _storage.Data.TotalTopupCount;
+        }
+
+        public void RecordTopup()
+        {
+            _storage.Data.TotalTopupCount++;
+            _storage.Save();
+        }
+
+        public bool IsGloryPassClaimed(int milestoneId)
+        {
+            return _storage.Data.ClaimedGloryPassIds.Contains(milestoneId);
+        }
+
+        public void ClaimGloryPass(int milestoneId)
+        {
+            if (!IsGloryPassClaimed(milestoneId))
+            {
+                _storage.Data.ClaimedGloryPassIds.Add(milestoneId);
+                _storage.Save();
+            }
+        }
+
+        public void ResetGloryPassClaims()
+        {
+            if (_storage.Data.ClaimedGloryPassIds.Count > 0)
+            {
+                _storage.Data.ClaimedGloryPassIds.Clear();
+                _storage.Save();
+            }
         }
     }
 }

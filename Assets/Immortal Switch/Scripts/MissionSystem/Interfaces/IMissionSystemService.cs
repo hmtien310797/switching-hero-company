@@ -47,6 +47,6 @@ namespace Immortal_Switch.Scripts.MissionSystem.Interfaces
         /// </summary>
         /// <param name="row">cfg</param>
         /// <param name="isAdsX2">xem ads x2</param>
-        List<RewardEntry> RewardGroupClaim(DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row, bool isAdsX2);
+        List<ItemRewardData> RewardGroupClaim(DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row, bool isAdsX2);
     }
 }

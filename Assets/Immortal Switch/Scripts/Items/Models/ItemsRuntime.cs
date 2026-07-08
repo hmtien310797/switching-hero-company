@@ -15,16 +15,22 @@ namespace Immortal_Switch.Scripts.Items.Models
         public List<ItemData> Items = new();
     }
 
-    public class ItemDisplayData
+    public interface IItemDisplayData
     {
-        public Sprite ItemIcon;
-        public ItemTierEntry TierInfo;
+        public Sprite ItemIcon { get; set; }
+        public ItemTierEntry TierInfo { get; set; }
     }
 
-    public class ItemRewardData : ItemDisplayData
+    public class ItemRewardData : ItemData, IItemDisplayData
     {
-        public string ItemKey;
-        public BigNumber Quantity;
+        public Sprite ItemIcon { get; set; }
+        public ItemTierEntry TierInfo { get; set; }
+    }
+
+    public class ItemDisplayData : IItemDisplayData
+    {
+        public Sprite ItemIcon { get; set; }
+        public ItemTierEntry TierInfo { get; set; }
     }
 
     public class ItemData

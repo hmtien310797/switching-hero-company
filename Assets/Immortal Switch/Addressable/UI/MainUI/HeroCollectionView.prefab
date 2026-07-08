@@ -34,10 +34,10 @@ RectTransform:
   - {fileID: 430630700906195456}
   m_Father: {fileID: 4957097538068612042}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -35.4273}
-  m_SizeDelta: {x: 384.30386, y: 70.8546}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &3999614446585406934
 CanvasRenderer:
@@ -320,10 +320,10 @@ RectTransform:
   - {fileID: 5471373478999659393}
   m_Father: {fileID: 4957097538068612042}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 394.30386, y: -35.4273}
-  m_SizeDelta: {x: 384.30386, y: 70.8546}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &4639642106932374202
 CanvasRenderer:
@@ -461,7 +461,7 @@ MonoBehaviour:
   MainMode: 0
   CloseOnBackdrop: 0
   CacheOnClose: 1
-  animatedRoot: {fileID: 4851407237975440276}
+  animatedRoot: {fileID: 0}
   showDuration: 0.25
   hideDuration: 0.2
   showFromOffset: {x: 0, y: 900}
@@ -522,11 +522,11 @@ MonoBehaviour:
   fitMode: 2
   useSafeArea: 1
   minScale: 0.35
-  maxScale: 1
-  anchoredY: 210
-  changePosY: 0
-  yPosPortrait: 210
-  yPosLandscape: 1
+  maxScale: 5
+  anchoredY: 200
+  changePosY: 1
+  yPosPortrait: 200
+  yPosLandscape: 150
   useScaleReduction: 0
   scaleReductionPercent: 0
 --- !u!1 &2743356159390905360
@@ -681,7 +681,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4851407237975440276
 RectTransform:
   m_ObjectHideFlags: 0
@@ -701,7 +701,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 210}
+  m_AnchoredPosition: {x: 0, y: 200}
   m_SizeDelta: {x: 861.3228, y: 1601.8809}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &5613709524474291966
@@ -1056,7 +1056,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 17}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6341282415443840425
 MonoBehaviour:

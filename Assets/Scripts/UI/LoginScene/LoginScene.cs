@@ -61,7 +61,17 @@ public class LoginScene : MonoBehaviour
         registerPanel.SetActive(false);
         Debug.Log($"[LoginScene] btnGoogleLogin={btnGoogleLogin}, btnAppleLogin={btnAppleLogin}");
     }
-    
+
+    private void OnEnable()
+    {
+        loadingSceneCanvasGroup.alpha = 1f;
+        loadingSceneCanvasGroup.blocksRaycasts = true;
+        loadingSceneCanvasGroup.interactable = true;
+        loginPanel.SetActive(false);
+        registerPanel.SetActive(false);
+        buttonLayout.SetActive(true);
+    }
+
     private void OnInitSceneDataComplete()
     {
         buttonLayout.SetActive(false);
@@ -73,9 +83,18 @@ public class LoginScene : MonoBehaviour
     private void OnUserLogOut()
     {
         buttonLayout.SetActive(true);
+        btnLoginBD.gameObject.SetActive(true);
+        btnAppleLogin.gameObject.SetActive(true);
+        btnGoogleLogin.gameObject.SetActive(true);
+        btnLoginGuest.gameObject.SetActive(true);
+        // Gỡ overlay loading để lộ nút login — trước đây set lại alpha=1/blocksRaycasts=true
+        // ở đây khiến overlay che vĩnh viễn buttonLayout vì OnInitSceneDataComplete (nơi gỡ
+        // overlay) chỉ được bắn từ PvEBattleController trong MainBattleScene, không bao giờ
+        // chạy lại khi đã quay về LoginScene.
         loadingSceneCanvasGroup.alpha = 1f;
         loadingSceneCanvasGroup.blocksRaycasts = true;
         loadingSceneCanvasGroup.interactable = true;
+        
     }
 
     private void OnScreenOrientationChanged(ScreenOrientationTracker.ScreenViewMode obj)
@@ -140,14 +159,18 @@ public class LoginScene : MonoBehaviour
 
     private void OnClickLogin()
     {
-        var hasBadwordUsername = IllegalWordDetection.Check(ipUsername.text);
+        var badwordMatches = IllegalWordDetection.DetectIllegalWords(ipUsername.text);
 
-        if (hasBadwordUsername)
+        if (badwordMatches.Count > 0)
         {
-            Debug.LogError("Username chứa ký tự đặc biệt");
+            foreach (var match in badwordMatches)
+            {
+                var matchedWord = ipUsername.text.Substring(match.Key, match.Value);
+                Debug.LogError($"[LoginScene] Username \"{ipUsername.text}\" bị chặn do khớp badword \"{matchedWord}\" tại vị trí {match.Key} (dài {match.Value})");
+            }
             return;
         }
-        
+
         DoLogin(ipUsername.text, ipPassword.text).Forget();
     }
 
@@ -179,6 +202,18 @@ public class LoginScene : MonoBehaviour
 
     private void OnClickSubmitRegister()
     {
+        var badwordMatches = IllegalWordDetection.DetectIllegalWords(ipUsernameRegister.text);
+
+        if (badwordMatches.Count > 0)
+        {
+            foreach (var match in badwordMatches)
+            {
+                var matchedWord = ipUsernameRegister.text.Substring(match.Key, match.Value);
+                Debug.LogError($"[LoginScene] Username đăng ký \"{ipUsernameRegister.text}\" bị chặn do khớp badword \"{matchedWord}\" tại vị trí {match.Key} (dài {match.Value})");
+            }
+            return;
+        }
+
         DoRegister(ipUsernameRegister.text, ipPasswordRegister.text, ipPasswordConfirmRegister.text).Forget();
     }
 

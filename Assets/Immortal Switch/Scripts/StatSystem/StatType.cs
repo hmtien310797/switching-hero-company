@@ -22,6 +22,9 @@ namespace Immortal_Switch.Scripts.StatSystem
         FlatAtkBonus,
         AtkPercentBonus,
         FinalDmgBonus = 17,
+        DmgBonus = 18,
+        BasicDmgBonus = 19,
+        SkillDmgBonus = 20,
     }
 
     public enum ModifierOp
@@ -38,19 +41,19 @@ namespace Immortal_Switch.Scripts.StatSystem
 
     public enum BuffStackRule
     {
-        None,       
-        Refresh,   
-        Stack,     
-        Replace     
+        None,
+        Refresh,
+        Stack,
+        Replace
     }
-    
+
     [Flags]
     public enum StatusEffectType
     {
-        None    = 0,
-        Stun    = 1 << 0,
+        None = 0,
+        Stun = 1 << 0,
         Silence = 1 << 1,
-        Freeze  = 1 << 2
+        Freeze = 1 << 2
     }
 
     public enum PeriodicEffectType
@@ -66,10 +69,9 @@ namespace Immortal_Switch.Scripts.StatSystem
         Poison,
         Burn,
         True,
-        Crit, 
+        Crit,
         Skill,
         Heal,
         Miss,
-        
     }
 }

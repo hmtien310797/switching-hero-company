@@ -206,7 +206,7 @@ namespace Immortal_Switch.Scripts.Pooling
             }
             catch (Exception exception)
             {
-                Debug.Log("Need More Pool");
+                Debug.LogError(exception);
                 return null;
             }
             

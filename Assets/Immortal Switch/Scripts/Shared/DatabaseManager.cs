@@ -48,6 +48,9 @@ namespace Immortal_Switch.Scripts.Shared
         private DynamicHeroesGlobalSpecificationsPackIapDatabase packSpecialDb;
 
         [SerializeField]
+        private DynamicHeroesGlobalSpecificationsGameRechargeMilestoneDatabase packGloryPassDb;
+
+        [SerializeField]
         private DynamicHeroesGlobalSpecificationsProductIdDatabase productDb;
 
         // Server-sourced reward preview cache — dungeon_key -> stage -> rewards. Populated by
@@ -64,11 +67,11 @@ namespace Immortal_Switch.Scripts.Shared
 
         public override async UniTask InitializeAsync()
         {
-
             InitHeroData();
             InitBossData();
             InitSkillData();
             InitCreepData();
+
             //dungeonRewardResolver = new DungeonRewardResolver(dungeonDb);
             await ItemDb.InitializeAsync();
         }
@@ -111,12 +114,12 @@ namespace Immortal_Switch.Scripts.Shared
         /// <summary>
         /// parse string rewards ra array
         /// </summary>
-        public List<ItemRewardData> GetRewards(string rewards)
+        public List<ItemRewardData> GetRewards(string strReward)
         {
             var entries = new List<(string itemKey, BigNumber quantity)>();
-            var splitRewards = rewards.Split(';');
+            var rewards = strReward.Split(';');
 
-            foreach (var reward in splitRewards)
+            foreach (var reward in rewards)
             {
                 var splits = reward.Split(':');
 
@@ -147,13 +150,18 @@ namespace Immortal_Switch.Scripts.Shared
                 var set = items[i];
                 var entry = entries[i];
 
-                results.Add(new ItemRewardData
+                if (set != null &&
+                    set.TierInfo != null &&
+                    set.ItemIcon != null)
                 {
-                    ItemIcon = set?.ItemIcon,
-                    TierInfo = set?.TierInfo,
-                    Quantity = entry.quantity,
-                    ItemKey = entry.itemKey,
-                });
+                    results.Add(new ItemRewardData
+                    {
+                        ItemIcon = set.ItemIcon,
+                        TierInfo = set.TierInfo,
+                        Quantity = entry.quantity,
+                        ItemKey = entry.itemKey,
+                    });
+                }
             }
 
             return results;
@@ -181,6 +189,7 @@ namespace Immortal_Switch.Scripts.Shared
         public IReadOnlyList<ItemRewardData> GetDungeonRewards(int dungeonId, int stageIdx)
         {
             var dungeonKey = GetDungeonKey(dungeonId);
+
             if (dungeonKey != null &&
                 dungeonStageRewardCache.TryGetValue(dungeonKey, out var stageMap) &&
                 stageMap.TryGetValue(Mathf.Max(1, stageIdx), out var rewards))
@@ -200,20 +209,25 @@ namespace Immortal_Switch.Scripts.Shared
         public async UniTask EnsureDungeonStageTableAsync(int dungeonId)
         {
             var dungeonKey = GetDungeonKey(dungeonId);
-            if (dungeonKey == null || dungeonStageRewardCache.ContainsKey(dungeonKey))
+
+            if (dungeonKey == null ||
+                dungeonStageRewardCache.ContainsKey(dungeonKey))
                 return;
 
             var response = await NakamaClient.Instance.GetDungeonStageTableAsync(dungeonKey);
-            if (!response.Success || response.Stages == null)
+
+            if (!response.Success ||
+                response.Stages == null)
             {
                 Debug.LogWarning($"[DatabaseManager] dungeon/stage_table failed for {dungeonKey}: {response.Error}");
                 return;
             }
 
             var stageMap = new Dictionary<int, IReadOnlyList<ItemRewardData>>();
+
             for (int i = 0; i < response.Stages.Count; i++)
             {
-                var entry   = response.Stages[i];
+                var entry = response.Stages[i];
                 var rewards = new List<ItemRewardData>();
 
                 if (entry.Rewards != null)
@@ -267,7 +281,7 @@ namespace Immortal_Switch.Scripts.Shared
         /// <summary>
         /// dungeon key: treasure, relic, awakening, weapon
         /// </summary>
-        public IReadOnlyList<ItemDisplayData> GetDungeonRewards(int dungeonKey)
+        public IReadOnlyList<IItemDisplayData> GetDungeonRewards(int dungeonKey)
         {
             var rewardData = GetDungeonRewards(dungeonKey, 0);
 
@@ -453,6 +467,46 @@ namespace Immortal_Switch.Scripts.Shared
             }
 
             return list;
+        }
+
+        public List<DynamicHeroesGlobalSpecificationsGameRechargeMilestoneRow> GetShopPacksGloryPass()
+        {
+            return packGloryPassDb.rows;
+        }
+
+        public IReadOnlyList<ItemRewardData> GetShopGloryPassRewards(int shopPackId)
+        {
+            var result = new List<ItemRewardData>();
+            var packs = GetShopPacksGloryPass();
+            var pack = packs.FirstOrDefault(v => v.iD == shopPackId);
+
+            if (pack != null)
+            {
+                var rewards = new List<(int itemId, int quantity)>
+                {
+                    (pack.itemId1, pack.quantity1),
+                    (pack.itemId2, pack.quantity2),
+                    (pack.itemId3, pack.quantity3),
+                };
+
+                foreach (var tuple in rewards)
+                {
+                    var itemDisplay = GetDisplayData(tuple.itemId);
+
+                    if (itemDisplay != null)
+                    {
+                        result.Add(new ItemRewardData
+                        {
+                            ItemIcon = itemDisplay.ItemIcon,
+                            TierInfo = itemDisplay.TierInfo,
+                            Quantity = tuple.quantity,
+                            ItemKey = $"{tuple.itemId}",
+                        });
+                    }
+                }
+            }
+
+            return result;
         }
 
 #endregion

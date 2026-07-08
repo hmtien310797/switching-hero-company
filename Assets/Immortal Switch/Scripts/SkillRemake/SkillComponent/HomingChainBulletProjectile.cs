@@ -29,6 +29,8 @@ public class HomingChainBulletProjectile : MonoBehaviour,
     private AddressableProjectilePoolable addressablePoolable;
     private CancellationTokenRegistration _endStageCancelRegistration;
     private Transform pendingTarget;
+    private bool isDespawning;
+    private bool hasEndStageCancelRegistration;
     
     private void Awake()
     {
@@ -43,11 +45,18 @@ public class HomingChainBulletProjectile : MonoBehaviour,
                 this
             );
         }
-        
-        
     }
     
+    private void DisposeEndStageCancelRegistration()
+    {
+        if (!hasEndStageCancelRegistration)
+            return;
 
+        _endStageCancelRegistration.Dispose();
+        _endStageCancelRegistration = default;
+        hasEndStageCancelRegistration = false;
+    }
+    
     public void Setup(
         ICombatUnit owner,
         Vector3 spawnPosition,
@@ -80,13 +89,30 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
         StartFirstTarget();
 
-        if (BattleFlowController.Instance.endStageSessionCancellationTokenSource != null)
+        DisposeEndStageCancelRegistration();
+
+        if (BattleFlowController.Instance != null &&
+            BattleFlowController.Instance.endStageSessionCancellationTokenSource != null)
         {
-            _endStageCancelRegistration =
-                BattleFlowController.Instance
-                    .endStageSessionCancellationTokenSource
-                    .Token
-                    .Register(DespawnSelf);
+            var token = BattleFlowController.Instance
+                .endStageSessionCancellationTokenSource
+                .Token;
+
+            if (token.CanBeCanceled)
+            {
+                _endStageCancelRegistration =
+                    token.Register(static state =>
+                    {
+                        var self = state as HomingChainBulletProjectile;
+
+                        if (self == null)
+                            return;
+
+                        self.DespawnSelf();
+                    }, this);
+
+                hasEndStageCancelRegistration = true;
+            }
         }
     }
 
@@ -94,7 +120,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
     {
         currentTarget = iHeroBattleContext.GetRandomEnemyAlive();
 
-        if (currentTarget == null)
+        if (!currentTarget.IsUnityAlive())
         {
             DespawnSelf();
             return;
@@ -140,8 +166,8 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
         currentTarget = iHeroBattleContext.GetRandomFromFarthestEnemies(transform.position,
             visitedTargets);
-
-        if (currentTarget == null)
+        
+        if (!currentTarget.IsUnityAlive())
         {
             DespawnSelf();
             return;
@@ -168,7 +194,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
     private void StartMoveToVirtualPoint()
     {
-        if (currentTarget == null)
+        if (!currentTarget.IsUnityAlive())
         {
             DespawnSelf();
             return;
@@ -291,7 +317,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
     private void StartMoveToCurrentTarget()
     {
-        if (currentTarget == null)
+        if (!currentTarget.IsUnityAlive())
         {
             DespawnSelf();
             return;
@@ -331,6 +357,15 @@ public class HomingChainBulletProjectile : MonoBehaviour,
     
     private void DespawnSelf()
     {
+        if (isDespawning)
+            return;
+
+        if (this == null)
+            return;
+
+        isDespawning = true;
+
+        DisposeEndStageCancelRegistration();
         KillMoveTween();
 
         if (addressablePoolable == null)
@@ -351,8 +386,6 @@ public class HomingChainBulletProjectile : MonoBehaviour,
             gameObject.SetActive(false);
             return;
         }
-
-        _endStageCancelRegistration.Dispose();
 
         addressablePoolable.Despawn();
     }
@@ -446,7 +479,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
     private void OnReachCurrentTarget()
     {
-        if (currentTarget == null)
+        if (!currentTarget.IsUnityAlive())
             return;
 
         if (!visitedTargets.Contains(currentTarget))
@@ -491,6 +524,10 @@ public class HomingChainBulletProjectile : MonoBehaviour,
     {
         if (!other.TryGetComponent(out ICombatUnit combatUnit))
             return;
+
+        if (!combatUnit.IsUnityAlive())
+            return;
+        
         HitEffectManager.Instance.Play(combatUnit);
         DamageResult damageResult = DamageCalculator.CalculateDamage(caster, combatUnit, config.damage);
         combatUnit.TakeDamage(damageResult);
@@ -549,24 +586,36 @@ public class HomingChainBulletProjectile : MonoBehaviour,
         transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
     }
 
-    private void KillMoveTween()
+    private void KillMoveTween(bool cachePreviousPosition = true)
     {
-        if (moveTween != null && moveTween.IsActive())
+        if (moveTween != null)
         {
-            moveTween.Kill();
+            if (moveTween.IsActive())
+            {
+                moveTween.Kill();
+            }
+
             moveTween = null;
         }
 
-        previousPosition = transform.position;
+        if (cachePreviousPosition && this != null)
+        {
+            previousPosition = transform.position;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        DisposeEndStageCancelRegistration();
+        KillMoveTween(false);
     }
     
     public void OnProjectileSpawnedFromPool()
     {
-        // Không gọi Setup ở đây.
-        // Caster và config được truyền sau khi Spawn() hoàn tất.
-
+        DisposeEndStageCancelRegistration();
         KillMoveTween();
 
+        isDespawning = false;
         isInitialized = false;
         isMovingToVirtualPoint = false;
 
@@ -583,6 +632,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
     public void OnProjectileDespawnedToPool()
     {
+        DisposeEndStageCancelRegistration();
         KillMoveTween();
 
         config = null;
@@ -595,6 +645,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
         hitTargetCount = 0;
 
+        isDespawning = false;
         isInitialized = false;
         isMovingToVirtualPoint = false;
 

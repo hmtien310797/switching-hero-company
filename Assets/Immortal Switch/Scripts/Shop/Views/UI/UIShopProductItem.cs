@@ -1,3 +1,4 @@
+using Immortal_Switch.Scripts.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,9 +18,9 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         // --- Private Fields ---
 
-        public void Bind(string quantity)
+        public void Bind(BigNumber quantity)
         {
-            txtQuantity.text = quantity;
+            txtQuantity.text = quantity.ToInputString();
         }
     }
 }

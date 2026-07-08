@@ -9,9 +9,10 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Tutorial.Views
 {
-    public class TutorialData
+    public class TutorialArgs
     {
         public string LocalizeKey;
+        public string NarratorId;
         public string ActionType;
 
         [CanBeNull]
@@ -68,6 +69,9 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         [SerializeField]
         private TextEffect txtEffectStory;
+
+        [SerializeField]
+        private TextMeshProUGUI txtNarrator;
 
         [SerializeField]
         private float storySpacing = 24f;
@@ -127,7 +131,7 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
             TutorialManager.Instance.OnSkip();
         }
 
-        private void OnChangeStep(TutorialData obj)
+        private void OnChangeStep(TutorialArgs obj)
         {
             RefreshVisual(obj);
         }
@@ -172,23 +176,24 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
         {
             base.OnShow(args);
 
-            if (args is TutorialData tutorial)
+            if (args is TutorialArgs tutorial)
             {
                 RefreshVisual(tutorial);
             }
         }
 
-        private void RefreshVisual(TutorialData tutorial)
+        private void RefreshVisual(TutorialArgs args)
         {
-            if (!string.IsNullOrWhiteSpace(tutorial.LocalizeKey))
+            if (!string.IsNullOrWhiteSpace(args.LocalizeKey))
             {
-                ShowStory(tutorial.LocalizeKey);
+                ShowStory(args.LocalizeKey, args.NarratorId);
             }
 
-            if (tutorial.Target != null)
+            if (args.Target != null)
             {
                 btnStory.interactable = false;
-                Focus(tutorial.Target);
+
+                Focus(args.Target);
                 UpdateStoryPosition(_rtBtnMask);
             }
             else
@@ -207,11 +212,12 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
             rtStory.anchoredPosition = _orgStoryAnchoredPosition;
         }
 
-        private void ShowStory(string txt)
+        private void ShowStory(string story, string narrator)
         {
             rtStory.gameObject.SetActive(true);
 
-            txtStory.text = txt;
+            txtNarrator.text = narrator;
+            txtStory.text = story;
             btnStory.interactable = true;
 
             txtEffectStory.StopOnStartEffects();

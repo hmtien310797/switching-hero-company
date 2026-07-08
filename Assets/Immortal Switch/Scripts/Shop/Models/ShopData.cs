@@ -25,5 +25,15 @@ namespace Immortal_Switch.Scripts.Shop.Models
         /// Ngay reset cuoi cung cho monthly limit.
         /// </summary>
         public DateTime? MonthlyResetDate;
+
+        /// <summary>
+        /// Tong so lan nap (mua diamond) tu truoc den nay.
+        /// </summary>
+        public int TotalTopupCount;
+
+        /// <summary>
+        /// Danh sach milestoneId GloryPass da nhan thuong.
+        /// </summary>
+        public List<int> ClaimedGloryPassIds = new();
     }
 }

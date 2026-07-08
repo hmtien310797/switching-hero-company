@@ -494,6 +494,13 @@ namespace Battle
             CurrentStage = Mathf.Max(1, progression.CurrentStage);
             serverFrontierStage = CurrentStage;
             CurrentStageService.SetCurrentStage(CurrentStage);
+
+            // stage_creeps_cleared từ server ("đã giết hết creep của stage này, chỉ chưa xong
+            // boss") mang đúng ý nghĩa losingStage đang có cục bộ (bỏ qua creep wave, mở nút
+            // boss) — OR vào đây để resume sau khi đóng/mở lại app cũng vào thẳng boss như retry
+            // sau khi thua. Không tự set false: Victory đã tự reset losingStage=false ở
+            // OnStageClearedAsync trước khi gọi battle/end (server cũng trả false cùng lúc).
+            losingStage = losingStage || progression.StageCreepsCleared;
         }
 
         /// <summary>Resync current_stage thật từ server sau lỗi STAGE_MISMATCH/INVALID_STAGE của battle/end.</summary>
@@ -1155,7 +1162,32 @@ namespace Battle
                 return;
             }
 
+            // Creep wave của CurrentStage vừa hoàn thành lần đầu (losingStage/playCompletedStage
+            // đều false ở đây — xem điều kiện trên) — CurrentStage chắc chắn == serverFrontierStage
+            // (playCompletedStage chỉ false khi stage >= frontier). Báo server ngay trước khi boss
+            // xuất hiện, để app đóng/crash giữa lúc đánh boss vẫn resume thẳng vào boss sau này.
+            ReportCreepsClearedCheckpoint();
+
             SpawnBoss();
+        }
+
+        private async void ReportCreepsClearedCheckpoint()
+        {
+            try
+            {
+                var response = await NakamaClient.Instance.BattleCheckpointAsync(
+                    new BattleCheckpointRequest { Stage = CurrentStage });
+
+                if (response != null && !response.Success && response.Error == "STAGE_MISMATCH")
+                {
+                    Debug.LogWarning("[PvE] battle/checkpoint rejected (STAGE_MISMATCH) — resyncing progression.");
+                    await ResyncProgressionFromServerAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[PvE] battle/checkpoint RPC failed: {e.Message}");
+            }
         }
 
         private void RefreshEnemyHeroTargets()

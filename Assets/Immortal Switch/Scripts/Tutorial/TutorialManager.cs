@@ -6,6 +6,7 @@ using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Tutorial.Interfaces;
 using Immortal_Switch.Scripts.Tutorial.Views;
 using Immortal_Switch.Scripts.UI;
@@ -26,7 +27,7 @@ namespace Immortal_Switch.Scripts.Tutorial
         /// <summary>
         /// event fire khi thay doi tutorial step
         /// </summary>
-        public event Action<TutorialData> OnChangeStep;
+        public event Action<TutorialArgs> OnChangeStep;
 
         /// <summary>
         /// event fire khi tutorial click
@@ -93,16 +94,22 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         private async UniTask ReconcileGuideFromServerAsync(int guideId)
         {
-            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+            if (NakamaClient.Instance == null ||
+                !NakamaClient.Instance.IsLoggedIn)
+                return;
 
             try
             {
                 var state = await NakamaClient.Instance.GetTutorialStateAsync();
-                if (state?.CompletedStepIds == null) return;
+
+                if (state?.CompletedStepIds == null)
+                    return;
 
                 var tutorials = DatabaseManager.Instance.TutorialDb.GetTutorials(guideId);
-                var lastStep  = tutorials.LastOrDefault();
-                if (lastStep != null && state.CompletedStepIds.Contains(lastStep.stepId))
+                var lastStep = tutorials.LastOrDefault();
+
+                if (lastStep != null &&
+                    state.CompletedStepIds.Contains(lastStep.stepId))
                 {
                     Service.Complete(guideId);
                 }
@@ -120,14 +127,20 @@ namespace Immortal_Switch.Scripts.Tutorial
         /// </summary>
         private async UniTask SyncStepCompletionAsync(DynamicHeroesGlobalSpecificationsTutConfigRow step)
         {
-            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+            if (NakamaClient.Instance == null ||
+                !NakamaClient.Instance.IsLoggedIn)
+                return;
 
             try
             {
                 var response = await NakamaClient.Instance.CompleteTutorialStepAsync(step.stepId);
-                if (response == null || !response.Success) return;
 
-                if (response.Balances != null && response.Balances.Count > 0)
+                if (response == null ||
+                    !response.Success)
+                    return;
+
+                if (response.Balances != null &&
+                    response.Balances.Count > 0)
                 {
                     CurrencyLedgerService.Instance?.ClearPendingByReason(CurrencyTransactionReason.TutorialReward);
                     CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
@@ -260,20 +273,21 @@ namespace Immortal_Switch.Scripts.Tutorial
 
             var isOpening = UIManager.Instance.IsOpen<TutorialView>();
 
-            var tutorialData = new TutorialData
+            var args = new TutorialArgs
             {
                 ActionType = row.actionType,
                 LocalizeKey = row.localizeKey,
                 Target = target,
+                NarratorId = row.narratorId,
             };
 
             if (isOpening)
             {
-                OnChangeStep?.Invoke(tutorialData);
+                OnChangeStep?.Invoke(args);
             }
             else
             {
-                UIManager.Instance.OpenPopupAsync<TutorialView>(tutorialData, false).Forget();
+                UIManager.Instance.OpenPopupAsync<TutorialView>(args, false).Forget();
             }
         }
 
@@ -306,11 +320,18 @@ namespace Immortal_Switch.Scripts.Tutorial
             if (rewards == null)
             {
                 Debug.LogError("[Tutorial] Rewards parse error");
-                onContinueTutorial();
+                OnClosePopupReward();
                 return;
             }
 
-            // todo: show popup rewards
+            UIManager.Instance
+                .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
+                {
+                    Rewards = rewards,
+                    OnClose = OnClosePopupReward,
+                })
+                .Forget();
+
             foreach (var reward in rewards)
             {
                 try
@@ -329,7 +350,12 @@ namespace Immortal_Switch.Scripts.Tutorial
                 }
             }
 
-            onContinueTutorial();
+            return;
+
+            void OnClosePopupReward()
+            {
+                onContinueTutorial();
+            }
         }
     }
 }

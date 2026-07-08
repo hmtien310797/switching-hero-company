@@ -8,9 +8,30 @@ using Newtonsoft.Json;
 [Serializable]
 public class BattleProgression
 {
-    [JsonProperty("current_stage")]         public int CurrentStage;
-    [JsonProperty("current_chapter")]       public int CurrentChapter;
-    [JsonProperty("highest_stage_cleared")] public int HighestStageCleared;
+    [JsonProperty("current_stage")]         public int  CurrentStage;
+    [JsonProperty("current_chapter")]       public int  CurrentChapter;
+    [JsonProperty("highest_stage_cleared")] public int  HighestStageCleared;
+    /// <summary>true nếu server đã nhận checkpoint "đã giết hết creep" cho CurrentStage (qua battle/checkpoint, hoặc suy ra từ 1 lần Defeat với creep_kills == total_creeps) — dùng để mở thẳng nút boss khi resume sau khi đóng/mở lại app, không bắt dọn lại creep.</summary>
+    [JsonProperty("stage_creeps_cleared")]  public bool StageCreepsCleared;
+}
+
+// ── battle/checkpoint ─────────────────────────────────────────────────────────
+
+/// <summary>Báo "đã giết hết creep của CurrentStage" — gọi 1 lần ngay trước khi boss xuất hiện, để server nhớ giúp resume thẳng vào boss nếu app đóng/crash trước khi battle/end kịp chạy.</summary>
+[Serializable]
+public class BattleCheckpointRequest
+{
+    /// <summary>Global stage vừa dọn hết creep — phải khớp current_stage server đang lưu.</summary>
+    [JsonProperty("stage")] public int Stage;
+}
+
+[Serializable]
+public class BattleCheckpointResponse
+{
+    [JsonProperty("success")] public bool   Success;
+    /// <summary>Chỉ có giá trị khi Success == false — hiện chỉ có "STAGE_MISMATCH".</summary>
+    [JsonProperty("error")]   public string Error;
+    [JsonProperty("updated_progression")] public BattleProgression UpdatedProgression;
 }
 
 // ── battle/end ────────────────────────────────────────────────────────────────

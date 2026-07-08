@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2b0db8554eef3b4b83f4ad5815665bf, type: 3}
+  m_Name: SoundLibrarySO
+  m_EditorClassIdentifier: 
+  bgmClips:
+  - id: 100
+    addressableKey: 
+    volumeMultiplier: 0
+  - id: 101
+    addressableKey: 
+    volumeMultiplier: 0
+  sfxClips:
+  - id: 100
+    addressableKey: button_click
+    volumeMultiplier: 0
+    preload: 1
+  - id: 301
+    addressableKey: normal_hit
+    volumeMultiplier: 0
+    preload: 1

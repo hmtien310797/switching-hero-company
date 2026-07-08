@@ -82,16 +82,12 @@ namespace Immortal_Switch.Scripts.UI
         }
 #endif
 
-        private IEnumerator Start()
+        private void Start()
         {
-            // cho unity tinh toan height chinh xac cua canvas.
-            yield return null;
-
-            //CacheDesignSize();
             Apply();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (NeedRefresh())
             {
@@ -111,43 +107,18 @@ namespace Immortal_Switch.Scripts.UI
             return false;
         }
 
-        private void CacheDesignSize()
-        {
-            if ( /*!autoDetectDesignSize ||*/
-                cachedDesignSize ||
-                panelRoot == null)
-                return;
-
-            // lấy size gốc (unscaled)
-            Vector2 size = panelRoot.rect.size;
-
-            // nếu bị scale rồi thì reverse lại
-            if (panelRoot.localScale != Vector3.one)
-            {
-                size = new Vector2(
-                    panelRoot.rect.width / panelRoot.localScale.x,
-                    panelRoot.rect.height / panelRoot.localScale.y
-                );
-            }
-
-            // fallback tránh lỗi
-            if (size.x > 0 &&
-                size.y > 0)
-            {
-                /*designSize = size;*/
-                cachedDesignSize = true;
-            }
-        }
-
         [Button]
         private void Apply()
         {
             if (panelRoot == null)
                 return;
 
+            // yeu cau update canvas truoc khi apply
+            Canvas.ForceUpdateCanvases();
+
             bool isPortrait = Screen.height >= Screen.width;
 
-            float scale = CalculateScale(isPortrait);
+            float scale = CalculateScale();
 
             panelRoot.localScale = Vector3.one * scale;
 
@@ -162,8 +133,10 @@ namespace Immortal_Switch.Scripts.UI
             lastSafeArea = Screen.safeArea;
         }
 
-        private float CalculateScale(bool isPortrait)
+        private float CalculateScale()
         {
+            bool isPortrait = Screen.height >= Screen.width;
+
             if (isPortrait)
                 return 1f;
 
@@ -173,7 +146,7 @@ namespace Immortal_Switch.Scripts.UI
 
             // ko su dung dynamic vi moi lan thay doi orientation, UI can thoi gian hien thi
             //float yOffset = Mathf.Max(0f, panelRoot.anchoredPosition.y);
-            float yOffset = Mathf.Max(0f, changePosY ? yPosLandscape : anchoredY);
+            float yOffset = Mathf.Max(0f, changePosY ? (isPortrait ? yPosPortrait : yPosLandscape) : anchoredY);
             float finalY = (panelRoot.root as RectTransform)!.rect.height;
 
             var sizeDelta = panelRoot.sizeDelta;
@@ -198,7 +171,7 @@ namespace Immortal_Switch.Scripts.UI
                     break;
             }
 
-            if (useScaleReduction)
+            if (useScaleReduction && !isPortrait)
             {
                 scale *= 1f - scaleReductionPercent / 100f;
             }

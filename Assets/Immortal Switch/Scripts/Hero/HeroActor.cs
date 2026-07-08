@@ -9,6 +9,7 @@ using Immortal_Switch.Scripts.Equipment.Runtime;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.Sound;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -527,6 +528,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
             currentTarget.TakeDamage(damageResult);
             HitEffectManager.Instance.Play(currentTarget);
+            SoundManager.Instance.PlaySfx(SoundId.HeroHit);
         }
     }
 
