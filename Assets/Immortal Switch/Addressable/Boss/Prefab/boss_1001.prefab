@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4378392224121908283}
   - component: {fileID: 2157218445760095175}
   - component: {fileID: 2301857392755416939}
+  - component: {fileID: 5457860810090606883}
   m_Layer: 8
   m_Name: boss_1001
   m_TagString: Untagged
@@ -117,6 +118,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25ea273746fe4887b2eeb6b9493b5b40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &5457860810090606883
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3304938489146931119}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5, y: 10, z: 5}
+  m_Center: {x: 0, y: 5, z: 0}
 --- !u!1 &4040622283807460625
 GameObject:
   m_ObjectHideFlags: 0

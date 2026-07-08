@@ -9,8 +9,6 @@ namespace Immortal_Switch.Scripts.Sound
 {
     public class SoundManager : Singleton<SoundManager>
     {
-        public static SoundManager Instance { get; private set; }
-
         [SerializeField] private SoundDefinitionSO soundDefinition;
         [SerializeField] private bool initializeOnAwake = true;
 
@@ -72,17 +70,7 @@ namespace Immortal_Switch.Scripts.Sound
         {
             SceneManager.sceneLoaded -= HandleSceneLoaded;
         }
-
-        private void OnDestroy()
-        {
-            if (Instance == this)
-            {
-                ReleaseCachedSfxClips();
-                ReleaseBgmClips();
-                Instance = null;
-            }
-        }
-
+        
         public override async UniTask InitializeAsync()
         {
             if (initialized)

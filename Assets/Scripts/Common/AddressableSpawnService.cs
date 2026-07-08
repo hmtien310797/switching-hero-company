@@ -300,7 +300,8 @@ namespace Immortal_Switch.Scripts.Common
 
         public static UniTask<AudioClip> LoadAudioClipAsync(string key)
         {
-            return LoadAssetAsync<AudioClip>(key);
+            string finalKey = $"Assets/Immortal Switch/Addressable/SoundData/SFX/{key}.wav";
+            return LoadAssetAsync<AudioClip>(finalKey);
         }
 
         public static void ReleaseAudioClip(AudioClip audioClip)

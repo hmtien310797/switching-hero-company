@@ -867,6 +867,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ad1d67da87c4c847ad1a28f60a0745c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
   heroTeamController: {fileID: 569612736}
   controlledHeroSlotIndex: 0
 --- !u!1001 &818825787
@@ -880,10 +881,6 @@ PrefabInstance:
     - target: {fileID: 699346998048564425, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_Name
       value: GameCameraController
-      objectReference: {fileID: 0}
-    - target: {fileID: 3471696155095352930, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 1024
       objectReference: {fileID: 0}
     - target: {fileID: 4154709527439956535, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: followBossCamera
@@ -944,10 +941,6 @@ PrefabInstance:
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9097243558221480606, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 3008
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
