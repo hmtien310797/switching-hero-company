@@ -624,6 +624,19 @@ namespace Immortal_Switch.Scripts.Sound
             cachedSfxClips.Remove(soundId);
             AddressableSpawnService.ReleaseAudioClip(clip);
         }
+        
+        public void ReleaseCachedSfxCollection(SoundId[] soundIds)
+        {
+            for (int i = 0; i < soundIds.Length; i++)
+            {
+                SoundId currentSound = soundIds[i];
+                if (!cachedSfxClips.TryGetValue(currentSound, out AudioClip clip))
+                    return;
+
+                cachedSfxClips.Remove(currentSound);
+                AddressableSpawnService.ReleaseAudioClip(clip);
+            }
+        }
 
         public void ReleaseCachedSfxClips()
         {

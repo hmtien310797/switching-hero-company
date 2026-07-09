@@ -4,6 +4,7 @@ using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.UI;
 using Spine.Unity;
 using TMPro;
@@ -55,6 +56,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [Header("Stats")] [SerializeField] private UIHeroInfoStat statAtk;
         [SerializeField] private UIHeroInfoStat statHp;
         [SerializeField] private UIHeroInfoStat statSpd;
+
+        [SerializeField] private HeroSkillDetailUI ultimateSkillDetailUI;
+        [SerializeField] private HeroSkillDetailUI passiveSkillDetailUI;
+
+        [SerializeField] private UIHeroAllSkillDetail uiHeroAllSkillDetail;
         
         private const string HERO_SPRITE_ATLAS_KEY = "hero_sprite_atlas";
         private int _currentHeroIdx;
@@ -238,6 +244,23 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 statHp.Bind(0);
                 statSpd.Bind(0);
             }
+            
+            SkillDataSO ultimateSkillData = DatabaseManager.Instance.GetUltimateSkillDataByHeroId(heroId);
+            if (ultimateSkillData != null)
+            {
+                ultimateSkillDetailUI.Bind(heroStatSnapshot.ultimateSkillLevel, ultimateSkillData, ShowSkillDetail);
+            }
+            
+            SkillDataSO passiveSkillData = DatabaseManager.Instance.GetPassiveSkillDataByHeroId(heroId);
+            if (passiveSkillData != null)
+            {
+                passiveSkillDetailUI.Bind(heroStatSnapshot.passiveSkillLevel, passiveSkillData, ShowSkillDetail);
+            }
+        }
+
+        private void ShowSkillDetail(SkillDataSO skillDataSo, int currentLevel)
+        {
+            uiHeroAllSkillDetail.Show(skillDataSo, currentLevel);
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.SkillSystem.Description;
+using Immortal_Switch.Scripts.Sound;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -108,6 +109,7 @@ namespace Immortal_Switch.Scripts.Skill
         [Tooltip("Full Addressable key của SkillRuntimeObject prefab.")]
         public string RuntimeAddressableKey;
         
+        public SoundSetting soundDefinition;
         public SkillSpawnPositionType SpawnPositionType = SkillSpawnPositionType.Self;
         public SkillFollowType FollowType = SkillFollowType.None;
         public Vector3 SpawnOffset;
@@ -188,6 +190,15 @@ namespace Immortal_Switch.Scripts.Skill
     }
 
     [Serializable]
+    public struct SoundSetting
+    {
+        public SoundId startSound;
+        public SoundId hitSound;
+        public SoundId finalHitSound;
+        public bool loopStartSoundUntilSkillEnd;
+    }
+
+    [Serializable]
     public class SkillPassiveConfig
     {
         [Header("Stack")]
@@ -246,7 +257,8 @@ namespace Immortal_Switch.Scripts.Skill
         public int Level = 1;
 
         public List<SkillPhaseData> Phases = new();
-        public List<SkillDescriptionParam> DescriptionParams = new();
+        [TextArea(3,12)]
+        public String Description;
 
         [ShowIf("@$root.OwnerType == SkillOwnerType.PassiveSkill")]
         public SkillPassiveLevelConfig PassiveLevelConfig;
@@ -304,6 +316,7 @@ namespace Immortal_Switch.Scripts.Skill
     {
         [Header("Identity")]
         public int SkillId;
+        public int HeroId;
         public string SkillKey;
         public HeroClass SkillClass;
         public string SkillName;
@@ -360,6 +373,11 @@ namespace Immortal_Switch.Scripts.Skill
             }
 
             return null;
+        }
+        
+        public SoundId[] GetAllNeedSound()
+        {
+            return new []{RuntimeObjectConfig.soundDefinition.startSound, RuntimeObjectConfig.soundDefinition.hitSound, RuntimeObjectConfig.soundDefinition.finalHitSound};
         }
 
         public SkillLevelData GetLevelData(int level)

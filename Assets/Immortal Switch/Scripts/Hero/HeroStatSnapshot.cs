@@ -10,6 +10,9 @@ namespace Immortal_Switch.Scripts.Hero
         public int CurrentStarInTier;
         public int CurrentShard;
 
+        public int ultimateSkillLevel;
+        public int passiveSkillLevel;
+
         public float Health;
         public float IdleStateTime;
         public float IdleIntervalTime;

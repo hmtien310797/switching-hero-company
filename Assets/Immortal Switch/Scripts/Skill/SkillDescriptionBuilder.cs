@@ -20,17 +20,17 @@ namespace Immortal_Switch.Scripts.Skill
                 return result;
 
             // Ưu tiên DescriptionParams nếu có
-            if (levelData.DescriptionParams != null)
-            {
-                for (int i = 0; i < levelData.DescriptionParams.Count; i++)
-                {
-                    var param = levelData.DescriptionParams[i];
-                    if (param == null || string.IsNullOrEmpty(param.Key)) continue;
-
-                    string valueText = FormatValue(param.Value, param.IsPercent, param.DecimalPlaces);
-                    result = result.Replace("{" + param.Key + "}", valueText);
-                }
-            }
+            // if (levelData.DescriptionParams != null)
+            // {
+            //     for (int i = 0; i < levelData.DescriptionParams.Count; i++)
+            //     {
+            //         var param = levelData.DescriptionParams[i];
+            //         if (param == null || string.IsNullOrEmpty(param.Key)) continue;
+            //
+            //         string valueText = FormatValue(param.Value, param.IsPercent, param.DecimalPlaces);
+            //         result = result.Replace("{" + param.Key + "}", valueText);
+            //     }
+            // }
 
             //ReplaceAutoTokens(levelData, ref result);
 

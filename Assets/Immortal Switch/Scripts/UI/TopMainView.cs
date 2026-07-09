@@ -19,6 +19,7 @@ using Immortal_Switch.Scripts.Tutorial;
 using Sirenix.OdinInspector;
 using Spine.Unity;
 using TMPro;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -108,6 +109,21 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private Button buttonSetting;
 
+        [Header("Performance Overlay")]
+        [SerializeField]
+        private TMP_Text txtFps;
+
+        [SerializeField, Min(0.05f)]
+        private float perfOverlayRefreshInterval = 0.5f;
+
+        private ProfilerRecorder drawCallsRecorder;
+        private ProfilerRecorder batchesRecorder;
+        private ProfilerRecorder setPassCallsRecorder;
+
+        private float perfFpsAccumulator;
+        private int perfFpsFrameCount;
+        private float perfRefreshTimer;
+
         private readonly Tween[] heroIconTweens = new Tween[2];
         private bool isHeroIconSwapped;
         private int heroIconSwitchVersion;
@@ -130,6 +146,45 @@ namespace Immortal_Switch.Scripts.UI
 
             HideAbleObjects();
             skeletonGraphic.gameObject.SetActive(false);
+
+            drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Draw Calls Count");
+            batchesRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
+            setPassCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "SetPass Calls Count");
+        }
+
+        private void Update()
+        {
+            UpdatePerformanceOverlay();
+        }
+
+        // Cac counter Render (Draw Calls/Batches/SetPass) chi co du lieu trong
+        // Development Build hoac Editor Play Mode - build release thuong tra ve 0.
+        private void UpdatePerformanceOverlay()
+        {
+            if (txtFps == null)
+            {
+                return;
+            }
+
+            perfFpsAccumulator += Time.unscaledDeltaTime;
+            perfFpsFrameCount++;
+            perfRefreshTimer += Time.unscaledDeltaTime;
+
+            if (perfRefreshTimer < perfOverlayRefreshInterval)
+            {
+                return;
+            }
+
+            float avgFps = perfFpsAccumulator > 0f ? perfFpsFrameCount / perfFpsAccumulator : 0f;
+            long drawCalls = drawCallsRecorder.Valid ? drawCallsRecorder.LastValue : 0;
+            long batches = batchesRecorder.Valid ? batchesRecorder.LastValue : 0;
+            long setPassCalls = setPassCallsRecorder.Valid ? setPassCallsRecorder.LastValue : 0;
+
+            txtFps.text = $"FPS: {avgFps:0.0}\nDrawCall: {drawCalls}\nBatches: {batches}\nSetPass: {setPassCalls}";
+
+            perfFpsAccumulator = 0f;
+            perfFpsFrameCount = 0;
+            perfRefreshTimer = 0f;
         }
 
         private UniTask OnClickTutorial(string arg1, int arg2)
@@ -267,6 +322,10 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnDestroy()
         {
+            drawCallsRecorder.Dispose();
+            batchesRecorder.Dispose();
+            setPassCallsRecorder.Dispose();
+
             TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
             TutorialManager.Instance.OnClick -= OnClickTutorial;
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageEnd);

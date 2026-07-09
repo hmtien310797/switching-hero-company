@@ -127,6 +127,7 @@ namespace Immortal_Switch.Scripts.Skill
         public void ApplyServerResponse(SummonExecuteResponse response)
         {
             saveData.TotalRoll = response.NewTotalRoll;
+            saveData.SummonLevel = response.NewSummonLevel;
 
             if (response.Entries != null)
             {
@@ -157,6 +158,7 @@ namespace Immortal_Switch.Scripts.Skill
         {
             if (state == null) return;
             saveData.TotalRoll = state.TotalRoll;
+            saveData.SummonLevel = state.SummonLevel;
             if (state.ClaimedRewardLevels != null)
                 saveData.ClaimedRewardLevels = new System.Collections.Generic.List<int>(state.ClaimedRewardLevels);
             Save();

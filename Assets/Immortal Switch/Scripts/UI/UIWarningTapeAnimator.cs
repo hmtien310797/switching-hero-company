@@ -1,5 +1,6 @@
 using System.Collections;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
@@ -57,6 +58,9 @@ public class UIWarningTapeAnimator : MonoBehaviour
     private Vector3 defaultScale;
     private bool isVisible;
 
+    private const float PosYVertical = 300f;
+    private const float PosYHorizontal = 150f;
+
     private void Reset()
     {
         root = transform as RectTransform;
@@ -93,12 +97,38 @@ public class UIWarningTapeAnimator : MonoBehaviour
 
     private void Start()
     {
+        OnOrientationChanged(ScreenOrientationTracker.Instance.CurrentMode);
+        ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
         GameEventManager.Subscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationEvent);
     }
 
     private void OnDestroy()
     {
         GameEventManager.Unsubscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationEvent);
+    }
+
+    private void OnOrientationChanged(ScreenOrientationTracker.ScreenViewMode orientation)
+    {
+        Vector2 posA = rawImageA.rectTransform.anchoredPosition;
+        Vector2 posB = rawImageB.rectTransform.anchoredPosition;
+        switch (orientation)
+        {
+            case ScreenOrientationTracker.ScreenViewMode.Landscape:
+                posA.y = -PosYHorizontal;
+                rawImageA.rectTransform.anchoredPosition = posA;
+                
+                posB.y = PosYHorizontal;
+                rawImageB.rectTransform.anchoredPosition = posB;
+                break;
+            
+            case ScreenOrientationTracker.ScreenViewMode.Portrait:
+                posA.y = -PosYVertical;
+                rawImageA.rectTransform.anchoredPosition = posA;
+                
+                posB.y = PosYVertical;
+                rawImageB.rectTransform.anchoredPosition = posB;
+                break;
+        }
     }
 
     private void OnBossSpawnAnimationEvent(bool result)

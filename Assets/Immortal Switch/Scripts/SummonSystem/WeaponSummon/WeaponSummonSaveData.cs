@@ -7,6 +7,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
     public class WeaponSummonSaveData
     {
         public int TotalRoll;
+        public int SummonLevel = 1;
         public bool SkipGemFallbackConfirm;
         public List<int> ClaimedRewardLevels = new();
     }

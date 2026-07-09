@@ -28,6 +28,8 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             public string Payload;
         }
 
+        private const int InitTimeoutSeconds = 15;
+
         private IStoreController _storeController;
         private IExtensionProvider _extensionProvider;
         private UniTaskCompletionSource<bool> _initTcs;
@@ -36,6 +38,11 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         // pack_id (từ config pack_diamond) — cần gửi kèm receipt lên RPC iap/purchase để server biết
         // cộng thưởng theo pack nào; Unity IAP chỉ biết storeProductId (google/apple product id).
         private readonly Dictionary<string, int> _pendingPackIds = new();
+
+        /// <summary>True khi IAP đã init xong và store sẵn sàng nhận mua hàng. UI (shop) phải kiểm
+        /// tra cờ này trước khi cho mở màn mua hàng — false khi thiết bị không có store khả dụng
+        /// (không có Google Play/App Store, sandbox lỗi...) hoặc khi init bị timeout.</summary>
+        public bool IsAvailable => _storeController != null;
 
         protected override void OnSingletonAwake()
         {
@@ -52,23 +59,42 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             if (_storeController != null)
                 return;
 
-            var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
-            var products = DatabaseManager.Instance.GetAllProducts();
-
-            foreach (var product in products)
+            try
             {
-                string storeProductId = GetStoreProductId(product);
+                var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
+                var products = DatabaseManager.Instance.GetAllProducts();
 
-                if (string.IsNullOrEmpty(storeProductId))
-                    continue;
+                foreach (var product in products)
+                {
+                    string storeProductId = GetStoreProductId(product);
 
-                ProductType type = product.subscribe == 1 ? ProductType.Subscription : ProductType.Consumable;
-                builder.AddProduct(storeProductId, type);
+                    if (string.IsNullOrEmpty(storeProductId))
+                        continue;
+
+                    ProductType type = product.subscribe == 1 ? ProductType.Subscription : ProductType.Consumable;
+                    builder.AddProduct(storeProductId, type);
+                }
+
+                _initTcs = new UniTaskCompletionSource<bool>();
+                UnityPurchasing.Initialize(this, builder);
+
+                // Một số thiết bị (không có Google Play/App Store, sandbox lỗi...) không bao giờ gọi
+                // OnInitialized lẫn OnInitializeFailed — nếu await thẳng _initTcs.Task, bootstrap sẽ
+                // treo vĩnh viễn ở đây. Timeout để đảm bảo flow game luôn tiếp tục được.
+                (bool hasResult, bool success) = await UniTask.WhenAny(
+                    _initTcs.Task, UniTask.Delay(TimeSpan.FromSeconds(InitTimeoutSeconds)));
+
+                if (!hasResult)
+                    Debug.LogWarning($"[IAPManager] Initialize timeout sau {InitTimeoutSeconds}s — store không phản hồi, tiếp tục flow game không có IAP.");
+                else if (!success)
+                    Debug.LogWarning("[IAPManager] Initialize failed — tiếp tục flow game không có IAP.");
             }
-
-            _initTcs = new UniTaskCompletionSource<bool>();
-            UnityPurchasing.Initialize(this, builder);
-            await _initTcs.Task;
+            catch (Exception ex)
+            {
+                // Không để lỗi khởi tạo IAP (thiết bị không hỗ trợ store, exception từ plugin...) chặn
+                // luôn bootstrap — shop sẽ chỉ báo "không khả dụng" thay vì crash toàn bộ game.
+                Debug.LogWarning($"[IAPManager] Initialize exception: {ex.Message}");
+            }
         }
 
         private static string GetStoreProductId(DynamicHeroesGlobalSpecificationsProductIdRow product)

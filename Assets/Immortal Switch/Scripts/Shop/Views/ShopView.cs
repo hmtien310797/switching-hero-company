@@ -105,6 +105,16 @@ namespace Immortal_Switch.Scripts.Shop.Views
         public override void OnShow(object args)
         {
             base.OnShow(args);
+
+            // IAP có thể chưa init xong (thiết bị không có Google Play/App Store, timeout...) —
+            // không cho mở Shop trong trường hợp đó thay vì để người chơi bấm mua rồi mới báo lỗi.
+            if (!IAPManager.Instance.IsAvailable)
+            {
+                UIManager.Instance.ShowToast("Cửa hàng hiện không khả dụng trên thiết bị này.");
+                UIManager.Instance.Close<ShopView>();
+                return;
+            }
+
             OnOrientationChanged(ScreenOrientationTracker.Instance.CurrentMode);
 
             tabVertical.Initialize();

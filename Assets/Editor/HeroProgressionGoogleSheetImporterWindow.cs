@@ -314,6 +314,12 @@ namespace Immortal_Switch.Scripts.Hero.Editor
                 NextStarInTier = ParseInt(
                     GetCell(row, headers, "NextStarInTier"),
                     "NextStarInTier"),
+                UltimateSkillLevel = ParseInt(
+                    GetCell(row, headers, "UltimateSkillLevel"),
+                    "UltimateSkillLevel"),
+                PassiveSkillLevel = ParseInt(
+                    GetCell(row, headers, "PassiveSkillLevel"),
+                    "PassiveSkillLevel"),
                 HealthMultiplier = ParseFloat(
                     GetCell(row, headers, "HealthMultiplier"),
                     "HealthMultiplier"),
@@ -488,6 +494,8 @@ namespace Immortal_Switch.Scripts.Hero.Editor
             destination.ShardCostToNext = source.ShardCostToNext;
             destination.IsMaxNode = source.IsMaxNode;
             destination.NextTier = source.NextTier;
+            destination.UltimateSkillLevel = source.UltimateSkillLevel;
+            destination.PassiveSkillLevel = source.PassiveSkillLevel;
             destination.NextStarInTier = source.NextStarInTier;
             destination.HealthMultiplier = source.HealthMultiplier;
             destination.AttackMultiplier = source.AttackMultiplier;
@@ -545,6 +553,8 @@ namespace Immortal_Switch.Scripts.Hero.Editor
                 "IsMaxNode",
                 "NextTier",
                 "NextStarInTier",
+                "UltimateSkillLevel",
+                "PassiveSkillLevel",
                 "HealthMultiplier",
                 "AttackMultiplier",
                 "DefenseMultiplier",
@@ -578,6 +588,13 @@ namespace Immortal_Switch.Scripts.Hero.Editor
 
         private static int ParseInt(string raw, string fieldName)
         {
+            raw = raw.Trim();
+
+            if (raw.EndsWith(",", StringComparison.Ordinal))
+            {
+                raw = raw.TrimEnd(',');
+            }
+
             if (int.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
             {
                 return value;
@@ -1031,6 +1048,8 @@ namespace Immortal_Switch.Scripts.Hero.Editor
             public bool IsMaxNode;
             public HeroProgressTier NextTier;
             public int NextStarInTier;
+            public int UltimateSkillLevel;
+            public int PassiveSkillLevel;
             public float HealthMultiplier;
             public float AttackMultiplier;
             public float DefenseMultiplier;
@@ -1048,6 +1067,8 @@ namespace Immortal_Switch.Scripts.Hero.Editor
                     Tier = Tier,
                     StarInTier = StarInTier,
                     ShardCostToNext = ShardCostToNext,
+                    UltimateSkillLevel = UltimateSkillLevel,
+                    PassiveSkillLevel = PassiveSkillLevel,
                     IsMaxNode = IsMaxNode,
                     NextTier = NextTier,
                     NextStarInTier = NextStarInTier,

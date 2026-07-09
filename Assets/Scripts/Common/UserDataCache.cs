@@ -7,6 +7,7 @@ using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SkillRemake;
+using Immortal_Switch.Scripts.Sound;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -199,7 +200,13 @@ namespace Common
             if (!canEquip)
                 return -1;
 
-            await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(skillToEquip);
+            var prewarmTasks = new List<UniTask>
+            {
+                AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(skillToEquip),
+                SoundManager.Instance.PreloadSfxAsync(skillToEquip.GetAllNeedSound())
+            };
+            await UniTask.WhenAll(prewarmTasks);
+            
             currentHero.HeroSkillController.EquipSkill(skillToEquip);
             OnHeroSkillChanged?.Invoke(heroId);
             return slotIndex;
@@ -212,6 +219,7 @@ namespace Common
             bool equipResult = actor.HeroSkillController.UnequipSkill(equippedSkillData);
             if (equipResult)
             {
+                SoundManager.Instance.ReleaseCachedSfxCollection(equippedSkillData.GetAllNeedSound());
                 AddressableSkillSpawnService.DisposeSkillComponent(equippedSkillData);
                 OnHeroSkillChanged?.Invoke(heroId);
             }
@@ -226,8 +234,16 @@ namespace Common
             {
                 return false;
             }
+            SoundManager.Instance.ReleaseCachedSfxCollection(currentHero.HeroSkillController.GetClassSkillAt(slot).GetAllNeedSound());
             AddressableSkillSpawnService.DisposeSkillComponent(currentHero.HeroSkillController.GetClassSkillAt(slot));
-            await AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(skillData);
+            
+            var prewarmTasks = new List<UniTask>
+            {
+                AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(skillData),
+                SoundManager.Instance.PreloadSfxAsync(skillData.GetAllNeedSound())
+            };
+            await UniTask.WhenAll(prewarmTasks);
+
             bool equipResult = currentHero.HeroSkillController.ReplaceSkillAt(slot, skillData, true);
             OnHeroSkillChanged?.Invoke(heroId);
             return equipResult;

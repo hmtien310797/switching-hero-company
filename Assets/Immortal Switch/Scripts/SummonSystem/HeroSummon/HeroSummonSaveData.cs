@@ -7,6 +7,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
     public class HeroSummonSaveData
     {
         public int TotalRoll;
+        public int SummonLevel = 1;
         public int PityMissCounter;
         public bool SkipGemFallbackConfirm;
         public List<int> ClaimedRewardLevels = new();

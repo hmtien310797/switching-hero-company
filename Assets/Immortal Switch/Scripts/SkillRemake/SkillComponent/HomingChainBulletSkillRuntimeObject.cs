@@ -172,7 +172,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
             }
 
             bullet.Setup(
-                Context.Caster,
+                Context.Caster, Config,
                 spawnPosition,
                 initialDirection,
                 config, Context.BattleContext

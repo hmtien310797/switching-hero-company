@@ -176,6 +176,8 @@ namespace Immortal_Switch.Scripts.Hero
                 Health = node.HealthMultiplier == 0 ? hero.Health : node.HealthMultiplier,
                 Defense = node.DefenseMultiplier == 0? hero.Defense : node.DefenseMultiplier,
                 Attack = node.AttackMultiplier == 0 ? hero.Attack : node.AttackMultiplier,
+                ultimateSkillLevel = node.UltimateSkillLevel,
+                passiveSkillLevel = node.PassiveSkillLevel
                 
                 //temp lock
                 // AttackSpeed = hero.AttackSpeed * node.AttackSpeedMultiplier,

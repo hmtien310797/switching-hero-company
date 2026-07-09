@@ -37,5 +37,8 @@ namespace Immortal_Switch.Scripts.Sound
         AuraLoop = 400,
         WarningLoop = 401,
         ChargingLoop = 402,
+        
+        //Bastet
+        HitBastet
     }
 }

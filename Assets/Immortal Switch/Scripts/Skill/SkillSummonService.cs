@@ -37,45 +37,12 @@ namespace Immortal_Switch.Scripts.Skill
             return config != null ? config.GetOption(optionId) : null;
         }
 
+        // Authoritative: server tính summon_level (dựa trên total_roll + bảng Skill_Levels
+        // phía server) và trả về qua summon/skill + summon/state — client chỉ lưu lại,
+        // không tự suy ra từ config local (dễ lệch nếu SkillSummonConfigSO không đồng bộ).
         public int GetCurrentSummonLevel()
         {
-            if (config == null || config.SummonLevels == null || config.SummonLevels.Count == 0)
-                return 1;
-
-            int totalRoll = Mathf.Max(0, saveData.TotalRoll);
-            int currentLevel = 1;
-            int consumed = 0;
-
-            var sorted = config.SummonLevels
-                .Where(x => x != null)
-                .OrderBy(x => x.SummonLevel)
-                .ToList();
-
-            for (int i = 0; i < sorted.Count; i++)
-            {
-                var entry = sorted[i];
-
-                // chỉ xử lý cost của level hiện tại
-                if (entry.SummonLevel != currentLevel)
-                    continue;
-
-                int need = Mathf.Max(0, entry.TotalRollRequired);
-
-                if (need <= 0)
-                    break;
-
-                if (totalRoll >= consumed + need)
-                {
-                    consumed += need;
-                    currentLevel++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return currentLevel;
+            return Mathf.Max(1, saveData.SummonLevel);
         }
 
         public int GetCurrentLevelProgressRoll()

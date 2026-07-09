@@ -6,6 +6,8 @@ using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pooling;
+using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.Sound;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -31,6 +33,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
     private Transform pendingTarget;
     private bool isDespawning;
     private bool hasEndStageCancelRegistration;
+    private SkillRuntimeObjectConfig _skillRuntimeObjectConfig;
     
     private void Awake()
     {
@@ -58,13 +61,13 @@ public class HomingChainBulletProjectile : MonoBehaviour,
     }
     
     public void Setup(
-        ICombatUnit owner,
+        ICombatUnit owner, SkillRuntimeObjectConfig skillRuntimeObjectConfig,
         Vector3 spawnPosition,
         Vector3 initialDirection,
         HomingChainBulletConfig bulletConfig, IHeroBattleContext battleContext)
     {
         KillMoveTween();
-
+        _skillRuntimeObjectConfig = skillRuntimeObjectConfig;
         caster = owner;
         config = bulletConfig;
 
@@ -529,6 +532,7 @@ public class HomingChainBulletProjectile : MonoBehaviour,
             return;
         
         HitEffectManager.Instance.Play(combatUnit);
+        SoundManager.Instance.PlaySfx(_skillRuntimeObjectConfig.soundDefinition.hitSound);
         DamageResult damageResult = DamageCalculator.CalculateDamage(caster, combatUnit, config.damage);
         combatUnit.TakeDamage(damageResult);
     }

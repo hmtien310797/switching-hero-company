@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 727400d8e1c143a4b86a6ec1f07fe5a1, type: 3}
   m_Name: skilldata_ultimate_brandonlowen
   m_EditorClassIdentifier: 
-  SkillId: 2
+  SkillId: 8001
+  HeroId: 8
   SkillKey: 
   SkillClass: 0
   SkillName: Galtin Arrow
@@ -33,6 +34,11 @@ MonoBehaviour:
     RuntimeVisualType: 1
     SpawnMode: 0
     RuntimeAddressableKey: bullet_spawner_skill_runtime_object
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 0
     FollowType: 1
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -174,7 +180,191 @@ MonoBehaviour:
           Amount: 1
         TriggerSkill: {fileID: 0}
       hasCameraShake: 0
-    DescriptionParams: []
+    Description: 
+    PassiveLevelConfig:
+      MergeMode: 0
+      Modifiers: []
+  - Level: 2
+    Phases:
+    - PhaseId: 0
+      TriggerType: 0
+      EventName: hit
+      Delay: 0
+      NormalizedTime: 0
+      Actions:
+      - ActionType: 1
+        ChancePercent: 100
+        TargetTypeOverride: 10
+        Damage:
+          SkillDamageBonusPercent: 600
+          ScaleWithClassSkillLevel: 1
+          CountAsSkillDamage: 1
+        Dot:
+          EffectId: DOT
+          TickDamageBonusPercent: 1
+          ScaleDamageWithClassSkillLevel: 1
+          TickInterval: 1
+          Duration: 5
+          DamageType: 0
+          StackRule: 0
+        StatModifier:
+          ModifierId: 
+          StatType: 0
+          PercentValue: 0
+          ScaleValueWithClassSkillLevel: 1
+          Duration: 5
+        Area:
+          AreaPrefab: {fileID: 0}
+          Shape: 1
+          PositionType: 0
+          Anchor: 1
+          Radius: 9
+          BoxSize: {x: 6, y: 4}
+          Duration: 0
+          TickInterval: 0
+          HitOncePerTarget: 0
+          OnHitActions: []
+        Projectile:
+          BulletPatternConfig:
+            patternType: 1
+            bulletAddressableKey: bullet_projectile
+            bulletSpeed: 50
+            bulletLifeTime: 0.5
+            totalWaves: 20
+            timeBetweenWaves: 0.3
+            bulletsPerWave: 4
+            spreadAngle: 25
+            rotationSpeedPerWave: 0
+            bulletSpawnDelay: 0
+            alternateBulletOrderEachWave: 0
+            damage: 100
+            delayWhenStartFiring: 0
+          HomingChainBulletConfig:
+            bulletAddressableKey: 
+            bulletCount: 1
+            delayBetweenBullets: 0.05
+            enemyLayer:
+              serializedVersion: 2
+              m_Bits: 0
+            searchRadius: 20
+            maxTargetsPerBullet: 4
+            straightSpeed: 18
+            curveSpeed: 22
+            arriveDistance: 0.2
+            curveTangentLength: 3
+            damage: 100
+            drawDebugPath: 0
+            curveHeight: 4
+            alternateCurveSide: 1
+            useVerticalArc: 1
+            alternateVerticalArc: 1
+            verticalArcOnFirstChainMove: 1
+            verticalArcHeightRange: {x: 0.5, y: 3}
+            UseShortDistanceDetour: 1
+            minDetourDistance: 5
+            virtualPointXRange: {x: 8, y: 12}
+            virtualPointZRange: {x: 5, y: 9}
+            virtualPointYRange: {x: 2, y: 3}
+            virtualPointFindAttempts: 12
+          OnHitActions: []
+        Stack:
+          StackKey: 
+          Amount: 1
+        TriggerSkill: {fileID: 0}
+      hasCameraShake: 0
+    Description: 
+    PassiveLevelConfig:
+      MergeMode: 0
+      Modifiers: []
+  - Level: 3
+    Phases:
+    - PhaseId: 0
+      TriggerType: 0
+      EventName: hit
+      Delay: 0
+      NormalizedTime: 0
+      Actions:
+      - ActionType: 1
+        ChancePercent: 100
+        TargetTypeOverride: 10
+        Damage:
+          SkillDamageBonusPercent: 800
+          ScaleWithClassSkillLevel: 1
+          CountAsSkillDamage: 1
+        Dot:
+          EffectId: DOT
+          TickDamageBonusPercent: 1
+          ScaleDamageWithClassSkillLevel: 1
+          TickInterval: 1
+          Duration: 5
+          DamageType: 0
+          StackRule: 0
+        StatModifier:
+          ModifierId: 
+          StatType: 0
+          PercentValue: 0
+          ScaleValueWithClassSkillLevel: 1
+          Duration: 5
+        Area:
+          AreaPrefab: {fileID: 0}
+          Shape: 1
+          PositionType: 0
+          Anchor: 1
+          Radius: 9
+          BoxSize: {x: 6, y: 4}
+          Duration: 0
+          TickInterval: 0
+          HitOncePerTarget: 0
+          OnHitActions: []
+        Projectile:
+          BulletPatternConfig:
+            patternType: 1
+            bulletAddressableKey: bullet_projectile
+            bulletSpeed: 50
+            bulletLifeTime: 0.5
+            totalWaves: 20
+            timeBetweenWaves: 0.3
+            bulletsPerWave: 4
+            spreadAngle: 25
+            rotationSpeedPerWave: 0
+            bulletSpawnDelay: 0
+            alternateBulletOrderEachWave: 0
+            damage: 100
+            delayWhenStartFiring: 0
+          HomingChainBulletConfig:
+            bulletAddressableKey: 
+            bulletCount: 1
+            delayBetweenBullets: 0.05
+            enemyLayer:
+              serializedVersion: 2
+              m_Bits: 0
+            searchRadius: 20
+            maxTargetsPerBullet: 4
+            straightSpeed: 18
+            curveSpeed: 22
+            arriveDistance: 0.2
+            curveTangentLength: 3
+            damage: 100
+            drawDebugPath: 0
+            curveHeight: 4
+            alternateCurveSide: 1
+            useVerticalArc: 1
+            alternateVerticalArc: 1
+            verticalArcOnFirstChainMove: 1
+            verticalArcHeightRange: {x: 0.5, y: 3}
+            UseShortDistanceDetour: 1
+            minDetourDistance: 5
+            virtualPointXRange: {x: 8, y: 12}
+            virtualPointZRange: {x: 5, y: 9}
+            virtualPointYRange: {x: 2, y: 3}
+            virtualPointFindAttempts: 12
+          OnHitActions: []
+        Stack:
+          StackKey: 
+          Amount: 1
+        TriggerSkill: {fileID: 0}
+      hasCameraShake: 0
+    Description: 
     PassiveLevelConfig:
       MergeMode: 0
       Modifiers: []

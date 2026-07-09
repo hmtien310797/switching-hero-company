@@ -34,31 +34,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             return config.GetOption(optionId);
         }
 
-        /// <summary>
-        /// Segment-based:
-        /// Level 1 cost = cost để lên level 2
-        /// Level 2 cost = cost để lên level 3
-        /// ...
-        /// </summary>
+        // Authoritative: server tính summon_level (dựa trên total_roll + bảng Hero_Levels
+        // phía server) và trả về qua summon/hero + summon/state — client chỉ lưu lại,
+        // không tự suy ra từ config local (dễ lệch nếu HeroSummonConfigSO không đồng bộ).
         public int GetCurrentSummonLevel()
         {
-            int remainingRoll = Mathf.Max(0, saveData.TotalRoll);
-            int currentLevel = 1;
-
-            while (true)
-            {
-                int levelCost = GetLevelCost(currentLevel);
-                if (levelCost <= 0)
-                    break;
-
-                if (remainingRoll < levelCost)
-                    break;
-
-                remainingRoll -= levelCost;
-                currentLevel++;
-            }
-
-            return currentLevel;
+            return Mathf.Max(1, saveData.SummonLevel);
         }
 
         /// <summary>

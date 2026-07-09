@@ -5,6 +5,8 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pooling;
+using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.Sound;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -29,6 +31,7 @@ public class BulletProjectile :
 
     private ICombatUnit sourceCombatUnit;
     private CancellationTokenRegistration _endStageCancelRegistration;
+    private SkillRuntimeObjectConfig config;
 
     private void Awake()
     {
@@ -46,7 +49,7 @@ public class BulletProjectile :
     }
 
     public void Setup(
-        ICombatUnit source,
+        ICombatUnit source, SkillRuntimeObjectConfig Config,
         Vector3 moveDirection,
         float bulletSpeed,
         float bulletLifeTime,
@@ -59,7 +62,7 @@ public class BulletProjectile :
          * giữ sourceCombatUnit từ lần sử dụng trước.
          */
         sourceCombatUnit = source;
-
+        config = Config;
         direction =
             moveDirection.sqrMagnitude > 0.0001f
                 ? moveDirection.normalized
@@ -149,7 +152,6 @@ public class BulletProjectile :
             );
 
         targetCombatUnit.TakeDamage(damageResult);
-
         if (despawnOnHit)
         {
             DespawnSelf();

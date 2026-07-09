@@ -1,3 +1,4 @@
+using Immortal_Switch.Scripts.Sound;
 using Spine;
 using Spine.Unity;
 using UnityEngine;
@@ -49,7 +50,12 @@ namespace Immortal_Switch.Scripts.Skill
 
             if (e.Data.Name == "finalhit")
             {
+                SoundManager.Instance.PlaySfx(Config.soundDefinition.finalHitSound);
                 GameCameraController.Instance.ShakeCamera();
+            }
+            else if (e.Data.Name == "hit")
+            {
+                SoundManager.Instance.PlaySfx(Config.soundDefinition.hitSound);
             }
         }
 

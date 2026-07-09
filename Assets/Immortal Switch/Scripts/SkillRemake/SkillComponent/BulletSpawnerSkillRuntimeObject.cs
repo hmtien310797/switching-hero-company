@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
+using Immortal_Switch.Scripts.Sound;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -79,6 +80,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 }
                 else
                 {
+                    SoundManager.Instance.PlaySfx(Config.soundDefinition.hitSound);
                     SpawnCurrentWaveInstant(waveIndex);
                 }
 
@@ -191,6 +193,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
             {
                 bullet.Setup(
                     null,
+                    Config,
                     direction,
                     currentPattern.bulletSpeed,
                     currentPattern.bulletLifeTime,
@@ -212,7 +215,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
             }
 
             bullet.Setup(
-                Context.Caster,
+                Context.Caster, Config,
                 direction,
                 currentPattern.bulletSpeed,
                 currentPattern.bulletLifeTime,

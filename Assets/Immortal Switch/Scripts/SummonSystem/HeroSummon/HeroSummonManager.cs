@@ -122,7 +122,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         /// </summary>
         public void ApplyServerResponse(SummonExecuteResponse response)
         {
-            saveData.TotalRoll = response.NewTotalRoll;
+            saveData.TotalRoll   = response.NewTotalRoll;
+            saveData.SummonLevel = response.NewSummonLevel;
             Save();
             NotifyChanged();
         }
@@ -132,6 +133,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         {
             if (state == null) return;
             saveData.TotalRoll        = state.TotalRoll;
+            saveData.SummonLevel      = state.SummonLevel;
             saveData.PityMissCounter  = state.PityMissCounter;
             if (state.ClaimedRewardLevels != null)
                 saveData.ClaimedRewardLevels = new System.Collections.Generic.List<int>(state.ClaimedRewardLevels);

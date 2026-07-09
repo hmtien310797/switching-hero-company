@@ -6,6 +6,7 @@ using Battle;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.SkillRemake;
+using Immortal_Switch.Scripts.Sound;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using Spine.Unity;
@@ -71,7 +72,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public async UniTask InitializeUltimateSkillDataAndClassSkillData()
         {
-            var prewarmTasks = new List<UniTask>(classSkills.Count + 1);
+            var prewarmTasks = new List<UniTask>();
 
             for (int i = 0; i < classSkills.Count; i++)
             {
@@ -81,12 +82,19 @@ namespace Immortal_Switch.Scripts.Skill
                     continue;
 
                 prewarmTasks.Add(
-                    AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(classSkill)
+                    AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(classSkill));
+                
+                prewarmTasks.Add(
+                    SoundManager.Instance.PreloadSfxAsync(classSkill.GetAllNeedSound())
                 );
             }
 
             prewarmTasks.Add(
                 AddressableSkillSpawnService.PrewarmSkillRuntimeAssetsAsync(ultimateSkill)
+            );
+            
+            prewarmTasks.Add(
+                SoundManager.Instance.PreloadSfxAsync(ultimateSkill.GetAllNeedSound())
             );
 
             await UniTask.WhenAll(prewarmTasks);
@@ -95,6 +103,8 @@ namespace Immortal_Switch.Scripts.Skill
         public void DespawnAllInstanceOfUltimateSkillAndClassSkill()
         {
             AddressableSkillSpawnService.DisposeSkillComponent(ultimateSkill);
+            SoundManager.Instance.ReleaseCachedSfxCollection(ultimateSkill.GetAllNeedSound());
+
             for (int i = 0; i < classSkills.Count; i++)
             {
                 SkillDataSO currentSkill = classSkills[i];
@@ -103,6 +113,7 @@ namespace Immortal_Switch.Scripts.Skill
                     continue;
                 }
 
+                SoundManager.Instance.ReleaseCachedSfxCollection(currentSkill.GetAllNeedSound());
                 AddressableSkillSpawnService.DisposeSkillComponent(currentSkill);
             }
         }

@@ -159,43 +159,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
             return result;
         }
 
+        // Authoritative: server tính summon_level (dựa trên total_roll + bảng Weapon_Levels
+        // phía server) và trả về qua summon/weapon + summon/state — client chỉ lưu lại,
+        // không tự suy ra từ config local (dễ lệch nếu WeaponSummonConfigSO không đồng bộ).
         public int GetCurrentSummonLevel()
         {
-            if (config == null || config.SummonLevels == null || config.SummonLevels.Count == 0)
-                return 1;
-
-            int totalRoll = Mathf.Max(0, saveData.TotalRoll);
-            int currentLevel = 1;
-            int consumed = 0;
-
-            var sorted = config.SummonLevels
-                .Where(x => x != null)
-                .OrderBy(x => x.SummonLevel)
-                .ToList();
-
-            for (int i = 0; i < sorted.Count; i++)
-            {
-                var entry = sorted[i];
-
-                if (entry.SummonLevel != currentLevel)
-                    continue;
-
-                int need = Mathf.Max(0, entry.TotalRollRequired);
-                if (need <= 0)
-                    break;
-
-                if (totalRoll >= consumed + need)
-                {
-                    consumed += need;
-                    currentLevel++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return currentLevel;
+            return Mathf.Max(1, saveData.SummonLevel);
         }
 
         public int GetCurrentLevelProgressRoll()

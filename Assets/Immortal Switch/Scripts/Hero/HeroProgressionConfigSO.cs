@@ -45,7 +45,8 @@ namespace Immortal_Switch.Scripts.Hero
         [Header("Current State")]
         public HeroProgressTier Tier;
         [Min(0)] public int StarInTier = 0;
-
+        public int UltimateSkillLevel;
+        public int PassiveSkillLevel;
         [Header("Upgrade To Next")]
         [Min(0)] public int ShardCostToNext = 0;
         public bool IsMaxNode = false;
