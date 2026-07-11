@@ -9,21 +9,17 @@ namespace Immortal_Switch.Scripts.Shared
 {
     public partial class DatabaseManager
     {
-        private const string ClassSkillDataLabel = "class_skill_data";
-        private const string UltimateSkillDataLabel = "ultimate_skill_data";
-        private const string PassiveSkillDataLabel = "passive_skill_data";
+        private const string ClassSkillDataLabel = "skill_data";
 
         private readonly List<SkillDataSO> classSkillData = new();
         private readonly List<SkillDataSO> ultimateSkillData = new();
         private readonly List<SkillDataSO> passiveSkillData = new();
 
-        private readonly Dictionary<int, SkillDataSO> skillDataDict = new();
+        private readonly Dictionary<int, SkillDataSO> classSkillDataDict = new();
         private readonly Dictionary<int, SkillDataSO> ultimateSkillDataByHeroId = new();
         private readonly Dictionary<int, SkillDataSO> passiveSkillDataByHeroId = new();
 
-        private AsyncOperationHandle<IList<SkillDataSO>> classSkillDataHandle;
-        private AsyncOperationHandle<IList<SkillDataSO>> ultimateSkillDataHandle;
-        private AsyncOperationHandle<IList<SkillDataSO>> passiveSkillDataHandle;
+        private AsyncOperationHandle<IList<SkillDataSO>> skillDataHandle;
 
         private bool isSkillDataLoaded;
 
@@ -33,54 +29,28 @@ namespace Immortal_Switch.Scripts.Shared
             ultimateSkillData.Clear();
             passiveSkillData.Clear();
 
-            skillDataDict.Clear();
+            classSkillDataDict.Clear();
             ultimateSkillDataByHeroId.Clear();
             passiveSkillDataByHeroId.Clear();
 
             isSkillDataLoaded = false;
 
-            classSkillDataHandle = Addressables.LoadAssetsAsync<SkillDataSO>(
+            skillDataHandle = Addressables.LoadAssetsAsync<SkillDataSO>(
                 ClassSkillDataLabel,
                 null
             );
 
-            ultimateSkillDataHandle = Addressables.LoadAssetsAsync<SkillDataSO>(
-                UltimateSkillDataLabel,
-                null
-            );
-
-            passiveSkillDataHandle = Addressables.LoadAssetsAsync<SkillDataSO>(
-                PassiveSkillDataLabel,
-                null
-            );
-
             await UniTask.WhenAll(
-                classSkillDataHandle.Task.AsUniTask(),
-                ultimateSkillDataHandle.Task.AsUniTask(),
-                passiveSkillDataHandle.Task.AsUniTask()
+                skillDataHandle.Task.AsUniTask()
             );
 
-            if (classSkillDataHandle.Status != AsyncOperationStatus.Succeeded)
+            if (skillDataHandle.Status != AsyncOperationStatus.Succeeded)
             {
                 Debug.LogError($"[DatabaseManager] Load ClassSkillData failed. Label: {ClassSkillDataLabel}");
                 return;
             }
 
-            if (ultimateSkillDataHandle.Status != AsyncOperationStatus.Succeeded)
-            {
-                Debug.LogError($"[DatabaseManager] Load UltimateSkillData failed. Label: {UltimateSkillDataLabel}");
-                return;
-            }
-
-            if (passiveSkillDataHandle.Status != AsyncOperationStatus.Succeeded)
-            {
-                Debug.LogError($"[DatabaseManager] Load PassiveSkillData failed. Label: {PassiveSkillDataLabel}");
-                return;
-            }
-
-            CacheSkillList(classSkillDataHandle.Result, classSkillData, null);
-            CacheSkillList(ultimateSkillDataHandle.Result, ultimateSkillData, ultimateSkillDataByHeroId);
-            CacheSkillList(passiveSkillDataHandle.Result, passiveSkillData, passiveSkillDataByHeroId);
+            CacheSkillList(skillDataHandle.Result);
 
             isSkillDataLoaded = true;
 
@@ -92,10 +62,7 @@ namespace Immortal_Switch.Scripts.Shared
             );
         }
 
-        private void CacheSkillList(
-            IList<SkillDataSO> source,
-            List<SkillDataSO> targetList,
-            Dictionary<int, SkillDataSO> heroIdMapper)
+        private void CacheSkillList(IList<SkillDataSO> source)
         {
             foreach (SkillDataSO data in source)
             {
@@ -104,29 +71,30 @@ namespace Immortal_Switch.Scripts.Shared
                     continue;
                 }
 
-                targetList.Add(data);
-
-                if (skillDataDict.ContainsKey(data.SkillId))
+                switch (data.OwnerType)
                 {
-                    Debug.LogError($"[DatabaseManager] Duplicate SkillData SkillId: {data.SkillId}, Asset: {data.name}");
+                    case SkillOwnerType.ClassSkill:
+                        classSkillData.Add(data);
+                        if (!classSkillDataDict.TryAdd(data.SkillId, data))
+                        {
+                            Debug.LogError($"[DatabaseManager] Duplicate SkillData SkillId: {data.SkillId}, Asset: {data.name}");
+                        }
+                        break;
+                    case SkillOwnerType.UltimateSkill:
+                        ultimateSkillData.Add(data);
+                        if (!ultimateSkillDataByHeroId.TryAdd(data.HeroId, data))
+                        {
+                            Debug.LogError($"[DatabaseManager] Duplicate SkillData HeroId: {data.HeroId}, Asset: {data.name}");
+                        }
+                        break;
+                    default:
+                        passiveSkillData.Add(data);
+                        if (!passiveSkillDataByHeroId.TryAdd(data.HeroId, data))
+                        {
+                            Debug.LogError($"[DatabaseManager] Duplicate SkillData HeroId: {data.HeroId}, Asset: {data.name}");
+                        }
+                        break;
                 }
-                else
-                {
-                    skillDataDict.Add(data.SkillId, data);
-                }
-
-                if (heroIdMapper == null)
-                {
-                    continue;
-                }
-
-                if (heroIdMapper.ContainsKey(data.HeroId))
-                {
-                    Debug.LogError($"[DatabaseManager] Duplicate SkillData HeroId: {data.HeroId}, Asset: {data.name}");
-                    continue;
-                }
-
-                heroIdMapper.Add(data.HeroId, data);
             }
         }
 
@@ -138,7 +106,7 @@ namespace Immortal_Switch.Scripts.Shared
                 return null;
             }
 
-            if (!skillDataDict.TryGetValue(id, out SkillDataSO data))
+            if (!classSkillDataDict.TryGetValue(id, out SkillDataSO data))
             {
                 Debug.LogError($"[DatabaseManager] Missing SkillData Id: {id}");
                 return null;
@@ -192,25 +160,15 @@ namespace Immortal_Switch.Scripts.Shared
             ultimateSkillData.Clear();
             passiveSkillData.Clear();
 
-            skillDataDict.Clear();
+            classSkillDataDict.Clear();
             ultimateSkillDataByHeroId.Clear();
             passiveSkillDataByHeroId.Clear();
 
             isSkillDataLoaded = false;
 
-            if (classSkillDataHandle.IsValid())
+            if (skillDataHandle.IsValid())
             {
-                Addressables.Release(classSkillDataHandle);
-            }
-
-            if (ultimateSkillDataHandle.IsValid())
-            {
-                Addressables.Release(ultimateSkillDataHandle);
-            }
-
-            if (passiveSkillDataHandle.IsValid())
-            {
-                Addressables.Release(passiveSkillDataHandle);
+                Addressables.Release(skillDataHandle);
             }
         }
     }

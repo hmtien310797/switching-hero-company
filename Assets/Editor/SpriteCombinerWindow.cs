@@ -71,9 +71,121 @@ public class SpriteCombinerWindow : EditorWindow
             snapToPixel = EditorGUILayout.Toggle("Snap To Pixel", snapToPixel);
             drawCheckerBackground = EditorGUILayout.Toggle("Checker Background", drawCheckerBackground);
 
-            outputFolder = EditorGUILayout.TextField("Output Folder", outputFolder);
+            DrawOutputFolderField();
             outputFileName = EditorGUILayout.TextField("Output File Name", outputFileName);
         }
+    }
+
+    private void DrawOutputFolderField()
+    {
+        UnityEngine.Object currentFolder = null;
+
+        if (!string.IsNullOrWhiteSpace(outputFolder) &&
+            AssetDatabase.IsValidFolder(outputFolder))
+        {
+            currentFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(outputFolder);
+        }
+
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            EditorGUI.BeginChangeCheck();
+
+            UnityEngine.Object selectedFolder = EditorGUILayout.ObjectField(
+                "Output Folder",
+                currentFolder,
+                typeof(DefaultAsset),
+                false
+            );
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                TrySetOutputFolder(selectedFolder);
+            }
+
+            if (GUILayout.Button("Select", GUILayout.Width(60)))
+            {
+                string absolutePath = EditorUtility.OpenFolderPanel(
+                    "Select Output Folder",
+                    Application.dataPath,
+                    string.Empty
+                );
+
+                if (!string.IsNullOrEmpty(absolutePath))
+                {
+                    string assetPath = AbsolutePathToAssetPath(absolutePath);
+
+                    if (!string.IsNullOrEmpty(assetPath))
+                    {
+                        outputFolder = assetPath;
+                    }
+                    else
+                    {
+                        EditorUtility.DisplayDialog(
+                            "Invalid Folder",
+                            "Output folder must be inside this Unity project's Assets folder.",
+                            "OK"
+                        );
+                    }
+                }
+            }
+        }
+
+        if (!AssetDatabase.IsValidFolder(outputFolder))
+        {
+            EditorGUILayout.HelpBox(
+                "Drag a folder from the Project window here, or click Select. Folder must be inside Assets.",
+                MessageType.Warning
+            );
+        }
+        else
+        {
+            EditorGUILayout.LabelField(
+                "Path",
+                outputFolder,
+                EditorStyles.miniLabel
+            );
+        }
+    }
+
+    private void TrySetOutputFolder(UnityEngine.Object selectedFolder)
+    {
+        if (selectedFolder == null)
+            return;
+
+        string path = AssetDatabase.GetAssetPath(selectedFolder);
+
+        if (AssetDatabase.IsValidFolder(path))
+        {
+            outputFolder = path;
+            GUI.FocusControl(null);
+            return;
+        }
+
+        EditorUtility.DisplayDialog(
+            "Invalid Folder",
+            "Please drag a folder from the Project window.",
+            "OK"
+        );
+    }
+
+    private string AbsolutePathToAssetPath(string absolutePath)
+    {
+        string normalizedAbsolutePath = absolutePath
+            .Replace("\\", "/")
+            .TrimEnd('/');
+
+        string normalizedAssetsPath = Application.dataPath
+            .Replace("\\", "/")
+            .TrimEnd('/');
+
+        if (!normalizedAbsolutePath.StartsWith(
+                normalizedAssetsPath,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return "Assets" + normalizedAbsolutePath.Substring(normalizedAssetsPath.Length);
     }
 
     private void DrawToolbar()
@@ -656,10 +768,14 @@ public class SpriteCombinerWindow : EditorWindow
 
         output.Apply();
 
-        if (!Directory.Exists(outputFolder))
-            Directory.CreateDirectory(outputFolder);
+        if (!AssetDatabase.IsValidFolder(outputFolder))
+        {
+            Debug.LogError($"Output folder is invalid or is not inside Assets: {outputFolder}");
+            return;
+        }
 
-        string outputPath = Path.Combine(outputFolder, outputFileName);
+        string outputPath = Path.Combine(outputFolder, outputFileName)
+            .Replace("\\", "/");
 
         if (!outputPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             outputPath += ".png";
