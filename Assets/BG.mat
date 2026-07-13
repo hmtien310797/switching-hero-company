@@ -15,6 +15,7 @@ Material:
   m_InvalidKeywords:
   - _PIXELLINKTOSHINE_ON
   - _SPARKLEMASKBYALPHA_ON
+  - _USENORMALIZEDPIXELUV_ON
   - _USEPIXELSQUARES_ON
   - _USEPULSE_ON
   - _USESHINE_ON
@@ -112,6 +113,16 @@ Material:
     - _DstBlendAlpha: 0
     - _EdgeIntensity: 1
     - _EdgeWidth: 1.5
+    - _EndSparkDebugAlwaysOn: 0
+    - _EndSparkIntensity: 4
+    - _EndSparkMaskByAlpha: 0
+    - _EndSparkPhase: 0.88
+    - _EndSparkPulsePower: 2
+    - _EndSparkRotation: 0
+    - _EndSparkRotationSpeed: 0
+    - _EndSparkSize: 0.22
+    - _EndSparkSoftness: 0.06
+    - _EndSparkTriggerWidth: 0.08
     - _EnvironmentReflections: 1
     - _FlameCutoff: 0.35
     - _FlameDistortion: 0.08
@@ -128,19 +139,19 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _PixelAreaMaxY: 0.55
-    - _PixelAreaMinX: 0.45
-    - _PixelBaseVisibility: 0
-    - _PixelCornerRadius: 0.8
+    - _PixelAreaMaxY: 0.42
+    - _PixelAreaMinX: 0.55
+    - _PixelBaseVisibility: 0.04
+    - _PixelCornerRadius: 0.65
     - _PixelDebugAlwaysOn: 0
     - _PixelGridX: 7
     - _PixelGridY: 7
     - _PixelLinkToShine: 1
-    - _PixelRandomness: 0.3
-    - _PixelRevealStrength: 1.5
-    - _PixelShineBoost: 10
-    - _PixelSquareIntensity: 0.81
-    - _PixelSquareSize: 0.75
+    - _PixelRandomness: 0.35
+    - _PixelRevealStrength: 1
+    - _PixelShineBoost: 3
+    - _PixelSquareIntensity: 1.2
+    - _PixelSquareSize: 0.68
     - _PulseIntensity: 0.12
     - _PulseMin: 0.1
     - _PulseSpeed: 1.5
@@ -149,10 +160,10 @@ Material:
     - _ShineAngle: 25
     - _ShineIntensity: 0.35
     - _ShinePhase: 0
-    - _ShineRepeat: 1
-    - _ShineSoftness: 0.174
+    - _ShineRepeat: 0.55
+    - _ShineSoftness: 0.113
     - _ShineSpeed: 0.35
-    - _ShineWidth: 0.01
+    - _ShineWidth: 0.035
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SparkleIntensity: 2
@@ -172,7 +183,9 @@ Material:
     - _StencilWriteMask: 255
     - _Surface: 0
     - _UseEdgeGlow: 0
+    - _UseEndSpark: 0
     - _UseFlame: 0
+    - _UseNormalizedPixelUV: 1
     - _UsePixelSquares: 1
     - _UsePulse: 1
     - _UseShine: 1
@@ -186,6 +199,8 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EdgeColor: {r: 1, g: 0.35, b: 0.02, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EndSparkColor: {r: 1, g: 0.95, b: 0.7, a: 1}
+    - _EndSparkPosition: {r: 0.9, g: 0.1, b: 0, a: 0}
     - _FlameColorHigh: {r: 1, g: 0.75, b: 0.05, a: 1}
     - _FlameColorLow: {r: 1, g: 0.06, b: 0.01, a: 1}
     - _FlameScale: {r: 2, g: 4, b: 0, a: 0}

@@ -1,4 +1,4 @@
-Shader "Custom/UI/ItemTierFX1_Final"
+Shader "Custom/UI/ItemTierFX1_noooooo"
 {
     Properties
     {
@@ -50,6 +50,19 @@ Shader "Custom/UI/ItemTierFX1_Final"
         _SparkleThreshold ("Spawn Threshold", Range(0,0.99)) = 0.72
         _SparkleRotationSpeed ("Rotation Speed", Range(-5,5)) = 0.3
         [Toggle] _SparkleMaskByAlpha ("Mask By Sprite Alpha", Float) = 1
+
+        [Header(End Spark)]
+        [Toggle] _UseEndSpark ("Use End Spark", Float) = 0
+        _EndSparkPosition ("End Spark Position", Vector) = (0.9,0.1,0,0)
+        _EndSparkSize ("End Spark Size", Range(0.01,1)) = 0.22
+        _EndSparkIntensity ("End Spark Intensity", Range(0,12)) = 4
+        _EndSparkColor ("End Spark Color", Color) = (1,0.95,0.7,1)
+        _EndSparkRotation ("End Spark Rotation", Range(-180,180)) = 0
+        _EndSparkRotationSpeed ("End Spark Rotation Speed", Range(-5,5)) = 0
+        _EndSparkTriggerWidth ("End Spark Trigger Width", Range(0.001,0.5)) = 0.08
+        _EndSparkSoftness ("End Spark Softness", Range(0.001,0.5)) = 0.06
+        _EndSparkPulsePower ("End Spark Pulse Power", Range(0.1,8)) = 2
+        [Toggle] _EndSparkMaskByAlpha ("Mask End Spark By Sprite Alpha", Float) = 0
 
         [Header(Pixel Squares)]
         [Toggle] _UsePixelSquares ("Use Pixel Squares", Float) = 0
@@ -187,6 +200,18 @@ Shader "Custom/UI/ItemTierFX1_Final"
             float _SparkleRotationSpeed;
             float _SparkleMaskByAlpha;
 
+            float _UseEndSpark;
+            float4 _EndSparkPosition;
+            float _EndSparkSize;
+            float _EndSparkIntensity;
+            fixed4 _EndSparkColor;
+            float _EndSparkRotation;
+            float _EndSparkRotationSpeed;
+            float _EndSparkTriggerWidth;
+            float _EndSparkSoftness;
+            float _EndSparkPulsePower;
+            float _EndSparkMaskByAlpha;
+
             float _UsePixelSquares;
             float _UseNormalizedPixelUV;
             fixed4 _PixelSquareColor;
@@ -289,6 +314,33 @@ Shader "Custom/UI/ItemTierFX1_Final"
             }
 
 
+
+            float SampleEndSparkSprite(float2 uv, float2 center, float size, float rotation)
+            {
+                float safeSize = max(size, 0.0001);
+
+                float2 spriteUV =
+                    (uv - center) / safeSize + 0.5;
+
+                spriteUV = RotateAroundCenter(
+                    spriteUV,
+                    rotation
+                );
+
+                float inside =
+                    step(0.0, spriteUV.x) *
+                    step(spriteUV.x, 1.0) *
+                    step(0.0, spriteUV.y) *
+                    step(spriteUV.y, 1.0);
+
+                fixed4 sparkleSample = tex2D(
+                    _SparkleTex,
+                    spriteUV
+                );
+
+                return sparkleSample.a * inside;
+            }
+
             float GetPixelSquarePattern(float2 uv)
             {
                 float2 gridCount = float2(
@@ -348,8 +400,6 @@ Shader "Custom/UI/ItemTierFX1_Final"
                 fixed4 tex = tex2D(_MainTex, i.texcoord) + _TextureSampleAdd;
                 fixed4 col = tex * i.color;
 
-                // Preserve the original sprite UV for Gradient, Shine and Sparkle.
-                // Only Pixel Squares can optionally use normalized RectTransform UV.
                 float2 spriteUV = i.texcoord;
                 float2 normalizedPixelUV = saturate(i.effectUV);
 
@@ -449,6 +499,68 @@ Shader "Custom/UI/ItemTierFX1_Final"
                     sparkle * _SparkleColor.a
                 );
 
+                // One fixed star appears when the shine band reaches its configured end point.
+                float2 endSparkCenter = saturate(_EndSparkPosition.xy);
+
+                float endSparkProjected = dot(
+                    endSparkCenter - 0.5,
+                    shineDirection
+                );
+
+                float endSparkTravel = frac(
+                    endSparkProjected * _ShineRepeat -
+                    _Time.y * _ShineSpeed +
+                    _ShinePhase
+                );
+
+                float endSparkDistanceToBand =
+                    abs(endSparkTravel - 0.5);
+
+                float endSparkTrigger =
+                    1.0 - smoothstep(
+                        _EndSparkTriggerWidth,
+                        _EndSparkTriggerWidth + _EndSparkSoftness,
+                        endSparkDistanceToBand
+                    );
+
+                endSparkTrigger = pow(
+                    saturate(endSparkTrigger),
+                    _EndSparkPulsePower
+                );
+
+                float endSparkRotation = radians(
+                    _EndSparkRotation +
+                    _Time.y * _EndSparkRotationSpeed * 360.0
+                );
+
+                float endSpark = SampleEndSparkSprite(
+                    spriteUV,
+                    endSparkCenter,
+                    _EndSparkSize,
+                    endSparkRotation
+                );
+
+                float endSparkAlphaMask = lerp(
+                    1.0,
+                    tex.a,
+                    saturate(_EndSparkMaskByAlpha)
+                );
+
+                endSpark *=
+                    endSparkTrigger *
+                    _UseEndSpark *
+                    endSparkAlphaMask;
+
+                col.rgb +=
+                    _EndSparkColor.rgb *
+                    endSpark *
+                    _EndSparkIntensity;
+
+                col.a = max(
+                    col.a,
+                    endSpark * _EndSparkColor.a
+                );
+
 
                 float2 pixelUV = lerp(
                     spriteUV,
@@ -458,8 +570,6 @@ Shader "Custom/UI/ItemTierFX1_Final"
 
                 float pixelSquares = GetPixelSquarePattern(pixelUV);
 
-                // Pixel Squares get their own reveal band so the original Frame/Tier
-                // shine remains exactly as before.
                 float pixelProjected = dot(
                     pixelUV - 0.5,
                     shineDirection
@@ -473,11 +583,12 @@ Shader "Custom/UI/ItemTierFX1_Final"
 
                 float pixelDistanceToBand = abs(pixelTravel - 0.5);
 
-                float pixelShine = 1.0 - smoothstep(
-                    _ShineWidth,
-                    _ShineWidth + _ShineSoftness,
-                    pixelDistanceToBand
-                );
+                float pixelShine =
+                    1.0 - smoothstep(
+                        _ShineWidth,
+                        _ShineWidth + _ShineSoftness,
+                        pixelDistanceToBand
+                    );
 
                 pixelShine *= _UseShine;
 

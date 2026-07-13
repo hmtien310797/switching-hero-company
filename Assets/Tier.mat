@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
+  - _PIXELLINKTOSHINE_ON
   - _SPARKLEMASKBYALPHA_ON
   - _USEEDGEGLOW_ON
   - _USEPULSE_ON
@@ -74,7 +75,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _SparkleTex:
         m_Texture: {fileID: 2800000, guid: d0c75f6dab76e0349a13bf74539c7fac, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 2, y: 2}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
@@ -111,6 +112,16 @@ Material:
     - _DstBlendAlpha: 0
     - _EdgeIntensity: 2
     - _EdgeWidth: 1
+    - _EndSparkDebugAlwaysOn: 0
+    - _EndSparkIntensity: 4
+    - _EndSparkMaskByAlpha: 0
+    - _EndSparkPhase: 0.88
+    - _EndSparkPulsePower: 2
+    - _EndSparkRotation: 0
+    - _EndSparkRotationSpeed: 0
+    - _EndSparkSize: 0.22
+    - _EndSparkSoftness: 0.06
+    - _EndSparkTriggerWidth: 0.08
     - _EnvironmentReflections: 1
     - _FlameCutoff: 0
     - _FlameDistortion: 0.09
@@ -127,6 +138,19 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _PixelAreaMaxY: 0.42
+    - _PixelAreaMinX: 0.55
+    - _PixelBaseVisibility: 0.04
+    - _PixelCornerRadius: 0.65
+    - _PixelDebugAlwaysOn: 0
+    - _PixelGridX: 7
+    - _PixelGridY: 7
+    - _PixelLinkToShine: 1
+    - _PixelRandomness: 0.35
+    - _PixelRevealStrength: 1
+    - _PixelShineBoost: 3
+    - _PixelSquareIntensity: 1.2
+    - _PixelSquareSize: 0.68
     - _PulseIntensity: 0.17
     - _PulseMin: 0.15
     - _PulseSpeed: 3.5
@@ -141,10 +165,10 @@ Material:
     - _ShineWidth: 0.045
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _SparkleIntensity: 3
+    - _SparkleIntensity: 1.58
     - _SparkleMaskByAlpha: 1
     - _SparkleRotationSpeed: 0.3
-    - _SparkleScale: 3
+    - _SparkleScale: 2.2
     - _SparkleSize: 1
     - _SparkleSpeed: 3
     - _SparkleThreshold: 0
@@ -158,7 +182,10 @@ Material:
     - _StencilWriteMask: 255
     - _Surface: 0
     - _UseEdgeGlow: 1
+    - _UseEndSpark: 0
     - _UseFlame: 0
+    - _UseNormalizedPixelUV: 0
+    - _UsePixelSquares: 0
     - _UsePulse: 1
     - _UseShine: 0
     - _UseSparkle: 1
@@ -171,13 +198,17 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EdgeColor: {r: 0.9372549, g: 0.4117647, b: 0.007843138, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EndSparkColor: {r: 1, g: 0.95, b: 0.7, a: 1}
+    - _EndSparkPosition: {r: 0.9, g: 0.1, b: 0, a: 0}
     - _FlameColorHigh: {r: 1, g: 0.75, b: 0.05, a: 1}
     - _FlameColorLow: {r: 1, g: 0.06, b: 0.01, a: 1}
     - _FlameScale: {r: 2, g: 2, b: 0, a: 0}
+    - _PixelSquareColor: {r: 1, g: 0.65, b: 0.2, a: 1}
     - _PulseColor: {r: 1, g: 0.5031938, b: 0, a: 1}
     - _ShineColor: {r: 1, g: 0.9509599, b: 0.5235849, a: 1}
     - _SparkleColor: {r: 1, g: 0.9326016, b: 0.4669811, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+    - _SpriteUVRect: {r: 0, g: 0, b: 1, a: 1}
     - _TopColor: {r: 1, g: 0.8702529, b: 0.5235849, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
