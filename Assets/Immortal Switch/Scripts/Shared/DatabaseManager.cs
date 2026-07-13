@@ -67,13 +67,8 @@ namespace Immortal_Switch.Scripts.Shared
 
         public override async UniTask InitializeAsync()
         {
-            InitHeroData();
-            InitBossData();
-            InitSkillData();
-            InitCreepData();
-
-            //dungeonRewardResolver = new DungeonRewardResolver(dungeonDb);
-            await ItemDb.InitializeAsync();
+            await UniTask.WhenAll(InitHeroDataAsync(), InitBossDataAsync(), InitSkillDataAsync(), InitCreepDataAsync(),
+                ItemDb.InitializeAsync());
         }
 
 #region Helper
