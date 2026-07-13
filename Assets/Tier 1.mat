@@ -7,14 +7,14 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: curvedworld_softwind_vegetation
-  m_Shader: {fileID: 4800000, guid: e5b1df82db8744aa79383c6a872440b0, type: 3}
+  m_Name: Tier 1
+  m_Shader: {fileID: 4800000, guid: eb3c83584554f4c57a1a97dc3086ab3b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
-  - _USEVEGETATIONWIND_ON
-  - _USEWIND_ON
+  - _USEEDGEGLOW_ON
+  - _USEFLAME_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -50,8 +50,12 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _FlameNoiseTex:
+        m_Texture: {fileID: 2800000, guid: 3f1d4fadb37c37e4488860109d7dce4b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d45b27a1fa14b402f8bced848ace78e9, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -66,11 +70,11 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _SpecGlossMap:
-        m_Texture: {fileID: 0}
+    - _SparkleTex:
+        m_Texture: {fileID: 2800000, guid: d0c75f6dab76e0349a13bf74539c7fac, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _VegetationTex:
+    - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -91,68 +95,91 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _BendPower: 2
-    - _BendStart: 0.05
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
+    - _ColorMask: 15
     - _Cull: 2
-    - _CurveOffsetY: 0
-    - _CurveStartDistance: 0
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
+    - _EdgeIntensity: 2
+    - _EdgeWidth: 1
     - _EnvironmentReflections: 1
-    - _ForwardCurvature: 0.0003
+    - _FlameCutoff: 0.167
+    - _FlameDistortion: 0.3
+    - _FlameHeight: 1
+    - _FlameIntensity: 3.61
+    - _FlameMaskByAlpha: 0
+    - _FlameSoftness: 0.263
+    - _FlameSpeed: 0.15
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _HorizontalCurvature: 0.002
-    - _HorizontalStartDistance: 0
+    - _GradientPower: 1.2
+    - _GradientStrength: 0.1
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _PulseIntensity: 0.17
+    - _PulseMin: 0.15
+    - _PulseSpeed: 3.5
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _ShineAngle: 30
+    - _ShineIntensity: 2.5
+    - _ShinePhase: 0
+    - _ShineRepeat: 1.2
+    - _ShineSoftness: 0.025
+    - _ShineSpeed: 0.8
+    - _ShineWidth: 0.045
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
+    - _SparkleIntensity: 3
+    - _SparkleMaskByAlpha: 0
+    - _SparkleRotationSpeed: 0.3
+    - _SparkleScale: 3
+    - _SparkleSize: 1
+    - _SparkleSpeed: 3
+    - _SparkleThreshold: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
     - _Surface: 0
-    - _UseAlphaClip: 0
-    - _UseVegetation: 0
-    - _UseVegetationWind: 1
-    - _UseWind: 1
-    - _VegetationBendPower: 5.33
-    - _VegetationBendStart: 0.05
-    - _VegetationOpacity: 1
-    - _VegetationWindFrequency: 20
-    - _VegetationWindSpeed: 10
-    - _VegetationWindStrength: 0.1
-    - _WindDetailSpeed: 2.1
-    - _WindDetailStrength: 0.0196
-    - _WindFrequency: 3.85
-    - _WindPhaseOffset: 0
-    - _WindSpeed: 2.6
-    - _WindStrength: 0.203
+    - _UseEdgeGlow: 1
+    - _UseFlame: 1
+    - _UsePulse: 0
+    - _UseShine: 0
+    - _UseSparkle: 0
+    - _UseUIAlphaClip: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BottomColor: {r: 1, g: 0.61755633, b: 0.019607842, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EdgeColor: {r: 0.9372549, g: 0.4117647, b: 0.007843138, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FlameColorHigh: {r: 1, g: 0.05098039, b: 0.1361348, a: 1}
+    - _FlameColorLow: {r: 1, g: 0.59660846, b: 0.011764705, a: 1}
+    - _FlameScale: {r: 2, g: 2, b: 0, a: 0}
+    - _PulseColor: {r: 1, g: 0.5031938, b: 0, a: 1}
+    - _ShineColor: {r: 1, g: 0.9509599, b: 0.5235849, a: 1}
+    - _SparkleColor: {r: 1, g: 0.9326016, b: 0.4669811, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-    - _VegetationColor: {r: 1, g: 1, b: 1, a: 1}
-    - _VegetationOffset: {r: 0, g: 0, b: 0, a: 0}
-    - _VegetationScale: {r: 1, g: 1, b: 0, a: 0}
+    - _TopColor: {r: 1, g: 0.8702529, b: 0.5235849, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &7069677462945757783
+--- !u!114 &7504692578833227578
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
