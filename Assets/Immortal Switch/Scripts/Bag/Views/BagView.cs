@@ -35,20 +35,26 @@ namespace Immortal_Switch.Scripts.Bag.Views
         private ItemRewardData OnResolveItem(int itemIdx)
         {
             var item = _items[itemIdx];
-            var display = DatabaseManager.Instance.GetDisplayDataByItemKey(item.ItemKey);
 
-            if (display == null)
+            if (int.TryParse(item.ItemKey, out var itemId))
             {
-                return null;
+                var display = DatabaseManager.Instance.GetDisplayData(itemId);
+
+                if (display == null)
+                {
+                    return null;
+                }
+
+                return new ItemRewardData
+                {
+                    ItemKey = item.ItemKey,
+                    Quantity = item.Quantity,
+                    TierInfo = display.TierInfo,
+                    ItemIcon = display.ItemIcon,
+                };
             }
 
-            return new ItemRewardData
-            {
-                ItemKey = item.ItemKey,
-                Quantity = item.Quantity,
-                TierInfo = display.TierInfo,
-                ItemIcon = display.ItemIcon,
-            };
+            return null;
         }
     }
 }

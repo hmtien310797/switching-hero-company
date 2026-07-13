@@ -11,7 +11,7 @@ namespace Immortal_Switch.Scripts.Shared.UI
         private TextMeshProUGUI txtQuantity;
 
         public void BindQuantity(BigNumber quantity)
-        {
+        { 
             txtQuantity.text = quantity.ToInputString();
         }
     }

@@ -43,6 +43,9 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         [SerializeField]
         private Button btnPrev;
 
+        [SerializeField]
+        private Toggle consecutiveChallengeToggle;
+
         [Header("Reward references")]
         [SerializeField]
         private RectTransform rewardContainer;
@@ -67,15 +70,24 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         private int _currentStageIdx;
         private int _maxStageIdx;
 
+        private int ownedTicket;
+
         private void Awake()
         {
             btnNext.onClick.AddListener(OnClickNext);
             btnPrev.onClick.AddListener(OnClickPrev);
             btnStart.onClick.AddListener(OnClickStart);
+    
         }
 
         private void OnClickStart()
         {
+            if(ownedTicket <= 0)
+            {
+                UIManager.Instance.ShowToast("Not Enough Dungeon Ticket");
+                return;
+            }
+
             _onStart?.Invoke(_dungeonId ,_currentStageIdx + 1);
             //for testing dungeon temporarily
             UIManager.Instance.TogglePopupAsync<DungeonView>();
@@ -107,7 +119,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
         private void RefreshBtnDirection()
         {
-            if (_currentStageIdx >= _maxStageIdx - 1)
+            if (_currentStageIdx >= _maxStageIdx)
             {
                 btnNext.gameObject.SetActive(false);
                 btnPrev.gameObject.SetActive(true);
@@ -127,6 +139,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         public void Bind(int dungeonId, int ticketOwned, int ticketRequired, string title, int currentStageIdx, int maxStageIdx, Action<int, int> onStart,
             Func<int, int, IReadOnlyList<ItemRewardData>> onStageChanged)
         {
+            ownedTicket = ticketOwned;
             _dungeonId = dungeonId;
             _onStart = onStart;
             _currentStageIdx = currentStageIdx;

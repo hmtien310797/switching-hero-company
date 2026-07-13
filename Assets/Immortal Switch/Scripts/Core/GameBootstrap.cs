@@ -181,6 +181,7 @@ namespace Immortal_Switch.Scripts.Core
         private void ApplyPlayerData(PlayerMeResponse player)
         {
             UserDataCache.Instance.DisplayName = player.display_name ?? string.Empty;
+            UserDataCache.Instance.Uid = player.user_id ?? string.Empty;
             TopMainView.Instance?.SetDisplayName(UserDataCache.Instance.DisplayName);
 
             UserDataCache.Instance.Exp = player.exp;

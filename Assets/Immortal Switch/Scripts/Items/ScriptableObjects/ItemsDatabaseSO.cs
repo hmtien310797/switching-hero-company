@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Shared.Constants;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -49,16 +50,31 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
         public Sprite LoadIconByItemId(int itemId)
         {
             var item = FindItem(itemId);
-            return item != null ? LoadIcon("ic_currency_Diamond_B") : null;
+
+            if (item != null)
+            {
+                return LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+            }
+
+            Debug.LogError($"Item {itemId} not found");
+            return null;
         }
 
         public Sprite LoadIconByItemKey(string itemKey)
         {
             var item = FindItem(itemKey);
-            return item != null ? LoadIcon("ic_currency_Diamond_B") : null;
+
+            if (item != null)
+            {
+                return LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+            }
+
+            Debug.LogError($"Item {itemKey} not found");
+            return null;
         }
 
-        public Sprite LoadIcon(string iconKey)
+        [CanBeNull]
+        public Sprite LoadIcon(string iconKey, string rarity, string itemType, string itemName)
         {
             if (string.IsNullOrWhiteSpace(iconKey))
             {
@@ -76,12 +92,13 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
                 return sprite;
             }
 
-            sprite = _itemAtlas.GetSprite("ic_currency_Diamond_B");
+            var key = $"ic_{itemType.ToLower()}_{itemName.Replace(" ", "_")}_{rarity}";
+            sprite = _itemAtlas.GetSprite(key);
 
             if (sprite == null)
             {
-                throw new KeyNotFoundException(
-                    $"Sprite '{iconKey}' was not found in atlas '{SpriteAtlasConstants.CURRENCY}'.");
+                Debug.LogError($"Sprite '{iconKey}' was not found in atlas '{SpriteAtlasConstants.CURRENCY}'.");
+                return null;
             }
 
             _spriteCache.Add(iconKey, sprite);

@@ -1,3 +1,4 @@
+using System;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
@@ -6,6 +7,7 @@ using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.AFKReward.Views;
 using Immortal_Switch.Scripts.Bag.Views;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.GameSetting.Views;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items;
@@ -261,16 +263,23 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnActiveFramingClaimClicked()
         {
+            var stageRewards = PvEBattleController.Instance.GetStageRuntimeData().BaseRewards;
+            var afkCurrentTime = DateTime.UtcNow.AddMinutes(30);
+
             UIManager.Instance
                 .OpenPopupAsync<AFKRewardView>(new AFKRewardArgs
                 {
                     OnClaim = OnClickClaim,
+                    Rewards = stageRewards,
+                    AfkCurrentTime = afkCurrentTime,
                 })
                 .Forget();
         }
 
         private void OnClickClaim(bool isClaimX2)
         {
+            Debug.Log($"OnClickClaim in AFKRewardView: {isClaimX2}");
+
             if (rewardSyncService != null)
             {
                 rewardSyncService.ClaimRewardAsync().Forget();

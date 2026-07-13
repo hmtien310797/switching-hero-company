@@ -21,6 +21,9 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         private TextMeshProUGUI txtBaseValue;
 
         [SerializeField]
+        private Image imgIcon;
+
+        [SerializeField]
         private GameObject goBadge;
 
         [SerializeField]
@@ -61,8 +64,12 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             _onClickBuy?.Invoke(storeProductId, 0);
         }
 
-        public void Bind(string title, string price, DynamicHeroesGlobalSpecificationsProductIdRow product,
-            int baseValue, bool hasFirstBuyMultiplier, Action<string, int> onClickBuy)
+        public void Bind(
+            string title, string price,
+            DynamicHeroesGlobalSpecificationsProductIdRow product,
+            int baseValue, bool hasFirstBuyMultiplier,
+            Action<string, int> onClickBuy, string iconId
+        )
         {
             goBadge.SetActive(hasFirstBuyMultiplier);
 
@@ -72,6 +79,13 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
             _onClickBuy = onClickBuy;
             _product = product;
+
+            var icon = ShopManager.Instance.Atlas.LoadIcon(iconId);
+
+            if (icon != null)
+            {
+                imgIcon.sprite = icon;
+            }
         }
     }
 }

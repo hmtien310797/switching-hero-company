@@ -67,9 +67,13 @@ namespace Immortal_Switch.Scripts.Shared
 
         public override async UniTask InitializeAsync()
         {
-            List<UniTask> tasks = new List<UniTask> { InitBossDataAsync(), InitHeroDataAsync(), 
-                InitSkillDataAsync(), InitCreepDataAsync(), ItemDb.InitializeAsync()};
-            await UniTask.WhenAll(tasks);
+            InitHeroData();
+            InitBossData();
+            InitSkillData();
+            InitCreepData();
+
+            //dungeonRewardResolver = new DungeonRewardResolver(dungeonDb);
+            await ItemDb.InitializeAsync();
         }
 
 #region Helper
@@ -93,15 +97,21 @@ namespace Immortal_Switch.Scripts.Shared
 
             if (item != null)
             {
-                var tier = Enum.TryParse<EItemTier>(item.rarity, true, out var result) ? result : EItemTier.D;
-                var tierInfo = ItemTierDb.Get(tier);
-                var icon = ItemDb.LoadIcon(item.iconKey);
+                var icon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
 
-                return new ItemDisplayData
+                if (TrySetTierInfo(item.rarity, out var tierInfo) &&
+                    tierInfo != null)
                 {
-                    ItemIcon = icon,
-                    TierInfo = tierInfo,
-                };
+                    return new ItemDisplayData
+                    {
+                        ItemIcon = icon,
+                        TierInfo = tierInfo,
+                    };
+                }
+            }
+            else
+            {
+                Debug.LogError($"Item {itemKey} not found");
             }
 
             return null;
@@ -295,21 +305,21 @@ namespace Immortal_Switch.Scripts.Shared
 
             if (item != null)
             {
-                var itemIcon = ItemDb.LoadIcon(item.iconKey);
+                var itemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
 
-                if (Enum.TryParse<EItemTier>(item.rarity, true, out var result))
+                if (TrySetTierInfo(item.rarity, out var tierInfo) &&
+                    tierInfo != null)
                 {
-                    var tierInfo = ItemTierDb.Get(result);
-
-                    if (tierInfo != null)
+                    return new ItemDisplayData
                     {
-                        return new ItemDisplayData
-                        {
-                            ItemIcon = itemIcon,
-                            TierInfo = tierInfo,
-                        };
-                    }
+                        ItemIcon = itemIcon,
+                        TierInfo = tierInfo,
+                    };
                 }
+            }
+            else
+            {
+                Debug.LogError($"Item {itemId} not found");
             }
 
             return null;
@@ -321,24 +331,40 @@ namespace Immortal_Switch.Scripts.Shared
 
             if (item != null)
             {
-                var itemIcon = ItemDb.LoadIcon(item.iconKey);
+                var itemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
 
-                if (Enum.TryParse<EItemTier>(item.rarity, true, out var result))
+                if (TrySetTierInfo(item.rarity, out var tierInfo) &&
+                    tierInfo != null)
                 {
-                    var tierInfo = ItemTierDb.Get(result);
-
-                    if (tierInfo != null)
+                    return new ItemDisplayData
                     {
-                        return new ItemDisplayData
-                        {
-                            ItemIcon = itemIcon,
-                            TierInfo = tierInfo,
-                        };
-                    }
+                        ItemIcon = itemIcon,
+                        TierInfo = tierInfo,
+                    };
                 }
+            }
+            else
+            {
+                Debug.LogError($"Item {itemKey} not found");
             }
 
             return null;
+        }
+
+        public bool TrySetTierInfo(string rarity, out ItemTierEntry tierInfo)
+        {
+            if (Enum.TryParse<EItemTier>(rarity, true, out var result))
+            {
+                tierInfo = ItemTierDb.Get(result);
+
+                if (tierInfo != null)
+                {
+                    return true;
+                }
+            }
+
+            tierInfo = null;
+            return false;
         }
 
         private bool TrySetDisplayData(ItemRewardData rewardData)
@@ -360,7 +386,7 @@ namespace Immortal_Switch.Scripts.Shared
             if (tierInfo == null)
                 return false;
 
-            rewardData.ItemIcon = ItemDb.LoadIcon(item.iconKey);
+            rewardData.ItemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
             rewardData.TierInfo = tierInfo;
 
             return true;
@@ -487,17 +513,30 @@ namespace Immortal_Switch.Scripts.Shared
 
                 foreach (var tuple in rewards)
                 {
-                    var itemDisplay = GetDisplayData(tuple.itemId);
+                    var item = ItemDb.FindItem(tuple.itemId);
 
-                    if (itemDisplay != null)
+                    if (item != null)
                     {
-                        result.Add(new ItemRewardData
+                        var itemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+
+                        if (itemIcon != null)
                         {
-                            ItemIcon = itemDisplay.ItemIcon,
-                            TierInfo = itemDisplay.TierInfo,
-                            Quantity = tuple.quantity,
-                            ItemKey = $"{tuple.itemId}",
-                        });
+                            if (TrySetTierInfo(item.rarity, out var tierInfo) &&
+                                tierInfo != null)
+                            {
+                                result.Add(new ItemRewardData
+                                {
+                                    ItemIcon = itemIcon,
+                                    TierInfo = tierInfo,
+                                    Quantity = tuple.quantity,
+                                    ItemKey = item.itemKey,
+                                });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError($"Item {tuple.itemId} not found");
                     }
                 }
             }

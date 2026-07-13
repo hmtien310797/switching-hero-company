@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.Tutorial;
 using TMPro;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         private TextMeshProUGUI txtRewardQuantity;
 
         [SerializeField]
-        private Image imgRewardIcon;
+        private UIItemSlot rewardSlot;
 
         [Header("Mission info")]
         [SerializeField]
@@ -112,26 +113,22 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             if (rewards.Count > 0)
             {
                 var reward = rewards[0];
-                var sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemKey(reward.ItemKey);
 
-                if (sprite != null)
-                {
-                    imgRewardIcon.sprite = sprite;
-                }
-
-                txtRewardQuantity.text = reward.Quantity.ToInputString();
+                rewardSlot.Bind(reward.ItemIcon, reward.TierInfo.border, reward.TierInfo.background, reward.TierInfo.tierIcon);
+                txtRewardQuantity.SetText(reward.Quantity.ToInputString());
             }
         }
 
         private void OnClaim()
         {
-            if (_cfg == null)
+            if (_cfg != null)
             {
-                Debug.LogError("MissionSystemClaim Not Found");
-                return;
+                MissionSystemManager.Instance.MissionClaim(_cfg);
             }
-
-            MissionSystemManager.Instance.MissionClaim(_cfg);
+            else
+            {
+                Debug.LogError("Mission claim not found");
+            }
         }
     }
 }

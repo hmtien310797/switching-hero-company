@@ -56,9 +56,10 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             // server-side), since local StageCount is a stale placeholder (500) otherwise.
             // ticketOwned is a shared balance across all dungeons, not per-dungeon — it comes from
             // state.TicketBalance regardless of whether this specific dungeonKey has an info entry.
-            var maxStage       = info != null ? info.StageCount    : DatabaseManager.Instance.GetDungeonMaxStage(dungeonId);
             var ticketRequired = info != null ? info.TicketRequest : DatabaseManager.Instance.GetDungeonTicketRequest(dungeonId);
-            var startIdx       = Mathf.Clamp(info?.HighestStageCleared ?? 0, 0, Mathf.Max(0, maxStage - 1));
+            //set 500 for test, expect info.highestStageCleard is alway available
+            var startIdx       = Mathf.Clamp(info?.HighestStageCleared ?? 0, 0, Mathf.Max(0, 500 - 1));
+            var maxStage = startIdx + 1;
             var ticketOwned    = (int)state.TicketBalance;
 
             var ui = await UIManager.Instance.OpenPopupAsync<DungeonView>();

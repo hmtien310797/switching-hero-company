@@ -38,7 +38,10 @@ namespace Common
 
         /// <summary>Display name của player — set bởi GameBootstrap từ player/me.</summary>
         public string DisplayName { get; set; }
-        
+
+        /// <summary>Uid của player — set bởi GameBootstrap từ player/me.</summary>
+        public string Uid { get; set; }
+
         /// <summary>exp của player — set bởi GameBootstrap từ player/me.</summary>
         public long Exp { get; set; }
 

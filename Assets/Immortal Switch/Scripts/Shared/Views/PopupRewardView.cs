@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Immortal_Switch.Scripts.Bag.Views.UI;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
@@ -29,10 +29,10 @@ namespace Immortal_Switch.Scripts.Shared.Views
         private RectTransform rewardContainer;
 
         [SerializeField]
-        private UIBagItem rewardPrefab;
+        private UIReward rewardPrefab;
 
         // --- Private Fields ---
-        private List<UIBagItem> _rewards = new();
+        private List<UIReward> _rewards = new();
         private PopupRewardArgs _args;
 
         public override void OnShow(object args)
@@ -66,9 +66,10 @@ namespace Immortal_Switch.Scripts.Shared.Views
                     clone.Bind(reward.ItemIcon,
                         reward.TierInfo.border,
                         reward.TierInfo.background,
-                        reward.TierInfo.tierIcon,
-                        reward.Quantity
+                        reward.TierInfo.tierIcon
                     );
+
+                    clone.BindQuantity(reward.Quantity);
                 }
                 else
                 {
@@ -77,10 +78,10 @@ namespace Immortal_Switch.Scripts.Shared.Views
                     clone.Bind(reward.ItemIcon,
                         reward.TierInfo.border,
                         reward.TierInfo.background,
-                        reward.TierInfo.tierIcon,
-                        reward.Quantity
+                        reward.TierInfo.tierIcon
                     );
 
+                    clone.BindQuantity(reward.Quantity);
                     _rewards.Add(clone);
                 }
             }

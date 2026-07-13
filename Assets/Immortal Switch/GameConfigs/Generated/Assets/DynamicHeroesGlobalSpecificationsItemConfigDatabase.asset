@@ -670,7 +670,7 @@ MonoBehaviour:
     maxStack: 999999
     useType: Consume
     iconKey: icon_summon_ticket_skill
-    sortOrder: 8
+    sortOrder: 46
     status: Active
   - itemId: 47
     itemKey: summon_ticket_hero_banner
@@ -684,5 +684,19 @@ MonoBehaviour:
     maxStack: 999999
     useType: Consume
     iconKey: icon_summon_ticket_hero_banner
-    sortOrder: 9
+    sortOrder: 47
+    status: Active
+  - itemId: 48
+    itemKey: user_exp
+    itemType: Resource
+    itemGroup: HeroGrowth
+    itemName: User EXP
+    desc: "T\xE0i nguy\xEAn d\xF9ng \u0111\u1EC3 t\u0103ng level cho user"
+    rarity: D
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 999999999
+    useType: Consume
+    iconKey: icon_user_exp
+    sortOrder: 48
     status: Active
