@@ -11,5 +11,15 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         /// goi dac biet 1n
         /// </summary>
         public const int ID_DAILY_SPECIAL = 14;
+
+        /// <summary>
+        /// goi thang thuong
+        /// </summary>
+        public const int ID_MONTHLY_NORMAL = 15;
+
+        /// <summary>
+        /// goi thang cao
+        /// </summary>
+        public const int ID_MONTHLY_PREMIUM = 16;
     }
 }

@@ -3,6 +3,15 @@ using System.Collections.Generic;
 
 namespace Immortal_Switch.Scripts.Shop.Models
 {
+    public class MonthlyPassData
+    {
+        /// <summary>Ngày mua gói.</summary>
+        public DateTime PurchaseDate;
+
+        /// <summary>Danh sách ngày đã nhận thưởng (1-based).</summary>
+        public List<int> ClaimedDays = new();
+    }
+
     public class ShopData
     {
         /// <summary>
@@ -35,5 +44,10 @@ namespace Immortal_Switch.Scripts.Shop.Models
         /// Danh sach milestoneId GloryPass da nhan thuong.
         /// </summary>
         public List<int> ClaimedGloryPassIds = new();
+
+        /// <summary>
+        /// Data monthly pass theo packId (15 = normal, 16 = premium).
+        /// </summary>
+        public Dictionary<int, MonthlyPassData> MonthlyPasses = new();
     }
 }

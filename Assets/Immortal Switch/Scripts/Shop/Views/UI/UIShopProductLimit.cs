@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Items.Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,15 +25,17 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         [SerializeField]
         private Button btnBuy;
 
-        [Header("Product references")]
+        [Header("Reward references")]
         [SerializeField]
-        private RectTransform productContainer;
+        private RectTransform rewardContainer;
 
         [SerializeField]
-        private UIShopProductItem productPrefab;
+        private UIShopProductItem rewardPrefab;
 
         // --- Private Fields ---
+        private List<UIShopProductItem> _rewards = new();
         private Action<string, int> _onClickBuy;
+
         private DynamicHeroesGlobalSpecificationsProductIdRow _product;
         private DynamicHeroesGlobalSpecificationsPackIapRow _iap;
 
@@ -67,7 +71,9 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         private void OnClickBuy()
         {
             if (_product == null)
+            {
                 return;
+            }
 
 #if UNITY_IOS
             string storeProductId = _product.appleID;
@@ -80,8 +86,12 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             _onClickBuy?.Invoke(storeProductId, _iap.iD);
         }
 
-        public void Bind(string title, string price, DynamicHeroesGlobalSpecificationsProductIdRow product,
-            DynamicHeroesGlobalSpecificationsPackIapRow iap, Action<string, int> onClickBuy)
+        public void Bind(string title, string price,
+            DynamicHeroesGlobalSpecificationsProductIdRow product,
+            DynamicHeroesGlobalSpecificationsPackIapRow iap,
+            Action<string, int> onClickBuy,
+            IReadOnlyList<ItemRewardData> rewards
+        )
         {
             txtPrice.text = price;
             txtTitle.text = title;
@@ -92,6 +102,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
             RefreshLimit();
             RefreshBonus();
+            RefreshRewards(rewards);
         }
 
         private void RefreshLimit()
@@ -106,6 +117,27 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         private void RefreshBonus()
         {
             txtBonus.text = $"Giá trị <size=30>{_iap.bonus}</size>";
+        }
+
+        private void RefreshRewards(IReadOnlyList<ItemRewardData> rewards)
+        {
+            for (int i = 0; i < rewards.Count; i++)
+            {
+                var reward = rewards[i];
+
+                if (_rewards.Count > i)
+                {
+                    var clone = _rewards[i];
+                    clone.gameObject.SetActive(true);
+                    clone.Bind(reward.ItemIcon, reward.Quantity);
+                }
+                else
+                {
+                    var clone = Instantiate(rewardPrefab, rewardContainer);
+                    clone.Bind(reward.ItemIcon, reward.Quantity);
+                    _rewards.Add(clone);
+                }
+            }
         }
     }
 }

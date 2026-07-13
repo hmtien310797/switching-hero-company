@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9170f37531b50ef49815b3340880a093, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsConfigShopDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - tabId: 1
+    tabKey: special_tab
+    uiNameVi: "\u01AFu \u0110\xE3i \u0110\u1EB7c Bi\u1EC7t"
+    uiNameEn: Special Offers
+    sortOrder: 1
+    sourceTable: pack_iap
+    iconId: icon_tab_special
+    enable: 1
+  - tabId: 2
+    tabKey: monthly_tab
+    uiNameVi: "G\xF3i Qu\xE0 Th\xE1ng"
+    uiNameEn: Monthly Packs
+    sortOrder: 2
+    sourceTable: pack_iap
+    iconId: icon_tab_monthly
+    enable: 1
+  - tabId: 3
+    tabKey: reputation_tab
+    uiNameVi: "Danh V\u1ECDng"
+    uiNameEn: Reputation
+    sortOrder: 3
+    sourceTable: recharge_milestone
+    iconId: icon_tab_reputation
+    enable: 1
+  - tabId: 4
+    tabKey: pack_gem
+    uiNameVi: "G\xF3i N\u1EA1p"
+    uiNameEn: Gem Packs
+    sortOrder: 4
+    sourceTable: pack_gem
+    iconId: co
+    enable: 1
+  - tabId: 5
+    tabKey: even_tab
+    uiNameVi: "G\xF3i Event"
+    uiNameEn: Event Pack
+    sortOrder: 5
+    sourceTable: event_iap
+    iconId: icon_tab_event
+    enable: 1

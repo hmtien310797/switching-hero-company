@@ -50,7 +50,9 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         private void OnClickBuy()
         {
             if (_product == null)
+            {
                 return;
+            }
 
 #if UNITY_IOS
             string storeProductId = _product.appleID;
@@ -73,6 +75,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         {
             goBadge.SetActive(hasFirstBuyMultiplier);
 
+            txtFirstTopupMultiplierQuantity.text = baseValue.ToString();
             txtBaseValue.text = baseValue.ToString();
             txtPrice.text = price;
             txtTitle.text = title;

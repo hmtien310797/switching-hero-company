@@ -1,4 +1,5 @@
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.Modules.Power.Services.Interfaces
@@ -13,6 +14,6 @@ namespace Immortal_Switch.Scripts.Modules.Power.Services.Interfaces
         /// <summary>
         /// tinh toan luc chien cua hero
         /// </summary>
-        double CalculateHeroCp(StatsController stats, int playerLevel);
+        double CalculateHeroCp(StatsController stats, int playerLevel, SummonRarity rarity);
     }
 }

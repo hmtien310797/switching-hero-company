@@ -237,8 +237,8 @@ MonoBehaviour:
   txtBonus: {fileID: 950719971676797785}
   txtLimit: {fileID: 1558827820853056658}
   btnBuy: {fileID: 2564453012105472646}
-  productContainer: {fileID: 7498632129774860117}
-  productPrefab: {fileID: 8753219880103749512, guid: a69b3e69957b8e14fb6f72ececaf2492, type: 3}
+  rewardContainer: {fileID: 7498632129774860117}
+  rewardPrefab: {fileID: 8753219880103749512, guid: a69b3e69957b8e14fb6f72ececaf2492, type: 3}
 --- !u!1 &1375315947905641401
 GameObject:
   m_ObjectHideFlags: 0
@@ -428,8 +428,8 @@ MonoBehaviour:
   txtBonus: {fileID: 7462955421638770075}
   txtLimit: {fileID: 2991892502160848189}
   btnBuy: {fileID: 8404233940113196467}
-  productContainer: {fileID: 1286308243914196519}
-  productPrefab: {fileID: 8753219880103749512, guid: a69b3e69957b8e14fb6f72ececaf2492, type: 3}
+  rewardContainer: {fileID: 1286308243914196519}
+  rewardPrefab: {fileID: 8753219880103749512, guid: a69b3e69957b8e14fb6f72ececaf2492, type: 3}
 --- !u!1 &1942071059911893695
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,7 +439,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7498632129774860117}
-  - component: {fileID: 98977093425182505}
+  - component: {fileID: 7698668743980581260}
   m_Layer: 5
   m_Name: packages_panel
   m_TagString: Untagged
@@ -466,7 +466,7 @@ RectTransform:
   m_AnchoredPosition: {x: -0.0008010864, y: 0}
   m_SizeDelta: {x: 158.93, y: 82.647}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &98977093425182505
+--- !u!114 &7698668743980581260
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -475,7 +475,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1942071059911893695}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
@@ -484,14 +484,12 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 10
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 61.632, y: 84.046}
+  m_Spacing: {x: 10, y: 0}
+  m_Constraint: 1
+  m_ConstraintCount: 5
 --- !u!1 &2627821136965856113
 GameObject:
   m_ObjectHideFlags: 0
@@ -1434,7 +1432,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1286308243914196519}
-  - component: {fileID: 6990733676894775369}
+  - component: {fileID: 2188256973075387315}
   m_Layer: 5
   m_Name: packages_panel
   m_TagString: Untagged
@@ -1461,7 +1459,7 @@ RectTransform:
   m_AnchoredPosition: {x: -0.00079345703, y: 0}
   m_SizeDelta: {x: 158.93, y: 82.647}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &6990733676894775369
+--- !u!114 &2188256973075387315
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1470,7 +1468,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7252242290252985319}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
@@ -1479,14 +1477,12 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 10
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 61.632, y: 84.046}
+  m_Spacing: {x: 10, y: 0}
+  m_Constraint: 1
+  m_ConstraintCount: 5
 --- !u!1 &7669325281061671267
 GameObject:
   m_ObjectHideFlags: 0

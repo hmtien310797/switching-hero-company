@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shop.Views.UI
@@ -16,10 +16,12 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         public void Bind(ShopSpecialRuntimeData weekly, ShopSpecialRuntimeData daily, Action<string, int> onClickBuy)
         {
             var weeklyPrice = weekly.Product.price.ToString(CultureInfo.InvariantCulture);
-            packWeekly.Bind(weekly.Pack.nameVi, weeklyPrice, weekly.Product, weekly.Pack, onClickBuy);
+            var weeklyRewards = DatabaseManager.Instance.GetShopSpecialRewards(weekly.Pack.iD);
+            packWeekly.Bind(weekly.Pack.nameVi, weeklyPrice, weekly.Product, weekly.Pack, onClickBuy, weeklyRewards);
 
             var dailyPrice = daily.Product.price.ToString(CultureInfo.InvariantCulture);
-            packDaily.Bind(daily.Pack.nameVi, dailyPrice, daily.Product, daily.Pack, onClickBuy);
+            var dailyRewards = DatabaseManager.Instance.GetShopSpecialRewards(daily.Pack.iD);
+            packDaily.Bind(daily.Pack.nameVi, dailyPrice, daily.Product, daily.Pack, onClickBuy, dailyRewards);
         }
     }
 }

@@ -260,9 +260,8 @@ public class HeroPassiveState : HeroStateBase
 
     public override async UniTask Enter()
     {
+        duration = 2.2f;
         owner.SetActionLocked(true);
-
-        duration = owner.Anim.PlayPassive();
         timer = 0f;
         hasTriggered = false;
     }
@@ -271,18 +270,11 @@ public class HeroPassiveState : HeroStateBase
     {
         timer += deltaTime;
 
-        float triggerTime = duration * owner.PassiveHitNormalizedTime;
+        float triggerTime = duration;
 
         if (!hasTriggered && timer >= triggerTime)
         {
             hasTriggered = true;
-
-            // TODO:
-            // Passive thật nên tách thành HeroPassiveAbility.
-            // Có passive là aura/stat modifier, có passive là active proc animation.
-            // Bản showcase tạm gây damage nhỏ.
-            // if (owner.HasValidTarget())
-            //     owner.CurrentTarget.ReceiveDamage(1.5f);
         }
 
         if (timer >= duration)

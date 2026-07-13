@@ -25,6 +25,8 @@ namespace Immortal_Switch.Scripts.StatSystem
         DmgBonus = 18,
         BasicDmgBonus = 19,
         SkillDmgBonus = 20,
+        HealEffect = 21,
+        Evasion = 22,
     }
 
     public enum ModifierOp

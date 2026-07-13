@@ -49,7 +49,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         private PassiveSkillRuntime passiveRuntime;
         private SkeletonAnimation ownerSkeletonAnimation;
-        private int activePassiveAuraTrack = -1;
+        private int activePassiveAuraTrack = 1;
         private readonly SkillTargetResolver targetResolver = new();
         private readonly Dictionary<SkillDataSO, float> cooldownRemainingBySkill = new();
 
@@ -69,6 +69,8 @@ namespace Immortal_Switch.Scripts.Skill
         public event Action<HeroSkillController> SkillsChanged;
 
         public HeroActor Owner => owner;
+        
+        
 
         public async UniTask InitializeUltimateSkillDataAndClassSkillData()
         {
@@ -544,6 +546,13 @@ namespace Immortal_Switch.Scripts.Skill
                 return false;
             }
 
+            SkillPassiveConfig passiveConfig = passiveSkill.GetPassiveConfig(level);
+            
+            if (ShouldBlockPassiveDuringUltimate(passiveConfig))
+            {
+                return false;
+            }
+
             // Cooldown chỉ bắt đầu khi buff thực sự có thể apply.
             StartCooldown(skillToActivate, level);
 
@@ -553,6 +562,9 @@ namespace Immortal_Switch.Scripts.Skill
             PlayPassiveTriggerAnimation(
                 skillToActivate,
                 level);
+            
+            PlayPassiveAura(passiveConfig);
+            ClearPassiveAuraAfter(passiveConfig.BuffDuration).Forget();
 
             SkillEventBus.Raise(new SkillEventContext
             {
@@ -564,6 +576,26 @@ namespace Immortal_Switch.Scripts.Skill
             });
 
             return true;
+        }
+        
+        private bool ShouldBlockPassiveDuringUltimate(
+            SkillPassiveConfig passiveConfig)
+        {
+            if (owner == null ||
+                owner.StateMachine == null)
+            {
+                return false;
+            }
+
+            if (passiveConfig == null ||
+                !passiveConfig.PlayTriggerAnimation ||
+                string.IsNullOrEmpty(passiveConfig.TriggerAnimation))
+            {
+                return false;
+            }
+
+            return owner.StateMachine.CurrentStateId ==
+                   HeroStateId.Ultimate;
         }
         
         private void PlayPassiveTriggerAnimation(
@@ -586,7 +618,9 @@ namespace Immortal_Switch.Scripts.Skill
             {
                 return;
             }
-
+            
+            owner.StateMachine.ChangeState(HeroStateId.Passive);
+            
             animationDriver.PlaySkill(
                 passiveConfig.TriggerAnimation);
         }
@@ -1212,10 +1246,10 @@ namespace Immortal_Switch.Scripts.Skill
                     passiveSkill,
                     level);
 
-            PlayPassiveAura(level);
+            //PlayPassiveAura(level);
         }
         
-        private void PlayPassiveAura(int level)
+        private void PlayPassiveAura(SkillPassiveConfig passiveConfig)
         {
             if (passiveSkill == null ||
                 ownerSkeletonAnimation == null ||
@@ -1223,9 +1257,6 @@ namespace Immortal_Switch.Scripts.Skill
             {
                 return;
             }
-
-            SkillPassiveConfig passiveConfig =
-                passiveSkill.GetPassiveConfig(level);
 
             if (passiveConfig == null ||
                 string.IsNullOrEmpty(
@@ -1255,10 +1286,33 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
             }
 
+            int trackIndex = activePassiveAuraTrack;
+
+            ownerSkeletonAnimation.AnimationState.SetEmptyAnimation(
+                trackIndex,
+                0f);
+
+            ownerSkeletonAnimation.AnimationState.Apply(
+                ownerSkeletonAnimation.Skeleton);
+
             ownerSkeletonAnimation.AnimationState.ClearTrack(
-                activePassiveAuraTrack);
+                trackIndex);
+
+            ownerSkeletonAnimation.Update(0f);
 
             activePassiveAuraTrack = -1;
+        }
+        
+        private async UniTaskVoid ClearPassiveAuraAfter(float delay)
+        {
+            if (delay <= 0f)
+            {
+                ClearPassiveAura();
+                return;
+            }
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: destroyCancellationToken);
+            ClearPassiveAura();
         }
 
         private void OnSkillEvent(SkillEventContext context)

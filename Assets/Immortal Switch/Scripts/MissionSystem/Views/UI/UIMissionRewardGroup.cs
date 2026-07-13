@@ -8,12 +8,18 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 {
     public class UIMissionRewardGroup : MonoBehaviour
     {
-        [Header("References reward")] [SerializeField]
+        [Header("References reward")]
+        [SerializeField]
         private UIMissionTotalPoint uiMissionTotalPoint;
 
-        [SerializeField] private Image imgProgress;
-        [SerializeField] private List<UIMissionPoint> points = new();
-        [SerializeField] private List<UIMissionRewardGroupEntry> rewardGroupEntries = new();
+        [SerializeField]
+        private Image imgProgress;
+
+        [SerializeField]
+        private List<UIMissionPoint> points = new();
+
+        [SerializeField]
+        private List<UIMissionRewardGroupEntry> rewardGroupEntries = new();
 
         // --- Private Fields ---
         private string _missionType;

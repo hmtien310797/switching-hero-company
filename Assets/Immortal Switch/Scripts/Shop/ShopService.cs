@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Shop.Interfaces;
+using Immortal_Switch.Scripts.Shop.Models;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shop
@@ -72,6 +74,28 @@ namespace Immortal_Switch.Scripts.Shop
             {
                 _storage.Save();
             }
+
+            // Reset monthly pass đã hết hạn (quá 30 ngày)
+            ResetExpiredMonthlyPasses();
+        }
+
+        private void ResetExpiredMonthlyPasses()
+        {
+            var expired = _storage.Data.MonthlyPasses.Keys
+                .Where(packId => GetMonthlyPassCurrentDay(packId) > 30)
+                .ToList();
+
+            if (expired.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var packId in expired)
+            {
+                _storage.Data.MonthlyPasses.Remove(packId);
+            }
+
+            _storage.Save();
         }
 
         private void ResetPurchasesByCycle(string cycle)
@@ -141,6 +165,75 @@ namespace Immortal_Switch.Scripts.Shop
                 _storage.Data.ClaimedGloryPassIds.Clear();
                 _storage.Save();
             }
+        }
+
+        // ── Monthly Pass ──────────────────────────────────────────────────────
+
+        private MonthlyPassData GetOrCreatePassData(int packId)
+        {
+            if (!_storage.Data.MonthlyPasses.TryGetValue(packId, out var data))
+            {
+                data = new MonthlyPassData();
+                _storage.Data.MonthlyPasses[packId] = data;
+            }
+
+            return data;
+        }
+
+        /// <summary>Đã mua monthly pass packId chưa (còn trong hạn 30 ngày).</summary>
+        public bool IsMonthlyPassPurchased(int packId)
+        {
+            return _storage.Data.MonthlyPasses.ContainsKey(packId) && GetMonthlyPassCurrentDay(packId) <= 30;
+        }
+
+        /// <summary>Ngày mua monthly pass.</summary>
+        public DateTime? GetMonthlyPassPurchaseDate(int packId)
+        {
+            return _storage.Data.MonthlyPasses.TryGetValue(packId, out var data)
+                ? data.PurchaseDate
+                : null;
+        }
+
+        /// <summary>Ngày hiện tại tính từ lúc mua (1-based). Trả về 1 nếu chưa mua, >30 nếu đã hết hạn.</summary>
+        public int GetMonthlyPassCurrentDay(int packId)
+        {
+            if (!_storage.Data.MonthlyPasses.TryGetValue(packId, out var data))
+            {
+                return 1;
+            }
+
+            return (DateTime.UtcNow.Date - data.PurchaseDate.Date).Days + 1;
+        }
+
+        /// <summary>Kiểm tra ngày thứ day đã nhận thưởng chưa.</summary>
+        public bool IsMonthlyPassDayClaimed(int packId, int day)
+        {
+            return _storage.Data.MonthlyPasses.TryGetValue(packId, out var data) && data.ClaimedDays.Contains(day);
+        }
+
+        /// <summary>Đánh dấu đã nhận thưởng cho ngày thứ day. Hết 30 ngày, pass tự động hết hạn vào ngày hôm sau.</summary>
+        public void ClaimMonthlyPassDay(int packId, int day)
+        {
+            var data = GetOrCreatePassData(packId);
+
+            if (!data.ClaimedDays.Contains(day))
+            {
+                data.ClaimedDays.Add(day);
+                _storage.Save();
+            }
+        }
+
+        /// <summary>Ghi nhận giao dịch mua monthly pass.</summary>
+        public void PurchaseMonthlyPass(int packId)
+        {
+            var data = new MonthlyPassData
+            {
+                PurchaseDate = DateTime.UtcNow,
+                ClaimedDays = new List<int>(),
+            };
+
+            _storage.Data.MonthlyPasses[packId] = data;
+            _storage.Save();
         }
     }
 }

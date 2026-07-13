@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using Common;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Modules.Power.Services.Interfaces;
-using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.StatSystem;
@@ -13,10 +13,16 @@ namespace Immortal_Switch.Scripts.Modules.Power.Services
     {
         public double CalculatePlayerCp()
         {
-            var stats = PowerUpManager.Instance.BoundPlayerStats;
+            var heroes = UserDataCache.Instance.inBattleHeroes;
             var synergy = UserDataCache.Instance.AreAllBattleHeroesSameClass() ? ValueConstants.SYNERGY_MULT : 0f;
             var playerLevelInfo = DatabaseManager.Instance.GetLevelByTotalExp(UserDataCache.Instance.Exp);
-            var totalHeroCp = stats.Sum(stat => CalculateHeroCp(stat, playerLevelInfo.level));
+
+            var totalHeroCp = heroes.Sum(hero =>
+            {
+                var stat = hero.Stats;
+                return CalculateHeroCp(stat, playerLevelInfo.level, hero.HeroData.SummonRarity);
+            });
+
             var playerCp = totalHeroCp * (1 + synergy);
             return playerCp;
         }
@@ -67,14 +73,27 @@ namespace Immortal_Switch.Scripts.Modules.Power.Services
         /// tinh toan hero cp:  (OFFENSE + DEFENSE) × grade_mult × level_mult × 0.20
         /// level_mult = 1 + 0.85 × ln(player_level + 1)
         /// </summary>
-        public double CalculateHeroCp(StatsController stats, int playerLevel)
+        public double CalculateHeroCp(StatsController stats, int playerLevel, SummonRarity rarity)
         {
             var step1 = CalculateStep1(stats);
             var step2 = CalculateStep2(stats, step1);
             var step3 = CalculateStep3(stats, step2);
             var step4 = CalculateStep4(stats);
             var levelMult = CalculateLevelMult(playerLevel);
-            return (step3 + step4) * levelMult * 0.2f;
+            var gradeMult = CalculateGradeMult(rarity);
+            return (step3 + step4) * gradeMult * levelMult * 0.2f;
+        }
+
+        private double CalculateGradeMult(SummonRarity rarity)
+        {
+            return rarity switch
+            {
+                SummonRarity.Common => 1.00f,
+                SummonRarity.Rare => 1.35f,
+                SummonRarity.Epic => 1.80f,
+                SummonRarity.Legendary => 2.40f,
+                _ => 1.00f,
+            };
         }
 
         private double CalculateLevelMult(int playerLevel)

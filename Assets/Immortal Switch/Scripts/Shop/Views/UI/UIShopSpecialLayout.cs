@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using UnityEngine;
 
@@ -56,17 +57,18 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 }
 
                 var price = row.Product.price.ToString(CultureInfo.InvariantCulture);
+                var rewards = DatabaseManager.Instance.GetShopSpecialRewards(row.Pack.iD);
 
                 if (_productsItem.Count > i)
                 {
                     var clone = _productsItem[i];
                     clone.gameObject.SetActive(true);
-                    clone.Bind(row.Pack.nameVi, price, row.Product, row.Pack, _onClickBuy);
+                    clone.Bind(row.Pack.nameVi, price, row.Product, row.Pack, _onClickBuy, rewards);
                 }
                 else
                 {
                     var clone = Instantiate(productPrefab, productContainer);
-                    clone.Bind(row.Pack.nameVi, price, row.Product, row.Pack, _onClickBuy);
+                    clone.Bind(row.Pack.nameVi, price, row.Product, row.Pack, _onClickBuy, rewards);
                     _productsItem.Add(clone);
                 }
             }

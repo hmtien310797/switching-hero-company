@@ -529,6 +529,16 @@ public class HeroActor : MonoBehaviour, ICombatUnit
             currentTarget.TakeDamage(damageResult);
             HitEffectManager.Instance.Play(currentTarget);
             SoundManager.Instance.PlaySfx(SoundId.HeroHit);
+            SkillEventBus.Raise(new SkillEventContext
+            {
+                EventType = SkillTriggerEventType.OnHit,
+                Owner = this,
+                Source = this,
+                Target = currentTarget,
+                Skill = null,
+
+                DamageResult = damageResult
+            });
         }
     }
 
@@ -541,6 +551,16 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         {
             DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
             currentTarget.TakeDamage(damageResult);
+            SkillEventBus.Raise(new SkillEventContext
+            {
+                EventType = SkillTriggerEventType.OnHit,
+                Owner = this,
+                Source = this,
+                Target = currentTarget,
+                Skill = null,
+
+                DamageResult = damageResult
+            });
             return;
         }
 

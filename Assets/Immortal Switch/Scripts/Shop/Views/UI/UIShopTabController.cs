@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
@@ -123,18 +124,28 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         private void RefreshTab()
         {
+            var tabsDb = DatabaseManager.Instance.GetAllTabs();
+
             for (int i = 0; i < tabs.Count; i++)
             {
+                var cfg = tabsDb.FirstOrDefault(v => v.tabId == (int)tabs[i].tab);
+
+                if (cfg == null)
+                {
+                    Debug.LogWarning($"[UIShopTab] cfg {tabs[i].tab} not found");
+                    continue;
+                }
+
                 if (_tabsItem.Count > i)
                 {
                     var clone = _tabsItem[i];
                     clone.gameObject.SetActive(true);
-                    clone.Bind(i, tabs[i].tab.ToString(), OnClickTab);
+                    clone.Bind(i, cfg.uiNameVi, OnClickTab);
                 }
                 else
                 {
                     var clone = Instantiate(shopTabPrefab, shopTabContainer);
-                    clone.Bind(i, tabs[i].tab.ToString(), OnClickTab);
+                    clone.Bind(i, cfg.uiNameVi, OnClickTab);
                     _tabsItem.Add(clone);
                 }
             }
@@ -190,7 +201,11 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 }
 
                 case EShopTab.MonthlyPass:
+                {
+                    var packs = DatabaseManager.Instance.GetShopPacksSpecial();
+                    _selectedLayout.GetComponent<UIShopMonthlyLayout>().Bind(packs, _onBuyProduct, _onClaim);
                     break;
+                }
 
                 case EShopTab.GloryPass:
                 {
@@ -207,10 +222,8 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 }
 
                 case null:
-                    break;
-
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    break;
             }
         }
     }

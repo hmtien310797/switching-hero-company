@@ -127,16 +127,18 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         {
             for (int i = 0; i < rewards.Count; i++)
             {
+                var reward = rewards[i];
+
                 if (_rewards.Count > i)
                 {
                     var clone = _rewards[i];
                     clone.gameObject.SetActive(true);
-                    clone.Bind(rewards[i].Quantity);
+                    clone.Bind(reward.ItemIcon, reward.Quantity);
                 }
                 else
                 {
                     var clone = Instantiate(rewardPrefab, rewardContainer);
-                    clone.Bind(rewards[i].Quantity);
+                    clone.Bind(reward.ItemIcon, reward.Quantity);
                     _rewards.Add(clone);
                 }
             }

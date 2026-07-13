@@ -18,8 +18,9 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         // --- Private Fields ---
 
-        public void Bind(BigNumber quantity)
+        public void Bind(Sprite itemIcon, BigNumber quantity)
         {
+            imgIcon.sprite = itemIcon;
             txtQuantity.text = quantity.ToInputString();
         }
     }

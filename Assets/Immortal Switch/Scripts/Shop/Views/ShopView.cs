@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shop.IAP;
 using Immortal_Switch.Scripts.Shop.Views.UI;
 using Immortal_Switch.Scripts.UI;
@@ -14,22 +15,27 @@ namespace Immortal_Switch.Scripts.Shop.Views
         /// <summary>
         /// shop kim cuong
         /// </summary>
-        Topup = 0,
+        Topup = 4,
 
         /// <summary>
         /// goi thang
         /// </summary>
-        MonthlyPass = 1,
+        MonthlyPass = 2,
 
         /// <summary>
         /// goi danh vong
         /// </summary>
-        GloryPass = 2,
+        GloryPass = 3,
 
         /// <summary>
         /// goi dac biet
         /// </summary>
-        Special = 3,
+        Special = 1,
+
+        /// <summary>
+        /// goi event
+        /// </summary>
+        Event = 5,
     }
 
     [Serializable]
@@ -139,11 +145,20 @@ namespace Immortal_Switch.Scripts.Shop.Views
         /// </summary>
         private void OnClickClaim(int shopPackId, EShopTab shopTab)
         {
-            if (shopTab != EShopTab.GloryPass)
+            switch (shopTab)
             {
-                return;
-            }
+                case EShopTab.GloryPass:
+                    ClaimGloryPass(shopPackId);
+                    break;
 
+                case EShopTab.MonthlyPass:
+                    ClaimMonthlyPass(shopPackId);
+                    break;
+            }
+        }
+
+        private void ClaimGloryPass(int shopPackId)
+        {
             var pack = DatabaseManager.Instance.GetShopPacksGloryPass()
                 .Find(v => v.iD == shopPackId);
 
@@ -160,6 +175,28 @@ namespace Immortal_Switch.Scripts.Shop.Views
             }
 
             ClaimGloryPassAsync(shopPackId).Forget();
+        }
+
+        private void ClaimMonthlyPass(int packId)
+        {
+            if (!ShopManager.Instance.IsMonthlyPassPurchased(packId))
+            {
+                return;
+            }
+
+            var currentDay = ShopManager.Instance.GetMonthlyPassCurrentDay(packId);
+
+            if (currentDay <= 0 ||
+                ShopManager.Instance.IsMonthlyPassDayClaimed(packId, currentDay))
+            {
+                return;
+            }
+
+            var rewards = DatabaseManager.Instance.GetPackMonthly(packId, currentDay);
+
+            // TODO: show popup reward
+
+            ShopManager.Instance.ClaimMonthlyPassDay(packId, currentDay);
         }
 
         /// <summary>Gọi recharge/claim — server tự kiểm tra lại số lượt tích nạp trong tháng hiện tại
@@ -196,6 +233,10 @@ namespace Immortal_Switch.Scripts.Shop.Views
                 {
                     // gói IAP special (có limit)
                     ShopManager.Instance.RecordPurchase(packId);
+                }
+                else if (packId is PackIdConstants.ID_MONTHLY_NORMAL or PackIdConstants.ID_MONTHLY_PREMIUM)
+                {
+                    ShopManager.Instance.PurchaseMonthlyPass(packId);
                 }
                 else
                 {

@@ -1,3 +1,5 @@
+using System;
+
 namespace Immortal_Switch.Scripts.Shop.Interfaces
 {
     public interface IShopService
@@ -30,6 +32,26 @@ namespace Immortal_Switch.Scripts.Shop.Interfaces
 
         /// <summary>Reset danh sách GloryPass đã nhận đầu tháng.</summary>
         void ResetGloryPassClaims();
+
+        // ── Monthly Pass ──────────────────────────────────────────────────────
+
+        /// <summary>Đã mua monthly pass packId chưa.</summary>
+        bool IsMonthlyPassPurchased(int packId);
+
+        /// <summary>Ngày mua monthly pass.</summary>
+        DateTime? GetMonthlyPassPurchaseDate(int packId);
+
+        /// <summary>Ngày hiện tại tính từ lúc mua (1-based).</summary>
+        int GetMonthlyPassCurrentDay(int packId);
+
+        /// <summary>Kiểm tra ngày thứ day đã nhận thưởng chưa.</summary>
+        bool IsMonthlyPassDayClaimed(int packId, int day);
+
+        /// <summary>Đánh dấu đã nhận thưởng cho ngày thứ day.</summary>
+        void ClaimMonthlyPassDay(int packId, int day);
+
+        /// <summary>Ghi nhận giao dịch mua monthly pass.</summary>
+        void PurchaseMonthlyPass(int packId);
 
     }
 }

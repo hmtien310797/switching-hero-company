@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated row data from CSV: Dynamic Heroes - Global Specifications - pack_iap
+    /// Auto generated row data from CSV: DynamicHeroes-GlobalSpecifications-pack_iap
     /// </summary>
     [Serializable]
     public class DynamicHeroesGlobalSpecificationsPackIapRow
@@ -113,6 +113,11 @@ namespace Game.Configs.Generated
         /// CSV Column: limit_reset
         /// </summary>
         public string limitReset;
+
+        /// <summary>
+        /// CSV Column: milestone_points
+        /// </summary>
+        public int milestonePoints;
 
     }
 }

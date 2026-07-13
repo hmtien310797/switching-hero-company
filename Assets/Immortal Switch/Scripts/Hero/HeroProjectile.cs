@@ -1,4 +1,5 @@
 ﻿using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -55,6 +56,16 @@ public class HeroProjectile : MonoBehaviour
             DamageResult damageResult = DamageCalculator.CalculateDamage(attacker, target);
             target.TakeDamage(damageResult);
             HitEffectManager.Instance.Play(target);
+            SkillEventBus.Raise(new SkillEventContext
+            {
+                EventType = SkillTriggerEventType.OnHit,
+                Owner = attacker as HeroActor,
+                Source = attacker,
+                Target = target,
+                Skill = null,
+
+                DamageResult = damageResult
+            });
             Destroy(gameObject);
         }
     }

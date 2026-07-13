@@ -9,7 +9,6 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.DungeonSystem.Models;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
-using Immortal_Switch.Scripts.Shop.Views.UI;
 using Immortal_Switch.Scripts.Tutorial.Models;
 using UnityEngine;
 
@@ -39,19 +38,6 @@ namespace Immortal_Switch.Scripts.Shared
         [Header("Tutorial database")]
         [field: SerializeField]
         public TutorialDatabaseSO TutorialDb { get; private set; }
-
-        [Header("Product database")]
-        [SerializeField]
-        private DynamicHeroesGlobalSpecificationsPackDiamondDatabase packDiamondDb;
-
-        [SerializeField]
-        private DynamicHeroesGlobalSpecificationsPackIapDatabase packSpecialDb;
-
-        [SerializeField]
-        private DynamicHeroesGlobalSpecificationsGameRechargeMilestoneDatabase packGloryPassDb;
-
-        [SerializeField]
-        private DynamicHeroesGlobalSpecificationsProductIdDatabase productDb;
 
         // Server-sourced reward preview cache — dungeon_key -> stage -> rewards. Populated by
         // EnsureDungeonStageTableAsync(dungeonId) from dungeon/stage_table. Replaces the old
@@ -431,112 +417,6 @@ namespace Immortal_Switch.Scripts.Shared
                 : 1f;
 
             return (entry.level, currentExp, targetExp, progress);
-        }
-
-#endregion
-
-#region Shop db
-
-        /// <summary>Toàn bộ product khai báo trong bảng product_id — dùng để đăng ký catalog cho
-        /// Unity IAP lúc khởi tạo (IAPManager).</summary>
-        public List<DynamicHeroesGlobalSpecificationsProductIdRow> GetAllProducts()
-        {
-            return productDb.rows;
-        }
-
-        public List<ShopTopupRuntimeData> GetShopPacksTopup()
-        {
-            var list = new List<ShopTopupRuntimeData>();
-
-            foreach (var row in packDiamondDb.rows)
-            {
-                var product = productDb.rows.FirstOrDefault(v => v.iD == row.productId);
-
-                if (product != null)
-                {
-                    list.Add(new ShopTopupRuntimeData
-                    {
-                        Pack = row,
-                        Product = product,
-                    });
-                }
-            }
-
-            return list;
-        }
-
-        public List<ShopSpecialRuntimeData> GetShopPacksSpecial()
-        {
-            var list = new List<ShopSpecialRuntimeData>();
-
-            foreach (var row in packSpecialDb.rows)
-            {
-                var product = productDb.rows.FirstOrDefault(v => v.iD == row.productID);
-
-                if (product != null)
-                {
-                    list.Add(new ShopSpecialRuntimeData
-                    {
-                        Pack = row,
-                        Product = product,
-                    });
-                }
-            }
-
-            return list;
-        }
-
-        public List<DynamicHeroesGlobalSpecificationsGameRechargeMilestoneRow> GetShopPacksGloryPass()
-        {
-            return packGloryPassDb.rows;
-        }
-
-        public IReadOnlyList<ItemRewardData> GetShopGloryPassRewards(int shopPackId)
-        {
-            var result = new List<ItemRewardData>();
-            var packs = GetShopPacksGloryPass();
-            var pack = packs.FirstOrDefault(v => v.iD == shopPackId);
-
-            if (pack != null)
-            {
-                var rewards = new List<(int itemId, int quantity)>
-                {
-                    (pack.itemId1, pack.quantity1),
-                    (pack.itemId2, pack.quantity2),
-                    (pack.itemId3, pack.quantity3),
-                };
-
-                foreach (var tuple in rewards)
-                {
-                    var item = ItemDb.FindItem(tuple.itemId);
-
-                    if (item != null)
-                    {
-                        var itemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
-
-                        if (itemIcon != null)
-                        {
-                            if (TrySetTierInfo(item.rarity, out var tierInfo) &&
-                                tierInfo != null)
-                            {
-                                result.Add(new ItemRewardData
-                                {
-                                    ItemIcon = itemIcon,
-                                    TierInfo = tierInfo,
-                                    Quantity = tuple.quantity,
-                                    ItemKey = item.itemKey,
-                                });
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"Item {tuple.itemId} not found");
-                    }
-                }
-            }
-
-            return result;
         }
 
 #endregion

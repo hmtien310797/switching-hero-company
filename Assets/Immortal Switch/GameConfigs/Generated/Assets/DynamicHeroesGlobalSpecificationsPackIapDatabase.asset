@@ -34,6 +34,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: none
+    milestonePoints: 0
   - iD: 2
     productID: 3
     nameEn: Daily Boost Pack
@@ -55,6 +56,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: daily
+    milestonePoints: 0
   - iD: 3
     productID: 5
     nameEn: Summon Pack
@@ -76,6 +78,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 4
     productID: 5
     nameEn: Growth Pack
@@ -97,6 +100,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 5
     productID: 6
     nameEn: Equipment Pack
@@ -118,6 +122,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 6
     productID: 6
     nameEn: Weekly Special
@@ -139,6 +144,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: weekly
+    milestonePoints: 0
   - iD: 7
     productID: 6
     nameEn: Relic Pack
@@ -160,6 +166,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 8
     productID: 8
     nameEn: Epic Hero Pack
@@ -181,6 +188,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 9
     productID: 8
     nameEn: Weapon Master Pack
@@ -202,6 +210,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 10
     productID: 12
     nameEn: Legendary Pack
@@ -209,11 +218,11 @@ MonoBehaviour:
     shopTab: special_tab
     sortOrder: 12
     itemId1: 21
-    quantity1: 15
+    quantity1: 18
     itemId2: 12
-    quantity2: 200
+    quantity2: 250
     itemId3: 3
-    quantity3: 7500
+    quantity3: 5000
     bonus: 400%
     limit: 1
     iconId: icon_pack_legendary
@@ -223,6 +232,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 11
     productID: 12
     nameEn: Transcendence Pack
@@ -230,11 +240,11 @@ MonoBehaviour:
     shopTab: special_tab
     sortOrder: 13
     itemId1: 17
-    quantity1: 80
+    quantity1: 100
     itemId2: 42
     quantity2: 60
     itemId3: 3
-    quantity3: 6000
+    quantity3: 4000
     bonus: 400%
     limit: 1
     iconId: icon_pack_transcend
@@ -244,6 +254,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 12
     productID: 13
     nameEn: Supreme Value Pack
@@ -251,11 +262,11 @@ MonoBehaviour:
     shopTab: special_tab
     sortOrder: 14
     itemId1: 3
-    quantity1: 15000
+    quantity1: 10000
     itemId2: 21
-    quantity2: 20
+    quantity2: 24
     itemId3: 47
-    quantity3: 50
+    quantity3: 60
     bonus: 400%
     limit: 1
     iconId: icon_pack_supreme
@@ -265,6 +276,7 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: monthly
+    milestonePoints: 0
   - iD: 13
     productID: 5
     nameEn: Weekly Energy Pass
@@ -273,19 +285,20 @@ MonoBehaviour:
     sortOrder: 1
     itemId1: 4
     quantity1: 2000
-    itemId2: 41
-    quantity2: 20
-    itemId3: 4
-    quantity3: 1500
+    itemId2: 4
+    quantity2: 1500
+    itemId3: 41
+    quantity3: 20
     bonus: 2400%
     limit: 1
     iconId: icon_pack_energy_week
     isHot: 1
     isBestValue: 0
     enable: 1
-    packType: normal
-    dripDays: 0
+    packType: subscription
+    dripDays: 6
     limitReset: weekly
+    milestonePoints: 0
   - iD: 14
     productID: 2
     nameEn: Daily Energy Pack
@@ -307,3 +320,48 @@ MonoBehaviour:
     packType: normal
     dripDays: 0
     limitReset: daily
+    milestonePoints: 0
+  - iD: 15
+    productID: 14
+    nameEn: Monthly Card
+    nameVi: "G\xF3i Qu\xE0 Th\xE1ng Th\u01B0\u1EDDng"
+    shopTab: monthly_tab
+    sortOrder: 1
+    itemId1: 3
+    quantity1: 300
+    itemId2: 3
+    quantity2: 100
+    itemId3: 8
+    quantity3: 20
+    bonus: 1850%
+    limit: 1
+    iconId: icon_monthly_normal
+    isHot: 1
+    isBestValue: 0
+    enable: 1
+    packType: subscription
+    dripDays: 30
+    limitReset: monthly
+    milestonePoints: 0
+  - iD: 16
+    productID: 15
+    nameEn: Premium Monthly Card
+    nameVi: "G\xF3i Qu\xE0 Th\xE1ng Cao C\u1EA5p"
+    shopTab: monthly_tab
+    sortOrder: 2
+    itemId1: 3
+    quantity1: 500
+    itemId2: 3
+    quantity2: 200
+    itemId3: 47
+    quantity3: 25
+    bonus: 1400%
+    limit: 1
+    iconId: icon_monthly_premium
+    isHot: 0
+    isBestValue: 1
+    enable: 1
+    packType: subscription
+    dripDays: 30
+    limitReset: monthly
+    milestonePoints: 0

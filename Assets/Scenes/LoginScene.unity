@@ -1592,12 +1592,20 @@ MonoBehaviour:
     BackgroundMusicVolume: 1
     SfxEnabled: 1
     SfxVolume: 1
+    OffscreenEnabled: 1
+    OffscreenIdx: -1
     ScreenShakeEnabled: 1
     DamageFontEnabled: 1
     ContentNotiEnabled: 1
     AutoSleepModeEnabled: 0
     SkillEffectEnabled: 1
     MonsterVisualEnabled: 1
+    BattleMusicEnabled: 1
+    EventNotiEnabled: 1
+    LangCode: en
+    GraphicIdx: 0
+    QualityIdx: 0
+    Fps: 100
 --- !u!4 &538152162
 Transform:
   m_ObjectHideFlags: 0
@@ -2150,11 +2158,35 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
       propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9999905
+      objectReference: {fileID: 0}
+    - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.004363368
+      objectReference: {fileID: 0}
+    - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
+      propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
@@ -2164,6 +2196,10 @@ PrefabInstance:
     - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 732855127276913130, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1255665553640268839, guid: 3b2c1eefcef2d32439ec4fb6b913f798, type: 3}
       propertyPath: m_Pivot.x

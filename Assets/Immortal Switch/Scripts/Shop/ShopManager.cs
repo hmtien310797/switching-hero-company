@@ -97,6 +97,42 @@ namespace Immortal_Switch.Scripts.Shop
             OnDataChanged?.Invoke();
         }
 
+        // ── Monthly Pass ──────────────────────────────────────────────────────
+
+        public bool IsMonthlyPassPurchased(int packId)
+        {
+            return Service.IsMonthlyPassPurchased(packId);
+        }
+
+        public DateTime? GetMonthlyPassPurchaseDate(int packId)
+        {
+            return Service.GetMonthlyPassPurchaseDate(packId);
+        }
+
+        /// <summary>Ngày hiện tại tính từ lúc mua (1-based).</summary>
+        public int GetMonthlyPassCurrentDay(int packId)
+        {
+            return Service.GetMonthlyPassCurrentDay(packId);
+        }
+
+        public bool IsMonthlyPassDayClaimed(int packId, int day)
+        {
+            return Service.IsMonthlyPassDayClaimed(packId, day);
+        }
+
+        public void ClaimMonthlyPassDay(int packId, int day)
+        {
+            Service.ClaimMonthlyPassDay(packId, day);
+            OnDataChanged?.Invoke();
+        }
+
+        /// <summary>Ghi nhận giao dịch mua monthly pass.</summary>
+        public void PurchaseMonthlyPass(int packId)
+        {
+            Service.PurchaseMonthlyPass(packId);
+            OnDataChanged?.Invoke();
+        }
+
         // ── Internal ──────────────────────────────────────────────────────────
 
         private void Load()

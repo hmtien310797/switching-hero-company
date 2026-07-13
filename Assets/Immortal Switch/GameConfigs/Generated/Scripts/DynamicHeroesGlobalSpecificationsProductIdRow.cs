@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated row data from CSV: Dynamic Heroes - Global Specifications - product_id
+    /// Auto generated row data from CSV: DynamicHeroes-GlobalSpecifications-product_id
     /// </summary>
     [Serializable]
     public class DynamicHeroesGlobalSpecificationsProductIdRow
@@ -98,6 +98,11 @@ namespace Game.Configs.Generated
         /// CSV Column: Subscribe
         /// </summary>
         public int subscribe;
+
+        /// <summary>
+        /// CSV Column: Point
+        /// </summary>
+        public int point;
 
     }
 }

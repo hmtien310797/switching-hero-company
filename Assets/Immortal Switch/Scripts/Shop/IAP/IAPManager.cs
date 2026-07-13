@@ -44,6 +44,12 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         /// (không có Google Play/App Store, sandbox lỗi...) hoặc khi init bị timeout.</summary>
         public bool IsAvailable => _storeController != null;
 
+        /// <summary>
+        /// event fire khi mua thanh cong
+        /// 1: pack id da mua thanh cong
+        /// </summary>
+        public event Action<int> OnPurchased;
+
         protected override void OnSingletonAwake()
         {
             // Instance được tạo động (không có prefab đặt sẵn trong scene để tick
@@ -57,7 +63,9 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         public override async UniTask InitializeAsync()
         {
             if (_storeController != null)
+            {
                 return;
+            }
 
             try
             {
@@ -69,7 +77,9 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                     string storeProductId = GetStoreProductId(product);
 
                     if (string.IsNullOrEmpty(storeProductId))
+                    {
                         continue;
+                    }
 
                     ProductType type = product.subscribe == 1 ? ProductType.Subscription : ProductType.Consumable;
                     builder.AddProduct(storeProductId, type);
@@ -85,9 +95,13 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                     _initTcs.Task, UniTask.Delay(TimeSpan.FromSeconds(InitTimeoutSeconds)));
 
                 if (!hasResult)
+                {
                     Debug.LogWarning($"[IAPManager] Initialize timeout sau {InitTimeoutSeconds}s — store không phản hồi, tiếp tục flow game không có IAP.");
+                }
                 else if (!success)
+                {
                     Debug.LogWarning("[IAPManager] Initialize failed — tiếp tục flow game không có IAP.");
+                }
             }
             catch (Exception ex)
             {
@@ -192,6 +206,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
                 Debug.Log($"[IAPManager] Purchase validated & confirmed -> product={storeProductId} pack={packId} gems={response.GemsGranted}");
                 callback?.Invoke(true, null);
+                OnPurchased?.Invoke(packId);
             }
             catch (Exception ex)
             {
@@ -205,7 +220,9 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         private static string ExtractReceiptPayload(string rawReceipt)
         {
             if (string.IsNullOrEmpty(rawReceipt))
+            {
                 return null;
+            }
 
             try
             {
@@ -226,7 +243,9 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                 var player = await NakamaClient.Instance.GetPlayerMeAsync();
 
                 if (player == null)
+                {
                     return;
+                }
 
                 CurrencyManager.Instance.Set(CurrencyType.gold, player.coins);
                 CurrencyManager.Instance.Set(CurrencyType.diamond, player.gems);
