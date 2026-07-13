@@ -11,23 +11,22 @@ using Immortal_Switch.Scripts.Equipment.Runtime;
 using Immortal_Switch.Scripts.Equipment.Services;
 using Immortal_Switch.Scripts.Equipment.UI;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Equipment.Core
 {
     public class WeaponManager : Singleton<WeaponManager>
     {
-        [SerializeField] private WeaponDatabaseSO database;
 
         private WeaponSaveData saveData;
-
         private WeaponInventoryService inventory;
         private WeaponEquipService equip;
         private WeaponAutoEquipService autoEquip;
         private WeaponUpgradeService upgrade;
         private WeaponFuseService fuse;
 
-        public WeaponDatabaseSO Database => database;
+        private WeaponDatabaseSO database;
         public WeaponSaveData SaveData => saveData;
         public WeaponInventoryService Inventory => inventory;
         public WeaponEquipService Equip => equip;
@@ -66,6 +65,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 
         private void Load()
         {
+            database = DatabaseManager.Instance.GetWeaponDatabase();
             saveData = new WeaponSaveData();
         }
 

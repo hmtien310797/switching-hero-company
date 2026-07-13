@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
@@ -21,9 +22,15 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         [Header("Visual Config")]
         [SerializeField] private CurrencyVisualConfigSO currencyVisualConfig;
 
+        private WeaponDatabaseSO _weaponDatabaseSo;
         public void SetDeployedHeroes(List<HeroActor> heroes)
         {
             deployedHeroes = heroes ?? new List<HeroActor>();
+        }
+
+        private void Awake()
+        {
+            _weaponDatabaseSo = DatabaseManager.Instance.GetWeaponDatabase();
         }
 
         public StandardWeaponTabViewModel BuildStandardTab(HeroClass selectedClass, int selectedWeaponId,
@@ -32,7 +39,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             int resolvedSelectedWeaponId = selectedWeaponId;
             if (resolvedSelectedWeaponId <= 0)
             {
-                var standardWeaponDefinitionSos = WeaponManager.Instance.Database.GetStandardsByClass(selectedClass);
+                var standardWeaponDefinitionSos = _weaponDatabaseSo.GetStandardsByClass(selectedClass);
                 if (standardWeaponDefinitionSos != null && standardWeaponDefinitionSos.Count > 0)
                     resolvedSelectedWeaponId = standardWeaponDefinitionSos[0].WeaponId;
             }
@@ -56,10 +63,10 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 });
             }
 
-            if (WeaponManager.Instance == null || WeaponManager.Instance.Database == null)
+            if (_weaponDatabaseSo == null)
                 return vm;
 
-            var standards = WeaponManager.Instance.Database.GetStandardsByClass(selectedClass);
+            var standards = _weaponDatabaseSo.GetStandardsByClass(selectedClass);
             for (int i = 0; i < standards.Count; i++)
             {
                 var def = standards[i];
@@ -102,14 +109,14 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 HeroId = heroId
             };
 
-            if (WeaponManager.Instance == null || WeaponManager.Instance.Database == null)
+            if (WeaponManager.Instance == null || _weaponDatabaseSo == null)
                 return vm;
 
             var hero = DatabaseManager.Instance != null ? DatabaseManager.Instance.GetHeroDataById(heroId) : null;
             if (hero != null)
                 vm.HeroName = hero.Name;
 
-            var def = WeaponManager.Instance.Database.GetExclusiveByHeroId(heroId);
+            var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
             if (def == null)
                 return vm;
 
@@ -147,7 +154,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         public WeaponDetailViewModel BuildStandardDetail(int weaponId, int focusedHeroId = 0)
         {
-            var def = WeaponManager.Instance.Database.GetStandard(weaponId);
+            var def = _weaponDatabaseSo.GetStandard(weaponId);
             if (def == null)
                 return null;
 
@@ -196,7 +203,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         public WeaponDetailViewModel BuildExclusiveDetail(int heroId)
         {
-            var def = WeaponManager.Instance.Database.GetExclusiveByHeroId(heroId);
+            var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
             if (def == null)
                 return null;
 
@@ -248,7 +255,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (WeaponManager.Instance == null)
                 return null;
 
-            var def = WeaponManager.Instance.Database.GetStandard(weaponId);
+            var def = _weaponDatabaseSo.GetStandard(weaponId);
             if (def == null)
                 return null;
 
@@ -524,7 +531,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (WeaponManager.Instance == null)
                 return false;
 
-            var def = WeaponManager.Instance.Database.GetStandard(weaponId);
+            var def = _weaponDatabaseSo.GetStandard(weaponId);
             if (def == null)
                 return false;
 
@@ -547,7 +554,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (WeaponManager.Instance == null)
                 return false;
 
-            var def = WeaponManager.Instance.Database.GetExclusiveByHeroId(heroId);
+            var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
             if (def == null)
                 return false;
 
@@ -570,7 +577,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (WeaponManager.Instance == null)
                 return false;
 
-            var def = WeaponManager.Instance.Database.GetStandard(weaponId);
+            var def = _weaponDatabaseSo.GetStandard(weaponId);
             if (def == null || def.LimitBreakConfig == null)
                 return false;
 
@@ -593,7 +600,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (WeaponManager.Instance == null)
                 return false;
 
-            var def = WeaponManager.Instance.Database.GetExclusiveByHeroId(heroId);
+            var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
             if (def == null || def.LimitBreakConfig == null)
                 return false;
 
@@ -616,7 +623,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (WeaponManager.Instance == null)
                 return false;
 
-            var def = WeaponManager.Instance.Database.GetStandard(weaponId);
+            var def = _weaponDatabaseSo.GetStandard(weaponId);
             if (def == null)
                 return false;
 
@@ -641,7 +648,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         private int GetCurrentMaxLevelForStandard(int weaponId)
         {
-            var def = WeaponManager.Instance.Database.GetStandard(weaponId);
+            var def = _weaponDatabaseSo.GetStandard(weaponId);
             if (def == null || def.LimitBreakConfig == null)
                 return 25;
 
@@ -651,7 +658,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         private int GetCurrentMaxLevelForExclusive(int heroId)
         {
-            var def = WeaponManager.Instance.Database.GetExclusiveByHeroId(heroId);
+            var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
             if (def == null || def.LimitBreakConfig == null)
                 return 25;
 

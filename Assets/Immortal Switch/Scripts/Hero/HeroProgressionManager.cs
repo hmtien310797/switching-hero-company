@@ -10,43 +10,27 @@ namespace Immortal_Switch.Scripts.Hero
 {
     public class HeroProgressionManager : Singleton<HeroProgressionManager>
     {
-        [SerializeField] private HeroProgressionDatabaseSO database;
         private const string saveKey = "hero_progression_save";
 
         private HeroCollectionSaveData saveData;
         private HeroProgressionService service;
 
         public HeroProgressionService Service => service;
-        public HeroProgressionDatabaseSO Database => database;
         public event Action<HeroCollectionChangedArgs> OnHeroCollectionChanged;
+        private HeroProgressionDatabaseSO database;
         private readonly Dictionary<int, List<HeroProgressionRuntimeBridge>> heroBridges = new();
         
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            Load();
-            service = new HeroProgressionService(database, saveData);
-        }
-
         public override UniTask InitializeAsync()
         {
+            Load();
+            service = new HeroProgressionService(database, saveData);
             return UniTask.CompletedTask;
         }
 
-        public void Save()
+        private void Load()
         {
-            //ES3.Save(saveKey, saveData);
-        }
-
-        public void Load()
-        {
+            database = DatabaseManager.Instance.HeroProgressionDatabase;
             saveData = new HeroCollectionSaveData();
-            // if (ES3.KeyExists(saveKey))
-            //     saveData = ES3.Load<HeroCollectionSaveData>(saveKey);
-            // else
-            //     saveData = new HeroCollectionSaveData();
         }
 
         public void ResetData()
@@ -57,13 +41,7 @@ namespace Immortal_Switch.Scripts.Hero
             if (ES3.KeyExists(saveKey))
                 ES3.DeleteKey(saveKey);
         }
-
-        public bool UnlockHero(HeroDataSO hero)
-        {
-            bool result = service.UnlockHero(hero);
-            if (result) Save();
-            return result;
-        }
+        
 
         /// <summary>Sync shard count tuyệt đối từ server (hero/list, player/me).</summary>
         public void SetShard(int heroId, int amount)
@@ -71,18 +49,16 @@ namespace Immortal_Switch.Scripts.Hero
             if (service == null) return;
 
             service.SetShard(heroId, amount);
-            Save();
             NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.ShardAdded);
             RefreshHeroRuntime(heroId);
         }
 
         /// <summary>Sync tier + star tuyệt đối từ server (hero/list, player/me — HeroInstance.Rarity/Star).</summary>
-        public void SetProgress(int heroId, HeroProgressTier tier, int starInTier)
+        private void SetProgress(int heroId, HeroProgressTier tier, int starInTier)
         {
             if (service == null) return;
 
             service.SetProgress(heroId, tier, starInTier);
-            Save();
             NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroUpgraded);
             RefreshHeroRuntime(heroId);
         }
@@ -190,8 +166,7 @@ namespace Immortal_Switch.Scripts.Hero
 
             service.SetProgress(response.HeroId, tier, response.NewStar);
             service.SetShard(response.HeroId, response.ShardBalance);
-
-            Save();
+            
             NotifyHeroCollectionChanged(response.HeroId, HeroCollectionChangeType.HeroUpgraded);
             RefreshHeroRuntime(response.HeroId);
         }
@@ -234,8 +209,7 @@ namespace Immortal_Switch.Scripts.Hero
             owned.CurrentTier = config.StartingTier;
             owned.CurrentStarInTier = config.StartingStarInTier;
             owned.CurrentShard = 0;
-
-            Save();
+            
             NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroReset);
             RefreshHeroRuntime(heroId);
         }
@@ -257,8 +231,7 @@ namespace Immortal_Switch.Scripts.Hero
             owned.CurrentTier = config.StartingTier;
             owned.CurrentStarInTier = config.StartingStarInTier;
             owned.CurrentShard = 0;
-
-            Save();
+            
             NotifyHeroCollectionChanged(heroId, HeroCollectionChangeType.HeroReset);
             RefreshHeroRuntime(heroId);
         }
@@ -345,8 +318,7 @@ namespace Immortal_Switch.Scripts.Hero
 
             bool unlocked = service.UnlockHero(hero);
             if (!unlocked) return;
-
-            Save();
+            
             NotifyHeroCollectionChanged(hero.Id, HeroCollectionChangeType.HeroUnlocked);
             RefreshHeroRuntime(hero.Id);
         }
@@ -363,7 +335,6 @@ namespace Immortal_Switch.Scripts.Hero
             }
 
             service.AddShard(hero.Id, amount);
-            Save();
 
             if (justUnlocked)
                 NotifyHeroCollectionChanged(hero.Id, HeroCollectionChangeType.HeroUnlocked);

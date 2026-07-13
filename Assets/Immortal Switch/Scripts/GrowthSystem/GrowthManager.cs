@@ -3,24 +3,20 @@
  using Immortal_Switch.Scripts.Core;
  using UnityEngine;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.GrowthSystem
 {
     public class GrowthManager : Singleton<GrowthManager>
     {
-        [Header("Config")]
-        [SerializeField] private GrowthDatabaseSO growthDatabase;
-        [SerializeField] private int defaultGold = 100000;
-
-        private const string SAVE_KEY = "GROWTH_SAVE";
-
         public GrowthSaveData SaveData { get; private set; }
         public GrowthSystemService Service { get; private set; }
 
         public event Action OnGrowthChanged;
-        public event Action<int> OnGoldChanged;
         public event Action<int, int, bool> OnTierReadyToUpgradePopup;
+        
+        private GrowthDatabaseSO growthDatabase;
 
         public override UniTask InitializeAsync()
         {
@@ -28,21 +24,10 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             return UniTask.CompletedTask;
         }
 
-        public void Save()
+        private void Load()
         {
-            ES3.Save(SAVE_KEY, SaveData);
-        }
-
-        public void Load()
-        {
-            if (ES3.KeyExists(SAVE_KEY))
-            {
-                SaveData = ES3.Load<GrowthSaveData>(SAVE_KEY);
-            }
-            else
-            {
-                SaveData = new GrowthSaveData();
-            }
+            growthDatabase = DatabaseManager.Instance.GrowthDatabase;
+            SaveData = new GrowthSaveData();
 
             Service = new GrowthSystemService(growthDatabase, SaveData);
             OnGrowthChanged?.Invoke();
@@ -84,7 +69,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             }
 
             SaveData.SetStack(stat, response.NewStack);
-            Save();
 
             CurrencyLedgerService.Instance.TrySpend(CurrencyType.gold, response.GoldSpent, CurrencyTransactionReason.GrowthUpgrade);
 
@@ -132,7 +116,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
             }
 
             SaveData.CurrentUnlockedTier = response.NewTier;
-            Save();
             OnGrowthChanged?.Invoke();
             return true;
         }
@@ -151,7 +134,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
             if (SaveData.CurrentUnlockedTier != oldTier)
             {
-                Save();
                 OnGrowthChanged?.Invoke();
             }
         }
@@ -197,9 +179,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 }
             }
 
-            if (autoSave)
-                Save();
-
             OnGrowthChanged?.Invoke();
         }
 
@@ -240,41 +219,11 @@ namespace Immortal_Switch.Scripts.GrowthSystem
 
         public void ClearData()
         {
-            if (ES3.KeyExists(SAVE_KEY))
-                ES3.DeleteKey(SAVE_KEY);
-
             SaveData = new GrowthSaveData();
             Service = new GrowthSystemService(growthDatabase, SaveData);
 
             Debug.Log("[Growth] DATA CLEARED");
             OnGrowthChanged?.Invoke();
-        }
-
-        [ContextMenu("DEBUG / Unlock Next Tier")]
-        public void DebugUnlockNextTier()
-        {
-            DebugUnlockTierLocal(SaveData.CurrentUnlockedTier + 1);
-            Debug.Log("[Growth] Unlock Tier");
-        }
-
-        [ContextMenu("DEBUG / Save")]
-        public void DebugSave()
-        {
-            Save();
-            Debug.Log("[Growth] Saved");
-        }
-
-        [ContextMenu("DEBUG / Load")]
-        public void DebugLoad()
-        {
-            Load();
-            Debug.Log("[Growth] Loaded");
-        }
-
-        [ContextMenu("DEBUG / CLEAR ALL DATA")]
-        public void DebugClearData()
-        {
-            ClearData();
         }
     }
 }

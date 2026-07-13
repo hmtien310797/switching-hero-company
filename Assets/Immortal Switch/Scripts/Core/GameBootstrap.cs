@@ -19,6 +19,7 @@ using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.WeaponSummon;
+using Immortal_Switch.Scripts.TransmutationSystem;
 using Immortal_Switch.Scripts.Tutorial;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
@@ -43,6 +44,8 @@ namespace Immortal_Switch.Scripts.Core
 
                 // init dau tien. có các manager khác sử dụng tới. tránh lỗi.
                 await DatabaseManager.Instance.InitializeAsync();
+                TransmutationSystemManager.Instance.InitializeAsync();
+                HeroProgressionManager.Instance.InitializeAsync();
                 await PlayerSystemManager.Instance.InitializeAsync();
                 await ShopManager.Instance.InitializeAsync();
                 await MissionSystemManager.Instance.InitializeAsync();

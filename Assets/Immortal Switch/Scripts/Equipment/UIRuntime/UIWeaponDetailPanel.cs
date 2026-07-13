@@ -5,6 +5,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Tutorial;
 using TMPro;
 using UnityEngine;
@@ -273,12 +274,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         private WeaponFuseAllResult BuildMockFuseAllResultForPreview()
         {
             var result = new WeaponFuseAllResult();
-
-            if (WeaponManager.Instance == null ||
-                WeaponManager.Instance.Database == null)
-                return result;
-
-            var database = WeaponManager.Instance.Database;
+            var database = DatabaseManager.Instance.GetWeaponDatabase();
 
             // lấy vài món sample từ database để test popup
             var std1 = database.GetStandard(1001);

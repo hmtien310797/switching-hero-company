@@ -7,7 +7,7 @@ namespace Immortal_Switch.Scripts.Shared
 {
     public partial class DatabaseManager
     {
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsConfigLanguageDatabase languageDb;
 
         public IReadOnlyList<DynamicHeroesGlobalSpecificationsConfigLanguageRow> GetLanguagesReleased()

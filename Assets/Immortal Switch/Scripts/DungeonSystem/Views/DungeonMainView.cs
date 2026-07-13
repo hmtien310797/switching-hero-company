@@ -109,7 +109,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             _selectedDungeon.SetStatus(ETabPresetStatus.Selected);
 
             // lay ra thong tin sprite
-            var spriteInfo = DatabaseManager.Instance.DungeonDb.Get(_selectedDungeon.DungeonId);
+            var spriteInfo = DatabaseManager.Instance.DungeonVisualDb.Get(_selectedDungeon.DungeonId);
 
             if (spriteInfo != null)
             {

@@ -18,10 +18,6 @@ namespace Immortal_Switch.Scripts.MissionSystem
 {
     public class MissionSystemManager : Singleton<MissionSystemManager>
     {
-        [Header("Config")]
-        [SerializeField]
-        private MissionSystemDatabaseSO database;
-
         private IMissionSystemService Service { get; set; }
         private IMissionSystemStorage Storage { get; set; }
 
@@ -55,12 +51,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
         public event Action<List<MissionSystemPoint>, string> OnRewardGroupClaimed;
 
         // --- Private Field ---
+        private MissionSystemDatabaseSO _database;
 
         protected override void OnSingletonAwake()
         {
-            Load();
-            Storage.OnAfterSave = () => SyncToServerAsync().Forget();
-
             PlayerSystemManager.Instance.OnLoginNewDay += OnPlayerSystemLoginNewDay;
             GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
@@ -96,21 +90,24 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public override async UniTask InitializeAsync()
         {
+            Load();
             await SyncFromServerAsync();
         }
 
-        public void Load()
+        private void Load()
         {
-            Storage = new MissionSystemStorage(database);
+            _database = DatabaseManager.Instance.MissionSystemDatabase;
+            Storage = new MissionSystemStorage(_database);
             Service = new MissionSystemService(Storage);
 
             Storage.Load();
             Storage.Initialize();
+            Storage.OnAfterSave = () => SyncToServerAsync().Forget();
         }
 
         public List<DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow> GetMilesStone(string scope)
         {
-            return database.MissionPointMilesStoneConfig.rows.FindAll(v => v.scope == scope);
+            return _database.MissionPointMilesStoneConfig.rows.FindAll(v => v.scope == scope);
         }
 
         public int GetPoint(string missionType)
@@ -160,12 +157,12 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public List<DynamicHeroesGlobalSpecificationsMissionConfigRow> GetMissions(string missionType)
         {
-            return database.MissionConfig.rows.FindAll(v => v.type == missionType);
+            return _database.MissionConfig.rows.FindAll(v => v.type == missionType);
         }
 
         public DynamicHeroesGlobalSpecificationsMissionConfigRow GetMission(string id)
         {
-            return database.MissionConfig.rows.Find(v => v.missionId == id);
+            return _database.MissionConfig.rows.Find(v => v.missionId == id);
         }
 
         public bool IsCompleted(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
@@ -194,7 +191,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             {
                 // tiep nhiem vu moi.
                 case MissionSystemTypes.MAIN:
-                    var nextCfg = database.MissionConfig.rows.Find(v => v.missionId == cfg.nextMission);
+                    var nextCfg = _database.MissionConfig.rows.Find(v => v.missionId == cfg.nextMission);
 
                     if (nextCfg != null)
                     {

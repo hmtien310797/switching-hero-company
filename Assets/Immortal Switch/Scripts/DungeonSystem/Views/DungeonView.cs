@@ -77,6 +77,14 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             btnNext.onClick.AddListener(OnClickNext);
             btnPrev.onClick.AddListener(OnClickPrev);
             btnStart.onClick.AddListener(OnClickStart);
+            btnSweep.onClick.AddListener(() =>
+            {
+                UIManager.Instance.ShowToast("Coming Soon");
+            });
+            consecutiveChallengeToggle.onValueChanged.AddListener(_ =>
+            {
+                UIManager.Instance.ShowToast("Coming Soon");
+            });
     
         }
 

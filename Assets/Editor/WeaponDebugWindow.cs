@@ -129,7 +129,7 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
             if (selectedHero != null)
             {
                 selectedHeroClass = selectedHero.HeroClass;
-                standardCandidates = WeaponManager.Instance.Database.GetStandardsByClass(selectedHeroClass);
+                standardCandidates = DatabaseManager.Instance.GetWeaponDatabase().GetStandardsByClass(selectedHeroClass);
                 if (standardCandidates.Count > 0 && (selectedStandard == null || selectedStandard.WeaponClass != selectedHeroClass))
                     selectedStandard = standardCandidates[0];
             }
@@ -244,7 +244,7 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("EXCLUSIVE WEAPON", EditorStyles.boldLabel);
 
-            var def = WeaponManager.Instance.Database.GetExclusiveByHeroId(selectedHeroId);
+            var def = DatabaseManager.Instance.GetWeaponDatabase().GetExclusiveByHeroId(selectedHeroId);
             if (def == null)
             {
                 EditorGUILayout.HelpBox("No exclusive weapon for this hero.", MessageType.Info);

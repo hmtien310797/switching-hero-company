@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 
 namespace Battle.Dungeon
@@ -24,7 +25,7 @@ namespace Battle.Dungeon
             finalRewards = Array.Empty<DungeonRuntimeReward>();
 
             if (!DungeonStageRuntimeBuilder.TryBuild(
-                    database,
+                    DatabaseManager.Instance.DungeonDatabase,
                     dungeonId,
                     stage,
                     out runtimeData))

@@ -148,7 +148,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
         {
             var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationSystemLevelInfoPanel>();
             var manager = TransmutationSystemManager.Instance;
-            ui.Bind(manager.Database.RateConfig.rows, manager.Storage.Data.Level);
+            ui.Bind(DatabaseManager.Instance.TransmutationSystemDatabase.RateConfig.rows, manager.Storage.Data.Level);
         }
 
         private void OnClickAuto()

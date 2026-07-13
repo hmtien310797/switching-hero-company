@@ -1,6 +1,7 @@
 ﻿using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Services;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -74,7 +75,7 @@ namespace Immortal_Switch.Scripts.Equipment.Runtime
             if (equip.EquippedStandardWeaponId <= 0)
                 return;
 
-            var def = WeaponManager.Instance.Database.GetStandard(equip.EquippedStandardWeaponId);
+            var def = DatabaseManager.Instance.GetWeaponDatabase().GetStandard(equip.EquippedStandardWeaponId);
             if (def == null || def.WeaponClass != heroClass)
                 return;
 
@@ -97,7 +98,7 @@ namespace Immortal_Switch.Scripts.Equipment.Runtime
             if (equip.EquippedExclusiveWeaponId <= 0)
                 return;
 
-            var def = WeaponManager.Instance.Database.GetExclusive(equip.EquippedExclusiveWeaponId);
+            var def = DatabaseManager.Instance.GetWeaponDatabase().GetExclusive(equip.EquippedExclusiveWeaponId);
             if (def == null || def.HeroId != heroId)
                 return;
 

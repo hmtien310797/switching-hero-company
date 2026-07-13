@@ -11,32 +11,32 @@ using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Tutorial.Models;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Immortal_Switch.Scripts.Shared
 {
     public partial class DatabaseManager : Singleton<DatabaseManager>
     {
-        [Header("Database config")]
-        [field: SerializeField]
+        [field: DatabaseBinding]
         public ItemTierDatabaseSO ItemTierDb { get; private set; }
 
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsBadWordDatabase badwordDb;
 
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsPlayerExpDatabase playerExpDb;
 
-        [field: SerializeField]
+        [field: DatabaseBinding]
         public ItemsDatabaseSO ItemDb { get; private set; }
 
-        [SerializeField]
-        private DungeonDatabaseSO dungeonDb;
+        [field: DatabaseBinding]
+        public DungeonDatabaseSO DungeonDatabase { get; private set; }
 
-        [field: SerializeField]
-        public DungeonSystemDatabaseSO DungeonDb { get; private set; }
-
-        [Header("Tutorial database")]
-        [field: SerializeField]
+        [field: DatabaseBinding]
+        public DungeonSystemDatabaseSO DungeonVisualDb { get; private set; }
+        
+        [field: DatabaseBinding]
         public TutorialDatabaseSO TutorialDb { get; private set; }
 
         // Server-sourced reward preview cache — dungeon_key -> stage -> rewards. Populated by
@@ -45,17 +45,33 @@ namespace Immortal_Switch.Scripts.Shared
         // silently drift from the server's already-baked game_dungeon_config.js numbers.
         private readonly Dictionary<string, Dictionary<int, IReadOnlyList<ItemRewardData>>> dungeonStageRewardCache = new();
 
-        protected override void OnSingletonAwake()
-        {
-            InitBadwords();
-            base.OnSingletonAwake();
-        }
-
         public override async UniTask InitializeAsync()
         {
-            await UniTask.WhenAll(InitHeroDataAsync(), InitBossDataAsync(), InitSkillDataAsync(), InitCreepDataAsync(),
-                ItemDb.InitializeAsync());
+            // Chỉ load label game_database đúng một lần.
+            await LoadGameDatabaseAsync();
+
+            // Chỉ gọi sau khi ItemDb đã được bind.
+            if (ItemDb != null)
+            {
+                await ItemDb.InitializeAsync();
+            }
+            else
+            {
+                Debug.LogError(
+                    "[DatabaseManager] ItemDb chưa được load."
+                );
+            }
+
+            await UniTask.WhenAll(
+                InitHeroDataAsync(),
+                InitBossDataAsync(),
+                InitSkillDataAsync(),
+                InitCreepDataAsync()
+            );
+            
+            InitBadwords();
         }
+        
 
 #region Helper
 
@@ -238,7 +254,7 @@ namespace Immortal_Switch.Scripts.Shared
         /// </summary>
         public string GetDungeonKey(int dungeonId)
         {
-            return dungeonDb.TryGetDefinition(dungeonId, out var definition) ? definition.DungeonKey : null;
+            return DungeonDatabase.TryGetDefinition(dungeonId, out var definition) ? definition.DungeonKey : null;
         }
 
         /// <summary>
@@ -246,7 +262,7 @@ namespace Immortal_Switch.Scripts.Shared
         /// </summary>
         public int GetDungeonMaxStage(int dungeonId)
         {
-            return dungeonDb.GetDungeonMaxStage(dungeonId);
+            return DungeonDatabase.GetDungeonMaxStage(dungeonId);
         }
 
         /// <summary>
@@ -254,7 +270,7 @@ namespace Immortal_Switch.Scripts.Shared
         /// </summary>
         public string GetDungeonTitle(int dungeonId)
         {
-            return dungeonDb.GetDungeonDisplayName(dungeonId);
+            return DungeonDatabase.GetDungeonDisplayName(dungeonId);
         }
 
         /// <summary>
@@ -262,7 +278,7 @@ namespace Immortal_Switch.Scripts.Shared
         /// </summary>
         public int GetDungeonTicketRequest(int dungeonId)
         {
-            return dungeonDb.GetDungeonTicketRequest(dungeonId);
+            return DungeonDatabase.GetDungeonTicketRequest(dungeonId);
         }
 
         /// <summary>

@@ -9,26 +9,25 @@ namespace Immortal_Switch.Scripts.Shared
 {
     public partial class DatabaseManager
     {
-        [Header("Product database")]
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsPackDiamondDatabase packDiamondDb;
 
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsPackIapDatabase packSpecialDb;
 
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsGameRechargeMilestoneDatabase packGloryPassDb;
 
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsConfigShopDatabase configShopDb;
 
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsProductIdDatabase productDb;
 
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsPackMothlyTotalDatabase packMonthlyTotalDb;
 
-        [SerializeField]
+        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsPackMonthlyDatabase packMonthlyDb;
 
         public List<DynamicHeroesGlobalSpecificationsConfigShopRow> GetAllTabs()

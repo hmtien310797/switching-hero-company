@@ -19,9 +19,6 @@ namespace Battle.Dungeon
 {
     public sealed partial class DungeonBattleController : MonoBehaviour, IHeroBattleContext
     {
-        [Header("Dungeon Data")] [SerializeField]
-        private DungeonDatabaseSO database;
-
         [SerializeField] private int dungeonId = 1;
         [SerializeField, Min(1)] private int stage = 1;
 
