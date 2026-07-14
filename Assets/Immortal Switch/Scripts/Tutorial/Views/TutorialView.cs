@@ -105,13 +105,8 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
             TutorialManager.Instance.OnCompleteTutorial += OnCompleteTutorial;
             TutorialManager.Instance.OnChangeStep += OnChangeStep;
 
-#if UNITY_EDITOR
             btnSkip.gameObject.SetActive(true);
             btnSkip.onClick.AddListener(OnClickSkip);
-#else
-            btnSkip.gameObject.SetActive(false);
-#endif
-
             btnStory.onClick.AddListener(OnClickFocus);
             btnMask.onClick.AddListener(OnClickFocus);
 
@@ -143,10 +138,7 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         private void OnDestroy()
         {
-#if UNITY_EDITOR
             btnSkip.onClick.RemoveListener(OnClickSkip);
-#endif
-
             btnStory.onClick.RemoveListener(OnClickFocus);
             btnMask.onClick.RemoveListener(OnClickFocus);
 

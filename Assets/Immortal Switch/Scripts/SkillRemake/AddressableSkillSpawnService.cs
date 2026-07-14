@@ -38,6 +38,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 switch (skillData.RuntimeObjectConfig.RuntimeVisualType)
                 {
                     case SkillRuntimeVisualType.SpawnHomingProjectile:
+                    case  SkillRuntimeVisualType.HeroSpineObjectAndHomingProjectile:    
                         await AddressablePoolService.Instance.CreatePoolAsync(
                             skillData.BasePhases[0].Actions[0].Projectile.HomingChainBulletConfig.bulletAddressableKey, skillData.BasePhases[0].Actions[0].Projectile.HomingChainBulletConfig.bulletCount);
                         break;
@@ -54,6 +55,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 switch (skillData.RuntimeObjectConfig.RuntimeVisualType)
                 {
                     case SkillRuntimeVisualType.SpawnHomingProjectile:
+                    case  SkillRuntimeVisualType.HeroSpineObjectAndHomingProjectile:    
                         await AddressablePoolService.Instance.CreatePoolAsync(
                             skillData.Levels[level-1].Phases[0].Actions[0].Projectile.HomingChainBulletConfig.bulletAddressableKey, skillData.Levels[level-1].Phases[0].Actions[0].Projectile.HomingChainBulletConfig.bulletCount);
                         break;
@@ -88,6 +90,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 switch (skillData.RuntimeObjectConfig.RuntimeVisualType)
                 {
                     case SkillRuntimeVisualType.SpawnHomingProjectile:
+                    case  SkillRuntimeVisualType.HeroSpineObjectAndHomingProjectile:    
                         AddressablePoolService.Instance.DespawnAndDisposePool(
                             skillData.BasePhases[0].Actions[0].Projectile.HomingChainBulletConfig.bulletAddressableKey);
                         break;
@@ -104,6 +107,7 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 switch (skillData.RuntimeObjectConfig.RuntimeVisualType)
                 {
                     case SkillRuntimeVisualType.SpawnHomingProjectile:
+                    case  SkillRuntimeVisualType.HeroSpineObjectAndHomingProjectile:    
                         AddressablePoolService.Instance.DespawnAndDisposePool(
                             skillData.Levels[0].Phases[0].Actions[0].Projectile.HomingChainBulletConfig.bulletAddressableKey);
                         break;

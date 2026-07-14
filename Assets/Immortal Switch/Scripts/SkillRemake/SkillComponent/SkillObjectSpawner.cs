@@ -83,6 +83,7 @@ namespace Immortal_Switch.Scripts.Skill
                     switch (config.RuntimeVisualType)
                     {
                         case SkillRuntimeVisualType.SpawnHomingProjectile:
+                        case SkillRuntimeVisualType.HeroSpineObjectAndHomingProjectile:    
                             keyAsset = SkillRuntimeObjectConfig.HomingBulletSpawnerKey;
                             break;
                         case SkillRuntimeVisualType.SpawnProjectilePatternBehavior:

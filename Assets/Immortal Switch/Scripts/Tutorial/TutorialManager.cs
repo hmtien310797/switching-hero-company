@@ -324,13 +324,11 @@ namespace Immortal_Switch.Scripts.Tutorial
                 return;
             }
 
-            UIManager.Instance
-                .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
+            UIManager.Instance.OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
                 {
                     Rewards = rewards,
                     OnClose = OnClosePopupReward,
-                })
-                .Forget();
+                }, false).Forget();
 
             foreach (var reward in rewards)
             {

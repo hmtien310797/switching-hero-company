@@ -1,13 +1,22 @@
 using System;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Level.Stage;
+using UnityEngine;
 
 namespace Battle.Dungeon
 {
     [Serializable]
     public class DungeonRuntimeReward : ItemRewardData
     {
+        public DungeonRuntimeReward(string itemKey, BigNumber quantity) : base(itemKey, quantity)
+        {
+        }
 
+        public DungeonRuntimeReward(string itemKey, BigNumber quantity, Sprite itemIcon, ItemTierEntry tierInfo) : base(itemKey, quantity, itemIcon, tierInfo)
+        {
+        }
     }
 
     [Serializable]

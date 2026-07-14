@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Currency
@@ -96,11 +100,21 @@ namespace Immortal_Switch.Scripts.Currency
         /// field riêng vì tên JSON không khớp tên CurrencyType ("diamonds" vs "diamond"); còn lại
         /// (items) parse theo tên CurrencyType — bỏ qua key không khớp enum nào (vd. item_id số).
         /// </summary>
-        public void ApplyServerBalances(long gold, long diamonds, int energy, IReadOnlyDictionary<string, double> items = null)
+        public void ApplyServerBalances(long gold, long diamonds, int crystal, IReadOnlyDictionary<string, double> items = null)
         {
             Set(CurrencyType.gold, BigNumber.FromDouble(gold));
             Set(CurrencyType.diamond, BigNumber.FromDouble(diamonds));
-            Set(CurrencyType.energy, BigNumber.FromDouble(energy));
+            Set(CurrencyType.crystal, BigNumber.FromDouble(crystal));
+            
+            UIManager.Instance.TogglePopupAsync<PopupRewardView>(new PopupRewardArgs
+            {
+                Rewards = new List<ItemRewardData>
+                {
+                    new(nameof(CurrencyType.gold), BigNumber.FromDouble(gold)),
+                    new(nameof(CurrencyType.diamond), BigNumber.FromDouble(diamonds)),
+                    new(nameof(CurrencyType.crystal), BigNumber.FromDouble(crystal)),
+                }
+            }, false).Forget();
 
             if (items == null)
                 return;
@@ -113,7 +127,7 @@ namespace Immortal_Switch.Scripts.Currency
         }
 
         /// <summary>
-        /// Ghi đè balance tuyệt đối từ balances array của server (afk/claim, idle/flush).
+        /// Ghi đè balance tuyệt đối từ balances array của server (afk/claim).
         /// currency_type trong RewardDto khớp tên CurrencyType enum (case-insensitive).
         /// amount là string số nguyên.
         /// </summary>

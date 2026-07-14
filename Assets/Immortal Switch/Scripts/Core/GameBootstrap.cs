@@ -185,6 +185,8 @@ namespace Immortal_Switch.Scripts.Core
         {
             UserDataCache.Instance.DisplayName = player.display_name ?? string.Empty;
             UserDataCache.Instance.Uid = player.user_id ?? string.Empty;
+            UserDataCache.Instance.GoogleLinked = player.google_linked;
+            UserDataCache.Instance.AppleLinked = player.apple_linked;
             TopMainView.Instance?.SetDisplayName(UserDataCache.Instance.DisplayName);
 
             UserDataCache.Instance.Exp = player.exp;

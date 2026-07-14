@@ -19,9 +19,9 @@ namespace Immortal_Switch.Scripts.Currency
 
         summon_ticket,
         advanced_summon_ticket,
-
+        
         hero_exp,
-
+        user_exp,
         hero_fragment,
         epic_hero_fragment,
         legendary_hero_fragment,

@@ -98,8 +98,13 @@ namespace Immortal_Switch.Scripts.HeroUIView
             return viewData;
         }
 
-        public static int Sort(HeroCollectionItemViewData a, HeroCollectionItemViewData b)
+        public static int Sort(
+            HeroCollectionItemViewData a,
+            HeroCollectionItemViewData b)
         {
+            if (a.IsInLineup != b.IsInLineup)
+                return a.IsInLineup ? -1 : 1;
+
             if (a.IsAcquired != b.IsAcquired)
                 return a.IsAcquired ? -1 : 1;
 

@@ -21,6 +21,16 @@ namespace Immortal_Switch.Scripts.Items.Models
 
     public class ItemRewardData : ItemData, IItemDisplayData
     {
+        public ItemRewardData(string itemKey, BigNumber quantity) : base(itemKey, quantity)
+        {
+        }
+        
+        public ItemRewardData(string itemKey, BigNumber quantity, Sprite itemIcon, ItemTierEntry tierInfo) : base(itemKey, quantity)
+        {
+            ItemIcon =  itemIcon;
+            TierInfo = tierInfo;
+        }
+
         public Sprite ItemIcon { get; set; }
         public ItemTierEntry TierInfo { get; set; }
     }
@@ -35,5 +45,11 @@ namespace Immortal_Switch.Scripts.Items.Models
     {
         public string ItemKey;
         public BigNumber Quantity;
+
+        public ItemData(string itemKey, BigNumber quantity)
+        {
+            ItemKey = itemKey;
+            Quantity = quantity;
+        }
     }
 }

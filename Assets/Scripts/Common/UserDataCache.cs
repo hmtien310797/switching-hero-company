@@ -42,6 +42,15 @@ namespace Common
         /// <summary>Uid của player — set bởi GameBootstrap từ player/me.</summary>
         public string Uid { get; set; }
 
+        /// <summary>Đã link Google chưa — set bởi GameBootstrap từ player/me.</summary>
+        public bool GoogleLinked { get; set; }
+
+        /// <summary>Đã link Apple chưa — set bởi GameBootstrap từ player/me.</summary>
+        public bool AppleLinked { get; set; }
+
+        /// <summary>Account đã link bất kỳ social provider nào — quyết định hiển thị gg_linked/gg_no_link trong SettingView.</summary>
+        public bool IsSocialLinked => GoogleLinked || AppleLinked;
+
         /// <summary>exp của player — set bởi GameBootstrap từ player/me.</summary>
         public long Exp { get; set; }
 
@@ -187,7 +196,7 @@ namespace Common
             return 0;
         }
         
-                /// <summary>Trang bị skill vào slot trống đầu tiên (thật, không phải vị trí đã dồn).
+        /// <summary>Trang bị skill vào slot trống đầu tiên (thật, không phải vị trí đã dồn).
         /// Trả về slot_index thật đã dùng để caller gửi đúng lên server (skill/equip), hoặc -1 nếu
         /// không trang bị được.</summary>
         public async UniTask<int> EquipSkill(int heroId, int skillId)

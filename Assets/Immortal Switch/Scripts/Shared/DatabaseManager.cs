@@ -94,7 +94,7 @@ namespace Immortal_Switch.Scripts.Shared
 
             if (item != null)
             {
-                var icon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+                Sprite icon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
 
                 if (TrySetTierInfo(item.rarity, out var tierInfo) &&
                     tierInfo != null)
@@ -157,13 +157,7 @@ namespace Immortal_Switch.Scripts.Shared
                     set.TierInfo != null &&
                     set.ItemIcon != null)
                 {
-                    results.Add(new ItemRewardData
-                    {
-                        ItemIcon = set.ItemIcon,
-                        TierInfo = set.TierInfo,
-                        Quantity = entry.quantity,
-                        ItemKey = entry.itemKey,
-                    });
+                    results.Add(new ItemRewardData(entry.itemKey, entry.quantity, set.ItemIcon, set.TierInfo));
                 }
             }
 
@@ -237,7 +231,7 @@ namespace Immortal_Switch.Scripts.Shared
                 {
                     foreach (var kv in entry.Rewards)
                     {
-                        var reward = new ItemRewardData { ItemKey = kv.Key, Quantity = BigNumber.FromDouble(kv.Value) };
+                        var reward = new ItemRewardData(kv.Key, BigNumber.FromDouble(kv.Value));
                         TrySetDisplayData(reward);
                         rewards.Add(reward);
                     }
@@ -364,7 +358,7 @@ namespace Immortal_Switch.Scripts.Shared
             return false;
         }
 
-        private bool TrySetDisplayData(ItemRewardData rewardData)
+        public bool TrySetDisplayData(ItemRewardData rewardData)
         {
             if (rewardData == null ||
                 string.IsNullOrEmpty(rewardData.ItemKey))

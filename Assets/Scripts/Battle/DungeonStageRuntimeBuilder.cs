@@ -184,11 +184,7 @@ namespace Battle.Dungeon
                 if (amount <= 0d)
                     continue;
 
-                temp[validCount++] = new DungeonRuntimeReward
-                {
-                    ItemKey = itemId,
-                    Quantity = BigNumber.FromDouble(amount)
-                };
+                temp[validCount++] = new DungeonRuntimeReward(itemId, BigNumber.FromDouble(amount));
             }
 
             if (validCount == 0)

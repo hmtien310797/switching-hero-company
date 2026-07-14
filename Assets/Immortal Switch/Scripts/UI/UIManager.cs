@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Shared.Views;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -398,6 +399,127 @@ namespace Immortal_Switch.Scripts.UI
             var view = await OpenPopupAsync<T>(args, withBackdrop);
             GameEventManager.Trigger(GameEvents.OnToggleMainView);
             return view != null;
+        }
+
+        public async UniTask<T> PreloadAsync<T>() where T : UIView
+        {
+            var key = typeof(T).Name;
+
+            // Đã được cache rồi thì trả lại luôn.
+            if (_cachedEntries.TryGetValue(key, out var cachedEntry) &&
+                cachedEntry != null &&
+                cachedEntry.view != null)
+            {
+                return cachedEntry.view as T;
+            }
+
+            // Nếu đang có một luồng load/open cùng UI này.
+            if (_openingTasks.TryGetValue(key, out var existingTask))
+            {
+                return (T)await existingTask.Task;
+            }
+
+            var tcs = new UniTaskCompletionSource<UIView>();
+            _openingTasks[key] = tcs;
+
+            AsyncOperationHandle<GameObject> handle = default;
+
+            try
+            {
+                handle = Addressables.LoadAssetAsync<GameObject>(key);
+                await handle.Task;
+
+                if (handle.Status != AsyncOperationStatus.Succeeded ||
+                    handle.Result == null)
+                {
+                    Debug.LogError($"[UIManager] Failed to preload UI: {key}");
+
+                    tcs.TrySetResult(null);
+                    return null;
+                }
+
+                var prefab = handle.Result;
+                var prefabView = prefab.GetComponent<UIView>();
+
+                if (prefabView == null)
+                {
+                    Debug.LogError(
+                        $"[UIManager] Prefab {key} does not contain UIView.");
+
+                    Addressables.Release(handle);
+
+                    tcs.TrySetResult(null);
+                    return null;
+                }
+
+                var layer = prefabView.Layer;
+                var parent = GetLayerRoot(layer);
+
+                if (parent == null)
+                {
+                    Addressables.Release(handle);
+
+                    tcs.TrySetResult(null);
+                    return null;
+                }
+
+                var go = Instantiate(prefab, parent, false);
+
+                var typedView = go.GetComponent<T>();
+
+                if (typedView == null)
+                {
+                    Destroy(go);
+                    Addressables.Release(handle);
+
+                    tcs.TrySetResult(null);
+                    return null;
+                }
+
+                // Không gọi OnShow hoặc PlayShowAsync.
+                go.SetActive(false);
+
+                // Preload thì bắt buộc phải cache,
+                // nếu không UI sẽ không có nơi giữ instance và handle.
+                typedView.CacheOnClose = true;
+
+                var entry = new Entry
+                {
+                    key = key,
+                    layer = layer,
+                    handle = handle,
+                    view = typedView,
+                    closed = true,
+                    cacheOnClose = true
+                };
+
+                _cachedEntries[key] = entry;
+
+                Debug.Log($"[UIManager] Preloaded UI: {key}");
+
+                tcs.TrySetResult(typedView);
+
+                return typedView;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(
+                    $"[UIManager] Failed to preload {key}: {exception}");
+
+                if (handle.IsValid())
+                {
+                    Addressables.Release(handle);
+                    Addressables.Release(handle);
+                }
+
+                tcs.TrySetResult(null);
+
+                return null;
+            }
+            finally
+            {
+                _openingTasks.Remove(key);
+            }
         }
 
         /// <summary>
@@ -863,6 +985,7 @@ namespace Immortal_Switch.Scripts.UI
                 OpenPopupAsync<TopMainView>(withBackdrop: false)
             );
 
+            PreloadAsync<PopupRewardView>().Forget();
             tapeAnimator.transform.parent = GetLayerRoot(UILayer.Main);
         }
 

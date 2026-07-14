@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Common;
+using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.GameSetting.Views.UI;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
+using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -227,7 +230,13 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
 
         private void OnClickDeleteAccount()
         {
-            // todo: on click delete account
+            UIManager.Instance
+                .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
+                    "Xoá tài khoản",
+                    "Hành động này sẽ xoá vĩnh viễn tài khoản và toàn bộ dữ liệu.\nBạn có chắc chắn muốn tiếp tục?",
+                    () => SettingManager.Instance.DeleteAccount()
+                ))
+                .Forget();
         }
 
         private void OnClickLogout()

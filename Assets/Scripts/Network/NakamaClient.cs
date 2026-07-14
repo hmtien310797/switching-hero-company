@@ -280,6 +280,27 @@ public class NakamaClient : MonoBehaviour
     }
 
     /// <summary>
+    /// Link tài khoản Google vào account đang đăng nhập (Android). googleToken là idToken lấy từ
+    /// Google Sign-In SDK. Server chặn qua beforeLinkGoogle nếu account không phải guest/BD (đã
+    /// link Google/Apple từ trước) — xem nakama/src/handler/account.js.
+    /// </summary>
+    public async Task LinkGoogleAsync(string googleToken)
+    {
+        await Client.LinkGoogleAsync(Session, googleToken);
+        Debug.Log($"[NakamaClient] Google linked. UserId={Session.UserId}");
+    }
+
+    /// <summary>
+    /// Link tài khoản Apple vào account đang đăng nhập (iOS). appleToken là identityToken lấy từ
+    /// Sign In with Apple SDK. Cùng rule chặn với LinkGoogleAsync.
+    /// </summary>
+    public async Task LinkAppleAsync(string appleToken)
+    {
+        await Client.LinkAppleAsync(Session, appleToken);
+        Debug.Log($"[NakamaClient] Apple linked. UserId={Session.UserId}");
+    }
+
+    /// <summary>
     /// Set session từ bên ngoài (ví dụ sau khi auth qua hệ thống custom).
     /// </summary>
     public void SetSession(ISession session)
@@ -437,6 +458,20 @@ public class NakamaClient : MonoBehaviour
         var payload = JsonUtility.ToJson(request);
         var response = await CallRpcAsync("player/update", payload);
         return JsonUtility.FromJson<PlayerUpdateResponse>(response.Payload);
+    }
+
+    /// <summary>Đổi display_name qua RPC player/rename. Server validate độ dài 2-20 ký tự.</summary>
+    public async Task<PlayerRenameResponse> RenamePlayerAsync(string displayName)
+    {
+        var payload = JsonUtility.ToJson(new PlayerRenameRequest { display_name = displayName });
+        var response = await CallRpcAsync("player/rename", payload);
+        return JsonUtility.FromJson<PlayerRenameResponse>(response.Payload);
+    }
+
+    /// <summary>Xoá vĩnh viễn tài khoản qua RPC account/delete. Không thể hoàn tác.</summary>
+    public async Task DeleteAccountAsync()
+    {
+        await CallRpcAsync("account/delete", "{}");
     }
 
     // ── Summon Execute ────────────────────────────────────────────────────────
@@ -769,27 +804,15 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<AfkClaimResponse>(response.Payload);
     }
 
-    // ── Online Idle ───────────────────────────────────────────────────────────
-
     /// <summary>
-    /// Claim active farming reward khi player bấm nút hình gương.
-    /// Không cần gửi gì — server tự tính elapsed từ last_claim_unix và stage hiện tại.
+    /// Xem trước reward sẽ nhận nếu claim ngay bây giờ — KHÔNG ghi checkpoint, KHÔNG cộng bag.
+    /// Dùng để hiển thị popup claim với số liệu thật trước khi player bấm Claim (response
+    /// không có field balances vì chưa có gì được cộng).
     /// </summary>
-    public async Task<IdleClaimResponse> ClaimOnlineIdleAsync()
+    public async Task<AfkClaimResponse> PeekAfkRewardAsync()
     {
-        var response = await CallRpcAsync("idle/claim", "{}");
-        return JsonConvert.DeserializeObject<IdleClaimResponse>(response.Payload);
-    }
-
-    /// <summary>
-    /// Flush online idle reward mỗi 60 giây hoặc khi stage thay đổi.
-    /// Server verify expected reward từ config, cộng wallet và trả balances.
-    /// </summary>
-    public async Task<IdleFlushResponse> FlushOnlineIdleAsync(IdleFlushRequest request)
-    {
-        var payload  = JsonConvert.SerializeObject(request);
-        var response = await CallRpcAsync("idle/flush", payload);
-        return JsonConvert.DeserializeObject<IdleFlushResponse>(response.Payload);
+        var response = await CallRpcAsync("afk/preview", "{}");
+        return JsonConvert.DeserializeObject<AfkClaimResponse>(response.Payload);
     }
 
     // ── Mission ───────────────────────────────────────────────────────────────

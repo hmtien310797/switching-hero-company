@@ -642,4 +642,17 @@ namespace Immortal_Switch.Scripts.Core
             return result;
         }
     }
+    
+    public static class BigNumberExtensions
+    {
+        public static BigNumber ToBigNumber(this string input)
+        {
+            if (BigNumber.TryParseInputString(input, out var result))
+            {
+                return result;
+            }
+
+            return BigNumber.Zero;
+        }
+    }
 }

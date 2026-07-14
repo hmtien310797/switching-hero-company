@@ -15,20 +15,26 @@ namespace Immortal_Switch.Scripts.Shared.UI
     [RequireComponent(typeof(Button))]
     public class UITabPreset : MonoBehaviour
     {
-        [Header("Main references")] [SerializeField]
+        [Header("Main references")]
+        [SerializeField]
         private Button btn;
 
-        [Header("Selected references")] [SerializeField]
+        [Header("Selected references")]
+        [SerializeField]
         private TextMeshProUGUI txtSelected;
 
-        [SerializeField] private GameObject goSelected;
+        [SerializeField]
+        private GameObject goSelected;
 
-        [Header("Normal references")] [SerializeField]
+        [Header("Normal references")]
+        [SerializeField]
         private TextMeshProUGUI txtNormal;
 
-        [SerializeField] private GameObject goNormal;
+        [SerializeField]
+        private GameObject goNormal;
 
-        [Header("Status references")] [SerializeField]
+        [Header("Status references")]
+        [SerializeField]
         private GameObject goLock;
 
         // --- Private Fields
@@ -61,6 +67,11 @@ namespace Immortal_Switch.Scripts.Shared.UI
 
         public void SetLabel(string txt)
         {
+            if (string.IsNullOrWhiteSpace(txt))
+            {
+                return;
+            }
+
             if (txtSelected != null)
             {
                 txtSelected.text = txt;

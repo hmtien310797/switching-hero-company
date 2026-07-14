@@ -45,13 +45,7 @@ namespace Immortal_Switch.Scripts.Bag.Views
                     return null;
                 }
 
-                return new ItemRewardData
-                {
-                    ItemKey = item.ItemKey,
-                    Quantity = item.Quantity,
-                    TierInfo = display.TierInfo,
-                    ItemIcon = display.ItemIcon,
-                };
+                return new ItemRewardData(item.ItemKey, item.Quantity, display.ItemIcon, display.TierInfo);
             }
 
             return null;

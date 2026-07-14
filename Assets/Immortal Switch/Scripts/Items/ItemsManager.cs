@@ -25,11 +25,7 @@ namespace Immortal_Switch.Scripts.Items
 
             foreach (var entry in rsp.Items)
             {
-                _runtime.Items.Add(new ItemData
-                {
-                    ItemKey = entry.ItemId,
-                    Quantity = entry.Quantity,
-                });
+                _runtime.Items.Add(new ItemData(entry.ItemId, entry.Quantity));
             }
         }
 

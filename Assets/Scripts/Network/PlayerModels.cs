@@ -8,6 +8,10 @@ public class PlayerMeResponse
     [JsonProperty("username")]       public string            username;
     [JsonProperty("display_name")]   public string            display_name;
     [JsonProperty("avatar_url")]     public string            avatar_url;
+    // Chỉ true khi account đã link Google/Apple — account guest/BD (username+password) đều false.
+    // Xem NakamaClient.LinkGoogleAsync/LinkAppleAsync + nakama/src/handler/account.js.
+    [JsonProperty("google_linked")]  public bool              google_linked;
+    [JsonProperty("apple_linked")]   public bool              apple_linked;
     [JsonProperty("level")]          public int               level;
     [JsonProperty("exp")]            public int               exp;
     [JsonProperty("gems")]   public int gems;
@@ -47,4 +51,16 @@ public class PlayerUpdateRequest
 public class PlayerUpdateResponse
 {
     public bool updated;
+}
+
+[Serializable]
+public class PlayerRenameRequest
+{
+    public string display_name;
+}
+
+[Serializable]
+public class PlayerRenameResponse
+{
+    public string display_name;
 }

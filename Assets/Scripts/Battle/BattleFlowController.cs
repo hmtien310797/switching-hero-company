@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Battle.Dungeon;
 using Cysharp.Threading.Tasks;
@@ -6,6 +7,9 @@ using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.DungeonSystem;
+using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.UI;
 using Nakama;
 using UnityEngine;
 
@@ -284,6 +288,18 @@ namespace Battle
             if (res.Success)
             {
                 CurrencyManager.Instance?.ApplyServerBalances(res.Balances);
+                List<ItemRewardData> rewards = new List<ItemRewardData>();
+                
+                for (int i = 0; i < res.Balances.Count; i++)
+                {
+                    RewardDto reward = res.Balances[i];
+                    rewards.Add(new ItemRewardData(reward.CurrencyType, reward.Amount.ToBigNumber()));
+                }
+                
+                UIManager.Instance.TogglePopupAsync<PopupRewardView>(new PopupRewardArgs
+                {
+                    Rewards = rewards
+                }).Forget();
             }
             else
             {

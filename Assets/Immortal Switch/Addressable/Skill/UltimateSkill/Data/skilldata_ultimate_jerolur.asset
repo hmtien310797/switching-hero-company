@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 727400d8e1c143a4b86a6ec1f07fe5a1, type: 3}
   m_Name: skilldata_ultimate_jerolur
   m_EditorClassIdentifier: 
-  SkillId: 10001
+  SkillId: 1001
   HeroId: 10
   SkillKey: 
   SkillClass: 0
@@ -28,12 +28,12 @@ MonoBehaviour:
     MoveToCastRange: 0
     CastRange: 10
     Cooldown: 15
-    TargetSelectType: 0
+    TargetSelectType: 1
     HeroAnimationName: ulti
   RuntimeObjectConfig:
-    RuntimeVisualType: 5
+    RuntimeVisualType: 8
     SpawnMode: 0
-    RuntimeAddressableKey: bullet_spawner_skill_runtime_object
+    RuntimeAddressableKey: homing_chain_bullet_skill_runtime_object
     soundDefinition:
       startSound: 0
       hitSound: 301
@@ -102,9 +102,9 @@ MonoBehaviour:
       Actions:
       - ActionType: 0
         ChancePercent: 100
-        TargetTypeOverride: 10
+        TargetTypeOverride: 0
         Damage:
-          SkillDamageBonusPercent: 535
+          SkillDamageBonusPercent: 100
           ScaleWithClassSkillLevel: 1
           CountAsSkillDamage: 1
         Dot:
@@ -126,31 +126,31 @@ MonoBehaviour:
           Shape: 0
           PositionType: 1
           Anchor: 0
-          Radius: 9
+          Radius: 2
           BoxSize: {x: 2, y: 2}
           Duration: 0
           TickInterval: 0
-          HitOncePerTarget: 0
+          HitOncePerTarget: 1
           OnHitActions: []
         Projectile:
           BulletPatternConfig:
-            patternType: 1
-            bulletAddressableKey: bullet_projectile
-            bulletSpeed: 50
-            bulletLifeTime: 0.5
-            totalWaves: 20
-            timeBetweenWaves: 0.3
-            bulletsPerWave: 4
-            spreadAngle: 25
+            patternType: 0
+            bulletAddressableKey: 
+            bulletSpeed: 0
+            bulletLifeTime: 0
+            totalWaves: 0
+            timeBetweenWaves: 0
+            bulletsPerWave: 0
+            spreadAngle: 0
             rotationSpeedPerWave: 0
             bulletSpawnDelay: 0
             alternateBulletOrderEachWave: 0
-            damage: 100
+            damage: 0
             delayWhenStartFiring: 0
           HomingChainBulletConfig:
-            bulletAddressableKey: homing_chain_bullet
-            bulletCount: 8
-            delayBetweenBullets: 0.05
+            bulletAddressableKey: homing_chain_ultimate_jerolur_bullet
+            bulletCount: 6
+            delayBetweenBullets: 0.9
             enemyLayer:
               serializedVersion: 2
               m_Bits: 320
@@ -194,9 +194,9 @@ MonoBehaviour:
       Actions:
       - ActionType: 0
         ChancePercent: 100
-        TargetTypeOverride: 10
+        TargetTypeOverride: 0
         Damage:
-          SkillDamageBonusPercent: 700
+          SkillDamageBonusPercent: 120
           ScaleWithClassSkillLevel: 1
           CountAsSkillDamage: 1
         Dot:
@@ -218,31 +218,31 @@ MonoBehaviour:
           Shape: 0
           PositionType: 1
           Anchor: 0
-          Radius: 9
+          Radius: 2
           BoxSize: {x: 2, y: 2}
           Duration: 0
           TickInterval: 0
-          HitOncePerTarget: 0
+          HitOncePerTarget: 1
           OnHitActions: []
         Projectile:
           BulletPatternConfig:
-            patternType: 1
-            bulletAddressableKey: bullet_projectile
-            bulletSpeed: 50
-            bulletLifeTime: 0.5
-            totalWaves: 20
-            timeBetweenWaves: 0.3
-            bulletsPerWave: 4
-            spreadAngle: 25
+            patternType: 0
+            bulletAddressableKey: 
+            bulletSpeed: 0
+            bulletLifeTime: 0
+            totalWaves: 0
+            timeBetweenWaves: 0
+            bulletsPerWave: 0
+            spreadAngle: 0
             rotationSpeedPerWave: 0
             bulletSpawnDelay: 0
             alternateBulletOrderEachWave: 0
-            damage: 100
+            damage: 0
             delayWhenStartFiring: 0
           HomingChainBulletConfig:
-            bulletAddressableKey: homing_chain_bullet
-            bulletCount: 8
-            delayBetweenBullets: 0.05
+            bulletAddressableKey: homing_chain_ultimate_jerolur_bullet
+            bulletCount: 6
+            delayBetweenBullets: 0.9
             enemyLayer:
               serializedVersion: 2
               m_Bits: 320
@@ -252,7 +252,7 @@ MonoBehaviour:
             curveSpeed: 40
             arriveDistance: 0.2
             curveTangentLength: 3
-            damage: 100
+            damage: 120
             drawDebugPath: 0
             curveHeight: 4
             alternateCurveSide: 1
@@ -286,9 +286,9 @@ MonoBehaviour:
       Actions:
       - ActionType: 0
         ChancePercent: 100
-        TargetTypeOverride: 10
+        TargetTypeOverride: 0
         Damage:
-          SkillDamageBonusPercent: 900
+          SkillDamageBonusPercent: 350
           ScaleWithClassSkillLevel: 1
           CountAsSkillDamage: 1
         Dot:
@@ -310,31 +310,31 @@ MonoBehaviour:
           Shape: 0
           PositionType: 1
           Anchor: 0
-          Radius: 9
+          Radius: 2
           BoxSize: {x: 2, y: 2}
           Duration: 0
           TickInterval: 0
-          HitOncePerTarget: 0
+          HitOncePerTarget: 1
           OnHitActions: []
         Projectile:
           BulletPatternConfig:
-            patternType: 1
-            bulletAddressableKey: bullet_projectile
-            bulletSpeed: 50
-            bulletLifeTime: 0.5
-            totalWaves: 20
-            timeBetweenWaves: 0.3
-            bulletsPerWave: 4
-            spreadAngle: 25
+            patternType: 0
+            bulletAddressableKey: 
+            bulletSpeed: 0
+            bulletLifeTime: 0
+            totalWaves: 0
+            timeBetweenWaves: 0
+            bulletsPerWave: 0
+            spreadAngle: 0
             rotationSpeedPerWave: 0
             bulletSpawnDelay: 0
             alternateBulletOrderEachWave: 0
-            damage: 100
+            damage: 0
             delayWhenStartFiring: 0
           HomingChainBulletConfig:
-            bulletAddressableKey: homing_chain_bullet
-            bulletCount: 8
-            delayBetweenBullets: 0.05
+            bulletAddressableKey: homing_chain_ultimate_jerolur_bullet
+            bulletCount: 6
+            delayBetweenBullets: 0.9
             enemyLayer:
               serializedVersion: 2
               m_Bits: 320
@@ -344,7 +344,7 @@ MonoBehaviour:
             curveSpeed: 40
             arriveDistance: 0.2
             curveTangentLength: 3
-            damage: 100
+            damage: 350
             drawDebugPath: 0
             curveHeight: 4
             alternateCurveSide: 1

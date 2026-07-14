@@ -233,7 +233,7 @@ namespace Editor.ExcelConfigTool.Windows
 
                 var displayName = string.IsNullOrEmpty(entry.fileName) ? "(auto)" : entry.fileName;
                 GUI.enabled = false;
-                EditorGUILayout.TextField(displayName, GUILayout.Width(450));
+                EditorGUILayout.TextField(displayName, GUILayout.Width(400));
                 GUI.enabled = true;
 
                 if (GUILayout.Button("x", GUILayout.Width(20)))

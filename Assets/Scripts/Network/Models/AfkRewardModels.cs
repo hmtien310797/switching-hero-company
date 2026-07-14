@@ -41,32 +41,3 @@ public class AfkClaimResponse
     [JsonProperty("rewards")]             public List<RewardDto> Rewards;
     [JsonProperty("balances")]            public List<RewardDto> Balances;
 }
-
-// ── idle/claim ────────────────────────────────────────────────────────────────
-// Request: "{}" — không cần gửi gì, server tự tính elapsed từ last_claim_unix.
-
-[Serializable]
-public class IdleClaimResponse
-{
-    [JsonProperty("success")]          public bool            Success;
-    [JsonProperty("elapsed_seconds")]  public int             ElapsedSeconds;
-    [JsonProperty("rewards")]          public List<RewardDto> Rewards;
-    [JsonProperty("balances")]         public List<RewardDto> Balances;
-}
-
-// ── idle/flush ────────────────────────────────────────────────────────────────
-
-[Serializable]
-public class IdleFlushRequest
-{
-    [JsonProperty("stage")]           public int            Stage;
-    [JsonProperty("elapsed_seconds")] public int            ElapsedSeconds;
-    [JsonProperty("rewards")]         public List<RewardDto> Rewards;
-}
-
-[Serializable]
-public class IdleFlushResponse
-{
-    [JsonProperty("success")]  public bool            Success;
-    [JsonProperty("balances")] public List<RewardDto> Balances;
-}

@@ -145,24 +145,7 @@ namespace Immortal_Switch.Scripts.Reward
 
         private static List<StageReward> ConvertRewards(List<RewardDto> dtos)
         {
-            var list = new List<StageReward>();
-            if (dtos == null) return list;
-
-            for (int i = 0; i < dtos.Count; i++)
-            {
-                RewardDto dto = dtos[i];
-                if (!Enum.TryParse(dto.CurrencyType, true, out CurrencyType type))
-                    continue;
-                if (!double.TryParse(dto.Amount,
-                    System.Globalization.NumberStyles.Float,
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    out double amount) || amount <= 0)
-                    continue;
-
-                list.Add(new StageReward(type, BigNumber.FromDouble(amount)));
-            }
-
-            return list;
+            return new List<StageReward>(StageRewardConverter.FromRewardDtos(dtos));
         }
 
         private static bool IsClientReady()

@@ -30,7 +30,10 @@ namespace Immortal_Switch.Scripts.Skill
         [SerializeField] private SkillDataSO ultimateSkill;
         [SerializeField] private SkillDataSO passiveSkill;
 
-        [Header("Runtime")]
+        [Header("Runtime")] 
+        [SerializeField] private bool ultimateHasAura;
+        [ShowIf("ultimateHasAura")]
+        [SerializeField] private float ultimateAuraTime;
         [SerializeField] private bool autoBindOnAwake = true;
         [SerializeField] private HeroAutoSkillController autoSkillController;
         [SerializeField] private bool autoCreateAutoSkillController = true;
@@ -69,8 +72,6 @@ namespace Immortal_Switch.Scripts.Skill
         public event Action<HeroSkillController> SkillsChanged;
 
         public HeroActor Owner => owner;
-        
-        
 
         public async UniTask InitializeUltimateSkillDataAndClassSkillData()
         {
@@ -304,7 +305,6 @@ namespace Immortal_Switch.Scripts.Skill
             return GetEquippedClassSkillSlot(skillData) >= 0;
         }
 
-
         public bool CanCastUltimate()
         {
             return ultimateSkill != null && IsCooldownReady(ultimateSkill);
@@ -455,6 +455,7 @@ namespace Immortal_Switch.Scripts.Skill
             if (result)
             {
                 owner.CastingUltimate(true);
+                PlayUltimateAuraAsync();
             }
             return result;
         }
@@ -633,73 +634,7 @@ namespace Immortal_Switch.Scripts.Skill
             ICombatUnit target = owner.HasValidTarget() ? owner.CurrentTarget : null;
             return targetResolver.CountEnemiesInRange(CreateContext(currentSkill, currentSkillLevel, target), owner.Position, range);
         }
-
-        public async UniTask<bool> TryDebugCastClassSkillAsync(int oneBasedIndex)
-        {
-            return await TryCastClassSkillAsync(oneBasedIndex - 1);
-        }
-
-        public async UniTask<bool> TryDebugCastUltimate()
-        {
-            return await TryCastUltimateAsync();
-        }
-
-        public UniTask<bool> TryDebugCastPassive()
-        {
-            if (passiveSkill == null ||
-                passiveRuntime == null)
-            {
-                return UniTask.FromResult(false);
-            }
-
-            int level =
-                levelProvider.GetSkillLevel(
-                    passiveSkill,
-                    owner);
-
-            ResolvedPassiveConfig resolvedConfig =
-                passiveSkill.GetResolvedPassiveConfig(level);
-
-            SkillPassiveConfig config =
-                resolvedConfig?.BaseConfig;
-
-            if (config == null)
-                return UniTask.FromResult(false);
-
-            BuffData debugBuff = new BuffData
-            {
-                Id = $"passive_{passiveSkill.SkillKey}_{passiveSkill.SkillId}",
-                Name = passiveSkill.SkillName,
-                Kind = BuffKind.Buff,
-                Duration = config.BuffDuration,
-                MaxStacks = 1,
-                StackRule = BuffStackRule.Replace,
-                Modifiers = new List<StatModifier>()
-            };
-
-            if (resolvedConfig.Modifiers != null)
-            {
-                for (int i = 0;
-                     i < resolvedConfig.Modifiers.Count;
-                     i++)
-                {
-                    StatModifier modifier =
-                        resolvedConfig.Modifiers[i];
-
-                    if (modifier != null)
-                        debugBuff.Modifiers.Add(modifier.Clone());
-                }
-            }
-
-            bool result =
-                TryActivatePassive(
-                    passiveSkill,
-                    debugBuff);
-
-            return UniTask.FromResult(result);
-        }
-
-
+        
         private void Start()
         {
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
@@ -881,6 +816,10 @@ namespace Immortal_Switch.Scripts.Skill
                 case SkillRuntimeVisualType.HeroSpineObjectAndProjectile:
                     result = await CastHeroSpineAndSpawnedProjectile(context, castConfig, runtimeConfig, isUltimate);
                     break;
+                
+                case SkillRuntimeVisualType.HeroSpineObjectAndHomingProjectile:
+                    result = await CastHeroSpineAndSpawnedHomingProjectile(context, castConfig, runtimeConfig, isUltimate);
+                    break;
 
                 case SkillRuntimeVisualType.ProjectileOnly:
                 case SkillRuntimeVisualType.Instant:
@@ -1021,6 +960,41 @@ namespace Immortal_Switch.Scripts.Skill
             DelayFinishCurrentSkill(delay, isUltimate).Forget();
             return true;
             // FinishCurrentSkill() will be called by OnAnimationComplete() when the hero animation ends.
+        }
+        
+        private async UniTask<bool> CastHeroSpineAndSpawnedHomingProjectile(
+            SkillRuntimeContext context,
+            SkillCastConfig castConfig,
+            SkillRuntimeObjectConfig runtimeConfig, bool isUltimate)
+        {
+            if (context == null)
+            {
+                FinishCurrentSkill(isUltimate);
+                return false;
+            }
+
+            // The spawned object is independent. Do not finish the skill here, because the hero
+            // must stay locked until the hero ultimate animation completes.
+            await SpawnRuntimeObjectInternal(context, runtimeConfig, finishImmediatelyIfIndependent: false, isUltimate);
+
+            bool lockCasterDuringHeroAnimation = runtimeConfig == null || runtimeConfig.LockCasterDuringHeroAnimation;
+            if (lockCasterDuringHeroAnimation && owner != null)
+            {
+                owner.SetActionLocked(true);
+                owner.Locomotion?.Stop();
+            }
+
+            if (castConfig == null || string.IsNullOrEmpty(castConfig.HeroAnimationName))
+            {
+                // No hero animation configured. The spawned object has already been created,
+                // so release the caster immediately.
+                FinishCurrentSkill(isUltimate);
+                return false;
+            }
+
+            float delay = animationDriver.PlaySkill(castConfig.HeroAnimationName);
+            DelayFinishCurrentSkill(delay, isUltimate).Forget();
+            return true;
         }
 
         private Vector3 GetRuntimeObjectSpawnPosition(SkillRuntimeContext context, SkillRuntimeObjectConfig runtimeConfig)
@@ -1275,6 +1249,29 @@ namespace Immortal_Switch.Scripts.Skill
                 passiveConfig.PassiveAuraAnimation,
                 true);
         }
+        
+        private async UniTask PlayUltimateAuraAsync()
+        {
+            if (passiveSkill == null ||
+                ownerSkeletonAnimation == null ||
+                ownerSkeletonAnimation.AnimationState == null)
+            {
+                return;
+            }
+
+            if (!ultimateHasAura)
+            {
+                return;
+            }
+
+            ownerSkeletonAnimation.AnimationState.SetAnimation(
+                3,
+                "ulti_mix",
+                true);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(ultimateAuraTime), cancellationToken: destroyCancellationToken);
+            ClearUltimateAura();
+        }
 
         private void ClearPassiveAura()
         {
@@ -1301,6 +1298,21 @@ namespace Immortal_Switch.Scripts.Skill
             ownerSkeletonAnimation.Update(0f);
 
             activePassiveAuraTrack = -1;
+        }
+        
+        private void ClearUltimateAura()
+        {
+            ownerSkeletonAnimation.AnimationState.SetEmptyAnimation(
+                3,
+                0f);
+
+            ownerSkeletonAnimation.AnimationState.Apply(
+                ownerSkeletonAnimation.Skeleton);
+
+            ownerSkeletonAnimation.AnimationState.ClearTrack(
+                3);
+
+            ownerSkeletonAnimation.Update(0f);
         }
         
         private async UniTaskVoid ClearPassiveAuraAfter(float delay)

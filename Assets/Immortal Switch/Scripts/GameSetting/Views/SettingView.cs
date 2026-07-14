@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Common;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.GameSetting.Views.Layouts;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.UI;
@@ -41,7 +43,7 @@ namespace Immortal_Switch.Scripts.GameSetting.Views
         private void OnEnable()
         {
             // main layout
-            mainLayout.Bind(false, false, OnGgLink, OnLinkClaim);
+            mainLayout.Bind(false, UserDataCache.Instance.IsSocialLinked, OnGgLink, OnLinkClaim);
             OnSegmentChanged(0);
         }
 
@@ -52,7 +54,16 @@ namespace Immortal_Switch.Scripts.GameSetting.Views
 
         private void OnGgLink()
         {
-            Debug.Log("OnGgLink");
+            LinkAccountAsync().Forget();
+        }
+
+        private async UniTaskVoid LinkAccountAsync()
+        {
+            var linked = await SettingManager.Instance.LinkAccountAsync();
+            if (linked)
+            {
+                mainLayout.SetLinked(true);
+            }
         }
 
         private void OnSegmentChanged(int idx)

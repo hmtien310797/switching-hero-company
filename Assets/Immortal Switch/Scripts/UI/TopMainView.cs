@@ -7,6 +7,7 @@ using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.AFKReward.Views;
 using Immortal_Switch.Scripts.Bag.Views;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Event.Views;
 using Immortal_Switch.Scripts.GameSetting.Views;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
@@ -45,6 +46,9 @@ namespace Immortal_Switch.Scripts.UI
 
         [SerializeField]
         private Button btnShop;
+
+        [SerializeField]
+        private Button btnEvent;
 
         [SerializeField]
         CurrencyView currencyView;
@@ -141,6 +145,7 @@ namespace Immortal_Switch.Scripts.UI
             TutorialManager.Instance.OnClick += OnClickTutorial;
             Instance = this;
 
+            btnEvent.onClick.AddListener(OnClickEvent);
             btnShop.onClick.AddListener(OnClickShop);
             btnBag.onClick.AddListener(OnClickBag);
             profileBtn.onClick.AddListener(OnClickProfile);
@@ -152,6 +157,11 @@ namespace Immortal_Switch.Scripts.UI
             drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Draw Calls Count");
             batchesRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
             setPassCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "SetPass Calls Count");
+        }
+
+        private void OnClickEvent()
+        {
+            UIManager.Instance.TogglePopupAsync<EventView>().Forget();
         }
 
         private void Update()
@@ -261,29 +271,70 @@ namespace Immortal_Switch.Scripts.UI
             FarmingIdleScreenService.Close();
         }
 
-        private void OnActiveFramingClaimClicked()
+        // Nút gương — chỉ PEEK (afk/preview, không commit) để mở popup với số liệu thật.
+        // Claim thật sự chỉ xảy ra khi player bấm nút Claim bên trong popup (OnClickClaim).
+        private void OnAfkClaimClicked()
         {
-            var stageRewards = PvEBattleController.Instance.GetStageRuntimeData().BaseRewards;
-            var afkCurrentTime = DateTime.UtcNow.AddMinutes(30);
+            OnAfkClaimClickedAsync().Forget();
+        }
+
+        private async UniTaskVoid OnAfkClaimClickedAsync()
+        {
+            // Field rewardSyncService của riêng TopMainView không được wire trong prefab gốc
+            // (fileID: 0) — lấy thẳng từ PvEBattleController, nơi nó luôn được gán thật, giống
+            // cách CurrencyTextBinder đang làm.
+            RewardSyncService service = PvEBattleController.Instance != null
+                ? PvEBattleController.Instance.RewardSyncService
+                : rewardSyncService;
+
+            if (service == null)
+            {
+                Debug.LogWarning("[TopMainView] RewardSyncService not found — not opening popup.");
+                return;
+            }
+
+            AfkClaimResponse preview = await service.PreviewRewardAsync();
+            if (preview == null || !preview.Success)
+            {
+                Debug.LogWarning("[TopMainView] afk/preview failed — not opening popup.");
+                return;
+            }
+
+            // Luôn mở popup khi call thành công, kể cả chưa đủ MIN_CLAIM_SECONDS (has_reward=false) —
+            // vẫn hiển thị elapsed_seconds/rewards thật (có thể là 0), thay vì im lặng không phản
+            // hồi gì khiến nút trông như bị đứng.
+            var stageRewards  = PvEBattleController.Instance.GetStageRuntimeData().BaseRewards;
+            var earnedRewards = StageRewardConverter.FromRewardDtos(preview.Rewards);
 
             UIManager.Instance
                 .OpenPopupAsync<AFKRewardView>(new AFKRewardArgs
                 {
-                    OnClaim = OnClickClaim,
-                    Rewards = stageRewards,
-                    AfkCurrentTime = afkCurrentTime,
+                    OnClaim        = OnClickClaim,
+                    Rewards        = stageRewards,
+                    EarnedRewards  = earnedRewards,
+                    ElapsedSeconds = preview.ElapsedSeconds,
                 })
                 .Forget();
         }
 
+        // Nút Claim/ClaimX2 bên trong popup — đây mới là lúc commit thật (afk/claim).
+        // "Claim x2" (xem ads nhân đôi) chưa có RPC hỗ trợ nên tạm thời vẫn chỉ cộng đúng 1x.
         private void OnClickClaim(bool isClaimX2)
         {
-            Debug.Log($"OnClickClaim in AFKRewardView: {isClaimX2}");
+            OnClickClaimAsync(isClaimX2).Forget();
+        }
 
-            if (rewardSyncService != null)
-            {
-                rewardSyncService.ClaimRewardAsync().Forget();
-            }
+        private async UniTaskVoid OnClickClaimAsync(bool isClaimX2)
+        {
+            RewardSyncService service = PvEBattleController.Instance != null
+                ? PvEBattleController.Instance.RewardSyncService
+                : rewardSyncService;
+
+            if (service == null)
+                return;
+
+            AfkClaimResponse response = await service.ClaimRewardAsync();
+            Debug.Log($"[TopMainView] afk/claim isClaimX2={isClaimX2} hasReward={response?.HasReward}");
         }
 
         private void OnClickAutoSkill()
@@ -306,7 +357,7 @@ namespace Immortal_Switch.Scripts.UI
 
             RefreshPlayerInfo();
             autoSkillButton.onClick.AddListener(OnClickAutoSkill);
-            btnActiveFramingClaim.onClick.AddListener(OnActiveFramingClaimClicked);
+            btnActiveFramingClaim.onClick.AddListener(OnAfkClaimClicked);
             SetHeroTeamController(HeroTeamController.Instance);
 
             moveButton.onClick.AddListener(() =>

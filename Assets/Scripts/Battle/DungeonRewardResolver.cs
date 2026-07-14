@@ -162,14 +162,8 @@ namespace Battle.Dungeon
             {
                 return;
             }
-            
-            resolvedRewards.Add(
-                new DungeonRuntimeReward
-                {
-                    ItemKey = itemId,
-                    Quantity = BigNumber.FromDouble(evaluatedAmount)
-                }
-            );
+
+            resolvedRewards.Add(new DungeonRuntimeReward(itemId, BigNumber.FromDouble(evaluatedAmount)));
         }
     }
 }

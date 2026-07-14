@@ -76,10 +76,7 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
         [CanBeNull]
         public Sprite LoadIcon(string iconKey, string rarity, string itemType, string itemName)
         {
-            if (string.IsNullOrWhiteSpace(iconKey))
-            {
-                throw new ArgumentException("Icon key cannot be null or empty.", nameof(iconKey));
-            }
+            var key = $"ic_{itemType.ToLower()}_{itemName.Replace(" ", "_")}_{rarity}";
 
             if (_itemAtlas == null)
             {
@@ -87,21 +84,20 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
                     $"{nameof(ItemsDatabaseSO)} has not been initialized. Call {nameof(InitializeAsync)}() before loading icons.");
             }
 
-            if (_spriteCache.TryGetValue(iconKey, out var sprite))
+            if (_spriteCache.TryGetValue(key, out var sprite))
             {
                 return sprite;
             }
 
-            var key = $"ic_{itemType.ToLower()}_{itemName.Replace(" ", "_")}_{rarity}";
             sprite = _itemAtlas.GetSprite(key);
 
             if (sprite == null)
             {
-                Debug.LogError($"Sprite '{iconKey}' was not found in atlas '{SpriteAtlasConstants.CURRENCY}'.");
+                Debug.LogError($"Sprite '{key}' was not found in atlas '{SpriteAtlasConstants.CURRENCY}'.");
                 return null;
             }
 
-            _spriteCache.Add(iconKey, sprite);
+            _spriteCache.Add(key, sprite);
             return sprite;
         }
 

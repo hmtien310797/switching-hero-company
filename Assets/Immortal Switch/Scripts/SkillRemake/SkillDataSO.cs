@@ -146,7 +146,8 @@ namespace Immortal_Switch.Scripts.Skill
                    RuntimeVisualType == SkillRuntimeVisualType.SpawnProjectilePatternBehavior ||
                    RuntimeVisualType == SkillRuntimeVisualType.SpawnHomingProjectile ||
                    RuntimeVisualType == SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject ||
-                   RuntimeVisualType == SkillRuntimeVisualType.HeroSpineObjectAndProjectile;
+                   RuntimeVisualType == SkillRuntimeVisualType.HeroSpineObjectAndProjectile ||
+                   RuntimeVisualType == SkillRuntimeVisualType.HeroSpineObjectAndHomingProjectile;
         }
     }
     

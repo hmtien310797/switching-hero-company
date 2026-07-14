@@ -192,13 +192,7 @@ namespace Immortal_Switch.Scripts.Shared
                         if (TrySetTierInfo(item.rarity, out var tierInfo) &&
                             tierInfo != null)
                         {
-                            result.Add(new ItemRewardData
-                            {
-                                ItemIcon = itemIcon,
-                                TierInfo = tierInfo,
-                                Quantity = tuple.quantity,
-                                ItemKey = item.itemKey,
-                            });
+                            result.Add(new ItemRewardData(item.itemKey, tuple.quantity, itemIcon, tierInfo));
                         }
                     }
                 }

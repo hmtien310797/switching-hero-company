@@ -1,9 +1,17 @@
 ﻿using System;
+using System.Text;
+using AppleAuth;
+using AppleAuth.Enums;
+using AppleAuth.Extensions;
+using AppleAuth.Interfaces;
+using AppleAuth.Native;
 using Battle;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.UI;
+using Nakama;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -41,6 +49,12 @@ public class SettingManager : Singleton<SettingManager>
         base.Awake();
         LoadSetting();
         ApplyAllSettings();
+    }
+
+    private void Update()
+    {
+        // Bơm callback native của Sign In with Apple vào main thread — bắt buộc theo AppleAuth plugin.
+        _appleAuthManager?.Update();
     }
 
     public override UniTask InitializeAsync()
@@ -413,6 +427,140 @@ public class SettingManager : Singleton<SettingManager>
 
         //Transitioner.Instance.TransitionInWithoutChangingScene();
         await NakamaClient.Instance.HandleForceLogout("Nothing");
+    }
+
+#endregion
+
+#region Delete Account
+
+    public void DeleteAccount()
+    {
+        DeleteAccountAsync().Forget();
+    }
+
+    private async UniTask DeleteAccountAsync()
+    {
+        try
+        {
+            await NakamaClient.Instance.DeleteAccountAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SettingManager] DeleteAccount failed: {e.Message}");
+            UIManager.Instance.ShowToast("Xoá tài khoản thất bại. Vui lòng thử lại.");
+            return;
+        }
+
+        await UIManager.Instance.DespawnAllSessionViewsAsync();
+
+        PvEBattleController.Instance.CleanupBattle(true);
+        await UniTask.Yield();
+
+        await NakamaClient.Instance.HandleForceLogout("Tài khoản đã được xoá.");
+    }
+
+#endregion
+
+#region Account Link
+
+    // Chỉ account guest (device) hoặc BD (username/password qua auth/register) mới link được —
+    // server enforce qua beforeLinkGoogle/beforeLinkApple (nakama/src/handler/account.js). Android
+    // link Google, iOS link Apple; không hỗ trợ nền tảng khác.
+    private IAppleAuthManager _appleAuthManager;
+
+    public bool IsAccountLinked => UserDataCache.Instance.IsSocialLinked;
+
+    public async UniTask<bool> LinkAccountAsync()
+    {
+        if (IsAccountLinked)
+        {
+            UIManager.Instance.ShowToast("Tài khoản đã được liên kết.");
+            return false;
+        }
+
+        try
+        {
+            string provider;
+            string token;
+
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                provider = "Google";
+                token = await GetGoogleIdTokenAsync();
+            }
+            else if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                provider = "Apple";
+                token = await GetAppleIdentityTokenAsync();
+            }
+            else
+            {
+                UIManager.Instance.ShowToast("Liên kết tài khoản chỉ hỗ trợ trên thiết bị Android/iOS.");
+                return false;
+            }
+
+            if (provider == "Google")
+            {
+                await NakamaClient.Instance.LinkGoogleAsync(token);
+                UserDataCache.Instance.GoogleLinked = true;
+            }
+            else
+            {
+                await NakamaClient.Instance.LinkAppleAsync(token);
+                UserDataCache.Instance.AppleLinked = true;
+            }
+
+            UIManager.Instance.ShowToast($"Liên kết {provider} thành công.");
+            return true;
+        }
+        catch (ApiResponseException e)
+        {
+            Debug.LogError($"[SettingManager] LinkAccount failed: {e.StatusCode} {e.Message}");
+            UIManager.Instance.ShowToast(e.StatusCode == 409
+                ? "Tài khoản này đã được liên kết với một tài khoản khác."
+                : "Liên kết tài khoản thất bại. Vui lòng thử lại.");
+            return false;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SettingManager] LinkAccount failed: {e.Message}");
+            UIManager.Instance.ShowToast("Liên kết tài khoản thất bại. Vui lòng thử lại.");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// TODO: project chưa tích hợp Google Play Games / Google Sign-In plugin, nên chưa có cách lấy
+    /// id_token thật trên Android. Khi thêm plugin, thay thân hàm này bằng lệnh gọi SDK thật, giữ
+    /// nguyên chữ ký (trả về id_token dạng string).
+    /// </summary>
+    private UniTask<string> GetGoogleIdTokenAsync()
+    {
+        throw new NotSupportedException("Google Sign-In SDK chưa được tích hợp vào project.");
+    }
+
+    private async UniTask<string> GetAppleIdentityTokenAsync()
+    {
+        if (_appleAuthManager == null && AppleAuthManager.IsCurrentPlatformSupported)
+            _appleAuthManager = new AppleAuthManager(new PayloadDeserializer());
+
+        if (_appleAuthManager == null)
+            throw new NotSupportedException("Sign In with Apple không được hỗ trợ trên thiết bị này.");
+
+        var tcs = new UniTaskCompletionSource<string>();
+        _appleAuthManager.LoginWithAppleId(
+            new AppleAuthLoginArgs(LoginOptions.IncludeEmail),
+            credential =>
+            {
+                var identityToken = (credential as IAppleIDCredential)?.IdentityToken;
+                if (identityToken == null)
+                    tcs.TrySetException(new Exception("Không lấy được identity token từ Apple."));
+                else
+                    tcs.TrySetResult(Encoding.UTF8.GetString(identityToken));
+            },
+            error => tcs.TrySetException(new Exception($"Sign In with Apple thất bại: {error.GetAuthorizationErrorCode()}"))
+        );
+        return await tcs.Task;
     }
 
 #endregion

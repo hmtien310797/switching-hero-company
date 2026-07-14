@@ -314,8 +314,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toggle: {fileID: 7239543403527604038}
-  onSelected: {fileID: 1439376730697037198}
-  offSelected: {fileID: 3495873874326612694}
+  onSelected: {fileID: 3495873874326612694}
+  offSelected: {fileID: 1439376730697037198}
 --- !u!1001 &6251047231751355456
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -326,7 +326,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 499854259321784235, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
       propertyPath: m_Name
-      value: off
+      value: on
       objectReference: {fileID: 0}
     - target: {fileID: 2919884049769158780, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
       propertyPath: m_Pivot.x
@@ -410,11 +410,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7369006722070091414, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7802986711684191440, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
       propertyPath: m_IsOn
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8311918445774869144, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
+      propertyPath: m_text
+      value: "M\u1EDF"
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7802986711684191440, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
@@ -442,7 +446,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 499854259321784235, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
       propertyPath: m_Name
-      value: on
+      value: off
       objectReference: {fileID: 0}
     - target: {fileID: 2919884049769158780, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
       propertyPath: m_Pivot.x
@@ -526,7 +530,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7369006722070091414, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9121428348586839529, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}
+      propertyPath: m_text
+      value: "T\u1EAFt"
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7802986711684191440, guid: b7cf5a365afa2d242ad40b52dcaf7f07, type: 3}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
@@ -48,11 +49,13 @@ namespace Immortal_Switch.Scripts.HeroUIView
         private List<HeroDataSO> allHeroData;
         private readonly HashSet<int> lineupHeroIds = new();
         private HeroInfoView currentHeroInfoView;
+        private readonly Dictionary<int, HeroCollectionItemUI> itemCache = new();
 
         private void Awake()
         {
             TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
             TutorialManager.Instance.OnClick += OnClickTutorial;
+            GameEventManager.Subscribe(GameEvents.OnActiveLineupChanged, OnActiveLineUpChanged);
             allHeroData = DatabaseManager.Instance.GetAllHeroData();
         }
 
@@ -60,6 +63,22 @@ namespace Immortal_Switch.Scripts.HeroUIView
         {
             TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
             TutorialManager.Instance.OnClick -= OnClickTutorial;
+            GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, OnActiveLineUpChanged);
+        }
+
+        private void OnActiveLineUpChanged()
+        {
+            lineupHeroIds.Clear();
+            for (int i = 0; i < UserDataCache.Instance.InBattleHeroIdList.Count; i++)
+            {
+                int currentHeroId = UserDataCache.Instance.InBattleHeroIdList[i];
+                if (currentHeroId <= 0)
+                {
+                    continue;
+                }
+                lineupHeroIds.Add(currentHeroId);
+            }
+            RefreshAll();
         }
         
         private UniTask OnClickTutorial(string arg1, int arg2)
@@ -305,22 +324,62 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void ApplyFiltersAndRebuild()
         {
-            ClearSpawnedItems();
+            spawnedItems.Clear();
 
-            var filtered = allItemsData.Where(PassFilter).ToList();
+            currentSelectedItem = null;
 
-            foreach (var data in filtered)
+            // Tắt toàn bộ item trước.
+            foreach (var cachedItem in itemCache.Values)
             {
-                var item = Instantiate(itemPrefab, contentRoot);
+                if (cachedItem != null)
+                {
+                    cachedItem.gameObject.SetActive(false);
+                    cachedItem.SetSelected(false);
+                    cachedItem.SetReadyHighlight(false);
+                }
+            }
+
+            int siblingIndex = 0;
+
+            for (int i = 0; i < allItemsData.Count; i++)
+            {
+                var data = allItemsData[i];
+
+                if (data == null || !PassFilter(data))
+                    continue;
+
+                var item = GetOrCreateItem(data.HeroId);
+
+                item.gameObject.SetActive(true);
+                item.transform.SetSiblingIndex(siblingIndex);
+
                 item.Bind(data);
-                item.SetClickCallback(OnClickHeroItem);
                 item.SetButtonInteractable(true);
                 item.SetDimmed(false);
                 item.SetSelected(false);
                 item.SetReadyHighlight(false);
 
                 spawnedItems.Add(item);
+
+                siblingIndex++;
             }
+        }
+        
+        private HeroCollectionItemUI GetOrCreateItem(int heroId)
+        {
+            if (itemCache.TryGetValue(heroId, out var cachedItem) &&
+                cachedItem != null)
+            {
+                return cachedItem;
+            }
+
+            var item = Instantiate(itemPrefab, contentRoot);
+
+            item.SetClickCallback(OnClickHeroItem);
+
+            itemCache[heroId] = item;
+
+            return item;
         }
 
         private bool PassFilter(HeroCollectionItemViewData data)
@@ -395,18 +454,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 case HeroClassFilterMode.Mage: return heroClass == HeroClass.Mage;
                 default: return true;
             }
-        }
-
-        private void ClearSpawnedItems()
-        {
-            for (int i = 0; i < spawnedItems.Count; i++)
-            {
-                if (spawnedItems[i] != null)
-                    Destroy(spawnedItems[i].gameObject);
-            }
-
-            spawnedItems.Clear();
-            currentSelectedItem = null;
         }
     }
 

@@ -34,11 +34,7 @@ namespace Battle.Dungeon
             {
                 DungeonRuntimeReward source = runtimeData.Rewards[i];
 
-                result[i] = new DungeonRuntimeReward
-                {
-                    ItemKey = source.ItemKey,
-                    Quantity = source.Quantity * multiplier
-                };
+                result[i] = new DungeonRuntimeReward(source.ItemKey, source.Quantity * multiplier);
             }
 
             return result;
