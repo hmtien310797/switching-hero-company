@@ -51,7 +51,7 @@ namespace UI.LoginScene
 
             _currentProgress = 0f;
             ApplyProgress(0f);
-            PlayTo(1f);
+            //PlayTo(1f);
         }
 
         public void PlayTo(float targetProgress)
@@ -67,6 +67,15 @@ namespace UI.LoginScene
 
             _progressTween?.Kill();
 
+            var distance = Mathf.Abs(targetProgress - _currentProgress);
+
+            // duration là thời gian chạy từ 0 -> 1.
+            // Ví dụ progress tăng 10% thì chỉ tween duration * 10%.
+            var tweenDuration = Mathf.Max(
+                0.05f,
+                duration * distance
+            );
+
             _progressTween = DOTween.To(
                     () => _currentProgress,
                     value =>
@@ -75,7 +84,7 @@ namespace UI.LoginScene
                         ApplyProgress(_currentProgress);
                     },
                     targetProgress,
-                    duration
+                    tweenDuration
                 )
                 .SetEase(ease)
                 .SetLink(gameObject)
@@ -83,7 +92,7 @@ namespace UI.LoginScene
                 {
                     if (Mathf.Approximately(_currentProgress, 1f))
                     {
-                        goProgressObj.SetActive(false);
+                        goProgressObj?.SetActive(false);
                         onLoadComplete?.Invoke();
                     }
                 });
@@ -102,6 +111,28 @@ namespace UI.LoginScene
 
             _currentProgress = Mathf.Clamp01(progress);
             ApplyProgress(_currentProgress);
+        }
+        
+        public void ResetProgress()
+        {
+            if (!IsValid())
+            {
+                return;
+            }
+
+            BuildPathCache();
+
+            _progressTween?.Kill();
+            _progressTween = null;
+
+            _currentProgress = 0f;
+
+            if (goProgressObj != null)
+            {
+                goProgressObj.SetActive(true);
+            }
+
+            ApplyProgress(0f);
         }
 
         private void ApplyProgress(float progress)

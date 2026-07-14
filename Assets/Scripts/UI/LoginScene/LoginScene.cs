@@ -36,6 +36,12 @@ public class LoginScene : MonoBehaviour
     [SerializeField] private Button btnRegister;
     [SerializeField] private Button btnBackToLogin;
     
+    [SerializeField] private TMP_Text progressTextVertical;
+    [SerializeField] private TMP_Text progressTextHorizontal;
+    
+    [SerializeField] private UI.LoginScene.SliderStarFollower sliderStarFollowerVertical;
+    [SerializeField] private UI.LoginScene.SliderStarFollower sliderStarFollowerHorizontal;
+    
     [SerializeField]
     private CanvasGroup loadingSceneCanvasGroup;
 
@@ -71,6 +77,34 @@ public class LoginScene : MonoBehaviour
         registerPanel.SetActive(false);
         buttonLayout.SetActive(true);
     }
+    
+    private async UniTask RunBootstrapAsync()
+    {
+        sliderStarFollowerVertical?.ResetProgress();
+        sliderStarFollowerHorizontal?.ResetProgress();
+
+        await GameBootstrap.Instance.RunAsync(
+            OnBootstrapProgress
+        );
+    }
+    
+    private void OnBootstrapProgress(
+        float progress,
+        string message)
+    {
+        sliderStarFollowerVertical?.PlayTo(progress);
+        sliderStarFollowerHorizontal?.PlayTo(progress);
+
+        if (progressTextVertical != null)
+        {
+            progressTextVertical.text = message;
+        }
+
+        if (progressTextHorizontal != null)
+        {
+            progressTextHorizontal.text = message;
+        }
+    }
 
     private void OnInitSceneDataComplete()
     {
@@ -87,14 +121,9 @@ public class LoginScene : MonoBehaviour
         btnAppleLogin.gameObject.SetActive(true);
         btnGoogleLogin.gameObject.SetActive(true);
         btnLoginGuest.gameObject.SetActive(true);
-        // Gỡ overlay loading để lộ nút login — trước đây set lại alpha=1/blocksRaycasts=true
-        // ở đây khiến overlay che vĩnh viễn buttonLayout vì OnInitSceneDataComplete (nơi gỡ
-        // overlay) chỉ được bắn từ PvEBattleController trong MainBattleScene, không bao giờ
-        // chạy lại khi đã quay về LoginScene.
         loadingSceneCanvasGroup.alpha = 1f;
         loadingSceneCanvasGroup.blocksRaycasts = true;
         loadingSceneCanvasGroup.interactable = true;
-        
     }
 
     private void OnScreenOrientationChanged(ScreenOrientationTracker.ScreenViewMode obj)
@@ -231,7 +260,7 @@ public class LoginScene : MonoBehaviour
             await NakamaClient.Instance.LoginAsync(username, password);
             loginPanel.gameObject.SetActive(false);
             await SceneManager.LoadSceneAsync("MainBattleScene");
-            await GameBootstrap.Instance.RunAsync();
+            await RunBootstrapAsync();
         }
         catch (ApiResponseException e)
         {
@@ -258,7 +287,7 @@ public class LoginScene : MonoBehaviour
             await NakamaClient.Instance.LoginAsync(username, password);
             registerPanel.SetActive(false);
             await SceneManager.LoadSceneAsync("MainBattleScene");
-            await GameBootstrap.Instance.RunAsync();
+            await RunBootstrapAsync();
         }
         catch (ApiResponseException e)
         {
@@ -279,10 +308,11 @@ public class LoginScene : MonoBehaviour
     {
         try
         {
+            buttonLayout.SetActive(false);
             await NakamaClient.Instance.AuthenticateDeviceAsync();
             Debug.Log($"[LoginScene] Guest login success. UserId={NakamaClient.Instance.Session.UserId}");
             await SceneManager.LoadSceneAsync("MainBattleScene");
-            await GameBootstrap.Instance.RunAsync();
+            await RunBootstrapAsync();
         }
         catch (Exception e)
         {
@@ -300,20 +330,28 @@ public class LoginScene : MonoBehaviour
     {
         try
         {
+            buttonLayout.SetActive(false);
             var user = await GoogleSignIn.DefaultInstance.SignIn();
+            if (user == null)
+            {
+                buttonLayout.SetActive(true);
+                return;
+            }
             Debug.Log($"[LoginScene] Google sign-in success. Email={user.Email}");
 
             await NakamaClient.Instance.AuthenticateGoogleAsync(user.IdToken);
             Debug.Log($"[LoginScene] Google Nakama auth success. UserId={NakamaClient.Instance.Session.UserId}");
             await SceneManager.LoadSceneAsync("MainBattleScene");
-            await GameBootstrap.Instance.RunAsync();
+            await RunBootstrapAsync();
         }
         catch (GoogleSignIn.SignInException e)
         {
+            buttonLayout.SetActive(true);
             Debug.LogError($"[LoginScene] Google login failed. Status={e.Status} Message={e.Message}");
         }
         catch (Exception e)
         {
+            buttonLayout.SetActive(true);
             Debug.LogError($"[LoginScene] Google login failed: {e.GetType().Name} {e.Message}");
         }
     }
@@ -334,6 +372,7 @@ public class LoginScene : MonoBehaviour
 
         try
         {
+            buttonLayout.SetActive(false);
             var tcs = new UniTaskCompletionSource<string>();
 
             _appleAuthManager.LoginWithAppleId(
@@ -343,19 +382,26 @@ public class LoginScene : MonoBehaviour
                     if (credential is IAppleIDCredential appleCredential)
                         tcs.TrySetResult(Encoding.UTF8.GetString(appleCredential.IdentityToken));
                     else
+                    {
                         tcs.TrySetException(new Exception("Invalid Apple credential type"));
+                        buttonLayout.SetActive(true);
+                    }
                 },
-                error => tcs.TrySetException(new Exception($"Apple Sign-In error: {error.LocalizedDescription}"))
-            );
+                error =>
+                {
+                    buttonLayout.SetActive(true);
+                    tcs.TrySetException(new Exception($"Apple Sign-In error: {error.LocalizedDescription}"));
+                });
 
             var identityToken = await tcs.Task;
             await NakamaClient.Instance.AuthenticateAppleAsync(identityToken);
             Debug.Log($"[LoginScene] Apple Nakama auth success. UserId={NakamaClient.Instance.Session.UserId}");
             await SceneManager.LoadSceneAsync("MainBattleScene");
-            await GameBootstrap.Instance.RunAsync();
+            await RunBootstrapAsync();
         }
         catch (Exception e)
         {
+            buttonLayout.SetActive(true);
             Debug.LogError($"[LoginScene] Apple login failed: {e.Message}");
         }
     }

@@ -33,26 +33,50 @@ namespace Immortal_Switch.Scripts.Core
             Application.targetFrameRate = 60;
         }
 
-        public async UniTask RunAsync()
+        public async UniTask RunAsync(
+            Action<float, string> onProgress = null)
         {
+            const int totalSteps = 16;
+
+            var progress = new BootstrapProgress(
+                totalSteps,
+                onProgress
+            );
+
             try
             {
-                // Đảm bảo có session trước khi fetch data
-                // (trường hợp chạy thẳng từ MainBattleScene trong Editor)
-                if (!NakamaClient.Instance.IsLoggedIn)
-                    await NakamaClient.Instance.AuthenticateDeviceAsync();
+                progress.ReportCurrent("Preparing game data");
 
-                // init dau tien. có các manager khác sử dụng tới. tránh lỗi.
+                // 1
+                if (!NakamaClient.Instance.IsLoggedIn)
+                {
+                    await NakamaClient.Instance.AuthenticateDeviceAsync();
+                }
+
+                progress.CompleteStep("Authenticated");
+
+                // 2
                 await DatabaseManager.Instance.InitializeAsync();
+                progress.CompleteStep("Database initialized");
+
                 TransmutationSystemManager.Instance.InitializeAsync();
                 HeroProgressionManager.Instance.InitializeAsync();
-                await PlayerSystemManager.Instance.InitializeAsync();
-                await ShopManager.Instance.InitializeAsync();
-                await MissionSystemManager.Instance.InitializeAsync();
 
-                // Fetch player data — includes heroes/skills/weapons inventory
+                // 3
+                await PlayerSystemManager.Instance.InitializeAsync();
+                progress.CompleteStep("Player system initialized");
+
+                // 4
+                await ShopManager.Instance.InitializeAsync();
+                progress.CompleteStep("Shop initialized");
+
+                // 5
+                await MissionSystemManager.Instance.InitializeAsync();
+                progress.CompleteStep("Mission system initialized");
+
                 PlayerMeResponse player = null;
 
+                // 6
                 try
                 {
                     player = await NakamaClient.Instance.GetPlayerMeAsync();
@@ -60,14 +84,18 @@ namespace Immortal_Switch.Scripts.Core
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"[Bootstrap] Failed to fetch player/me: {ex.Message}");
+                    Debug.LogWarning(
+                        $"[Bootstrap] Failed to fetch player/me: {ex.Message}"
+                    );
                 }
 
-                // Fetch complete skill data: owned + shards + equipped.
-                // player/me có thể thiếu shards — skill/list là source of truth đầy đủ.
+                progress.CompleteStep("Player data loaded");
+
+                // 7
                 try
                 {
-                    var skillList = await NakamaClient.Instance.GetSkillListAsync();
+                    var skillList =
+                        await NakamaClient.Instance.GetSkillListAsync();
 
                     if (skillList != null)
                     {
@@ -77,22 +105,33 @@ namespace Immortal_Switch.Scripts.Core
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"[Bootstrap] Failed to fetch skill/list: {ex.Message}");
+                    Debug.LogWarning(
+                        $"[Bootstrap] Failed to fetch skill/list: {ex.Message}"
+                    );
                 }
 
-                // Đồng bộ summon state (total_roll, pity, summon_level, claimed milestones)
+                progress.CompleteStep("Skill data loaded");
+                await UniTask.Delay(TimeSpan.FromSeconds(1f));
+
+                // 8
                 try
                 {
-                    var summonState = await NakamaClient.Instance.GetSummonStateAsync();
+                    var summonState =
+                        await NakamaClient.Instance.GetSummonStateAsync();
+
                     UserDataCache.Instance.SummonState = summonState;
                     ApplySummonState(summonState);
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"[Bootstrap] Failed to fetch summon state: {ex.Message}");
+                    Debug.LogWarning(
+                        $"[Bootstrap] Failed to fetch summon state: {ex.Message}"
+                    );
                 }
-                
-                // Đồng bộ bag
+
+                progress.CompleteStep("Summon data loaded");
+
+                // 9
                 try
                 {
                     var bag = await NakamaClient.Instance.GetBagAsync();
@@ -100,37 +139,73 @@ namespace Immortal_Switch.Scripts.Core
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"[Bootstrap] Failed to fetch bag state: {ex.Message}");
+                    Debug.LogWarning(
+                        $"[Bootstrap] Failed to fetch bag state: {ex.Message}"
+                    );
                 }
 
+                progress.CompleteStep("Bag data loaded");
+
+                // 10
                 await UserDataCache.Instance.InitializeAsync();
+                progress.CompleteStep("User cache initialized");
+                await UniTask.Delay(TimeSpan.FromSeconds(1f));
+
+                // 11
                 await GrowthManager.Instance.InitializeAsync();
                 SyncGrowthToManager(player?.growth);
-                await PowerUpManager.Instance.InitializeAsync();
+                progress.CompleteStep("Growth data initialized");
 
-                // IAP không chặn bootstrap nếu store không khả dụng (vd: chạy trong Editor không
-                // có store thật) — shop vẫn mở được, chỉ nút mua sẽ báo lỗi khi bấm.
+                // 12
+                await PowerUpManager.Instance.InitializeAsync();
+                progress.CompleteStep("Power-up system initialized");
+
+                // 13
                 try
                 {
                     await IAPManager.Instance.InitializeAsync();
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"[Bootstrap] Failed to initialize IAP: {ex.Message}");
+                    Debug.LogWarning(
+                        $"[Bootstrap] Failed to initialize IAP: {ex.Message}"
+                    );
                 }
 
+                progress.CompleteStep("Store Service initialized");
+
+                // 14
                 await SkillViewDataProvider.Instance.InitializeAsync();
+                progress.CompleteStep("Skill view data prepared");
+                
                 await AddressablePoolService.Instance.InitializeAsync();
+
+                // 15
                 await UIManager.Instance.InitializeAsync();
+                progress.CompleteStep("UI initialized");
+                
                 await HeroImageService.InitializeAsync();
+
+                // 16
+                progress.CompleteStep("Battle data initialized");
                 await PvEBattleController.Instance.InitializeAsync();
-                await TutorialManager.Instance.TryGuide(TutorialGuideIds.NEW_USER_GUIDE);
+                
+                await TutorialManager.Instance.TryGuide(
+                    TutorialGuideIds.NEW_USER_GUIDE
+                );
+                
 
                 Debug.Log("Bootstrap completed");
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
+
+                // Không đẩy lên 100% khi bootstrap lỗi nghiêm trọng.
+                onProgress?.Invoke(
+                    0f,
+                    $"Bootstrap failed: {ex.Message}"
+                );
             }
         }
 
@@ -190,7 +265,7 @@ namespace Immortal_Switch.Scripts.Core
             TopMainView.Instance?.SetDisplayName(UserDataCache.Instance.DisplayName);
 
             UserDataCache.Instance.Exp = player.exp;
-            
+
             CurrencyManager.Instance.Set(CurrencyType.gold, player.coins);
             CurrencyManager.Instance.Set(CurrencyType.diamond, player.gems);
             CurrencyManager.Instance.Set(CurrencyType.HeroTicket, player.hero_ticket);
@@ -215,9 +290,8 @@ namespace Immortal_Switch.Scripts.Core
             // không cần gọi battle/progression riêng (chỉ gọi lại khi resync sau STAGE_MISMATCH/INVALID_STAGE)
             PvEBattleController.Instance.ApplyServerProgression(player.progression);
 
-            Debug.Log($"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, WeaponTicket={player.weapon_ticket}, WeaponOre={player.weapon_ore}, Energy={player.energy}");
-
-
+            Debug.Log(
+                $"[Bootstrap] Player data applied. Coins={player.coins}, Gems={player.gems}, HeroTicket={player.hero_ticket}, SkillTicket={player.skill_ticket}, WeaponTicket={player.weapon_ticket}, WeaponOre={player.weapon_ore}, Energy={player.energy}");
         }
 
         private void ApplySummonState(SummonStateResponse state)
@@ -297,6 +371,47 @@ namespace Immortal_Switch.Scripts.Core
         public override UniTask InitializeAsync()
         {
             return UniTask.CompletedTask;
+        }
+
+        private sealed class BootstrapProgress
+        {
+            private readonly int _totalSteps;
+            private readonly Action<float, string> _onProgress;
+
+            private int _completedSteps;
+
+            public BootstrapProgress(
+                int totalSteps,
+                Action<float, string> onProgress)
+            {
+                _totalSteps = Mathf.Max(1, totalSteps);
+                _onProgress = onProgress;
+            }
+
+            public void ReportCurrent(string message)
+            {
+                _onProgress?.Invoke(
+                    Mathf.Clamp01(_completedSteps / (float)_totalSteps),
+                    message
+                );
+            }
+
+            public void CompleteStep(string message)
+            {
+                _completedSteps++;
+
+                var progress = Mathf.Clamp01(
+                    _completedSteps / (float)_totalSteps
+                );
+
+                _onProgress?.Invoke(progress, message);
+            }
+
+            public void Complete(string message = "Complete")
+            {
+                _completedSteps = _totalSteps;
+                _onProgress?.Invoke(1f, message);
+            }
         }
     }
 }

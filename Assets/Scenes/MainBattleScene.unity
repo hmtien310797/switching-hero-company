@@ -149,7 +149,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DontDestroyOnLoadEnabled: 0
-  database: {fileID: 11400000, guid: 89ff8b391b9e64c82ac7356834aef25c, type: 2}
 --- !u!4 &183078251
 Transform:
   m_ObjectHideFlags: 0
@@ -274,7 +273,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 610a47f8beb246f5bb13f7ffde243abf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  database: {fileID: 11400000, guid: f55d507dd85915e4ab0cb40ccc6023c7, type: 2}
   dungeonId: 1
   stage: 1
   dungeonMapController: {fileID: 238822548}
@@ -427,8 +425,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DontDestroyOnLoadEnabled: 0
-  growthDatabase: {fileID: 11400000, guid: aae22e943d5177b479d943194fa765b8, type: 2}
-  defaultGold: 100000
 --- !u!4 &417113860
 Transform:
   m_ObjectHideFlags: 0
@@ -835,7 +831,7 @@ MonoBehaviour:
   DontDestroyOnLoadEnabled: 0
   chapterBattleController: {fileID: 4923867838286174209}
   dungeonBattleController: {fileID: 252925625}
-  resultHoldSeconds: 1
+  resultHoldSeconds: 2.4
 --- !u!4 &811213264
 Transform:
   m_ObjectHideFlags: 0
@@ -1258,7 +1254,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DontDestroyOnLoadEnabled: 0
-  database: {fileID: 11400000, guid: 5dffae6fb1cf8a748b39653333173ebb, type: 2}
 --- !u!4 &1246934769
 Transform:
   m_ObjectHideFlags: 0
@@ -2330,8 +2325,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb2e399d977c43acb3d042b0e790d33d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onlineIdleFlushIntervalSeconds: 60
-  baseRewardIsPerMinute: 0
   enableDebugLog: 1
 --- !u!4 &6485306239574347344
 Transform:
