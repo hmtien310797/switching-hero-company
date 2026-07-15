@@ -41,9 +41,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         {
             TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
             TutorialManager.Instance.OnClick += OnClickTutorial;
+        }
 
-            BindSegmentedControl();
+        private void Start()
+        {
             HideAllPanelsImmediate();
+            BindSegmentedControl();
         }
 
         private void OnDestroy()

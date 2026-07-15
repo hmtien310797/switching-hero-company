@@ -96,6 +96,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         private void OnDisable()
         {
+            HideAllPopups();
             UnsubscribeEvents();
         }
 
@@ -106,6 +107,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         protected override void OnHidePanel()
         {
+        }
+        
+        private void HideAllPopups()
+        {
+            sequencePopup.Hide();
+            probabilityPopup.Hide();
+            summonAchievementRewardView.Hide();
         }
 
         public override bool HasNotification()

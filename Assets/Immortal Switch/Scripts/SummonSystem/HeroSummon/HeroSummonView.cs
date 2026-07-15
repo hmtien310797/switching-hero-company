@@ -118,7 +118,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         protected override void OnHidePanel()
         {
-            HideAllPopups();
         }
 
         private void SubscribeEvents()
@@ -197,6 +196,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         private void HideAllPopups()
         {
+            sequencePopup.Hide();
+            probabilityPopup.Hide();
+            summonAchievementRewardView.Hide();
         }
 
         private void TrySummon(string optionId)

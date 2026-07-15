@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Loading.Views;
 using Immortal_Switch.Scripts.Shared.Views;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -978,14 +979,14 @@ namespace Immortal_Switch.Scripts.UI
         #region Main Scene Init
 
         // Put BottomMainView on SubMain, TopMainView on OverMain (NOT Main)
-        public async UniTask InitMainScene()
+        private async UniTask InitMainScene()
         {
-            var result = await UniTask.WhenAll(
+            await UniTask.WhenAll(
                 OpenPopupAsync<BottomMainView>(withBackdrop: false),
-                OpenPopupAsync<TopMainView>(withBackdrop: false)
+                OpenPopupAsync<TopMainView>(withBackdrop: false),
+            PreloadAsync<PopupRewardView>(), PreloadAsync<LoadingView>()
             );
-
-            PreloadAsync<PopupRewardView>().Forget();
+            
             tapeAnimator.transform.parent = GetLayerRoot(UILayer.Main);
         }
 

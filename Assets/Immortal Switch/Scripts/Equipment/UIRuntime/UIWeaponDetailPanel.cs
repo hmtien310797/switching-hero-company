@@ -5,6 +5,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
+using Immortal_Switch.Scripts.Loading.Views;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Tutorial;
 using TMPro;
@@ -261,13 +262,16 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (WeaponManager.Instance == null)
                 return;
 
+            LoadingService.Show();
             var result = await WeaponManager.Instance.TryFuseAllStandardWeaponsAsync();
-
+            LoadingService.Hide();
             if (result != null &&
                 result.HasAnyReward &&
                 fuseAllResultPopup != null)
+            {
                 fuseAllResultPopup.Show(result);
-
+            }
+            
             RequestRefresh();
         }
 

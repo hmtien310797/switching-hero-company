@@ -453,6 +453,8 @@ namespace Immortal_Switch.Scripts.Equipment.Core
                 NotifyAllRelevantWeaponChangesAfterFuseAll(result);
             }
 
+            await SyncFromServerAsync();
+
             return result;
         }
 

@@ -76,7 +76,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
         protected override void OnHidePanel()
         {
-            HideAllPopups();
+
         }
 
         public override bool HasNotification()
@@ -124,6 +124,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
         private void HideAllPopups()
         {
+            sequencePopup.Hide();
+            probabilityPopup.Hide();
+            summonAchievementRewardView.Hide();
         }
 
         private void OpenAchievementPopup()
