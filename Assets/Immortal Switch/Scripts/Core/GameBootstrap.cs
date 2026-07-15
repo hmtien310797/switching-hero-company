@@ -63,16 +63,16 @@ namespace Immortal_Switch.Scripts.Core
                 HeroProgressionManager.Instance.InitializeAsync();
 
                 // 3
-                await PlayerSystemManager.Instance.InitializeAsync();
-                progress.CompleteStep("Player system initialized");
+                await MissionSystemManager.Instance.InitializeAsync();
+                progress.CompleteStep("Mission system initialized");
 
                 // 4
                 await ShopManager.Instance.InitializeAsync();
                 progress.CompleteStep("Shop initialized");
 
                 // 5
-                await MissionSystemManager.Instance.InitializeAsync();
-                progress.CompleteStep("Mission system initialized");
+                await PlayerSystemManager.Instance.InitializeAsync();
+                progress.CompleteStep("Player system initialized");
 
                 PlayerMeResponse player = null;
 
