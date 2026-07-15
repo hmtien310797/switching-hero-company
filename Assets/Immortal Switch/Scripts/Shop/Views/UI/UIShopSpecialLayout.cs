@@ -43,8 +43,9 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             for (int i = 0; i < rows.Count; i++)
             {
                 var row = rows[i];
+                var packId = row.Pack.iD;
 
-                switch (row.Pack.iD)
+                switch (packId)
                 {
                     // id 13: gói weekly, 14: daily
                     case PackIdConstants.ID_WEEKLY_SPECIAL:
@@ -56,8 +57,13 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                         continue;
                 }
 
+                if (PackIdConstants.IsPackSpecial(packId))
+                {
+                    continue;
+                }
+
                 var price = row.Product.price.ToString(CultureInfo.InvariantCulture);
-                var rewards = DatabaseManager.Instance.GetShopSpecialRewards(row.Pack.iD);
+                var rewards = DatabaseManager.Instance.GetShopSpecialRewards(packId);
 
                 if (_productsItem.Count > i)
                 {

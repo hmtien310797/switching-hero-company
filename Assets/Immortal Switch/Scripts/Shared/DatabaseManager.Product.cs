@@ -185,7 +185,7 @@ namespace Immortal_Switch.Scripts.Shared
 
                 if (item != null)
                 {
-                    var itemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+                    var itemIcon = ItemDb.LoadIcon(item.rarity, item.itemType, item.itemKey);
 
                     if (itemIcon != null)
                     {

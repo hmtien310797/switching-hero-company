@@ -36,6 +36,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         private Vector2 _orgShopTabHighlightAnchoredPos;
 
         private Action<string, int> _onBuyProduct;
+        private Action<string, int> _onBuyBundleProduct;
         private Action<int, EShopTab> _onClaim;
         private Action<EShopTab> _onChangeTab;
 
@@ -64,11 +65,12 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             RefreshTab();
         }
 
-        public void Bind(EShopTab defaultTab, Action<string, int> onBuyProduct, Action<EShopTab> onChangeTab,
-            Action<int, EShopTab> onClaim)
+        public void Bind(EShopTab defaultTab, Action<string, int> onBuyProduct, Action<string, int> onBuyBundleProduct,
+            Action<EShopTab> onChangeTab, Action<int, EShopTab> onClaim)
         {
             _onClaim = onClaim;
             _onBuyProduct = onBuyProduct;
+            _onBuyBundleProduct = onBuyBundleProduct;
             _onChangeTab = onChangeTab;
 
             DisableHighlight();
@@ -217,7 +219,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 case EShopTab.Special:
                 {
                     var packs = DatabaseManager.Instance.GetShopPacksSpecial();
-                    _selectedLayout.GetComponent<UIShopSpecialLayout>().Bind(packs, _onBuyProduct);
+                    _selectedLayout.GetComponent<UIShopSpecialLayout>().Bind(packs, _onBuyBundleProduct);
                     break;
                 }
 

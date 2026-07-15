@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,6 +32,9 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         [SerializeField]
         private UIShopProductItem rewardPrefab;
+
+        [SerializeField]
+        private Image imgChest;
 
         // --- Private Fields ---
         private List<UIShopProductItem> _rewards = new();
@@ -102,7 +106,21 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
             RefreshLimit();
             RefreshBonus();
-            RefreshRewards(rewards);
+
+            if (iap.iD is PackIdConstants.ID_MONTHLY_NORMAL
+                or PackIdConstants.ID_MONTHLY_PREMIUM
+                or PackIdConstants.ID_DAILY_SPECIAL
+                or PackIdConstants.ID_WEEKLY_SPECIAL)
+            {
+                rewardContainer.gameObject.SetActive(true);
+                RefreshRewards(rewards);
+            }
+            else
+            {
+                rewardContainer.gameObject.SetActive(false);
+                imgChest.gameObject.SetActive(true);
+                imgChest.sprite = ShopManager.Instance.Atlas.LoadIcon(iap.iconId);
+            }
         }
 
         private void RefreshLimit()

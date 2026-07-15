@@ -62,13 +62,13 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             string storeProductId = _product.googleID;
 #endif
 
-            // ko limit goi nay.
-            _onClickBuy?.Invoke(storeProductId, 0);
+            _onClickBuy?.Invoke(storeProductId, _packId);
         }
 
         public void Bind(
             string title, string price,
             DynamicHeroesGlobalSpecificationsProductIdRow product,
+            int packId,
             int baseValue, bool hasFirstBuyMultiplier,
             Action<string, int> onClickBuy, string iconId
         )
@@ -82,6 +82,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
             _onClickBuy = onClickBuy;
             _product = product;
+            _packId = packId;
 
             var icon = ShopManager.Instance.Atlas.LoadIcon(iconId);
 

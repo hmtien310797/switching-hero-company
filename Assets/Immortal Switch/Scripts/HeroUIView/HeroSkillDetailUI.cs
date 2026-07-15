@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Skill;
 
 namespace Immortal_Switch.Scripts.HeroUIView
@@ -18,7 +19,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         public void Bind(int currentLevel, SkillDataSO skillData, Action<SkillDataSO, int> skillButtonCallback)
         {
             _skillData = skillData;
-            skillUI.sprite = _skillData.SkillIcon;
+            skillUI.sprite = SkillImageService.GetSkillIcon(_skillData);
             skillNameAndLevel.text = $"{_skillData.SkillName} Lv.{currentLevel}";
             skillDescription.text = skillData.BuildDescription(currentLevel);
             skillButton.onClick.RemoveAllListeners();

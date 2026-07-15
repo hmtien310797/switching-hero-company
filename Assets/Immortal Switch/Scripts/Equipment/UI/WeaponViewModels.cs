@@ -22,6 +22,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         public string DisplayValue;
     }
 
+    [System.Serializable]
     public class StandardWeaponCardViewModel
     {
         public int WeaponId;

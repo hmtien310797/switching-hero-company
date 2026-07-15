@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Skill;
 
 namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
@@ -24,7 +25,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                     grouped = new SkillSummonGroupedResultEntry
                     {
                         SkillAsset = skill,
-                        Icon = skill != null ? skill.SkillIcon : null,
+                        Icon = SkillImageService.GetSkillIcon(skill),
                         SkillName = entry.SkillName,
                         Count = 0,
                         IsNewSkill = false,

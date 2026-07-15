@@ -9,6 +9,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         [SerializeField] private Image icon;
         [SerializeField] private GameObject emptyObject;
         [SerializeField] private GameObject selectedObject;
+        [SerializeField] private GameObject iconSkillParent;
 
         private int slotIndex;
         private int skillId = -1;
@@ -26,7 +27,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             if (icon != null)
             {
-                icon.gameObject.SetActive(hasSkill);
+                iconSkillParent.SetActive(hasSkill);
                 if (hasSkill)
                     icon.sprite = iconSprite;
             }

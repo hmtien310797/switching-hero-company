@@ -1,4 +1,5 @@
 using System;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 using UnityEngine.UI;
@@ -129,7 +130,7 @@ namespace Immortal_Switch.Scripts.UI.Skill
                 return missingSkillSprite;
 
             // Adjust this property name if your SkillDataSO uses SkillIcon/Icon instead.
-            return skillData.SkillIcon != null ? skillData.SkillIcon : missingSkillSprite;
+            return SkillImageService.GetSkillIcon(skillData);
         }
     }
 }

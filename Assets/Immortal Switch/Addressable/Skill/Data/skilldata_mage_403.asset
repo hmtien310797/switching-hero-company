@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_mage_403
   m_EditorClassIdentifier: 
   SkillId: 403
+  HeroId: 0
   SkillKey: skilldata_mage_403
   SkillClass: 4
   SkillName: Infernal Meteor Rain
-  IconSkillKey: icon_skilldata_mage_403
+  IconSkillKey: ic_class_mage_Infernal_Meteor_Rain
   SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
   Description: "M\u1EDF c\xE1c c\u1ED5ng dung nham tr\xEAn kh\xF4ng, tri\u1EC7u h\u1ED3i
     thi\xEAn th\u1EA1ch r\u01A1i li\xEAn t\u1EE5c xu\u1ED1ng chi\u1EBFn tr\u01B0\u1EDDng.
@@ -36,6 +37,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 0
     RuntimeAddressableKey: prefab_inferno_meteor_rain_controller
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}

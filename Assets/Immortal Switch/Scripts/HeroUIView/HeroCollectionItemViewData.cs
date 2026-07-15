@@ -11,7 +11,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
         public string HeroName;
 
         public Sprite PortraitIcon;
-        public Sprite ShardIcon;
         public Sprite RarityIcon;
         public Sprite ElementIcon;
         public Sprite HeroClassIcon;

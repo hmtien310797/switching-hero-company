@@ -35,7 +35,7 @@ namespace Immortal_Switch.Scripts.Shared
 
         [field: DatabaseBinding]
         public DungeonSystemDatabaseSO DungeonVisualDb { get; private set; }
-        
+
         [field: DatabaseBinding]
         public TutorialDatabaseSO TutorialDb { get; private set; }
 
@@ -68,10 +68,9 @@ namespace Immortal_Switch.Scripts.Shared
                 InitSkillDataAsync(),
                 InitCreepDataAsync()
             );
-            
+
             InitBadwords();
         }
-        
 
 #region Helper
 
@@ -94,7 +93,7 @@ namespace Immortal_Switch.Scripts.Shared
 
             if (item != null)
             {
-                Sprite icon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+                Sprite icon = ItemDb.LoadIcon(item.rarity, item.itemType, item.itemKey);
 
                 if (TrySetTierInfo(item.rarity, out var tierInfo) &&
                     tierInfo != null)
@@ -119,7 +118,7 @@ namespace Immortal_Switch.Scripts.Shared
         /// </summary>
         public List<ItemRewardData> GetRewards(string strReward)
         {
-            var entries = new List<(string itemKey, BigNumber quantity)>();
+            var entries = new List<(int itemId, BigNumber quantity)>();
             var rewards = strReward.Split(';');
 
             foreach (var reward in rewards)
@@ -129,9 +128,11 @@ namespace Immortal_Switch.Scripts.Shared
                 // có 2 key là item key va quantity
                 if (splits.Length > 1)
                 {
-                    var itemKey = splits[0];
-                    BigNumber.TryParse(splits[1], out var quantity);
-                    entries.Add((itemKey, quantity));
+                    if (BigNumber.TryParse(splits[1], out var quantity) &&
+                        int.TryParse(splits[0], out var itemId))
+                    {
+                        entries.Add((itemId, quantity));
+                    }
                 }
                 else
                 {
@@ -145,7 +146,7 @@ namespace Immortal_Switch.Scripts.Shared
                 return new List<ItemRewardData>();
             }
 
-            var items = entries.Select(entry => GetDisplayData(entry.itemKey)).ToList();
+            var items = entries.Select(entry => GetDisplayData(entry.itemId)).ToList();
             var results = new List<ItemRewardData>(entries.Count);
 
             for (var i = 0; i < entries.Count; i++)
@@ -157,7 +158,7 @@ namespace Immortal_Switch.Scripts.Shared
                     set.TierInfo != null &&
                     set.ItemIcon != null)
                 {
-                    results.Add(new ItemRewardData(entry.itemKey, entry.quantity, set.ItemIcon, set.TierInfo));
+                    results.Add(new ItemRewardData(entry.itemId, entry.quantity, set.ItemIcon, set.TierInfo));
                 }
             }
 
@@ -296,7 +297,7 @@ namespace Immortal_Switch.Scripts.Shared
 
             if (item != null)
             {
-                var itemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+                var itemIcon = ItemDb.LoadIcon(item.rarity, item.itemType, item.itemKey);
 
                 if (TrySetTierInfo(item.rarity, out var tierInfo) &&
                     tierInfo != null)
@@ -322,7 +323,7 @@ namespace Immortal_Switch.Scripts.Shared
 
             if (item != null)
             {
-                var itemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+                var itemIcon = ItemDb.LoadIcon(item.rarity, item.itemType, item.itemKey);
 
                 if (TrySetTierInfo(item.rarity, out var tierInfo) &&
                     tierInfo != null)
@@ -377,7 +378,7 @@ namespace Immortal_Switch.Scripts.Shared
             if (tierInfo == null)
                 return false;
 
-            rewardData.ItemIcon = ItemDb.LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+            rewardData.ItemIcon = ItemDb.LoadIcon(item.rarity, item.itemType, item.itemKey);
             rewardData.TierInfo = tierInfo;
 
             return true;

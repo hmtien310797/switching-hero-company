@@ -94,6 +94,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             {
                 var entry = btnDungeons[index];
                 entry.Bind(index, string.Empty, OnClickDungeon);
+                entry.SetStatus(ETabPresetStatus.Normal);
             }
         }
 

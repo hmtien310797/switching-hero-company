@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated ScriptableObject database from CSV: Dynamic Heroes - Global Specifications - tut_config
+    /// Auto generated ScriptableObject database from CSV: DynamicHeroes-GlobalSpecifications-tut_config
     /// </summary>
     [CreateAssetMenu(
         fileName = "DynamicHeroesGlobalSpecificationsTutConfigDatabase",

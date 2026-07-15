@@ -32,7 +32,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         [Header("Star Display")]
         [SerializeField] protected UIWeaponStarDisplay starDisplay;
-
+        
         protected Action onClick;
 
         public void BindCommon(
@@ -58,19 +58,12 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             if (txtShard != null)
                 txtShard.text = shardText;
-
-            /*if (txtStar != null)
-                txtStar.text = starText;*/
-
-            if (equippedMark != null)
-                equippedMark.SetActive(isEquipped);
+            
+            equippedMark.gameObject.SetActive(isEquipped);
 
             if (lockedMask != null)
                 lockedMask.SetActive(isLocked);
-
-            if (redDot != null)
-                redDot.SetActive(showRedDot);
-
+            
             if (selectedMark != null)
                 selectedMark.SetActive(isSelected);
 

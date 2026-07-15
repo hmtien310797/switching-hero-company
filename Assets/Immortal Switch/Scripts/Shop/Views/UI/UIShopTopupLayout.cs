@@ -45,7 +45,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
                     clone.Bind(
                         row.Pack.nameVi, price,
-                        row.Product, row.Pack.quantity,
+                        row.Product, row.Pack.iD, row.Pack.quantity,
                         hasFirstBuyMultiplier, _onClickBuy,
                         row.Pack.iconId
                     );
@@ -56,7 +56,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
                     clone.Bind(
                         row.Pack.nameVi, price,
-                        row.Product, row.Pack.quantity,
+                        row.Product, row.Pack.iD, row.Pack.quantity,
                         hasFirstBuyMultiplier, _onClickBuy,
                         row.Pack.iconId
                     );

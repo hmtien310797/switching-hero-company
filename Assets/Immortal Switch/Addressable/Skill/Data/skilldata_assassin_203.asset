@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_assassin_203
   m_EditorClassIdentifier: 
   SkillId: 203
+  HeroId: 0
   SkillKey: skilldata_assassin_203
   SkillClass: 2
   SkillName: Shadow Burst Slash
-  IconSkillKey: icon_skilldata_assassin_203
+  IconSkillKey: ic_class_assassin_Fatal_Mark_Detonation
   SkillIcon: {fileID: 21300000, guid: 4c01d07068be19044a6ae219280af31c, type: 3}
   Description: "Tung m\u1ED9t \u0111\xF2n ch\xE9m b\xF3ng t\u1ED1i v\xE0o m\u1EE5c
     ti\xEAu \u01B0u ti\xEAn, g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng.
@@ -37,6 +38,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_shadow_burst_slash
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -98,6 +104,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 7
         BoxSize: {x: 2, y: 2}
         Duration: 0

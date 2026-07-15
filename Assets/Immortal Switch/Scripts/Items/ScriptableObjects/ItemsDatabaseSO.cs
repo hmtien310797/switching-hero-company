@@ -53,7 +53,7 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
 
             if (item != null)
             {
-                return LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+                return LoadIcon(item.rarity, item.itemType, item.itemKey);
             }
 
             Debug.LogError($"Item {itemId} not found");
@@ -66,7 +66,7 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
 
             if (item != null)
             {
-                return LoadIcon(item.iconKey, item.rarity, item.itemType, item.itemName);
+                return LoadIcon(item.rarity, item.itemType, item.itemKey);
             }
 
             Debug.LogError($"Item {itemKey} not found");
@@ -74,9 +74,9 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
         }
 
         [CanBeNull]
-        public Sprite LoadIcon(string iconKey, string rarity, string itemType, string itemName)
+        public Sprite LoadIcon(string rarity, string itemType, string itemKey)
         {
-            var key = $"ic_{itemType.ToLower()}_{itemName.Replace(" ", "_")}_{rarity}";
+            var key = $"ic_{itemType}_{itemKey}_{rarity}".ToLower();
 
             if (_itemAtlas == null)
             {

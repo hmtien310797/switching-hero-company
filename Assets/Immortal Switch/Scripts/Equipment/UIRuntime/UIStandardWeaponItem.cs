@@ -7,7 +7,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
     {
         private int weaponId;
         private Action<int> onClickWithId;
-
+        
         public void Bind(StandardWeaponCardViewModel vm, Action<int> clickCallback)
         {
             weaponId = vm.WeaponId;

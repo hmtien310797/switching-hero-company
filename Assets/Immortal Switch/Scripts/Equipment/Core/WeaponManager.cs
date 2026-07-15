@@ -40,16 +40,11 @@ namespace Immortal_Switch.Scripts.Equipment.Core
         
         private UserDataCache userDataCache;
 
-        protected override void Awake()
+        public override UniTask InitializeAsync()
         {
-            base.Awake();
             Load();
             userDataCache = UserDataCache.Instance;
             BuildServices();
-        }
-
-        public override UniTask InitializeAsync()
-        {
             return UniTask.CompletedTask;
         }
 

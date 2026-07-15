@@ -51,7 +51,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 portraitIcon.sprite = data.PortraitIcon;
 
             if (shardIcon != null)
-                shardIcon.sprite = data.ShardIcon;
+                shardIcon.sprite = data.PortraitIcon;
 
             if (rarityIcon != null)
                 rarityIcon.sprite = data.RarityIcon;

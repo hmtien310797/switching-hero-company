@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated row data from CSV: Dynamic Heroes - Global Specifications - tut_config
+    /// Auto generated row data from CSV: DynamicHeroes-GlobalSpecifications-tut_config
     /// </summary>
     [Serializable]
     public class DynamicHeroesGlobalSpecificationsTutConfigRow

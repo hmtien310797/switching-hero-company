@@ -121,7 +121,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                 if (rewards.Count > 0)
                 {
                     var reward = rewards[0];
-                    sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemKey(reward.ItemKey);
+                    sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemId(reward.ItemId);
                     quantityFormat = reward.Quantity.ToInputString();
                 }
 

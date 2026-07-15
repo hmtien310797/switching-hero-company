@@ -224,10 +224,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
             if (@class != null)
             {
-                imgRace.sprite = @class.Icon;
                 txtClass.text = @class.ClassName;
             }
 
+            imgRace.sprite = HeroImageService.GetHeroClassIcon(hero);
             imgShard.sprite = hero.ShardIcon;
             txtHeroName.text = hero.Name;
             heroStatSnapshot = HeroProgressionManager.Instance.Service.GetCurrentStats(heroId);
@@ -248,13 +248,15 @@ namespace Immortal_Switch.Scripts.HeroUIView
             SkillDataSO ultimateSkillData = DatabaseManager.Instance.GetUltimateSkillDataByHeroId(heroId);
             if (ultimateSkillData != null)
             {
-                ultimateSkillDetailUI.Bind(heroStatSnapshot.ultimateSkillLevel, ultimateSkillData, ShowSkillDetail);
+                ultimateSkillDetailUI.Bind(heroStatSnapshot?.ultimateSkillLevel ?? 1,
+                    ultimateSkillData, ShowSkillDetail);
             }
             
             SkillDataSO passiveSkillData = DatabaseManager.Instance.GetPassiveSkillDataByHeroId(heroId);
             if (passiveSkillData != null)
             {
-                passiveSkillDetailUI.Bind(heroStatSnapshot.passiveSkillLevel, passiveSkillData, ShowSkillDetail);
+                passiveSkillDetailUI.Bind(heroStatSnapshot?.passiveSkillLevel ?? 1,
+                    passiveSkillData, ShowSkillDetail);
             }
         }
 

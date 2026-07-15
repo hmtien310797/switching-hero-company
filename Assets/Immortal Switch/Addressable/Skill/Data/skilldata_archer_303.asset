@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_archer_303
   m_EditorClassIdentifier: 
   SkillId: 303
+  HeroId: 0
   SkillKey: skilldata_archer_303
   SkillClass: 3
   SkillName: Phoenix
-  IconSkillKey: icon_skilldata_archer_303
+  IconSkillKey: ic_class_archer_Phoenix
   SkillIcon: {fileID: 21300000, guid: b636c108bffb21b4ab8236429dbc8f8d, type: 3}
   Description: "Tri\u1EC7u h\u1ED3i Ph\u01B0\u1EE3ng Ho\xE0ng l\u1EEDa bay th\u1EB3ng
     v\u1EC1 ph\xEDa tr\u01B0\u1EDBc, li\xEAn t\u1EE5c t\u1EA5n c\xF4ng k\u1EBB \u0111\u1ECBch
@@ -36,6 +37,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 0
     RuntimeAddressableKey: prefab_phoenix_controller
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 0
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -97,6 +103,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 9
         BoxSize: {x: 2, y: 2}
         Duration: 0

@@ -6083,8 +6083,8 @@ MonoBehaviour:
   btnPremium: {fileID: 6394946484936234372}
   btnX1: {fileID: 5106656041510760348}
   btnX10: {fileID: 8446295247485420997}
-  txtX1: {fileID: 6133722810360841107}
-  txtX10: {fileID: 7419227653731609034}
+  txtX1: {fileID: 2722873137191760637}
+  txtX10: {fileID: 1594466592311023780}
   normal: {fileID: 6714071710179600201}
   premium: {fileID: 6416289053906824753}
 --- !u!1 &8621377683572835891
@@ -7729,6 +7729,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53a04af387231b84082e56118f42f840, type: 3}
+--- !u!114 &2722873137191760637 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4266429083939137272, guid: 53a04af387231b84082e56118f42f840, type: 3}
+  m_PrefabInstance: {fileID: 2232923486799713285}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &3511180468708183861 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3334572597419891504, guid: 53a04af387231b84082e56118f42f840, type: 3}
@@ -7745,17 +7756,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6133722810360841107 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5468403975081826198, guid: 53a04af387231b84082e56118f42f840, type: 3}
-  m_PrefabInstance: {fileID: 2232923486799713285}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &2676301671828132188
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7768,6 +7768,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIEventWheelSegment
       objectReference: {fileID: 0}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentOdd
+      value: 
+      objectReference: {fileID: 21300000, guid: 67679c0c714c58644b3a4927d40827d5, type: 3}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentEven
+      value: 
+      objectReference: {fileID: 21300000, guid: 26fc9304267052b499edcfdad4d10e71, type: 3}
     - target: {fileID: 6919667943005713046, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0.9
@@ -8210,9 +8218,9 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3334572597419891504, guid: 53a04af387231b84082e56118f42f840, type: 3}
   m_PrefabInstance: {fileID: 3248722949179145820}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7419227653731609034 stripped
+--- !u!114 &1594466592311023780 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5468403975081826198, guid: 53a04af387231b84082e56118f42f840, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4266429083939137272, guid: 53a04af387231b84082e56118f42f840, type: 3}
   m_PrefabInstance: {fileID: 3248722949179145820}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
@@ -10245,6 +10253,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIEventWheelSegment (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentOdd
+      value: 
+      objectReference: {fileID: 21300000, guid: 67679c0c714c58644b3a4927d40827d5, type: 3}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentEven
+      value: 
+      objectReference: {fileID: 21300000, guid: 26fc9304267052b499edcfdad4d10e71, type: 3}
     - target: {fileID: 6919667943005713046, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0.9
@@ -11018,6 +11034,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIEventWheelSegment (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentOdd
+      value: 
+      objectReference: {fileID: 21300000, guid: 67679c0c714c58644b3a4927d40827d5, type: 3}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentEven
+      value: 
+      objectReference: {fileID: 21300000, guid: 26fc9304267052b499edcfdad4d10e71, type: 3}
     - target: {fileID: 6919667943005713046, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0.9
@@ -11581,6 +11605,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIEventWheelSegment (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentOdd
+      value: 
+      objectReference: {fileID: 21300000, guid: 67679c0c714c58644b3a4927d40827d5, type: 3}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentEven
+      value: 
+      objectReference: {fileID: 21300000, guid: 26fc9304267052b499edcfdad4d10e71, type: 3}
     - target: {fileID: 6534295299021120757, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -11852,6 +11884,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIEventWheelSegment (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentOdd
+      value: 
+      objectReference: {fileID: 21300000, guid: 67679c0c714c58644b3a4927d40827d5, type: 3}
+    - target: {fileID: 2042546441748135359, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
+      propertyPath: sprSegmentEven
+      value: 
+      objectReference: {fileID: 21300000, guid: 26fc9304267052b499edcfdad4d10e71, type: 3}
     - target: {fileID: 6534295299021120757, guid: c8399cf1ebc9ccb4197600a44d0ffcf2, type: 3}
       propertyPath: m_Sprite
       value: 

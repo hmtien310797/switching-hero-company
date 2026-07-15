@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
@@ -520,7 +521,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 bool isSelected = selectedSkill != null && skillData != null &&
                                   selectedSkill.SkillId == skillData.SkillId;
-                equippedSlots[i].Setup(i, skillId, skillData != null ? skillData.SkillIcon : null, isSelected);
+                equippedSlots[i].Setup(i, skillId, SkillImageService.GetSkillIcon(skillData), isSelected);
             }
         }
 
@@ -573,7 +574,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             var state = dataProvider.BuildSkillState(hero, skillData);
 
-            if (detailIcon != null) detailIcon.sprite = skillData.SkillIcon;
+            if (detailIcon != null) detailIcon.sprite = SkillImageService.GetSkillIcon(skillData);
 
             if (tierInfo != null)
             {
@@ -664,7 +665,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 replaceHeroPreview.Setup(selectedHero.HeroId, selectedHero.HeroIcon, true);
 
             if (replacePendingSkillIcon != null)
-                replacePendingSkillIcon.sprite = pendingReplaceSkill != null ? pendingReplaceSkill.SkillIcon : null;
+                replacePendingSkillIcon.sprite = SkillImageService.GetSkillIcon(pendingReplaceSkill);
 
             if (replaceInstructionText != null)
                 replaceInstructionText.text = "Vui lòng chọn ô để trang bị.";
@@ -684,7 +685,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 var skillData = dataProvider.GetClassPool(selectedHero.HeroClass)
                     .FirstOrDefault(x => x != null && x.SkillId == skillId);
 
-                replaceSlotViews[i].Setup(slotIndex, skillData != null ? skillData.SkillIcon : null);
+                replaceSlotViews[i].Setup(slotIndex, SkillImageService.GetSkillIcon(skillData));
                 replaceSlotViews[i].Button.onClick.RemoveAllListeners();
                 replaceSlotViews[i].Button.onClick.AddListener(() => OnClickReplaceSlot(slotIndex).Forget());
             }

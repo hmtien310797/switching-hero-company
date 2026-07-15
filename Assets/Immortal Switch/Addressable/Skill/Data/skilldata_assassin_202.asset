@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_assassin_202
   m_EditorClassIdentifier: 
   SkillId: 202
+  HeroId: 0
   SkillKey: skilldata_assassin_202
   SkillClass: 2
   SkillName: Fatal Mark Detonation
-  IconSkillKey: icon_skilldata_assassin_202
+  IconSkillKey: ic_class_assassin_Fatal_Mark_Detonation
   SkillIcon: {fileID: 21300000, guid: 0c4ebff9e2d03eb46b7504cb10f5dba7, type: 3}
   Description: "G\u1EAFn \u1EA5n k\xFD l\xEAn m\u1EE5c ti\xEAu, sau \u0111\xF3 ph\xE1t
     n\u1ED5 g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng. M\u1EE5c
@@ -36,6 +37,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_fatal_mark_detonation
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -97,6 +103,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 3.5
         BoxSize: {x: 2, y: 2}
         Duration: 0
@@ -194,7 +201,7 @@ MonoBehaviour:
   Levels:
   - Level: 1
     Phases: []
-    DescriptionParams: []
+    Description: 
     PassiveLevelConfig:
       MergeMode: 0
       Modifiers: []

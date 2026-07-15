@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_warrior_104
   m_EditorClassIdentifier: 
   SkillId: 104
+  HeroId: 0
   SkillKey: skilldata_warrior_104
   SkillClass: 1
   SkillName: Blade Vortex
-  IconSkillKey: icon_skilldata_warrior_104
+  IconSkillKey: ic_class_knight_Blade_Vortex
   SkillIcon: {fileID: 21300000, guid: 6c9b75bfb15794043be2187e58d11a45, type: 3}
   Description: "T\u1EA1o m\u1ED9t v\xF2ng ki\u1EBFm xoay t\u1EA1i v\u1ECB tr\xED
     m\u1EE5c ti\xEAu, g\xE2y s\xE1t th\u01B0\u01A1ng li\xEAn t\u1EE5c l\xEAn k\u1EBB
@@ -36,6 +37,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_blade_vortex
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 0
     FollowType: 1
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -97,6 +103,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 7
         BoxSize: {x: 2, y: 2}
         Duration: 0

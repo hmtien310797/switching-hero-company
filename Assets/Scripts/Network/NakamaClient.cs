@@ -672,6 +672,21 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<IapPurchaseResponse>(response.Payload);
     }
 
+    /// <summary>Gửi pack_id + receipt lên RPC iap/pack_purchase — dùng cho pack_iap (bundle nhiều
+    /// item, vd. gói Special), khác iap/purchase chỉ cộng 1 loại tiền theo pack_diamond. Server tự
+    /// verify receipt rồi cộng cả 3 slot item + enforce purchase limit theo pack.limit_reset.</summary>
+    public async Task<IapPackPurchaseResponse> IapPackPurchaseAsync(int packId, string store, string receipt)
+    {
+        var payload = JsonConvert.SerializeObject(new IapPackPurchaseRequest
+        {
+            PackId  = packId,
+            Store   = store,
+            Receipt = receipt,
+        });
+        var response = await CallRpcAsync("iap/pack_purchase", payload);
+        return JsonConvert.DeserializeObject<IapPackPurchaseResponse>(response.Payload);
+    }
+
     // ── Recharge Milestone ────────────────────────────────────────────────────
 
     /// <summary>Điểm tích nạp tháng hiện tại + trạng thái claimed từng mốc — nguồn sự thật, gọi

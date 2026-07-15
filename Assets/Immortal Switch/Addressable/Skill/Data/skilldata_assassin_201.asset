@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_assassin_201
   m_EditorClassIdentifier: 
   SkillId: 201
+  HeroId: 0
   SkillKey: skilldata_assassin_201
   SkillClass: 2
   SkillName: Blade Storm Circle
-  IconSkillKey: icon_skilldata_assassin_201
+  IconSkillKey: ic_class_assassin_lade_Storm_Circle
   SkillIcon: {fileID: 21300000, guid: 6c9b75bfb15794043be2187e58d11a45, type: 3}
   Description: "T\u1EA1o v\xF9ng l\u01B0\u1EE1i \u0111ao xoay quanh m\u1EE5c ti\xEAu,
     li\xEAn t\u1EE5c g\xE2y s\xE1t th\u01B0\u01A1ng l\xEAn k\u1EBB \u0111\u1ECBch
@@ -36,6 +37,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_blade_storm_circle
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 0
     FollowType: 1
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -97,6 +103,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 8
         BoxSize: {x: 2, y: 2}
         Duration: 0

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_warrior_105
   m_EditorClassIdentifier: 
   SkillId: 105
+  HeroId: 0
   SkillKey: skilldata_warrior_105
   SkillClass: 1
   SkillName: Phantom Great Slash
-  IconSkillKey: icon_skilldata_warrior_105
+  IconSkillKey: ic_class_knight_Phantom_Great_Slash
   SkillIcon: {fileID: 21300000, guid: b636c108bffb21b4ab8236429dbc8f8d, type: 3}
   Description: "Tri\u1EC7u h\u1ED3i ki\u1EBFm \u1EA3o \u1EA3nh r\u01A1i xu\u1ED1ng
     khu v\u1EF1c m\u1EE5c ti\xEAu, g\xE2y nhi\u1EC1u \u0111\u1EE3t s\xE1t th\u01B0\u01A1ng
@@ -36,6 +37,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 0
     RuntimeAddressableKey: prefab_phantom_great_slash_controller
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -97,6 +103,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 9
         BoxSize: {x: 2, y: 2}
         Duration: 0

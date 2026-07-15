@@ -328,25 +328,8 @@ namespace Immortal_Switch.Scripts.Tutorial
                 {
                     Rewards = rewards,
                     OnClose = OnClosePopupReward,
-                }, false).Forget();
-
-            foreach (var reward in rewards)
-            {
-                try
-                {
-                    var currency = CurrencyMapper.Parse(reward.ItemKey);
-
-                    CurrencyLedgerService.Instance.AddOrMergeIncome(
-                        currency,
-                        reward.Quantity,
-                        CurrencyTransactionReason.TutorialReward
-                    );
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError(ex);
-                }
-            }
+                }, false)
+                .Forget();
 
             return;
 

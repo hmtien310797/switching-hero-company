@@ -322,7 +322,6 @@ namespace Immortal_Switch.Scripts.Skill
         public HeroClass SkillClass;
         public string SkillName;
         public string IconSkillKey;
-        public Sprite SkillIcon;
         [TextArea(3,12)]
         public String Description;
 

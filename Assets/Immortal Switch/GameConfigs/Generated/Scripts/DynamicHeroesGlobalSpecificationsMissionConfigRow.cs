@@ -1,9 +1,10 @@
 using System;
+using UnityEngine;
 
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated row data from CSV: Dynamic Heroes - Global Specifications - mission_config
+    /// Auto generated row data from CSV: DynamicHeroes-GlobalSpecifications-mission_config
     /// </summary>
     [Serializable]
     public class DynamicHeroesGlobalSpecificationsMissionConfigRow

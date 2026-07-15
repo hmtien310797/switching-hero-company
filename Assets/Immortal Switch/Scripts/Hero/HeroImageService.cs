@@ -75,6 +75,14 @@ namespace Immortal_Switch.Scripts.Addressable
             }
         }
         
+        public static Sprite GetHeroClassIcon(HeroDataSO heroData)
+        {
+            if (heroData == null)
+                return null;
+
+            return GetHeroClass(heroData.HeroClass.ToString());
+        }
+        
         public static Sprite GetHeroIcon(HeroDataSO heroData)
         {
             if (heroData == null)
@@ -329,6 +337,42 @@ namespace Immortal_Switch.Scripts.Addressable
             }
 
             SpriteCache.Add(spriteName, sprite);
+            return sprite;
+        }
+        
+        private static Sprite GetHeroClass(string spriteName)
+        {
+            if (string.IsNullOrWhiteSpace(spriteName))
+                return null;
+            
+            string classKey = $"icon_class_{spriteName}".ToLower();
+
+            if (SpriteCache.TryGetValue(classKey, out Sprite cachedSprite))
+                return cachedSprite;
+            
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(classKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={classKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(classKey, sprite);
             return sprite;
         }
     }

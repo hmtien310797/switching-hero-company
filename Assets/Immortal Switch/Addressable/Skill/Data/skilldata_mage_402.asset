@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_mage_402
   m_EditorClassIdentifier: 
   SkillId: 402
+  HeroId: 0
   SkillKey: skilldata_mage_402
   SkillClass: 4
   SkillName: Frost Nova Prison
-  IconSkillKey: icon_skilldata_mage_402
+  IconSkillKey: ic_class_mage_Frost_Nova_Prison
   SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
   Description: "T\u1EA1o v\xF2ng b\u0103ng d\u01B0\u1EDBi ch\xE2n k\u1EBB \u0111\u1ECBch,
     sau \u0111\xF3 tri\u1EC7u h\u1ED3i c\xE1c c\u1ED9t b\u0103ng b\xF9ng n\u1ED5
@@ -38,6 +39,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_frost_nova_prison
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -99,6 +105,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 7
         BoxSize: {x: 2, y: 2}
         Duration: 0

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_assassin_204
   m_EditorClassIdentifier: 
   SkillId: 204
+  HeroId: 0
   SkillKey: skilldata_assassin_204
   SkillClass: 2
   SkillName: Shadow Cleave Field
-  IconSkillKey: icon_skilldata_assassin_204
+  IconSkillKey: ic_class_assassin_Shadow_Cleave_Field
   SkillIcon: {fileID: 21300000, guid: a81d0a09e37212949a876de5fa12aae5, type: 3}
   Description: "T\u1EA1o v\xF9ng ch\xE9m li\xEAn t\u1EE5c quanh b\u1EA3n th\xE2n,
     g\xE2y s\xE1t th\u01B0\u01A1ng nhi\u1EC1u l\u1EA7n l\xEAn t\u1EA5t c\u1EA3 k\u1EBB
@@ -36,6 +37,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_shadow_cleave_field
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -97,6 +103,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 7
         BoxSize: {x: 2, y: 2}
         Duration: 0

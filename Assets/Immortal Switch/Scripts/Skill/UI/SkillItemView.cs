@@ -1,4 +1,5 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using TMPro;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             clickCallback = onClick;
 
             if (icon != null)
-                icon.sprite = state.SkillData != null ? state.SkillData.SkillIcon : null;
+                icon.sprite = SkillImageService.GetSkillIcon(state.SkillData);
 
             if (levelText != null)
                 levelText.text = $"Lv.{state.Level}";

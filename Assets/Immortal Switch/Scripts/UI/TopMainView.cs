@@ -90,6 +90,13 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private RewardSyncService rewardSyncService;
 
+        // Phải khớp MIN_CLAIM_SECONDS phía server (nakama/src/handler/afk.js) — nút chỉ
+        // interactable khi AFK đã tích lũy đủ ngần này giây kể từ checkpoint gần nhất.
+        private const float AfkClaimMinSeconds = 60f;
+
+        private double afkAccumulatedSeconds;
+        private bool afkTimerSynced;
+
         [SerializeField]
         private GameObject[] disableObjectsWhenPlayDungeon;
 
@@ -99,9 +106,15 @@ namespace Immortal_Switch.Scripts.UI
         [Header("Hero Icon Switch Animation")]
         [SerializeField]
         private Image[] iconHeroImage;
+        
+        [SerializeField]
+        private Image[] iconHeroClassImage;
 
         [SerializeField]
         private RectTransform[] heroIconAnchors;
+        
+        [SerializeField]
+        private RectTransform[] heroClassIconAnchors;
 
         [SerializeField]
         private RectTransform heroIconAnimationRoot;
@@ -167,6 +180,59 @@ namespace Immortal_Switch.Scripts.UI
         private void Update()
         {
             UpdatePerformanceOverlay();
+            UpdateAfkClaimTimer();
+        }
+
+        // Tự đếm nội suy phía client giữa hai lần đồng bộ server, để nút không đứng im chờ
+        // response — dừng đếm ngay khi đã đủ ngưỡng, không cần tick tiếp cho tới lần reset kế.
+        private void UpdateAfkClaimTimer()
+        {
+            if (!afkTimerSynced || btnActiveFramingClaim == null || btnActiveFramingClaim.interactable)
+            {
+                return;
+            }
+
+            afkAccumulatedSeconds += Time.unscaledDeltaTime;
+            UpdateAfkClaimButtonInteractable();
+        }
+
+        private void UpdateAfkClaimButtonInteractable()
+        {
+            if (btnActiveFramingClaim == null)
+            {
+                return;
+            }
+
+            btnActiveFramingClaim.interactable = afkTimerSynced && afkAccumulatedSeconds >= AfkClaimMinSeconds;
+        }
+
+        private void SyncAfkAccumulatedSeconds(double elapsedSeconds)
+        {
+            afkAccumulatedSeconds = Math.Max(0d, elapsedSeconds);
+            afkTimerSynced = true;
+            UpdateAfkClaimButtonInteractable();
+        }
+
+        // Kéo elapsed_seconds thật từ afk/preview để seed bộ đếm cục bộ — tránh vừa vào game
+        // đã cho bấm claim (hoặc ngược lại bắt chờ đủ 60s dù đã tích lũy sẵn từ lúc offline).
+        private async UniTaskVoid RefreshAfkClaimAvailabilityAsync()
+        {
+            RewardSyncService service = PvEBattleController.Instance != null
+                ? PvEBattleController.Instance.RewardSyncService
+                : rewardSyncService;
+
+            if (service == null)
+            {
+                return;
+            }
+
+            AfkClaimResponse preview = await service.PreviewRewardAsync();
+            if (preview == null || !preview.Success)
+            {
+                return;
+            }
+
+            SyncAfkAccumulatedSeconds(preview.ElapsedSeconds);
         }
 
         // Cac counter Render (Draw Calls/Batches/SetPass) chi co du lieu trong
@@ -313,7 +379,7 @@ namespace Immortal_Switch.Scripts.UI
                     Rewards        = stageRewards,
                     EarnedRewards  = earnedRewards,
                     ElapsedSeconds = preview.ElapsedSeconds,
-                })
+                }, false)
                 .Forget();
         }
 
@@ -335,6 +401,13 @@ namespace Immortal_Switch.Scripts.UI
 
             AfkClaimResponse response = await service.ClaimRewardAsync();
             Debug.Log($"[TopMainView] afk/claim isClaimX2={isClaimX2} hasReward={response?.HasReward}");
+
+            // afk/claim luôn reset checkpoint phía server kể cả khi has_reward=false
+            // (xem writeAfkState trong nakama/src/handler/afk.js) — đồng bộ lại bộ đếm cục bộ về 0.
+            if (response != null && response.Success)
+            {
+                SyncAfkAccumulatedSeconds(0d);
+            }
         }
 
         private void OnClickAutoSkill()
@@ -358,6 +431,8 @@ namespace Immortal_Switch.Scripts.UI
             RefreshPlayerInfo();
             autoSkillButton.onClick.AddListener(OnClickAutoSkill);
             btnActiveFramingClaim.onClick.AddListener(OnAfkClaimClicked);
+            btnActiveFramingClaim.interactable = false;
+            RefreshAfkClaimAvailabilityAsync().Forget();
             SetHeroTeamController(HeroTeamController.Instance);
 
             moveButton.onClick.AddListener(() =>
@@ -458,6 +533,7 @@ namespace Immortal_Switch.Scripts.UI
 
                 HeroDataSO heroDataSo = currentHero.HeroData;
                 iconHeroImage[i].sprite = HeroImageService.GetHeroIcon(heroDataSo);
+                iconHeroClassImage[i].sprite = HeroImageService.GetHeroClassIcon(heroDataSo);
             }
         }
 
@@ -524,6 +600,9 @@ namespace Immortal_Switch.Scripts.UI
 
             RectTransform iconHero1 = iconHeroImage[0].rectTransform;
             RectTransform iconHero2 = iconHeroImage[1].rectTransform;
+            
+            RectTransform iconHeroClass1 = iconHeroClassImage[0].rectTransform;
+            RectTransform iconHeroClass2 = iconHeroClassImage[1].rectTransform;
 
             RectTransform hero1TargetAnchor = isHeroIconSwapped
                 ? heroIconAnchors[1]
@@ -532,24 +611,33 @@ namespace Immortal_Switch.Scripts.UI
             RectTransform hero2TargetAnchor = isHeroIconSwapped
                 ? heroIconAnchors[0]
                 : heroIconAnchors[1];
+            
+            RectTransform hero1ClassTargetAnchor = isHeroIconSwapped
+                ? heroClassIconAnchors[1]
+                : heroClassIconAnchors[0];
 
+            RectTransform hero2ClassTargetAnchor = isHeroIconSwapped
+                ? heroClassIconAnchors[0]
+                : heroClassIconAnchors[1];
+            
             MoveHeroIcon(
                 iconIndex: 0,
-                iconRect: iconHero1,
-                targetAnchor: hero1TargetAnchor,
+                iconRect: iconHero1, iconHeroClass1,
+                targetAnchor: hero1TargetAnchor, hero1ClassTargetAnchor,
                 switchVersion: currentVersion);
 
             MoveHeroIcon(
                 iconIndex: 1,
-                iconRect: iconHero2,
-                targetAnchor: hero2TargetAnchor,
+                iconRect: iconHero2, iconHeroClass2,
+                targetAnchor: hero2TargetAnchor, hero2ClassTargetAnchor,
                 switchVersion: currentVersion);
         }
 
         private void MoveHeroIcon(
             int iconIndex,
-            RectTransform iconRect,
+            RectTransform iconRect, RectTransform iconClassRect,
             RectTransform targetAnchor,
+            RectTransform targetClassAnchor,
             int switchVersion)
         {
             if (iconRect == null ||
@@ -566,6 +654,7 @@ namespace Immortal_Switch.Scripts.UI
              * Không tự tính từ anchoredPosition nữa.
              */
             Vector3 targetWorldPosition = targetAnchor.position;
+            Vector3 targetClassWorldPosition = targetClassAnchor.position;
 
             /*
              * Scale cuối cùng của icon khi nằm bên trong targetAnchor.
@@ -579,6 +668,11 @@ namespace Immortal_Switch.Scripts.UI
                 ConvertWorldScaleToLocalScale(
                     iconRect.parent,
                     targetWorldScale);
+            
+            Vector3 targetClassLocalScaleInCurrentParent =
+                ConvertWorldScaleToLocalScale(
+                    iconClassRect.parent,
+                    targetWorldScale);
 
             Sequence sequence = DOTween.Sequence();
 
@@ -586,11 +680,23 @@ namespace Immortal_Switch.Scripts.UI
                 iconRect
                     .DOMove(targetWorldPosition, heroIconSwitchDuration)
                     .SetEase(Ease.Linear));
+            
+            sequence.Join(
+                iconClassRect
+                    .DOMove(targetClassWorldPosition, heroIconSwitchDuration)
+                    .SetEase(Ease.Linear));
 
             sequence.Join(
                 iconRect
                     .DOScale(
                         targetLocalScaleInCurrentParent,
+                        heroIconSwitchDuration)
+                    .SetEase(Ease.Linear));
+            
+            sequence.Join(
+                iconClassRect
+                    .DOScale(
+                        targetClassLocalScaleInCurrentParent,
                         heroIconSwitchDuration)
                     .SetEase(Ease.Linear));
 
@@ -604,6 +710,7 @@ namespace Immortal_Switch.Scripts.UI
                     }
 
                     AttachIconToAnchor(iconRect, targetAnchor);
+                    AttachIconToAnchor(iconClassRect, targetClassAnchor);
 
                     heroIconTweens[iconIndex] = null;
                 });

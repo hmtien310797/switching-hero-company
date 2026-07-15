@@ -24,10 +24,22 @@ namespace Immortal_Switch.Scripts.Items.Models
         public ItemRewardData(string itemKey, BigNumber quantity) : base(itemKey, quantity)
         {
         }
-        
-        public ItemRewardData(string itemKey, BigNumber quantity, Sprite itemIcon, ItemTierEntry tierInfo) : base(itemKey, quantity)
+
+        public ItemRewardData(string itemKey, BigNumber quantity, Sprite itemIcon, ItemTierEntry tierInfo)
+            : base(itemKey, quantity)
         {
-            ItemIcon =  itemIcon;
+            ItemIcon = itemIcon;
+            TierInfo = tierInfo;
+        }
+
+        public ItemRewardData(int itemId, BigNumber quantity) : base(itemId, quantity)
+        {
+        }
+
+        public ItemRewardData(int itemId, BigNumber quantity, Sprite itemIcon, ItemTierEntry tierInfo)
+            : base(itemId, quantity)
+        {
+            ItemIcon = itemIcon;
             TierInfo = tierInfo;
         }
 
@@ -43,12 +55,19 @@ namespace Immortal_Switch.Scripts.Items.Models
 
     public class ItemData
     {
+        public int ItemId;
         public string ItemKey;
         public BigNumber Quantity;
 
         public ItemData(string itemKey, BigNumber quantity)
         {
             ItemKey = itemKey;
+            Quantity = quantity;
+        }
+
+        public ItemData(int itemId, BigNumber quantity)
+        {
+            ItemId = itemId;
             Quantity = quantity;
         }
     }

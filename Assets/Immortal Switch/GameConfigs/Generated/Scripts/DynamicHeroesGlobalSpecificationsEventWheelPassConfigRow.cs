@@ -20,29 +20,29 @@ namespace Game.Configs.Generated
         public int eventId;
 
         /// <summary>
-        /// CSV Column: wheel_required
+        /// CSV Column: level
         /// </summary>
-        public int wheelRequired;
+        public int level;
 
         /// <summary>
-        /// CSV Column: free_item_id
+        /// CSV Column: spin_required
         /// </summary>
-        public int freeItemId;
+        public int spinRequired;
 
         /// <summary>
-        /// CSV Column: free_amount
+        /// CSV Column: free_diamond
         /// </summary>
-        public int freeAmount;
+        public int freeDiamond;
 
         /// <summary>
-        /// CSV Column: paid_item_id
+        /// CSV Column: paid_diamond
         /// </summary>
-        public int paidItemId;
+        public int paidDiamond;
 
         /// <summary>
-        /// CSV Column: paid_amount
+        /// CSV Column: is_big_node
         /// </summary>
-        public int paidAmount;
+        public int isBigNode;
 
     }
 }

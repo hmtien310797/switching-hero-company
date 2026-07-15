@@ -1141,6 +1141,7 @@ GameObject:
   - component: {fileID: 2674320825094181168}
   - component: {fileID: 6493005884469014125}
   - component: {fileID: 1864452429788933377}
+  - component: {fileID: 3477812332424249788}
   m_Layer: 5
   m_Name: BtnChallenge
   m_TagString: Untagged
@@ -1250,6 +1251,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3477812332424249788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8515390654429580681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d75ec3c4a424c4292d5fc2338ada1c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  pressedScale: 0.9
+  bounceScale: 1.1
+  pressDuration: 0.08
+  bounceDuration: 0.15
 --- !u!1 &8974320435359363678
 GameObject:
   m_ObjectHideFlags: 0

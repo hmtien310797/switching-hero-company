@@ -21,5 +21,10 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         /// goi thang cao
         /// </summary>
         public const int ID_MONTHLY_PREMIUM = 16;
+
+        public static bool IsPackSpecial(int packId)
+        {
+            return packId is ID_DAILY_SPECIAL or ID_WEEKLY_SPECIAL or ID_MONTHLY_NORMAL or ID_MONTHLY_PREMIUM;
+        }
     }
 }

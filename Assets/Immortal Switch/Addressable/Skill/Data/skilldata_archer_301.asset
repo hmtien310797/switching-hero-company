@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_archer_301
   m_EditorClassIdentifier: 
   SkillId: 301
+  HeroId: 0
   SkillKey: skilldata_archer_301
   SkillClass: 3
-  SkillName: GaltinArrow
-  IconSkillKey: icon_skilldata_archer_301
+  SkillName: Galtin Arrow
+  IconSkillKey: ic_class_archer_GaltinArrow
   SkillIcon: {fileID: 21300000, guid: 6c9b75bfb15794043be2187e58d11a45, type: 3}
   Description: "B\u1EAFn nhi\u1EC1u m\u0169i t\xEAn \u0111i\u1EC7n v\u1EC1 ph\xEDa
     tr\u01B0\u1EDBc, t\u1EA5n c\xF4ng k\u1EBB \u0111\u1ECBch b\u1EB1ng nhi\u1EC1u
@@ -36,6 +37,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_galtin_arrow
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -97,6 +103,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 9
         BoxSize: {x: 2, y: 2}
         Duration: 0
@@ -225,6 +232,7 @@ MonoBehaviour:
           AreaPrefab: {fileID: 0}
           Shape: 0
           PositionType: 1
+          Anchor: 0
           Radius: 2
           BoxSize: {x: 2, y: 2}
           Duration: 0
@@ -279,7 +287,7 @@ MonoBehaviour:
           Amount: 1
         TriggerSkill: {fileID: 0}
       hasCameraShake: 0
-    DescriptionParams: []
+    Description: 
     PassiveLevelConfig:
       MergeMode: 0
       Modifiers: []

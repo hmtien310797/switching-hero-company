@@ -1,10 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.Shop.Views;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.Purchasing;
 
@@ -35,9 +40,13 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         private UniTaskCompletionSource<bool> _initTcs;
 
         private readonly Dictionary<string, Action<bool, string>> _pendingCallbacks = new();
-        // pack_id (từ config pack_diamond) — cần gửi kèm receipt lên RPC iap/purchase để server biết
-        // cộng thưởng theo pack nào; Unity IAP chỉ biết storeProductId (google/apple product id).
+        // pack_id (từ config pack_diamond hoặc pack_iap) — cần gửi kèm receipt lên RPC iap/purchase
+        // hoặc iap/pack_purchase để server biết cộng thưởng theo pack nào; Unity IAP chỉ biết
+        // storeProductId (google/apple product id).
         private readonly Dictionary<string, int> _pendingPackIds = new();
+        // true nếu pack_id thuộc pack_iap (bundle nhiều item, vd. Special) — validate qua
+        // iap/pack_purchase thay vì iap/purchase (pack_diamond, 1 loại tiền). Set bởi BuyPackProduct.
+        private readonly Dictionary<string, bool> _pendingIsBundle = new();
 
         /// <summary>True khi IAP đã init xong và store sẵn sàng nhận mua hàng. UI (shop) phải kiểm
         /// tra cờ này trước khi cho mở màn mua hàng — false khi thiết bị không có store khả dụng
@@ -143,6 +152,32 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
             _pendingCallbacks[storeProductId] = onComplete;
             _pendingPackIds[storeProductId] = packId;
+            _pendingIsBundle[storeProductId] = false;
+            _storeController.InitiatePurchase(product);
+        }
+
+        /// <summary>Như <see cref="BuyProduct"/>, nhưng packId thuộc pack_iap (bundle nhiều item —
+        /// vd. Special) nên validate qua RPC iap/pack_purchase thay vì iap/purchase (xem
+        /// ValidateAndConfirmAsync).</summary>
+        public void BuyPackProduct(int packId, string storeProductId, Action<bool, string> onComplete)
+        {
+            if (_storeController == null)
+            {
+                onComplete?.Invoke(false, "IAP chưa khởi tạo xong.");
+                return;
+            }
+
+            Product product = _storeController.products.WithID(storeProductId);
+
+            if (product == null || !product.availableToPurchase)
+            {
+                onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
+                return;
+            }
+
+            _pendingCallbacks[storeProductId] = onComplete;
+            _pendingPackIds[storeProductId] = packId;
+            _pendingIsBundle[storeProductId] = true;
             _storeController.InitiatePurchase(product);
         }
 
@@ -179,6 +214,9 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             _pendingPackIds.TryGetValue(storeProductId, out int packId);
             _pendingPackIds.Remove(storeProductId);
 
+            _pendingIsBundle.TryGetValue(storeProductId, out bool isBundle);
+            _pendingIsBundle.Remove(storeProductId);
+
             string payload = ExtractReceiptPayload(product.receipt);
 
             if (string.IsNullOrEmpty(payload))
@@ -196,17 +234,52 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
             try
             {
-                // RPC iap/purchase: server tự verify receipt với store rồi cộng thưởng theo pack_id
-                // (BagLib.add) — không dùng NakamaClient.ValidatePurchaseApple/GoogleAsync (API
-                // built-in của Nakama) vì nó chỉ verify + chống replay, không cộng được gì cả.
-                var response = await NakamaClient.Instance.IapPurchaseAsync(packId, store, payload);
+                if (isBundle)
+                {
+                    // RPC iap/pack_purchase: bundle nhiều item (pack_iap, vd. Special) — server verify
+                    // receipt rồi cộng cả 3 slot item, khác iap/purchase chỉ cộng 1 loại tiền.
+                    var response = await NakamaClient.Instance.IapPackPurchaseAsync(packId, store, payload);
 
-                _storeController.ConfirmPendingPurchase(product);
-                await RefreshCurrencyAsync();
+                    _storeController.ConfirmPendingPurchase(product);
+                    CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
 
-                Debug.Log($"[IAPManager] Purchase validated & confirmed -> product={storeProductId} pack={packId} gems={response.GemsGranted}");
-                callback?.Invoke(true, null);
-                OnPurchased?.Invoke(packId);
+                    UIManager.Instance.TogglePopupAsync<PopupRewardView>(
+                        new PopupRewardArgs
+                        {
+                            Rewards = DatabaseManager.Instance.GetShopSpecialRewards(packId).ToList()
+                        }).Forget();
+
+                    Debug.Log($"[IAPManager] Pack purchase validated & confirmed -> product={storeProductId} pack={packId} count={response.PurchaseCount}/{response.Limit}");
+                    callback?.Invoke(true, null);
+                    OnPurchased?.Invoke(packId);
+                }
+                else
+                {
+                    // RPC iap/purchase: server tự verify receipt với store rồi cộng thưởng theo pack_id
+                    // (BagLib.add) — không dùng NakamaClient.ValidatePurchaseApple/GoogleAsync (API
+                    // built-in của Nakama) vì nó chỉ verify + chống replay, không cộng được gì cả.
+                    var response = await NakamaClient.Instance.IapPurchaseAsync(packId, store, payload);
+
+                    _storeController.ConfirmPendingPurchase(product);
+                    await RefreshCurrencyAsync();
+
+                    UIManager.Instance.TogglePopupAsync<PopupRewardView>(
+                        new PopupRewardArgs
+                        {
+                            Rewards = new List<ItemRewardData>
+                            {
+                                new ItemRewardData(
+                                    DatabaseManager.Instance.ItemDb
+                                        .FindItem(response.ItemId)
+                                        .itemKey,
+                                    BigNumber.FromInt(response.Balance))
+                            }
+                        }).Forget();
+
+                    Debug.Log($"[IAPManager] Purchase validated & confirmed -> product={storeProductId} pack={packId} gems={response.GemsGranted}");
+                    callback?.Invoke(true, null);
+                    OnPurchased?.Invoke(packId);
+                }
             }
             catch (Exception ex)
             {
@@ -269,6 +342,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             {
                 _pendingCallbacks.Remove(storeProductId);
                 _pendingPackIds.Remove(storeProductId);
+                _pendingIsBundle.Remove(storeProductId);
                 callback?.Invoke(false, failureDescription.message);
             }
 

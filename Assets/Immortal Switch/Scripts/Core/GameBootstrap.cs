@@ -150,6 +150,8 @@ namespace Immortal_Switch.Scripts.Core
                 await UserDataCache.Instance.InitializeAsync();
                 progress.CompleteStep("User cache initialized");
                 await UniTask.Delay(TimeSpan.FromSeconds(1f));
+                
+                WeaponManager.Instance.InitializeAsync().Forget();
 
                 // 11
                 await GrowthManager.Instance.InitializeAsync();
@@ -184,7 +186,7 @@ namespace Immortal_Switch.Scripts.Core
                 await UIManager.Instance.InitializeAsync();
                 progress.CompleteStep("UI initialized");
                 
-                await HeroImageService.InitializeAsync();
+                await UniTask.WhenAll(HeroImageService.InitializeAsync(), SkillImageService.InitializeAsync());
 
                 // 16
                 progress.CompleteStep("Battle data initialized");

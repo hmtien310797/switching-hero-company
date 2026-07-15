@@ -1,4 +1,5 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Addressable;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,7 +25,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             skillData = state.SkillData;
             clickCallback = onClick;
 
-            icon.sprite = state.SkillData != null ? state.SkillData.SkillIcon : null;
+            icon.sprite = SkillImageService.GetSkillIcon(state.SkillData);
             levelText.text = $"Lv.{state.Level}";
             shardText.text = $"{state.CurrentShard}/{state.RequiredShard}";
             shardFill.fillAmount = state.RequiredShard <= 0 ? 0f : (float)state.CurrentShard / state.RequiredShard;

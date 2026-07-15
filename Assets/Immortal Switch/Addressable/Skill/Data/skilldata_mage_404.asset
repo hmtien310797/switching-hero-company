@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_mage_404
   m_EditorClassIdentifier: 
   SkillId: 404
+  HeroId: 0
   SkillKey: skilldata_mage_404
   SkillClass: 4
   SkillName: Abyss Gravity Collapse
-  IconSkillKey: icon_skilldata_mage_404
+  IconSkillKey: ic_class_mage_Abyss_Gravity_Collapse
   SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
   Description: "T\u1EA1o m\u1ED9t h\u1ED1 \u0111en h\u01B0 kh\xF4ng h\xFAt k\u1EBB
     \u0111\u1ECBch v\xE0o trung t\xE2m v\xE0 g\xE2y s\xE1t th\u01B0\u01A1ng li\xEAn
@@ -37,6 +38,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_abyss_gravity_collapse
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 1
     FollowType: 0
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -98,6 +104,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 10
         BoxSize: {x: 2, y: 2}
         Duration: 0

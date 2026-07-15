@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: skilldata_archer_305
   m_EditorClassIdentifier: 
   SkillId: 305
+  HeroId: 0
   SkillKey: skilldata_archer_305
   SkillClass: 3
-  SkillName: Tempest ArrowStorm
-  IconSkillKey: icon_skilldata_archer_305
+  SkillName: Tempest Arrow Storm
+  IconSkillKey: ic_class_archer_Tempest_ArrowStorm
   SkillIcon: {fileID: 21300000, guid: 5bdeeab694a8feb42a193987d56827f8, type: 3}
   Description: "M\u1ED7i khi k\xEDch ho\u1EA1t k\u1EF9 n\u0103ng, nh\u1EADn 1 stack
     M\u0169i T\xEAn S\xE9t. Khi \u0111\u1EA1t \u0111\u1EE7 stack, c\xE1c m\u0169i
@@ -37,6 +38,11 @@ MonoBehaviour:
     RuntimeVisualType: 2
     SpawnMode: 1
     RuntimeAddressableKey: prefab_tempest_arrow
+    soundDefinition:
+      startSound: 0
+      hitSound: 0
+      finalHitSound: 0
+      loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 0
     FollowType: 1
     SpawnOffset: {x: 0, y: 0, z: 0}
@@ -98,6 +104,7 @@ MonoBehaviour:
         AreaPrefab: {fileID: 0}
         Shape: 0
         PositionType: 1
+        Anchor: 0
         Radius: 7
         BoxSize: {x: 2, y: 2}
         Duration: 0

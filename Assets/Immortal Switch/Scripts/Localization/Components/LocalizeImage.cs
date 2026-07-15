@@ -29,9 +29,11 @@ namespace Immortal_Switch.Scripts.Localization.Components
             }
         }
 
+#if UNITY_EDITOR
         [SerializeField]
         [ListDrawerSettings(ShowFoldout = true)]
         [OnInspectorInit(nameof(AutoPopulateEntries))]
+#endif
         private List<LanguageSpriteEntry> sprites = new();
 
         [SerializeField]

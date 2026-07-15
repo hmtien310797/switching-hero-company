@@ -127,8 +127,8 @@ namespace Immortal_Switch.Scripts.Shop.Views
             tabHorizontal.Initialize();
 
             var tab = args is ShopArgs data ? data.DefaultTab : defaultTab;
-            tabVertical.Bind(tab, OnClickBuyProduct, OnChangeTab, OnClickClaim);
-            tabHorizontal.Bind(tab, OnClickBuyProduct, OnChangeTab, OnClickClaim);
+            tabVertical.Bind(tab, OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
+            tabHorizontal.Bind(tab, OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
 
             // Re-sync điểm/milestone GloryPass mỗi lần mở Shop — tránh lệch nếu tích nạp ở phiên khác.
             ShopManager.Instance.SyncRechargeStateAsync().Forget();
@@ -244,6 +244,23 @@ namespace Immortal_Switch.Scripts.Shop.Views
                     // sync lại recharge/state để GloryPass phản ánh đúng ngay
                     ShopManager.Instance.SyncRechargeStateAsync().Forget();
                 }
+            });
+        }
+
+        /// <summary>Mua gói Special (pack_iap, nhiều item/gói) — khác OnClickBuyProduct vì phải đi
+        /// qua RPC iap/pack_purchase (BuyPackProduct) để server cộng đủ cả 3 slot item thay vì chỉ 1.</summary>
+        private void OnClickBuyBundleProduct(string storeProductId, int packId)
+        {
+            IAPManager.Instance.BuyPackProduct(packId, storeProductId, (success, error) =>
+            {
+                if (!success)
+                {
+                    Debug.LogWarning($"[ShopView] Bundle purchase failed -> product={storeProductId}, error={error}");
+                    return;
+                }
+
+                ShopManager.Instance.RecordPurchase(packId);
+                ShopManager.Instance.SyncRechargeStateAsync().Forget();
             });
         }
     }
