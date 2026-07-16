@@ -190,7 +190,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 CanFusion = IsHighestTierAndHighestStar(def),
                 CanFuseAll = true, // phase này để true, sau này có service global thì check thật
 
-                EquipEffects = BuildStatLines(def.EquipStats),
+                EquipEffects = BuildStatLines(def.EquipStats, state.Level),
                 MaxShard = def.FuseShardRequired,
                 ShardProgressNormalized = def.FuseShardRequired > 0
                     ? Mathf.Clamp01((float)state.CurrentShard / def.FuseShardRequired)
@@ -243,7 +243,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 CanFusion = false,
                 CanFuseAll = false,
 
-                EquipEffects = BuildStatLines(def.EquipStats)
+                EquipEffects = BuildStatLines(def.EquipStats, 1)
             };
 
             vm.UpgradePanel = BuildExclusiveUpgradePanel(def, state, heroId);
@@ -477,7 +477,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             return baseValue * (1f + (level - 1) * 0.05f);
         }
 
-        private List<WeaponStatLineViewModel> BuildStatLines(WeaponStatBlock[] stats)
+        private List<WeaponStatLineViewModel> BuildStatLines(WeaponStatBlock[] stats, int level)
         {
             var result = new List<WeaponStatLineViewModel>();
             if (stats == null)
@@ -492,7 +492,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                     Operation = item.Operation,
                     Value = item.Value,
                     DisplayName = GetStatDisplayName(item.StatType),
-                    DisplayValue = GetStatDisplayValue(item.Operation, item.Value)
+                    DisplayValue = GetStatDisplayValue(item.Operation, GetScaledWeaponStatValue(item.Value, level))
                 });
             }
 
@@ -745,7 +745,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         {
             if (op == ModifierOp.Multiply)
                 return $"{value * 100f:0.##}%";
-
+            
             return value.ToString("0.##");
         }
         

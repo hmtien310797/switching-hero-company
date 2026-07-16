@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared.UI;
@@ -28,17 +29,13 @@ namespace Immortal_Switch.Scripts.Shared.Views
 
     public class PopupRewardView : AnimatedUIView
     {
-        [SerializeField]
-        private RectTransform rewardContainer;
+        [SerializeField] private RectTransform rewardContainer;
 
-        [SerializeField]
-        private UIReward rewardPrefab;
+        [SerializeField] private UIReward rewardPrefab;
 
-        [SerializeField] 
-        private TMP_Text remainingText;
-        
-        [SerializeField] 
-        private Button buttonClose;
+        [SerializeField] private TMP_Text remainingText;
+
+        [SerializeField] private Button buttonClose;
 
         // --- Private Fields ---
         private List<UIReward> _rewards = new();
@@ -49,7 +46,6 @@ namespace Immortal_Switch.Scripts.Shared.Views
         {
             buttonClose.onClick.AddListener(HidePopupRewardView);
         }
-
 
         public override void OnShow(object args)
         {
@@ -68,7 +64,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
             RefreshRewards(runtime.Rewards);
             StartCountdown(3);
         }
-        
+
         private void HideAllRewards()
         {
             for (int i = 0; i < _rewards.Count; i++)
@@ -94,46 +90,96 @@ namespace Immortal_Switch.Scripts.Shared.Views
 
         private void RefreshRewards(List<ItemRewardData> rewards)
         {
-            int rewardCount = rewards?.Count ?? 0;
+            int displayIndex = 0;
 
-            for (int i = 0; i < rewardCount; i++)
+            if (rewards != null)
             {
-                var reward = rewards[i];
-
-                if (reward == null)
-                    continue;
-
-                DatabaseManager.Instance.TrySetDisplayData(reward);
-
-                UIReward clone;
-
-                if (_rewards.Count > i)
+                for (int i = 0; i < rewards.Count; i++)
                 {
-                    clone = _rewards[i];
-                    clone.gameObject.SetActive(true);
+                    ItemRewardData reward = rewards[i];
+
+                    // Reward null thì bỏ qua, vẫn tiếp tục hiển thị item khác.
+                    if (reward == null)
+                    {
+                        Debug.LogWarning(
+                            $"[PopupRewardView] Reward tại index {i} bị null.");
+                        continue;
+                    }
+
+                    bool setDisplaySuccess =
+                        DatabaseManager.Instance != null &&
+                        DatabaseManager.Instance.TrySetDisplayData(reward);
+
+                    // Không tìm thấy data thì bỏ qua riêng item này.
+                    if (!setDisplaySuccess)
+                    {
+                        Debug.LogWarning(
+                            $"[PopupRewardView] Không tìm thấy display data. " +
+                            $"ItemKey={reward.ItemKey}");
+
+                        continue;
+                    }
+
+                    // TierInfo null cũng chỉ bỏ qua item đó.
+                    if (reward.TierInfo == null)
+                    {
+                        Debug.LogWarning(
+                            $"[PopupRewardView] TierInfo bị null. " +
+                            $"ItemKey={reward.ItemKey}");
+
+                        continue;
+                    }
+
+                    UIReward clone;
+
+                    if (displayIndex < _rewards.Count)
+                    {
+                        clone = _rewards[displayIndex];
+
+                        if (clone == null)
+                        {
+                            Debug.LogWarning(
+                                $"[PopupRewardView] UIReward cache null tại index {displayIndex}.");
+
+                            continue;
+                        }
+
+                        clone.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        if (rewardPrefab == null || rewardContainer == null)
+                        {
+                            Debug.LogError(
+                                "[PopupRewardView] rewardPrefab hoặc rewardContainer chưa được gán.");
+
+                            break;
+                        }
+
+                        clone = Instantiate(
+                            rewardPrefab,
+                            rewardContainer,
+                            false);
+
+                        _rewards.Add(clone);
+                    }
+
+                    clone.transform.SetSiblingIndex(displayIndex);
+
+                    clone.Bind(
+                        reward.ItemIcon,
+                        reward.TierInfo.border,
+                        reward.TierInfo.background,
+                        reward.TierInfo.tierIcon);
+
+                    clone.BindQuantity(reward.Quantity);
+
+                    displayIndex++;
                 }
-                else
-                {
-                    clone = Instantiate(
-                        rewardPrefab,
-                        rewardContainer,
-                        false);
-
-                    _rewards.Add(clone);
-                }
-
-                clone.transform.SetSiblingIndex(i);
-
-                clone.Bind(
-                    reward.ItemIcon,
-                    reward.TierInfo.border,
-                    reward.TierInfo.background,
-                    reward.TierInfo.tierIcon);
-
-                clone.BindQuantity(reward.Quantity);
             }
 
-            for (int i = rewardCount; i < _rewards.Count; i++)
+            // Tắt những UI cũ không còn được sử dụng.
+            for (int i = displayIndex; i < _rewards.Count; i++)
             {
                 if (_rewards[i] != null)
                 {
@@ -141,7 +187,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
                 }
             }
         }
-        
+
         private void StartCountdown(int durationSeconds)
         {
             KillCountdown();
@@ -184,16 +230,64 @@ namespace Immortal_Switch.Scripts.Shared.Views
             countdownTween?.Kill();
             countdownTween = null;
         }
-        
+
         private void HidePopupRewardView()
         {
             KillCountdown();
-            UIManager.Instance.Close<PopupRewardView>();
+            PopupRewardService.Close();
         }
-        
+
         private void OnDestroy()
         {
             KillCountdown();
+        }
+    }
+
+    public static class PopupRewardService
+    {
+        public static bool IsShowing =>
+            UIManager.Instance != null &&
+            UIManager.Instance.IsOpen<PopupRewardView>();
+
+        public static void Show(
+            IReadOnlyList<ItemRewardData> rewards,
+            Action onClose = null,
+            bool withBackdrop = false)
+        {
+            ShowAsync(rewards, onClose, withBackdrop).Forget();
+        }
+
+        private static async UniTask<PopupRewardView> ShowAsync(
+            IReadOnlyList<ItemRewardData> rewards,
+            Action onClose = null,
+            bool withBackdrop = true)
+        {
+            if (UIManager.Instance == null)
+            {
+                UnityEngine.Debug.LogError(
+                    "[PopupRewardService] UIManager instance was not found.");
+                return null;
+            }
+
+            var args = new PopupRewardArgs
+            {
+                Rewards = rewards == null
+                    ? new List<ItemRewardData>()
+                    : new List<ItemRewardData>(rewards),
+                OnClose = onClose
+            };
+
+            return await UIManager.Instance.OpenPopupAsync<PopupRewardView>(
+                args,
+                withBackdrop);
+        }
+
+        public static void Close()
+        {
+            if (UIManager.Instance == null)
+                return;
+
+            UIManager.Instance.Close<PopupRewardView>();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 
 namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
@@ -7,8 +8,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
     {
         public static SummonAchievementRewardListData BuildWeapon(
             WeaponSummonConfigSO config,
-            WeaponSummonSaveData saveData,
-            SummonRewardVisualConfigSO rewardVisualConfig)
+            WeaponSummonSaveData saveData)
         {
             var result = new SummonAchievementRewardListData
             {
@@ -30,7 +30,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                     continue;
 
                 var reward = entry.RewardItems[0];
-                var visual = rewardVisualConfig != null ? rewardVisualConfig.Get(reward) : null;
 
                 bool isClaimed = saveData != null &&
                                  saveData.ClaimedRewardLevels != null &&
@@ -40,8 +39,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 {
                     Level = entry.SummonLevel,
                     Title = $"Cấp Triệu hồi {entry.SummonLevel}",
-                    RewardText = BuildRewardText(reward, visual),
-                    RewardIcon = visual != null ? visual.Icon : null,
+                    RewardText = BuildRewardText(reward),
+                    RewardIcon = DatabaseManager.Instance.ItemDb.LoadIconByItemId(reward.ItemId),
                     State = isClaimed
                         ? SummonAchievementRewardState.Claimed
                         : SummonAchievementRewardState.Normal
@@ -51,16 +50,16 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             return result;
         }
 
-        private static string BuildRewardText(SummonRewardItem reward, RewardVisualEntry visual)
+        private static string BuildRewardText(SummonRewardItem reward)
         {
             if (reward == null)
                 return string.Empty;
 
-            string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
-                ? visual.DisplayName
-                : reward.RewardType.ToString();
+            // string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
+            //     ? visual.DisplayName
+            //     : reward.RewardType.ToString();
 
-            return $"{name} x{reward.Amount}";
+            return $"chưa có key";
         }
     }
 }

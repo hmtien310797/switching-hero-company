@@ -148,7 +148,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             return new SummonRewardPreviewData
             {
                 SummonLevel = entry.SummonLevel,
-                RewardItem = rewardItem,
+                ItemId = rewardItem.ItemId,
+                Quantity = rewardItem.Amount,
                 IsClaimable = IsRewardClaimable(entry.SummonLevel),
                 IsClaimed = IsRewardClaimed(entry.SummonLevel)
             };
@@ -242,7 +243,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
                 result.Entries.Add(new HeroSummonResultEntry
                 {
-                    RollIndex = i + 1,
                     HeroAsset = hero,
                     HeroName = hero.Name,
                     IsNewHero = !alreadyOwned,

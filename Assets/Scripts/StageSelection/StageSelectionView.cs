@@ -16,6 +16,13 @@ namespace Immortal_Switch.Scripts.StageSelection
 
     public class StageSelectionView : AnimatedUIView
     {
+        [Header("Layouts")]
+        [SerializeField]
+        private GameObject goElementCounterLayout;
+
+        [SerializeField]
+        private GameObject goElementInfoLayout;
+
         [SerializeField]
         private List<BackgroundVisual> visuals = new();
 
@@ -54,6 +61,18 @@ namespace Immortal_Switch.Scripts.StageSelection
         [SerializeField]
         private Button nextChapterButton;
 
+        [SerializeField]
+        private Button btnElementCounterOpen;
+
+        [SerializeField]
+        private Button btnElementCounterClose;
+
+        [SerializeField]
+        private Button btnElementInfoOpen;
+
+        [SerializeField]
+        private Button btnElementInfoClose;
+
         // --- Private Fields ---
         private StageRuntimeData currentData;
         private GameObject _currentEffect;
@@ -71,6 +90,42 @@ namespace Immortal_Switch.Scripts.StageSelection
 
             if (nextChapterButton != null)
                 nextChapterButton.onClick.AddListener(HandleNextChapterClicked);
+
+            btnElementCounterOpen.onClick.AddListener(OnClickElementCounterOpen);
+            btnElementCounterClose.onClick.AddListener(OnClickElementCounterClose);
+
+            btnElementInfoOpen.onClick.AddListener(OnClickElementInfoOpen);
+            btnElementInfoClose.onClick.AddListener(OnClickElementInfoClose);
+        }
+
+        private void OnClickElementCounterOpen()
+        {
+            SetActiveElementCounter(true);
+        }
+
+        private void OnClickElementCounterClose()
+        {
+            SetActiveElementCounter(false);
+        }
+
+        private void SetActiveElementCounter(bool active)
+        {
+            goElementCounterLayout.SetActive(active);
+        }
+
+        private void OnClickElementInfoOpen()
+        {
+            SetActiveElementInfo(true);
+        }
+
+        private void OnClickElementInfoClose()
+        {
+            SetActiveElementInfo(false);
+        }
+
+        private void SetActiveElementInfo(bool active)
+        {
+            goElementInfoLayout.SetActive(active);
         }
 
         private void Start()
@@ -229,6 +284,12 @@ namespace Immortal_Switch.Scripts.StageSelection
 
             if (nextChapterButton != null)
                 nextChapterButton.onClick.RemoveListener(HandleNextChapterClicked);
+
+            btnElementCounterOpen.onClick.RemoveListener(OnClickElementCounterOpen);
+            btnElementCounterClose.onClick.RemoveListener(OnClickElementCounterClose);
+
+            btnElementInfoOpen.onClick.RemoveListener(OnClickElementInfoOpen);
+            btnElementInfoClose.onClick.RemoveListener(OnClickElementInfoClose);
         }
 
         private void HandleSelectedStageChanged(StageRuntimeData data)

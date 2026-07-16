@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated row data from CSV: DynamicHeroes-GlobalSpecifications-event_wheel_shop_config
+    /// Auto generated row data from CSV: Dynamic Heroes - Global Specifications - event_wheel_shop_config
     /// </summary>
     [Serializable]
     public class DynamicHeroesGlobalSpecificationsEventWheelShopConfigRow

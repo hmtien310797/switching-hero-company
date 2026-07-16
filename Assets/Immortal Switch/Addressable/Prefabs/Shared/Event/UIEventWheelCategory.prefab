@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6035142329733154692}
   - component: {fileID: 2448929475452009187}
   - component: {fileID: 5933735478157866514}
+  - component: {fileID: 263646661705273086}
   m_Layer: 5
   m_Name: UIEventWheelCategory
   m_TagString: Untagged
@@ -121,6 +122,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &263646661705273086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4430919010642086316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74f380b321a749c7835643dc391fe9dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  img: {fileID: 2448929475452009187}
+  sprSelect: {fileID: 21300000, guid: bd53b99756576b449a00a6b22d9464f0, type: 3}
+  sprNormal: {fileID: 21300000, guid: 243b5cd760b2934478dbe97f2a749d62, type: 3}
 --- !u!1 &7297825837598072902
 GameObject:
   m_ObjectHideFlags: 0
@@ -155,7 +171,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 18.7, y: 3.1}
+  m_AnchoredPosition: {x: 18.699997, y: 3.0999985}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4529413131096249331

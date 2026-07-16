@@ -1,0 +1,52 @@
+item_id,item_key,item_type,item_group,item_name,desc,rarity,is_currency,is_stackable,max_stack,use_type,icon_key,sort_order,status
+1,gold,Currency,SoftCurrency,Gold,"Soft currency dùng để nâng cấp hero, equipment và mua vật phẩm thường",D,TRUE,TRUE,999999999,Resource,icon_gold,1,Active
+2,crystal,Currency,PremiumCurrency,Crystal,Premium currency cao cấp dùng cho summon đặc biệt và shop giới hạn,A,TRUE,TRUE,999999999,Resource,icon_crystal,2,Active
+3,diamond,Currency,PremiumCurrency,Diamond,"Premium currency dùng để summon, mua vật phẩm hiếm và tăng tốc tiến trình",B,TRUE,TRUE,999999999,Resource,icon_diamond,3,Active
+4,energy,Currency,Stamina,Energy,"Dùng để tham gia dungeon, boss challenge và activity đặc biệt",D,TRUE,TRUE,999999,Resource,icon_energy,4,Active
+5,arena_token,Currency,ShopToken,Arena Token,Token nhận từ Arena PvP dùng trong Arena Shop,C,TRUE,TRUE,999999999,Resource,icon_arena_token,5,Active
+6,guild_coin,Currency,ShopToken,Guild Coin,Coin nhận từ Guild Boss và Guild Event dùng trong Guild Shop,C,TRUE,TRUE,999999999,Resource,icon_guild_coin,6,Active
+7,event_token,Currency,EventCurrency,Event Token,Token giới hạn thời gian dùng để đổi reward trong Event Shop,C,TRUE,TRUE,999999999,Resource,icon_event_token,7,Active
+8,summon_ticket_hero,Gacha,Ticket,Summon Ticket Heroes,Vé summon hero trong banner thường,C,FALSE,TRUE,999999,Consume,icon_summon_ticket,8,Active
+9,summon_ticket_weapon,Gacha,Ticket,Summon Ticket Weapon,Vé summon weapon,B,FALSE,TRUE,999999,Consume,icon_summon_ticket_weapon,9,Active
+10,hero_exp,Resource,HeroGrowth,Hero EXP,Tài nguyên dùng để tăng level hero,D,FALSE,TRUE,999999999,Consume,icon_hero_exp,10,Active
+11,hero_fragment,Resource,HeroFragment,Hero Fragment,Mảnh hero dùng để mở khóa hoặc nâng sao hero,C,FALSE,TRUE,999999,Consume,icon_hero_fragment,11,Active
+12,epic_hero_fragment,Resource,HeroFragment,Epic Hero Fragment,Mảnh hero Epic dùng để tiến hóa hero cấp Epic,B,FALSE,TRUE,999999,Consume,icon_epic_hero_fragment,12,Active
+13,legendary_hero_fragment,Resource,HeroFragment,Legendary Hero Fragment,Mảnh hero Legendary dùng để tiến hóa hero cao cấp,A,FALSE,TRUE,999999,Consume,icon_legendary_hero_fragment,13,Active
+14,equipment_upgrade_stone,Upgrade,EquipmentUpgrade,Equipment Upgrade Stone,Nguyên liệu nâng cấp level trang bị,D,FALSE,TRUE,9999999,Consume,icon_equipment_upgrade_stone,14,Active
+15,gear_refinement_stone,Upgrade,EquipmentRefine,Gear Refinement Stone,Nguyên liệu refine hoặc enhance trang bị,C,FALSE,TRUE,9999999,Consume,icon_gear_refinement_stone,15,Active
+16,breakthrough_stone,Upgrade,HeroBreakthrough,Breakthrough Stone,Nguyên liệu dùng để breakthrough hero,B,FALSE,TRUE,9999999,Consume,icon_breakthrough_stone,16,Active
+17,transcendence_stone,Upgrade,HeroTranscendence,Transcendence Stone,Vật phẩm dùng để transcend hero ở cấp cao,A,FALSE,TRUE,9999999,Consume,icon_transcendence_stone,17,Active
+18,equipment_chest,Equipment,Chest,Equipment Chest,Rương chứa trang bị ngẫu nhiên,D,FALSE,TRUE,999999,OpenChest,icon_equipment_chest,18,Active
+19,rare_equipment_chest,Equipment,Chest,Rare Equipment Chest,Rương chứa trang bị Rare hoặc cao hơn,C,FALSE,TRUE,999999,OpenChest,icon_rare_equipment_chest,19,Active
+20,epic_equipment_chest,Equipment,Chest,Epic Equipment Chest,Rương chứa trang bị Epic hoặc cao hơn,B,FALSE,TRUE,999999,OpenChest,icon_epic_equipment_chest,20,Active
+21,legendary_equipment_chest,Equipment,Chest,Legendary Equipment Chest,Rương chứa trang bị Legendary,A,FALSE,TRUE,999999,OpenChest,icon_legendary_equipment_chest,21,Active
+22,dungeon_key,Dungeon,EntryTicket,Dungeon Key,Chìa khóa dùng để vào dungeon đặc biệt,C,FALSE,TRUE,999999,Consume,icon_dungeon_key,22,Active
+23,boss_challenge_ticket,Dungeon,EntryTicket,Boss Challenge Ticket,Vé dùng để tham gia Boss Challenge,C,FALSE,TRUE,999999,Consume,icon_boss_challenge_ticket,23,Active
+24,event_dice,Event,EventTool,Event Dice,Xúc xắc dùng trong mini game event board,C,FALSE,TRUE,999999,Consume,icon_event_dice,24,Active
+25,bingo_ticket,Event,EventTool,Bingo Ticket,Ticket dùng để mở ô trong Bingo Event,C,FALSE,TRUE,999999,Consume,icon_bingo_ticket,25,Active
+26,treasure_map,Event,EventTool,Treasure Map,Vật phẩm dùng để mở Treasure Hunt Event,B,FALSE,TRUE,999999,Consume,icon_treasure_map,26,Active
+27,gold_chest,Shop,Chest,Gold Chest,Rương mở ra nhận Gold,D,FALSE,TRUE,999999,OpenChest,icon_gold_chest,27,Active
+28,diamond_chest,Shop,Chest,Diamond Chest,Rương mở ra nhận Diamond,B,FALSE,TRUE,999999,OpenChest,icon_diamond_chest,28,Active
+29,resource_pack,Shop,Pack,Resource Pack,Gói chứa nhiều tài nguyên nâng cấp,C,FALSE,TRUE,999999,OpenPack,icon_resource_pack,29,Active
+30,pet_egg,Pet,PetGacha,Pet Egg,Trứng pet mở ra pet hỗ trợ chiến đấu,B,FALSE,TRUE,999999,OpenChest,icon_pet_egg,30,Active
+31,pet_upgrade_food,Pet,PetUpgrade,Pet Upgrade Food,Nguyên liệu dùng để nâng cấp pet,D,FALSE,TRUE,9999999,Consume,icon_pet_upgrade_food,31,Active
+32,relic_fragment,Relic,RelicFragment,Relic Fragment,Mảnh relic dùng để mở khóa relic,B,FALSE,TRUE,999999,Consume,icon_relic_fragment,32,Active
+33,relic_upgrade_stone,Relic,RelicUpgrade,Relic Upgrade Stone,Nguyên liệu dùng để nâng cấp relic,C,FALSE,TRUE,9999999,Consume,icon_relic_upgrade_stone,33,Active
+34,monster_card,MonsterCard,Card,Monster Card,Thẻ monster dùng để mở khóa passive bonus,B,FALSE,TRUE,999999,Consume,icon_monster_card,34,Active
+35,monster_essence,MonsterCard,CardUpgrade,Monster Essence,Nguyên liệu dùng để nâng cấp monster card,C,FALSE,TRUE,9999999,Consume,icon_monster_essence,35,Active
+36,artifact_fragment,Artifact,ArtifactFragment,Artifact Fragment,Mảnh artifact dùng để mở khóa artifact,B,FALSE,TRUE,999999,Consume,icon_artifact_fragment,36,Active
+37,artifact_upgrade_core,Artifact,ArtifactUpgrade,Artifact Upgrade Core,Nguyên liệu dùng để nâng cấp artifact,C,FALSE,TRUE,9999999,Consume,icon_artifact_upgrade_core,37,Active
+38,resource_coin,Event,LeaderboardCurrency,Resource Coin,Currency dùng trong event leaderboard,C,TRUE,TRUE,999999999,Resource,icon_resource_coin,38,Active
+39,roulette_ticket,Event,EventTicket,Roulette Ticket,Vé dùng để quay vòng quay may mắn,C,FALSE,TRUE,999999,Consume,icon_roulette_ticket,39,Active
+40,offline_reward_chest,Idle,Chest,Offline Reward Chest,Rương phần thưởng idle khi offline,D,FALSE,TRUE,999999,OpenChest,icon_offline_reward_chest,40,Active
+41,quick_loot_ticket,Idle,Ticket,Quick Loot Ticket,Vé dùng để nhận nhanh phần thưởng idle,C,FALSE,TRUE,999999,Consume,icon_quick_loot_ticket,41,Active
+42,awakening_fruit,Resource,HeroAwaken,Awakening Fruit,"Nguyên liệu dùng để awaken hero, nhận từ Hầm Kim Cương",A,FALSE,TRUE,9999999,Consume,icon_awakening_fruit,42,Active
+43,weapon_ore,Upgrade,WeaponUpgrade,Weapon Ore,"Nguyên liệu nâng cấp vũ khí, nhận từ Hầm Trang Bị",D,FALSE,TRUE,9999999,Consume,icon_weapon_ore,43,Active
+44,weapon_gem,Upgrade,WeaponUpgrade,Weapon Gem,"Nguyên liệu cường hóa vũ khí, nhận từ Hầm Trang Bị",C,FALSE,TRUE,9999999,Consume,icon_weapon_gem,44,Active
+45,weapon_essence,Upgrade,WeaponUpgrade,Weapon Essence,"Nguyên liệu tinh luyện vũ khí cấp cao, nhận từ Hầm Trang Bị",B,FALSE,TRUE,9999999,Consume,icon_weapon_essence,45,Active
+46,summon_ticket_skill,Gacha,Ticket,Summon Ticket Skill,Vé summon skill trong banner thường,C,FALSE,TRUE,999999,Consume,icon_summon_ticket_skill,46,Active
+47,summon_ticket_hero_banner,Gacha,Ticket,Summon Ticket hero banner,Vé summon hero trong banner event,B,FALSE,TRUE,999999,Consume,icon_summon_ticket_hero_banner,47,Active
+48,user_exp,Resource,HeroGrowth,User EXP,Tài nguyên dùng để tăng level cho user,D,FALSE,TRUE,999999999,Consume,icon_user_exp,48,Active
+49,lucky_wheel_ticket_silver,Event,EventTool,Lucky Wheel Ticket Silver,Ticket dùng để mở ô trong Bingo Event,C,FALSE,TRUE,999999,Consume,icon_lucky_wheel_ticket_silver,49,Active
+50,lucky_wheel_ticket_gold,Event,EventTool,Lucky Wheel Ticket Gold,Ticket dùng để mở ô trong Bingo Event vòng quay xịn hơn,A,FALSE,TRUE,999999,Consume,icon_lucky_wheel_ticket_gold,50,Active
+51,lucky_wheel_point,Event,EventTool,Lucky Wheel Point,Điểm đổi thưởng ở vòng quay,B,FALSE,TRUE,999999,Consume,icon_lucky_wheel_point,51,Active

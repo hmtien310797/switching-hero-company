@@ -11,8 +11,6 @@ using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Tutorial.Models;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Immortal_Switch.Scripts.Shared
 {
@@ -20,9 +18,6 @@ namespace Immortal_Switch.Scripts.Shared
     {
         [field: DatabaseBinding]
         public ItemTierDatabaseSO ItemTierDb { get; private set; }
-
-        [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsBadWordDatabase badwordDb;
 
         [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsPlayerExpDatabase playerExpDb;
@@ -68,8 +63,6 @@ namespace Immortal_Switch.Scripts.Shared
                 InitSkillDataAsync(),
                 InitCreepDataAsync()
             );
-
-            InitBadwords();
         }
 
 #region Helper
@@ -118,6 +111,12 @@ namespace Immortal_Switch.Scripts.Shared
         /// </summary>
         public List<ItemRewardData> GetRewards(string strReward)
         {
+            if (string.IsNullOrWhiteSpace(strReward))
+            {
+                Debug.LogError("[DatabaseManager] GetRewards with param null");
+                return new List<ItemRewardData>();
+            }
+
             var entries = new List<(int itemId, BigNumber quantity)>();
             var rewards = strReward.Split(';');
 
@@ -133,10 +132,6 @@ namespace Immortal_Switch.Scripts.Shared
                     {
                         entries.Add((itemId, quantity));
                     }
-                }
-                else
-                {
-                    Debug.LogError($"Reward {reward} wrong config");
                 }
             }
 
@@ -163,16 +158,6 @@ namespace Immortal_Switch.Scripts.Shared
             }
 
             return results;
-        }
-
-#endregion
-
-#region Badword db
-
-        private void InitBadwords()
-        {
-            var badwords = badwordDb.rows.Select(v => v.vi).ToArray();
-            IllegalWordDetection.Init(badwords);
         }
 
 #endregion

@@ -74,6 +74,15 @@ namespace Immortal_Switch.Scripts.Core
                 await PlayerSystemManager.Instance.InitializeAsync();
                 progress.CompleteStep("Player system initialized");
 
+                // WeaponManager.saveData chỉ được gán trong InitializeAsync() (Load()) — phải
+                // await xong TRƯỚC khi ApplyPlayerData (bước 6) gọi SyncWeaponListToManager, nếu
+                // không saveData vẫn null và WeaponManager.SyncFromServer ném NullReferenceException,
+                // khiến ApplyPlayerData bị abort giữa chừng TRƯỚC dòng GetPlayerDataFromServer — hệ
+                // quả là UserDataCache.HeroList/WeaponList không bao giờ được set (rơi về lineup mặc
+                // định) dù RPC player/me đã trả dữ liệu đúng. Trước đây gọi fire-and-forget ở bước 10,
+                // sau cả bước 6 — luôn trễ.
+                await WeaponManager.Instance.InitializeAsync();
+
                 PlayerMeResponse player = null;
 
                 // 6
@@ -84,8 +93,11 @@ namespace Immortal_Switch.Scripts.Core
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning(
-                        $"[Bootstrap] Failed to fetch player/me: {ex.Message}"
+                    // Log đầy đủ (không chỉ ex.Message) — exception có thể xảy ra trong
+                    // ApplyPlayerData (xử lý response), không hẳn ở chính RPC GetPlayerMeAsync,
+                    // nên cần stack trace để biết chính xác dòng nào throw.
+                    Debug.LogError(
+                        $"[Bootstrap] player/me fetch or apply failed: {ex}"
                     );
                 }
 
@@ -150,8 +162,6 @@ namespace Immortal_Switch.Scripts.Core
                 await UserDataCache.Instance.InitializeAsync();
                 progress.CompleteStep("User cache initialized");
                 await UniTask.Delay(TimeSpan.FromSeconds(1f));
-                
-                WeaponManager.Instance.InitializeAsync().Forget();
 
                 // 11
                 await GrowthManager.Instance.InitializeAsync();
@@ -270,9 +280,9 @@ namespace Immortal_Switch.Scripts.Core
 
             CurrencyManager.Instance.Set(CurrencyType.gold, player.coins);
             CurrencyManager.Instance.Set(CurrencyType.diamond, player.gems);
-            CurrencyManager.Instance.Set(CurrencyType.HeroTicket, player.hero_ticket);
-            CurrencyManager.Instance.Set(CurrencyType.SkillTicket, player.skill_ticket);
-            CurrencyManager.Instance.Set(CurrencyType.WeaponTicket, player.weapon_ticket);
+            CurrencyManager.Instance.Set(CurrencyType.summon_ticket_hero, player.hero_ticket);
+            CurrencyManager.Instance.Set(CurrencyType.summon_ticket_skill, player.skill_ticket);
+            CurrencyManager.Instance.Set(CurrencyType.summon_ticket_weapon, player.weapon_ticket);
             CurrencyManager.Instance.Set(CurrencyType.weapon_ore, player.weapon_ore);
 
 

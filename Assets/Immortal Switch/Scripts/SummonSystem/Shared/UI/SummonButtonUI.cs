@@ -1,5 +1,6 @@
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
@@ -18,35 +19,21 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         [SerializeField] private Image currencyIcon;
         [SerializeField] private TMP_Text rollCountText;
 
-        [Header("Icons")]
-        [PreviewField][SerializeField] private Sprite heroTicketIcon;
-        [PreviewField][SerializeField] private Sprite skillTicketIcon;
-        [PreviewField][SerializeField] private Sprite weaponTicketIcon;
-        [PreviewField][SerializeField] private Sprite diamondIcon;
-
         [Header("Visual")]
         [SerializeField] private GameObject redDot;
         [SerializeField] private Color normalColor = Color.white;
         [SerializeField] private Color notEnoughColor = Color.red;
         [SerializeField] private CanvasGroup canvasGroup;
-
-        [Header("Category")]
-        [SerializeField] private SummonCategory summonCategory = SummonCategory.Hero;
-
+        
+        private SummonCategory summonCategory = SummonCategory.Hero;
         private string optionId;
         private System.Action<string> clickAction;
 
         public void Init(string summonOptionId, System.Action<string> onClick, SummonCategory category)
         {
-            summonCategory = category;
-            Init(summonOptionId, onClick);
-        }
-
-        public void Init(string summonOptionId, System.Action<string> onClick)
-        {
             optionId = summonOptionId;
             clickAction = onClick;
-
+            summonCategory = category;
             if (button != null)
             {
                 button.onClick.RemoveAllListeners();
@@ -78,18 +65,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             if (rollCountText != null)
                 rollCountText.text = $"{option.RollCount} lần";
 
-            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.HeroTicket);
+            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.summon_ticket_hero);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
 
             bool hasEnoughTicket = ticket >= option.TicketCost;
             bool hasEnoughGem    = gem    >= option.GemCost;
 
             if (hasEnoughTicket)
-                SetUI(option.TicketCost, heroTicketIcon, true, normalColor);
+                SetUI(option.TicketCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("summon_ticket_hero"), true, normalColor);
             else if (hasEnoughGem)
-                SetUI(option.GemCost, diamondIcon, false, normalColor);
+                SetUI(option.GemCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("diamond"), false, normalColor);
             else
-                SetUI(option.GemCost, diamondIcon, false, notEnoughColor);
+                SetUI(option.GemCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("diamond"), false, notEnoughColor);
         }
 
         private void RefreshWeapon()
@@ -104,18 +91,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             if (rollCountText != null)
                 rollCountText.text = $"{option.RollCount} lần";
 
-            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.WeaponTicket);
+            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.summon_ticket_weapon);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
 
             bool hasEnoughTicket = ticket >= option.TicketCost;
             bool hasEnoughGem    = gem    >= option.GemCost;
 
             if (hasEnoughTicket)
-                SetUI(option.TicketCost, weaponTicketIcon, true, normalColor);
+                SetUI(option.TicketCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("summon_ticket_weapon"), true, normalColor);
             else if (hasEnoughGem)
-                SetUI(option.GemCost, diamondIcon, false, normalColor);
+                SetUI(option.GemCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("diamond"), false, normalColor);
             else
-                SetUI(option.GemCost, diamondIcon, false, notEnoughColor);
+                SetUI(option.GemCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("diamond"), false, notEnoughColor);
         }
 
         private void RefreshSkill()
@@ -130,18 +117,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             if (rollCountText != null)
                 rollCountText.text = $"{option.RollCount} lần";
 
-            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.SkillTicket);
+            BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.summon_ticket_skill);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
 
             bool hasEnoughTicket = ticket >= option.TicketCost;
             bool hasEnoughGem    = gem    >= option.GemCost;
 
             if (hasEnoughTicket)
-                SetUI(option.TicketCost, skillTicketIcon, true, normalColor);
+                SetUI(option.TicketCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("summon_ticket_skill"), true, normalColor);
             else if (hasEnoughGem)
-                SetUI(option.GemCost, diamondIcon, false, normalColor);
+                SetUI(option.GemCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("diamond"), false, normalColor);
             else
-                SetUI(option.GemCost, diamondIcon, false, notEnoughColor);
+                SetUI(option.GemCost, DatabaseManager.Instance.ItemDb.LoadIconByItemKey("diamond"), false, notEnoughColor);
         }
 
         public void SetInteractable(bool value)

@@ -21,32 +21,48 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         public override SummonCategory Category => SummonCategory.Skill;
 
         [Header("Buttons")]
-        [SerializeField] private SummonButtonUI summonButtonA;
-        [SerializeField] private SummonButtonUI summonButtonB;
+        [SerializeField]
+        private SummonButtonUI summonButtonA;
+
+        [SerializeField]
+        private SummonButtonUI summonButtonB;
 
         [Header("Texts")]
-        [SerializeField] private TMP_Text summonLevelText;
+        [SerializeField]
+        private TMP_Text summonLevelText;
 
         [Header("Progress")]
-        [SerializeField] private Image summonLevelProgressFill;
+        [SerializeField]
+        private Image summonLevelProgressFill;
 
         [Header("Reward Preview")]
-        [SerializeField] private SummonLevelRewardPreviewUI levelRewardPreviewUI;
+        [SerializeField]
+        private SummonLevelRewardPreviewUI levelRewardPreviewUI;
 
         [Header("Popup")]
-        [SerializeField] private SkillSummonSequencePopup sequencePopup;
-        [SerializeField] private SkillSummonProbabilityPopup probabilityPopup;
+        [SerializeField]
+        private SkillSummonSequencePopup sequencePopup;
+
+        [SerializeField]
+        private SkillSummonProbabilityPopup probabilityPopup;
 
         [Header("Achievement")]
-        [SerializeField] private Button summonAchievementButton;
-        [SerializeField] private SummonAchievementRewardView summonAchievementRewardView;
+        [SerializeField]
+        private Button summonAchievementButton;
+
+        [SerializeField]
+        private SummonAchievementRewardView summonAchievementRewardView;
 
         [Header("Probability")]
-        [SerializeField] private Button probabilityInfoButton;
+        [SerializeField]
+        private Button probabilityInfoButton;
 
         [Header("Option Id")]
-        [SerializeField] private string optionAId = "summon_30";
-        [SerializeField] private string optionBId = "summon_50";
+        [SerializeField]
+        private string optionAId = "summon_30";
+
+        [SerializeField]
+        private string optionBId = "summon_50";
 
         private bool isBound;
         private bool isSummoning;
@@ -76,12 +92,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
         protected override void OnHidePanel()
         {
-
         }
 
         public override bool HasNotification()
         {
-            if (SkillSummonManager.Instance == null || SkillSummonManager.Instance.Service == null)
+            if (SkillSummonManager.Instance == null ||
+                SkillSummonManager.Instance.Service == null)
                 return false;
 
             var claimables = SkillSummonManager.Instance.Service.GetClaimableRewardLevels();
@@ -94,10 +110,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 return;
 
             if (summonButtonA != null)
-                summonButtonA.Init(optionAId, TrySummon);
+                summonButtonA.Init(optionAId, TrySummon, SummonCategory.Skill);
 
             if (summonButtonB != null)
-                summonButtonB.Init(optionBId, TrySummon);
+                summonButtonB.Init(optionBId, TrySummon, SummonCategory.Skill);
 
             if (summonAchievementButton != null)
             {
@@ -116,7 +132,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
         private void OpenProbabilityPopup()
         {
-            if (probabilityPopup == null || SkillSummonManager.Instance == null)
+            if (probabilityPopup == null ||
+                SkillSummonManager.Instance == null)
                 return;
 
             probabilityPopup.Show(SkillSummonManager.Instance.GetCurrentSummonLevel());
@@ -136,7 +153,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
         public override void RefreshView()
         {
-            if (SkillSummonManager.Instance == null || SkillSummonManager.Instance.Service == null)
+            if (SkillSummonManager.Instance == null ||
+                SkillSummonManager.Instance.Service == null)
                 return;
 
             RefreshSummonLevel();
@@ -184,6 +202,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (paymentType == SummonPaymentType.Gem)
             {
                 bool skipConfirm = SkillSummonManager.Instance.SaveData.SkipGemFallbackConfirm;
+
                 if (skipConfirm)
                 {
                     ExecuteSummonAsync(optionId).Forget();
@@ -210,9 +229,19 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
                     "Cảnh báo",
                     $"Không đủ Vé Anh hùng.\nLần triệu hồi này sẽ tiêu tốn {gemCost} Kim cương.\nXác nhận?",
-                    () => ExecuteSummonAsync(optionId).Forget()
+                    () => ExecuteSummonAsync(optionId).Forget(),
+                    onDoNotShowAgainChanged: OnDoNotShowAgainChanged
                 ))
                 .Forget();
+        }
+
+        private void OnDoNotShowAgainChanged(bool value)
+        {
+            if (SkillSummonManager.Instance != null)
+            {
+                SkillSummonManager.Instance.SaveData.SkipGemFallbackConfirm = value;
+                SkillSummonManager.Instance.Save();
+            }
         }
 
         private async UniTaskVoid ExecuteSummonAsync(string optionId)
@@ -241,7 +270,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 }
 
                 // Cập nhật currency HUD từ server
-                CurrencyManager.Instance.Set(CurrencyType.SkillTicket, response.CurrencyBalances.SkillTicket);
+                CurrencyManager.Instance.Set(CurrencyType.summon_ticket_skill, response.CurrencyBalances.SkillTicket);
                 CurrencyManager.Instance.Set(CurrencyType.diamond, response.CurrencyBalances.Diamond);
 
                 // Sync local save data
@@ -249,14 +278,15 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
                 // Map server entries → SkillSummonResult để drive animation
                 Enum.TryParse<SummonPaymentType>(response.PaymentType, true, out var parsedPayment);
+
                 var result = new SkillSummonResult
                 {
-                    PaymentType               = parsedPayment,
-                    PaidAmount                = response.PaidAmount,
-                    OldTotalRoll              = response.OldTotalRoll,
-                    NewTotalRoll              = response.NewTotalRoll,
-                    OldSummonLevel            = response.OldSummonLevel,
-                    NewSummonLevel            = response.NewSummonLevel,
+                    PaymentType = parsedPayment,
+                    PaidAmount = response.PaidAmount,
+                    OldTotalRoll = response.OldTotalRoll,
+                    NewTotalRoll = response.NewTotalRoll,
+                    OldSummonLevel = response.OldSummonLevel,
+                    NewSummonLevel = response.NewSummonLevel,
                     NewlyUnlockedRewardLevels = response.NewlyUnlockedRewardLevels != null
                         ? new List<int>(response.NewlyUnlockedRewardLevels)
                         : new List<int>()
@@ -269,12 +299,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
 
                     result.Entries.Add(new SkillSummonResultEntry
                     {
-                        RollIndex   = entry.RollIndex,
-                        SkillAsset  = skillData,
-                        SkillId     = entry.SkillId,
-                        SkillName   = entry.SkillName,
-                        Grade       = grade,
-                        IsNewSkill  = entry.IsNew,
+                        RollIndex = entry.RollIndex,
+                        SkillAsset = skillData,
+                        SkillId = entry.SkillId,
+                        SkillName = entry.SkillName,
+                        Grade = grade,
+                        IsNewSkill = entry.IsNew,
                         ShardGained = entry.ShardGained
                     });
                 }

@@ -1,10 +1,36 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Event.EventWheel.Controller;
+using Immortal_Switch.Scripts.Event.EventWheel.UI;
+using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 {
+    public enum EEventCategory
+    {
+        Normal = 1,
+        Premium = 2,
+    }
+
+    [Serializable]
+    public class EventLayoutCategory
+    {
+        public EEventCategory type;
+        public WheelController controller;
+        public UIEventWheelCategory category;
+    }
+
     public class EventLayout : MonoBehaviour
     {
         [Header("Header references")]
@@ -25,110 +51,294 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         private Button btnPremium;
 
         [SerializeField]
-        private Button btnX1;
+        private UIEventWheelButtonSpin btnX1Normal;
 
         [SerializeField]
-        private Button btnX10;
+        private UIEventWheelButtonSpin btnX10Normal;
 
         [SerializeField]
-        private TextMeshProUGUI txtX1;
+        private UIEventWheelButtonSpin btnX1Premium;
 
         [SerializeField]
-        private TextMeshProUGUI txtX10;
+        private UIEventWheelButtonSpin btnX10Premium;
 
         [Header("Wheel references")]
         [SerializeField]
-        private WheelController normal;
-
-        [SerializeField]
-        private WheelController premium;
+        private List<EventLayoutCategory> categories = new();
 
         // --- Private Fields ---
-        private bool _isPremium;
+        private List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow> _normalItems = new();
+        private List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow> _premiumItems = new();
+        private EventLayoutCategory _selectedCategory;
 
         private int _normalX1;
         private int _normalX10;
 
         private int _premiumX1;
         private int _premiumX10;
+        private bool _isRolling;
+        private CancellationTokenSource _spinCancellationTokenSource;
+        private UniTaskCompletionSource _spinCompletionSource;
 
         private void Awake()
         {
             btnNormal.onClick.AddListener(OnClickNormal);
             btnPremium.onClick.AddListener(OnClickPremium);
+        }
 
-            btnX1.onClick.AddListener(OnClickX1);
-            btnX10.onClick.AddListener(OnClickX10);
+        private void OnDestroy()
+        {
+            CancelCurrentSpin();
+            btnNormal.onClick.RemoveListener(OnClickNormal);
+            btnPremium.onClick.RemoveListener(OnClickPremium);
         }
 
         private void OnEnable()
         {
+            UnselectCategories();
             OnClickNormal();
+        }
+
+        private void OnDisable()
+        {
+            CancelCurrentSpin();
         }
 
         private void OnClickNormal()
         {
-            _isPremium = false;
             txtTitle.text = "Vòng quay cơ bản";
-
-            normal.gameObject.SetActive(true);
-            premium.gameObject.SetActive(false);
+            SetSelected(EEventCategory.Normal);
         }
 
         private void OnClickPremium()
         {
-            _isPremium = true;
             txtTitle.text = "Vòng quay cao cấp";
-
-            normal.gameObject.SetActive(false);
-            premium.gameObject.SetActive(true);
+            SetSelected(EEventCategory.Premium);
         }
 
-        public void Bind(int normalX1, int normalX10, int premiumX1, int premiumX10)
+        public void Bind(
+            int normalX1, int normalX10, int premiumX1, int premiumX10,
+            List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow> normalItems,
+            List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow> premiumItems
+        )
         {
+            _normalItems = new List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow>(normalItems);
+            _premiumItems = new List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow>(premiumItems);
+
             _normalX1 = normalX1;
             _normalX10 = normalX10;
 
             _premiumX1 = premiumX1;
             _premiumX10 = premiumX10;
 
-            RefreshPrice();
-        }
+            btnX1Normal.Bind(1, $"{_normalX1}", OnClickSpinNormal);
+            btnX10Normal.Bind(10, $"{_normalX10}", OnClickSpinNormal);
 
-        private void OnClickX1()
-        {
-            StartSpin();
-        }
+            btnX1Premium.Bind(1, $"{_premiumX1}", OnClickSpinPremium);
+            btnX10Premium.Bind(10, $"{_premiumX10}", OnClickSpinPremium);
 
-        private void OnClickX10()
-        {
-            StartSpin();
-        }
-
-        private void StartSpin()
-        {
-            if (_isPremium)
+            foreach (var category in categories)
             {
-                premium.StartSpin();
-            }
-            else
-            {
-                normal.StartSpin();
+                switch (category.type)
+                {
+                    case EEventCategory.Normal:
+                        category.controller.Bind(normalItems);
+                        break;
+
+                    case EEventCategory.Premium:
+                        category.controller.Bind(premiumItems);
+                        break;
+                }
             }
         }
 
-        private void RefreshPrice()
+        private void OnClickSpinNormal(int times)
         {
-            if (_isPremium)
+            StartSpin(EEventCategory.Normal, times).Forget();
+        }
+
+        private void OnClickSpinPremium(int times)
+        {
+            StartSpin(EEventCategory.Premium, times).Forget();
+        }
+
+        private async UniTask StartSpin(EEventCategory type, int times)
+        {
+            if (_isRolling ||
+                times <= 0 ||
+                _selectedCategory == null ||
+                _selectedCategory.type != type)
             {
-                txtX1.text = _premiumX1.ToString();
-                txtX10.text = _premiumX10.ToString();
+                return;
             }
-            else
+
+            _isRolling = true;
+
+            var spinCancellationTokenSource = new CancellationTokenSource();
+
+            _spinCancellationTokenSource = spinCancellationTokenSource;
+
+            var cancellationToken = spinCancellationTokenSource.Token;
+            var rewards = new List<ItemRewardData>();
+            var controller = _selectedCategory.controller;
+            var force = toggleSkipAnimation.isOn;
+
+            EventWheelPassManager.Instance.RecordSpinPurchase(
+                EventIdConstants.EVENT_WHEEL,
+                times
+            );
+
+            try
             {
-                txtX1.text = _normalX1.ToString();
-                txtX10.text = _normalX10.ToString();
+                for (int i = 0; i < times; i++)
+                {
+                    controller.StartSpin();
+
+                    var rndIdx = Random.Range(0, 5);
+                    Debug.Log($"SpinCount: {i} - {rndIdx} - {DateTime.Now}");
+
+                    if (!force)
+                    {
+                        var isCanceled = await UniTask
+                            .Delay(1000, cancellationToken: cancellationToken)
+                            .SuppressCancellationThrow();
+
+                        if (isCanceled)
+                        {
+                            return;
+                        }
+                    }
+
+                    var completionSource = new UniTaskCompletionSource();
+                    _spinCompletionSource = completionSource;
+
+                    controller.StopAt(
+                        rndIdx,
+                        force,
+                        () => completionSource.TrySetResult()
+                    );
+
+                    var isCompletionCanceled = await completionSource.Task.SuppressCancellationThrow();
+
+                    if (_spinCompletionSource == completionSource)
+                    {
+                        _spinCompletionSource = null;
+                    }
+
+                    if (isCompletionCanceled)
+                    {
+                        return;
+                    }
+
+                    AddReward(rndIdx);
+
+                    if (i < times - 1)
+                    {
+                        var stepDelay = Random.Range(1000, 2001);
+
+                        var isCanceled = await UniTask
+                            .Delay(stepDelay, cancellationToken: cancellationToken)
+                            .SuppressCancellationThrow();
+
+                        if (isCanceled)
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                if (rewards.Count > 0)
+                {
+                    await UIManager.Instance
+                        .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
+                        {
+                            Rewards = rewards,
+                        });
+                }
             }
+            finally
+            {
+                if (_spinCancellationTokenSource == spinCancellationTokenSource)
+                {
+                    _spinCancellationTokenSource.Dispose();
+                    _spinCancellationTokenSource = null;
+                    _spinCompletionSource = null;
+                    _isRolling = false;
+                }
+            }
+
+            void AddReward(int rewardIndex)
+            {
+                var reward = type == EEventCategory.Premium
+                    ? _premiumItems[rewardIndex]
+                    : _normalItems[rewardIndex];
+
+                if (reward == null)
+                {
+                    return;
+                }
+
+                var itemDisplay = DatabaseManager.Instance.GetDisplayData(reward.itemId);
+
+                if (itemDisplay != null)
+                {
+                    rewards.Add(new ItemRewardData(
+                        reward.itemId,
+                        reward.amount,
+                        itemDisplay.ItemIcon,
+                        itemDisplay.TierInfo
+                    ));
+                }
+            }
+        }
+
+        private void SetSelected(EEventCategory type)
+        {
+            if (_isRolling &&
+                _selectedCategory != null &&
+                _selectedCategory.type != type)
+            {
+                CancelCurrentSpin();
+            }
+
+            if (_selectedCategory != null)
+            {
+                _selectedCategory.controller.gameObject.SetActive(false);
+                _selectedCategory.category.SetSelected(false);
+                _selectedCategory = null;
+            }
+
+            foreach (var category in categories)
+            {
+                if (category.type == type)
+                {
+                    _selectedCategory = category;
+                    _selectedCategory.controller.gameObject.SetActive(true);
+                    _selectedCategory.category.SetSelected(true);
+                    break;
+                }
+            }
+        }
+
+        private void UnselectCategories()
+        {
+            foreach (var category in categories)
+            {
+                category.category.SetSelected(false);
+                category.controller.gameObject.SetActive(false);
+            }
+        }
+
+        /// <summary>Hủy chuỗi quay và completion source hiện tại khi đổi tab.</summary>
+        private void CancelCurrentSpin()
+        {
+            _spinCancellationTokenSource?.Cancel();
+            _spinCancellationTokenSource?.Dispose();
+            _spinCancellationTokenSource = null;
+
+            _spinCompletionSource?.TrySetCanceled();
+            _spinCompletionSource = null;
+            _isRolling = false;
         }
     }
 }

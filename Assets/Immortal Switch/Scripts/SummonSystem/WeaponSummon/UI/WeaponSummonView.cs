@@ -21,30 +21,49 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
     {
         public override SummonCategory Category => SummonCategory.Weapon;
 
-        [Header("Buttons")] [SerializeField] private SummonButtonUI summonButtonA;
-        [SerializeField] private SummonButtonUI summonButtonB;
+        [Header("Buttons")]
+        [SerializeField]
+        private SummonButtonUI summonButtonA;
 
-        [Header("Texts")] [SerializeField] private TMP_Text summonLevelText;
+        [SerializeField]
+        private SummonButtonUI summonButtonB;
 
-        [Header("Progress")] [SerializeField] private Image summonLevelProgressFill;
+        [Header("Texts")]
+        [SerializeField]
+        private TMP_Text summonLevelText;
 
-        [Header("Reward Preview")] [SerializeField]
+        [Header("Progress")]
+        [SerializeField]
+        private Image summonLevelProgressFill;
+
+        [Header("Reward Preview")]
+        [SerializeField]
         private SummonLevelRewardPreviewUI levelRewardPreviewUI;
 
         [Header("Popup")]
-        [SerializeField] private WeaponSummonProbabilityPopup probabilityPopup;
-        [SerializeField] private WeaponSummonSequencePopup sequencePopup;
+        [SerializeField]
+        private WeaponSummonProbabilityPopup probabilityPopup;
 
-        [Header("Achievement")] [SerializeField]
+        [SerializeField]
+        private WeaponSummonSequencePopup sequencePopup;
+
+        [Header("Achievement")]
+        [SerializeField]
         private SummonAchievementRewardView summonAchievementRewardView;
 
-        [SerializeField] private Button summonAchievementButton;
+        [SerializeField]
+        private Button summonAchievementButton;
 
-        [Header("Probability")] [SerializeField]
+        [Header("Probability")]
+        [SerializeField]
         private Button probabilityInfoButton;
 
-        [Header("Option Id")] [SerializeField] private string optionAId = "summon_30";
-        [SerializeField] private string optionBId = "summon_50";
+        [Header("Option Id")]
+        [SerializeField]
+        private string optionAId = "summon_30";
+
+        [SerializeField]
+        private string optionBId = "summon_50";
 
         private bool isBound;
         private bool isSummoning;
@@ -108,7 +127,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         protected override void OnHidePanel()
         {
         }
-        
+
         private void HideAllPopups()
         {
             sequencePopup.Hide();
@@ -258,9 +277,19 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
                     "Cảnh báo",
                     $"Không đủ Vé Anh hùng.\nLần triệu hồi này sẽ tiêu tốn {gemCost} Kim cương.\nXác nhận?",
-                    () => ExecuteSummonAsync(optionId).Forget()
+                    () => ExecuteSummonAsync(optionId).Forget(),
+                    onDoNotShowAgainChanged: OnDoNotShowAgainChanged
                 ))
                 .Forget();
+        }
+
+        private void OnDoNotShowAgainChanged(bool value)
+        {
+            if (WeaponSummonManager.Instance != null)
+            {
+                WeaponSummonManager.Instance.SaveData.SkipGemFallbackConfirm = value;
+                WeaponSummonManager.Instance.Save();
+            }
         }
 
         private async UniTaskVoid ExecuteSummonAsync(string optionId)
@@ -289,7 +318,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 }
 
                 // Cập nhật currency HUD từ server
-                CurrencyManager.Instance.Set(CurrencyType.WeaponTicket, response.CurrencyBalances.WeaponTicket);
+                CurrencyManager.Instance.Set(CurrencyType.summon_ticket_weapon, response.CurrencyBalances.WeaponTicket);
                 CurrencyManager.Instance.Set(CurrencyType.diamond, response.CurrencyBalances.Diamond);
 
                 // Sync local save data

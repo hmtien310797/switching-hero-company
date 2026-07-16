@@ -269,9 +269,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
             return new SummonRewardPreviewData
             {
                 SummonLevel = entry.SummonLevel,
-                RewardItem = entry.RewardItems != null && entry.RewardItems.Count > 0
-                    ? entry.RewardItems[0]
-                    : null,
+                Quantity = entry.RewardItems[0].Amount,
+                ItemId = entry.RewardItems[0].ItemId,
                 IsClaimable = isClaimable,
                 IsClaimed = isClaimed
             };

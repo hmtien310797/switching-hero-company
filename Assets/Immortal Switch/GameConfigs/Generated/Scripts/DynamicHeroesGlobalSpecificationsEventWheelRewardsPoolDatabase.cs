@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated ScriptableObject database from CSV: DynamicHeroes-GlobalSpecifications-event_wheel_rewards_pool
+    /// Auto generated ScriptableObject database from CSV: Dynamic Heroes - Global Specifications - event_wheel_rewards_pool
     /// </summary>
     [CreateAssetMenu(
         fileName = "DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolDatabase",

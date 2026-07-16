@@ -234,7 +234,8 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
                 .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
                     "Xoá tài khoản",
                     "Hành động này sẽ xoá vĩnh viễn tài khoản và toàn bộ dữ liệu.\nBạn có chắc chắn muốn tiếp tục?",
-                    () => SettingManager.Instance.DeleteAccount()
+                    () => SettingManager.Instance.DeleteAccount(),
+                    showToggleDoNotShowAgain: false
                 ))
                 .Forget();
         }

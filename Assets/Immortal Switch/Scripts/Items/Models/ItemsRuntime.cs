@@ -10,7 +10,7 @@ namespace Immortal_Switch.Scripts.Items.Models
         /// <summary>
         /// ds items sync voi server
         /// </summary>
-        public List<ItemData> Items = new();
+        public Dictionary<int, ItemData> Items = new();
     }
 
     public interface IItemDisplayData

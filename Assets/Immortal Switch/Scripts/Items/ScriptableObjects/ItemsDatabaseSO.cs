@@ -22,7 +22,9 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
 
         private SpriteAtlas _itemAtlas;
         private UniTask<SpriteAtlas>? _loadAtlasTask;
+
         private readonly Dictionary<string, Sprite> _spriteCache = new();
+        private readonly Dictionary<int, DynamicHeroesGlobalSpecificationsItemConfigRow> _itemsCache = new();
 
         public UniTask InitializeAsync()
         {
@@ -103,7 +105,19 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
 
         public DynamicHeroesGlobalSpecificationsItemConfigRow FindItem(int itemId)
         {
-            return ItemConfig.rows.FirstOrDefault(v => v.itemId == itemId);
+            if (_itemsCache.TryGetValue(itemId, out var item))
+            {
+                return item;
+            }
+
+            item = ItemConfig.rows.FirstOrDefault(v => v.itemId == itemId);
+
+            if (item != null)
+            {
+                _itemsCache.Add(itemId, item);
+            }
+
+            return item;
         }
 
         public DynamicHeroesGlobalSpecificationsItemConfigRow FindItem(string itemKey)

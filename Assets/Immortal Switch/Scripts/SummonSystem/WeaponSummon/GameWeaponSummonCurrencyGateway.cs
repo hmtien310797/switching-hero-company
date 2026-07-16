@@ -6,7 +6,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
     {
         public bool CanSpendWeaponTicket(int amount)
         {
-            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.WeaponTicket, amount);
+            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.summon_ticket_weapon, amount);
         }
 
         public bool CanSpendGem(int amount)
@@ -16,7 +16,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
 
         public void SpendWeaponTicket(int amount)
         {
-            CurrencyLedgerService.Instance.TrySpend(CurrencyType.WeaponTicket, amount, CurrencyTransactionReason.SummonWeapon);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.summon_ticket_weapon, amount, CurrencyTransactionReason.SummonWeapon);
         }
 
         public void SpendGem(int amount)

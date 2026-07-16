@@ -18,7 +18,10 @@ namespace Immortal_Switch.Scripts.Localization
         /// Fire khi ngôn ngữ thay đổi runtime. Các component LocalizeText / LocalizeImage
         /// subscribe event này để tự động cập nhật.
         /// </summary>
-        public event Action<string> OnLanguageChanged;
+        public static event Action<string> OnLanguageChanged;
+
+        private bool _isListeningLocaleChanges;
+        private int _localeChangeVersion;
 
         /// <summary>
         /// Tên String Table mặc định cho Default text.
@@ -45,8 +48,16 @@ namespace Immortal_Switch.Scripts.Localization
             TABLE_NAME,
         };
 
+        protected override void OnSingletonAwake()
+        {
+            base.OnSingletonAwake();
+            SubscribeLocaleChanges();
+        }
+
         public override async UniTask InitializeAsync()
         {
+            SubscribeLocaleChanges();
+
             // Chờ Unity Localization init xong
             await LocalizationSettings.InitializationOperation.ToUniTask();
 
@@ -65,19 +76,45 @@ namespace Immortal_Switch.Scripts.Localization
 
             // Preload các String Table cần thiết
             await PreloadTablesAsync();
-
-            // Subscribe sau khi đã init xong để tránh fire event lúc đang load
-            LocalizationSettings.SelectedLocaleChanged += OnSelectedLocaleChanged;
         }
 
         protected override void OnDestroy()
         {
-            LocalizationSettings.SelectedLocaleChanged -= OnSelectedLocaleChanged;
+            if (_isListeningLocaleChanges)
+            {
+                LocalizationSettings.SelectedLocaleChanged -= OnSelectedLocaleChanged;
+                _isListeningLocaleChanges = false;
+            }
+
             base.OnDestroy();
+        }
+
+        private void SubscribeLocaleChanges()
+        {
+            if (_isListeningLocaleChanges)
+            {
+                return;
+            }
+
+            LocalizationSettings.SelectedLocaleChanged += OnSelectedLocaleChanged;
+            _isListeningLocaleChanges = true;
         }
 
         private void OnSelectedLocaleChanged(Locale locale)
         {
+            var changeVersion = ++_localeChangeVersion;
+            NotifyLanguageChangedAsync(locale, changeVersion).Forget();
+        }
+
+        private async UniTaskVoid NotifyLanguageChangedAsync(Locale locale, int changeVersion)
+        {
+            await PreloadTablesAsync();
+
+            if (changeVersion != _localeChangeVersion)
+            {
+                return;
+            }
+
             OnLanguageChanged?.Invoke(locale.Identifier.Code);
         }
 
@@ -102,14 +139,15 @@ namespace Immortal_Switch.Scripts.Localization
         /// <summary>
         /// Đổi ngôn ngữ runtime. Gọi từ SettingManager khi người dùng chọn ngôn ngữ mới.
         /// </summary>
-        public void SetLanguage(string langCode)
+        public static void SetLanguage(string langCode)
         {
             if (string.IsNullOrEmpty(langCode))
             {
                 return;
             }
 
-            if (CurrentLangCode == langCode)
+            if (Instance == null ||
+                Instance.CurrentLangCode == langCode)
             {
                 return;
             }
@@ -131,7 +169,7 @@ namespace Immortal_Switch.Scripts.Localization
         /// Dùng khi cần lấy text một lần (không auto-update).
         /// tableName mặc định là "UI" nếu để trống.
         /// </summary>
-        public string GetText(string key, string tableName = TABLE_NAME)
+        public static string GetText(string key, string tableName = TABLE_NAME)
         {
             if (string.IsNullOrEmpty(key))
             {

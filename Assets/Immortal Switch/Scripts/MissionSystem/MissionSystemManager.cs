@@ -11,6 +11,7 @@ using Immortal_Switch.Scripts.MissionSystem.Models;
 using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
+using Immortal_Switch.Scripts.Shared.Views;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -245,6 +246,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
             var rewards = DatabaseManager.Instance.GetRewards(cfg.rewards);
             ClaimMissionOnServerAsync(cfg, rewards).Forget();
+            PopupRewardService.Show(rewards);
             return rewards;
         }
 

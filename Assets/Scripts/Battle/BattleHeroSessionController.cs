@@ -260,7 +260,11 @@ namespace Battle
             if (wasControlled)
                 gameCameraController?.SetFollowHero(newHero.transform);
 
-            SyncLineupToServerAsync().Forget();
+            // Preserve() vì task này có 2 consumer độc lập: Forget() ở đây (fire-and-forget bình
+            // thường) và FlushPendingLineupSyncAsync() (Logout/OnApplicationPause) — UniTask thường
+            // chỉ cho phép 1 lần GetResult, Preserve() mới cho awaited nhiều lần an toàn.
+            pendingLineupSyncTask = SyncLineupToServerAsync().Preserve();
+            pendingLineupSyncTask.Forget();
             return true;
         }
 
@@ -382,17 +386,27 @@ namespace Battle
             if (heroIds.Exists(id => id > 0))
                 return;
 
-            var owned = userDataCache.HeroList?.Owned;
-            if (owned != null && owned.Length > 0)
+            // InBattleHeroIdList is stale/unset — re-derive from the player's actual saved
+            // lineup (HeroList.Lineup uid -> hero_id) first. Previously this fell straight to
+            // "first 2 owned heroes by array order", which silently showed whichever heroes
+            // happen to sit first in Owned (usually the starter heroes) instead of the real
+            // current team whenever this recovery path ran.
+            heroIds = userDataCache.ResolveLineupHeroIds();
+
+            if (!heroIds.Exists(id => id > 0))
             {
-                for (int i = 0; i < heroIds.Count && i < owned.Length; i++)
-                    heroIds[i] = owned[i].HeroId;
-            }
-            else
-            {
-                heroIds[0] = 2;
-                if (heroIds.Count > 1)
-                    heroIds[1] = 4;
+                var owned = userDataCache.HeroList?.Owned;
+                if (owned != null && owned.Length > 0)
+                {
+                    for (int i = 0; i < heroIds.Count && i < owned.Length; i++)
+                        heroIds[i] = owned[i].HeroId;
+                }
+                else
+                {
+                    heroIds[0] = 2;
+                    if (heroIds.Count > 1)
+                        heroIds[1] = 4;
+                }
             }
 
             userDataCache.SetBattleLineup(heroIds);
@@ -435,6 +449,24 @@ namespace Battle
             LineupActorsChanged?.Invoke();
         }
 
+        // Trận vừa xong / logout ngay sau khi swap hero có thể xảy ra trước khi request này
+        // hoàn tất — track task đang chạy để Logout/DeleteAccount/OnApplicationPause có thể
+        // đợi nó xong trước khi ngắt session, tránh mất lineup vừa đổi (không ghi được lên server).
+        private UniTask pendingLineupSyncTask = UniTask.CompletedTask;
+
+        /// <summary>Đợi lần sync lineup gần nhất (nếu có) hoàn tất — gọi trước khi logout/thoát app
+        /// để không mất thay đổi lineup vừa swap giữa trận.</summary>
+        public UniTask FlushPendingLineupSyncAsync()
+        {
+            return pendingLineupSyncTask;
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus)
+                FlushPendingLineupSyncAsync().Forget();
+        }
+
         private async UniTask SyncLineupToServerAsync()
         {
             if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn)
@@ -462,34 +494,43 @@ namespace Battle
             // Nếu thiếu UID, refresh hero/list trước để tránh ghi null lên server.
             if (missingUid)
             {
+                bool refreshed = await userDataCache.RefreshHeroListFromServerAsync();
+                if (!refreshed)
+                {
+                    Debug.LogError("[PvE] hero/list refresh failed before lineup sync.");
+                    return;
+                }
+
+                for (int i = 0; i < lineupUids.Length; i++)
+                {
+                    int heroId = userDataCache.InBattleHeroIdList[i];
+                    lineupUids[i] = heroId > 0 ? userDataCache.GetHeroUid(heroId) : null;
+                }
+            }
+
+            // Ghi lineup xuống local TRƯỚC khi gửi request — đồng bộ, không phụ thuộc network.
+            // Nếu app bị kill/crash/Editor-Stop trước khi request kịp tới server (không đi qua
+            // Logout bình thường nên FlushPendingLineupSyncAsync không kịp chạy), entry này còn
+            // nằm trên máy để lần mở app kế tiếp gửi lại thay vì mất swap vừa rồi.
+            string userId = NakamaClient.Instance.Session?.UserId;
+            PendingLineupSync.Save(userId, lineupUids);
+
+            // Một lần retry cho lỗi mạng thoáng qua — đây là ghi dữ liệu quan trọng (mất là
+            // người chơi phải swap lại từ đầu), không đáng để bỏ qua chỉ vì 1 request lỗi.
+            for (int attempt = 0; attempt < 2; attempt++)
+            {
                 try
                 {
-                    var heroListResponse = await NakamaClient.Instance.GetHeroListAsync();
-                    if (heroListResponse?.Owned != null && userDataCache.HeroList != null)
-                        userDataCache.HeroList.Owned = heroListResponse.Owned;
-
-                    for (int i = 0; i < lineupUids.Length; i++)
-                    {
-                        int heroId = userDataCache.InBattleHeroIdList[i];
-                        lineupUids[i] = heroId > 0 ? userDataCache.GetHeroUid(heroId) : null;
-                    }
+                    var response = await NakamaClient.Instance.SetLineupAsync(lineupUids);
+                    if (response != null && response.Updated && userDataCache.HeroList != null)
+                        userDataCache.HeroList.Lineup = response.Lineup;
+                    PendingLineupSync.Clear(userId);
+                    return;
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"[PvE] hero/list refresh failed before lineup sync: {e.Message}");
-                    return;
+                    Debug.LogError($"[PvE] hero/set_lineup RPC failed (attempt {attempt + 1}/2): {e.Message}");
                 }
-            }
-
-            try
-            {
-                var response = await NakamaClient.Instance.SetLineupAsync(lineupUids);
-                if (response != null && response.Updated && userDataCache.HeroList != null)
-                    userDataCache.HeroList.Lineup = response.Lineup;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[PvE] hero/set_lineup RPC failed: {e.Message}");
             }
         }
     }

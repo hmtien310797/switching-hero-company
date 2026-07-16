@@ -61,7 +61,7 @@ namespace Immortal_Switch.Scripts.Equipment.Services
             return result;
         }
 
-        private static float GetLevelMultiplier(int level)
+        public static float GetLevelMultiplier(int level)
         {
             if (level <= 1)
                 return 1f;

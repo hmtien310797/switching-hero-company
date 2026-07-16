@@ -79,11 +79,9 @@ namespace Immortal_Switch.Scripts.Currency
         // value and corrupt existing local currency saves on update.
         summon_ticket_hero,
         summon_ticket_weapon,
+        summon_ticket_skill,
 
         // ===== Legacy =====
-        HeroTicket = summon_ticket,
-        WeaponTicket,
-        SkillTicket,
 
         WeaponEnhancementStone = equipment_upgrade_stone,
         WeaponBreakThroughStone = breakthrough_stone,

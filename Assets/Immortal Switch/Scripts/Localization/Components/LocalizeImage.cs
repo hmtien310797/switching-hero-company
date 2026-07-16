@@ -40,6 +40,16 @@ namespace Immortal_Switch.Scripts.Localization.Components
         [Required]
         private Image imgTarget;
 
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (imgTarget == null)
+            {
+                imgTarget = GetComponent<Image>();
+            }
+        }
+#endif
+
         private void Awake()
         {
             if (imgTarget == null)
@@ -50,16 +60,13 @@ namespace Immortal_Switch.Scripts.Localization.Components
 
         private void OnEnable()
         {
-            LocalizationManager.Instance.OnLanguageChanged += OnLanguageChanged;
+            LocalizationManager.OnLanguageChanged += OnLanguageChanged;
             ApplySprite();
         }
 
         private void OnDisable()
         {
-            if (LocalizationManager.Instance != null)
-            {
-                LocalizationManager.Instance.OnLanguageChanged -= OnLanguageChanged;
-            }
+            LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
         private void OnLanguageChanged(string langCode)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -162,10 +163,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         private void BindSummonButtons()
         {
             if (summonButtonA != null)
-                summonButtonA.Init(optionAId, HandleSummonButtonClick);
+                summonButtonA.Init(optionAId, HandleSummonButtonClick, SummonCategory.Weapon);
 
             if (summonButtonB != null)
-                summonButtonB.Init(optionBId, HandleSummonButtonClick);
+                summonButtonB.Init(optionBId, HandleSummonButtonClick, SummonCategory.Weapon);
         }
 
         private void RefreshSummonButtons()

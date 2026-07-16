@@ -204,8 +204,10 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
                 case EShopTab.MonthlyPass:
                 {
+                    // pack_iap subscription rows — cùng RPC iap/pack_purchase với Special, khác
+                    // iap/purchase (pack_diamond) chỉ biết cộng 1 loại tiền.
                     var packs = DatabaseManager.Instance.GetShopPacksSpecial();
-                    _selectedLayout.GetComponent<UIShopMonthlyLayout>().Bind(packs, _onBuyProduct, _onClaim);
+                    _selectedLayout.GetComponent<UIShopMonthlyLayout>().Bind(packs, _onBuyBundleProduct, _onClaim);
                     break;
                 }
 

@@ -8,8 +8,10 @@ using AppleAuth.Native;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
+using Google;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
 using Newtonsoft.Json;
@@ -406,20 +408,23 @@ public class SettingManager : Singleton<SettingManager>
 
     public void Logout()
     {
-        // TODO:
-        // 1. Stop battle / pause gameplay if needed.
-        // 2. Save current user data.
-        // 3. Clear local session token.
-        // 4. Disconnect socket / backend session.
-        // 5. Return to login scene.
-        // 6. Clear runtime cache if needed.
         LogoutAsync().Forget();
-        Debug.Log("[SettingManager] Logout called. This is placeholder logic.");
     }
 
     private async UniTask LogoutAsync()
     {
         await UIManager.Instance.DespawnAllSessionViewsAsync();
+
+        // Đợi request hero/set_lineup (nếu vừa swap hero giữa trận) ghi xong lên server trước
+        // khi dọn battle session — CleanupBattle huỷ session ngay, không chờ request nào đang
+        // chạy nền, nên logout ngay sau khi swap có thể làm mất thay đổi lineup vừa rồi.
+        if (BattleHeroSessionController.Instance != null)
+            await BattleHeroSessionController.Instance.FlushPendingLineupSyncAsync();
+
+        // Tương tự cho skill equip/unequip/replace/auto-equip vừa thao tác — các request này cũng
+        // fire-and-forget nên logout ngay sau khi đổi skill có thể làm mất thay đổi vừa rồi.
+        if (SkillViewDataProvider.Instance != null)
+            await SkillViewDataProvider.Instance.FlushPendingSkillSyncAsync();
 
         //await Transitioner.Instance.TransitionOutWithoutChangingScene(destroyCancellationToken);
         PvEBattleController.Instance.CleanupBattle(true);
@@ -466,6 +471,10 @@ public class SettingManager : Singleton<SettingManager>
     // Chỉ account guest (device) hoặc BD (username/password qua auth/register) mới link được —
     // server enforce qua beforeLinkGoogle/beforeLinkApple (nakama/src/handler/account.js). Android
     // link Google, iOS link Apple; không hỗ trợ nền tảng khác.
+    [Header("Google Sign-In")]
+    [SerializeField]
+    private string googleWebClientId = "546099158752-8bgak6biutovg9ke6qavt2aktstihbdk.apps.googleusercontent.com";
+
     private IAppleAuthManager _appleAuthManager;
 
     public bool IsAccountLinked => UserDataCache.Instance.IsSocialLinked;
@@ -513,6 +522,11 @@ public class SettingManager : Singleton<SettingManager>
             UIManager.Instance.ShowToast($"Liên kết {provider} thành công.");
             return true;
         }
+        catch (OperationCanceledException)
+        {
+            // Người dùng huỷ Google/Apple sign-in — không hiện toast lỗi.
+            return false;
+        }
         catch (ApiResponseException e)
         {
             Debug.LogError($"[SettingManager] LinkAccount failed: {e.StatusCode} {e.Message}");
@@ -529,14 +543,20 @@ public class SettingManager : Singleton<SettingManager>
         }
     }
 
-    /// <summary>
-    /// TODO: project chưa tích hợp Google Play Games / Google Sign-In plugin, nên chưa có cách lấy
-    /// id_token thật trên Android. Khi thêm plugin, thay thân hàm này bằng lệnh gọi SDK thật, giữ
-    /// nguyên chữ ký (trả về id_token dạng string).
-    /// </summary>
-    private UniTask<string> GetGoogleIdTokenAsync()
+    private async UniTask<string> GetGoogleIdTokenAsync()
     {
-        throw new NotSupportedException("Google Sign-In SDK chưa được tích hợp vào project.");
+        GoogleSignIn.Configuration = new GoogleSignInConfiguration
+        {
+            WebClientId = googleWebClientId,
+            RequestIdToken = true,
+            UseGameSignIn = false
+        };
+
+        var user = await GoogleSignIn.DefaultInstance.SignIn();
+        if (user == null)
+            throw new OperationCanceledException("Người dùng huỷ đăng nhập Google.");
+
+        return user.IdToken;
     }
 
     private async UniTask<string> GetAppleIdentityTokenAsync()
@@ -590,10 +610,7 @@ public class SettingManager : Singleton<SettingManager>
 
     private void ApplyLangCode(string langCode)
     {
-        if (LocalizationManager.Instance != null)
-        {
-            LocalizationManager.Instance.SetLanguage(langCode);
-        }
+        LocalizationManager.SetLanguage(langCode);
     }
 
     private void ApplyEventNotiEnabled(bool enabled)

@@ -34,68 +34,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Data
     [Serializable]
     public class SummonRewardItem
     {
-        [HorizontalGroup("Row", 60)]
-        [HideLabel]
-        public SummonRewardType RewardType;
-
-        // ===== Currency =====
-        [ShowIf(nameof(IsCurrency))]
-        [LabelWidth(100)]
-        public CurrencyType CurrencyType;
-
-        // ===== Hero =====
-        [ShowIf(nameof(IsHero))]
-        [LabelWidth(100)]
-        public string HeroId;
-
-        [ShowIf(nameof(IsHero))]
-        [LabelWidth(100)]
-        public SummonRarity HeroRarity;
-
-        // ===== Skill =====
-        [ShowIf(nameof(IsSkill))]
-        [LabelWidth(100)]
-        public string SkillId;
-
-        [ShowIf(nameof(IsSkill))]
-        [LabelWidth(100)]
-        public SkillSummonGrade SkillGrade;
-
-        // ===== Random Hero =====
-        [ShowIf(nameof(IsRandomHero))]
-        [LabelText("Pool Rarity")]
-        public SummonRarity RandomHeroRarity;
-
-        [ShowIf(nameof(IsRandomHero))]
-        [LabelText("Pool Id (optional)")]
-        public string PoolId;
-
-        // ===== Random Skill =====
-        [ShowIf(nameof(IsRandomSkill))]
-        [LabelText("Pool Grade")]
-        public SkillSummonGrade RandomSkillGrade;
-
-        [ShowIf(nameof(IsRandomSkill))]
-        [LabelText("Pool Id (optional)")]
-        public string SkillPoolId;
-
-        // ===== Common =====
-        [LabelWidth(100)]
+        public int ItemId;
         public int Amount;
-
-        public string Description;
-
-        private bool IsCurrency() => RewardType == SummonRewardType.Currency;
-        private bool IsHero() => RewardType == SummonRewardType.Hero;
-        private bool IsSkill() => RewardType == SummonRewardType.Skill;
-        private bool IsRandomHero() => RewardType == SummonRewardType.RandomHero;
-        private bool IsRandomSkill() => RewardType == SummonRewardType.RandomSkill;
     }
 
     [Serializable]
     public class HeroSummonResultEntry
     {
-        public int RollIndex;
         public UnityEngine.Object HeroAsset;
         public string HeroName;
         public bool IsNewHero;
@@ -123,7 +68,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Data
     public class SummonRewardPreviewData
     {
         public int SummonLevel;
-        public SummonRewardItem RewardItem;
+        public int Quantity;
+        public int ItemId;
         public bool IsClaimable;
         public bool IsClaimed;
     }

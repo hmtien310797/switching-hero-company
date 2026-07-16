@@ -50,6 +50,19 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Views.UI
                 return;
             }
 
+            var badwordMatches = IllegalWordDetection.DetectIllegalWords(newName);
+            if (badwordMatches.Count > 0)
+            {
+                foreach (var match in badwordMatches)
+                {
+                    var matchedWord = newName.Substring(match.Key, match.Value);
+                    Debug.LogError($"[UIProfileRenamePopup] Tên \"{newName}\" bị chặn do khớp badword \"{matchedWord}\" tại vị trí {match.Key} (dài {match.Value})");
+                }
+
+                UIManager.Instance.ShowToast("Tên chứa từ ngữ không phù hợp");
+                return;
+            }
+
             RenameAsync(newName).Forget();
         }
 

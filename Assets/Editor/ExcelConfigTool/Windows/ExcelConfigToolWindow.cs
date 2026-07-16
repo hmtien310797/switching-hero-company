@@ -1,45 +1,37 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
+using Editor.ExcelConfigTool.Models;
 using Editor.ExcelConfigTool.Services;
-using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
 namespace Editor.ExcelConfigTool.Windows
 {
-    [Serializable]
-    public class UrlEntry
-    {
-        public string url;
-        public string fileName;
-    }
-
     public class ExcelConfigToolWindow : EditorWindow
     {
         private ExcelConfigToolService _service;
+        private ExcelConfigToolSettings _settings;
         private List<UrlEntry> _entries = new();
-        private string _inputFolder = "Assets/Immortal Switch/GameConfigs/Excel";
-        private string _outputScriptFolder = "Assets/Immortal Switch/GameConfigs/Generated/Scripts";
-        private string _outputAssetFolder = "Assets/Immortal Switch/GameConfigs/Generated/Assets";
+        private string _inputFolder;
+        private string _outputScriptFolder;
+        private string _outputAssetFolder;
         private Vector2 _scrollPos;
         private bool _isRunning;
+        private bool _isCancelling;
+        private CancellationTokenSource _syncCancellation;
 
-        // Sync state machine
         private enum SyncStep
         {
             None,
             Downloading,
             GenerateScripts,
-            WaitCompile,
             GenerateAssets,
-            Done
+            Done,
         }
 
         private SyncStep _syncStep;
-
-        private const string PREFS_KEY = "ExcelConfigTool_Entries";
 
         [MenuItem("Tools/Excel Config Tool")]
         public static void Open()
@@ -50,36 +42,54 @@ namespace Editor.ExcelConfigTool.Windows
         private void OnEnable()
         {
             _service = new ExcelConfigToolService();
-            LoadEntries();
+            LoadSettings();
             EditorApplication.update += OnEditorUpdate;
         }
 
         private void OnDisable()
         {
-            SaveEntries();
+            _syncCancellation?.Cancel();
+            _syncCancellation?.Dispose();
+            _syncCancellation = null;
+            SaveSettings();
             EditorApplication.update -= OnEditorUpdate;
         }
 
-        private void LoadEntries()
+        private void LoadSettings()
         {
-            var raw = EditorPrefs.GetString(PREFS_KEY, "");
-
-            _entries = string.IsNullOrEmpty(raw)
-                ? new List<UrlEntry>()
-                : JsonConvert.DeserializeObject<List<UrlEntry>>(raw) ?? new List<UrlEntry>();
+            _settings = ExcelConfigToolSettingsStore.Load();
+            _entries = _settings.entries ?? new List<UrlEntry>();
+            _inputFolder = _settings.inputFolder;
+            _outputScriptFolder = _settings.outputScriptFolder;
+            _outputAssetFolder = _settings.outputAssetFolder;
         }
 
-        private void SaveEntries()
+        private void SaveSettings()
         {
-            var valid = _entries.Where(e => !string.IsNullOrWhiteSpace(e.url)).ToList();
-            EditorPrefs.SetString(PREFS_KEY, JsonConvert.SerializeObject(valid));
+            if (_settings == null)
+            {
+                return;
+            }
+
+            _settings.entries = _entries;
+            _settings.inputFolder = _inputFolder;
+            _settings.outputScriptFolder = _outputScriptFolder;
+            _settings.outputAssetFolder = _outputAssetFolder;
+            ExcelConfigToolSettingsStore.Save(_settings);
         }
 
         private void OnGUI()
         {
+            EditorGUI.BeginChangeCheck();
             _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
             GUILayout.Label("Excel Config Tool", EditorStyles.boldLabel);
+
+            EditorGUILayout.HelpBox(
+                $"Project settings: {ExcelConfigToolSettingsStore.SETTINGS_PATH}",
+                MessageType.None
+            );
+
             EditorGUILayout.Space(4);
 
             DrawEntryList();
@@ -91,9 +101,9 @@ namespace Editor.ExcelConfigTool.Windows
 
             EditorGUILayout.Space(12);
 
-            GUI.enabled = !_isRunning && _entries.Count > 0;
+            GUI.enabled = !_isRunning && _entries.Any(e => !string.IsNullOrWhiteSpace(e.url));
 
-            if (GUILayout.Button("Sync All (Download → Scripts → Assets)", GUILayout.Height(40)))
+            if (GUILayout.Button("Sync All (Download -> Scripts -> Assets)", GUILayout.Height(40)))
             {
                 SyncAll();
             }
@@ -103,60 +113,152 @@ namespace Editor.ExcelConfigTool.Windows
             if (_isRunning)
             {
                 EditorGUILayout.HelpBox(GetStatusText(), MessageType.Info);
+
+                using (new EditorGUI.DisabledScope(_isCancelling))
+                {
+                    if (GUILayout.Button("Cancel Sync", GUILayout.Height(28)))
+                    {
+                        CancelSync();
+                    }
+                }
             }
             else if (_entries.Count == 0)
             {
-                EditorGUILayout.HelpBox("Thêm URL Google Sheets vào danh sách.", MessageType.Warning);
+                EditorGUILayout.HelpBox("Add at least one Google Sheets CSV URL.", MessageType.Warning);
             }
 
             EditorGUILayout.EndScrollView();
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                SaveSettings();
+            }
         }
 
         private string GetStatusText()
         {
+            if (_isCancelling)
+            {
+                return "Cancelling sync...";
+            }
+
             return _syncStep switch
             {
-                SyncStep.Downloading => "Đang tải CSV từ Google Sheets...",
-                SyncStep.GenerateScripts => "Đang generate scripts...",
-                SyncStep.WaitCompile => "Đang chờ Unity compile...",
-                SyncStep.GenerateAssets => "Đang generate assets...",
-                _ => "Đang xử lý..."
+                SyncStep.Downloading => "Downloading CSV files from Google Sheets...",
+                SyncStep.GenerateScripts => "Generating scripts...",
+                SyncStep.GenerateAssets => "Generating ScriptableObject assets...",
+                _ => "Processing...",
             };
         }
 
-        // ── Sync state machine (chạy trên main thread qua EditorApplication.update) ──
-
         private void SyncAll()
         {
+            var requests = _entries
+                .Select((entry, index) => new DownloadRequest
+                {
+                    SourceIndex = index,
+                    Url = entry.url,
+                })
+                .Where(request => !string.IsNullOrWhiteSpace(request.Url))
+                .ToList();
+
+            if (requests.Count == 0)
+            {
+                EditorUtility.DisplayDialog("Excel Config Tool", "No valid URL was configured.", "OK");
+                return;
+            }
+
+            SaveSettings();
+            _syncCancellation?.Dispose();
+            _syncCancellation = new CancellationTokenSource();
+            _isCancelling = false;
             _isRunning = true;
             _syncStep = SyncStep.Downloading;
             Repaint();
 
-            var force = EditorUtility.DisplayDialog(
+            var forceOverwrite = EditorUtility.DisplayDialog(
                 "Overwrite?",
-                "Ghi đè file CSV đã tồn tại?",
+                "Overwrite existing CSV files?",
                 "Yes, overwrite",
-                "No, skip existing"
+                "No, keep existing"
             );
 
-            DownloadAsync(force);
+            DownloadAsync(requests, forceOverwrite);
         }
 
-        private async void DownloadAsync(bool force)
+        private async void DownloadAsync(
+            IReadOnlyList<DownloadRequest> requests,
+            bool forceOverwrite
+        )
         {
-            var urls = _entries.Select(e => e.url).ToList();
-            var results = await GoogleSheetDownloader.DownloadAllAsync(urls, _inputFolder, force);
-
-            // Cập nhật filename sau khi download (chạy trên ThreadPool, chỉ ghi dữ liệu)
-            for (int i = 0; i < results.Count && i < _entries.Count; i++)
+            try
             {
-                _entries[i].fileName = results[i].FileName;
+                var results = await GoogleSheetDownloader.DownloadAllAsync(
+                    requests,
+                    _inputFolder,
+                    forceOverwrite,
+                    _syncCancellation.Token
+                );
+
+                foreach (var result in results.Where(result => result.IsSuccess))
+                {
+                    if (result.SourceIndex >= 0 &&
+                        result.SourceIndex < _entries.Count)
+                    {
+                        _entries[result.SourceIndex].fileName = result.FileName;
+                    }
+                }
+
+                SaveSettings();
+
+                var failures = results.Where(result => !result.IsSuccess).ToList();
+
+                if (failures.Count > 0)
+                {
+                    StopSync();
+
+                    var details = string.Join(
+                        "\n",
+                        failures.Select(result =>
+                            $"Entry #{result.SourceIndex + 1}: {result.ErrorMessage}"
+                        )
+                    );
+
+                    Debug.LogError(
+                        "[ExcelConfigTool] Sync stopped because one or more downloads failed:\n" +
+                        details
+                    );
+
+                    EditorUtility.DisplayDialog(
+                        "Download failed",
+                        $"Sync was stopped to avoid generating from stale CSV files.\n\n{details}",
+                        "OK"
+                    );
+
+                    return;
+                }
+
+                _syncStep = SyncStep.GenerateScripts;
             }
+            catch (OperationCanceledException) when (
+                _syncCancellation == null ||
+                _syncCancellation.IsCancellationRequested
+            )
+            {
+                Debug.LogWarning("[ExcelConfigTool] Sync cancelled by user.");
+                StopSync();
+            }
+            catch (Exception e)
+            {
+                StopSync();
+                Debug.LogError($"[ExcelConfigTool] Download batch failed:\n{e}");
 
-            SaveEntries();
-
-            // Đánh dấu để main thread xử lý tiếp
-            _syncStep = SyncStep.GenerateScripts;
+                EditorUtility.DisplayDialog(
+                    "Download failed",
+                    "The download batch failed. Check the Console for details.",
+                    "OK"
+                );
+            }
         }
 
         private void OnEditorUpdate()
@@ -166,80 +268,138 @@ namespace Editor.ExcelConfigTool.Windows
                 return;
             }
 
-            switch (_syncStep)
+            if (_syncCancellation?.IsCancellationRequested == true)
             {
-                case SyncStep.GenerateScripts:
-                    _syncStep = SyncStep.WaitCompile;
-                    _service.GenerateScripts(_inputFolder, _outputScriptFolder);
-                    break;
+                Debug.LogWarning("[ExcelConfigTool] Sync cancelled by user.");
+                StopSync();
+                return;
+            }
 
-                case SyncStep.WaitCompile:
-                    if (EditorApplication.isCompiling ||
-                        EditorApplication.isUpdating)
+            try
+            {
+                switch (_syncStep)
+                {
+                    case SyncStep.GenerateScripts:
                     {
-                        return;
+                        var changedScriptCount = _service.GenerateScripts(
+                            _inputFolder,
+                            _outputScriptFolder,
+                            true
+                        );
+
+                        if (changedScriptCount > 0)
+                        {
+                            ExcelConfigSyncCoordinator.ScheduleAssetsAfterScriptReload(
+                                _inputFolder,
+                                _outputAssetFolder
+                            );
+
+                            CompleteSync();
+
+                            // Set the pending session state before requesting a refresh,
+                            // so DidReloadScripts cannot race ahead of the coordinator.
+                            AssetDatabase.Refresh();
+                        }
+                        else
+                        {
+                            _syncStep = SyncStep.GenerateAssets;
+                        }
+
+                        break;
                     }
 
-                    _syncStep = SyncStep.GenerateAssets;
-                    break;
+                    case SyncStep.GenerateAssets:
+                        _service.GenerateOrUpdateAssets(
+                            _inputFolder,
+                            _outputAssetFolder,
+                            true
+                        );
 
-                case SyncStep.GenerateAssets:
-                    _syncStep = SyncStep.Done;
-                    _service.GenerateOrUpdateAssets(_inputFolder, _outputAssetFolder);
-
-                    _isRunning = false;
-                    Repaint();
-                    EditorUtility.DisplayDialog("Done", "Sync hoàn tất!", "OK");
-                    break;
+                        CompleteSync();
+                        Repaint();
+                        EditorUtility.DisplayDialog("Excel Config Tool", "Sync completed.", "OK");
+                        break;
+                }
             }
-
-            if (_syncStep != SyncStep.WaitCompile)
+            catch (Exception e)
             {
-                Repaint();
+                StopSync();
+                Debug.LogError($"[ExcelConfigTool] Sync failed:\n{e}");
+
+                EditorUtility.DisplayDialog(
+                    "Excel Config Tool",
+                    "Sync failed. Check the Console for details.",
+                    "OK"
+                );
             }
+
+            Repaint();
         }
 
-        // ── UI ────────────────────────────────────────────────────────────────
+        private void StopSync()
+        {
+            _syncStep = SyncStep.None;
+            _isRunning = false;
+            _isCancelling = false;
+            _syncCancellation?.Dispose();
+            _syncCancellation = null;
+            Repaint();
+        }
+
+        private void CompleteSync()
+        {
+            _syncStep = SyncStep.Done;
+            _isRunning = false;
+            _isCancelling = false;
+            _syncCancellation?.Dispose();
+            _syncCancellation = null;
+        }
+
+        private void CancelSync()
+        {
+            if (!_isRunning || _isCancelling)
+            {
+                return;
+            }
+
+            _isCancelling = true;
+            _syncCancellation?.Cancel();
+            Repaint();
+        }
 
         private void DrawEntryList()
         {
             GUILayout.Label("URL Entries", EditorStyles.boldLabel);
-            EditorGUILayout.BeginHorizontal();
 
             if (GUILayout.Button("+ Add URL", GUILayout.Width(100)))
             {
                 _entries.Add(new UrlEntry());
-                SaveEntries();
+                SaveSettings();
             }
 
-            EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(4);
 
-            for (int i = 0; i < _entries.Count; i++)
+            for (var i = 0; i < _entries.Count; i++)
             {
                 var entry = _entries[i];
 
                 EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"#{i + 1}", GUILayout.Width(24));
+                entry.url = EditorGUILayout.TextField(entry.url);
 
-                EditorGUILayout.LabelField($"#{i + 1}", GUILayout.Width(20));
+                var displayName = string.IsNullOrEmpty(entry.fileName)
+                    ? "(auto)"
+                    : entry.fileName;
 
-                var newUrl = EditorGUILayout.TextField(entry.url);
-
-                if (newUrl != entry.url)
+                using (new EditorGUI.DisabledScope(true))
                 {
-                    entry.url = newUrl;
-                    SaveEntries();
+                    EditorGUILayout.TextField(displayName, GUILayout.Width(400));
                 }
-
-                var displayName = string.IsNullOrEmpty(entry.fileName) ? "(auto)" : entry.fileName;
-                GUI.enabled = false;
-                EditorGUILayout.TextField(displayName, GUILayout.Width(400));
-                GUI.enabled = true;
 
                 if (GUILayout.Button("x", GUILayout.Width(20)))
                 {
                     _entries.RemoveAt(i);
-                    SaveEntries();
+                    SaveSettings();
                     GUIUtility.ExitGUI();
                 }
 
@@ -254,18 +414,16 @@ namespace Editor.ExcelConfigTool.Windows
 
             if (GUILayout.Button("Select", GUILayout.Width(80)))
             {
-                var selected = EditorUtility.OpenFolderPanel(label, Application.dataPath, "");
+                var selected = EditorUtility.OpenFolderPanel(label, Application.dataPath, string.Empty);
 
-                if (string.IsNullOrWhiteSpace(selected))
+                if (!string.IsNullOrWhiteSpace(selected))
                 {
-                    return;
+                    folder = selected.StartsWith(Application.dataPath, StringComparison.OrdinalIgnoreCase)
+                        ? "Assets" + selected[Application.dataPath.Length..]
+                        : selected;
+
+                    folder = folder.Replace("\\", "/");
                 }
-
-                folder = selected.StartsWith(Application.dataPath)
-                    ? "Assets" + selected[Application.dataPath.Length..]
-                    : selected;
-
-                folder = folder.Replace("\\", "/");
             }
 
             EditorGUILayout.EndHorizontal();

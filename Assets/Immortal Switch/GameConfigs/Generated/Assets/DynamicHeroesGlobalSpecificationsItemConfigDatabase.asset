@@ -17,9 +17,8 @@ MonoBehaviour:
     itemKey: gold
     itemType: Currency
     itemGroup: SoftCurrency
-    itemName: Gold
-    desc: "Soft currency d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p hero, equipment v\xE0
-      mua v\u1EADt ph\u1EA9m th\u01B0\u1EDDng"
+    itemName: ui_item_gold
+    desc: ui_item_gold_decs
     rarity: D
     isCurrency: 1
     isStackable: 1
@@ -32,9 +31,8 @@ MonoBehaviour:
     itemKey: crystal
     itemType: Currency
     itemGroup: PremiumCurrency
-    itemName: Crystal
-    desc: "Premium currency cao c\u1EA5p d\xF9ng cho summon \u0111\u1EB7c bi\u1EC7t
-      v\xE0 shop gi\u1EDBi h\u1EA1n"
+    itemName: ui_item_crystal
+    desc: ui_item_crystal_decs
     rarity: A
     isCurrency: 1
     isStackable: 1
@@ -47,9 +45,8 @@ MonoBehaviour:
     itemKey: diamond
     itemType: Currency
     itemGroup: PremiumCurrency
-    itemName: Diamond
-    desc: "Premium currency d\xF9ng \u0111\u1EC3 summon, mua v\u1EADt ph\u1EA9m hi\u1EBFm
-      v\xE0 t\u0103ng t\u1ED1c ti\u1EBFn tr\xECnh"
+    itemName: ui_item_diamond
+    desc: ui_item_diamond_decs
     rarity: B
     isCurrency: 1
     isStackable: 1
@@ -62,9 +59,8 @@ MonoBehaviour:
     itemKey: energy
     itemType: Currency
     itemGroup: Stamina
-    itemName: Energy
-    desc: "D\xF9ng \u0111\u1EC3 tham gia dungeon, boss challenge v\xE0 activity \u0111\u1EB7c
-      bi\u1EC7t"
+    itemName: ui_item_energy
+    desc: ui_item_energy_decs
     rarity: D
     isCurrency: 1
     isStackable: 1
@@ -77,8 +73,8 @@ MonoBehaviour:
     itemKey: arena_token
     itemType: Currency
     itemGroup: ShopToken
-    itemName: Arena Token
-    desc: "Token nh\u1EADn t\u1EEB Arena PvP d\xF9ng trong Arena Shop"
+    itemName: ui_item_arena_token
+    desc: ui_item_arena_token_decs
     rarity: C
     isCurrency: 1
     isStackable: 1
@@ -91,9 +87,8 @@ MonoBehaviour:
     itemKey: guild_coin
     itemType: Currency
     itemGroup: ShopToken
-    itemName: Guild Coin
-    desc: "Coin nh\u1EADn t\u1EEB Guild Boss v\xE0 Guild Event d\xF9ng trong Guild
-      Shop"
+    itemName: ui_item_guild_coin
+    desc: ui_item_guild_coin_decs
     rarity: C
     isCurrency: 1
     isStackable: 1
@@ -106,9 +101,8 @@ MonoBehaviour:
     itemKey: event_token
     itemType: Currency
     itemGroup: EventCurrency
-    itemName: Event Token
-    desc: "Token gi\u1EDBi h\u1EA1n th\u1EDDi gian d\xF9ng \u0111\u1EC3 \u0111\u1ED5i
-      reward trong Event Shop"
+    itemName: ui_item_event_token
+    desc: ui_item_event_token_decs
     rarity: C
     isCurrency: 1
     isStackable: 1
@@ -121,8 +115,8 @@ MonoBehaviour:
     itemKey: summon_ticket_hero
     itemType: Gacha
     itemGroup: Ticket
-    itemName: Summon Ticket Heroes
-    desc: "V\xE9 summon hero trong banner th\u01B0\u1EDDng"
+    itemName: ui_item_summon_ticket_heroes
+    desc: ui_item_summon_ticket_heroes_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -135,8 +129,8 @@ MonoBehaviour:
     itemKey: summon_ticket_weapon
     itemType: Gacha
     itemGroup: Ticket
-    itemName: Summon Ticket Weapon
-    desc: "V\xE9 summon weapon"
+    itemName: ui_item_summon_ticket_weapon
+    desc: ui_item_summon_ticket_weapon
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -149,8 +143,8 @@ MonoBehaviour:
     itemKey: hero_exp
     itemType: Resource
     itemGroup: HeroGrowth
-    itemName: Hero EXP
-    desc: "T\xE0i nguy\xEAn d\xF9ng \u0111\u1EC3 t\u0103ng level hero"
+    itemName: ui_item_hero_exp
+    desc: ui_item_hero_exp_decs
     rarity: D
     isCurrency: 0
     isStackable: 1
@@ -163,9 +157,8 @@ MonoBehaviour:
     itemKey: hero_fragment
     itemType: Resource
     itemGroup: HeroFragment
-    itemName: Hero Fragment
-    desc: "M\u1EA3nh hero d\xF9ng \u0111\u1EC3 m\u1EDF kh\xF3a ho\u1EB7c n\xE2ng
-      sao hero"
+    itemName: ui_item_hero_fragment
+    desc: ui_item_hero_fragment_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -178,9 +171,8 @@ MonoBehaviour:
     itemKey: epic_hero_fragment
     itemType: Resource
     itemGroup: HeroFragment
-    itemName: Epic Hero Fragment
-    desc: "M\u1EA3nh hero Epic d\xF9ng \u0111\u1EC3 ti\u1EBFn h\xF3a hero c\u1EA5p
-      Epic"
+    itemName: ui_item_epic_hero_fragment
+    desc: ui_item_epic_hero_fragment_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -193,9 +185,8 @@ MonoBehaviour:
     itemKey: legendary_hero_fragment
     itemType: Resource
     itemGroup: HeroFragment
-    itemName: Legendary Hero Fragment
-    desc: "M\u1EA3nh hero Legendary d\xF9ng \u0111\u1EC3 ti\u1EBFn h\xF3a hero cao
-      c\u1EA5p"
+    itemName: ui_item_legendary_hero_fragment
+    desc: ui_item_legendary_hero_fragment_decs
     rarity: A
     isCurrency: 0
     isStackable: 1
@@ -208,8 +199,8 @@ MonoBehaviour:
     itemKey: equipment_upgrade_stone
     itemType: Upgrade
     itemGroup: EquipmentUpgrade
-    itemName: Equipment Upgrade Stone
-    desc: "Nguy\xEAn li\u1EC7u n\xE2ng c\u1EA5p level trang b\u1ECB"
+    itemName: ui_item_equipment_upgrade_stone
+    desc: ui_item_equipment_upgrade_stone_decs
     rarity: D
     isCurrency: 0
     isStackable: 1
@@ -222,8 +213,8 @@ MonoBehaviour:
     itemKey: gear_refinement_stone
     itemType: Upgrade
     itemGroup: EquipmentRefine
-    itemName: Gear Refinement Stone
-    desc: "Nguy\xEAn li\u1EC7u refine ho\u1EB7c enhance trang b\u1ECB"
+    itemName: ui_item_Gear_Refinement_Stone
+    desc: ui_item_Gear_Refinement_Stone_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -236,8 +227,8 @@ MonoBehaviour:
     itemKey: breakthrough_stone
     itemType: Upgrade
     itemGroup: HeroBreakthrough
-    itemName: Breakthrough Stone
-    desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 breakthrough hero"
+    itemName: ui_item_Breakthrough_Stone
+    desc: ui_item_Breakthrough_Stone_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -250,9 +241,8 @@ MonoBehaviour:
     itemKey: transcendence_stone
     itemType: Upgrade
     itemGroup: HeroTranscendence
-    itemName: Transcendence Stone
-    desc: "V\u1EADt ph\u1EA9m d\xF9ng \u0111\u1EC3 transcend hero \u1EDF c\u1EA5p
-      cao"
+    itemName: ui_item_Transcendence_Stone
+    desc: ui_item_Transcendence_Stone_decs
     rarity: A
     isCurrency: 0
     isStackable: 1
@@ -265,8 +255,8 @@ MonoBehaviour:
     itemKey: equipment_chest
     itemType: Equipment
     itemGroup: Chest
-    itemName: Equipment Chest
-    desc: "R\u01B0\u01A1ng ch\u1EE9a trang b\u1ECB ng\u1EABu nhi\xEAn"
+    itemName: ui_item_Equipment_Chest
+    desc: ui_item_Equipment_Chest_decs
     rarity: D
     isCurrency: 0
     isStackable: 1
@@ -279,8 +269,8 @@ MonoBehaviour:
     itemKey: rare_equipment_chest
     itemType: Equipment
     itemGroup: Chest
-    itemName: Rare Equipment Chest
-    desc: "R\u01B0\u01A1ng ch\u1EE9a trang b\u1ECB Rare ho\u1EB7c cao h\u01A1n"
+    itemName: ui_item_Rare_Equipment_Chest
+    desc: ui_item_Rare_Equipment_Chest_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -293,8 +283,8 @@ MonoBehaviour:
     itemKey: epic_equipment_chest
     itemType: Equipment
     itemGroup: Chest
-    itemName: Epic Equipment Chest
-    desc: "R\u01B0\u01A1ng ch\u1EE9a trang b\u1ECB Epic ho\u1EB7c cao h\u01A1n"
+    itemName: ui_item_Epic_Equipment_Chest
+    desc: ui_item_Epic_Equipment_Chest_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -307,8 +297,8 @@ MonoBehaviour:
     itemKey: legendary_equipment_chest
     itemType: Equipment
     itemGroup: Chest
-    itemName: Legendary Equipment Chest
-    desc: "R\u01B0\u01A1ng ch\u1EE9a trang b\u1ECB Legendary"
+    itemName: ui_item_Legendary_Equipment_Chest
+    desc: ui_item_Legendary_Equipment_Chest_decs
     rarity: A
     isCurrency: 0
     isStackable: 1
@@ -321,8 +311,8 @@ MonoBehaviour:
     itemKey: dungeon_key
     itemType: Dungeon
     itemGroup: EntryTicket
-    itemName: Dungeon Key
-    desc: "Ch\xECa kh\xF3a d\xF9ng \u0111\u1EC3 v\xE0o dungeon \u0111\u1EB7c bi\u1EC7t"
+    itemName: ui_item_Dungeon_Key
+    desc: ui_item_Dungeon_Key_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -335,8 +325,8 @@ MonoBehaviour:
     itemKey: boss_challenge_ticket
     itemType: Dungeon
     itemGroup: EntryTicket
-    itemName: Boss Challenge Ticket
-    desc: "V\xE9 d\xF9ng \u0111\u1EC3 tham gia Boss Challenge"
+    itemName: ui_item_Boss_Challenge_Ticket
+    desc: ui_item_Boss_Challenge_Ticket_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -349,8 +339,8 @@ MonoBehaviour:
     itemKey: event_dice
     itemType: Event
     itemGroup: EventTool
-    itemName: Event Dice
-    desc: "X\xFAc x\u1EAFc d\xF9ng trong mini game event board"
+    itemName: ui_item_Event_Dice
+    desc: ui_item_Event_Dice_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -363,8 +353,8 @@ MonoBehaviour:
     itemKey: bingo_ticket
     itemType: Event
     itemGroup: EventTool
-    itemName: Bingo Ticket
-    desc: "Ticket d\xF9ng \u0111\u1EC3 m\u1EDF \xF4 trong Bingo Event"
+    itemName: ui_item_Bingo_Ticket
+    desc: ui_item_Bingo_Ticket_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -377,8 +367,8 @@ MonoBehaviour:
     itemKey: treasure_map
     itemType: Event
     itemGroup: EventTool
-    itemName: Treasure Map
-    desc: "V\u1EADt ph\u1EA9m d\xF9ng \u0111\u1EC3 m\u1EDF Treasure Hunt Event"
+    itemName: ui_item_Treasure_Map
+    desc: ui_item_Treasure_Map_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -391,8 +381,8 @@ MonoBehaviour:
     itemKey: gold_chest
     itemType: Shop
     itemGroup: Chest
-    itemName: Gold Chest
-    desc: "R\u01B0\u01A1ng m\u1EDF ra nh\u1EADn Gold"
+    itemName: ui_item_Gold_Chest
+    desc: ui_item_Gold_Chest_decs
     rarity: D
     isCurrency: 0
     isStackable: 1
@@ -405,8 +395,8 @@ MonoBehaviour:
     itemKey: diamond_chest
     itemType: Shop
     itemGroup: Chest
-    itemName: Diamond Chest
-    desc: "R\u01B0\u01A1ng m\u1EDF ra nh\u1EADn Diamond"
+    itemName: ui_item_Diamond_Chest
+    desc: ui_item_Diamond_Chest_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -419,8 +409,8 @@ MonoBehaviour:
     itemKey: resource_pack
     itemType: Shop
     itemGroup: Pack
-    itemName: Resource Pack
-    desc: "G\xF3i ch\u1EE9a nhi\u1EC1u t\xE0i nguy\xEAn n\xE2ng c\u1EA5p"
+    itemName: ui_item_Resource_Pack
+    desc: ui_item_Resource_Pack_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -433,8 +423,8 @@ MonoBehaviour:
     itemKey: pet_egg
     itemType: Pet
     itemGroup: PetGacha
-    itemName: Pet Egg
-    desc: "Tr\u1EE9ng pet m\u1EDF ra pet h\u1ED7 tr\u1EE3 chi\u1EBFn \u0111\u1EA5u"
+    itemName: ui_item_Pet_Egg
+    desc: ui_item_Pet_Egg_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -447,8 +437,8 @@ MonoBehaviour:
     itemKey: pet_upgrade_food
     itemType: Pet
     itemGroup: PetUpgrade
-    itemName: Pet Upgrade Food
-    desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p pet"
+    itemName: ui_item_Pet_Upgrade_Food
+    desc: ui_item_Pet_Upgrade_Food_decs
     rarity: D
     isCurrency: 0
     isStackable: 1
@@ -461,8 +451,8 @@ MonoBehaviour:
     itemKey: relic_fragment
     itemType: Relic
     itemGroup: RelicFragment
-    itemName: Relic Fragment
-    desc: "M\u1EA3nh relic d\xF9ng \u0111\u1EC3 m\u1EDF kh\xF3a relic"
+    itemName: ui_item_Relic_Fragment
+    desc: ui_item_Relic_Fragment_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -475,8 +465,8 @@ MonoBehaviour:
     itemKey: relic_upgrade_stone
     itemType: Relic
     itemGroup: RelicUpgrade
-    itemName: Relic Upgrade Stone
-    desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p relic"
+    itemName: ui_item_Relic_Upgrade_Stone
+    desc: ui_item_Relic_Upgrade_Stone_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -489,8 +479,8 @@ MonoBehaviour:
     itemKey: monster_card
     itemType: MonsterCard
     itemGroup: Card
-    itemName: Monster Card
-    desc: "Th\u1EBB monster d\xF9ng \u0111\u1EC3 m\u1EDF kh\xF3a passive bonus"
+    itemName: ui_item_Monster_Card
+    desc: ui_item_Monster_Card_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -503,8 +493,8 @@ MonoBehaviour:
     itemKey: monster_essence
     itemType: MonsterCard
     itemGroup: CardUpgrade
-    itemName: Monster Essence
-    desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p monster card"
+    itemName: ui_item_Monster_Essence
+    desc: ui_item_Monster_Essence_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -517,8 +507,8 @@ MonoBehaviour:
     itemKey: artifact_fragment
     itemType: Artifact
     itemGroup: ArtifactFragment
-    itemName: Artifact Fragment
-    desc: "M\u1EA3nh artifact d\xF9ng \u0111\u1EC3 m\u1EDF kh\xF3a artifact"
+    itemName: ui_item_Artifact_Fragment
+    desc: ui_item_Artifact_Fragment_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -531,8 +521,8 @@ MonoBehaviour:
     itemKey: artifact_upgrade_core
     itemType: Artifact
     itemGroup: ArtifactUpgrade
-    itemName: Artifact Upgrade Core
-    desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 n\xE2ng c\u1EA5p artifact"
+    itemName: ui_item_Artifact_Upgrade_Core
+    desc: ui_item_Artifact_Upgrade_Core_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -545,8 +535,8 @@ MonoBehaviour:
     itemKey: resource_coin
     itemType: Event
     itemGroup: LeaderboardCurrency
-    itemName: Resource Coin
-    desc: "Currency d\xF9ng trong event leaderboard"
+    itemName: ui_item_Resource_Coin
+    desc: ui_item_Resource_Coin_decs
     rarity: C
     isCurrency: 1
     isStackable: 1
@@ -559,8 +549,8 @@ MonoBehaviour:
     itemKey: roulette_ticket
     itemType: Event
     itemGroup: EventTicket
-    itemName: Roulette Ticket
-    desc: "V\xE9 d\xF9ng \u0111\u1EC3 quay v\xF2ng quay may m\u1EAFn"
+    itemName: ui_item_Roulette_Ticket
+    desc: ui_item_Roulette_Ticket_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -573,8 +563,8 @@ MonoBehaviour:
     itemKey: offline_reward_chest
     itemType: Idle
     itemGroup: Chest
-    itemName: Offline Reward Chest
-    desc: "R\u01B0\u01A1ng ph\u1EA7n th\u01B0\u1EDFng idle khi offline"
+    itemName: ui_item_Offline_Reward_Chest
+    desc: ui_item_Offline_Reward_Chest_decs
     rarity: D
     isCurrency: 0
     isStackable: 1
@@ -587,9 +577,8 @@ MonoBehaviour:
     itemKey: quick_loot_ticket
     itemType: Idle
     itemGroup: Ticket
-    itemName: Quick Loot Ticket
-    desc: "V\xE9 d\xF9ng \u0111\u1EC3 nh\u1EADn nhanh ph\u1EA7n th\u01B0\u1EDFng
-      idle"
+    itemName: ui_item_Quick_Loot_Ticket
+    desc: ui_item_Quick_Loot_Ticket_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -602,9 +591,8 @@ MonoBehaviour:
     itemKey: awakening_fruit
     itemType: Resource
     itemGroup: HeroAwaken
-    itemName: Awakening Fruit
-    desc: "Nguy\xEAn li\u1EC7u d\xF9ng \u0111\u1EC3 awaken hero, nh\u1EADn t\u1EEB
-      H\u1EA7m Kim C\u01B0\u01A1ng"
+    itemName: ui_item_Awakening_Fruit
+    desc: ui_item_Awakening_Fruit_decs
     rarity: A
     isCurrency: 0
     isStackable: 1
@@ -617,9 +605,8 @@ MonoBehaviour:
     itemKey: weapon_ore
     itemType: Upgrade
     itemGroup: WeaponUpgrade
-    itemName: Weapon Ore
-    desc: "Nguy\xEAn li\u1EC7u n\xE2ng c\u1EA5p v\u0169 kh\xED, nh\u1EADn t\u1EEB
-      H\u1EA7m Trang B\u1ECB"
+    itemName: ui_item_Weapon_Ore
+    desc: ui_item_Weapon_Ore_decs
     rarity: D
     isCurrency: 0
     isStackable: 1
@@ -632,9 +619,8 @@ MonoBehaviour:
     itemKey: weapon_gem
     itemType: Upgrade
     itemGroup: WeaponUpgrade
-    itemName: Weapon Gem
-    desc: "Nguy\xEAn li\u1EC7u c\u01B0\u1EDDng h\xF3a v\u0169 kh\xED, nh\u1EADn t\u1EEB
-      H\u1EA7m Trang B\u1ECB"
+    itemName: ui_item_Weapon_Gem
+    desc: ui_item_Weapon_Gem_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -647,9 +633,8 @@ MonoBehaviour:
     itemKey: weapon_essence
     itemType: Upgrade
     itemGroup: WeaponUpgrade
-    itemName: Weapon Essence
-    desc: "Nguy\xEAn li\u1EC7u tinh luy\u1EC7n v\u0169 kh\xED c\u1EA5p cao, nh\u1EADn
-      t\u1EEB H\u1EA7m Trang B\u1ECB"
+    itemName: ui_item_Weapon_Essence
+    desc: ui_item_Weapon_Essence_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -662,8 +647,8 @@ MonoBehaviour:
     itemKey: summon_ticket_skill
     itemType: Gacha
     itemGroup: Ticket
-    itemName: Summon Ticket Skill
-    desc: "V\xE9 summon skill trong banner th\u01B0\u1EDDng"
+    itemName: ui_item_Summon_Ticket_Skill
+    desc: ui_item_Summon_Ticket_Skill_decs
     rarity: C
     isCurrency: 0
     isStackable: 1
@@ -676,8 +661,8 @@ MonoBehaviour:
     itemKey: summon_ticket_hero_banner
     itemType: Gacha
     itemGroup: Ticket
-    itemName: Summon Ticket hero banner
-    desc: "V\xE9 summon hero trong banner event"
+    itemName: ui_item_Summon_Ticket_hero_banner
+    desc: ui_item_Summon_Ticket_hero_banner_decs
     rarity: B
     isCurrency: 0
     isStackable: 1
@@ -690,8 +675,8 @@ MonoBehaviour:
     itemKey: user_exp
     itemType: Resource
     itemGroup: HeroGrowth
-    itemName: User EXP
-    desc: "T\xE0i nguy\xEAn d\xF9ng \u0111\u1EC3 t\u0103ng level cho user"
+    itemName: ui_item_User_EXP
+    desc: ui_item_User_EXP_decs
     rarity: D
     isCurrency: 0
     isStackable: 1
@@ -699,4 +684,46 @@ MonoBehaviour:
     useType: Consume
     iconKey: icon_user_exp
     sortOrder: 48
+    status: Active
+  - itemId: 49
+    itemKey: lucky_wheel_ticket_silver
+    itemType: Event
+    itemGroup: EventTool
+    itemName: ui_item_Lucky_Wheel_Ticket_Silver
+    desc: ui_item_Lucky_Wheel_Ticket_Silver_decs
+    rarity: C
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 999999
+    useType: Consume
+    iconKey: icon_lucky_wheel_ticket_silver
+    sortOrder: 49
+    status: Active
+  - itemId: 50
+    itemKey: lucky_wheel_ticket_gold
+    itemType: Event
+    itemGroup: EventTool
+    itemName: ui_item_Lucky_Wheel_Ticket_Gold
+    desc: ui_item_Lucky_Wheel_Ticket_Gold_decs
+    rarity: A
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 999999
+    useType: Consume
+    iconKey: icon_lucky_wheel_ticket_gold
+    sortOrder: 50
+    status: Active
+  - itemId: 51
+    itemKey: lucky_wheel_point
+    itemType: Event
+    itemGroup: EventTool
+    itemName: ui_item_Lucky_Wheel_Point
+    desc: ui_item_Lucky_Wheel_Point_decs
+    rarity: B
+    isCurrency: 0
+    isStackable: 1
+    maxStack: 999999
+    useType: Consume
+    iconKey: icon_lucky_wheel_point
+    sortOrder: 51
     status: Active

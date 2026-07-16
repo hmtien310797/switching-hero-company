@@ -35,6 +35,11 @@ namespace Immortal_Switch.Scripts.Shared
             return configShopDb.rows;
         }
 
+        public DynamicHeroesGlobalSpecificationsProductIdRow GetProduct(int productId)
+        {
+            return productDb.rows.FirstOrDefault(v => v.iD == productId);
+        }
+
         /// <summary>Toàn bộ product khai báo trong bảng product_id — dùng để đăng ký catalog cho
         /// Unity IAP lúc khởi tạo (IAPManager).</summary>
         public List<DynamicHeroesGlobalSpecificationsProductIdRow> GetAllProducts()

@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
+﻿using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using TMPro;
 using UnityEngine;
@@ -25,9 +26,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         [Header("Claim")]
         [SerializeField] private Button claimButton;
         [SerializeField] private MonoBehaviour rewardReceiverBehaviour;
-
-        [Header("Visual Config")]
-        [SerializeField] private SummonRewardVisualConfigSO rewardVisualConfig;
 
         [Header("Alpha")]
         [SerializeField] private float claimableAlpha = 1f;
@@ -56,7 +54,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         private void Bind(SummonRewardPreviewData data)
         {
-            if (data == null || data.RewardItem == null)
+            if (data == null || data.ItemId == null)
             {
                 if (amountText != null)
                     amountText.text = string.Empty;
@@ -72,13 +70,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             }
 
             if (amountText != null)
-                amountText.text = data.RewardItem.Amount.ToString();
+                amountText.text = data.Quantity.ToString();
 
             if (rewardIcon != null)
             {
-                var visual = rewardVisualConfig != null ? rewardVisualConfig.Get(data.RewardItem) : null;
-                rewardIcon.sprite = visual != null ? visual.Icon : null;
-                rewardIcon.color = visual != null ? visual.Tint : Color.white;
+                var visual = DatabaseManager.Instance.ItemDb.LoadIconByItemId(data.ItemId);
+                rewardIcon.sprite = visual != null ? visual : null;
                 rewardIcon.enabled = rewardIcon.sprite != null;
             }
 
@@ -111,9 +108,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
             }
 
-            bool claimed = rewardReceiver.ClaimReward(currentPreviewData.SummonLevel, rewardReceiver, category);
-            if (!claimed)
-                return;
+            rewardReceiver.ClaimReward(currentPreviewData.SummonLevel, rewardReceiver, category);
 
             Refresh();
         }

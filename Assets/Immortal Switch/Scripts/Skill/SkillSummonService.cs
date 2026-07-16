@@ -247,13 +247,14 @@ namespace Immortal_Switch.Scripts.Skill
             return new SummonRewardPreviewData
             {
                 SummonLevel = entry.SummonLevel,
-                RewardItem = entry.RewardItems[0],
+                ItemId = entry.RewardItems[0].ItemId,
+                Quantity = entry.RewardItems[0].Amount,
                 IsClaimable = IsRewardClaimable(entry.SummonLevel),
                 IsClaimed = IsRewardClaimed(entry.SummonLevel)
             };
         }
 
-        public SummonLevelRewardEntry GetPreviewRewardEntry()
+        private SummonLevelRewardEntry GetPreviewRewardEntry()
         {
             if (config == null || config.LevelRewards == null || config.LevelRewards.Count == 0)
                 return null;

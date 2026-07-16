@@ -25,11 +25,27 @@ namespace Immortal_Switch.Scripts.Items
 
             foreach (var entry in rsp.Items)
             {
-                _runtime.Items.Add(new ItemData(entry.ItemId, entry.Quantity));
+                if (int.TryParse(entry.ItemId, out var itemId))
+                {
+                    _runtime.Items[itemId] = new ItemData(itemId, entry.Quantity);
+                }
             }
         }
 
-        public List<ItemData> GetItems()
+        public BigNumber GetQuantity(int itemId)
+        {
+            foreach (var item in _runtime.Items)
+            {
+                if (item.Key == itemId)
+                {
+                    return item.Value.Quantity;
+                }
+            }
+
+            return 0;
+        }
+
+        public Dictionary<int, ItemData> GetAllItem()
         {
             return _runtime.Items;
         }

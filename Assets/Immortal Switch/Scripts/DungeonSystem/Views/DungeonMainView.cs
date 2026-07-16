@@ -16,20 +16,27 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 {
     public class DungeonMainView : AnimatedUIView
     {
-        [Header("View references")] [SerializeField]
+        [Header("View references")]
+        [SerializeField]
         private Image bgImg;
 
-        [SerializeField] private Button btnChallenge;
+        [SerializeField]
+        private Button btnChallenge;
 
-        [Header("Button references")] [SerializeField]
+        [Header("Button references")]
+        [SerializeField]
         private List<UIDungeonBtn> btnDungeons;
 
-        [Header("Reward references")] [SerializeField]
+        [Header("Reward references")]
+        [SerializeField]
         private UIItemSlot rewardPrefab;
 
-        [SerializeField] private RectTransform rewardContainer;
+        [SerializeField]
+        private RectTransform rewardContainer;
 
-        [SerializeField] [Range(0f, 1f)] private float rewardScale;
+        [SerializeField]
+        [Range(0f, 1f)]
+        private float rewardScale;
 
         // --- Private Fields ---
         private List<UIItemSlot> _slots = new();
@@ -57,14 +64,23 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             // ticketOwned is a shared balance across all dungeons, not per-dungeon — it comes from
             // state.TicketBalance regardless of whether this specific dungeonKey has an info entry.
             var ticketRequired = info != null ? info.TicketRequest : DatabaseManager.Instance.GetDungeonTicketRequest(dungeonId);
+
             //set 500 for test, expect info.highestStageCleard is alway available
-            var startIdx       = Mathf.Clamp(info?.HighestStageCleared ?? 0, 0, Mathf.Max(0, 500 - 1));
+            var startIdx = Mathf.Clamp(info?.HighestStageCleared ?? 0, 0, Mathf.Max(0, 500 - 1));
             var maxStage = startIdx + 1;
-            var ticketOwned    = (int)state.TicketBalance;
+            var ticketOwned = (int)state.TicketBalance;
 
             var ui = await UIManager.Instance.OpenPopupAsync<DungeonView>();
             var title = DatabaseManager.Instance.GetDungeonTitle(dungeonId);
-            ui.Bind(dungeonId, ticketOwned, ticketRequired, title, startIdx, maxStage, OnClickStart, OnStageChangedAsync);
+            var visual = DatabaseManager.Instance.DungeonVisualDb.Get(dungeonId);
+
+            ui.Bind(
+                visual?.banner, dungeonId,
+                ticketOwned, ticketRequired,
+                title, startIdx, maxStage,
+                OnClickStart,
+                OnStageChangedAsync
+            );
         }
 
         private IReadOnlyList<ItemRewardData> OnStageChangedAsync(int dungeonId, int stageIdx)
@@ -146,6 +162,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
                     clone.transform.localScale = Vector3.one * rewardScale;
 
                     clone.gameObject.SetActive(true);
+
                     clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background,
                         entry.TierInfo.tierIcon);
                 }
@@ -156,6 +173,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
                     clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background,
                         entry.TierInfo.tierIcon);
+
                     _slots.Add(clone);
                 }
             }

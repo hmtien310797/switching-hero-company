@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
@@ -16,6 +17,8 @@ using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Shop.Views;
 using Immortal_Switch.Scripts.StageSelection;
 using Immortal_Switch.Scripts.Tutorial;
@@ -49,6 +52,12 @@ namespace Immortal_Switch.Scripts.UI
 
         [SerializeField]
         private Button btnEvent;
+
+        [SerializeField]
+        private Button btnGoldInfo;
+
+        [SerializeField]
+        private Button btnDiamondInfo;
 
         [SerializeField]
         CurrencyView currencyView;
@@ -106,13 +115,13 @@ namespace Immortal_Switch.Scripts.UI
         [Header("Hero Icon Switch Animation")]
         [SerializeField]
         private Image[] iconHeroImage;
-        
+
         [SerializeField]
         private Image[] iconHeroClassImage;
 
         [SerializeField]
         private RectTransform[] heroIconAnchors;
-        
+
         [SerializeField]
         private RectTransform[] heroClassIconAnchors;
 
@@ -158,6 +167,9 @@ namespace Immortal_Switch.Scripts.UI
             TutorialManager.Instance.OnClick += OnClickTutorial;
             Instance = this;
 
+            btnDiamondInfo.onClick.AddListener(OnClickDiamondInfo);
+            btnGoldInfo.onClick.AddListener(OnClickGoldInfo);
+
             btnEvent.onClick.AddListener(OnClickEvent);
             btnShop.onClick.AddListener(OnClickShop);
             btnBag.onClick.AddListener(OnClickBag);
@@ -170,6 +182,26 @@ namespace Immortal_Switch.Scripts.UI
             drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Draw Calls Count");
             batchesRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
             setPassCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "SetPass Calls Count");
+        }
+
+        private void OnClickDiamondInfo()
+        {
+            ShowItemInfo(ItemIdConstants.DIAMOND);
+        }
+
+        private void OnClickGoldInfo()
+        {
+            ShowItemInfo(ItemIdConstants.GOLD);
+        }
+
+        private void ShowItemInfo(int itemId)
+        {
+            UIManager.Instance
+                .OpenPopupAsync<PopupItemInfoView>(new PopupItemInfoArgs
+                {
+                    ItemId = itemId,
+                })
+                .Forget();
         }
 
         private void OnClickEvent()
@@ -187,7 +219,9 @@ namespace Immortal_Switch.Scripts.UI
         // response — dừng đếm ngay khi đã đủ ngưỡng, không cần tick tiếp cho tới lần reset kế.
         private void UpdateAfkClaimTimer()
         {
-            if (!afkTimerSynced || btnActiveFramingClaim == null || btnActiveFramingClaim.interactable)
+            if (!afkTimerSynced ||
+                btnActiveFramingClaim == null ||
+                btnActiveFramingClaim.interactable)
             {
                 return;
             }
@@ -227,7 +261,9 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             AfkClaimResponse preview = await service.PreviewRewardAsync();
-            if (preview == null || !preview.Success)
+
+            if (preview == null ||
+                !preview.Success)
             {
                 return;
             }
@@ -310,7 +346,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnClickBag()
         {
-            var items = ItemsManager.Instance.GetItems();
+            var items = ItemsManager.Instance.GetAllItem().Values.ToList();
             UIManager.Instance.TogglePopupAsync<BagView>(items, false).Forget();
         }
 
@@ -360,7 +396,9 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             AfkClaimResponse preview = await service.PreviewRewardAsync();
-            if (preview == null || !preview.Success)
+
+            if (preview == null ||
+                !preview.Success)
             {
                 Debug.LogWarning("[TopMainView] afk/preview failed — not opening popup.");
                 return;
@@ -369,15 +407,15 @@ namespace Immortal_Switch.Scripts.UI
             // Luôn mở popup khi call thành công, kể cả chưa đủ MIN_CLAIM_SECONDS (has_reward=false) —
             // vẫn hiển thị elapsed_seconds/rewards thật (có thể là 0), thay vì im lặng không phản
             // hồi gì khiến nút trông như bị đứng.
-            var stageRewards  = PvEBattleController.Instance.GetStageRuntimeData().BaseRewards;
+            var stageRewards = PvEBattleController.Instance.GetStageRuntimeData().BaseRewards;
             var earnedRewards = StageRewardConverter.FromRewardDtos(preview.Rewards);
 
             UIManager.Instance
                 .OpenPopupAsync<AFKRewardView>(new AFKRewardArgs
                 {
-                    OnClaim        = OnClickClaim,
-                    Rewards        = stageRewards,
-                    EarnedRewards  = earnedRewards,
+                    OnClaim = OnClickClaim,
+                    Rewards = stageRewards,
+                    EarnedRewards = earnedRewards,
                     ElapsedSeconds = preview.ElapsedSeconds,
                 }, false)
                 .Forget();
@@ -404,7 +442,8 @@ namespace Immortal_Switch.Scripts.UI
 
             // afk/claim luôn reset checkpoint phía server kể cả khi has_reward=false
             // (xem writeAfkState trong nakama/src/handler/afk.js) — đồng bộ lại bộ đếm cục bộ về 0.
-            if (response != null && response.Success)
+            if (response != null &&
+                response.Success)
             {
                 SyncAfkAccumulatedSeconds(0d);
             }
@@ -482,9 +521,11 @@ namespace Immortal_Switch.Scripts.UI
 
             if (switchMainSubHeroButton != null)
             {
-                switchMainSubHeroButton.onClick.RemoveListener(
-                    OnSwitchMainSubHeroButtonClicked);
+                switchMainSubHeroButton.onClick.RemoveListener(OnSwitchMainSubHeroButtonClicked);
             }
+
+            btnDiamondInfo.onClick.RemoveListener(OnClickDiamondInfo);
+            btnGoldInfo.onClick.RemoveListener(OnClickGoldInfo);
         }
 
         public void SetHeroSkeletonAnimationGraphic(HeroDataSO heroData)
@@ -571,18 +612,21 @@ namespace Immortal_Switch.Scripts.UI
                 currentGameObject.SetActive(result);
             }
         }
-        
+
         private void OnHeroDied(HeroActor actor)
         {
             heroDeadCount++;
+
             if (heroDeadCount > 1)
             {
                 return;
             }
+
             if (actor.IsChosen)
             {
                 OnSwitchMainSubHeroButtonClicked();
             }
+
             switchMainSubHeroButton.interactable = false;
         }
 
@@ -600,7 +644,7 @@ namespace Immortal_Switch.Scripts.UI
 
             RectTransform iconHero1 = iconHeroImage[0].rectTransform;
             RectTransform iconHero2 = iconHeroImage[1].rectTransform;
-            
+
             RectTransform iconHeroClass1 = iconHeroClassImage[0].rectTransform;
             RectTransform iconHeroClass2 = iconHeroClassImage[1].rectTransform;
 
@@ -611,7 +655,7 @@ namespace Immortal_Switch.Scripts.UI
             RectTransform hero2TargetAnchor = isHeroIconSwapped
                 ? heroIconAnchors[0]
                 : heroIconAnchors[1];
-            
+
             RectTransform hero1ClassTargetAnchor = isHeroIconSwapped
                 ? heroClassIconAnchors[1]
                 : heroClassIconAnchors[0];
@@ -619,7 +663,7 @@ namespace Immortal_Switch.Scripts.UI
             RectTransform hero2ClassTargetAnchor = isHeroIconSwapped
                 ? heroClassIconAnchors[0]
                 : heroClassIconAnchors[1];
-            
+
             MoveHeroIcon(
                 iconIndex: 0,
                 iconRect: iconHero1, iconHeroClass1,
@@ -668,7 +712,7 @@ namespace Immortal_Switch.Scripts.UI
                 ConvertWorldScaleToLocalScale(
                     iconRect.parent,
                     targetWorldScale);
-            
+
             Vector3 targetClassLocalScaleInCurrentParent =
                 ConvertWorldScaleToLocalScale(
                     iconClassRect.parent,
@@ -680,7 +724,7 @@ namespace Immortal_Switch.Scripts.UI
                 iconRect
                     .DOMove(targetWorldPosition, heroIconSwitchDuration)
                     .SetEase(Ease.Linear));
-            
+
             sequence.Join(
                 iconClassRect
                     .DOMove(targetClassWorldPosition, heroIconSwitchDuration)
@@ -692,7 +736,7 @@ namespace Immortal_Switch.Scripts.UI
                         targetLocalScaleInCurrentParent,
                         heroIconSwitchDuration)
                     .SetEase(Ease.Linear));
-            
+
             sequence.Join(
                 iconClassRect
                     .DOScale(

@@ -5,6 +5,29 @@ namespace Immortal_Switch.Scripts.Shared.Helper
 {
     public static class DateTimeHelper
     {
+        /// <summary>
+        /// lay ra thoi gian con lai
+        /// </summary>
+        /// <param name="now">thoi gian hien tai can check</param>
+        /// <param name="endTime">thoi gian ket thuc</param>
+        /// <returns>-1 neu endtime khong dung format, tra ve tong giay con lai</returns>
+        public static double CalculateRemainTime(DateTime now, string endTime)
+        {
+            const string FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+            if (!DateTime.TryParseExact(
+                    endTime,
+                    FORMAT,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var end))
+            {
+                return -1;
+            }
+
+            return (end - now).TotalSeconds;
+        }
+
         public static bool InTime(DateTime now, string startTime, string endTime)
         {
             const string FORMAT = "yyyy-MM-dd HH:mm:ss";

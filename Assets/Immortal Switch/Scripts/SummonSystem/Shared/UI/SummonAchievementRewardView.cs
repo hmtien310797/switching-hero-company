@@ -30,9 +30,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         [SerializeField] private Transform itemRoot;
         [SerializeField] private SummonAchievementRewardItemUI itemPrefab;
 
-        [Header("Reward Visual")]
-        [SerializeField] private SummonRewardVisualConfigSO rewardVisualConfig;
-
         [SerializeField] private Button closeButton;
 
         private SimpleUIPool<SummonAchievementRewardItemUI> itemPool;
@@ -120,8 +117,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
                     return HeroSummonAchievementRewardBuilder.BuildHeroic(
                         HeroSummonManager.Instance.Config,
-                        HeroSummonManager.Instance.SaveData,
-                        rewardVisualConfig
+                        HeroSummonManager.Instance.SaveData
                     );
                 }
 
@@ -132,8 +128,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
                     return SkillSummonAchievementRewardBuilder.BuildSkill(
                         SkillSummonManager.Instance.Config,
-                        SkillSummonManager.Instance.SaveData,
-                        rewardVisualConfig
+                        SkillSummonManager.Instance.SaveData
                     );
                 }
 
@@ -144,8 +139,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
                     return WeaponSummonAchievementRewardBuilder.BuildWeapon(
                         WeaponSummonManager.Instance.Config,
-                        WeaponSummonManager.Instance.SaveData,
-                        rewardVisualConfig
+                        WeaponSummonManager.Instance.SaveData
                     );
                 }
 

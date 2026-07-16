@@ -199,6 +199,14 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
                 uIWeaponClassTabItems[i].Bind(tabs[i], OnSelectClassTab);
             }
         }
+        
+        private float GetScaledWeaponStatValue(float baseValue, int level)
+        {
+            if (level <= 1)
+                return baseValue;
+
+            return baseValue * (1f + (level - 1) * 0.05f);
+        }
 
         private void BindStandardItems(List<StandardWeaponCardViewModel> items)
         {

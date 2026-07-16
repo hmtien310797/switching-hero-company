@@ -1,4 +1,5 @@
 using System.Linq;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 
 namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
@@ -7,8 +8,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
     {
         public static SummonAchievementRewardListData BuildHeroic(
             HeroSummonConfigSO config,
-            HeroSummonSaveData saveData,
-            SummonRewardVisualConfigSO rewardVisualConfig)
+            HeroSummonSaveData saveData)
         {
             var result = new SummonAchievementRewardListData
             {
@@ -30,7 +30,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                     continue;
 
                 var reward = entry.RewardItems[0];
-                var visual = rewardVisualConfig != null ? rewardVisualConfig.Get(reward) : null;
 
                 bool isClaimed = saveData != null && saveData.ClaimedRewardLevels.Contains(entry.SummonLevel);
 
@@ -38,8 +37,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 {
                     Level = entry.SummonLevel,
                     Title = $"Summon Level {entry.SummonLevel}",
-                    RewardText = BuildRewardText(reward, visual),
-                    RewardIcon = visual != null ? visual.Icon : null,
+                    RewardText = BuildRewardText(reward),
+                    RewardIcon = DatabaseManager.Instance.ItemDb.LoadIconByItemId(reward.ItemId),
                     State = isClaimed
                         ? SummonAchievementRewardState.Claimed
                         : SummonAchievementRewardState.Normal
@@ -49,33 +48,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             return result;
         }
 
-        private static string BuildRewardText(SummonRewardItem reward, RewardVisualEntry visual)
+        private static string BuildRewardText(SummonRewardItem reward)
         {
             if (reward == null)
                 return string.Empty;
 
-            switch (reward.RewardType)
-            {
-                case SummonRewardType.Currency:
-                {
-                    string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
-                        ? visual.DisplayName
-                        : reward.CurrencyType.ToString();
-
-                    return $"{name} x{reward.Amount}";
-                }
-
-                case SummonRewardType.RandomHero:
-                {
-                    string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
-                        ? visual.DisplayName
-                        : $"Random {reward.HeroRarity} Hero";
-
-                    return $"{name} x{reward.Amount}";
-                }
-            }
-
-            return reward.Description;
+            return "chưa có key";
         }
     }
 }

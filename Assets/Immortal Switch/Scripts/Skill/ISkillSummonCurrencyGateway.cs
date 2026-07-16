@@ -19,7 +19,7 @@ namespace Immortal_Switch.Scripts.Skill
     {
         public BigNumber GetSkillTicket()
         {
-            return CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.SkillTicket);
+            return CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.summon_ticket_skill);
         }
 
         public BigNumber GetGem()
@@ -29,7 +29,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public bool CanSpendSkillTicket(BigNumber amount)
         {
-            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.SkillTicket, amount);
+            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.summon_ticket_skill, amount);
         }
 
         public bool CanSpendGem(BigNumber amount)
@@ -39,7 +39,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public void SpendSkillTicket(BigNumber amount)
         {
-            CurrencyLedgerService.Instance.TrySpend(CurrencyType.SkillTicket, amount, CurrencyTransactionReason.SummonSkill);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.summon_ticket_skill, amount, CurrencyTransactionReason.SummonSkill);
         }
 
         public void SpendGem(BigNumber amount)

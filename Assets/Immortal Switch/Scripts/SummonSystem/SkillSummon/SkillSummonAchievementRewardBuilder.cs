@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 
@@ -8,8 +9,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
     {
         public static SummonAchievementRewardListData BuildSkill(
             SkillSummonConfigSO config,
-            SkillSummonSaveData saveData,
-            SummonRewardVisualConfigSO rewardVisualConfig)
+            SkillSummonSaveData saveData)
         {
             var result = new SummonAchievementRewardListData
             {
@@ -31,7 +31,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                     continue;
 
                 var reward = entry.RewardItems[0];
-                var visual = rewardVisualConfig != null ? rewardVisualConfig.Get(reward) : null;
 
                 bool isClaimed = saveData != null && saveData.ClaimedRewardLevels.Contains(entry.SummonLevel);
 
@@ -39,8 +38,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 {
                     Level = entry.SummonLevel,
                     Title = $"Summon Level {entry.SummonLevel}",
-                    RewardText = BuildRewardText(reward, visual),
-                    RewardIcon = visual != null ? visual.Icon : null,
+                    RewardText = BuildRewardText(reward),
+                    RewardIcon = DatabaseManager.Instance.ItemDb.LoadIconByItemId(reward.ItemId),
                     State = isClaimed
                         ? SummonAchievementRewardState.Claimed
                         : SummonAchievementRewardState.Normal
@@ -50,42 +49,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             return result;
         }
 
-        private static string BuildRewardText(SummonRewardItem reward, RewardVisualEntry visual)
+        private static string BuildRewardText(SummonRewardItem reward)
         {
             if (reward == null)
                 return string.Empty;
 
-            switch (reward.RewardType)
-            {
-                case SummonRewardType.Currency:
-                {
-                    string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
-                        ? visual.DisplayName
-                        : reward.CurrencyType.ToString();
-
-                    return $"{name} x{reward.Amount}";
-                }
-
-                case SummonRewardType.RandomSkill:
-                {
-                    string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
-                        ? visual.DisplayName
-                        : $"Random {reward.RandomSkillGrade} Skill";
-
-                    return $"{name} x{reward.Amount}";
-                }
-
-                case SummonRewardType.Skill:
-                {
-                    string name = visual != null && !string.IsNullOrEmpty(visual.DisplayName)
-                        ? visual.DisplayName
-                        : $"Skill {reward.SkillId}";
-
-                    return $"{name} x{reward.Amount}";
-                }
-            }
-
-            return reward.Description;
+            return "chưa có key";
         }
     }
 }

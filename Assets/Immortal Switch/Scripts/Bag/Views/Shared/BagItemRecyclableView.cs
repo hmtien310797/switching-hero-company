@@ -27,14 +27,12 @@ namespace Immortal_Switch.Scripts.Bag.Views.Shared
                 : Array.Empty<GameObject>();
 
         // --- Private Fields ---
-        private List<ItemData> _items = new();
-        private Func<int, ItemRewardData> _onResolveItem;
+        private Func<int, ItemData> _onResolveItem;
 
-        public void Bind(List<ItemData> items, int itemsCount, Func<int, ItemRewardData> onResolveItem)
+        public void Bind(int itemsCount, Func<int, ItemData> onResolveItem)
         {
             var isChanged = itemsCount != ItemsCount;
 
-            _items = items;
             _onResolveItem = onResolveItem;
             ItemsCount = itemsCount;
 
@@ -121,13 +119,7 @@ namespace Immortal_Switch.Scripts.Bag.Views.Shared
 
             if (data != null)
             {
-                ui.Bind(
-                    data.ItemIcon,
-                    data.TierInfo.border,
-                    data.TierInfo.background,
-                    data.TierInfo.tierIcon,
-                    data.Quantity
-                );
+                ui.Bind(data.ItemId, data.Quantity);
             }
         }
     }

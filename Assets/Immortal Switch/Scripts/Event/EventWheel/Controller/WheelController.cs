@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Event.EventWheel.UI;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
@@ -12,32 +14,60 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
         private List<UIEventWheelSegment> segments;
 
         [SerializeField]
-        [Range(0f, 360f)]
-        private float rotateDuration = 1f;
+        private RectTransform rotate;
 
         [SerializeField]
-        private int extraTurnsAfterResult = 1;
+        private RectTransform vfx;
+
+        [SerializeField]
+        [Range(0f, 360f)]
+        private float rotateDuration = 1f;
 
         // --- Public Fields ---
         public bool IsSpinning { get; private set; }
 
         // --- Private Fields ---
-        private Tweener _tweener;
+        private Tweener _spinTweener;
+        private Tweener _vfxTweener;
+        private Vector3 _orgWheelLocalPos;
+
         private float SegmentAngle => 360f / segments.Count;
+
+        private void Awake()
+        {
+            _orgWheelLocalPos = vfx.localPosition;
+        }
 
         private void OnEnable()
         {
-            BuildSegments();
+            KillTweens();
         }
 
-        private void BuildSegments()
+        public void Bind(List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow> rows)
         {
             var segmentCount = segments.Count;
 
             for (int i = 0; i < segmentCount; i++)
             {
-                segments[i].transform.localRotation = Quaternion.Euler(0f, 0f, SegmentAngle * i);
-                segments[i].BindCommon(i + 1, i % 2 == 0);
+                var segment = segments[i];
+                segment.transform.localRotation = Quaternion.Euler(0f, 0f, SegmentAngle * i);
+
+                if (rows.Count > i)
+                {
+                    var reward = rows[i];
+                    var itemDisplay = DatabaseManager.Instance.GetDisplayData(reward.itemId);
+
+                    if (itemDisplay != null)
+                    {
+                        segment.Bind(itemDisplay.ItemIcon,
+                            itemDisplay.TierInfo.border,
+                            itemDisplay.TierInfo.background,
+                            itemDisplay.TierInfo.tierIcon
+                        );
+
+                        segment.BindCommon(reward.amount, i % 2 == 0);
+                    }
+                }
             }
         }
 
@@ -48,16 +78,17 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
             IsSpinning = true;
 
             // Quay theo chiều kim đồng hồ.
-            _tweener = transform
+            _spinTweener = rotate
                 .DOLocalRotate(
-                    new Vector3(0f, 0f, -360f),
+                    Vector3.back * 360f,
                     rotateDuration,
-                    RotateMode.LocalAxisAdd)
-                .SetEase(Ease.Linear)
+                    RotateMode.LocalAxisAdd
+                )
+                .SetEase(Ease.InCubic)
                 .SetLoops(-1, LoopType.Incremental);
         }
 
-        public void StopAt(int targetIndex, Action onCompleted = null)
+        public void StopAt(int targetIndex, bool force = false, Action onCompleted = null)
         {
             var segmentCount = segments.Count;
 
@@ -68,69 +99,74 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
                 return;
             }
 
-            _tweener?.Kill();
-            _tweener = null;
+            _spinTweener?.Kill();
+            _spinTweener = null;
 
-            float currentZ = NormalizeAngle(transform.localEulerAngles.z);
+            float currentZ = NormalizeAngle(rotate.localEulerAngles.z);
 
-            // Góc tâm của target trên sprite/wheel.
+            // Segment được xếp ngược kim đồng hồ (+Z), nên để đưa target
+            // về kim chỉ thì góc đích của wheel phải mang dấu âm.
             float targetSegmentAngle = targetIndex * SegmentAngle;
-            float desiredZ = NormalizeAngle(targetSegmentAngle);
 
-            // Khoảng cách cần quay theo chiều kim đồng hồ.
-            float clockwiseDistance = Mathf.Repeat(
-                currentZ - desiredZ,
-                360f
-            );
-
-            /*
-             * Nếu target đã gần kim vàng dưới 1 segment (36°),
-             * không dừng ngay vì sẽ bị giật.
-             *
-             * Phải cộng 360°, không cộng 36°.
-             * Cộng 36° sẽ làm lệch sang segment kế tiếp.
-             */
-            if (clockwiseDistance < SegmentAngle)
+            if (!force)
             {
-                clockwiseDistance += 360f;
-            }
+                float desiredZ = NormalizeAngle(-targetSegmentAngle);
 
-            clockwiseDistance += extraTurnsAfterResult * 360f;
+                // Khoảng cách cần quay theo chiều kim đồng hồ.
+                float clockwiseDistance = Mathf.Repeat(
+                    currentZ - desiredZ,
+                    360f
+                );
 
-            // Chiều kim đồng hồ là giảm góc Z.
-            float finalZ = currentZ - clockwiseDistance;
-
-            float currentSpeed = 360f / rotateDuration;
-
-            /*
-             * Ease.OutCubic có vận tốc đầu xấp xỉ:
-             * 3 * distance / duration.
-             *
-             * Chọn duration như dưới giúp vận tốc đầu lúc giảm tốc
-             * gần với vận tốc đang quay đều, tránh khựng.
-             */
-            float stopDuration = 3f * clockwiseDistance / currentSpeed;
-            stopDuration = Mathf.Clamp(stopDuration, 1.5f, 6f);
-
-            _tweener = transform
-                .DOLocalRotate(
-                    new Vector3(0f, 0f, finalZ),
-                    stopDuration,
-                    RotateMode.FastBeyond360)
-                .SetEase(Ease.OutCubic)
-                .OnComplete(() =>
+                // Không dừng ngay nếu target vừa nằm sát phía trước kim.
+                if (clockwiseDistance < SegmentAngle)
                 {
-                    IsSpinning = false;
+                    clockwiseDistance += 360f;
+                }
 
-                    // Chuẩn hóa rotation để tránh số góc quá lớn sau nhiều lần quay.
-                    transform.localRotation = Quaternion.Euler(
-                        0f,
-                        0f,
-                        NormalizeAngle(finalZ)
-                    );
+                // LocalAxisAdd nhận delta. Clockwise luôn là Z âm.
+                float finalZ = -Mathf.Abs(clockwiseDistance);
 
-                    onCompleted?.Invoke();
-                });
+                float currentSpeed = 360f / rotateDuration;
+
+                /*
+                 * Ease.OutCubic có vận tốc đầu xấp xỉ:
+                 * 3 * distance / duration.
+                 *
+                 * Chọn duration như dưới giúp vận tốc đầu lúc giảm tốc
+                 * gần với vận tốc đang quay đều, tránh khựng.
+                 */
+                float stopDuration = 3f * clockwiseDistance / currentSpeed;
+                stopDuration = Mathf.Clamp(stopDuration, 1.5f, 6f);
+
+                _spinTweener = rotate
+                    .DOLocalRotate(
+                        new Vector3(0f, 0f, finalZ),
+                        stopDuration,
+                        RotateMode.LocalAxisAdd
+                    )
+                    .SetEase(Ease.OutCubic)
+                    .OnComplete(() =>
+                    {
+                        IsSpinning = false;
+
+                        ShowVfx(targetIndex);
+                        onCompleted?.Invoke();
+                    });
+            }
+            else
+            {
+                IsSpinning = false;
+
+                rotate.localRotation = Quaternion.Euler(
+                    0f,
+                    0f,
+                    -targetSegmentAngle
+                );
+
+                ShowVfx(targetIndex);
+                onCompleted?.Invoke();
+            }
         }
 
         private static float NormalizeAngle(float angle)
@@ -138,10 +174,41 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
             return Mathf.Repeat(angle, 360f);
         }
 
+        private void ShowVfx(int targetIndex)
+        {
+            if (segments.Count > targetIndex)
+            {
+                _vfxTweener?.Kill();
+                vfx.gameObject.SetActive(true);
+                vfx.SetParent(segments[targetIndex].Segment);
+                vfx.SetAsFirstSibling();
+
+                vfx.localPosition = _orgWheelLocalPos;
+
+                _vfxTweener = vfx
+                    .DOLocalRotate(
+                        Vector3.forward * 360f,
+                        rotateDuration,
+                        RotateMode.FastBeyond360
+                    )
+                    .SetEase(Ease.Linear)
+                    .SetLoops(-1, LoopType.Incremental);
+            }
+            else
+            {
+                Debug.LogError($"[WheelController] WinIdx: {targetIndex} > {segments.Count}");
+            }
+        }
+
         private void KillTweens()
         {
-            _tweener?.Kill();
-            _tweener = null;
+            vfx.gameObject.SetActive(false);
+
+            _vfxTweener?.Kill();
+            _vfxTweener = null;
+
+            _spinTweener?.Kill();
+            _spinTweener = null;
         }
 
         private void OnDestroy()

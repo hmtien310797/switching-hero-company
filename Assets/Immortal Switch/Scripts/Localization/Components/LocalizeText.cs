@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -20,6 +21,16 @@ namespace Immortal_Switch.Scripts.Localization.Components
         // --- Private Fields ---
         private LocalizedString _localizedString;
 
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (txtLabel == null)
+            {
+                txtLabel = GetComponent<TextMeshProUGUI>();
+            }
+        }
+#endif
+
         private void Awake()
         {
             if (txtLabel == null)
@@ -37,6 +48,7 @@ namespace Immortal_Switch.Scripts.Localization.Components
 
             _localizedString = new LocalizedString(LocalizationManager.TABLE_NAME, localizationKey);
             _localizedString.StringChanged += OnStringChanged;
+            _localizedString.RefreshString();
         }
 
         private void OnDisable()
@@ -75,6 +87,7 @@ namespace Immortal_Switch.Scripts.Localization.Components
 
             _localizedString = new LocalizedString(LocalizationManager.TABLE_NAME, key);
             _localizedString.StringChanged += OnStringChanged;
+            _localizedString.RefreshString();
         }
     }
 }

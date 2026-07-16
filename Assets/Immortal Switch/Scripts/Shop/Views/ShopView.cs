@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Shop.IAP;
 using Immortal_Switch.Scripts.Shop.Views.UI;
 using Immortal_Switch.Scripts.UI;
@@ -130,8 +131,10 @@ namespace Immortal_Switch.Scripts.Shop.Views
             tabVertical.Bind(tab, OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
             tabHorizontal.Bind(tab, OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
 
-            // Re-sync điểm/milestone GloryPass mỗi lần mở Shop — tránh lệch nếu tích nạp ở phiên khác.
+            // Re-sync điểm/milestone GloryPass và ngày/claimed Monthly Pass mỗi lần mở Shop — tránh
+            // lệch nếu tích nạp/qua ngày mới ở phiên khác.
             ShopManager.Instance.SyncRechargeStateAsync().Forget();
+            ShopManager.Instance.SyncMonthlyPassStateAsync().Forget();
         }
 
         private void OnChangeTab(EShopTab tab)
@@ -192,11 +195,28 @@ namespace Immortal_Switch.Scripts.Shop.Views
                 return;
             }
 
-            var rewards = DatabaseManager.Instance.GetPackMonthly(packId, currentDay);
+            ClaimMonthlyPassAsync(packId).Forget();
+        }
 
-            // TODO: show popup reward
+        /// <summary>Gọi monthlypass/claim — server tự suy ngày từ purchased_at (nguồn sự thật, có
+        /// thể lệch với bộ đếm cache dùng để hiện nút) rồi cộng thưởng thật; sau khi thành công,
+        /// sync lại monthlypass/state để current_day/claimed trong ShopManager luôn khớp server.</summary>
+        private async UniTaskVoid ClaimMonthlyPassAsync(int packId)
+        {
+            try
+            {
+                var response = await NakamaClient.Instance.MonthlyPassClaimAsync(packId);
 
-            ShopManager.Instance.ClaimMonthlyPassDay(packId, currentDay);
+                await ShopManager.Instance.SyncMonthlyPassStateAsync();
+                CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
+                PopupRewardService.Show(DatabaseManager.Instance.GetPackMonthly(packId, response.Day));
+
+                Debug.Log($"[ShopView] MonthlyPass claimed: pack={packId} day={response.Day}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[ShopView] Claim MonthlyPass thất bại -> pack={packId}: {ex.Message}");
+            }
         }
 
         /// <summary>Gọi recharge/claim — server tự kiểm tra lại số lượt tích nạp trong tháng hiện tại
@@ -234,10 +254,6 @@ namespace Immortal_Switch.Scripts.Shop.Views
                     // gói IAP special (có limit)
                     ShopManager.Instance.RecordPurchase(packId);
                 }
-                else if (packId is PackIdConstants.ID_MONTHLY_NORMAL or PackIdConstants.ID_MONTHLY_PREMIUM)
-                {
-                    ShopManager.Instance.PurchaseMonthlyPass(packId);
-                }
                 else
                 {
                     // gói kim cương (topup) — server đã cộng điểm tích nạp trong iap/purchase,
@@ -261,6 +277,14 @@ namespace Immortal_Switch.Scripts.Shop.Views
 
                 ShopManager.Instance.RecordPurchase(packId);
                 ShopManager.Instance.SyncRechargeStateAsync().Forget();
+
+                if (packId is PackIdConstants.ID_MONTHLY_NORMAL or PackIdConstants.ID_MONTHLY_PREMIUM)
+                {
+                    // gói Monthly Pass (pack_iap subscription) — server vừa cộng thưởng tức thời +
+                    // (re)bắt đầu chu kỳ 30 ngày, sync lại monthlypass/state để current_day/claimed
+                    // trong ShopManager phản ánh đúng ngay.
+                    ShopManager.Instance.SyncMonthlyPassStateAsync().Forget();
+                }
             });
         }
     }

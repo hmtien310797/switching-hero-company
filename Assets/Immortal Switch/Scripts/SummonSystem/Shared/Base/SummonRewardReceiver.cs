@@ -18,30 +18,30 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
             if (rewardItem == null)
                 return;
 
-            switch (rewardItem.RewardType)
-            {
-                case SummonRewardType.Currency:
-                    GrantCurrency(rewardItem);
-                    break;
-
-                case SummonRewardType.RandomHero:
-                    GrantRandomHero(rewardItem);
-                    break;
-                
-                case SummonRewardType.RandomSkill:
-                    for (int i = 0; i < rewardItem.Amount; i++)
-                    {
-                        var skill = SkillSummonManager.Instance.Service.GetRandomSkillByGrade(rewardItem.RandomSkillGrade);
-                        if (skill == null)
-                        {
-                            Debug.LogWarning($"No skill found for grade {rewardItem.RandomSkillGrade}");
-                            continue;
-                        }
-
-                        SkillSummonManager.Instance.Service.ProgressionService.AcquireOrAddDuplicate(skill, 1);
-                    }
-                    break;
-            }
+            // switch (rewardItem.RewardType)
+            // {
+            //     case SummonRewardType.Currency:
+            //         GrantCurrency(rewardItem);
+            //         break;
+            //
+            //     case SummonRewardType.RandomHero:
+            //         GrantRandomHero(rewardItem);
+            //         break;
+            //     
+            //     case SummonRewardType.RandomSkill:
+            //         // for (int i = 0; i < rewardItem.Amount; i++)
+            //         // {
+            //         //     var skill = SkillSummonManager.Instance.Service.GetRandomSkillByGrade(rewardItem.RandomSkillGrade);
+            //         //     if (skill == null)
+            //         //     {
+            //         //         Debug.LogWarning($"No skill found for grade {rewardItem.RandomSkillGrade}");
+            //         //         continue;
+            //         //     }
+            //         //
+            //         //     SkillSummonManager.Instance.Service.ProgressionService.AcquireOrAddDuplicate(skill, 1);
+            //         // }
+            //         break;
+            // }
         }
 
         public SummonRewardPreviewData GetRewardPreviewData(SummonCategory summonCategory)
@@ -59,29 +59,23 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
             }
         }
 
-        public bool ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver, SummonCategory summonCategory)
+        public async UniTask ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver, SummonCategory summonCategory)
         {
-            bool claimed;
             switch (summonCategory)
             {
                 case SummonCategory.Hero:
-                    claimed = HeroSummonManager.Instance.ClaimReward(summonLevel, rewardReceiver);
-                    if (claimed) PersistClaimOnServerAsync(summonLevel, summonCategory).Forget();
-                    return claimed;
+                    await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    break;
                 case SummonCategory.Skill:
-                    claimed = SkillSummonManager.Instance.ClaimReward(summonLevel, rewardReceiver);
-                    if (claimed) PersistClaimOnServerAsync(summonLevel, summonCategory).Forget();
-                    return claimed;
+                    await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    break;
                 case SummonCategory.Weapon:
-                    claimed = WeaponSummonManager.Instance.ClaimReward(summonLevel, rewardReceiver);
-                    if (claimed) PersistClaimOnServerAsync(summonLevel, summonCategory).Forget();
-                    return claimed;
-                default:
-                    return false;
+                    await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    break;
             }
         }
 
-        private async UniTaskVoid PersistClaimOnServerAsync(int summonLevel, SummonCategory category)
+        private async UniTask PersistClaimOnServerAsync(int summonLevel, SummonCategory category)
         {
             try
             {
@@ -101,9 +95,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 
                 if (result.CurrencyBalances != null)
                 {
-                    CurrencyManager.Instance.Set(CurrencyType.HeroTicket,   result.CurrencyBalances.HeroTicket);
-                    CurrencyManager.Instance.Set(CurrencyType.SkillTicket,  result.CurrencyBalances.SkillTicket);
-                    CurrencyManager.Instance.Set(CurrencyType.WeaponTicket, result.CurrencyBalances.WeaponTicket);
+                    CurrencyManager.Instance.Set(CurrencyType.summon_ticket_hero,   result.CurrencyBalances.HeroTicket);
+                    CurrencyManager.Instance.Set(CurrencyType.summon_ticket_skill,  result.CurrencyBalances.SkillTicket);
+                    CurrencyManager.Instance.Set(CurrencyType.summon_ticket_weapon, result.CurrencyBalances.WeaponTicket);
                     CurrencyManager.Instance.Set(CurrencyType.diamond,      result.CurrencyBalances.Diamond);
                 }
 
@@ -128,33 +122,34 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 
         private void GrantCurrency(SummonRewardItem rewardItem)
         {
-            CurrencyLedgerService.Instance.AddOrMergeIncome(
-                rewardItem.CurrencyType,
-                rewardItem.Amount,
-                CurrencyTransactionReason.Summon
-            );
+            // đồng bộ trên server
+            // CurrencyLedgerService.Instance.AddOrMergeIncome(
+            //     rewardItem.ItemId,
+            //     rewardItem.Amount,
+            //     CurrencyTransactionReason.Summon
+            // );
         }
 
         private void GrantRandomHero(SummonRewardItem rewardItem)
         {
-            if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
-                return;
-
-            for (int i = 0; i < rewardItem.Amount; i++)
-            {
-                var hero = HeroSummonManager.Instance.Service.GetRandomHeroByRarity(rewardItem.HeroRarity);
-                if (hero == null)
-                {
-                    Debug.LogWarning($"No hero found for rarity {rewardItem.HeroRarity}");
-                    continue;
-                }
-
-                bool alreadyOwned = HeroProgressionManager.Instance.Service.HasHero(hero.Id);
-                if (alreadyOwned)
-                    HeroProgressionManager.Instance.AddShardToHero(hero, 1, true);
-                else
-                    HeroProgressionManager.Instance.AcquireHeroIfNeeded(hero);
-            }
+            // if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
+            //     return;
+            //
+            // for (int i = 0; i < rewardItem.Amount; i++)
+            // {
+            //     var hero = HeroSummonManager.Instance.Service.GetRandomHeroByRarity(rewardItem.HeroRarity);
+            //     if (hero == null)
+            //     {
+            //         Debug.LogWarning($"No hero found for rarity {rewardItem.HeroRarity}");
+            //         continue;
+            //     }
+            //
+            //     bool alreadyOwned = HeroProgressionManager.Instance.Service.HasHero(hero.Id);
+            //     if (alreadyOwned)
+            //         HeroProgressionManager.Instance.AddShardToHero(hero, 1, true);
+            //     else
+            //         HeroProgressionManager.Instance.AcquireHeroIfNeeded(hero);
+            // }
         }
     }
 }

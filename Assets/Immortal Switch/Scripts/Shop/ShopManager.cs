@@ -18,6 +18,10 @@ namespace Immortal_Switch.Scripts.Shop
         /// đã nhận, không lưu local (xem <see cref="SyncRechargeStateAsync"/>).</summary>
         public RechargeStateResponse RechargeState { get; private set; }
 
+        /// <summary>Kết quả monthlypass/state gần nhất — nguồn sự thật cho trạng thái mua/nhận
+        /// thưởng ngày của Monthly Pass, không lưu local (xem <see cref="SyncMonthlyPassStateAsync"/>).</summary>
+        public MonthlyPassStateResponse MonthlyPassState { get; private set; }
+
         /// <summary>Fire khi purchase count hoặc recharge state thay đổi (mua mới, reset, hoặc sync lại từ server).</summary>
         public event Action OnDataChanged;
 
@@ -31,6 +35,7 @@ namespace Immortal_Switch.Scripts.Shop
             Service.CheckAndReset();
             SubscribeEvents();
             await SyncRechargeStateAsync();
+            await SyncMonthlyPassStateAsync();
         }
 
         protected override void OnDestroy()
@@ -97,40 +102,43 @@ namespace Immortal_Switch.Scripts.Shop
             OnDataChanged?.Invoke();
         }
 
-        // ── Monthly Pass ──────────────────────────────────────────────────────
+        // ── Monthly Pass (monthlypass/state — server là nguồn sự thật) ────────
 
+        /// <summary>Đã mua monthly pass packId chưa (còn trong hạn drip_days ngày), theo
+        /// monthlypass/state — không đếm/lưu local nữa vì server tự tính hạn từ purchased_at.</summary>
         public bool IsMonthlyPassPurchased(int packId)
         {
-            return Service.IsMonthlyPassPurchased(packId);
+            return MonthlyPassState?.Passes?.Find(p => p.Id == packId)?.IsPurchased ?? false;
         }
 
-        public DateTime? GetMonthlyPassPurchaseDate(int packId)
-        {
-            return Service.GetMonthlyPassPurchaseDate(packId);
-        }
-
-        /// <summary>Ngày hiện tại tính từ lúc mua (1-based).</summary>
+        /// <summary>Ngày hiện tại tính từ lúc mua (1-based), 0 nếu chưa mua hoặc đã hết hạn.</summary>
         public int GetMonthlyPassCurrentDay(int packId)
         {
-            return Service.GetMonthlyPassCurrentDay(packId);
+            return MonthlyPassState?.Passes?.Find(p => p.Id == packId)?.CurrentDay ?? 0;
         }
 
         public bool IsMonthlyPassDayClaimed(int packId, int day)
         {
-            return Service.IsMonthlyPassDayClaimed(packId, day);
+            var pass = MonthlyPassState?.Passes?.Find(p => p.Id == packId);
+            return pass?.Days?.Find(d => d.Day == day)?.IsClaimed ?? false;
         }
 
-        public void ClaimMonthlyPassDay(int packId, int day)
+        /// <summary>Gọi monthlypass/state và cache lại — dùng khi login (InitializeAsync) và sau mỗi
+        /// lần mua/nhận thưởng Monthly Pass, để trạng thái luôn khớp server thay vì đếm local.</summary>
+        public async UniTask<bool> SyncMonthlyPassStateAsync()
         {
-            Service.ClaimMonthlyPassDay(packId, day);
-            OnDataChanged?.Invoke();
-        }
+            try
+            {
+                MonthlyPassState = await NakamaClient.Instance.MonthlyPassStateAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[ShopManager] monthlypass/state RPC failed: {e.Message}");
+                return false;
+            }
 
-        /// <summary>Ghi nhận giao dịch mua monthly pass.</summary>
-        public void PurchaseMonthlyPass(int packId)
-        {
-            Service.PurchaseMonthlyPass(packId);
             OnDataChanged?.Invoke();
+            return true;
         }
 
         // ── Internal ──────────────────────────────────────────────────────────

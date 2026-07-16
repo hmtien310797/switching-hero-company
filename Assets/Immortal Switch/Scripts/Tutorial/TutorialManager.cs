@@ -323,13 +323,8 @@ namespace Immortal_Switch.Scripts.Tutorial
                 OnClosePopupReward();
                 return;
             }
-
-            UIManager.Instance.OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
-                {
-                    Rewards = rewards,
-                    OnClose = OnClosePopupReward,
-                }, false)
-                .Forget();
+            
+            PopupRewardService.Show(rewards, OnClosePopupReward);
 
             return;
 

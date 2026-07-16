@@ -59,7 +59,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             if (txtShard != null)
                 txtShard.text = shardText;
             
-            equippedMark.gameObject.SetActive(isEquipped);
+            if(equippedMark != null)
+                equippedMark.gameObject.SetActive(isEquipped);
 
             if (lockedMask != null)
                 lockedMask.SetActive(isLocked);

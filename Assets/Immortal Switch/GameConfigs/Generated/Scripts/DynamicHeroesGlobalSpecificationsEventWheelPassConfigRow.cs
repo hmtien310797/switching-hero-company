@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated row data from CSV: DynamicHeroes-GlobalSpecifications-event_wheel_pass_config
+    /// Auto generated row data from CSV: Dynamic Heroes - Global Specifications - event_wheel_pass_config
     /// </summary>
     [Serializable]
     public class DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow
@@ -30,14 +30,14 @@ namespace Game.Configs.Generated
         public int spinRequired;
 
         /// <summary>
-        /// CSV Column: free_diamond
+        /// CSV Column: free_item
         /// </summary>
-        public int freeDiamond;
+        public string freeItem;
 
         /// <summary>
-        /// CSV Column: paid_diamond
+        /// CSV Column: paid_item
         /// </summary>
-        public int paidDiamond;
+        public string paidItem;
 
         /// <summary>
         /// CSV Column: is_big_node

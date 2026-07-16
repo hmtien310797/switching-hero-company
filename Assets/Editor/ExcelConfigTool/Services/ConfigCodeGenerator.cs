@@ -9,28 +9,47 @@ namespace Editor.ExcelConfigTool.Services
     {
         private const string GENERATED_NAMESPACE = "Game.Configs.Generated";
 
-        public static void GenerateScripts(
+        public static int GenerateScripts(
             string outputScriptFolder,
             IReadOnlyList<ConfigSheetInfo> sheets
         )
         {
             Directory.CreateDirectory(outputScriptFolder);
+            var changedFileCount = 0;
 
             foreach (var sheet in sheets)
             {
                 var rowCode = GenerateRowClass(sheet);
                 var databaseCode = GenerateDatabaseClass(sheet);
 
-                File.WriteAllText(
+                changedFileCount += WriteIfChanged(
                     Path.Combine(outputScriptFolder, $"{sheet.RowClassName}.cs"),
                     rowCode
-                );
+                )
+                    ? 1
+                    : 0;
 
-                File.WriteAllText(
+                changedFileCount += WriteIfChanged(
                     Path.Combine(outputScriptFolder, $"{sheet.DatabaseClassName}.cs"),
                     databaseCode
-                );
+                )
+                    ? 1
+                    : 0;
             }
+
+            return changedFileCount;
+        }
+
+        private static bool WriteIfChanged(string path, string content)
+        {
+            if (File.Exists(path) &&
+                File.ReadAllText(path) == content)
+            {
+                return false;
+            }
+
+            File.WriteAllText(path, content);
+            return true;
         }
 
         private static string GenerateRowClass(ConfigSheetInfo sheet)

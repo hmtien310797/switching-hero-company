@@ -57,6 +57,25 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public event Action OnDataChanged;
         private UserDataCache userDataCache;
 
+        // Trận vừa xong / logout ngay sau khi equip-đổi skill có thể xảy ra trước khi request này
+        // hoàn tất — track task đang chạy để Logout/OnApplicationPause có thể đợi nó xong trước khi
+        // ngắt session, tránh mất skill loadout vừa đổi (không ghi được lên server). Cùng pattern
+        // với BattleHeroSessionController.pendingLineupSyncTask.
+        private UniTask pendingSkillSyncTask = UniTask.CompletedTask;
+
+        /// <summary>Đợi lần sync skill equip gần nhất (nếu có) hoàn tất — gọi trước khi logout/thoát
+        /// app để không mất thay đổi skill loadout vừa equip/unequip/replace/auto-equip.</summary>
+        public UniTask FlushPendingSkillSyncAsync()
+        {
+            return pendingSkillSyncTask;
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus)
+                FlushPendingSkillSyncAsync().Forget();
+        }
+
         public override async UniTask InitializeAsync()
         {
             allSkills = DatabaseManager.Instance.GetAllSkillData();
@@ -343,7 +362,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 OnDataChanged?.Invoke();
 
                 // Một RPC duy nhất, atomic ở server (skill/auto_equip) thay cho N+M RPC rời rạc.
-                await SyncAutoEquipAsync(heroContext.HeroId, targetSkillIds);
+                pendingSkillSyncTask = SyncAutoEquipAsync(heroContext.HeroId, targetSkillIds).Preserve();
+                await pendingSkillSyncTask;
             }
 
             Log(
@@ -584,7 +604,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
             heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
 
-            SyncEquipAsync(heroContext.HeroId, skillId, slotIndex).Forget();
+            pendingSkillSyncTask = SyncEquipAsync(heroContext.HeroId, skillId, slotIndex).Preserve();
+            pendingSkillSyncTask.Forget();
 
             Log(
                 $"TryEquipSkillToHero success -> heroId={heroContext.HeroId}, skillId={skillId}, slotIndex={slotIndex}");
@@ -617,7 +638,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
             heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
 
-            SyncUnequipAsync(skillId).Forget();
+            pendingSkillSyncTask = SyncUnequipAsync(heroContext.HeroId, skillId).Preserve();
+            pendingSkillSyncTask.Forget();
 
             Log($"TryUnequipSkillFromHero success -> heroId={heroContext.HeroId}, skillId={skillId}");
             return true;
@@ -652,24 +674,48 @@ namespace Immortal_Switch.Scripts.Skill.UI
             heroContext.RuntimeController?.RefreshSelectedSkillsRuntime();
             OnDataChanged?.Invoke();
 
-            SyncEquipAsync(heroContext.HeroId, newSkillId, slotIndex).Forget();
+            pendingSkillSyncTask = SyncEquipAsync(heroContext.HeroId, newSkillId, slotIndex).Preserve();
+            pendingSkillSyncTask.Forget();
 
             Log(
                 $"TryReplaceSkillOnHero success -> heroId={heroContext.HeroId}, slotIndex={slotIndex}, newSkillId={newSkillId}");
             return true;
         }
 
-        private async UniTaskVoid SyncEquipAsync(int heroId, int skillId, int slotIndex)
+        /// <summary>Ghi target skillUid[] hiện tại (sau khi state cục bộ đã được cập nhật) của 1
+        /// heroUid xuống local trước khi gửi RPC — nếu app bị kill/logout trước khi request kịp tới
+        /// server, PendingSkillEquipSync sẽ gửi lại ở lần login kế tiếp (xem UserDataCache.
+        /// ApplyPendingSkillEquipSyncIfAny).</summary>
+        private void SavePendingSkillState(string userId, string heroUid, int heroId)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(heroUid)) return;
+
+            List<int> currentSkillIds = UserDataCache.Instance.GetEquippedClassSkillIds(heroId) ?? new List<int>();
+            var skillUids = new string[currentSkillIds.Count];
+            for (int i = 0; i < currentSkillIds.Count; i++)
+            {
+                int skillId = currentSkillIds[i];
+                skillUids[i] = skillId > 0 ? UserDataCache.Instance.GetSkillUid(skillId) : null;
+            }
+
+            PendingSkillEquipSync.Save(userId, heroUid, skillUids);
+        }
+
+        private async UniTask SyncEquipAsync(int heroId, int skillId, int slotIndex)
         {
             if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+            if (UserDataCache.Instance == null) return;
 
-            string heroUid = UserDataCache.Instance?.GetHeroUid(heroId);
-            string skillUid = UserDataCache.Instance?.GetSkillUid(skillId);
+            string heroUid = await UserDataCache.Instance.GetHeroUidAsync(heroId);
+            string skillUid = UserDataCache.Instance.GetSkillUid(skillId);
             if (heroUid == null || skillUid == null)
             {
                 LogError($"SyncEquipAsync aborted — heroUid or skillUid not found. heroId={heroId}, skillId={skillId}");
                 return;
             }
+
+            string userId = NakamaClient.Instance.Session?.UserId;
+            SavePendingSkillState(userId, heroUid, heroId);
 
             try
             {
@@ -679,6 +725,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                     // Server có thể đã âm thầm gỡ skill này khỏi 1 hero/slot khác (xem
                     // Docs/api_skill_equip.md mục 1) — đối soát toàn bộ map, không chỉ hero vừa thao tác.
                     UserDataCache.Instance?.ReconcileEquippedFromServer(response.Equipped);
+                    PendingSkillEquipSync.Clear(userId, heroUid);
                     Log($"SyncEquipAsync done — heroUid={heroUid}, skillUid={skillUid}, slot={slotIndex}");
                 }
                 else
@@ -699,8 +746,9 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private async UniTask SyncAutoEquipAsync(int heroId, List<int> targetSkillIds)
         {
             if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
+            if (UserDataCache.Instance == null) return;
 
-            string heroUid = UserDataCache.Instance?.GetHeroUid(heroId);
+            string heroUid = await UserDataCache.Instance.GetHeroUidAsync(heroId);
             if (heroUid == null)
             {
                 LogError($"SyncAutoEquipAsync aborted — heroUid not found. heroId={heroId}");
@@ -715,12 +763,16 @@ namespace Immortal_Switch.Scripts.Skill.UI
                     skillUids.Add(skillUid);
             }
 
+            string userId = NakamaClient.Instance.Session?.UserId;
+            SavePendingSkillState(userId, heroUid, heroId);
+
             try
             {
                 var response = await NakamaClient.Instance.SkillAutoEquipAsync(heroUid, skillUids);
                 if (response != null && response.Updated)
                 {
                     UserDataCache.Instance?.ReconcileEquippedFromServer(response.Equipped);
+                    PendingSkillEquipSync.Clear(userId, heroUid);
                     Log($"SyncAutoEquipAsync done — heroUid={heroUid}, skills=[{string.Join(",", skillUids)}]");
                 }
                 else
@@ -738,7 +790,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             }
         }
 
-        private async UniTaskVoid SyncUnequipAsync(int skillId)
+        private async UniTask SyncUnequipAsync(int heroId, int skillId)
         {
             if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return;
 
@@ -749,12 +801,19 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 return;
             }
 
+            string userId = NakamaClient.Instance.Session?.UserId;
+            string heroUid = await UserDataCache.Instance.GetHeroUidAsync(heroId);
+            if (heroUid != null)
+                SavePendingSkillState(userId, heroUid, heroId);
+
             try
             {
                 var response = await NakamaClient.Instance.SkillUnequipAsync(skillUid);
                 if (response != null && response.Updated)
                 {
                     UserDataCache.Instance?.ReconcileEquippedFromServer(response.Equipped);
+                    if (heroUid != null)
+                        PendingSkillEquipSync.Clear(userId, heroUid);
                     Log($"SyncUnequipAsync done — skillUid={skillUid}");
                 }
                 else

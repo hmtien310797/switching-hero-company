@@ -296,10 +296,7 @@ namespace Battle
                     rewards.Add(new ItemRewardData(reward.CurrencyType, reward.Amount.ToBigNumber()));
                 }
                 
-                UIManager.Instance.TogglePopupAsync<PopupRewardView>(new PopupRewardArgs
-                {
-                    Rewards = rewards
-                }).Forget();
+                PopupRewardService.Show(rewards);
             }
             else
             {

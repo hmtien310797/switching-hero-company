@@ -11,11 +11,13 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -1070,6 +1072,16 @@ namespace Battle
             {
                 ApplyServerProgression(response.UpdatedProgression);
 
+                List<ItemRewardData> itemRewardData = new List<ItemRewardData>();
+                for (int i = 0; i < stageRuntimeData.ClearRewards.Length; i++)
+                {
+                    StageReward currentStageReward = stageRuntimeData.ClearRewards[i];
+                    ItemRewardData currentItemRewardData = new ItemRewardData(currentStageReward.currencyType.ToString(), currentStageReward.Amount);
+                    itemRewardData.Add(currentItemRewardData);
+                }
+                
+                PopupRewardService.Show(itemRewardData);
+                
                 if (response.UpdatedResources != null)
                 {
                     CurrencyManager.Instance.ApplyServerBalances(

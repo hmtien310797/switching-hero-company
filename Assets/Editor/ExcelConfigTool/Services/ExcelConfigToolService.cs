@@ -13,45 +13,42 @@ namespace Editor.ExcelConfigTool.Services
         private readonly CsvConfigRepository _csvRepository = new();
         private readonly ConfigHashCacheService _hashCacheService = new();
 
-        public List<ConfigSheetInfo> ReadExcelFolder(string inputFolder)
-        {
-            return _csvRepository.ReadFolder(inputFolder);
-        }
-
-        public void GenerateScripts(
+        public int GenerateScripts(
             string inputFolder,
-            string outputScriptFolder
+            string outputScriptFolder,
+            bool force = false
         )
         {
             var sheets = ReadChangedOrMissingConfigs(
                 inputFolder,
                 outputScriptFolder,
-                null
+                null,
+                force
             );
 
             if (sheets.Count == 0)
             {
                 Debug.Log("No changed CSV files. Skip generate scripts.");
-                return;
+                return 0;
             }
 
-            ConfigCodeGenerator.GenerateScripts(outputScriptFolder, sheets);
+            var changedScriptCount = ConfigCodeGenerator.GenerateScripts(outputScriptFolder, sheets);
 
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-
-            Debug.Log($"Generated scripts count: {sheets.Count * 2}");
+            Debug.Log($"Generated scripts changed: {changedScriptCount}");
+            return changedScriptCount;
         }
 
         public void GenerateOrUpdateAssets(
             string inputFolder,
-            string outputAssetFolder
+            string outputAssetFolder,
+            bool force = false
         )
         {
             var sheets = ReadChangedOrMissingConfigs(
                 inputFolder,
                 null,
-                outputAssetFolder
+                outputAssetFolder,
+                force
             );
 
             if (sheets.Count == 0)
@@ -88,7 +85,8 @@ namespace Editor.ExcelConfigTool.Services
         private List<ConfigSheetInfo> ReadChangedOrMissingConfigs(
             string inputFolder,
             string outputScriptFolder,
-            string outputAssetFolder
+            string outputAssetFolder,
+            bool force
         )
         {
             var result = new List<ConfigSheetInfo>();
@@ -103,15 +101,48 @@ namespace Editor.ExcelConfigTool.Services
                 .Where(v => !Path.GetFileName(v).StartsWith("~$"))
                 .ToList();
 
-            foreach (var file in files)
-            {
-                var normalizedCsvPath = file.Replace("\\", "/");
-                var sheet = _csvRepository.ReadFile(normalizedCsvPath);
-
-                if (sheet.Columns.Count == 0)
+            var candidates = files
+                .Select(file =>
                 {
-                    continue;
-                }
+                    var normalizedPath = file.Replace("\\", "/");
+
+                    return new
+                    {
+                        Path = normalizedPath,
+                        Sheet = _csvRepository.ReadFile(normalizedPath),
+                        LastWriteTimeUtc = File.GetLastWriteTimeUtc(file),
+                    };
+                })
+                .Where(candidate => candidate.Sheet.Columns.Count > 0)
+                .ToList();
+
+            var selectedCandidates = candidates
+                .GroupBy(candidate => candidate.Sheet.DatabaseClassName)
+                .Select(group => group
+                    .OrderByDescending(candidate => candidate.LastWriteTimeUtc)
+                    .ThenBy(candidate => candidate.Path)
+                    .First()
+                )
+                .ToList();
+
+            foreach (var duplicateGroup in candidates
+                         .GroupBy(candidate => candidate.Sheet.DatabaseClassName)
+                         .Where(group => group.Count() > 1))
+            {
+                var selected = selectedCandidates.First(candidate =>
+                    candidate.Sheet.DatabaseClassName == duplicateGroup.Key
+                );
+
+                Debug.LogWarning(
+                    $"[ExcelConfigTool] Multiple CSV files map to '{duplicateGroup.Key}'. " +
+                    $"Using newest file: {selected.Path}"
+                );
+            }
+
+            foreach (var candidate in selectedCandidates)
+            {
+                var normalizedCsvPath = candidate.Path;
+                var sheet = candidate.Sheet;
 
                 var hasCsvChanged = _hashCacheService.HasChanged(normalizedCsvPath);
 
@@ -139,13 +170,15 @@ namespace Editor.ExcelConfigTool.Services
                     !string.IsNullOrWhiteSpace(assetPath) &&
                     !File.Exists(assetPath);
 
-                if (hasCsvChanged ||
+                if (force ||
+                    hasCsvChanged ||
                     isMissingRowScript ||
                     isMissingDatabaseScript ||
                     isMissingAsset)
                 {
                     Debug.Log(
                         $"Need process config: {normalizedCsvPath} | " +
+                        $"Force={force}, " +
                         $"CsvChanged={hasCsvChanged}, " +
                         $"MissingRowScript={isMissingRowScript}, " +
                         $"MissingDatabaseScript={isMissingDatabaseScript}, " +

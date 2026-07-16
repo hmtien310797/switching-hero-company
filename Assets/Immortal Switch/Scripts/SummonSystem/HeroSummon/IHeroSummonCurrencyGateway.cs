@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 
@@ -19,6 +20,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
     {
         void GrantReward(SummonRewardItem rewardItem);
         SummonRewardPreviewData GetRewardPreviewData(SummonCategory summonCategory);
-        bool ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver, SummonCategory summonCategory);
+        UniTask ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver, SummonCategory summonCategory);
     }
 }

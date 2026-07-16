@@ -48,6 +48,16 @@ namespace Immortal_Switch.Scripts.Shared.Views
         public Action OnCancel { get; }
 
         /// <summary>
+        /// Callback được gọi khi người dùng nhấn bật toggle Không hiển thị lại thông báo.
+        /// </summary>
+        public Action<bool> OnDoNotShowAgainChanged { get; }
+
+        /// <summary>
+        /// Xác định có hiển thị toggle Không hiển thị lại thông báo hay không.
+        /// </summary>
+        public bool ShowToggleDoNotShowAgain { get; }
+
+        /// <summary>
         /// Khởi tạo thông tin cho popup xác nhận.
         /// </summary>
         /// <param name="title">Tiêu đề của popup.</param>
@@ -55,16 +65,20 @@ namespace Immortal_Switch.Scripts.Shared.Views
         /// <param name="confirmButtonText">Nội dung nút xác nhận.</param>
         /// <param name="cancelButtonText">Nội dung nút hủy.</param>
         /// <param name="showCancelButton">True để hiển thị nút hủy, false để chỉ hiển thị nút xác nhận.</param>
+        /// <param name="showToggleDoNotShowAgain">True để hiển thị toggle Không hiển thị lại thông báo hay không.</param>
         /// <param name="onConfirm">Hàm được gọi khi người dùng xác nhận.</param>
         /// <param name="onCancel">Hàm được gọi khi người dùng hủy.</param>
+        /// <param name="onDoNotShowAgainChanged">Hàm được gọi khi người dùng nhấn bật toggle Không hiển thị lại thông báo.</param>
         public PopupConfirmArgs(
             string title,
             string description,
             Action onConfirm = null,
             Action onCancel = null,
+            Action<bool> onDoNotShowAgainChanged = null,
             string confirmButtonText = null,
             string cancelButtonText = null,
-            bool showCancelButton = true
+            bool showCancelButton = true,
+            bool showToggleDoNotShowAgain = true
         )
         {
             Title = title;
@@ -74,6 +88,8 @@ namespace Immortal_Switch.Scripts.Shared.Views
             ShowCancelButton = showCancelButton;
             OnConfirm = onConfirm;
             OnCancel = onCancel;
+            OnDoNotShowAgainChanged = onDoNotShowAgainChanged;
+            ShowToggleDoNotShowAgain = showToggleDoNotShowAgain;
         }
     }
 
@@ -97,19 +113,34 @@ namespace Immortal_Switch.Scripts.Shared.Views
         [SerializeField]
         private TMP_Text txtBtnCancel;
 
+        [SerializeField]
+        private Toggle toggleDoNotShowAgain;
+
         // --- Private Fields ---
-        private Action _onConfirm;
-        private Action _onCancel;
+        private PopupConfirmArgs _args;
 
         private void Awake()
         {
             btnConfirm.onClick.AddListener(OnClickConfirm);
             btnCancel.onClick.AddListener(OnClickCancel);
+            toggleDoNotShowAgain.onValueChanged.AddListener(OnDoNotShowAgainChanged);
+        }
+
+        private void OnDestroy()
+        {
+            btnConfirm.onClick.RemoveListener(OnClickConfirm);
+            btnCancel.onClick.RemoveListener(OnClickCancel);
+            toggleDoNotShowAgain.onValueChanged.RemoveListener(OnDoNotShowAgainChanged);
+        }
+
+        private void OnDoNotShowAgainChanged(bool arg0)
+        {
+            _args.OnDoNotShowAgainChanged?.Invoke(arg0);
         }
 
         private void OnClickCancel()
         {
-            _onCancel?.Invoke();
+            _args.OnCancel?.Invoke();
             UIManager.Instance.Close<PopupConfirmView>();
         }
 
@@ -125,8 +156,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
 
         public void Bind(PopupConfirmArgs args)
         {
-            _onConfirm = args.OnConfirm;
-            _onCancel = args.OnCancel;
+            _args = args;
 
             if (!string.IsNullOrWhiteSpace(args.CancelButtonText))
             {
@@ -141,12 +171,13 @@ namespace Immortal_Switch.Scripts.Shared.Views
             txtDesc.text = args.Description;
             txtTitle.text = args.Title;
 
+            toggleDoNotShowAgain.gameObject.SetActive(args.ShowToggleDoNotShowAgain);
             btnCancel.gameObject.SetActive(args.ShowCancelButton);
         }
 
         private void OnClickConfirm()
         {
-            _onConfirm?.Invoke();
+            _args.OnConfirm?.Invoke();
             OnClickCancel();
         }
     }

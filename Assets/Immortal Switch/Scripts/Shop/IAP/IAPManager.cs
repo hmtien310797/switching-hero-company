@@ -120,8 +120,13 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             }
         }
 
-        private static string GetStoreProductId(DynamicHeroesGlobalSpecificationsProductIdRow product)
+        public static string GetStoreProductId(DynamicHeroesGlobalSpecificationsProductIdRow product)
         {
+            if (product == null)
+            {
+                return string.Empty;
+            }
+            
 #if UNITY_IOS
             return product.appleID;
 #elif UNITY_ANDROID
@@ -243,11 +248,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                     _storeController.ConfirmPendingPurchase(product);
                     CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
 
-                    UIManager.Instance.TogglePopupAsync<PopupRewardView>(
-                        new PopupRewardArgs
-                        {
-                            Rewards = DatabaseManager.Instance.GetShopSpecialRewards(packId).ToList()
-                        }).Forget();
+                    PopupRewardService.Show(DatabaseManager.Instance.GetShopSpecialRewards(packId));
 
                     Debug.Log($"[IAPManager] Pack purchase validated & confirmed -> product={storeProductId} pack={packId} count={response.PurchaseCount}/{response.Limit}");
                     callback?.Invoke(true, null);
@@ -262,20 +263,15 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
                     _storeController.ConfirmPendingPurchase(product);
                     await RefreshCurrencyAsync();
-
-                    UIManager.Instance.TogglePopupAsync<PopupRewardView>(
-                        new PopupRewardArgs
-                        {
-                            Rewards = new List<ItemRewardData>
-                            {
-                                new ItemRewardData(
-                                    DatabaseManager.Instance.ItemDb
-                                        .FindItem(response.ItemId)
-                                        .itemKey,
-                                    BigNumber.FromInt(response.Balance))
-                            }
-                        }).Forget();
-
+                    
+                    PopupRewardService.Show(new List<ItemRewardData>
+                    {
+                        new (DatabaseManager.Instance.ItemDb
+                                .FindItem(response.ItemId)
+                                .itemKey,
+                            BigNumber.FromInt(response.Balance))
+                    });
+                    
                     Debug.Log($"[IAPManager] Purchase validated & confirmed -> product={storeProductId} pack={packId} gems={response.GemsGranted}");
                     callback?.Invoke(true, null);
                     OnPurchased?.Invoke(packId);

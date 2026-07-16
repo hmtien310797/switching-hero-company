@@ -1,8 +1,11 @@
+using System;
 using Battle;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Reward;
+using Immortal_Switch.Scripts.Shared;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Currency
 {
@@ -10,6 +13,7 @@ namespace Immortal_Switch.Scripts.Currency
     {
         [SerializeField] private CurrencyType currencyType;
         [SerializeField] private TMP_Text amountText;
+        [SerializeField] private Image currencyImage;
 
         [Header("Optional")] 
         [SerializeField] private bool includeOnlineIdlePreview = true;
@@ -31,6 +35,14 @@ namespace Immortal_Switch.Scripts.Currency
             }
 
             Refresh();
+        }
+
+        private void OnEnable()
+        {
+            if (currencyImage != null)
+            {
+                currencyImage.sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemKey(currencyType.ToString());
+            }
         }
         
 
@@ -63,11 +75,6 @@ namespace Immortal_Switch.Scripts.Currency
             BigNumber displayAmount = CurrencyLedgerService.Instance != null ? CurrencyLedgerService.Instance.GetDisplayBalance(currencyType) : BigNumber.Zero;
 
             amountText.text = displayAmount.ToInputString();
-        }
-
-        private string FormatCurrency(BigNumber amount)
-        {
-            return amount.ToInputString();
         }
     }
 }

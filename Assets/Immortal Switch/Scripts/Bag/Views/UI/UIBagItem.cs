@@ -14,10 +14,10 @@ namespace Immortal_Switch.Scripts.Bag.Views.UI
         [SerializeField]
         private TextMeshProUGUI txtQuantity;
 
-        public void Bind(Sprite itemIcon, Sprite borderIcon, Sprite bgIcon, Sprite tierIcon, BigNumber quantity)
+        public void Bind(int itemId, BigNumber quantity)
         {
-            itemSlot.Bind(itemIcon, borderIcon, bgIcon, tierIcon);
-            txtQuantity.text = (quantity.ToInputString());
+            itemSlot.Bind(itemId, true);
+            txtQuantity.text = quantity.ToInputString();
         }
     }
 }

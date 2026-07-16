@@ -143,8 +143,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             if (isBound)
                 return;
 
-            summonButtonA?.Init(optionAId, TrySummon);
-            summonButtonB?.Init(optionBId, TrySummon);
+            summonButtonA?.Init(optionAId, TrySummon, SummonCategory.Hero);
+            summonButtonB?.Init(optionBId, TrySummon, SummonCategory.Hero);
 
             if (probabilityInfoButton != null)
             {
@@ -242,9 +242,19 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
                     "Cảnh báo",
                     $"Không đủ Vé Anh hùng.\nLần triệu hồi này sẽ tiêu tốn {gemCost} Kim cương.\nXác nhận?",
-                    () => ExecuteSummonAsync(optionId).Forget()
+                    () => ExecuteSummonAsync(optionId).Forget(),
+                    onDoNotShowAgainChanged: OnDoNotShowAgainChanged
                 ))
                 .Forget();
+        }
+
+        private void OnDoNotShowAgainChanged(bool value)
+        {
+            if (HeroSummonManager.Instance != null)
+            {
+                HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm = value;
+                HeroSummonManager.Instance.Save();
+            }
         }
 
         private async UniTaskVoid ExecuteSummonAsync(string optionId)
@@ -273,7 +283,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 }
 
                 // Cập nhật currency HUD từ server
-                CurrencyManager.Instance.Set(CurrencyType.HeroTicket, response.CurrencyBalances.HeroTicket);
+                CurrencyManager.Instance.Set(CurrencyType.summon_ticket_hero, response.CurrencyBalances.HeroTicket);
                 CurrencyManager.Instance.Set(CurrencyType.diamond, response.CurrencyBalances.Diamond);
 
                 // Sync local save data
@@ -302,7 +312,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
                     result.Entries.Add(new HeroSummonResultEntry
                     {
-                        RollIndex = entry.RollIndex,
                         HeroAsset = heroData,
                         HeroName = entry.HeroName,
                         IsNewHero = entry.IsNew,

@@ -32,6 +32,9 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         private TextMeshProUGUI txtTicket;
 
         [SerializeField]
+        private Image imgBanner;
+
+        [SerializeField]
         private Button btnStart;
 
         [SerializeField]
@@ -53,7 +56,9 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         [SerializeField]
         private UIReward rewardPrefab;
 
-        [SerializeField] private TextMeshProUGUI txtTicketDungeonPlayer;
+        [SerializeField]
+        private TextMeshProUGUI txtTicketDungeonPlayer;
+
         // --- Private Fields ---
         private List<UIReward> _rewards = new();
 
@@ -77,26 +82,20 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             btnNext.onClick.AddListener(OnClickNext);
             btnPrev.onClick.AddListener(OnClickPrev);
             btnStart.onClick.AddListener(OnClickStart);
-            btnSweep.onClick.AddListener(() =>
-            {
-                UIManager.Instance.ShowToast("Coming Soon");
-            });
-            consecutiveChallengeToggle.onValueChanged.AddListener(_ =>
-            {
-                UIManager.Instance.ShowToast("Coming Soon");
-            });
-    
+            btnSweep.onClick.AddListener(() => { UIManager.Instance.ShowToast("Coming Soon"); });
+            consecutiveChallengeToggle.onValueChanged.AddListener(_ => { UIManager.Instance.ShowToast("Coming Soon"); });
         }
 
         private void OnClickStart()
         {
-            if(ownedTicket <= 0)
+            if (ownedTicket <= 0)
             {
                 UIManager.Instance.ShowToast("Not Enough Dungeon Ticket");
                 return;
             }
 
-            _onStart?.Invoke(_dungeonId ,_currentStageIdx + 1);
+            _onStart?.Invoke(_dungeonId, _currentStageIdx + 1);
+
             //for testing dungeon temporarily
             UIManager.Instance.TogglePopupAsync<DungeonView>();
             UIManager.Instance.TogglePopupAsync<DungeonMainView>();
@@ -144,7 +143,9 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             }
         }
 
-        public void Bind(int dungeonId, int ticketOwned, int ticketRequired, string title, int currentStageIdx, int maxStageIdx, Action<int, int> onStart,
+        public void Bind(Sprite sprBanner, int dungeonId, int ticketOwned,
+            int ticketRequired, string title, int currentStageIdx,
+            int maxStageIdx, Action<int, int> onStart,
             Func<int, int, IReadOnlyList<ItemRewardData>> onStageChanged)
         {
             ownedTicket = ticketOwned;
@@ -153,6 +154,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             _currentStageIdx = currentStageIdx;
             _maxStageIdx = maxStageIdx;
             _onStageChanged = onStageChanged;
+            imgBanner.sprite = sprBanner;
 
             txtTitle.SetText(title);
             txtTicket.SetText($"{ticketRequired}");

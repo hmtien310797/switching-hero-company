@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -4.5, y: -38.6}
+  m_AnchoredPosition: {x: -2.4, y: -38.6}
   m_SizeDelta: {x: 210.59296, y: 45.999}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &6007070401768292861
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "10 L\u1EA7n Quay"
+  m_text: "1 L\u1EA7n Quay"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8559cdba7927f6e48b2c5bc6f1ea121c, type: 2}
   m_sharedMaterial: {fileID: 6882651087998995454, guid: 8559cdba7927f6e48b2c5bc6f1ea121c, type: 2}
@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 5242696811498398960}
   - component: {fileID: 176002715867037100}
   - component: {fileID: 6350792947688749977}
+  - component: {fileID: 1811119331412362927}
   m_Layer: 5
   m_Name: UIEventWheelButton
   m_TagString: Untagged
@@ -205,7 +206,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 84791d1c28790ef42ae9cd0d4c0fb5b7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: aba7baa2bfee64e43b5f4bc13f8f20a2, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -259,6 +260,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1811119331412362927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4353793164760726860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c330efaed8943e6a6f19add34c36454, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  btn: {fileID: 6350792947688749977}
+  txtTimes: {fileID: 5468403975081826198}
+  txtTicket: {fileID: 4266429083939137272}
 --- !u!1 &5269169014878229610
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,7 +309,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -8.6, y: 0}
+  m_AnchoredPosition: {x: -8.600006, y: 0}
   m_SizeDelta: {x: 77, y: 45}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &8791151873958811043

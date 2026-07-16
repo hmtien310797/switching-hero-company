@@ -106,16 +106,6 @@ namespace Immortal_Switch.Scripts.Currency
             Set(CurrencyType.diamond, BigNumber.FromDouble(diamonds));
             Set(CurrencyType.crystal, BigNumber.FromDouble(crystal));
             
-            UIManager.Instance.TogglePopupAsync<PopupRewardView>(new PopupRewardArgs
-            {
-                Rewards = new List<ItemRewardData>
-                {
-                    new(nameof(CurrencyType.gold), BigNumber.FromDouble(gold)),
-                    new(nameof(CurrencyType.diamond), BigNumber.FromDouble(diamonds)),
-                    new(nameof(CurrencyType.crystal), BigNumber.FromDouble(crystal)),
-                }
-            }, false).Forget();
-
             if (items == null)
                 return;
 

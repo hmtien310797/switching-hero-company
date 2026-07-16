@@ -707,6 +707,28 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<RechargeClaimResponse>(response.Payload);
     }
 
+    // ── Monthly Pass ──────────────────────────────────────────────────────────
+    // Xem handler/monthly_pass.js — pack_iap các row pack_type="subscription" (Monthly Pass tab).
+    // Mua vẫn đi qua IapPackPurchaseAsync (pack_iap); 2 RPC này chỉ phụ trách trạng thái/nhận
+    // thưởng ngày (server tự tính ngày từ purchased_at, client không tự đếm ngày cục bộ nữa).
+
+    /// <summary>Trạng thái mua/nhận thưởng của mọi Monthly Pass — nguồn sự thật, gọi khi login và
+    /// mỗi lần mở màn Shop/MonthlyPass (xem ShopManager.SyncMonthlyPassStateAsync).</summary>
+    public async Task<MonthlyPassStateResponse> MonthlyPassStateAsync()
+    {
+        var response = await CallRpcAsync("monthlypass/state", "{}");
+        return JsonConvert.DeserializeObject<MonthlyPassStateResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng ngày hiện tại của 1 Monthly Pass đã mua. Server tự suy ngày từ
+    /// purchased_at và throw nếu chưa mua/đã hết hạn/ngày đó đã nhận rồi.</summary>
+    public async Task<MonthlyPassClaimResponse> MonthlyPassClaimAsync(int packId)
+    {
+        var payload  = JsonConvert.SerializeObject(new MonthlyPassClaimRequest { PackId = packId });
+        var response = await CallRpcAsync("monthlypass/claim", payload);
+        return JsonConvert.DeserializeObject<MonthlyPassClaimResponse>(response.Payload);
+    }
+
     // ── Battle ────────────────────────────────────────────────────────────────
 
     /// <summary>Progression thật từ server (current_stage/current_chapter/highest_stage_cleared). Gọi sau login trước khi vào màn chọn stage.</summary>

@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Bag.Views.Shared;
 using Immortal_Switch.Scripts.Items.Models;
-using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
-using Random = System.Random;
 
 namespace Immortal_Switch.Scripts.Bag.Views
 {
@@ -29,26 +27,18 @@ namespace Immortal_Switch.Scripts.Bag.Views
         public void Bind(List<ItemData> items)
         {
             _items = new List<ItemData>(items);
-            recyclableView.Bind(items, items.Count, OnResolveItem);
+            recyclableView.Bind(items.Count, OnResolveItem);
         }
 
-        private ItemRewardData OnResolveItem(int itemIdx)
+        private ItemData OnResolveItem(int itemIdx)
         {
-            var item = _items[itemIdx];
-
-            if (int.TryParse(item.ItemKey, out var itemId))
+            if (itemIdx < 0 ||
+                _items.Count < itemIdx)
             {
-                var display = DatabaseManager.Instance.GetDisplayData(itemId);
-
-                if (display == null)
-                {
-                    return null;
-                }
-
-                return new ItemRewardData(item.ItemKey, item.Quantity, display.ItemIcon, display.TierInfo);
+                return null;
             }
 
-            return null;
+            return _items[itemIdx];
         }
     }
 }

@@ -318,14 +318,243 @@ namespace Common
             SkillList = skillListResponse;
             WeaponList = weaponListResponse;
 
-            var resolvedLineup = new List<int> { -1, -1 };
-
             if (HeroList?.Lineup == null || HeroList.Owned == null)
-            {
-                SetBattleLineup(resolvedLineup);
                 LogError("Hero inventory, lineup or owned hero list is null.");
+
+            ApplyPendingLineupSyncIfAny();
+            ApplyPendingSkillEquipSyncIfAny();
+
+            var resolvedLineup = ResolveLineupHeroIds();
+            SetBattleLineup(resolvedLineup);
+            Log($"Resolved battle lineup: [{resolvedLineup[0]}, {resolvedLineup[1]}]");
+        }
+
+        /// <summary>Một lần swap hero giữa trận trước đó có thể chưa kịp gửi hero/set_lineup lên
+        /// server (app bị kill/crash/Editor-Stop ngay sau khi swap — xem BattleHeroSessionController.
+        /// SyncLineupToServerAsync). Nếu còn entry pending trên máy cho đúng account này, áp nó vào
+        /// HeroList ngay (để lineup resolve đúng ngay từ đầu session) rồi gửi lại lên server nền.</summary>
+        private void ApplyPendingLineupSyncIfAny()
+        {
+            string userId = NakamaClient.Instance?.Session?.UserId;
+            var pendingLineup = PendingLineupSync.Load(userId);
+            if (pendingLineup == null || HeroList == null) return;
+
+            bool alreadyApplied = HeroList.Lineup != null
+                && HeroList.Lineup.Length == pendingLineup.Length
+                && HeroList.Lineup[0] == pendingLineup[0]
+                && HeroList.Lineup[1] == pendingLineup[1];
+
+            if (alreadyApplied)
+            {
+                PendingLineupSync.Clear(userId);
                 return;
             }
+
+            if (!PendingLineupResolvesToOwnedHeroes(pendingLineup))
+            {
+                // Entry không khớp uid nào trong Owned (hero đã đổi/mất từ lúc ghi entry này, hoặc
+                // server đã từ chối request này ở phiên trước và entry chưa được dọn — xem
+                // RetryPendingLineupSyncAsync). Bỏ, không ghi đè lineup ĐÚNG vừa lấy từ server bằng
+                // dữ liệu rác cục bộ — nếu không, mọi lần login sau sẽ liên tục hiện lại lineup sai
+                // (rơi về "2 hero đầu tiên trong Owned" do ResolveLineupHeroIds không resolve được).
+                Log($"[UserDataCache] Discarding stale/invalid pending lineup sync (no uid matches an owned hero): [{pendingLineup[0]}, {pendingLineup[1]}]");
+                PendingLineupSync.Clear(userId);
+                return;
+            }
+
+            Log($"[UserDataCache] Found pending lineup sync from a previous session, reapplying: [{pendingLineup[0]}, {pendingLineup[1]}]");
+            HeroList.Lineup = pendingLineup;
+            RetryPendingLineupSyncAsync(userId, pendingLineup).Forget();
+        }
+
+        /// <summary>Một pending entry chỉ đáng tin nếu mọi uid không rỗng trong đó khớp với 1 hero
+        /// đang thực sự sở hữu — nếu không, đó là dữ liệu cũ/rác (hero đã mất, tài khoản khác trên
+        /// cùng máy, hoặc entry bị kẹt lại do server từ chối ở phiên trước).</summary>
+        private bool PendingLineupResolvesToOwnedHeroes(string[] pendingLineup)
+        {
+            if (pendingLineup == null || HeroList?.Owned == null) return false;
+
+            foreach (var heroUid in pendingLineup)
+            {
+                if (string.IsNullOrEmpty(heroUid)) continue;
+
+                bool found = false;
+                foreach (var ownedHero in HeroList.Owned)
+                {
+                    if (string.Equals(heroUid, ownedHero.Uid, StringComparison.Ordinal))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) return false;
+            }
+
+            return true;
+        }
+
+        private async UniTask RetryPendingLineupSyncAsync(string userId, string[] pendingLineup)
+        {
+            try
+            {
+                var response = await NakamaClient.Instance.SetLineupAsync(pendingLineup);
+                if (response != null && response.Updated)
+                {
+                    if (HeroList != null) HeroList.Lineup = response.Lineup;
+                    PendingLineupSync.Clear(userId);
+                }
+                else
+                {
+                    // Server từ chối rõ ràng (không phải lỗi mạng) — retry thêm cũng sẽ luôn thất
+                    // bại, giữ lại entry chỉ khiến nó tiếp tục ghi đè lineup đúng ở các lần login
+                    // sau (xem ApplyPendingLineupSyncIfAny). Xoá để dừng vòng lặp.
+                    Debug.LogWarning($"[UserDataCache] Server rejected pending hero/set_lineup (not a network error) — discarding stale entry: [{pendingLineup[0]}, {pendingLineup[1]}]");
+                    PendingLineupSync.Clear(userId);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[UserDataCache] Retry of pending hero/set_lineup failed, will retry again next launch: {e.Message}");
+            }
+        }
+
+        /// <summary>Như ApplyPendingLineupSyncIfAny nhưng cho skill equip (xem SkillViewDataProvider.
+        /// SyncEquipAsync/SyncUnequipAsync/SyncAutoEquipAsync — chỗ ghi entry này xuống local trước
+        /// khi gửi RPC). Mỗi entry là target skillUid[] (theo slot) của 1 heroUid; nếu server chưa
+        /// khớp, áp ngay vào SkillList.Equipped rồi gửi lại qua skill/auto_equip ở nền.</summary>
+        private void ApplyPendingSkillEquipSyncIfAny()
+        {
+            string userId = NakamaClient.Instance?.Session?.UserId;
+            var pendingMap = PendingSkillEquipSync.Load(userId);
+            if (pendingMap == null || pendingMap.Count == 0) return;
+
+            if (SkillList == null) SkillList = new SkillListResponse();
+            if (SkillList.Equipped == null) SkillList.Equipped = new Dictionary<string, string[]>();
+
+            foreach (var entry in pendingMap)
+            {
+                string heroUid = entry.Key;
+                string[] pendingSkillUids = entry.Value;
+
+                bool alreadyApplied = SkillList.Equipped.TryGetValue(heroUid, out var serverSlots)
+                    && SkillUidsEqual(serverSlots, pendingSkillUids);
+
+                if (alreadyApplied)
+                {
+                    PendingSkillEquipSync.Clear(userId, heroUid);
+                    continue;
+                }
+
+                if (!PendingSkillEquipResolvesToOwned(heroUid, pendingSkillUids))
+                {
+                    // Entry không còn khớp hero/skill đang sở hữu (đã mất hero/skill từ lúc ghi entry
+                    // này, hoặc server đã từ chối request này ở phiên trước và entry chưa được dọn —
+                    // xem RetryPendingSkillEquipSyncAsync). Bỏ, không ghi đè loadout ĐÚNG vừa lấy từ
+                    // server bằng dữ liệu rác cục bộ (cùng lỗi đã gặp ở ApplyPendingLineupSyncIfAny).
+                    Log($"[UserDataCache] Discarding stale/invalid pending skill equip sync for heroUid={heroUid} (hero or skill uid no longer owned).");
+                    PendingSkillEquipSync.Clear(userId, heroUid);
+                    continue;
+                }
+
+                Log($"[UserDataCache] Found pending skill equip sync for heroUid={heroUid}, reapplying.");
+                SkillList.Equipped[heroUid] = pendingSkillUids;
+                RetryPendingSkillEquipSyncAsync(userId, heroUid, pendingSkillUids).Forget();
+            }
+        }
+
+        private static bool SkillUidsEqual(string[] a, string[] b)
+        {
+            if (a == null || b == null) return a == b;
+            if (a.Length != b.Length) return false;
+            for (int i = 0; i < a.Length; i++)
+                if (!string.Equals(a[i], b[i], StringComparison.Ordinal)) return false;
+            return true;
+        }
+
+        /// <summary>Như PendingLineupResolvesToOwnedHeroes nhưng cho skill equip — heroUid phải là
+        /// hero đang sở hữu, và mọi skillUid không rỗng trong pendingSkillUids phải là skill đang
+        /// sở hữu.</summary>
+        private bool PendingSkillEquipResolvesToOwned(string heroUid, string[] pendingSkillUids)
+        {
+            if (string.IsNullOrEmpty(heroUid) || HeroList?.Owned == null || pendingSkillUids == null)
+                return false;
+
+            bool heroOwned = false;
+            foreach (var ownedHero in HeroList.Owned)
+            {
+                if (string.Equals(heroUid, ownedHero.Uid, StringComparison.Ordinal))
+                {
+                    heroOwned = true;
+                    break;
+                }
+            }
+            if (!heroOwned) return false;
+
+            if (SkillList?.Owned == null) return false;
+
+            foreach (var skillUid in pendingSkillUids)
+            {
+                if (string.IsNullOrEmpty(skillUid)) continue;
+
+                bool skillOwned = false;
+                foreach (var ownedSkill in SkillList.Owned)
+                {
+                    if (string.Equals(skillUid, ownedSkill.Uid, StringComparison.Ordinal))
+                    {
+                        skillOwned = true;
+                        break;
+                    }
+                }
+
+                if (!skillOwned) return false;
+            }
+
+            return true;
+        }
+
+        private async UniTask RetryPendingSkillEquipSyncAsync(string userId, string heroUid, string[] pendingSkillUids)
+        {
+            try
+            {
+                var targetSkillUids = new List<string>();
+                foreach (var skillUid in pendingSkillUids)
+                    if (!string.IsNullOrEmpty(skillUid)) targetSkillUids.Add(skillUid);
+
+                var response = await NakamaClient.Instance.SkillAutoEquipAsync(heroUid, targetSkillUids);
+                if (response != null && response.Updated)
+                {
+                    ReconcileEquippedFromServer(response.Equipped);
+                    PendingSkillEquipSync.Clear(userId, heroUid);
+                }
+                else
+                {
+                    // Server từ chối rõ ràng (không phải lỗi mạng) — retry thêm cũng sẽ luôn thất
+                    // bại, giữ lại entry chỉ khiến nó tiếp tục ghi đè loadout đúng ở các lần login
+                    // sau. Xoá để dừng vòng lặp.
+                    Debug.LogWarning($"[UserDataCache] Server rejected pending skill equip for heroUid={heroUid} (not a network error) — discarding stale entry.");
+                    PendingSkillEquipSync.Clear(userId, heroUid);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[UserDataCache] Retry of pending skill equip failed for heroUid={heroUid}, will retry again next launch: {e.Message}");
+            }
+        }
+
+        /// <summary>Resolves HeroList.Lineup (uid array, the server's source of truth for the
+        /// active team) against HeroList.Owned into hero_id slots — [-1, -1] (or per-slot -1)
+        /// wherever a uid is empty or has no matching owned hero. Shared by the boot-time
+        /// resolution above and BattleHeroSessionController.EnsureValidBattleLineup's recovery
+        /// path, so a stale/unset InBattleHeroIdList re-derives the real lineup instead of
+        /// falling back to an arbitrary pick from Owned.</summary>
+        public List<int> ResolveLineupHeroIds()
+        {
+            var resolvedLineup = new List<int>(BattleHeroSlotCountValue);
+            for (int i = 0; i < BattleHeroSlotCountValue; i++) resolvedLineup.Add(-1);
+
+            if (HeroList?.Lineup == null || HeroList.Owned == null)
+                return resolvedLineup;
 
             for (int lineupIndex = 0;
                  lineupIndex < HeroList.Lineup.Length && lineupIndex < BattleHeroSlotCountValue;
@@ -346,8 +575,7 @@ namespace Common
                 }
             }
 
-            SetBattleLineup(resolvedLineup);
-            Log($"Resolved battle lineup: [{resolvedLineup[0]}, {resolvedLineup[1]}]");
+            return resolvedLineup;
         }
 
         public int GetBattleHeroIdAt(int slotIndex)
@@ -485,6 +713,43 @@ namespace Common
             foreach (var s in SkillList.Owned)
                 if (s.SkillId == skillId) return s.Uid;
             return null;
+        }
+
+        /// <summary>Refresh HeroList.Owned từ hero/list — HeroList chỉ nạp 1 lần lúc bootstrap (player/me)
+        /// nên hero vừa summon trong session hiện tại chưa có uid trong cache cho tới khi gọi hàm này.</summary>
+        public async UniTask<bool> RefreshHeroListFromServerAsync()
+        {
+            if (NakamaClient.Instance == null || !NakamaClient.Instance.IsLoggedIn) return false;
+
+            try
+            {
+                var heroListResponse = await NakamaClient.Instance.GetHeroListAsync();
+                if (heroListResponse?.Owned == null) return false;
+
+                if (HeroList == null)
+                    HeroList = new HeroInventory();
+
+                HeroList.Owned = heroListResponse.Owned;
+                return true;
+            }
+            catch (Exception e)
+            {
+                LogError($"RefreshHeroListFromServerAsync failed: {e.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>Như GetHeroUid, nhưng nếu cache local chưa có (hero vừa summon trong session này)
+        /// thì refresh hero/list rồi thử lại 1 lần trước khi trả null.</summary>
+        public async UniTask<string> GetHeroUidAsync(int heroId)
+        {
+            string uid = GetHeroUid(heroId);
+            if (uid != null) return uid;
+
+            if (await RefreshHeroListFromServerAsync())
+                uid = GetHeroUid(heroId);
+
+            return uid;
         }
 
         #endregion

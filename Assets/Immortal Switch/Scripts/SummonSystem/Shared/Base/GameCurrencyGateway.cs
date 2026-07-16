@@ -8,7 +8,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
     {
         public BigNumber GetHeroTicket()
         {
-            return CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.HeroTicket);
+            return CurrencyLedgerService.Instance.GetDisplayBalance(CurrencyType.summon_ticket_hero);
         }
 
         public BigNumber GetGem()
@@ -18,7 +18,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 
         public bool CanSpendHeroTicket(BigNumber amount)
         {
-            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.HeroTicket, amount);
+            return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.summon_ticket_hero, amount);
         }
 
         public bool CanSpendGem(int amount)
@@ -28,7 +28,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
 
         public void SpendHeroTicket(BigNumber amount)
         {
-            CurrencyLedgerService.Instance.TrySpend(CurrencyType.HeroTicket, amount, CurrencyTransactionReason.SummonHero);
+            CurrencyLedgerService.Instance.TrySpend(CurrencyType.summon_ticket_hero, amount, CurrencyTransactionReason.SummonHero);
         }
 
         public void SpendGem(int amount)

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
+using Immortal_Switch.Scripts.Shared;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +12,8 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {
     public class UIWeaponUpgradePanel : BaseUIPopup
     {
+        [SerializeField] private WeaponViewDataProvider weaponViewDataProvider;
+        
         [Header("Shared Preview")]
         [SerializeField] private TMP_Text txtWeaponName;
 
@@ -39,11 +43,18 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [Header("Star Display")]
         [SerializeField] private UIWeaponStarDisplay starDisplay;
 
+        [SerializeField] private Image itemImage;
+
         private readonly List<UIWeaponUpgradeStatLineItem> statPreviewItems = new();
         private WeaponUpgradePanelViewModel currentVm;
         private WeaponDetailViewModel currentDetailVm;
         private int currentHeroId;
         private Action onChanged;
+
+        private void Awake()
+        {
+            itemImage.sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemId(43);
+        }
 
         public void Bind(
             WeaponUpgradePanelViewModel vm,
@@ -68,7 +79,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             selectedWeapon.BindCommon(
                 vm.Icon,
-                "+1",
+                $"+{vm.CurrentLevel}",
                 vm.MaxShard > 0
                     ? $"{vm.CurrentShard}/{vm.MaxShard}"
                     : vm.CurrentShard.ToString(), vm.ShardProgressNormalized,
@@ -128,7 +139,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             }
 
             if (txtNextLevelCost != null)
-                txtNextLevelCost.text = $"<color=#93fd36>{vm.CurrentLevel}</color>/{vm.NextLevelCost}";
+                txtNextLevelCost.text = $"<color=#93fd36>{CurrencyManager.Instance.Get(CurrencyType.weapon_ore)}</color>/{vm.NextLevelCost}";
 
             if (txtLevelUpAllCost != null)
                 txtLevelUpAllCost.text = vm.LevelUpAllCost.ToString();
@@ -212,6 +223,9 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             else
                 await WeaponManager.Instance.TryLevelUpStandardAsync(currentDetailVm.WeaponId);
 
+            var result = weaponViewDataProvider.BuildStandardDetail(currentDetailVm.WeaponId);
+            BindSharedPreview(result.UpgradePanel);
+            BindModes(result.UpgradePanel);
             onChanged?.Invoke();
         }
 
@@ -231,6 +245,9 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
                 WeaponManager.Instance.NotifyStandardWeaponChanged(currentDetailVm.WeaponId);
             }
 
+            var result = weaponViewDataProvider.BuildStandardDetail(currentDetailVm.WeaponId);
+            BindSharedPreview(result.UpgradePanel);
+            BindModes(result.UpgradePanel);
             onChanged?.Invoke();
         }
 
@@ -244,6 +261,9 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             else
                 await WeaponManager.Instance.TryLimitBreakStandardAsync(currentDetailVm.WeaponId);
 
+            var result = weaponViewDataProvider.BuildStandardDetail(currentDetailVm.WeaponId);
+            BindSharedPreview(result.UpgradePanel);
+            BindModes(result.UpgradePanel);
             onChanged?.Invoke();
         }
     }
