@@ -127,9 +127,11 @@ namespace Immortal_Switch.Scripts.Shop.Views
             tabVertical.Initialize();
             tabHorizontal.Initialize();
 
+            tabVertical.Bind(OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
+            tabHorizontal.Bind(OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
+
             var tab = args is ShopArgs data ? data.DefaultTab : defaultTab;
-            tabVertical.Bind(tab, OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
-            tabHorizontal.Bind(tab, OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
+            OnChangeTab(tab);
 
             // Re-sync điểm/milestone GloryPass và ngày/claimed Monthly Pass mỗi lần mở Shop — tránh
             // lệch nếu tích nạp/qua ngày mới ở phiên khác.

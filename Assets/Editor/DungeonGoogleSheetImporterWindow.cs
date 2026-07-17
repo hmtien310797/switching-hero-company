@@ -202,6 +202,7 @@ namespace Battle.Dungeon.Editor
                 SetPrivateField(data, "enemyId", ReadInt(row, "enemy_id"));
                 SetPrivateField(data, "bossId", ReadInt(row, "boss_id"));
                 SetPrivateField(data, "mapName", ReadString(row, "map_name"));
+                SetPrivateField(data, "available", ReadBool(row, "available", true));
 
                 result.Add(data);
             }
@@ -528,6 +529,39 @@ namespace Battle.Dungeon.Editor
             return row.TryGetValue(key, out string value)
                 ? value.Trim()
                 : defaultValue;
+        }
+
+        private static bool ReadBool(
+            Dictionary<string, string> row,
+            string key,
+            bool defaultValue = false)
+        {
+            string value = ReadString(row, key);
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return defaultValue;
+            }
+
+            switch (Normalize(value))
+            {
+                case "TRUE":
+                case "1":
+                case "YES":
+                case "Y":
+                    return true;
+
+                case "FALSE":
+                case "0":
+                case "NO":
+                case "N":
+                    return false;
+
+                default:
+                    throw new FormatException(
+                        $"Không thể parse bool: column='{key}', value='{value}'"
+                    );
+            }
         }
 
         private static int ReadInt(

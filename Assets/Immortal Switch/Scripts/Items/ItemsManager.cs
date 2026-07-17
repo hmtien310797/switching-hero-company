@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
@@ -47,7 +48,9 @@ namespace Immortal_Switch.Scripts.Items
 
         public Dictionary<int, ItemData> GetAllItem()
         {
-            return _runtime.Items;
+            return _runtime.Items
+                .Where(v => v.Value != null && v.Value.Quantity > 0)
+                .ToDictionary(v => v.Key, v => v.Value);
         }
     }
 }

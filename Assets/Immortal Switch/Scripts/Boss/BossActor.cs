@@ -52,11 +52,13 @@ namespace Immortal_Switch.Scripts.Boss
         private ICombatUnit currentTarget;
         private IBossSkillLogic skillLogic;
         private BossDataSO bossData;
+        private int attackComboIndex;
 
         private float attackCooldown = 1f;
         private float attackTimer;
         private float spawnTimer;
         private bool hasHitThisAttack;
+        private bool isPlayingAttackAnimation;
         
         public event Action<BossActor> OnDead;
         
@@ -85,6 +87,7 @@ namespace Immortal_Switch.Scripts.Boss
         public ICombatUnit Target => currentTarget;
 
         public int NormalAttackCount { get; private set; }
+        
 
         public bool IsReady => currentState != BossState.Spawn && currentState != BossState.Dead;
 
@@ -140,6 +143,8 @@ namespace Immortal_Switch.Scripts.Boss
             currentTarget = null;
             attackTimer = 0f;
             hasHitThisAttack = false;
+            ResetAttackCombo();
+            isPlayingAttackAnimation = false;
 
             skillLogic = BossSkillLogicFactory.Create(BossId);
             skillLogic.Initialize(this);
@@ -176,6 +181,8 @@ namespace Immortal_Switch.Scripts.Boss
             currentTarget = null;
             attackTimer = 0f;
             hasHitThisAttack = false;
+            ResetAttackCombo();
+            isPlayingAttackAnimation = false;
 
             skillLogic = BossSkillLogicFactory.Create(BossId);
             skillLogic.Initialize(this);
@@ -380,12 +387,33 @@ namespace Immortal_Switch.Scripts.Boss
             if (stats != null && !stats.CanAttack())
                 return;
 
+            if (isPlayingAttackAnimation)
+                return;
+
             attackTimer += deltaTime;
 
             if (attackTimer >= attackCooldown)
             {
                 StartAttack();
             }
+        }
+        
+        public int GetCurrentAttackComboIndex()
+        {
+            return attackComboIndex;
+        }
+
+        public void AdvanceAttackCombo()
+        {
+            attackComboIndex++;
+
+            if (attackComboIndex >= 3)
+                attackComboIndex = 0;
+        }
+
+        public void ResetAttackCombo()
+        {
+            attackComboIndex = 0;
         }
 
         private void StartAttack()
@@ -395,9 +423,10 @@ namespace Immortal_Switch.Scripts.Boss
 
             attackTimer = 0f;
             hasHitThisAttack = false;
+            isPlayingAttackAnimation = true;
 
             animationDriver?.FaceTarget(transform.position, currentTarget.Position);
-            animationDriver?.PlayAttack(0);
+            animationDriver?.PlayAttack(attackComboIndex);
         }
 
         private void OnSpineEvent(string eventName)
@@ -446,6 +475,13 @@ namespace Immortal_Switch.Scripts.Boss
                 return;
             }
 
+            if (currentState == BossState.Attack)
+            {
+                isPlayingAttackAnimation = false;
+                AdvanceAttackCombo();
+                return;
+            }
+
             if (currentState == BossState.CastSkill)
             {
                 ChangeState(BossState.Idle);
@@ -489,10 +525,13 @@ namespace Immortal_Switch.Scripts.Boss
                     break;
 
                 case BossState.Idle:
+                    isPlayingAttackAnimation = false;
                     animationDriver?.PlayIdle();
                     break;
 
                 case BossState.Run:
+                    isPlayingAttackAnimation = false;
+                    ResetAttackCombo();
                     animationDriver?.PlayRun();
                     break;
 
@@ -501,9 +540,13 @@ namespace Immortal_Switch.Scripts.Boss
                     break;
 
                 case BossState.CastSkill:
+                    isPlayingAttackAnimation = false;
+                    ResetAttackCombo();
                     break;
 
                 case BossState.Dead:
+                    isPlayingAttackAnimation = false;
+                    ResetAttackCombo();
                     animationDriver?.PlayDead();
                     break;
             }

@@ -31,6 +31,6 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Models
     public class EventWheelPassClaimResult
     {
         public bool Changed;
-        public List<ItemRewardData> Rewards = new();
+        public List<ItemData> Rewards = new();
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using Immortal_Switch.Scripts.StatSystem;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +19,9 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
         private StatType currentStat;
         private Action<StatType> onClickUpgrade;
+        private bool canUpgrade;
+        private static readonly Color UpgradeUnavailableColor =
+            new Color32(210, 55, 55, 255);
 
         public void Initialize(StatTierViewData viewData, Action<StatType> onUpgradeClicked)
         {
@@ -28,7 +32,6 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             if (statName != null) statName.text = viewData.Name;
             if (statProgress != null) statProgress.fillAmount = viewData.StatProgressPercent;
             if (statCurrentStackValue != null) statCurrentStackValue.text = $"{viewData.StatCurrentStack}/{viewData.StatMaxStack}";
-            if (statValuePay != null) statValuePay.text = viewData.ValuePay;
 
             if (maxImage != null)
             {
@@ -42,10 +45,23 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                 levelUpButton.interactable = !viewData.IsMax;
                 levelUpButton.onClick.AddListener(OnClickLevelUp);
             }
+            canUpgrade = viewData.CanUpgrade;
+            if (statValuePay != null)
+            {
+                statValuePay.text = viewData.ValuePay;
+                statValuePay.color = canUpgrade
+                    ? Color.white
+                    : UpgradeUnavailableColor;
+            }
         }
 
         public void OnClickLevelUp()
         {
+            if (!canUpgrade)
+            {
+                UIManager.Instance.ShowToast("Not Enough Gold");
+                return;
+            }
             onClickUpgrade?.Invoke(currentStat);
         }
 

@@ -898,6 +898,14 @@ PrefabInstance:
       propertyPath: cineMachineHeroRotation
       value: 
       objectReference: {fileID: 2949855837492024296}
+    - target: {fileID: 7898301795404162207, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
+      propertyPath: m_Cameras.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7898301795404162207, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
+      propertyPath: 'm_Cameras.Array.data[1]'
+      value: 
+      objectReference: {fileID: 818825788}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.5
@@ -943,6 +951,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
+--- !u!20 &818825788 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 5423933335014698655, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
+  m_PrefabInstance: {fileID: 818825787}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &854501079
 GameObject:
   m_ObjectHideFlags: 0

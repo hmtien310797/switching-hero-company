@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Common;
 using Battle;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
@@ -85,11 +86,20 @@ namespace Immortal_Switch.Scripts.Skill
                 }
 
                 case SkillTargetType.AreaAroundCastPosition:
-                    ResolveEnemiesInArea(context,context.RuntimeObject != null ? context.RuntimeObject.transform.position : context.Caster.Position, areaData);
+                    ResolveEnemiesInArea(
+                        context,
+                        context.RuntimeObject != null
+                            ? context.RuntimeObject.transform.position
+                            : context.CastPosition,
+                        areaData);
                     break;
 
                 case SkillTargetType.AllEnemies:
                     ResolveAllEnemies(context);
+                    break;
+
+                case SkillTargetType.AllAllies:
+                    ResolveAllAllies();
                     break;
             }
 
@@ -146,6 +156,17 @@ namespace Immortal_Switch.Scripts.Skill
             }
         }
 
+
+        private void ResolveAllAllies()
+        {
+            UserDataCache cache = UserDataCache.Instance;
+            if (cache == null || cache.inBattleHeroes == null)
+                return;
+
+            for (int i = 0; i < cache.inBattleHeroes.Length; i++)
+                AddIfValid(cache.inBattleHeroes[i]);
+        }
+
         private void ResolveAllEnemies(SkillRuntimeContext context)
         {
             IBattleTargetRegistry registry = context?.BattleContext?.TargetRegistry;
@@ -188,7 +209,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public bool HasValidTarget(ICombatUnit target)
         {
-            return target.IsUnityAlive() && !target.IsDead;
+            return target != null && target.IsUnityAlive() && !target.IsDead;
         }
 
         private static bool IsInsideBox(
@@ -232,7 +253,9 @@ namespace Immortal_Switch.Scripts.Skill
                 : context.CastPosition;
 
             Vector3 destination;
-            if (context.MainTarget.IsUnityAlive() && !context.MainTarget.IsDead)
+            if (context.MainTarget != null &&
+                context.MainTarget.IsUnityAlive() &&
+                !context.MainTarget.IsDead)
             {
                 destination = context.MainTarget.Position;
             }

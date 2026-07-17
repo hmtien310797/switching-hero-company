@@ -56,28 +56,28 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     _storage.Data.Main.Progress += value;
                 }
 
-                matches.Add(MissionSystemTypes.MAIN, _storage.Data.Main);
+                matches.Add(MissionTypes.MAIN, _storage.Data.Main);
             }
 
             var mission = SetProgress(_storage.Data.DailyTask.Tasks, needSetProgress, eventKey, value);
 
             if (mission != null)
             {
-                matches.Add(MissionSystemTypes.DAILY, mission);
+                matches.Add(MissionTypes.DAILY, mission);
             }
 
             mission = SetProgress(_storage.Data.WeeklyTask.Tasks, needSetProgress, eventKey, value);
 
             if (mission != null)
             {
-                matches.Add(MissionSystemTypes.WEEKLY, mission);
+                matches.Add(MissionTypes.WEEKLY, mission);
             }
 
             mission = SetProgress(_storage.Data.RepeatTask, needSetProgress, eventKey, value);
 
             if (mission != null)
             {
-                matches.Add(MissionSystemTypes.REPEAT, mission);
+                matches.Add(MissionTypes.REPEAT, mission);
             }
 
             if (matches.Count > 0)
@@ -108,7 +108,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
             switch (missionType)
             {
-                case MissionSystemTypes.MAIN:
+                case MissionTypes.MAIN:
                     if (_storage.Data.Main.Id == missionId)
                     {
                         _storage.Data.Main.IsClaimed = isClaimed;
@@ -117,7 +117,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                     break;
 
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     foreach (var entry in _storage.Data.DailyTask.Tasks.Where(entry => entry.Id == missionId))
                     {
                         entry.IsClaimed = isClaimed;
@@ -127,7 +127,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                     break;
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     foreach (var entry in _storage.Data.WeeklyTask.Tasks.Where(entry => entry.Id == missionId))
                     {
                         entry.IsClaimed = isClaimed;
@@ -137,8 +137,8 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                     break;
 
-                case MissionSystemTypes.REPEAT:
-                case MissionSystemTypes.ACHIEVEMENT:
+                case MissionTypes.REPEAT:
+                case MissionTypes.ACHIEVEMENT:
                     foreach (var entry in _storage.Data.RepeatTask.Where(entry => entry.Id == missionId))
                     {
                         entry.IsClaimed = isClaimed;
@@ -162,12 +162,12 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             switch (missionType)
             {
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     _storage.Data.DailyTask.Point += point;
                     _storage.Save();
                     break;
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     _storage.Data.WeeklyTask.Point += point;
                     _storage.Save();
                     break;
@@ -178,12 +178,12 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             switch (cfg.type)
             {
-                case MissionSystemTypes.MAIN:
+                case MissionTypes.MAIN:
                     return _storage.Data.Main.Id == cfg.missionId &&
                            _storage.Data.Main.Progress >= cfg.target &&
                            !_storage.Data.Main.IsClaimed;
 
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     foreach (var entry in _storage.Data.DailyTask.Tasks.Where(entry => entry.Id == cfg.missionId))
                     {
                         return entry.Progress >= cfg.target && !entry.IsClaimed;
@@ -191,7 +191,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                     break;
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     foreach (var entry in _storage.Data.WeeklyTask.Tasks.Where(entry => entry.Id == cfg.missionId))
                     {
                         return entry.Progress >= cfg.target && !entry.IsClaimed;
@@ -199,7 +199,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                     break;
 
-                case MissionSystemTypes.REPEAT:
+                case MissionTypes.REPEAT:
                     foreach (var entry in _storage.Data.RepeatTask.Where(entry => entry.Id == cfg.missionId))
                     {
                         return entry.Progress >= cfg.target && !entry.IsClaimed;
@@ -217,7 +217,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
             switch (row.scope)
             {
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     if (_storage.Data.DailyTask.Point >= row.pointThreshold &&
                         _storage.Data.DailyTask.PointsClaimed.All(v => v.Target != row.pointThreshold))
                     {
@@ -252,7 +252,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                     break;
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     if (_storage.Data.WeeklyTask.Point >= row.pointThreshold &&
                         _storage.Data.WeeklyTask.PointsClaimed.All(v => v.Target != row.pointThreshold))
                     {
@@ -293,7 +293,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         private bool NeedSetProgress(string eventKey)
         {
-            return eventKey is MissionSystemEventKeys.EVENT_CLEAR_STAGE or MissionSystemEventKeys.EVENT_HERO_LEVELUP;
+            return eventKey is MissionEventKeys.EVENT_CLEAR_STAGE or MissionEventKeys.EVENT_HERO_LEVELUP;
         }
     }
 }

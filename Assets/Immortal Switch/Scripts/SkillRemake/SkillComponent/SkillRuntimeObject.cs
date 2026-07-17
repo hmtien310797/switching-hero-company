@@ -21,6 +21,7 @@ namespace Immortal_Switch.Scripts.Skill
         public event Action<SkillRuntimeObject> Despawned;
 
         private static readonly List<SkillPhaseData> PhaseBuffer = new();
+        public SkillAreaRuntime skillArea;
 
         [Header("Debug Runtime Event")]
         [SerializeField] private bool debugCountRuntimeEvent;
@@ -48,6 +49,11 @@ namespace Immortal_Switch.Scripts.Skill
         private bool isDespawning;
         private int skillId;
 
+        private void Awake()
+        {
+            skillArea = GetComponent<SkillAreaRuntime>();
+        }
+
         public virtual void Init(
             SkillRuntimeContext context,
             SkillRuntimeObjectConfig config,
@@ -55,6 +61,10 @@ namespace Immortal_Switch.Scripts.Skill
             SkillTargetResolver targetResolver,
             ISkillObjectSpawner spawner, object arg = null)
         {
+            if (skillArea == null)
+            {
+                skillArea = GetComponent<SkillAreaRuntime>();
+            }
             Context = context;
             Config = config;
             Executor = executor;

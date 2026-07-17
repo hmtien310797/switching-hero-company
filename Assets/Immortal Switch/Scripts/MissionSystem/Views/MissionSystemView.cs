@@ -1,7 +1,5 @@
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.MissionSystem.Views.UI;
-using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
@@ -9,13 +7,24 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
 {
     public class MissionSystemView : AnimatedUIView
     {
-        [Header("Tabs")] [SerializeField] private UIMissionSystemTaskView dailyView;
-        [SerializeField] private UIMissionSystemTaskView weeklyView;
-        [SerializeField] private UIMissionSystemRepeatView repeatView;
+        [Header("Tabs")]
+        [SerializeField]
+        private UIMissionSystemTaskView dailyView;
 
-        [SerializeField] private SegmentedControlOption dailyOption;
-        [SerializeField] private SegmentedControlOption weeklyOption;
-        [SerializeField] private SegmentedControlOption repeatOption;
+        [SerializeField]
+        private UIMissionSystemTaskView weeklyView;
+
+        [SerializeField]
+        private UIMissionSystemRepeatView repeatView;
+
+        [SerializeField]
+        private SegmentedControlOption dailyOption;
+
+        [SerializeField]
+        private SegmentedControlOption weeklyOption;
+
+        [SerializeField]
+        private SegmentedControlOption repeatOption;
 
         // --- Private Fields ---
         // loai tab da chon
@@ -23,10 +32,10 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
 
         private void Awake()
         {
-            dailyOption.Bind(() => OnClickOption(MissionSystemTypes.DAILY));
-            weeklyOption.Bind(() => OnClickOption(MissionSystemTypes.WEEKLY));
-            repeatOption.Bind(() => OnClickOption(MissionSystemTypes.REPEAT));
-            OnClickOption(MissionSystemTypes.DAILY);
+            dailyOption.Bind(() => OnClickOption(MissionTypes.DAILY));
+            weeklyOption.Bind(() => OnClickOption(MissionTypes.WEEKLY));
+            repeatOption.Bind(() => OnClickOption(MissionTypes.REPEAT));
+            OnClickOption(MissionTypes.DAILY);
         }
 
         private void OnClickOption(string missionType)
@@ -44,7 +53,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
         {
             switch (missionType)
             {
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     dailyView.gameObject.SetActive(value);
                     dailyOption.SetSelected(value);
 
@@ -55,7 +64,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
                     repeatOption.SetSelected(!value);
                     break;
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     dailyView.gameObject.SetActive(!value);
                     dailyOption.SetSelected(!value);
 
@@ -66,7 +75,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
                     repeatOption.SetSelected(!value);
                     break;
 
-                case MissionSystemTypes.REPEAT:
+                case MissionTypes.REPEAT:
                     dailyView.gameObject.SetActive(!value);
                     dailyOption.SetSelected(!value);
 
@@ -92,7 +101,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
 
             switch (missionType)
             {
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                 {
                     var milestone = MissionSystemManager.Instance.GetMilesStone(missionType);
                     var point = MissionSystemManager.Instance.GetPoint(missionType);
@@ -101,7 +110,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
                     break;
                 }
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                 {
                     var milestone = MissionSystemManager.Instance.GetMilesStone(missionType);
                     var point = MissionSystemManager.Instance.GetPoint(missionType);
@@ -110,7 +119,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views
                     break;
                 }
 
-                case MissionSystemTypes.REPEAT:
+                case MissionTypes.REPEAT:
                     repeatView.Initialize(missions, tasks, missionType, JumpTo);
                     break;
             }

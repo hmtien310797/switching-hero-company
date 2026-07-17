@@ -1,3 +1,5 @@
+using System;
+
 namespace Immortal_Switch.Scripts.Skill
 {
     public enum SkillOwnerType
@@ -153,6 +155,23 @@ namespace Immortal_Switch.Scripts.Skill
         OwnerAndAlly
     }
     
+
+
+    [Flags]
+    public enum SkillBuffTargetMask
+    {
+        None = 0,
+        Self = 1 << 0,
+        Allies = 1 << 1,
+        Enemies = 1 << 2,
+    }
+
+    public enum SkillBuffApplyMode
+    {
+        Timed,
+        WhileInArea
+    }
+
     public enum PassiveLevelMergeMode
     {
         Override,

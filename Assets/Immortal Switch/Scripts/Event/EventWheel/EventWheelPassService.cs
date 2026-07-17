@@ -255,7 +255,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         private static bool CollectClaimableRewards(
             EventWheelPassProgressData progress,
             DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row,
-            ICollection<ItemRewardData> rewards
+            ICollection<ItemData> rewards
         )
         {
             if (progress.PurchasedSpinCount < row.spinRequired)
@@ -284,7 +284,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         }
 
         /// <summary>Phân tích chuỗi cấu hình reward và thêm các phần thưởng runtime vào kết quả.</summary>
-        private static void AddRewards(string rewardConfig, ICollection<ItemRewardData> output)
+        private static void AddRewards(string rewardConfig, ICollection<ItemData> output)
         {
             var rewards = DatabaseManager.Instance.GetRewards(rewardConfig);
 

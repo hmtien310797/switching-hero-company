@@ -47,11 +47,29 @@ namespace Immortal_Switch.Scripts.Skill
     [Serializable]
     public class SkillStatModifierData
     {
-        public string ModifierId;
+        [Header("Target")]
+        [Tooltip("Có thể chọn nhiều loại target cùng lúc: Self, Allies, Enemies.")]
+        public SkillBuffTargetMask TargetMask = SkillBuffTargetMask.Self;
+
+        [Tooltip("Timed: apply ngay rồi tự hết theo Duration. WhileInArea: còn nằm trong vùng thì còn hiệu lực.")]
+        public SkillBuffApplyMode ApplyMode = SkillBuffApplyMode.Timed;
+
+        [Header("Modifier")]
+        public string ModifierId = "skill_stat_modifier";
         public StatType StatType;
+        public ModifierOp Operation = ModifierOp.Multiply;
+
+        [Tooltip("Giá trị modifier. Ví dụ +9% = 0.09, -40% = -0.4.")]
         public float PercentValue;
+
         public bool ScaleValueWithClassSkillLevel = true;
-        public float Duration = 5f;
+
+        [Header("Duration")]
+        [Min(0.01f)] public float Duration = 5f;
+
+        [Header("Stack")]
+        public BuffStackRule StackRule = BuffStackRule.Replace;
+        [Min(1)] public int MaxStacks = 1;
     }
 
     [Serializable]

@@ -24,6 +24,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.UI
@@ -89,6 +90,7 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] private GameObject tapeAnimator;
 
         [SerializeField] private CanvasScaler canvasScaler;
+        [SerializeField] private Canvas canvas;
 
         [Header("Toast")] [SerializeField] private ToastMessageView toastMessagePrefab;
 
@@ -134,6 +136,10 @@ namespace Immortal_Switch.Scripts.UI
 
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
             CreateLayerRootsFromEnum();
+            SceneManager.sceneLoaded += (arg0, mode) =>
+            {
+                canvas.worldCamera = Camera.main;
+            };
         }
 
         protected override void OnDestroy()

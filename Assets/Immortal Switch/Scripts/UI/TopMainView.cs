@@ -13,6 +13,7 @@ using Immortal_Switch.Scripts.GameSetting.Views;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items;
+using Immortal_Switch.Scripts.Leaderboard.Views;
 using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.Reward;
@@ -35,69 +36,52 @@ namespace Immortal_Switch.Scripts.UI
     {
         public static TopMainView Instance;
 
-        [SerializeField]
-        HeroSkillBarUI heroSkillBarUI;
+        [SerializeField] HeroSkillBarUI heroSkillBarUI;
+
+        [SerializeField] private Button switchMainSubHeroButton;
+
+        [SerializeField] private Button moveButton;
+
+        [SerializeField] private Button btnBag;
+
+        [SerializeField] private Button btnShop;
+
+        [SerializeField] private Button btnEvent;
 
         [SerializeField]
-        private Button switchMainSubHeroButton;
-
-        [SerializeField]
-        private Button moveButton;
-
-        [SerializeField]
-        private Button btnBag;
-
-        [SerializeField]
-        private Button btnShop;
-
-        [SerializeField]
-        private Button btnEvent;
+        private Button btnLeaderboard;
 
         [SerializeField]
         private Button btnGoldInfo;
 
-        [SerializeField]
-        private Button btnDiamondInfo;
+        [SerializeField] private Button btnDiamondInfo;
 
-        [SerializeField]
-        CurrencyView currencyView;
+        [SerializeField] CurrencyView currencyView;
 
-        [SerializeField]
-        HeroJoystick heroJostick;
+        [SerializeField] HeroJoystick heroJostick;
 
-        [SerializeField]
-        private Button autoSkillButton;
+        [SerializeField] private Button autoSkillButton;
 
-        [SerializeField]
-        private Button autoSwitchButton;
+        [SerializeField] private Button autoSwitchButton;
 
-        [SerializeField]
-        private Button profileBtn;
+        [SerializeField] private Button profileBtn;
 
-        [Header("Player references")]
-        [SerializeField]
+        [Header("Player references")] [SerializeField]
         private TMP_Text txtPlayerName;
 
-        [SerializeField]
-        private TMP_Text txtPlayerLevel;
+        [SerializeField] private TMP_Text txtPlayerLevel;
 
-        [SerializeField]
-        private Image imgPlayerProgress;
+        [SerializeField] private Image imgPlayerProgress;
 
-        [SerializeField]
-        private GameObject rotateObject;
+        [SerializeField] private GameObject rotateObject;
 
-        [SerializeField]
-        private GameObject[] hideAbleObjects;
+        [SerializeField] private GameObject[] hideAbleObjects;
 
-        [SerializeField]
-        private SkeletonGraphic skeletonGraphic;
+        [SerializeField] private SkeletonGraphic skeletonGraphic;
 
-        [SerializeField]
-        private Button btnActiveFramingClaim;
+        [SerializeField] private Button btnActiveFramingClaim;
 
-        [SerializeField]
-        private RewardSyncService rewardSyncService;
+        [SerializeField] private RewardSyncService rewardSyncService;
 
         // Phải khớp MIN_CLAIM_SECONDS phía server (nakama/src/handler/afk.js) — nút chỉ
         // interactable khi AFK đã tích lũy đủ ngần này giây kể từ checkpoint gần nhất.
@@ -106,43 +90,31 @@ namespace Immortal_Switch.Scripts.UI
         private double afkAccumulatedSeconds;
         private bool afkTimerSynced;
 
-        [SerializeField]
-        private GameObject[] disableObjectsWhenPlayDungeon;
+        [SerializeField] private GameObject[] disableObjectsWhenPlayDungeon;
 
-        [SerializeField]
-        private GameObject[] enableObjectsWhenPlayDungeon;
+        [SerializeField] private GameObject[] enableObjectsWhenPlayDungeon;
 
-        [Header("Hero Icon Switch Animation")]
-        [SerializeField]
+        [Header("Hero Icon Switch Animation")] [SerializeField]
         private Image[] iconHeroImage;
 
-        [SerializeField]
-        private Image[] iconHeroClassImage;
+        [SerializeField] private Image[] iconHeroClassImage;
 
-        [SerializeField]
-        private RectTransform[] heroIconAnchors;
+        [SerializeField] private RectTransform[] heroIconAnchors;
 
-        [SerializeField]
-        private RectTransform[] heroClassIconAnchors;
+        [SerializeField] private RectTransform[] heroClassIconAnchors;
 
-        [SerializeField]
-        private RectTransform heroIconAnimationRoot;
+        [SerializeField] private RectTransform heroIconAnimationRoot;
 
-        [SerializeField, Min(0.01f)]
-        private float heroIconSwitchDuration = 0.25f;
+        [SerializeField, Min(0.01f)] private float heroIconSwitchDuration = 0.25f;
 
-        [SerializeField]
-        private Ease heroIconSwitchEase = Ease.OutCubic;
+        [SerializeField] private Ease heroIconSwitchEase = Ease.OutCubic;
 
-        [SerializeField]
-        private Button buttonSetting;
+        [SerializeField] private Button buttonSetting;
 
-        [Header("Performance Overlay")]
-        [SerializeField]
+        [Header("Performance Overlay")] [SerializeField]
         private TMP_Text txtFps;
 
-        [SerializeField, Min(0.05f)]
-        private float perfOverlayRefreshInterval = 0.5f;
+        [SerializeField, Min(0.05f)] private float perfOverlayRefreshInterval = 0.5f;
 
         private ProfilerRecorder drawCallsRecorder;
         private ProfilerRecorder batchesRecorder;
@@ -167,6 +139,7 @@ namespace Immortal_Switch.Scripts.UI
             TutorialManager.Instance.OnClick += OnClickTutorial;
             Instance = this;
 
+            btnLeaderboard.onClick.AddListener(OnClickLeaderboard);
             btnDiamondInfo.onClick.AddListener(OnClickDiamondInfo);
             btnGoldInfo.onClick.AddListener(OnClickGoldInfo);
 
@@ -182,6 +155,11 @@ namespace Immortal_Switch.Scripts.UI
             drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Draw Calls Count");
             batchesRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
             setPassCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "SetPass Calls Count");
+        }
+
+        private void OnClickLeaderboard()
+        {
+            UIManager.Instance.TogglePopupAsync<LeaderboardView>().Forget();
         }
 
         private void OnClickDiamondInfo()
@@ -357,7 +335,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnClickProfile()
         {
-            UIManager.Instance.OpenPopupAsync<ProfileView>().Forget();
+            UIManager.Instance.TogglePopupAsync<ProfileView>().Forget();
         }
 
         [Button]
@@ -445,6 +423,7 @@ namespace Immortal_Switch.Scripts.UI
             if (response != null &&
                 response.Success)
             {
+                GameEventManager.Trigger(GameEvents.ON_AFK_REWARD_CLAIM_COUNT);
                 SyncAfkAccumulatedSeconds(0d);
             }
         }
@@ -524,6 +503,7 @@ namespace Immortal_Switch.Scripts.UI
                 switchMainSubHeroButton.onClick.RemoveListener(OnSwitchMainSubHeroButtonClicked);
             }
 
+            btnLeaderboard.onClick.RemoveListener(OnClickLeaderboard);
             btnDiamondInfo.onClick.RemoveListener(OnClickDiamondInfo);
             btnGoldInfo.onClick.RemoveListener(OnClickGoldInfo);
         }
@@ -679,13 +659,17 @@ namespace Immortal_Switch.Scripts.UI
 
         private void MoveHeroIcon(
             int iconIndex,
-            RectTransform iconRect, RectTransform iconClassRect,
+            RectTransform iconRect,
+            RectTransform iconClassRect,
             RectTransform targetAnchor,
             RectTransform targetClassAnchor,
             int switchVersion)
         {
             if (iconRect == null ||
-                targetAnchor == null)
+                iconClassRect == null ||
+                targetAnchor == null ||
+                targetClassAnchor == null ||
+                heroIconAnimationRoot == null)
             {
                 return;
             }
@@ -693,65 +677,55 @@ namespace Immortal_Switch.Scripts.UI
             heroIconTweens[iconIndex]?.Kill(false);
             heroIconTweens[iconIndex] = null;
 
-            /*
-             * Đây là vị trí thật của anchor trong world space.
-             * Không tự tính từ anchoredPosition nữa.
-             */
-            Vector3 targetWorldPosition = targetAnchor.position;
-            Vector3 targetClassWorldPosition = targetClassAnchor.position;
+            // Đưa icon về cùng một không gian RectTransform để tween.
+            // worldPositionStays = true giúp icon không nhảy tại thời điểm đổi parent.
+            iconRect.SetParent(heroIconAnimationRoot, true);
+            iconClassRect.SetParent(heroIconAnimationRoot, true);
 
-            /*
-             * Scale cuối cùng của icon khi nằm bên trong targetAnchor.
-             *
-             * Icon luôn có localScale = 1.
-             * Scale 0.9 đã nằm trên HeroIconAnchor2.
-             */
-            Vector3 targetWorldScale = targetAnchor.lossyScale;
+            Vector3 targetLocalPosition =
+                heroIconAnimationRoot.InverseTransformPoint(targetAnchor.position);
 
-            Vector3 targetLocalScaleInCurrentParent =
+            Vector3 targetClassLocalPosition =
+                heroIconAnimationRoot.InverseTransformPoint(targetClassAnchor.position);
+
+            Vector3 targetLocalScale =
                 ConvertWorldScaleToLocalScale(
-                    iconRect.parent,
-                    targetWorldScale);
+                    heroIconAnimationRoot,
+                    targetAnchor.lossyScale);
 
-            Vector3 targetClassLocalScaleInCurrentParent =
+            Vector3 targetClassLocalScale =
                 ConvertWorldScaleToLocalScale(
-                    iconClassRect.parent,
-                    targetWorldScale);
+                    heroIconAnimationRoot,
+                    targetClassAnchor.lossyScale);
 
             Sequence sequence = DOTween.Sequence();
 
             sequence.Join(
                 iconRect
-                    .DOMove(targetWorldPosition, heroIconSwitchDuration)
-                    .SetEase(Ease.Linear));
+                    .DOLocalMove(targetLocalPosition, heroIconSwitchDuration)
+                    .SetEase(heroIconSwitchEase));
 
             sequence.Join(
                 iconClassRect
-                    .DOMove(targetClassWorldPosition, heroIconSwitchDuration)
-                    .SetEase(Ease.Linear));
+                    .DOLocalMove(targetClassLocalPosition, heroIconSwitchDuration)
+                    .SetEase(heroIconSwitchEase));
 
             sequence.Join(
                 iconRect
-                    .DOScale(
-                        targetLocalScaleInCurrentParent,
-                        heroIconSwitchDuration)
-                    .SetEase(Ease.Linear));
+                    .DOScale(targetLocalScale, heroIconSwitchDuration)
+                    .SetEase(heroIconSwitchEase));
 
             sequence.Join(
                 iconClassRect
-                    .DOScale(
-                        targetClassLocalScaleInCurrentParent,
-                        heroIconSwitchDuration)
-                    .SetEase(Ease.Linear));
+                    .DOScale(targetClassLocalScale, heroIconSwitchDuration)
+                    .SetEase(heroIconSwitchEase));
 
             sequence
                 .SetUpdate(true)
                 .OnComplete(() =>
                 {
                     if (switchVersion != heroIconSwitchVersion)
-                    {
                         return;
-                    }
 
                     AttachIconToAnchor(iconRect, targetAnchor);
                     AttachIconToAnchor(iconClassRect, targetClassAnchor);

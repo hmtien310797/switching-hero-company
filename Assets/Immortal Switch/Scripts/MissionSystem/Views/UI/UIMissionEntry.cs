@@ -129,7 +129,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         public void RefreshIcon()
         {
-            imgReward.sprite = Row.type == MissionSystemTypes.DAILY ? sprIconDaily : sprIconWeekly;
+            imgReward.sprite = Row.type == MissionTypes.DAILY ? sprIconDaily : sprIconWeekly;
         }
 
         public void RefreshVisual()

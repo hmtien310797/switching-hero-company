@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Common;
 using Immortal_Switch.Scripts.Combat;
 using UnityEngine;
 using Immortal_Switch.Scripts.StatSystem;
@@ -38,7 +39,7 @@ namespace Immortal_Switch.Scripts.Skill
             if (Random.Range(0f, 100f) > action.ChancePercent)
                 return;
 
-            bool isUltimate = context.SkillData.OwnerType == SkillOwnerType.UltimateSkill;
+            bool isUltimate = context.SkillData != null && context.SkillData.OwnerType == SkillOwnerType.UltimateSkill;
 
             SkillTargetType targetType = action.TargetTypeOverride;
 
@@ -67,8 +68,7 @@ namespace Immortal_Switch.Scripts.Skill
 
                 case SkillActionType.ApplyBuff:
                 case SkillActionType.ApplyDebuff:
-                    Debug.LogWarning(
-                        "[SkillExecutor] Buff/Debuff action data is ready, but BuffModule integration is not implemented in phase 1.");
+                    ExecuteBuffDebuff(context, action);
                     break;
             }
         }
@@ -95,6 +95,234 @@ namespace Immortal_Switch.Scripts.Skill
                 context.SkillLevel,
                 scaleWithClassSkillLevel
             );
+        }
+
+
+        private readonly List<ICombatUnit> buffTargetBuffer = new();
+
+        public bool IsWhileInAreaBuffAction(SkillActionData action)
+        {
+            return action != null &&
+                   (action.ActionType == SkillActionType.ApplyBuff ||
+                    action.ActionType == SkillActionType.ApplyDebuff) &&
+                   action.StatModifier != null &&
+                   action.StatModifier.ApplyMode == SkillBuffApplyMode.WhileInArea;
+        }
+
+        private void ExecuteBuffDebuff(
+            SkillRuntimeContext context,
+            SkillActionData action)
+        {
+            if (context == null || action == null || action.StatModifier == null)
+                return;
+
+            // WhileInArea phải do SkillAreaRuntime quản lý để remove đúng lúc target rời vùng.
+            if (action.StatModifier.ApplyMode == SkillBuffApplyMode.WhileInArea)
+                return;
+
+            ResolveBuffTargets(context, action, action.Area, buffTargetBuffer, onlyTargetsInsideArea: false);
+
+            BuffKind kind = action.ActionType == SkillActionType.ApplyDebuff
+                ? BuffKind.Debuff
+                : BuffKind.Buff;
+
+            for (int i = 0; i < buffTargetBuffer.Count; i++)
+            {
+                ICombatUnit target = buffTargetBuffer[i];
+                if (!HasValidTarget(target) || target.Stats == null || target.Stats.BuffModule == null)
+                    continue;
+
+                BuffData buffData = CreateBuffData(context, action, kind, string.Empty);
+                target.Stats.BuffModule.ApplyBuff(buffData);
+            }
+
+            buffTargetBuffer.Clear();
+        }
+
+        public BuffData CreateBuffData(
+            SkillRuntimeContext context,
+            SkillActionData action,
+            BuffKind kind,
+            string idSuffix)
+        {
+            SkillStatModifierData modifierData = action != null ? action.StatModifier : null;
+            if (modifierData == null)
+                return null;
+
+            float value = GetScaledValue(
+                context,
+                modifierData.PercentValue,
+                modifierData.ScaleValueWithClassSkillLevel);
+
+            string skillKey = context != null && context.SkillData != null
+                ? context.SkillData.SkillKey
+                : "unknown_skill";
+
+            string modifierId = string.IsNullOrEmpty(modifierData.ModifierId)
+                ? "skill_stat_modifier"
+                : modifierData.ModifierId;
+
+            string suffix = string.IsNullOrEmpty(idSuffix)
+                ? string.Empty
+                : $"_{idSuffix}";
+
+            BuffData buffData = new BuffData
+            {
+                Id = $"{skillKey}_{modifierId}{suffix}",
+                Name = modifierId,
+                Kind = kind,
+                Duration = Mathf.Max(0.01f, modifierData.Duration),
+                MaxStacks = Mathf.Max(1, modifierData.MaxStacks),
+                StackRule = modifierData.StackRule,
+                Modifiers = new List<StatModifier>
+                {
+                    new StatModifier(
+                        modifierData.StatType,
+                        modifierData.Operation,
+                        value)
+                }
+            };
+
+            return buffData;
+        }
+
+        public void ResolveBuffTargets(
+            SkillRuntimeContext context,
+            SkillActionData action,
+            SkillAreaData areaData,
+            List<ICombatUnit> results,
+            bool onlyTargetsInsideArea)
+        {
+            results.Clear();
+
+            if (context == null || action == null || action.StatModifier == null)
+                return;
+
+            SkillBuffTargetMask mask = action.StatModifier.TargetMask;
+
+            if ((mask & SkillBuffTargetMask.Self) != 0)
+                AddBuffTarget(context.Caster, results);
+
+            if ((mask & SkillBuffTargetMask.Allies) != 0)
+                ResolveAllyTargets(results);
+
+            if ((mask & SkillBuffTargetMask.Enemies) != 0)
+            {
+                SkillTargetType targetType = onlyTargetsInsideArea
+                    ? SkillTargetType.AreaAroundTarget
+                    : action.TargetTypeOverride;
+
+                List<ICombatUnit> enemies = targetResolver.ResolveTargets(context, targetType, areaData);
+                for (int i = 0; i < enemies.Count; i++)
+                    AddBuffTarget(enemies[i], results);
+            }
+
+            if (!onlyTargetsInsideArea || areaData == null)
+                return;
+
+            Vector3 center = context.TargetPosition;
+            Vector3 direction = ResolveAreaDirection(context);
+
+            for (int i = results.Count - 1; i >= 0; i--)
+            {
+                if (!IsUnitInsideArea(results[i], areaData, center, direction))
+                    results.RemoveAt(i);
+            }
+        }
+
+        private void ResolveAllyTargets(List<ICombatUnit> results)
+        {
+            UserDataCache cache = UserDataCache.Instance;
+            if (cache == null || cache.inBattleHeroes == null)
+                return;
+
+            for (int i = 0; i < cache.inBattleHeroes.Length; i++)
+                AddBuffTarget(cache.inBattleHeroes[i], results);
+        }
+
+        private void AddBuffTarget(ICombatUnit target, List<ICombatUnit> results)
+        {
+            if (!HasValidTarget(target))
+                return;
+
+            if (!results.Contains(target))
+                results.Add(target);
+        }
+
+        private static Vector3 ResolveAreaDirection(SkillRuntimeContext context)
+        {
+            if (context == null || context.Caster == null)
+                return Vector3.right;
+
+            Vector3 direction = context.TargetPosition - context.Caster.Position;
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude <= 0.0001f)
+                direction = context.Caster.Transform != null
+                    ? context.Caster.Transform.forward
+                    : Vector3.right;
+
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude <= 0.0001f)
+                direction = Vector3.right;
+
+            return direction.normalized;
+        }
+
+        public bool IsUnitInsideArea(
+            ICombatUnit unit,
+            SkillAreaData areaData,
+            Vector3 areaCenter,
+            Vector3 castDirection)
+        {
+            if (!HasValidTarget(unit) || areaData == null)
+                return false;
+
+            Vector3 unitPosition = unit.Position;
+            unitPosition.y = areaCenter.y;
+
+            switch (areaData.Shape)
+            {
+                case SkillAreaShape.Box:
+                    return IsInsideBox(unitPosition, areaCenter, castDirection, areaData.BoxLength, areaData.BoxWidth);
+
+                case SkillAreaShape.Circle:
+                default:
+                    float radius = Mathf.Max(0f, areaData.Radius);
+                    return (unitPosition - areaCenter).sqrMagnitude <= radius * radius;
+            }
+        }
+
+        private static bool IsInsideBox(
+            Vector3 targetPosition,
+            Vector3 boxCenter,
+            Vector3 forwardDirection,
+            float boxLength,
+            float boxWidth)
+        {
+            forwardDirection.y = 0f;
+
+            if (forwardDirection.sqrMagnitude <= 0.0001f)
+                forwardDirection = Vector3.right;
+
+            forwardDirection.Normalize();
+
+            Vector3 rightDirection = new(
+                -forwardDirection.z,
+                0f,
+                forwardDirection.x);
+
+            Vector3 offset = targetPosition - boxCenter;
+            offset.y = 0f;
+
+            float forwardDistance = Vector3.Dot(offset, forwardDirection);
+            float sideDistance = Vector3.Dot(offset, rightDirection);
+            float halfLength = Mathf.Max(0f, boxLength) * 0.5f;
+            float halfWidth = Mathf.Max(0f, boxWidth) * 0.5f;
+
+            return Mathf.Abs(forwardDistance) <= halfLength &&
+                   Mathf.Abs(sideDistance) <= halfWidth;
         }
 
         private void ExecuteDamage(SkillRuntimeContext context, SkillActionData action, SkillTargetType targetType)
@@ -135,10 +363,9 @@ namespace Immortal_Switch.Scripts.Skill
 
         private bool HasValidTarget(ICombatUnit currentTarget)
         {
-            if (!currentTarget.IsUnityAlive())
-            {
+            if (currentTarget == null || !currentTarget.IsUnityAlive())
                 return false;
-            }
+
             return !currentTarget.IsDead;
         }
 
@@ -183,41 +410,14 @@ namespace Immortal_Switch.Scripts.Skill
         {
             if (context == null ||
                 action == null ||
-                action.Area == null ||
-                action.Area.AreaPrefab == null)
+                action.Area == null)
             {
                 return;
             }
 
             SkillAreaData areaData = action.Area;
-
-            Vector3 castDirection =
-                GetAreaCastDirection(context);
-
-            Vector3 areaOrigin =
-                GetAreaOrigin(
-                    context,
-                    areaData,
-                    castDirection);
-
-            Vector3 areaCenter =
-                areaData.ResolveAreaCenter(
-                    areaOrigin,
-                    castDirection);
-
-            Quaternion rotation =
-                GetAreaRotation(castDirection);
-
-            SkillAreaRuntime area =
-                objectSpawner.Spawn(
-                    areaData.AreaPrefab,
-                    areaCenter,
-                    rotation);
-
-            if (area == null)
-                return;
-
-            area.Init(
+            
+            context.RuntimeObject.skillArea.Init(
                 context,
                 areaData,
                 this,

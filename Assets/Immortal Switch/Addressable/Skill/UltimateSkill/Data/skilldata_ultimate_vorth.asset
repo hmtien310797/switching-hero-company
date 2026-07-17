@@ -18,15 +18,14 @@ MonoBehaviour:
   SkillClass: 0
   SkillName: Galtin Arrow
   IconSkillKey: ic_hero_Vorth_utimate
-  SkillIcon: {fileID: 21300000, guid: b0f5c98300e54a143b92c4742634e640, type: 3}
   Description: 
   OwnerType: 1
   MaxLevel: 3
   SkillTier: 1
   CastConfig:
     RequireTarget: 1
-    MoveToCastRange: 0
-    CastRange: 10
+    MoveToCastRange: 1
+    CastRange: 5
     Cooldown: 15
     TargetSelectType: 0
     HeroAnimationName: ulti
@@ -41,12 +40,12 @@ MonoBehaviour:
       loopStartSoundUntilSkillEnd: 0
     SpawnPositionType: 0
     FollowType: 0
-    SpawnOffset: {x: 0, y: 0, z: 0}
+    SpawnOffset: {x: 0, y: 1, z: 0}
     LifeTime: 0
     UseLifeTime: 0
-    DespawnOnAnimationComplete: 0
+    DespawnOnAnimationComplete: 1
     AnimationName: ulti
-    LoopAnimation: 1
+    LoopAnimation: 0
     LockCasterWhileAlive: 0
     LockCasterDuringHeroAnimation: 0
     MultiSpawnConfig:

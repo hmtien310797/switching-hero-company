@@ -88,7 +88,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void OnMissionSystemChangeProgress(string arg1, int arg2, string arg3)
         {
-            if (arg1 == MissionSystemTypes.MAIN)
+            if (arg1 == MissionTypes.MAIN)
             {
                 var cfg = MissionSystemManager.Instance.GetMission(arg3);
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
-using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.StatSystem;
 using JetBrains.Annotations;
 using TMPro;
@@ -11,30 +10,38 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 {
     public class UITransmutationSystemReplaceInfoPanel : MonoBehaviour
     {
-        [Header("View references")] [SerializeField]
+        [Header("View references")]
+        [SerializeField]
         private TextMeshProUGUI txtTitle;
 
-        [SerializeField] private GameObject goUsedLayout;
-        [SerializeField] private GameObject goEmptyLayout;
+        [SerializeField]
+        private GameObject goUsedLayout;
 
-        [Header("Selected item references")] [SerializeField]
+        [SerializeField]
+        private GameObject goEmptyLayout;
+
+        [Header("Selected item references")]
+        [SerializeField]
         private UITransmutationEquipment selectedEquip;
 
-        [Header("Equip & Unique Effect")] [SerializeField]
+        [Header("Equip & Unique Effect")]
+        [SerializeField]
         private Transform baseStatLineContainer;
 
-        [SerializeField] private Transform uniqueStatLineContainer;
-        [SerializeField] private UITransmutationStatLine statLinePrefab;
+        [SerializeField]
+        private Transform uniqueStatLineContainer;
+
+        [SerializeField]
+        private UITransmutationStatLine statLinePrefab;
 
         // --- Private Field ---
         private List<UITransmutationStatLine> _statLines = new();
 
         public void Bind(PlayerEquipViewData showEquip, [CanBeNull] PlayerEquipViewData oldEquip, bool isUsed)
         {
-            var showEquipCfg = DatabaseManager.Instance.ItemTierDb.Get(showEquip.ParsedTier);
             txtTitle.SetText(showEquip.Title);
             goUsedLayout.SetActive(isUsed);
-            selectedEquip.Bind(showEquipCfg, showEquip.Level);
+            selectedEquip.Bind(showEquip, showEquip.Level);
 
             var anyUnique = RebuildStats(showEquip, oldEquip, isUsed);
             goEmptyLayout.SetActive(!anyUnique);

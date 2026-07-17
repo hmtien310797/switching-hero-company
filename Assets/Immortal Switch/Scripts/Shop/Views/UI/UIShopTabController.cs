@@ -65,8 +65,12 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             RefreshTab();
         }
 
-        public void Bind(EShopTab defaultTab, Action<string, int> onBuyProduct, Action<string, int> onBuyBundleProduct,
-            Action<EShopTab> onChangeTab, Action<int, EShopTab> onClaim)
+        public void Bind(
+            Action<string, int> onBuyProduct,
+            Action<string, int> onBuyBundleProduct,
+            Action<EShopTab> onChangeTab,
+            Action<int, EShopTab> onClaim
+        )
         {
             _onClaim = onClaim;
             _onBuyProduct = onBuyProduct;
@@ -74,7 +78,6 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             _onChangeTab = onChangeTab;
 
             DisableHighlight();
-            ChangeTab(defaultTab);
         }
 
         public void ChangeTab(EShopTab tab)

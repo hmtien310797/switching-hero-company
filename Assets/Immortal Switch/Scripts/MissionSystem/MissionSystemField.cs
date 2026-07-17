@@ -3,7 +3,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
     /// <summary>
     /// Các sự kiện được dùng để theo dõi tiến trình nhiệm vụ, thành tựu và battle pass.
     /// </summary>
-    public static class MissionSystemEventKeys
+    public static class MissionEventKeys
     {
         /// <summary>
         /// Hoàn thành một màn chơi.
@@ -114,7 +114,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
     /// <summary>
     /// Loại nhiệm vụ trong hệ thống.
     /// </summary>
-    public static class MissionSystemTypes
+    public static class MissionTypes
     {
         /// <summary>
         /// Nhiệm vụ chính tuyến.

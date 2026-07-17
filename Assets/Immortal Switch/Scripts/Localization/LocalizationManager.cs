@@ -169,14 +169,14 @@ namespace Immortal_Switch.Scripts.Localization
         /// Dùng khi cần lấy text một lần (không auto-update).
         /// tableName mặc định là "UI" nếu để trống.
         /// </summary>
-        public static string GetText(string key, string tableName = TABLE_NAME)
+        public static string GetText(string key, params object[] args)
         {
             if (string.IsNullOrEmpty(key))
             {
                 return key;
             }
 
-            var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync(tableName, key);
+            var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync(TABLE_NAME, key, arguments: args);
             return op.IsDone ? op.Result : key;
         }
     }

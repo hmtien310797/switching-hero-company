@@ -100,13 +100,10 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 return;
             }
 
-            var rewards = new List<ItemRewardData>();
-            var itemDisplay = DatabaseManager.Instance.GetDisplayData(item.itemId);
-
-            if (itemDisplay != null)
+            var rewards = new List<ItemData>
             {
-                rewards.Add(new ItemRewardData(item.itemId, item.amount, itemDisplay.ItemIcon, itemDisplay.TierInfo));
-            }
+                new ItemData(item.itemId, item.amount),
+            };
 
             UIManager.Instance
                 .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs

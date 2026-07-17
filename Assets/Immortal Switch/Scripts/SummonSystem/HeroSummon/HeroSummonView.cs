@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Shared;
@@ -280,6 +281,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 {
                     Debug.LogWarning($"[HeroSummon] summon/execute failed: {response.Error}");
                     return;
+                }
+
+                var option = HeroSummonManager.Instance.Service.GetOption(optionId);
+
+                if (option != null)
+                {
+                    GameEventManager.Trigger(GameEvents.ON_SUMMON_HERO, option.RollCount);
                 }
 
                 // Cập nhật currency HUD từ server

@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.MissionSystem.Models;
-using Immortal_Switch.Scripts.TimerSystem;
+using Immortal_Switch.Scripts.Shared.Helper;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -13,45 +14,104 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 {
     public class UIMissionSystemTaskView : MonoBehaviour
     {
-        [Header("References prefab")] [SerializeField]
+        [Header("References prefab")]
+        [SerializeField]
         private RectTransform taskContainer;
 
-        [SerializeField] private UIMissionEntry taskPrefab;
+        [SerializeField]
+        private UIMissionEntry taskPrefab;
 
-        [Header("References button claim all")] [SerializeField]
+        [Header("References button claim all")]
+        [SerializeField]
         private Button btnClaimAll;
 
-        [SerializeField] private GameObject goBtnClaimAllRedDot;
+        [SerializeField]
+        private GameObject goBtnClaimAllRedDot;
 
-        [Header("References info group")] [SerializeField]
+        [Header("References info group")]
+        [SerializeField]
         private TextMeshProUGUI txtTitle;
 
-        [SerializeField] private UIMissionRewardGroup uiMissionRewardGroup;
+        [SerializeField]
+        private UIMissionRewardGroup uiMissionRewardGroup;
 
         // --- Private Fields ---
-        private readonly List<UIMissionEntry> _taskObjects = new();
+        private readonly List<UIMissionEntry> _tasks = new();
+
+        private CancellationTokenSource _refreshCancellation;
 
         private string _missionType;
 
         private void Awake()
         {
-            TimerSystemManager.Instance.OnMinuteTick += OnTimerSystemMinuteTick;
-            MissionSystemManager.Instance.OnMissionClaimed += OnMissionSystemMissionClaimed;
-            MissionSystemManager.Instance.OnChangeProgress += OnMissionSystemChangeProgress;
+            MissionSystemManager.Instance.OnMissionClaimed += OnMissionClaimed;
+            MissionSystemManager.Instance.OnChangeProgress += OnMissionChangeProgress;
             btnClaimAll.onClick.AddListener(OnClickClaimAll);
         }
 
-        private void OnTimerSystemMinuteTick(TimeSpan remain)
+        private void OnEnable()
         {
-            RefreshVisual(_missionType);
+            StartRefreshLoop();
+        }
+
+        private void OnDisable()
+        {
+            StopRefreshLoop();
         }
 
         private void OnDestroy()
         {
-            MissionSystemManager.Instance.OnChangeProgress -= OnMissionSystemChangeProgress;
+            StopRefreshLoop();
+            btnClaimAll.onClick.RemoveListener(OnClickClaimAll);
+
+            MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
+            MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
         }
 
-        private void OnMissionSystemMissionClaimed(string arg1, string arg2)
+        private void StartRefreshLoop()
+        {
+            StopRefreshLoop();
+
+            if (!isActiveAndEnabled ||
+                string.IsNullOrWhiteSpace(_missionType))
+            {
+                return;
+            }
+
+            _refreshCancellation = new CancellationTokenSource();
+            RefreshEveryMinuteAsync(_refreshCancellation.Token).Forget();
+        }
+
+        private async UniTaskVoid RefreshEveryMinuteAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var isCanceled = await UniTask
+                    .Delay(TimeSpan.FromMinutes(1), cancellationToken: cancellationToken)
+                    .SuppressCancellationThrow();
+
+                if (isCanceled)
+                {
+                    return;
+                }
+
+                RefreshVisual(_missionType);
+            }
+        }
+
+        private void StopRefreshLoop()
+        {
+            if (_refreshCancellation == null)
+            {
+                return;
+            }
+
+            _refreshCancellation.Cancel();
+            _refreshCancellation.Dispose();
+            _refreshCancellation = null;
+        }
+
+        private void OnMissionClaimed(string arg1, string arg2)
         {
             if (_missionType != arg2)
             {
@@ -62,7 +122,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             RefreshBtnClaimAll(anyCompleted);
         }
 
-        private void OnMissionSystemChangeProgress(string arg1, int arg2, string arg3)
+        private void OnMissionChangeProgress(string arg1, int arg2, string arg3)
         {
             if (_missionType != arg1)
             {
@@ -102,6 +162,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             Func<string, UniTask> onJump)
         {
             _missionType = missionType;
+            StartRefreshLoop();
 
             // check btn claim trang thai
             var anyCompleted = MissionSystemManager.Instance.AnyCompleted(_missionType);
@@ -114,10 +175,9 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void RefreshVisual(string missionType)
         {
-            if (missionType == MissionSystemTypes.DAILY)
+            if (missionType == MissionTypes.DAILY)
             {
-                var remain = TimerSystemManager.GetRemainingTimeToday();
-                Debug.Log($"Remain: {remain}");
+                var remain = DateTimeHelper.GetRemainingTimeToday();
                 txtTitle.text = string.Format(_GetTitle(missionType), $"{remain.Hours:D2}h{remain.Minutes:D2}m");
             }
             else
@@ -144,14 +204,14 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                     continue;
                 }
 
-                if (_taskObjects.Count > i)
+                if (_tasks.Count > i)
                 {
-                    _taskObjects[i].gameObject.SetActive(true);
-                    _taskObjects[i].Bind(rows[i], title, currentTask.Progress, onJump);
+                    _tasks[i].gameObject.SetActive(true);
+                    _tasks[i].Bind(rows[i], title, currentTask.Progress, onJump);
 
                     if (currentTask.IsClaimed)
                     {
-                        _taskObjects[i].ApplyStateClaimed();
+                        _tasks[i].ApplyStateClaimed();
                     }
                 }
                 else
@@ -165,7 +225,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                         clone.ApplyStateClaimed();
                     }
 
-                    _taskObjects.Add(clone);
+                    _tasks.Add(clone);
                 }
             }
         }
@@ -174,10 +234,10 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             switch (missionType)
             {
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     return "Nhiệm Vụ Hằng Tuần Trong 7 Ngày";
 
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     return "Nhiệm Vụ Hằng Ngày trong {0}";
             }
 
@@ -188,10 +248,10 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             switch (missionType)
             {
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     return "[Hằng Tuần]";
 
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     return "[Hằng Ngày]";
             }
 

@@ -50,6 +50,11 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         private async UniTask OnClickChallenge()
         {
             var dungeonId = _selectedDungeon.DungeonId;
+            if (!DatabaseManager.Instance.GetDungeonAvailableState(dungeonId))
+            {
+                UIManager.Instance.ShowToast("Dungeon not available");
+                return;
+            }
             await DatabaseManager.Instance.EnsureDungeonStageTableAsync(dungeonId); // no-op if already cached
 
             var dungeonKey = DatabaseManager.Instance.GetDungeonKey(dungeonId);

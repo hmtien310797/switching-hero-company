@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.GrowthSystem.UI
@@ -41,7 +42,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             int cost = service.GetUpgradeCost(stat, afford);
 
             bool isMax = service.IsMaxed(stat);
-            bool can = afford > 0 && !isMax;
+            bool can = gold >= cost && !isMax;
 
             return new StatTierViewData
             {

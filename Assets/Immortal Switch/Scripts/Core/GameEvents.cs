@@ -11,9 +11,12 @@
         public const string OnStageLost = "OnStageLost";
         public const string OnBossSpawnAnimationComplete = "OnBossSpawnAnimationComplete";
         public const string OnBossDead = "OnBossDead";
+
         public const string OnInitNewStage = "OnInitNewStage";
+
         // Change hero event
         public const string OnChangeHero = "OnChangeHero";
+
         // Change skill event
         public const string OnChangeSkill = "OnChangeSkill";
         public const string OnSpawnNextStage = "OnSpawnNextStage";
@@ -28,13 +31,22 @@
         public const string OnStageSessionChange = "OnStageSessionChange";
         public const string OnStageSessionEnd = "OnStageSessionEnd";
         public const string OnPlayDungeon = "OnPlayDungeon";
-        
+
         public const string OnKillAllDungeonInit = "OnKillAllDungeonInit";
         public const string OnKillAllDungeonEnemyCountChanged = "OnKillAllDungeonInit";
-        
+
         public const string OnDefenseDungeonInit = "OnDefenseDungeonInit";
         public const string OnDefenseDungeonDataChanged = "OnDefenseDungeonDataChanged";
-        
+
         public const string OnSelectedDungeonStage = "OnSelectedDungeonStage";
+
+        // summon
+        public const string ON_SUMMON_HERO = nameof(ON_SUMMON_HERO);
+
+        // afk reward
+        public const string ON_AFK_REWARD_CLAIM_COUNT = nameof(ON_AFK_REWARD_CLAIM_COUNT);
+
+        // dungeon
+        public const string ON_DUNGEON_CLEAR = nameof(ON_DUNGEON_CLEAR);
     }
 }

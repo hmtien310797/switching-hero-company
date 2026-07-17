@@ -94,7 +94,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             ShowRewards(rewards);
         }
 
-        private static void ShowRewards(List<ItemRewardData> rewards)
+        private static void ShowRewards(List<ItemData> rewards)
         {
             if (rewards == null ||
                 rewards.Count == 0)

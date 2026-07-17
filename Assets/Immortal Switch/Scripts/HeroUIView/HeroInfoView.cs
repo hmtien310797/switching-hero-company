@@ -207,7 +207,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
                 // set animation
                 heroSkeletonGraphic.AnimationState.ClearTracks();
-                heroSkeletonGraphic.AnimationState.SetAnimation(0, HeroAnimationNameConst.IDLE, true);
+                heroSkeletonGraphic.AnimationState.SetAnimation(0, SpineAnimationNameConstants.IDLE, true);
 
                 // update lại mesh UI
                 heroSkeletonGraphic.LateUpdate();

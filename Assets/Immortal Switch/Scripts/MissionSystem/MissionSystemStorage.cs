@@ -52,7 +52,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             Data.DailyTask = new MissionSystemTask
             {
                 Tasks = _db.MissionConfig.rows
-                    .FindAll(v => v.type == MissionSystemTypes.DAILY)
+                    .FindAll(v => v.type == MissionTypes.DAILY)
                     .Select(v => new MissionSystemEntry
                     {
                         Id = v.missionId,
@@ -71,7 +71,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             Data.WeeklyTask = new MissionSystemTask
             {
                 Tasks = _db.MissionConfig.rows
-                    .FindAll(v => v.type == MissionSystemTypes.WEEKLY)
+                    .FindAll(v => v.type == MissionTypes.WEEKLY)
                     .Select(v => new MissionSystemEntry
                     {
                         Id = v.missionId,
@@ -88,7 +88,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
         public void InitRepeat()
         {
             Data.RepeatTask = _db.MissionConfig.rows
-                .FindAll(v => v.type == MissionSystemTypes.REPEAT)
+                .FindAll(v => v.type == MissionTypes.REPEAT)
                 .Select(v => new MissionSystemEntry
                 {
                     Id = v.missionId,
@@ -101,7 +101,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void InitMain()
         {
-            var main = _db.MissionConfig.rows.FirstOrDefault(v => v.type == MissionSystemTypes.MAIN);
+            var main = _db.MissionConfig.rows.FirstOrDefault(v => v.type == MissionTypes.MAIN);
 
             if (main != null)
             {

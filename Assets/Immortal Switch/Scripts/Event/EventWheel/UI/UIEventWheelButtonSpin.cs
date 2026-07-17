@@ -64,10 +64,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
 
         private void RefreshLocalizedText()
         {
-            txtTimes.text = string.Format(
-                LocalizationManager.GetText(LocalizationKeys.UI_WHEEL),
-                _times
-            );
+            txtTimes.text = LocalizationManager.GetText(LocalizationKeys.UI_WHEEL, _times);
         }
     }
 }

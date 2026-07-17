@@ -28,6 +28,9 @@ namespace Battle.Dungeon
         [Tooltip("Addressable prefab name under Assets/Immortal Switch/Addressable/Map/Prefab.")]
         [SerializeField] private string mapName;
 
+        [Header("Availability")]
+        [SerializeField] private bool available = true;
+
         public int DungeonId => dungeonId;
         public string DungeonKey => dungeonKey;
         public string UiNameVi => uiNameVi;
@@ -41,6 +44,7 @@ namespace Battle.Dungeon
         public int EnemyId => enemyId;
         public int BossId => bossId;
         public string MapName => mapName;
+        public bool Available => available;
 
         public bool ContainsStage(int stage)
         {

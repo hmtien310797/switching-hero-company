@@ -20,10 +20,10 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             switch (missionType)
             {
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     return "Điểm Nhiệm Vụ Hằng Tuần";
 
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     return "Điểm Nhiệm Vụ Hằng Ngày";
             }
 

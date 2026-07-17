@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.DungeonSystem.Models;
-using Immortal_Switch.Scripts.DungeonSystem.Views.UI;
 using Immortal_Switch.Scripts.Items.Models;
-using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;

@@ -179,7 +179,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             _spinCancellationTokenSource = spinCancellationTokenSource;
 
             var cancellationToken = spinCancellationTokenSource.Token;
-            var rewards = new List<ItemRewardData>();
+            var rewards = new List<ItemData>();
             var controller = _selectedCategory.controller;
             var force = toggleSkipAnimation.isOn;
 
@@ -273,21 +273,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                     ? _premiumItems[rewardIndex]
                     : _normalItems[rewardIndex];
 
-                if (reward == null)
+                if (reward != null)
                 {
-                    return;
-                }
-
-                var itemDisplay = DatabaseManager.Instance.GetDisplayData(reward.itemId);
-
-                if (itemDisplay != null)
-                {
-                    rewards.Add(new ItemRewardData(
-                        reward.itemId,
-                        reward.amount,
-                        itemDisplay.ItemIcon,
-                        itemDisplay.TierInfo
-                    ));
+                    rewards.Add(new ItemData(reward.itemId, reward.amount));
                 }
             }
         }

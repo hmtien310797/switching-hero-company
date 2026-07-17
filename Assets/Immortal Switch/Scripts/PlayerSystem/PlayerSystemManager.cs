@@ -54,6 +54,7 @@ namespace Immortal_Switch.Scripts.PlayerSystem
                 DateTimeHelper.IsNewDay(Storage.Data.LastLogin.Value))
             {
                 Storage.Data.LastLogin = DateTime.UtcNow;
+
                 Storage.Save();
                 OnLoginNewDay?.Invoke();
             }

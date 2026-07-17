@@ -47,8 +47,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugCountRuntimeEvent: 0
   debugCountEventName: hit
-  debugLogRuntimeEventCount: 1
-  debugLogRuntimeEventTotalOnDespawn: 1
+  debugLogRuntimeEventCount: 0
+  debugLogRuntimeEventTotalOnDespawn: 0
   skeletonAnimation: {fileID: 7610600262427787311}
   fallbackAnimationName: 
   fallbackLoop: 0
@@ -61,11 +61,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 577235091910467941}
-  - component: {fileID: 347883401542577252}
   - component: {fileID: 5921650129321350082}
   - component: {fileID: 99358035388248543}
   - component: {fileID: 7610600262427787311}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Spine GameObject (hero_13_vorth_ulti)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,21 +86,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5114978648311206855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &347883401542577252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4591653550781377160}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b473abb659158442b906826a22f18bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playWhenSelected: 1
-  playWhenDeselected: 1
-  fixedTrackTime: 0
 --- !u!33 &5921650129321350082
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -198,5 +182,5 @@ MonoBehaviour:
   limitRuntimeUpdateRate: 0
   targetRuntimeFps: 20
   _animationName: ulti
-  loop: 1
+  loop: 0
   timeScale: 1

@@ -123,6 +123,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
             btnClaimAll.interactable = _manager.HasClaimable(_eventId, _rows);
             btnBuy.interactable = !isPremiumPurchased;
+
             goBonusRewardNotPurchased.SetActive(!isPremiumPurchased);
             goBonusRewardPurchased.SetActive(isPremiumPurchased);
             goBtnBuyNotPurchased.SetActive(!isPremiumPurchased);
@@ -155,7 +156,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             _isSubscribed = false;
         }
 
-        private static void ShowRewards(List<ItemRewardData> rewards)
+        private static void ShowRewards(List<ItemData> rewards)
         {
             if (rewards == null ||
                 rewards.Count == 0)

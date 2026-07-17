@@ -230,6 +230,9 @@ namespace Battle
 
             try
             {
+                // fire event clear dungeon, ko tính thắng thua.
+                GameEventManager.Trigger(GameEvents.ON_DUNGEON_CLEAR);
+                
                 CreateDungeonBattleCancellationToken();
                 CreateEndStageSessionCancellationToken();
                 Debug.Log($"[BattleFlow] Dungeon ended. Result={result}");

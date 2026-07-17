@@ -333,8 +333,8 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 if (segment == null)
                     break;
 
-                if (goldLeft < segment.GoldCostPerLevel)
-                    break;
+                // if (goldLeft < segment.GoldCostPerLevel)
+                //     break;
 
                 goldLeft -= segment.GoldCostPerLevel;
                 stackCursor++;

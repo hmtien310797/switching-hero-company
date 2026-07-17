@@ -10,7 +10,6 @@ using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Shared;
-using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Shared.Views;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -56,14 +55,18 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         protected override void OnSingletonAwake()
         {
-            PlayerSystemManager.Instance.OnLoginNewDay += OnPlayerSystemLoginNewDay;
+            PlayerSystemManager.Instance.OnLoginNewDay += OnPlayerLoginNewDay;
+
             GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+            GameEventManager.Subscribe<int>(GameEvents.ON_SUMMON_HERO, OnSummonHero);
+            GameEventManager.Subscribe(GameEvents.ON_AFK_REWARD_CLAIM_COUNT, OnAfkRewardClaimCount);
+            GameEventManager.Subscribe(GameEvents.ON_DUNGEON_CLEAR, OnDungeonClear);
         }
 
-        private void OnPlayerSystemLoginNewDay()
+        private void OnPlayerLoginNewDay()
         {
-            var matches = Service.ChangeProgress(MissionSystemEventKeys.EVENT_LOGIN, 1);
+            var matches = Service.ChangeProgress(MissionEventKeys.EVENT_LOGIN, 1);
             DispatchChangeProgress(matches);
         }
 
@@ -71,6 +74,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
+            GameEventManager.Unsubscribe<int>(GameEvents.ON_SUMMON_HERO, OnSummonHero);
+            GameEventManager.Unsubscribe(GameEvents.ON_AFK_REWARD_CLAIM_COUNT, OnAfkRewardClaimCount);
+            GameEventManager.Unsubscribe(GameEvents.ON_DUNGEON_CLEAR, OnDungeonClear);
             base.OnDestroy();
         }
 
@@ -78,14 +84,35 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             if (deadCnt >= 1)
             {
-                var matches = Service.ChangeProgress(MissionSystemEventKeys.EVENT_KILL_MONSTER, 100);
+                var matches = Service.ChangeProgress(MissionEventKeys.EVENT_KILL_MONSTER, 1);
                 DispatchChangeProgress(matches);
             }
         }
 
+        private void OnDungeonClear()
+        {
+            var matches = Service.ChangeProgress(MissionEventKeys.EVENT_DUNGEON_CLEAR, 1);
+            DispatchChangeProgress(matches);
+        }
+
+        private void OnAfkRewardClaimCount()
+        {
+            var matches = Service.ChangeProgress(MissionEventKeys.EVENT_CLAIM_IDLE, 1);
+            DispatchChangeProgress(matches);
+        }
+
+        private void OnSummonHero(int times)
+        {
+            var matches = Service.ChangeProgress(MissionEventKeys.EVENT_HERO_SUMMON, times);
+            DispatchChangeProgress(matches);
+        }
+
         private void OnStageCleared(int stage)
         {
-            var matches = Service.ChangeProgress(MissionSystemEventKeys.EVENT_CLEAR_STAGE, stage);
+            var matchClearStage = Service.ChangeProgress(MissionEventKeys.EVENT_CLEAR_STAGE, stage);
+            var matchKillBoss = Service.ChangeProgress(MissionEventKeys.EVENT_KILL_BOSS, 1);
+            var matches = matchClearStage.Concat(matchKillBoss);
+
             DispatchChangeProgress(matches);
         }
 
@@ -115,10 +142,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             switch (missionType)
             {
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     return Storage.Data.DailyTask.Point;
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     return Storage.Data.WeeklyTask.Point;
             }
 
@@ -129,13 +156,13 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             switch (missionType)
             {
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     return Storage.Data.DailyTask.Tasks;
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     return Storage.Data.WeeklyTask.Tasks;
 
-                case MissionSystemTypes.REPEAT:
+                case MissionTypes.REPEAT:
                     return Storage.Data.RepeatTask;
             }
 
@@ -146,10 +173,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             switch (missionType)
             {
-                case MissionSystemTypes.DAILY:
+                case MissionTypes.DAILY:
                     return Storage.Data.DailyTask.PointsClaimed;
 
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.WEEKLY:
                     return Storage.Data.WeeklyTask.PointsClaimed;
             }
 
@@ -191,7 +218,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             switch (cfg.type)
             {
                 // tiep nhiem vu moi.
-                case MissionSystemTypes.MAIN:
+                case MissionTypes.MAIN:
                     var nextCfg = _database.MissionConfig.rows.Find(v => v.missionId == cfg.nextMission);
 
                     if (nextCfg != null)
@@ -206,8 +233,8 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     DispatchProgressMainMission();
                     break;
 
-                case MissionSystemTypes.DAILY:
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.DAILY:
+                case MissionTypes.WEEKLY:
                 {
                     var isClaimed = Service.SetIsClaimed(cfg.missionId, cfg.type, true);
 
@@ -217,12 +244,12 @@ namespace Immortal_Switch.Scripts.MissionSystem
                         OnMissionClaimed?.Invoke(cfg.missionId, cfg.type);
 
                         OnChangePoint?.Invoke(
-                            cfg.type == MissionSystemTypes.DAILY ? Storage.Data.DailyTask.Point : Storage.Data.WeeklyTask.Point,
+                            cfg.type == MissionTypes.DAILY ? Storage.Data.DailyTask.Point : Storage.Data.WeeklyTask.Point,
                             cfg.type
                         );
                     }
 
-                    if (cfg.type == MissionSystemTypes.DAILY)
+                    if (cfg.type == MissionTypes.DAILY)
                     {
                         NotifyIfAllMissionDailyCompleted();
                     }
@@ -230,8 +257,8 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     break;
                 }
 
-                case MissionSystemTypes.REPEAT:
-                case MissionSystemTypes.ACHIEVEMENT:
+                case MissionTypes.REPEAT:
+                case MissionTypes.ACHIEVEMENT:
                 {
                     var isClaimed = Service.SetIsClaimed(cfg.missionId, cfg.type, true);
 
@@ -252,12 +279,12 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void ClaimAll(string missionType)
         {
-            var rewards = new List<ItemRewardData>();
+            var rewards = new List<ItemData>();
 
             switch (missionType)
             {
-                case MissionSystemTypes.DAILY:
-                case MissionSystemTypes.WEEKLY:
+                case MissionTypes.DAILY:
+                case MissionTypes.WEEKLY:
                 {
                     var missions = GetMissions(missionType);
 
@@ -276,7 +303,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                     break;
                 }
 
-                case MissionSystemTypes.REPEAT:
+                case MissionTypes.REPEAT:
                 {
                     var missions = GetMissions(missionType);
 
@@ -289,7 +316,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
                 }
             }
 
-            // todo: show ui rewards
+            PopupRewardService.Show(rewards);
             NotifyIfAllMissionDailyCompleted();
         }
 
@@ -301,11 +328,11 @@ namespace Immortal_Switch.Scripts.MissionSystem
             {
                 switch (row.scope)
                 {
-                    case MissionSystemTypes.DAILY:
+                    case MissionTypes.DAILY:
                         OnRewardGroupClaimed?.Invoke(Storage.Data.DailyTask.PointsClaimed, row.scope);
                         break;
 
-                    case MissionSystemTypes.WEEKLY:
+                    case MissionTypes.WEEKLY:
                         OnRewardGroupClaimed?.Invoke(Storage.Data.WeeklyTask.PointsClaimed, row.scope);
                         break;
                 }
@@ -320,9 +347,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             switch (missionType)
             {
-                case MissionSystemTypes.DAILY:
-                case MissionSystemTypes.WEEKLY:
-                case MissionSystemTypes.REPEAT:
+                case MissionTypes.DAILY:
+                case MissionTypes.WEEKLY:
+                case MissionTypes.REPEAT:
                     var missions = GetMissions(missionType);
 
                     if (missions.Any(IsCompleted))
@@ -339,21 +366,23 @@ namespace Immortal_Switch.Scripts.MissionSystem
         public void NotifyReady()
         {
             DispatchProgressMainMission();
-            OnRewardGroupClaimed?.Invoke(Storage.Data.DailyTask.PointsClaimed, MissionSystemTypes.DAILY);
-            OnRewardGroupClaimed?.Invoke(Storage.Data.WeeklyTask.PointsClaimed, MissionSystemTypes.WEEKLY);
+            OnRewardGroupClaimed?.Invoke(Storage.Data.DailyTask.PointsClaimed, MissionTypes.DAILY);
+            OnRewardGroupClaimed?.Invoke(Storage.Data.WeeklyTask.PointsClaimed, MissionTypes.WEEKLY);
         }
 
         public void NotifyIfAllMissionDailyCompleted()
         {
-            var missions = GetMissions(MissionSystemTypes.DAILY);
+            var missions = GetMissions(MissionTypes.DAILY);
 
             if (missions.All(IsCompleted))
             {
-                Service.ChangeProgress(MissionSystemEventKeys.EVENT_COMPLETE_DAILY, 1);
+                Service.ChangeProgress(MissionEventKeys.EVENT_COMPLETE_DAILY, 1);
             }
         }
 
-        private void DispatchChangeProgress(Dictionary<string, MissionSystemEntry> matches)
+        private void DispatchChangeProgress(
+            IEnumerable<KeyValuePair<string, MissionSystemEntry>> matches
+        )
         {
             foreach (var entry in matches)
             {
@@ -363,7 +392,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         private void DispatchProgressMainMission()
         {
-            OnChangeProgress?.Invoke(MissionSystemTypes.MAIN, Storage.Data.Main.Progress, Storage.Data.Main.Id);
+            OnChangeProgress?.Invoke(MissionTypes.MAIN, Storage.Data.Main.Progress, Storage.Data.Main.Id);
         }
 
         // ── Server sync ───────────────────────────────────────────────────────

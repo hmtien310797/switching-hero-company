@@ -113,7 +113,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
             return Service.HasClaimable(eventId, rows);
         }
 
-        public List<ItemRewardData> ClaimMilestone(
+        public List<ItemData> ClaimMilestone(
             int eventId,
             DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row
         )
@@ -128,7 +128,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
             return result.Rewards;
         }
 
-        public List<ItemRewardData> ClaimAll(
+        public List<ItemData> ClaimAll(
             int eventId,
             IReadOnlyList<DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow> rows
         )

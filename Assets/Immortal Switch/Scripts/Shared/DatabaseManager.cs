@@ -236,6 +236,11 @@ namespace Immortal_Switch.Scripts.Shared
         {
             return DungeonDatabase.TryGetDefinition(dungeonId, out var definition) ? definition.DungeonKey : null;
         }
+        
+        public bool GetDungeonAvailableState(int dungeonId)
+        {
+            return DungeonDatabase.TryGetDefinition(dungeonId, out var definition) && definition.Available;
+        }
 
         /// <summary>
         /// dungeon key: treasure, relic, awakening, weapon
@@ -275,10 +280,44 @@ namespace Immortal_Switch.Scripts.Shared
 
             return rewardData;
         }
+        
+        public ItemDisplayData GetDisplayData(ItemData itemData)
+        {
+            var item = ItemDb.FindItem(itemData.ItemId);
+            if (item == null)
+            {
+                item = ItemDb.FindItem(itemData.ItemKey);
+            }
+
+            if (item != null)
+            {
+                var itemIcon = ItemDb.LoadIcon(item.rarity, item.itemType, item.itemKey);
+
+                if (TrySetTierInfo(item.rarity, out var tierInfo) &&
+                    tierInfo != null)
+                {
+                    return new ItemDisplayData
+                    {
+                        ItemIcon = itemIcon,
+                        TierInfo = tierInfo,
+                    };
+                }
+            }
+            else
+            {
+                Debug.LogError($"Item {itemData} not found");
+            }
+
+            return null;
+        }
 
         public ItemDisplayData GetDisplayData(int itemId)
         {
             var item = ItemDb.FindItem(itemId);
+            if (item == null)
+            {
+                item = ItemDb.FindItem(itemId);
+            }
 
             if (item != null)
             {

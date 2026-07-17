@@ -2062,8 +2062,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9babf1ec16b42a187be95676601b8da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  autoSummonToggle: {fileID: 1380358084949297305}
-  skipAnimationToggle: {fileID: 6724168856723094251}
+  autoSummonToggle: {fileID: 6864349883113108981}
+  skipAnimationToggle: {fileID: 509136542373564652}
 --- !u!114 &8997941655831367512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15478,8 +15478,8 @@ MonoBehaviour:
   maxScale: 2
   anchoredY: 185
   changePosY: 1
-  yPosPortrait: 200
-  yPosLandscape: 150
+  yPosPortrait: 210
+  yPosLandscape: 160
   useScaleReduction: 0
   scaleReductionPercent: 0
 --- !u!1 &6242204324515754296
@@ -20941,8 +20941,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9babf1ec16b42a187be95676601b8da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  autoSummonToggle: {fileID: 1380358084949297305}
-  skipAnimationToggle: {fileID: 6724168856723094251}
+  autoSummonToggle: {fileID: 8133174037125813781}
+  skipAnimationToggle: {fileID: 1768752804791237721}
 --- !u!114 &1370646300150657502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22990,10 +22990,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4504664956874266011, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 7433643910664316478, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: currencyType
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8481808067183193493, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 94f3469021a069c41956270036f0a5c0, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -23612,6 +23620,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6340323217247997573}
     m_Modifications:
+    - target: {fileID: 2558816812478809740, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: jumpTab
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2753184407010358003, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Name
       value: CurrencyPanel
@@ -23696,10 +23708,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4504664956874266011, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 7433643910664316478, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: currencyType
       value: 49
       objectReference: {fileID: 0}
+    - target: {fileID: 8481808067183193493, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0295c2c30e9d67e41ba03c70913d3f0b, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -26020,6 +26040,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8659826835890269197}
     m_Modifications:
+    - target: {fileID: 2558816812478809740, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: jumpTab
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2753184407010358003, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Name
       value: CurrencyPanel
@@ -26104,10 +26128,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4504664956874266011, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 7433643910664316478, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: currencyType
       value: 48
       objectReference: {fileID: 0}
+    - target: {fileID: 8481808067183193493, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0295c2c30e9d67e41ba03c70913d3f0b, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -26247,9 +26279,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8659826835890269197}
     m_Modifications:
+    - target: {fileID: 1755366986481245426, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2753184407010358003, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Name
       value: CurrencyPanel (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2753184407010358003, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3782611220763204165, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Pivot.x
@@ -26331,10 +26371,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3978393901766662391, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_Color.a
+      value: 0.2627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504664956874266011, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 6622228500204856669, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7433643910664316478, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: currencyType
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8481808067183193493, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 94f3469021a069c41956270036f0a5c0, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -26789,10 +26845,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4504664956874266011, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 7433643910664316478, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: currencyType
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8481808067183193493, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 94f3469021a069c41956270036f0a5c0, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -26924,6 +26988,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6278519173029590329}
     m_Modifications:
+    - target: {fileID: 2558816812478809740, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: jumpTab
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2753184407010358003, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Name
       value: CurrencyPanel
@@ -27008,10 +27076,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4504664956874266011, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 7433643910664316478, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: currencyType
       value: 47
       objectReference: {fileID: 0}
+    - target: {fileID: 8481808067183193493, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0295c2c30e9d67e41ba03c70913d3f0b, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

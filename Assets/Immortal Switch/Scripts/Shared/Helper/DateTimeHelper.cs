@@ -55,6 +55,13 @@ namespace Immortal_Switch.Scripts.Shared.Helper
             return now >= start && now <= end;
         }
 
+        public static TimeSpan GetRemainingTimeToday()
+        {
+            var now = DateTime.Now;
+            var tomorrow = now.Date.AddDays(1);
+            return tomorrow - now;
+        }
+
         public static bool IsNewDay(DateTime date)
         {
             var diff = DateTime.UtcNow.Date.Subtract(date.Date);
