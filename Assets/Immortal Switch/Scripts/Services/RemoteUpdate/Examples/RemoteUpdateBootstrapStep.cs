@@ -1,148 +1,158 @@
 using System;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.Core;
-using UnityEngine;
 
 namespace Immortal_Switch.Scripts.RemoteUpdate.Examples
 {
     /// <summary>
-    /// Example adapter that plugs the Addressable remote update check into
-    /// <see cref="GameBootstrap.RunAsync"/> as step 0 (before Nakama auth).
+    /// Reusable bootstrap-step utility that calls
+    /// <see cref="AddressableRemoteUpdateService.DownloadRequiredContentAsync"/>
+    /// and maps progress into an <c>Action&lt;float, string&gt;</c> callback.
     ///
-    /// Usage inside GameBootstrap:
+    /// Used by <see cref="Immortal_Switch.Scripts.Core.GameBootstrap"/> as step 0
+    /// of the startup pipeline. Also usable as a standalone entry point for
+    /// scenes or flows that need to check for remote updates independently.
+    ///
+    /// <b>Important:</b> <see cref="Immortal_Switch.Scripts.Core.GameBootstrap"/>
+    /// is the sole owner of the Required pipeline during startup.
+    /// Other callers must not invoke <see cref="RunAsync"/> while the bootstrap
+    /// is in progress. Use <see cref="DownloadOptionalAsync"/> for deferred
+    /// content after the game has started.
+    ///
+    /// Usage:
     /// <code>
-    /// // Step 0: Download required Addressable content.
-    /// await RemoteUpdateBootstrapStep.RunAsync(progress, cancellationToken);
+    /// var result = await RemoteUpdateBootstrapStep.RunAsync(
+    ///     (percent, message) => progressBar.Report(percent, message),
+    ///     cancellationToken);
+    /// if (result.IsSuccess) { /* proceed into game */ }
+    /// else if (result.Status == RemoteContentUpdateStatus.Offline
+    ///          &amp;&amp; await AddressableRemoteUpdateService.Instance.IsContentAvailableOfflineAsync())
+    ///     { /* proceed offline */ }
     /// </code>
-    ///
-    /// This adapter converts <see cref="RemoteContentUpdateProgress"/> into
-    /// <see cref="BootstrapProgress"/> calls so the existing loading slider
-    /// reflects download progress.
     /// </summary>
     public static class RemoteUpdateBootstrapStep
     {
         /// <summary>
         /// Runs the required-content download pipeline and reports progress
-        /// via the provided callback. Call this before any Addressable-dependent
-        /// manager initialisation.
+        /// via the provided callback.
         /// </summary>
         /// <param name="onProgress">
-        /// Bootstrap progress callback. Receives (0→1, status message).
-        /// The first 10 % of the bootstrap bar is allocated to the update check.
+        /// Receives (0→1 normalised progress, status message).
+        /// The first portion of your overall loading bar should be allocated
+        /// to this phase (e.g. 0 % – 15 %).
         /// </param>
         /// <param name="cancellationToken">
-        /// Passed through from the bootstrap pipeline.
+        /// Propagated to the remote update service so cancellation flows
+        /// through the entire pipeline.
         /// </param>
         /// <returns>
-        /// True if the game may proceed; false if the update failed and the
-        /// caller should show an error / retry dialog.
+        /// The terminal result. Check <see cref="RemoteContentUpdateResult.IsSuccess"/>
+        /// before proceeding into gameplay. For Offline status, validate cached
+        /// content separately via <see cref="AddressableRemoteUpdateService.IsContentAvailableOfflineAsync"/>.
         /// </returns>
-        public static async UniTask<bool> RunAsync(
-            Action<float, string> onProgress,
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the service is already running a pipeline (dual-owner guard).
+        /// </exception>
+        public static async UniTask<RemoteContentUpdateResult> RunAsync(
+            Action<float, string> onProgress = null,
             System.Threading.CancellationToken cancellationToken = default)
         {
             var service = AddressableRemoteUpdateService.Instance;
 
-            // Wrap the Action<float, string> callback in our progress handler.
-            var handler = new BootstrapProgressHandler(onProgress);
-            var result = await service.DownloadRequiredContentAsync(handler, cancellationToken);
-
-            handler.OnComplete(result);
-
-            // Offline but cached? Proceed.
-            if (result.Status == RemoteContentUpdateStatus.Offline)
+            // ── Dual-owner guard ─────────────────────────────────────────
+            // GameBootstrap is the sole owner of the Required pipeline during
+            // startup. If another caller tries to run concurrently, fail fast.
+            if (service.IsRunning)
             {
-                Debug.Log("[RemoteUpdate] Running offline with cached content.");
-                onProgress?.Invoke(0.1f, "Running offline…");
-                return true;
+                throw new InvalidOperationException(
+                    "Addressable remote update is already running. " +
+                    "Only one caller may own the Required pipeline at a time. " +
+                    "Use DownloadOptionalContentAsync() for deferred content.");
             }
 
-            // No update needed? Proceed.
-            if (result.Status == RemoteContentUpdateStatus.NoUpdateNeeded)
-            {
-                Debug.Log("[RemoteUpdate] Content is up to date.");
-                onProgress?.Invoke(0.1f, "Content up to date.");
-                return true;
-            }
+            // Wrap the Action<float, string> in our progress handler.
+            var handler = new ProgressHandler(onProgress);
+            return await service.DownloadRequiredContentAsync(handler, cancellationToken);
+        }
 
-            // Success? Proceed.
-            if (result.Status == RemoteContentUpdateStatus.Complete)
-            {
-                Debug.Log($"[RemoteUpdate] Downloaded {FormatBytes(result.RequiredDownloadedBytes)} in " +
-                          $"{result.ElapsedTime.TotalSeconds:F1}s.");
-                onProgress?.Invoke(0.1f, "Update complete.");
-                return true;
-            }
-
-            // Timeout or failed — log and return false so the caller can decide.
-            Debug.LogError(
-                $"[RemoteUpdate] Update failed: {result.Status}. " +
-                $"Errors: {string.Join("; ", result.Errors)}");
-
-            return false;
+        /// <summary>
+        /// Downloads optional content only (e.g. high-res textures, voice-over).
+        /// Call this from the main menu or settings screen after the game has started
+        /// and the Required pipeline has completed.
+        /// </summary>
+        public static async UniTask<RemoteContentUpdateResult> DownloadOptionalAsync(
+            Action<float, string> onProgress = null,
+            System.Threading.CancellationToken cancellationToken = default)
+        {
+            var service = AddressableRemoteUpdateService.Instance;
+            var handler = new ProgressHandler(onProgress);
+            return await service.DownloadOptionalContentAsync(handler, cancellationToken);
         }
 
         // ── Progress handler adapter ──────────────────────────────────────
 
         /// <summary>
-        /// Maps <see cref="IRemoteUpdateProgressHandler"/> callbacks into the
-        /// <c>(float percent, string message)</c> format used by BootstrapProgress.
+        /// Maps <see cref="IRemoteUpdateProgressHandler"/> callbacks into
+        /// <c>(float percent, string message)</c> callbacks for simple UIs.
+        ///
+        /// <b>Important:</b> <see cref="OnComplete"/> does NOT change the
+        /// progress bar. It only reports the final status via the message.
+        /// The last progress value from <see cref="OnProgress"/> is preserved.
+        /// The caller (GameBootstrap) handles result-specific progress after
+        /// cache validation.
         /// </summary>
-        private sealed class BootstrapProgressHandler : IRemoteUpdateProgressHandler
+        private sealed class ProgressHandler : IRemoteUpdateProgressHandler
         {
             private readonly Action<float, string> _onProgress;
-            private RemoteContentUpdateProgress _lastProgress;
+            private float _lastPercent;
 
-            public BootstrapProgressHandler(Action<float, string> onProgress)
+            public ProgressHandler(Action<float, string> onProgress)
             {
                 _onProgress = onProgress;
             }
 
-            public void OnProgress(RemoteContentUpdateProgress progress)
+            void IRemoteUpdateProgressHandler.OnProgress(RemoteContentUpdateProgress progress)
             {
-                _lastProgress = progress;
-
-                // Map the overall pipeline to the first 10 % of the bootstrap bar.
-                float bootstrapPercent = 0.1f * progress.Percent;
-
-                // For non-downloading phases, report status with a nominal fraction.
-                if (progress.Status != RemoteContentUpdateStatus.Downloading &&
-                    progress.Status != RemoteContentUpdateStatus.Complete)
-                {
-                    bootstrapPercent = 0.01f; // at least some movement
-                }
-
-                _onProgress?.Invoke(bootstrapPercent, progress.CurrentLabel);
+                _lastPercent = progress.Percent;
+                _onProgress?.Invoke(progress.Percent, progress.CurrentLabel);
             }
 
-            public void OnComplete(RemoteContentUpdateResult result)
+            void IRemoteUpdateProgressHandler.OnComplete(RemoteContentUpdateResult result)
             {
-                if (result.IsSuccess)
+                // Do NOT change the progress bar here.
+                // The last OnProgress call already reported the terminal percent.
+                // Forcing 1f or 0f would:
+                //  - Show "100%" before cache validation (Offline case)
+                //  - Overwrite the service's accurate terminal progress
+                //  - Mislead the caller about when the phase actually ended
+                //
+                // The caller (GameBootstrap) handles result status after await
+                // and updates progress accordingly (e.g. CompleteReservedSteps).
+                //
+                // We only report the final status message at the last known
+                // progress position.
+                var message = result.Status switch
                 {
-                    _onProgress?.Invoke(0.1f, "Content ready.");
-                }
-                else
-                {
-                    var msg = result.Status == RemoteContentUpdateStatus.Timeout
-                        ? "Update timed out."
-                        : $"Update failed: {string.Join(", ", result.Errors)}";
-                    _onProgress?.Invoke(0f, msg);
-                }
-            }
-        }
+                    RemoteContentUpdateStatus.Complete
+                        or RemoteContentUpdateStatus.NoUpdateNeeded
+                        => "Content ready.",
 
-        private static string FormatBytes(long bytes)
-        {
-            if (bytes <= 0) return "0 B";
-            string[] suffixes = { "B", "KB", "MB", "GB" };
-            int order = 0;
-            double size = bytes;
-            while (size >= 1024 && order < suffixes.Length - 1)
-            {
-                order++;
-                size /= 1024;
+                    RemoteContentUpdateStatus.Offline
+                        => "Offline — checking cached content…",
+
+                    RemoteContentUpdateStatus.Timeout
+                        => "Update timed out.",
+
+                    RemoteContentUpdateStatus.Cancelled
+                        => "Update cancelled.",
+
+                    RemoteContentUpdateStatus.Failed
+                        => $"Update failed: {string.Join(", ", result.Errors)}",
+
+                    _ => $"Update ended: {result.Status}"
+                };
+
+                _onProgress?.Invoke(_lastPercent, message);
             }
-            return $"{size:0.##} {suffixes[order]}";
         }
     }
 }

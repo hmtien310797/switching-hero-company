@@ -1,7 +1,5 @@
 using System;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.Loading.Views;
-using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,23 +7,22 @@ using UnityEngine.UI;
 namespace Immortal_Switch.Scripts.RemoteUpdate.Examples
 {
     /// <summary>
-    /// Example loading-screen UIView that shows Addressable remote content
-    /// download progress with a progress bar, status text, size label,
-    /// and retry / skip-offline buttons.
+    /// Passive loading-screen UIView that displays Addressable remote content
+    /// download progress. This view does NOT start the pipeline — it only
+    /// receives progress and completion callbacks via
+    /// <see cref="IRemoteUpdateProgressHandler"/>.
     ///
-    /// Attach this to a UI prefab and open it before calling
-    /// <see cref="AddressableRemoteUpdateService.CheckAndDownloadUpdatesAsync"/>.
+    /// The pipeline is owned exclusively by <see cref="Immortal_Switch.Scripts.Core.GameBootstrap"/>.
     ///
-    /// This view implements <see cref="IRemoteUpdateProgressHandler"/> so it
-    /// can be passed directly into the service:
+    /// Usage:
     /// <code>
-    /// var view = await UIManager.Instance.OpenPopupAsync&gt;RemoteUpdateLoadingScreenView&lt;();
-    /// var service = AddressableRemoteUpdateService.Instance;
+    /// // In GameBootstrap or another owner:
+    /// var view = GetComponent&lt;RemoteUpdateLoadingScreenView&gt;();
     /// var result = await service.DownloadRequiredContentAsync(view, token);
-    /// if (result.IsSuccess) { /* proceed */ }
+    /// // view now shows progress bars and status text automatically.
     /// </code>
     /// </summary>
-    public class RemoteUpdateLoadingScreenView : UIView, IRemoteUpdateProgressHandler
+    public class RemoteUpdateLoadingScreenView : MonoBehaviour, IRemoteUpdateProgressHandler
     {
         // ── Serialized UI references ──────────────────────────────────────
 
@@ -35,85 +32,35 @@ namespace Immortal_Switch.Scripts.RemoteUpdate.Examples
         [SerializeField] private TMP_Text _sizeText;
         [SerializeField] private TMP_Text _percentText;
 
-        [Header("Buttons")]
-        [SerializeField] private Button _retryButton;
-        [SerializeField] private Button _skipOfflineButton;
-        [SerializeField] private Button _quitButton;
-
-        [Header("Settings")]
-        [SerializeField] private bool _quitOnFailure = true;
-
         // ── Internal state ────────────────────────────────────────────────
 
-        private AddressableRemoteUpdateService _service;
-        private System.Threading.CancellationTokenSource _cts;
         private RemoteContentUpdateResult _lastResult;
-        private bool _isRunning;
+        private bool _isComplete;
 
-        // ── UIView overrides ──────────────────────────────────────────────
+        // ── Public query ──────────────────────────────────────────────────
 
-        public override async UniTask PlayShowAsync(object args)
-        {
-            _service = AddressableRemoteUpdateService.Instance;
-            _cts = new System.Threading.CancellationTokenSource();
+        /// <summary>
+        /// Returns the last known result. Poll this after completion
+        /// to decide whether to proceed.
+        /// </summary>
+        public RemoteContentUpdateResult LastResult => _lastResult;
 
-            // Wire buttons.
-            if (_retryButton != null)
-                _retryButton.onClick.AddListener(OnRetryClicked);
-
-            if (_skipOfflineButton != null)
-            {
-                _skipOfflineButton.onClick.AddListener(OnSkipOfflineClicked);
-                _skipOfflineButton.gameObject.SetActive(false);
-            }
-
-            if (_quitButton != null)
-            {
-                _quitButton.onClick.AddListener(OnQuitClicked);
-                _quitButton.gameObject.SetActive(false);
-            }
-
-            await base.PlayShowAsync(args);
-
-            // Kick off the update check.
-            RunUpdateAsync().Forget();
-        }
-
-        public override UniTask PlayHideAsync()
-        {
-            _cts?.Cancel();
-            Cleanup();
-            return base.PlayHideAsync();
-        }
-
-        private void Cleanup()
-        {
-            if (_retryButton != null)
-                _retryButton.onClick.RemoveListener(OnRetryClicked);
-
-            if (_skipOfflineButton != null)
-                _skipOfflineButton.onClick.RemoveListener(OnSkipOfflineClicked);
-
-            if (_quitButton != null)
-                _quitButton.onClick.RemoveListener(OnQuitClicked);
-
-            _cts?.Dispose();
-            _cts = null;
-        }
+        /// <summary>
+        /// True after OnComplete has been called.
+        /// </summary>
+        public bool IsComplete => _isComplete;
 
         // ── IRemoteUpdateProgressHandler implementation ───────────────────
 
         void IRemoteUpdateProgressHandler.OnProgress(RemoteContentUpdateProgress progress)
         {
-            // The service invokes callbacks from the main thread via
-            // UniTask.Yield(PlayerLoopTiming.Update). If your setup differs,
-            // dispatch to main thread here:
-            //   UniTask.PostToMainThread(() => ApplyProgress(progress));
             ApplyProgress(progress);
         }
 
         void IRemoteUpdateProgressHandler.OnComplete(RemoteContentUpdateResult result)
         {
+            _lastResult = result;
+            _isComplete = true;
             ApplyComplete(result);
         }
 
@@ -125,7 +72,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate.Examples
                 _progressBar.value = progress.Percent;
 
             if (_statusText != null)
-                _statusText.text = StatusToLocalisedText(progress.Status);
+                _statusText.text = progress.CurrentLabel;
 
             if (_sizeText != null && progress.TotalBytes > 0)
             {
@@ -139,12 +86,8 @@ namespace Immortal_Switch.Scripts.RemoteUpdate.Examples
 
         private void ApplyComplete(RemoteContentUpdateResult result)
         {
-            _lastResult = result;
-            _isRunning = false;
-
             if (result.IsSuccess)
             {
-                // Update finished — the caller should close this view.
                 if (_statusText != null)
                     _statusText.text = "Update complete!";
                 if (_percentText != null)
@@ -154,133 +97,32 @@ namespace Immortal_Switch.Scripts.RemoteUpdate.Examples
                 return;
             }
 
-            // Failure — show appropriate buttons.
-            if (_statusText != null)
-            {
-                _statusText.text = result.Status == RemoteContentUpdateStatus.Timeout
-                    ? "Update timed out. Check your connection."
-                    : $"Update failed: {string.Join("\n", result.Errors)}";
-            }
-
-            if (_retryButton != null)
-                _retryButton.gameObject.SetActive(true);
-
             if (result.Status == RemoteContentUpdateStatus.Offline)
             {
-                if (_skipOfflineButton != null)
-                    _skipOfflineButton.gameObject.SetActive(true);
+                // Do not force the bar to 100% here.
+                // GameBootstrap still needs to validate that Required content
+                // is actually available in the local cache.
+                if (_statusText != null)
+                    _statusText.text = "Offline — checking cached content…";
+
+                return;
             }
 
-            if (_quitButton != null && _quitOnFailure)
-                _quitButton.gameObject.SetActive(true);
-        }
-
-        // ── Button handlers ───────────────────────────────────────────────
-
-        private void OnRetryClicked()
-        {
-            if (_retryButton != null)
-                _retryButton.gameObject.SetActive(false);
-            if (_skipOfflineButton != null)
-                _skipOfflineButton.gameObject.SetActive(false);
-            if (_quitButton != null)
-                _quitButton.gameObject.SetActive(false);
-
-            // Reset UI.
-            if (_progressBar != null) _progressBar.value = 0f;
-            if (_statusText != null) _statusText.text = "Retrying…";
-            if (_sizeText != null) _sizeText.text = string.Empty;
-            if (_percentText != null) _percentText.text = "0%";
-
-            // Re-create token source and retry.
-            _cts?.Dispose();
-            _cts = new System.Threading.CancellationTokenSource();
-            _isRunning = true;
-
-            RunUpdateAsync().Forget();
-        }
-
-        private void OnSkipOfflineClicked()
-        {
-            Debug.Log("[RemoteUpdate] User chose to skip update — running offline.");
-            // The caller should check _lastResult.IsSuccess and decide to proceed.
-            // Mark as "done" by setting a success-like state.
-            _lastResult = new RemoteContentUpdateResult(
-                RemoteContentUpdateStatus.Offline, _lastResult.ElapsedTime,
-                false, false, 0, 0);
-            _isRunning = false;
-        }
-
-        private void OnQuitClicked()
-        {
-            Debug.Log("[RemoteUpdate] User chose to quit.");
-            Application.Quit();
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#endif
-        }
-
-        // ── Update runner ─────────────────────────────────────────────────
-
-        private async UniTaskVoid RunUpdateAsync()
-        {
-            if (_isRunning) return;
-            _isRunning = true;
-
-            try
+            // Failed / Timeout / Cancelled.
+            if (_statusText != null)
             {
-                var result = await _service.CheckAndDownloadUpdatesAsync(
-                    this, _cts.Token);
-
-                // If the result is already handled by OnComplete, we're done.
-                // But if the caller is polling this view, expose the result.
-                _lastResult = result;
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.Log("[RemoteUpdate] Update cancelled by user.");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"[RemoteUpdate] Unexpected error: {ex}");
+                _statusText.text = result.Status switch
+                {
+                    RemoteContentUpdateStatus.Timeout =>
+                        "Update timed out. Check your connection.",
+                    RemoteContentUpdateStatus.Cancelled =>
+                        "Update cancelled.",
+                    _ => $"Update failed: {string.Join("\n", result.Errors)}"
+                };
             }
         }
-
-        // ── Public query ──────────────────────────────────────────────────
-
-        /// <summary>
-        /// Returns the last known result. Poll this after the view closes
-        /// to decide whether to proceed into the game.
-        /// </summary>
-        public RemoteContentUpdateResult LastResult => _lastResult;
-
-        /// <summary>
-        /// True while the update pipeline is still running.
-        /// </summary>
-        public bool IsRunning => _isRunning;
 
         // ── Helpers ───────────────────────────────────────────────────────
-
-        private static string StatusToLocalisedText(RemoteContentUpdateStatus status)
-        {
-            // In production, use the Unity Localization package.
-            // These strings are English fallbacks.
-            return status switch
-            {
-                RemoteContentUpdateStatus.Initializing => "Initialising…",
-                RemoteContentUpdateStatus.CheckingForUpdates => "Checking for updates…",
-                RemoteContentUpdateStatus.NoUpdateNeeded => "Content is up to date.",
-                RemoteContentUpdateStatus.UpdatingCatalogs => "Updating catalog…",
-                RemoteContentUpdateStatus.CalculatingDownloadSize => "Calculating size…",
-                RemoteContentUpdateStatus.Downloading => "Downloading…",
-                RemoteContentUpdateStatus.Complete => "Update complete!",
-                RemoteContentUpdateStatus.Failed => "Update failed.",
-                RemoteContentUpdateStatus.Offline => "No internet connection.",
-                RemoteContentUpdateStatus.Timeout => "Connection timed out.",
-                RemoteContentUpdateStatus.Cancelled => "Cancelled.",
-                _ => "Please wait…"
-            };
-        }
 
         private static string FormatBytes(long bytes)
         {

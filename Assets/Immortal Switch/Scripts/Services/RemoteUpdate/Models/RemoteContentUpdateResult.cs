@@ -30,11 +30,14 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
         /// <summary>Per-step or aggregate error messages collected during the pipeline.</summary>
         public IReadOnlyList<string> Errors { get; }
 
-        /// <summary>True when the pipeline finished without errors or timeouts.</summary>
+        /// <summary>
+        /// True when the pipeline finished without errors.
+        /// Offline is NOT considered success — callers must separately validate
+        /// cached content via <see cref="AddressableRemoteUpdateService.IsContentAvailableOfflineAsync"/>.
+        /// </summary>
         public bool IsSuccess =>
             Status == RemoteContentUpdateStatus.Complete ||
-            Status == RemoteContentUpdateStatus.NoUpdateNeeded ||
-            Status == RemoteContentUpdateStatus.Offline;
+            Status == RemoteContentUpdateStatus.NoUpdateNeeded;
 
         public RemoteContentUpdateResult(
             RemoteContentUpdateStatus status,

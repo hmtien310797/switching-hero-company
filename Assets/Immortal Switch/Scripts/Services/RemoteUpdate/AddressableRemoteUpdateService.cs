@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
 using Debug = UnityEngine.Debug;
 
 namespace Immortal_Switch.Scripts.RemoteUpdate
@@ -19,11 +18,17 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
     /// and downloads only new or changed bundles. Required content must finish before
     /// the game can start; optional content may be deferred.
     ///
-    /// Usage (in GameBootstrap or LoginScene):
+    /// Owned exclusively by <see cref="GameBootstrap"/>. Do not call this service
+    /// from other components during the bootstrap phase.
+    ///
+    /// Usage (in GameBootstrap):
     /// <code>
     /// var result = await AddressableRemoteUpdateService.Instance
     ///     .DownloadRequiredContentAsync(handler, cancellationToken);
     /// if (result.IsSuccess) { /* proceed into game */ }
+    /// else if (result.Status == RemoteContentUpdateStatus.Offline
+    ///          &amp;&amp; await service.IsContentAvailableOfflineAsync())
+    ///     { /* proceed offline */ }
     /// </code>
     /// </summary>
     public sealed class AddressableRemoteUpdateService : Singleton<AddressableRemoteUpdateService>
@@ -36,7 +41,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
         [SerializeField, Tooltip("Addressable label for optional bundles (may be downloaded later).")]
         private string _optionalLabel = "Optional";
 
-        [SerializeField, Tooltip("Seconds before a single operation is considered timed out.")]
+        [SerializeField, Tooltip("Seconds before a single network operation is considered timed out.")]
         private float _timeoutSeconds = 30f;
 
         [SerializeField, Tooltip("Maximum retry attempts per transient failure.")]
@@ -44,6 +49,16 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
 
         [SerializeField, Tooltip("Base delay in seconds between retries (multiplied by attempt number).")]
         private float _retryDelaySeconds = 2f;
+
+        [SerializeField, Tooltip("Seconds without any byte progress before the download is considered stalled.")]
+        private float _downloadStallTimeoutSeconds = 60f;
+
+        // ── Content-ready marker ──────────────────────────────────────────
+
+        private const string ContentReadyMarkerPrefix = "addr_content_ready_";
+
+        private string ContentReadyMarkerKey =>
+            ContentReadyMarkerPrefix + (_requiredLabel ?? "Required");
 
         // ── Internal state ────────────────────────────────────────────────
 
@@ -105,41 +120,101 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             IRemoteUpdateProgressHandler handler = null,
             CancellationToken cancellationToken = default)
         {
-            // Only download optional bundles — skip catalog checks.
             return await DownloadOptionalOnlyAsync(handler, cancellationToken);
         }
 
         /// <summary>
+        /// True while a pipeline is in flight. External code can check this
+        /// to avoid starting a duplicate update.
+        /// </summary>
+        public bool IsRunning => _runningUpdateTcs != null;
+
+        /// <summary>
         /// Cancels any currently running update pipeline.
         /// Safe to call from any thread, at any time.
+        /// Does NOT dispose the internal CTS — the pipeline's finally block handles that.
         /// </summary>
         public void CancelUpdate()
         {
             _internalCts?.Cancel();
-            _internalCts?.Dispose();
-            _internalCts = null;
         }
 
         /// <summary>
         /// Returns true when cached content is sufficient to run the game offline
-        /// (i.e. the required bundles were downloaded at least once).
+        /// (i.e. the required bundles were downloaded at least once AND the
+        /// content-ready marker exists).
         /// </summary>
-        public bool IsContentAvailableOffline()
+        public async UniTask<bool> IsContentAvailableOfflineAsync(
+            CancellationToken cancellationToken = default)
         {
-            // If we've ever successfully completed a download, cached content exists.
-            // A more thorough check could enumerate cached bundles, but the simplest
-            // signal is whether Addressables has a non-empty local catalog.
+            if (string.IsNullOrWhiteSpace(_requiredLabel))
+                return false;
+
+            // The marker proves that the Required phase completed successfully at least once.
+            if (!PlayerPrefs.HasKey(ContentReadyMarkerKey))
+                return false;
+
+            AsyncOperationHandle<long> handle = default;
+
             try
             {
-                var handle = Addressables.GetDownloadSizeAsync(_requiredLabel);
-                handle.WaitForCompletion(); // sync — safe because we expect instant return
-                long size = handle.Result;
-                Addressables.Release(handle);
+                handle = Addressables.GetDownloadSizeAsync(_requiredLabel);
+
+                long size = await handle.ToUniTask(
+                    cancellationToken: cancellationToken);
+
                 return size == 0;
             }
-            catch
+            catch (OperationCanceledException)
             {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning(
+                    $"[RemoteUpdate] Offline cache validation failed: {ex.Message}");
                 return false;
+            }
+            finally
+            {
+                if (handle.IsValid())
+                    Addressables.Release(handle);
+            }
+        }
+
+        /// <summary>
+        /// Synchronous convenience wrapper. Prefer <see cref="IsContentAvailableOfflineAsync"/>
+        /// to avoid blocking the main thread.
+        /// </summary>
+        [Obsolete(
+            "Use IsContentAvailableOfflineAsync instead. " +
+            "This synchronous wrapper may block the main thread.")]
+        public bool IsContentAvailableOffline()
+        {
+            if (string.IsNullOrWhiteSpace(_requiredLabel))
+                return false;
+
+            if (!PlayerPrefs.HasKey(ContentReadyMarkerKey))
+                return false;
+
+            AsyncOperationHandle<long> handle = default;
+
+            try
+            {
+                handle = Addressables.GetDownloadSizeAsync(_requiredLabel);
+                long size = handle.WaitForCompletion();
+                return size == 0;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning(
+                    $"[RemoteUpdate] Synchronous cache validation failed: {ex.Message}");
+                return false;
+            }
+            finally
+            {
+                if (handle.IsValid())
+                    Addressables.Release(handle);
             }
         }
 
@@ -151,12 +226,6 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             CancellationToken externalToken)
         {
             // ── Duplicate-call guard ──────────────────────────────────
-            if (_runningUpdateTcs != null)
-            {
-                Debug.Log("[RemoteUpdate] Update already in progress — awaiting existing task.");
-                return await _runningUpdateTcs.Task;
-            }
-
             _runningUpdateTcs = new UniTaskCompletionSource<RemoteContentUpdateResult>();
             var stopwatch = Stopwatch.StartNew();
             var errors = new List<string>();
@@ -174,82 +243,174 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             {
                 token.ThrowIfCancellationRequested();
 
-                // ── Step 1: Initialise Addressables ───────────────────
-                Report(handler, RemoteContentUpdateStatus.Initializing, "Initialising Addressables…");
+                // ── Phase 1: Initialise Addressables ──────────────────
+                // Weighted progress: 0.00 – 0.10
+                ReportPhase(handler, RemoteContentUpdateStatus.Initializing,
+                    "Initialising Addressables…", 0.00f);
                 await InitializeAddressablesAsync(token);
+                ReportPhase(handler, RemoteContentUpdateStatus.Initializing,
+                    "Addressables ready.", 0.10f);
 
-                // ── Step 2: Check for catalog updates ─────────────────
-                Report(handler, RemoteContentUpdateStatus.CheckingForUpdates, "Checking for updates…");
+                // ── Phase 2: Check for catalog updates ────────────────
+                // Weighted progress: 0.10 – 0.25
+                ReportPhase(handler, RemoteContentUpdateStatus.CheckingForUpdates,
+                    "Checking for updates…", 0.10f);
                 var catalogUpdates = await CheckForCatalogUpdatesWithRetryAsync(token);
+                ReportPhase(handler, RemoteContentUpdateStatus.CheckingForUpdates,
+                    catalogUpdates.Count > 0
+                        ? $"Found {catalogUpdates.Count} catalog update(s)."
+                        : "Catalog is current.",
+                    0.25f);
 
-                if (catalogUpdates.Count == 0)
+                // ── Phase 3: Update catalogs (only if needed) ────────
+                // Weighted progress: 0.25 – 0.40
+                if (catalogUpdates.Count > 0)
                 {
-                    Report(handler, RemoteContentUpdateStatus.NoUpdateNeeded,
-                        "Content is up to date.", isDone: true);
-                    var noUpdateResult = new RemoteContentUpdateResult(
-                        RemoteContentUpdateStatus.NoUpdateNeeded,
-                        stopwatch.Elapsed, false, false, 0, 0);
-                    _runningUpdateTcs.TrySetResult(noUpdateResult);
-                    return noUpdateResult;
+                    hadUpdates = true;
+                    ReportPhase(handler, RemoteContentUpdateStatus.UpdatingCatalogs,
+                        "Updating catalog…", 0.25f);
+                    await UpdateCatalogsWithRetryAsync(catalogUpdates, token);
+                    catalogUpdated = true;
                 }
+                ReportPhase(handler, RemoteContentUpdateStatus.UpdatingCatalogs,
+                    catalogUpdated ? "Catalog updated." : "Catalog is up to date.",
+                    0.40f);
 
-                hadUpdates = true;
+                // ── Phase 4: Calculate download sizes ────────────────
+                // Weighted progress: 0.40 – 0.50
+                ReportPhase(handler, RemoteContentUpdateStatus.CalculatingDownloadSize,
+                    "Calculating download size…", 0.40f);
 
-                // ── Step 3: Update catalogs ──────────────────────────
-                Report(handler, RemoteContentUpdateStatus.UpdatingCatalogs, "Updating catalog…");
-                var locators = await UpdateCatalogsWithRetryAsync(catalogUpdates, token);
-                catalogUpdated = true;
-
-                // ── Step 4: Calculate download sizes ──────────────────
-                Report(handler, RemoteContentUpdateStatus.CalculatingDownloadSize,
-                    "Calculating download size…");
                 long requiredSize = 0;
                 long optionalSize = 0;
 
                 if (!string.IsNullOrEmpty(_requiredLabel))
                     requiredSize = await GetDownloadSizeWithTimeoutAsync(_requiredLabel, token);
 
-                if (!string.IsNullOrEmpty(_optionalLabel))
+                if (downloadOptional && !string.IsNullOrEmpty(_optionalLabel))
                     optionalSize = await GetDownloadSizeWithTimeoutAsync(_optionalLabel, token);
 
-                Report(handler, RemoteContentUpdateStatus.CalculatingDownloadSize,
+                ReportPhase(handler, RemoteContentUpdateStatus.CalculatingDownloadSize,
                     $"Required: {FormatBytes(requiredSize)}, Optional: {FormatBytes(optionalSize)}",
-                    requiredBytes: requiredSize, optionalBytes: optionalSize);
+                    0.50f);
 
-                // ── Step 5: Download required content ─────────────────
+                // ── Phase 5: Download required content ───────────────
+                // Split the remaining 50% according to actual Required/Optional sizes
+                // so overall progress never moves backward.
+                long totalDownloadSize = requiredSize + optionalSize;
+                float requiredPhaseEnd = 1.00f;
+
+                if (downloadOptional && optionalSize > 0 && totalDownloadSize > 0)
+                {
+                    float requiredWeight =
+                        Mathf.Clamp01(requiredSize / (float)totalDownloadSize);
+
+                    requiredPhaseEnd = Mathf.Lerp(
+                        0.50f,
+                        1.00f,
+                        requiredWeight);
+                }
+
                 if (requiredSize > 0)
                 {
                     requiredDownloaded = await DownloadContentWithProgressAsync(
-                        _requiredLabel, "Required content", requiredSize,
-                        handler, token);
+                        _requiredLabel,
+                        "Required content",
+                        requiredSize,
+                        handler,
+                        token,
+                        0.50f,
+                        requiredPhaseEnd);
+                }
+                else
+                {
+                    ReportPhase(
+                        handler,
+                        RemoteContentUpdateStatus.Downloading,
+                        "Required content is already cached.",
+                        requiredPhaseEnd);
                 }
 
-                // ── Step 6: Download optional content (if requested) ──
+                // Required content is now either downloaded or already cached.
+                // Write the marker before Optional content, because Optional failure
+                // must not invalidate an otherwise usable Required cache.
+                MarkRequiredContentReady();
+
+                // ── Phase 6: Download optional content (if requested) ─
                 if (downloadOptional && optionalSize > 0)
                 {
                     optionalDownloaded = await DownloadContentWithProgressAsync(
-                        _optionalLabel, "Optional content", optionalSize,
-                        handler, token);
+                        _optionalLabel,
+                        "Optional content",
+                        optionalSize,
+                        handler,
+                        token,
+                        requiredPhaseEnd,
+                        1.00f);
                 }
 
                 // ── Success ───────────────────────────────────────────
-                Report(handler, RemoteContentUpdateStatus.Complete,
-                    "Update complete.", isDone: true);
+                ReportPhase(handler, RemoteContentUpdateStatus.Complete,
+                    "Update complete.", 1.00f, isDone: true);
                 var successResult = new RemoteContentUpdateResult(
                     RemoteContentUpdateStatus.Complete,
                     stopwatch.Elapsed, hadUpdates, catalogUpdated,
                     requiredDownloaded, optionalDownloaded, errors);
-                _runningUpdateTcs.TrySetResult(successResult);
-                return successResult;
+                return Finish(successResult, handler);
+            }
+            catch (OfflineException ex)
+            {
+                Debug.LogWarning($"[RemoteUpdate] Device is offline: {ex.Message}");
+                var offlineResult = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Offline, stopwatch.Elapsed,
+                    hadUpdates, catalogUpdated, requiredDownloaded, optionalDownloaded,
+                    new[] { ex.Message });
+                return Finish(offlineResult, handler);
+            }
+            catch (TimeoutException ex)
+            {
+                Debug.LogWarning($"[RemoteUpdate] Operation timed out: {ex.Message}");
+                errors.Add(ex.Message);
+                var timeoutResult = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Timeout, stopwatch.Elapsed,
+                    hadUpdates, catalogUpdated, requiredDownloaded, optionalDownloaded,
+                    errors);
+                ReportPhase(handler, RemoteContentUpdateStatus.Timeout,
+                    $"Update timed out: {ex.Message}", 1.00f, isDone: true, errorMessage: ex.Message);
+                return Finish(timeoutResult, handler);
             }
             catch (OperationCanceledException)
             {
+                Debug.Log("[RemoteUpdate] Pipeline cancelled.");
                 var cancelledResult = new RemoteContentUpdateResult(
                     RemoteContentUpdateStatus.Cancelled, stopwatch.Elapsed,
                     hadUpdates, catalogUpdated, requiredDownloaded, optionalDownloaded,
                     new[] { "Operation was cancelled." });
-                _runningUpdateTcs.TrySetResult(cancelledResult);
-                return cancelledResult;
+                return Finish(cancelledResult, handler);
+            }
+            catch (Exception ex) when (IsOffline(ex))
+            {
+                Debug.LogWarning(
+                    $"[RemoteUpdate] Device went offline during update: {ex.Message}");
+
+                var offlineResult = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Offline,
+                    stopwatch.Elapsed,
+                    hadUpdates,
+                    catalogUpdated,
+                    requiredDownloaded,
+                    optionalDownloaded,
+                    new[] { ex.Message });
+
+                ReportPhase(
+                    handler,
+                    RemoteContentUpdateStatus.Offline,
+                    "No internet connection.",
+                    1.00f,
+                    isDone: true,
+                    errorMessage: ex.Message);
+
+                return Finish(offlineResult, handler);
             }
             catch (Exception ex)
             {
@@ -260,10 +421,9 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                     RemoteContentUpdateStatus.Failed, stopwatch.Elapsed,
                     hadUpdates, catalogUpdated, requiredDownloaded, optionalDownloaded,
                     errors);
-                Report(handler, RemoteContentUpdateStatus.Failed,
-                    $"Update failed: {ex.Message}", isDone: true, errorMessage: ex.Message);
-                _runningUpdateTcs.TrySetResult(failedResult);
-                return failedResult;
+                ReportPhase(handler, RemoteContentUpdateStatus.Failed,
+                    $"Update failed: {ex.Message}", 1.00f, isDone: true, errorMessage: ex.Message);
+                return Finish(failedResult, handler);
             }
             finally
             {
@@ -274,18 +434,60 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
         }
 
         /// <summary>
-        /// Downloads optional content only — used when required content was
-        /// already downloaded during bootstrap.
+        /// Downloads optional content only.
+        /// Initialises Addressables first since it may not have been done
+        /// if the caller skipped the required pipeline.
         /// </summary>
         private async UniTask<RemoteContentUpdateResult> DownloadOptionalOnlyAsync(
             IRemoteUpdateProgressHandler handler,
             CancellationToken externalToken)
         {
+            // Optional and Required pipelines must never share the same running task.
+            // If another pipeline is active, fail fast instead of returning the
+            // result of an unrelated operation.
+            if (_runningUpdateTcs != null)
+            {
+                var busyResult = RemoteContentUpdateResult.Failed(
+                    TimeSpan.Zero,
+                    "Another Addressables update pipeline is already running.");
+
+                try
+                {
+                    handler?.OnComplete(busyResult);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+
+                return busyResult;
+            }
+
+            if (!await IsContentAvailableOfflineAsync(externalToken))
+            {
+                var requiredNotReadyResult = RemoteContentUpdateResult.Failed(
+                    TimeSpan.Zero,
+                    "Required content is not ready. Run the Required pipeline first.");
+
+                // No update TCS exists yet in this early-return path.
+                try
+                {
+                    handler?.OnComplete(requiredNotReadyResult);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+
+                return requiredNotReadyResult;
+            }
+
             if (string.IsNullOrEmpty(_optionalLabel))
             {
-                return new RemoteContentUpdateResult(
+                var emptyResult = new RemoteContentUpdateResult(
                     RemoteContentUpdateStatus.NoUpdateNeeded,
                     TimeSpan.Zero, false, false, 0, 0);
+                return Finish(emptyResult, handler);
             }
 
             if (_runningUpdateTcs != null)
@@ -304,28 +506,77 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             {
                 token.ThrowIfCancellationRequested();
 
+                // Ensure Addressables is initialised (may not have been done if
+                // the required pipeline was skipped).
+                ReportPhase(handler, RemoteContentUpdateStatus.Initializing,
+                    "Initialising Addressables…", 0.00f);
+                await InitializeAddressablesAsync(token);
+                ReportPhase(handler, RemoteContentUpdateStatus.Initializing,
+                    "Addressables ready.", 0.10f);
+
                 long optionalSize = await GetDownloadSizeWithTimeoutAsync(_optionalLabel, token);
                 long optionalDownloaded = 0;
 
                 if (optionalSize > 0)
                 {
                     optionalDownloaded = await DownloadContentWithProgressAsync(
-                        _optionalLabel, "Optional content", optionalSize, handler, token);
+                        _optionalLabel, "Optional content", optionalSize,
+                        handler, token, 0.10f, 1.00f);
                 }
 
                 var result = new RemoteContentUpdateResult(
                     RemoteContentUpdateStatus.Complete,
                     stopwatch.Elapsed, false, false, 0, optionalDownloaded);
-                _runningUpdateTcs.TrySetResult(result);
-                return result;
+                return Finish(result, handler);
             }
             catch (OperationCanceledException)
             {
                 var result = new RemoteContentUpdateResult(
                     RemoteContentUpdateStatus.Cancelled, stopwatch.Elapsed,
                     false, false, 0, 0, new[] { "Operation was cancelled." });
-                _runningUpdateTcs.TrySetResult(result);
-                return result;
+                return Finish(result, handler);
+            }
+            catch (TimeoutException ex)
+            {
+                var result = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Timeout,
+                    stopwatch.Elapsed,
+                    false,
+                    false,
+                    0,
+                    0,
+                    new[] { ex.Message });
+
+                ReportPhase(
+                    handler,
+                    RemoteContentUpdateStatus.Timeout,
+                    $"Optional download timed out: {ex.Message}",
+                    1.00f,
+                    isDone: true,
+                    errorMessage: ex.Message);
+
+                return Finish(result, handler);
+            }
+            catch (Exception ex) when (IsOffline(ex))
+            {
+                var result = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Offline,
+                    stopwatch.Elapsed,
+                    false,
+                    false,
+                    0,
+                    0,
+                    new[] { ex.Message });
+
+                ReportPhase(
+                    handler,
+                    RemoteContentUpdateStatus.Offline,
+                    "No internet connection.",
+                    1.00f,
+                    isDone: true,
+                    errorMessage: ex.Message);
+
+                return Finish(result, handler);
             }
             catch (Exception ex)
             {
@@ -333,8 +584,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 var result = new RemoteContentUpdateResult(
                     RemoteContentUpdateStatus.Failed, stopwatch.Elapsed,
                     false, false, 0, 0, new[] { ex.Message });
-                _runningUpdateTcs.TrySetResult(result);
-                return result;
+                return Finish(result, handler);
             }
             finally
             {
@@ -344,19 +594,42 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             }
         }
 
+        // ── Pipeline finalisation ─────────────────────────────────────────
+
+        /// <summary>
+        /// Called exactly once at every terminal path.
+        /// Sets the TCS result and notifies the progress handler.
+        /// </summary>
+        private RemoteContentUpdateResult Finish(
+            RemoteContentUpdateResult result,
+            IRemoteUpdateProgressHandler handler)
+        {
+            try
+            {
+                handler?.OnComplete(result);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+
+            _runningUpdateTcs?.TrySetResult(result);
+            return result;
+        }
+
         // ── Sub-steps (each with proper handle release) ───────────────────
 
         /// <summary>
         /// Initialise Addressables. Idempotent — safe to call even if already initialised.
         /// The handle is released immediately after completion.
         /// </summary>
-        private static async UniTask InitializeAddressablesAsync(System.Threading.CancellationToken token)
+        private static async UniTask InitializeAddressablesAsync(CancellationToken token)
         {
             AsyncOperationHandle<IResourceLocator> initHandle = default;
             try
             {
                 initHandle = Addressables.InitializeAsync();
-                await initHandle.ToUniTask(cancellationToken: token);
+                await initHandle.ToUniTask(cancellationToken:token);
             }
             finally
             {
@@ -370,7 +643,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
         /// Returns the list of updated catalog hashes (empty = no updates).
         /// </summary>
         private async UniTask<List<string>> CheckForCatalogUpdatesWithRetryAsync(
-            System.Threading.CancellationToken token)
+            CancellationToken token)
         {
             return await RetryAsync(
                 async ct =>
@@ -398,26 +671,30 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
 
         /// <summary>
         /// Calls Addressables.UpdateCatalogs with retry.
-        /// Returns the updated resource locators — these must be kept alive until
-        /// downloads complete so the download-size queries resolve correctly.
+        /// Returns the updated resource locators.
+        /// The handle is released after locators are extracted — Addressables
+        /// reference-counts the locators internally so they stay valid.
         /// </summary>
         private async UniTask<List<IResourceLocator>> UpdateCatalogsWithRetryAsync(
             List<string> catalogs,
-            System.Threading.CancellationToken token)
+            CancellationToken token)
         {
             return await RetryAsync(
                 async ct =>
                 {
                     var updateHandle = Addressables.UpdateCatalogs(catalogs, false);
-                    // NOTE: We do NOT release updateHandle here.
-                    // The locators it produces must stay alive for the download phase.
-                    // The caller is responsible for releasing it after downloads finish.
-                    // However, since we need to return the locators, we release the
-                    // handle but keep the locators alive via the returned list — they
-                    // are reference-counted by Addressables internally.
-                    var locators = await updateHandle.ToUniTask(cancellationToken: ct);
-                    Addressables.Release(updateHandle);
-                    return locators;
+                    try
+                    {
+                        var locators = await updateHandle.ToUniTask(cancellationToken: ct);
+                        return locators;
+                    }
+                    finally
+                    {
+                        // Release the handle — locators are reference-counted
+                        // by Addressables and remain valid for subsequent queries.
+                        if (updateHandle.IsValid())
+                            Addressables.Release(updateHandle);
+                    }
                 },
                 "UpdateCatalogs",
                 token);
@@ -428,7 +705,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
         /// </summary>
         private async UniTask<long> GetDownloadSizeWithTimeoutAsync(
             string label,
-            System.Threading.CancellationToken token)
+            CancellationToken token)
         {
             return await WithTimeoutAsync(
                 async ct =>
@@ -451,6 +728,9 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
 
         /// <summary>
         /// Downloads all dependencies for a label and reports per-frame progress.
+        /// Maps download sub-progress into the range [phaseStart, phaseEnd] of the
+        /// overall pipeline progress bar.
+        /// Detects download stalls (no bytes for <see cref="_downloadStallTimeoutSeconds"/>).
         /// Returns the number of bytes actually downloaded.
         /// </summary>
         private async UniTask<long> DownloadContentWithProgressAsync(
@@ -458,7 +738,9 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             string labelDescription,
             long expectedSizeBytes,
             IRemoteUpdateProgressHandler handler,
-            System.Threading.CancellationToken token)
+            CancellationToken token,
+            float phaseProgressStart,
+            float phaseProgressEnd)
         {
             AsyncOperationHandle downloadHandle = default;
             try
@@ -466,26 +748,38 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 downloadHandle = Addressables.DownloadDependenciesAsync(
                     label, Addressables.MergeMode.Union);
 
-                long lastDownloaded = 0;
+                long lastDownloaded = -1;
+                float lastStallCheckTime = Time.unscaledTime;
 
-                // Per-frame progress loop — exits when downloadHandle.IsDone.
+                // Per-frame progress loop.
                 while (!downloadHandle.IsDone && !token.IsCancellationRequested)
                 {
                     var status = downloadHandle.GetDownloadStatus();
                     long downloaded = status.DownloadedBytes;
                     long total = status.TotalBytes > 0 ? status.TotalBytes : expectedSizeBytes;
 
-                    float percent = total > 0
-                        ? Mathf.Clamp01((float)downloaded / total)
-                        : 0f;
-
-                    // Only report if bytes changed (avoids spamming the handler).
-                    if (downloaded != lastDownloaded || percent >= 1f)
+                    // Detect download stall.
+                    if (downloaded != lastDownloaded)
                     {
                         lastDownloaded = downloaded;
-                        ReportDownloadProgress(handler, RemoteContentUpdateStatus.Downloading,
-                            labelDescription, downloaded, total, percent);
+                        lastStallCheckTime = Time.unscaledTime;
                     }
+                    else if (Time.unscaledTime - lastStallCheckTime > _downloadStallTimeoutSeconds)
+                    {
+                        throw new TimeoutException(
+                            $"Download stalled — no progress for {_downloadStallTimeoutSeconds:F0}s.");
+                    }
+
+                    // Map download sub-progress into the phase range.
+                    float subPercent = total > 0
+                        ? Mathf.Clamp01((float)downloaded / total)
+                        : 0f;
+                    float overallPercent = Mathf.Lerp(phaseProgressStart, phaseProgressEnd, subPercent);
+
+                    ReportPhase(handler, RemoteContentUpdateStatus.Downloading,
+                        $"Downloading {labelDescription}… {FormatBytes(downloaded)} / {FormatBytes(total)}",
+                        overallPercent,
+                        downloadedBytes: downloaded, totalBytes: total);
 
                     await UniTask.Yield(PlayerLoopTiming.Update, token);
                 }
@@ -493,12 +787,14 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 // Await final completion to surface any exception.
                 await downloadHandle.ToUniTask(cancellationToken: token);
 
-                // Re-read final download status.
+                // Read final download status.
                 var finalStatus = downloadHandle.GetDownloadStatus();
                 long finalDownloaded = finalStatus.DownloadedBytes;
 
-                ReportDownloadProgress(handler, RemoteContentUpdateStatus.Downloading,
-                    labelDescription, finalDownloaded, finalDownloaded, 1f);
+                ReportPhase(handler, RemoteContentUpdateStatus.Downloading,
+                    $"{labelDescription} complete.",
+                    phaseProgressEnd,
+                    downloadedBytes: finalDownloaded, totalBytes: finalDownloaded);
 
                 return finalDownloaded;
             }
@@ -513,12 +809,12 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
 
         /// <summary>
         /// Retries an async operation up to <see cref="_maxRetryCount"/> times
-        /// with exponential backoff. Only retries on transient errors.
+        /// with exponential backoff. Only retries on transient network errors.
         /// </summary>
         private async UniTask<T> RetryAsync<T>(
-            Func<System.Threading.CancellationToken, UniTask<T>> operation,
+            Func<CancellationToken, UniTask<T>> operation,
             string operationName,
-            System.Threading.CancellationToken token)
+            CancellationToken token)
         {
             ExceptionDispatchInfo lastException = null;
 
@@ -575,11 +871,11 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
         /// Uses a linked CancellationTokenSource with CancelAfter for clean cancellation.
         /// </summary>
         private async UniTask<T> WithTimeoutAsync<T>(
-            Func<System.Threading.CancellationToken, UniTask<T>> operation,
+            Func<CancellationToken, UniTask<T>> operation,
             string operationName,
-            System.Threading.CancellationToken token)
+            CancellationToken token)
         {
-            using var timeoutCts = System.Threading.CancellationTokenSource.CreateLinkedTokenSource(token);
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(token);
             timeoutCts.CancelAfter(TimeSpan.FromSeconds(_timeoutSeconds));
 
             try
@@ -597,8 +893,9 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
         // ── Error classification ──────────────────────────────────────────
 
         /// <summary>
-        /// Returns true when the exception indicates a temporary failure
-        /// that is worth retrying (network blip, DNS, timeout).
+        /// Returns true when the exception indicates a temporary network failure
+        /// that is worth retrying. Does NOT retry data errors like invalid keys
+        /// or corrupt catalogs.
         /// </summary>
         private static bool IsTransientError(Exception ex)
         {
@@ -608,21 +905,29 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 return true;
             if (ex is System.Net.Http.HttpRequestException)
                 return true;
-            if (ex is InvalidOperationException)
-                return true; // Addressables may wrap network errors here
 
-            // UnityWebRequestException may not be accessible depending on asmdef.
-            // Detect it by type name and known network-error substrings.
+            // UnityWebRequestException may not be directly accessible depending
+            // on asmdef. Detect by type name.
             var typeName = ex.GetType().FullName ?? string.Empty;
             if (typeName.Contains("UnityWebRequestException"))
                 return true;
 
+            // Addressables RemoteProviderException wraps network errors.
+            if (typeName.Contains("RemoteProviderException"))
+                return true;
+
+            // Inspect inner exceptions too.
+            if (ex.InnerException != null && IsTransientError(ex.InnerException))
+                return true;
+
+            // Known transient error substrings in messages.
             var msg = ex.Message ?? string.Empty;
             if (msg.Contains("Cannot resolve destination host") ||
                 msg.Contains("No connection could be made") ||
                 msg.Contains("Connection timed out") ||
                 msg.Contains("Unable to complete SSL connection") ||
-                msg.Contains("request timed out"))
+                msg.Contains("request timed out") ||
+                msg.Contains("NameResolutionFailure"))
                 return true;
 
             return false;
@@ -637,7 +942,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 return true;
 
             // Also treat specific DNS / connection-refused as offline.
-            var msg = ex.InnerException?.Message ?? ex.Message;
+            var msg = (ex.InnerException?.Message ?? ex.Message) ?? string.Empty;
             return msg.Contains("No Internet") ||
                    msg.Contains("NameResolutionFailure") ||
                    msg.Contains("ConnectionRefused") ||
@@ -646,26 +951,21 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
 
         // ── Progress reporting ────────────────────────────────────────────
 
-        private static void Report(
+        /// <summary>
+        /// Reports phase-weighted progress. <paramref name="overallPercent"/>
+        /// is the position within the entire pipeline (0.0 – 1.0).
+        /// </summary>
+        private static void ReportPhase(
             IRemoteUpdateProgressHandler handler,
             RemoteContentUpdateStatus status,
             string label,
+            float overallPercent,
             bool isDone = false,
             string errorMessage = null,
+            long downloadedBytes = 0,
+            long totalBytes = 0,
             long requiredBytes = 0,
             long optionalBytes = 0)
-        {
-            handler?.OnProgress(RemoteContentUpdateProgress.StatusOnly(
-                status, label, isDone, errorMessage));
-        }
-
-        private static void ReportDownloadProgress(
-            IRemoteUpdateProgressHandler handler,
-            RemoteContentUpdateStatus status,
-            string labelDescription,
-            long downloadedBytes,
-            long totalBytes,
-            float percent)
         {
             if (handler == null) return;
 
@@ -673,9 +973,29 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 status,
                 downloadedBytes,
                 totalBytes,
-                $"Downloading {labelDescription}…",
-                percent,
-                false));
+                label,
+                overallPercent,
+                isDone,
+                errorMessage,
+                requiredBytes,
+                optionalBytes));
+        }
+
+        // ── Required-content marker ──────────────────────────────────────
+
+        private void MarkRequiredContentReady()
+        {
+            if (string.IsNullOrWhiteSpace(_requiredLabel))
+            {
+                throw new InvalidOperationException(
+                    "Required Addressables label is empty.");
+            }
+
+            PlayerPrefs.SetString(
+                ContentReadyMarkerKey,
+                _requiredLabel);
+
+            PlayerPrefs.Save();
         }
 
         // ── Formatting ────────────────────────────────────────────────────

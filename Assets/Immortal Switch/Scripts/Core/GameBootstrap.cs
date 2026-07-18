@@ -22,6 +22,8 @@ using Immortal_Switch.Scripts.SummonSystem.WeaponSummon;
 using Immortal_Switch.Scripts.TransmutationSystem;
 using Immortal_Switch.Scripts.Tutorial;
 using Immortal_Switch.Scripts.UI;
+using Immortal_Switch.Scripts.RemoteUpdate;
+using Immortal_Switch.Scripts.RemoteUpdate.Examples;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Core
@@ -34,9 +36,14 @@ namespace Immortal_Switch.Scripts.Core
         }
 
         public async UniTask RunAsync(
-            Action<float, string> onProgress = null)
+            Action<float, string> onProgress = null,
+            System.Threading.CancellationToken cancellationToken = default)
         {
-            const int totalSteps = 16;
+            // 3 virtual steps reserved for remote content update (may involve
+            // a long download — smooth sub-progress keeps the bar moving).
+            // + 16 existing bootstrap steps = 19 total.
+            const int totalSteps = 19;
+            const int remoteUpdateReservedSteps = 3;
 
             var progress = new BootstrapProgress(
                 totalSteps,
@@ -45,6 +52,11 @@ namespace Immortal_Switch.Scripts.Core
 
             try
             {
+                // ── Step 0: Remote content update (runs before every system init) ──
+                progress.ReserveSteps(remoteUpdateReservedSteps);
+                await RunRemoteContentUpdateAsync(progress, cancellationToken);
+                progress.CompleteReservedSteps("Content ready");
+
                 progress.ReportCurrent("Preparing game data");
 
                 // 1
@@ -213,11 +225,81 @@ namespace Immortal_Switch.Scripts.Core
             {
                 Debug.LogException(ex);
 
-                // Không đẩy lên 100% khi bootstrap lỗi nghiêm trọng.
+                // Report the failure so the loading UI shows the error,
+                // then rethrow so the caller (LoginScene) knows bootstrap failed
+                // and does NOT proceed into the game.
                 onProgress?.Invoke(
                     0f,
                     $"Bootstrap failed: {ex.Message}"
                 );
+
+                throw;
+            }
+        }
+
+        private async UniTask RunRemoteContentUpdateAsync(
+            BootstrapProgress progress,
+            System.Threading.CancellationToken cancellationToken)
+        {
+            var service = AddressableRemoteUpdateService.Instance;
+
+            RemoteContentUpdateResult result;
+            try
+            {
+                // Delegate to the reusable bootstrap-step utility.
+                // Progress is forwarded into the reserved-steps block so the
+                // loading bar moves smoothly during catalog checks and download.
+                result = await RemoteUpdateBootstrapStep.RunAsync(
+                    (percent, message) => progress.ReportReservedProgress(percent, message),
+                    cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[GameBootstrap] Remote update threw: {ex}");
+                throw new InvalidOperationException(
+                    $"Content update failed: {ex.Message}", ex);
+            }
+
+            switch (result.Status)
+            {
+                case RemoteContentUpdateStatus.Complete:
+                case RemoteContentUpdateStatus.NoUpdateNeeded:
+                    Debug.Log($"[GameBootstrap] Remote update OK. " +
+                              $"Downloaded {result.RequiredDownloadedBytes} bytes in " +
+                              $"{result.ElapsedTime.TotalSeconds:F1}s.");
+                    return;
+
+                case RemoteContentUpdateStatus.Offline:
+                    if (await service.IsContentAvailableOfflineAsync(cancellationToken))
+                    {
+                        Debug.Log("[GameBootstrap] Offline — using cached content.");
+                        return;
+                    }
+                    throw new InvalidOperationException(
+                        "No internet connection and required content is not cached. " +
+                        "Please connect to the internet on first launch.");
+
+                case RemoteContentUpdateStatus.Timeout:
+                    if (await service.IsContentAvailableOfflineAsync(cancellationToken))
+                    {
+                        Debug.LogWarning("[GameBootstrap] Update timed out — using cached content.");
+                        return;
+                    }
+                    throw new InvalidOperationException(
+                        "Content update timed out and no cached content is available. " +
+                        "Please check your connection and try again.");
+
+                case RemoteContentUpdateStatus.Failed:
+                    throw new InvalidOperationException(
+                        $"Content update failed: {string.Join("; ", result.Errors)}");
+
+                case RemoteContentUpdateStatus.Cancelled:
+                    throw new OperationCanceledException(
+                        "Remote content update was cancelled.");
+
+                default:
+                    throw new InvalidOperationException(
+                        $"Unexpected update status: {result.Status}");
             }
         }
 
@@ -391,6 +473,7 @@ namespace Immortal_Switch.Scripts.Core
             private readonly Action<float, string> _onProgress;
 
             private int _completedSteps;
+            private int _reservedSteps;
 
             public BootstrapProgress(
                 int totalSteps,
@@ -398,6 +481,49 @@ namespace Immortal_Switch.Scripts.Core
             {
                 _totalSteps = Mathf.Max(1, totalSteps);
                 _onProgress = onProgress;
+            }
+
+            /// <summary>
+            /// Reserve a block of <paramref name="count"/> steps that will be
+            /// completed together. Call <see cref="ReportReservedProgress"/> to
+            /// report sub-progress within the block, then
+            /// <see cref="CompleteReservedSteps"/> to finalise all of them.
+            /// </summary>
+            public void ReserveSteps(int count)
+            {
+                _reservedSteps = Mathf.Max(0, count);
+            }
+
+            /// <summary>
+            /// Report progress within the currently reserved block.
+            /// <paramref name="subPercent"/> should be 0.0 – 1.0.
+            /// The progress bar never moves backward.
+            /// </summary>
+            public void ReportReservedProgress(float subPercent, string message)
+            {
+                if (_reservedSteps <= 0) return;
+
+                float blockFraction = _reservedSteps / (float)_totalSteps;
+                float blockStart = _completedSteps / (float)_totalSteps;
+                float progress = blockStart + blockFraction * Mathf.Clamp01(subPercent);
+
+                _onProgress?.Invoke(Mathf.Clamp01(progress), message);
+            }
+
+            /// <summary>
+            /// Mark all reserved steps as complete and report the final
+            /// progress position.
+            /// </summary>
+            public void CompleteReservedSteps(string message)
+            {
+                _completedSteps += _reservedSteps;
+                _reservedSteps = 0;
+
+                var progress = Mathf.Clamp01(
+                    _completedSteps / (float)_totalSteps
+                );
+
+                _onProgress?.Invoke(progress, message);
             }
 
             public void ReportCurrent(string message)
