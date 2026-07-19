@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
 using Debug = UnityEngine.Debug;
 
 namespace Immortal_Switch.Scripts.RemoteUpdate
@@ -150,18 +151,36 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             if (string.IsNullOrWhiteSpace(_requiredLabel))
                 return false;
 
-            // The marker proves that the Required phase completed successfully at least once.
             if (!PlayerPrefs.HasKey(ContentReadyMarkerKey))
                 return false;
 
-            AsyncOperationHandle<long> handle = default;
+            AsyncOperationHandle<IList<IResourceLocation>>
+                locationsHandle = default;
+
+            AsyncOperationHandle<long> sizeHandle = default;
 
             try
             {
-                handle = Addressables.GetDownloadSizeAsync(_requiredLabel);
+                locationsHandle =
+                    Addressables.LoadResourceLocationsAsync(
+                        (object)_requiredLabel,
+                        null
+                    );
 
-                long size = await handle.ToUniTask(
-                    cancellationToken: cancellationToken);
+                IList<IResourceLocation> locations =
+                    await locationsHandle.ToUniTask(
+                        cancellationToken: cancellationToken
+                    );
+
+                if (locations == null || locations.Count == 0)
+                    return false;
+
+                sizeHandle =
+                    Addressables.GetDownloadSizeAsync(locations);
+
+                long size = await sizeHandle.ToUniTask(
+                    cancellationToken: cancellationToken
+                );
 
                 return size == 0;
             }
@@ -172,13 +191,18 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             catch (Exception ex)
             {
                 Debug.LogWarning(
-                    $"[RemoteUpdate] Offline cache validation failed: {ex.Message}");
+                    $"[RemoteUpdate] Offline cache validation failed: {ex}"
+                );
+
                 return false;
             }
             finally
             {
-                if (handle.IsValid())
-                    Addressables.Release(handle);
+                if (sizeHandle.IsValid())
+                    Addressables.Release(sizeHandle);
+
+                if (locationsHandle.IsValid())
+                    Addressables.Release(locationsHandle);
             }
         }
 
@@ -197,24 +221,44 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             if (!PlayerPrefs.HasKey(ContentReadyMarkerKey))
                 return false;
 
-            AsyncOperationHandle<long> handle = default;
+            AsyncOperationHandle<IList<IResourceLocation>>
+                locationsHandle = default;
+
+            AsyncOperationHandle<long> sizeHandle = default;
 
             try
             {
-                handle = Addressables.GetDownloadSizeAsync(_requiredLabel);
-                long size = handle.WaitForCompletion();
+                locationsHandle =
+                    Addressables.LoadResourceLocationsAsync(
+                        (object)_requiredLabel,
+                        null
+                    );
+
+                IList<IResourceLocation> locations =
+                    locationsHandle.WaitForCompletion();
+
+                if (locations == null || locations.Count == 0)
+                    return false;
+
+                sizeHandle =
+                    Addressables.GetDownloadSizeAsync(locations);
+
+                long size = sizeHandle.WaitForCompletion();
                 return size == 0;
             }
             catch (Exception ex)
             {
                 Debug.LogWarning(
-                    $"[RemoteUpdate] Synchronous cache validation failed: {ex.Message}");
+                    $"[RemoteUpdate] Synchronous cache validation failed: {ex}");
                 return false;
             }
             finally
             {
-                if (handle.IsValid())
-                    Addressables.Release(handle);
+                if (sizeHandle.IsValid())
+                    Addressables.Release(sizeHandle);
+
+                if (locationsHandle.IsValid())
+                    Addressables.Release(locationsHandle);
             }
         }
 
@@ -226,7 +270,16 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             CancellationToken externalToken)
         {
             // ── Duplicate-call guard ──────────────────────────────────
-            _runningUpdateTcs = new UniTaskCompletionSource<RemoteContentUpdateResult>();
+            if (_runningUpdateTcs != null)
+            {
+                Debug.Log(
+                    "[RemoteUpdate] Update already in progress — awaiting existing task.");
+
+                return await _runningUpdateTcs.Task;
+            }
+
+            _runningUpdateTcs =
+                new UniTaskCompletionSource<RemoteContentUpdateResult>();
             var stopwatch = Stopwatch.StartNew();
             var errors = new List<string>();
             bool hadUpdates = false;
@@ -272,6 +325,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                     await UpdateCatalogsWithRetryAsync(catalogUpdates, token);
                     catalogUpdated = true;
                 }
+
                 ReportPhase(handler, RemoteContentUpdateStatus.UpdatingCatalogs,
                     catalogUpdated ? "Catalog updated." : "Catalog is up to date.",
                     0.40f);
@@ -490,12 +544,6 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 return Finish(emptyResult, handler);
             }
 
-            if (_runningUpdateTcs != null)
-            {
-                Debug.Log("[RemoteUpdate] Update already in progress — awaiting existing task.");
-                return await _runningUpdateTcs.Task;
-            }
-
             _runningUpdateTcs = new UniTaskCompletionSource<RemoteContentUpdateResult>();
             var stopwatch = Stopwatch.StartNew();
             _internalCts?.Dispose();
@@ -629,7 +677,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             try
             {
                 initHandle = Addressables.InitializeAsync();
-                await initHandle.ToUniTask(cancellationToken:token);
+                await initHandle.ToUniTask(cancellationToken: token);
             }
             finally
             {
@@ -707,23 +755,57 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             string label,
             CancellationToken token)
         {
+            if (string.IsNullOrWhiteSpace(label))
+                return 0;
+
             return await WithTimeoutAsync(
                 async ct =>
                 {
+                    AsyncOperationHandle<IList<IResourceLocation>>
+                        locationsHandle = default;
+
                     AsyncOperationHandle<long> sizeHandle = default;
+
                     try
                     {
-                        sizeHandle = Addressables.GetDownloadSizeAsync(label);
-                        return await sizeHandle.ToUniTask(cancellationToken: ct);
+                        locationsHandle =
+                            Addressables.LoadResourceLocationsAsync(
+                                (object)label,
+                                null
+                            );
+
+                        IList<IResourceLocation> locations =
+                            await locationsHandle.ToUniTask(
+                                cancellationToken: ct
+                            );
+
+                        if (locations == null || locations.Count == 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"No Addressable locations found for label '{label}'. " +
+                                "Make sure the label exists and is assigned to the required assets."
+                            );
+                        }
+
+                        sizeHandle =
+                            Addressables.GetDownloadSizeAsync(locations);
+
+                        return await sizeHandle.ToUniTask(
+                            cancellationToken: ct
+                        );
                     }
                     finally
                     {
                         if (sizeHandle.IsValid())
                             Addressables.Release(sizeHandle);
+
+                        if (locationsHandle.IsValid())
+                            Addressables.Release(locationsHandle);
                     }
                 },
-                "GetDownloadSize",
-                token);
+                $"GetDownloadSize:{label}",
+                token
+            );
         }
 
         /// <summary>
@@ -742,59 +824,118 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             float phaseProgressStart,
             float phaseProgressEnd)
         {
+            AsyncOperationHandle<IList<IResourceLocation>>
+                locationsHandle = default;
+
             AsyncOperationHandle downloadHandle = default;
+
             try
             {
-                downloadHandle = Addressables.DownloadDependenciesAsync(
-                    label, Addressables.MergeMode.Union);
+                locationsHandle =
+                    Addressables.LoadResourceLocationsAsync(
+                        (object)label,
+                        null
+                    );
+
+                IList<IResourceLocation> locations =
+                    await locationsHandle.ToUniTask(
+                        cancellationToken: token
+                    );
+
+                if (locations == null || locations.Count == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"No Addressable locations found for label '{label}'."
+                    );
+                }
+
+                downloadHandle =
+                    Addressables.DownloadDependenciesAsync(
+                        locations,
+                        false
+                    );
 
                 long lastDownloaded = -1;
                 float lastStallCheckTime = Time.unscaledTime;
 
-                // Per-frame progress loop.
-                while (!downloadHandle.IsDone && !token.IsCancellationRequested)
+                while (!downloadHandle.IsDone)
                 {
-                    var status = downloadHandle.GetDownloadStatus();
-                    long downloaded = status.DownloadedBytes;
-                    long total = status.TotalBytes > 0 ? status.TotalBytes : expectedSizeBytes;
+                    token.ThrowIfCancellationRequested();
 
-                    // Detect download stall.
+                    var status = downloadHandle.GetDownloadStatus();
+
+                    long downloaded = status.DownloadedBytes;
+
+                    long total = status.TotalBytes > 0
+                        ? status.TotalBytes
+                        : expectedSizeBytes;
+
                     if (downloaded != lastDownloaded)
                     {
                         lastDownloaded = downloaded;
                         lastStallCheckTime = Time.unscaledTime;
                     }
-                    else if (Time.unscaledTime - lastStallCheckTime > _downloadStallTimeoutSeconds)
+                    else if (
+                        Time.unscaledTime - lastStallCheckTime >
+                        _downloadStallTimeoutSeconds)
                     {
                         throw new TimeoutException(
-                            $"Download stalled — no progress for {_downloadStallTimeoutSeconds:F0}s.");
+                            $"Download '{label}' stalled — no progress for " +
+                            $"{_downloadStallTimeoutSeconds:F0}s."
+                        );
                     }
 
-                    // Map download sub-progress into the phase range.
                     float subPercent = total > 0
-                        ? Mathf.Clamp01((float)downloaded / total)
+                        ? Mathf.Clamp01(
+                            downloaded / (float)total
+                        )
                         : 0f;
-                    float overallPercent = Mathf.Lerp(phaseProgressStart, phaseProgressEnd, subPercent);
 
-                    ReportPhase(handler, RemoteContentUpdateStatus.Downloading,
-                        $"Downloading {labelDescription}… {FormatBytes(downloaded)} / {FormatBytes(total)}",
+                    float overallPercent = Mathf.Lerp(
+                        phaseProgressStart,
+                        phaseProgressEnd,
+                        subPercent
+                    );
+
+                    ReportPhase(
+                        handler,
+                        RemoteContentUpdateStatus.Downloading,
+                        $"Downloading {labelDescription}… " +
+                        $"{FormatBytes(downloaded)} / {FormatBytes(total)}",
                         overallPercent,
-                        downloadedBytes: downloaded, totalBytes: total);
+                        downloadedBytes: downloaded,
+                        totalBytes: total
+                    );
 
-                    await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    await UniTask.Yield(
+                        PlayerLoopTiming.Update,
+                        token
+                    );
                 }
 
-                // Await final completion to surface any exception.
-                await downloadHandle.ToUniTask(cancellationToken: token);
+                await downloadHandle.ToUniTask(
+                    cancellationToken: token
+                );
 
-                // Read final download status.
-                var finalStatus = downloadHandle.GetDownloadStatus();
-                long finalDownloaded = finalStatus.DownloadedBytes;
+                var finalStatus =
+                    downloadHandle.GetDownloadStatus();
 
-                ReportPhase(handler, RemoteContentUpdateStatus.Downloading,
+                long finalDownloaded =
+                    finalStatus.DownloadedBytes;
+
+                long finalTotal =
+                    finalStatus.TotalBytes > 0
+                        ? finalStatus.TotalBytes
+                        : expectedSizeBytes;
+
+                ReportPhase(
+                    handler,
+                    RemoteContentUpdateStatus.Downloading,
                     $"{labelDescription} complete.",
                     phaseProgressEnd,
-                    downloadedBytes: finalDownloaded, totalBytes: finalDownloaded);
+                    downloadedBytes: finalDownloaded,
+                    totalBytes: finalTotal
+                );
 
                 return finalDownloaded;
             }
@@ -802,6 +943,9 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             {
                 if (downloadHandle.IsValid())
                     Addressables.Release(downloadHandle);
+
+                if (locationsHandle.IsValid())
+                    Addressables.Release(locationsHandle);
             }
         }
 
@@ -1011,6 +1155,7 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 order++;
                 size /= 1024;
             }
+
             return $"{size:0.##} {suffixes[order]}";
         }
 
@@ -1023,7 +1168,9 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
         private sealed class OfflineException : Exception
         {
             public OfflineException(string message, Exception inner)
-                : base(message, inner) { }
+                : base(message, inner)
+            {
+            }
         }
     }
 }
