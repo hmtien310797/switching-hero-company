@@ -18,7 +18,7 @@ namespace Immortal_Switch.Scripts.Shared
 
         private async UniTask InitBossDataAsync()
         {
-            bossDataMapper.Clear();
+            ReleaseBossData();
 
             bossDataHandle = Addressables.LoadAssetsAsync<BossDataSO>(
                 BossDataLabel,
@@ -82,6 +82,8 @@ namespace Immortal_Switch.Scripts.Shared
             {
                 Addressables.Release(bossDataHandle);
             }
+
+            bossDataHandle = default;
         }
     }
 }

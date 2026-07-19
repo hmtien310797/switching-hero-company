@@ -19,9 +19,7 @@ namespace Immortal_Switch.Scripts.Shared
 
         private async UniTask InitHeroDataAsync()
         {
-            heroData.Clear();
-            heroDataDict.Clear();
-            isHeroDataLoaded = false;
+            ReleaseHeroData();
 
             heroDataHandle = Addressables.LoadAssetsAsync<HeroDataSO>(
                 HeroDataLabel,

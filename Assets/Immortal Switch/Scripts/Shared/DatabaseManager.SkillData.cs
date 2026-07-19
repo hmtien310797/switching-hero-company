@@ -25,15 +25,7 @@ namespace Immortal_Switch.Scripts.Shared
 
         private async UniTask InitSkillDataAsync()
         {
-            classSkillData.Clear();
-            ultimateSkillData.Clear();
-            passiveSkillData.Clear();
-
-            classSkillDataDict.Clear();
-            ultimateSkillDataByHeroId.Clear();
-            passiveSkillDataByHeroId.Clear();
-
-            isSkillDataLoaded = false;
+            ReleaseSkillData();
 
             skillDataHandle = Addressables.LoadAssetsAsync<SkillDataSO>(
                 ClassSkillDataLabel,

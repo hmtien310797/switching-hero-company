@@ -18,9 +18,7 @@ namespace Immortal_Switch.Scripts.Shared
 
         private async UniTask InitCreepDataAsync()
         {
-            creepData.Clear();
-            creepDataMapper.Clear();
-            isCreepDataLoaded = false;
+            ReleaseCreepData();
 
             creepDataHandle = Addressables.LoadAssetsAsync<CreepDataSo>(
                 CreepDataLabel,
