@@ -1,18 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7018722638574066187
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 10
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -20,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: mat_gateteleport
-  m_Shader: {fileID: 4800000, guid: b204484b40f56504aa6cd9844ece3cc8, type: 3}
+  m_Name: StarrySky
+  m_Shader: {fileID: 4800000, guid: d8c432c5fecbc1d4c88ea9fccf507f5f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -98,18 +85,30 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
+    - _Aspect: 0.505
+    - _AspectRatio: 0.5
+    - _BigBright: 4
+    - _BigBrightness: 6
+    - _BigGridSize: 6
+    - _BigSize: 4
+    - _BigThreshold: 0.65
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
+    - _CrossLen: 0.1
+    - _CrossLength: 0.06
+    - _CrossWid: 60
+    - _CrossWidth: 40
     - _Cull: 2
+    - _Curvature: 0.0015
+    - _CurveAxisStrength: 0.08
     - _CurveOffsetY: 0
-    - _CurveStartDistance: 0
+    - _CurveStartDistance: 5
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DistortStrength: 0.08
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
@@ -117,40 +116,53 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _GlowIntensity: 0.59
-    - _HorizontalCurvature: 0.002
+    - _GridSize: 100
+    - _HorizontalCurvature: 0.0015
     - _HorizontalStartDistance: 0
-    - _InteriorBlend: 0.9
-    - _InteriorCenterY: 0.298
     - _Metallic: 0
-    - _NoiseScale: 4
-    - _NoiseSpeed: 0.4
+    - _NebulaIntensity: 0.12
+    - _NebulaScale: 3.5
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _PulseIntensity: 0.5
-    - _PulseSpeed: 3.62
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _RimIntensity: 3
-    - _RingCount: 8
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
+    - _StarBright: 2.5
+    - _StarBrightness: 3.5
+    - _StarFade: 0.1
+    - _StarRegionY: 0.67
+    - _StarSize: 100
+    - _StarThreshold: 0.45
     - _Surface: 0
-    - _SwirlSpeed: 2.58
-    - _SwirlStrength: 7.26
+    - _TwinkleMin: 0.05
+    - _TwinkleSpeed: 2
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.8207547, g: 0.623309, b: 0.7846886, a: 1}
-    - _ColorInner: {r: 1, g: 0.5235849, b: 0.93087304, a: 1}
-    - _ColorMid: {r: 0.33962262, g: 0.27714488, b: 0.33371258, a: 1}
-    - _ColorOuter: {r: 1, g: 0.3354582, b: 0, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RimColor: {r: 1, g: 1, b: 1, a: 1}
+    - _NebulaColor: {r: 0.3, g: 0.1, b: 0.5, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+    - _StarColorCool: {r: 0.75, g: 0.88, b: 1, a: 1}
+    - _StarColorRare: {r: 1, g: 0.65, b: 0.95, a: 1}
+    - _StarColorWarm: {r: 1, g: 0.95, b: 0.8, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!114 &656611825575919929
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 10

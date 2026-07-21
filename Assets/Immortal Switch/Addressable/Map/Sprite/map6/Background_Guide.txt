@@ -1,0 +1,26 @@
+============================================================
+📦 BỘ ASSET BACKGROUND ====================================================
+
+Hi Dev, Thanh đã chia sẵn bộ asset này thành 5 folder theo đúng thứ tự 
+Sorting Layer từ xa đến gần (từ 01 đến 05). Dev setup theo cấu trúc dưới đây nhé:
+
+1. THỨ TỰ CÁC LAYER (SORTING ORDER):
+   - [01_img_Background] -> Xa nhất (Bầu trời, dải màu chuyển sắc, tháp, núi)
+   - [02_img_Far_ground] -> Hậu cảnh (Hàng rào loop)
+   - [03_Ground]         -> Mặt đất (Khu vực playable của nhân vật)
+   - [04_img_Midground]  -> Trung cảnh (Cỏ, đá, hàng rào, cổng dịch chuyển)
+   - [05_img_Foreground] -> Gần nhất (Hàng rào tối che sát góc Camera)
+
+2. ĐỊNH VỊ VÀ TỶ LỆ (LAYOUT):
+   - Xem file [Mockup.png] ở thư mục gốc để biết vị trí chuẩn và tỉ lệ 
+     của từng hòn đá, bụi cỏ khi lên game hoàn chỉnh.
+
+3. LƯU Ý KỸ THUẬT KHI IMPORT UNITY:
+   - Thư mục [03_Ground]: Các file từ Ground_1 đến Ground_4 đã được làm Seamless. Ground_5 là lớp adjustments ( lớp màu phủ lên Ground 1--->4 )
+     Dev cài đặt Wrap Mode = Repeat để cuộn vòng lặp vô tận nhé.
+   - Thư mục [04_img_Midground] (Cỏ, đá, hàng rào) & [05_img_Foreground]: 
+     Vui lòng chỉnh Pivot = Bottom (hoặc Bottom Center) để khi dùng code rải 
+     ngẫu nhiên, chân vật thể tự động cắm chuẩn xuống mặt đường.
+
+Có gì chưa khớp hay bị lệch layer thì hú Thanh chỉnh lại nha!
+============================================================
