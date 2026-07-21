@@ -39,6 +39,11 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
         /// Thời gian AFK thực tế tính bằng server (response.ElapsedSeconds của afk/claim).
         /// </summary>
         public int ElapsedSeconds { get; set; }
+
+        /// <summary>
+        /// Trần thời gian tích lũy AFK do server quy định (response.MaxOfflineSeconds).
+        /// </summary>
+        public int MaxOfflineSeconds { get; set; }
     }
 
     public class AFKRewardView : AnimatedUIView
@@ -91,6 +96,16 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
             btnClaim.onClick.RemoveListener(OnClickClaim);
             btnClaimX2.onClick.RemoveListener(OnClickClaimX2);
             CancelAutoClaim();
+        }
+
+        // Tick theo cùng bộ đếm live của TopMainView (txtAfkClaimTimer cạnh btnActiveFramingClaim)
+        // thay vì đứng yên tại ElapsedSeconds snapshot lúc mở popup.
+        private void Update()
+        {
+            if (_args != null)
+            {
+                RefreshCurrentTime();
+            }
         }
 
         private void OnClickClaim()
@@ -171,13 +186,27 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
 
         private void RefreshCurrentTime()
         {
-            TimeSpan elapsed = TimeSpan.FromSeconds(Math.Max(0, _args.ElapsedSeconds));
+            // Ưu tiên bộ đếm live của TopMainView (cùng giá trị đang hiển thị ở btnActiveFramingClaim
+            // ngoài main view) — chỉ fallback về ElapsedSeconds snapshot khi TopMainView chưa sẵn sàng.
+            double elapsedSeconds = TopMainView.Instance != null
+                ? TopMainView.Instance.AfkAccumulatedSeconds
+                : Math.Max(0, _args.ElapsedSeconds);
+
+            double maxOfflineSeconds = TopMainView.Instance != null
+                ? TopMainView.Instance.AfkMaxOfflineSeconds
+                : _args.MaxOfflineSeconds;
+
+            TimeSpan elapsed = TimeSpan.FromSeconds(elapsedSeconds);
             string timeText = elapsed.TotalHours >= 1
                 ? $"{(int)elapsed.TotalHours:00} giờ {elapsed.Minutes:00} phút"
                 : $"{elapsed.Minutes:00} phút {elapsed.Seconds:00}s";
 
+            int maxHours = maxOfflineSeconds > 0
+                ? (int)(maxOfflineSeconds / 3600)
+                : 12;
+
             txtAfkCurrentTime.text =
-                timeText + "\n<color=#afa071><size=32>Tối đa 12 giờ</size></color>";
+                timeText + $"\n<color=#afa071><size=32>Tối đa {maxHours} giờ</size></color>";
         }
 
         private void RefreshAdsState()

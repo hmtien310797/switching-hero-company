@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
+using Immortal_Switch.Scripts.Event.EventLeHoiBangLong;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items;
@@ -39,11 +40,9 @@ namespace Immortal_Switch.Scripts.Core
             Action<float, string> onProgress = null,
             System.Threading.CancellationToken cancellationToken = default)
         {
-            // 3 virtual steps reserved for remote content update (may involve
-            // a long download — smooth sub-progress keeps the bar moving).
-            // + 16 existing bootstrap steps = 19 total.
-            const int totalSteps = 19;
-            const int remoteUpdateReservedSteps = 3;
+            // Chỉ tính các bước khởi tạo game.
+            // Addressables remote update được chạy thành một phase riêng trước RunAsync().
+            const int totalSteps = 16;
 
             var progress = new BootstrapProgress(
                 totalSteps,
@@ -52,11 +51,6 @@ namespace Immortal_Switch.Scripts.Core
 
             try
             {
-                // ── Step 0: Remote content update (runs before every system init) ──
-                progress.ReserveSteps(remoteUpdateReservedSteps);
-                await RunRemoteContentUpdateAsync(progress, cancellationToken);
-                progress.CompleteReservedSteps("Content ready");
-
                 progress.ReportCurrent("Preparing game data");
 
                 // 1
@@ -71,8 +65,14 @@ namespace Immortal_Switch.Scripts.Core
                 await DatabaseManager.Instance.InitializeAsync();
                 progress.CompleteStep("Database initialized");
 
-                TransmutationSystemManager.Instance.InitializeAsync();
-                HeroProgressionManager.Instance.InitializeAsync();
+                // Khởi tạo sớm để tiến trình nhiệm vụ event vẫn được ghi nhận khi UI chưa mở.
+                EventLeHoiBangLongManager.Instance.InitializeAsync().Forget();
+
+                TransmutationSystemManager.Instance.InitializeAsync().Forget();
+                HeroProgressionManager.Instance.InitializeAsync().Forget();
+                WeaponSummonManager.Instance.InitializeAsync().Forget();
+                SkillSummonManager.Instance.InitializeAsync().Forget();
+                HeroSummonManager.Instance.InitializeAsync().Forget();
 
                 // 3
                 await MissionSystemManager.Instance.InitializeAsync();
@@ -237,20 +237,21 @@ namespace Immortal_Switch.Scripts.Core
             }
         }
 
-        private async UniTask RunRemoteContentUpdateAsync(
-            BootstrapProgress progress,
-            System.Threading.CancellationToken cancellationToken)
+        /// <summary>
+        /// Chạy Addressables Required thành một phase progress độc lập từ 0 -> 1.
+        /// Gọi hàm này trước RunAsync().
+        /// </summary>
+        public async UniTask RunRemoteUpdateAsync(
+            Action<float, string> onProgress = null,
+            System.Threading.CancellationToken cancellationToken = default)
         {
             var service = AddressableRemoteUpdateService.Instance;
 
             RemoteContentUpdateResult result;
             try
             {
-                // Delegate to the reusable bootstrap-step utility.
-                // Progress is forwarded into the reserved-steps block so the
-                // loading bar moves smoothly during catalog checks and download.
                 result = await RemoteUpdateBootstrapStep.RunAsync(
-                    (percent, message) => progress.ReportReservedProgress(percent, message),
+                    onProgress,
                     cancellationToken);
             }
             catch (Exception ex)
@@ -264,17 +265,21 @@ namespace Immortal_Switch.Scripts.Core
             {
                 case RemoteContentUpdateStatus.Complete:
                 case RemoteContentUpdateStatus.NoUpdateNeeded:
-                    Debug.Log($"[GameBootstrap] Remote update OK. " +
-                              $"Downloaded {result.RequiredDownloadedBytes} bytes in " +
-                              $"{result.ElapsedTime.TotalSeconds:F1}s.");
+                    onProgress?.Invoke(1f, "Content ready");
+                    Debug.Log(
+                        $"[GameBootstrap] Remote update OK. " +
+                        $"Downloaded {result.RequiredDownloadedBytes} bytes in " +
+                        $"{result.ElapsedTime.TotalSeconds:F1}s.");
                     return;
 
                 case RemoteContentUpdateStatus.Offline:
                     if (await service.IsContentAvailableOfflineAsync(cancellationToken))
                     {
+                        onProgress?.Invoke(1f, "Using cached content");
                         Debug.Log("[GameBootstrap] Offline — using cached content.");
                         return;
                     }
+
                     throw new InvalidOperationException(
                         "No internet connection and required content is not cached. " +
                         "Please connect to the internet on first launch.");
@@ -282,9 +287,12 @@ namespace Immortal_Switch.Scripts.Core
                 case RemoteContentUpdateStatus.Timeout:
                     if (await service.IsContentAvailableOfflineAsync(cancellationToken))
                     {
-                        Debug.LogWarning("[GameBootstrap] Update timed out — using cached content.");
+                        onProgress?.Invoke(1f, "Using cached content");
+                        Debug.LogWarning(
+                            "[GameBootstrap] Update timed out — using cached content.");
                         return;
                     }
+
                     throw new InvalidOperationException(
                         "Content update timed out and no cached content is available. " +
                         "Please check your connection and try again.");

@@ -22,6 +22,8 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         [SerializeField] private Transform contentRoot;
         [SerializeField] private StatTierView prefab;
 
+        
+
         private readonly List<StatTierView> views = new();
 
         private void OnDestroy()

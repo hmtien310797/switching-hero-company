@@ -1,5 +1,4 @@
 using System;
-using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Leaderboard.Views.UI;
 using RecyclableScrollRect;
 using UnityEngine;
@@ -22,11 +21,6 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
         /// stage dat duoc
         /// </summary>
         public int Stage { get; set; }
-
-        /// <summary>
-        /// reward quantity
-        /// </summary>
-        public BigNumber RewardQuantity { get; set; }
     }
 
     public class LeaderboardRankRecyclableView : MonoBehaviour, IRSRDataSource
@@ -152,7 +146,7 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
 
             if (data != null)
             {
-                ui.Bind(data.Rank, data.PlayerName, data.Stage, false, data.RewardQuantity);
+                ui.Bind(data.Rank, data.PlayerName, data.Stage, false);
             }
         }
     }

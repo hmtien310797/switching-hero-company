@@ -5,6 +5,7 @@ using Battle;
 using Battle.Dungeon;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -34,6 +35,7 @@ public class GameStatView : MonoBehaviour
     private const string NormalChapterStageDataKey = "Stage {0}";
     private const string KillAllDungeonNameKey = "{0}";
     private const string KillAllDungeonStatKey = "Stage {0}  {1}/{2}";
+    private StageDataResolverSO stageDataResolverSo;
 
     void Awake()
     {
@@ -54,6 +56,7 @@ public class GameStatView : MonoBehaviour
         
         GameEventManager.Subscribe<DefenseDungeonDto>(GameEvents.OnDefenseDungeonInit, OnDefenseDungeonInit);
         GameEventManager.Subscribe<float>(GameEvents.OnDefenseDungeonDataChanged, OnDefenseDungeonDataChange);
+        stageDataResolverSo = DatabaseManager.Instance.StageDataResolver;
     }
 
     private void OnDestroy()
@@ -73,8 +76,8 @@ public class GameStatView : MonoBehaviour
 
     private void OnEnemyDead(int deadCount)
     {
-        currentDeadMonsterQuantityText.text = string.Format(DeadMonsterQuantityKey, deadCount, GameData.Instance.maxCreepsPerStage);
-        progressSlide.fillAmount = (float)deadCount / GameData.Instance.maxCreepsPerStage;
+        currentDeadMonsterQuantityText.text = string.Format(DeadMonsterQuantityKey, deadCount, stageDataResolverSo.MaxCreepsPerStage);
+        progressSlide.fillAmount = (float)deadCount / stageDataResolverSo.MaxCreepsPerStage;
     }
 
     private void OnKillAllDungeonInit(DungeonKillAllDto data)

@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shop.Layouts;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shop.Views.UI

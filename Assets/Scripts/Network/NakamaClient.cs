@@ -729,6 +729,53 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<MonthlyPassClaimResponse>(response.Payload);
     }
 
+    // ── Event Wheel (Lucky Wheel) ────────────────────────────────────────────
+    // Xem handler/event_wheel.js. Premium (paid) pass track chưa có RPC mua — server chưa có
+    // pack_iap row cho nó, xem comment đầu file server.
+
+    /// <summary>Snapshot đầy đủ: reward pool, shop, pass 100 mốc, số dư vé/point. Gọi khi mở
+    /// EventWheelView và sau mỗi lần spin/shop_buy/pass_claim thành công để đồng bộ lại.</summary>
+    public async Task<EventWheelStateResponse> GetEventWheelStateAsync()
+    {
+        var response = await CallRpcAsync("eventwheel/state", "{}");
+        return JsonConvert.DeserializeObject<EventWheelStateResponse>(response.Payload);
+    }
+
+    /// <summary>Quay 1 hoặc 10 lượt (category: 1=normal, 2=premium). Server trừ vé, random có
+    /// trọng số, trả về đúng ô (slot_index) mà client phải dừng animation tại đó.</summary>
+    public async Task<EventWheelSpinResponse> EventWheelSpinAsync(EventWheelSpinRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await CallRpcAsync("eventwheel/spin", payload);
+        return JsonConvert.DeserializeObject<EventWheelSpinResponse>(response.Payload);
+    }
+
+    /// <summary>Mua 1 item trong shop sự kiện bằng lucky_wheel_point.</summary>
+    public async Task<EventWheelShopBuyResponse> EventWheelShopBuyAsync(int shopSlotId)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventWheelShopBuyRequest { ShopSlotId = shopSlotId });
+        var response = await CallRpcAsync("eventwheel/shop_buy", payload);
+        return JsonConvert.DeserializeObject<EventWheelShopBuyResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng của 1 mốc pass khi đã đủ spin_required. track: "free" (mặc định) |
+    /// "paid" — "paid" cần đã mua Premium Pass (xem EventWheelPassBuyPremiumAsync).</summary>
+    public async Task<EventWheelPassClaimResponse> EventWheelPassClaimAsync(int level, string track = "free")
+    {
+        var payload  = JsonConvert.SerializeObject(new EventWheelPassClaimRequest { Level = level, Track = track });
+        var response = await CallRpcAsync("eventwheel/pass_claim", payload);
+        return JsonConvert.DeserializeObject<EventWheelPassClaimResponse>(response.Payload);
+    }
+
+    /// <summary>Validate receipt IAP và mở khoá track paid của pass sự kiện đang active — không tự
+    /// cộng thưởng, EventWheelPassClaimAsync(level, "paid") mới cộng paid_item từng mốc.</summary>
+    public async Task<EventWheelPassBuyPremiumResponse> EventWheelPassBuyPremiumAsync(string store, string receipt)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventWheelPassBuyPremiumRequest { Store = store, Receipt = receipt });
+        var response = await CallRpcAsync("eventwheel/pass_buy_premium", payload);
+        return JsonConvert.DeserializeObject<EventWheelPassBuyPremiumResponse>(response.Payload);
+    }
+
     // ── Battle ────────────────────────────────────────────────────────────────
 
     /// <summary>Progression thật từ server (current_stage/current_chapter/highest_stage_cleared). Gọi sau login trước khi vào màn chọn stage.</summary>
@@ -752,6 +799,26 @@ public class NakamaClient : MonoBehaviour
         var payload  = JsonConvert.SerializeObject(request);
         var response = await CallRpcAsync("battle/checkpoint", payload);
         return JsonConvert.DeserializeObject<BattleCheckpointResponse>(response.Payload);
+    }
+
+    // ── Leaderboard ───────────────────────────────────────────────────────────
+    // Xem handler/leaderboard.js — bảng xếp hạng theo highest_stage_cleared, dùng leaderboard
+    // built-in của Nakama. Reward theo hạng chưa có config, chưa trả về từ server.
+
+    /// <summary>Top bảng xếp hạng stage (mặc định 100 người đầu). cursor để phân trang tiếp — truyền lại next_cursor của lần gọi trước.</summary>
+    public async Task<LeaderboardStageTopResponse> GetLeaderboardStageTopAsync(int limit = 100, string cursor = null)
+    {
+        var payload  = JsonConvert.SerializeObject(new { limit, cursor });
+        var response = await CallRpcAsync("leaderboard/stage/top", payload);
+        return JsonConvert.DeserializeObject<LeaderboardStageTopResponse>(response.Payload);
+    }
+
+    /// <summary>Các record xếp hạng gần với chính người chơi hiện tại (nk.leaderboardRecordsHaystack) — dùng để hiển thị "hạng của tôi".</summary>
+    public async Task<LeaderboardStageAroundMeResponse> GetLeaderboardStageAroundMeAsync(int limit = 5)
+    {
+        var payload  = JsonConvert.SerializeObject(new { limit });
+        var response = await CallRpcAsync("leaderboard/stage/around_me", payload);
+        return JsonConvert.DeserializeObject<LeaderboardStageAroundMeResponse>(response.Payload);
     }
 
     // ── Dungeon ───────────────────────────────────────────────────────────────

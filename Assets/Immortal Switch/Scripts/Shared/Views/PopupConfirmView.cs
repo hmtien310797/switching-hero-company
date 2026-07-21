@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -179,6 +180,68 @@ namespace Immortal_Switch.Scripts.Shared.Views
         {
             _args.OnConfirm?.Invoke();
             OnClickCancel();
+        }
+    }
+    
+    public static class PopupConfirmService
+    {
+        public static void Show(
+            string title,
+            string description,
+            Action onConfirm = null,
+            Action onCancel = null,
+            Action<bool> onDoNotShowAgainChanged = null,
+            string confirmButtonText = null,
+            string cancelButtonText = null,
+            bool showCancelButton = true,
+            bool showToggleDoNotShowAgain = false,
+            bool withBackdrop = false)
+        {
+            if (UIManager.Instance == null)
+            {
+                Debug.LogError("[PopupConfirmService] UIManager.Instance chưa được khởi tạo.");
+                return;
+            }
+
+            var args = new PopupConfirmArgs(
+                title: title,
+                description: description,
+                onConfirm: onConfirm,
+                onCancel: onCancel,
+                onDoNotShowAgainChanged: onDoNotShowAgainChanged,
+                confirmButtonText: confirmButtonText,
+                cancelButtonText: cancelButtonText,
+                showCancelButton: showCancelButton,
+                showToggleDoNotShowAgain: showToggleDoNotShowAgain);
+
+            UIManager.Instance
+                .OpenPopupAsync<PopupConfirmView>(args, withBackdrop)
+                .Forget();
+        }
+
+        public static void ShowNotice(
+            string title,
+            string description,
+            Action onConfirm = null,
+            string confirmButtonText = null,
+            bool withBackdrop = false)
+        {
+            Show(
+                title: title,
+                description: description,
+                onConfirm: onConfirm,
+                confirmButtonText: confirmButtonText,
+                showCancelButton: false,
+                showToggleDoNotShowAgain: false,
+                withBackdrop: withBackdrop);
+        }
+
+        public static void Close()
+        {
+            if (UIManager.Instance == null)
+                return;
+
+            UIManager.Instance.Close<PopupConfirmView>();
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Immortal_Switch.Scripts.Localization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -48,17 +49,17 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             btn.interactable = !selected;
         }
 
-        public void Bind(int idx, string title, Action<int> onClick)
+        public void Bind(int idx, string key, Action<int> onClick)
         {
             _tabIdx = idx;
             _onClick = onClick;
 
-            BindTitle(title);
+            BindTitle(key);
         }
 
-        public void BindTitle(string title)
+        public void BindTitle(string key)
         {
-            txtTitle.text = title;
+            txtTitle.text = LocalizationManager.GetText(key);
         }
     }
 }

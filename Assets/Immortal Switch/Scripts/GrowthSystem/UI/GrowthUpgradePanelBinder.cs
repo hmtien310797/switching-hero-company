@@ -38,8 +38,8 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 
             int cur = service.GetCurrentStack(stat);
             int max = service.GetMaxAvailableStack(stat);
+            int cost = service.GetUpgradeCost(stat, amount);
             int afford = service.GetAffordableUpgradeAmount(stat, amount, gold);
-            int cost = service.GetUpgradeCost(stat, afford);
 
             bool isMax = service.IsMaxed(stat);
             bool can = gold >= cost && !isMax;

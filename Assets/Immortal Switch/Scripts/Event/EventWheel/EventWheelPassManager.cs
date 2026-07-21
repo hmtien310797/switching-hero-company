@@ -1,108 +1,108 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Event.EventWheel.Interfaces;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shop.IAP;
+using Nakama;
+using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Event.EventWheel
 {
+    /// <summary>
+    /// Cache trạng thái Event Wheel lấy từ server (RPC eventwheel/state) — server là nguồn sự
+    /// thật duy nhất, thay cho EventWheelPassService/Storage (ES3) cục bộ trước đây.
+    /// </summary>
     public class EventWheelPassManager : Singleton<EventWheelPassManager>
     {
-        public IEventWheelPassService Service { get; private set; }
-        public IEventWheelPassStorage Storage { get; private set; }
-
         public event Action OnDataChanged;
 
-        protected override void OnSingletonAwake()
-        {
-            Load();
-        }
+        public EventWheelStateResponse State { get; private set; }
 
-        public override UniTask InitializeAsync()
-        {
-            return UniTask.CompletedTask;
-        }
+        public override UniTask InitializeAsync() => UniTask.CompletedTask;
 
-        public int GetPurchasedSpinCount(int eventId)
+        /// <summary>Tải lại toàn bộ state từ server. Gọi khi mở EventWheelView và sau mỗi
+        /// spin/shop_buy/pass_claim/pass_buy_premium thành công để đồng bộ số dư/tiến trình.</summary>
+        public async UniTask RefreshAsync()
         {
-            return Service.GetPurchasedSpinCount(eventId);
-        }
-
-        public void RecordSpinPurchase(int eventId, int amount)
-        {
-            if (Service.RecordSpinPurchase(eventId, amount))
+            try
             {
+                State = await NakamaClient.Instance.GetEventWheelStateAsync();
                 OnDataChanged?.Invoke();
+            }
+            catch (ApiResponseException ex)
+            {
+                Debug.LogError($"[EventWheelPassManager] eventwheel/state failed: {ex.StatusCode} {ex.Message}");
             }
         }
 
-        /// <summary>Lấy số lần đã mua của một ô shop theo loại giới hạn trong cấu hình.</summary>
+        // ── Read-only accessors — luôn đọc từ snapshot RefreshAsync() gần nhất ──────────────
+
+        public int GetSpinTotal()
+        {
+            return State?.Progress?.SpinTotal ?? 0;
+        }
+
         public int GetShopPurchasedCount(DynamicHeroesGlobalSpecificationsEventWheelShopConfigRow row)
         {
-            return Service.GetShopPurchasedCount(row);
+            var slot = FindShopSlot(row.shopSlotId);
+            return slot?.PurchasedCount ?? 0;
         }
 
-        /// <summary>Lấy số lượt mua còn lại của một ô shop.</summary>
         public int GetShopRemaining(DynamicHeroesGlobalSpecificationsEventWheelShopConfigRow row)
         {
-            return Service.GetShopRemaining(row);
+            var slot = FindShopSlot(row.shopSlotId);
+            if (slot == null) return row.limitValue;
+            return Math.Max(0, slot.LimitValue - slot.PurchasedCount);
         }
 
-        /// <summary>Kiểm tra ô shop có thể mua thêm số lượt yêu cầu hay không.</summary>
         public bool CanPurchaseShopItem(
             DynamicHeroesGlobalSpecificationsEventWheelShopConfigRow row,
             int purchaseCount = 1
         )
         {
-            return Service.CanPurchaseShopItem(row, purchaseCount);
-        }
-
-        /// <summary>Ghi nhận lượt mua shop nếu chưa vượt giới hạn.</summary>
-        public bool RecordShopPurchase(
-            DynamicHeroesGlobalSpecificationsEventWheelShopConfigRow row,
-            int purchaseCount = 1
-        )
-        {
-            if (!Service.RecordShopPurchase(row, purchaseCount))
-            {
-                return false;
-            }
-
-            OnDataChanged?.Invoke();
-            return true;
-        }
-
-        public bool IsPremiumPurchased(int eventId)
-        {
-            return Service.IsPremiumPurchased(eventId);
-        }
-
-        public void PurchasePremium(int eventId)
-        {
-            if (Service.PurchasePremium(eventId))
-            {
-                OnDataChanged?.Invoke();
-            }
+            var slot = FindShopSlot(row.shopSlotId);
+            if (slot == null) return true;
+            return slot.LimitValue <= 0 || slot.PurchasedCount + purchaseCount <= slot.LimitValue;
         }
 
         public bool IsFreeClaimed(int eventId, int milestoneId)
         {
-            return Service.IsFreeClaimed(eventId, milestoneId);
+            return FindMilestone(milestoneId)?.FreeClaimed ?? false;
         }
 
         public bool IsPremiumClaimed(int eventId, int milestoneId)
         {
-            return Service.IsPremiumClaimed(eventId, milestoneId);
+            return FindMilestone(milestoneId)?.PaidClaimed ?? false;
         }
 
-        public bool CanClaim(
-            int eventId,
-            DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row
-        )
+        public bool IsPremiumPurchased(int eventId)
         {
-            return Service.CanClaim(eventId, row);
+            return State?.Progress?.IsPremium ?? false;
+        }
+
+        /// <summary>Còn track free có thể nhận ở mốc này không (không xét track paid).</summary>
+        public bool CanClaimFree(int eventId, DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row)
+        {
+            var milestone = FindMilestone(row.milestoneId);
+            return milestone != null && milestone.IsEligible && !milestone.FreeClaimed;
+        }
+
+        /// <summary>Còn track paid có thể nhận ở mốc này không — cần đã mua Premium Pass.</summary>
+        public bool CanClaimPaid(int eventId, DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row)
+        {
+            var milestone = FindMilestone(row.milestoneId);
+            return milestone != null && milestone.IsEligible && !milestone.PaidClaimed && IsPremiumPurchased(eventId);
+        }
+
+        /// <summary>Còn ít nhất 1 track (free hoặc paid) có thể nhận ở mốc này — dùng cho nút Claim
+        /// gộp 1 lần (UIEventWheelPassItem) và điều kiện enable "Claim All".</summary>
+        public bool CanClaim(int eventId, DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row)
+        {
+            return CanClaimFree(eventId, row) || CanClaimPaid(eventId, row);
         }
 
         public bool HasClaimable(
@@ -110,52 +110,189 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
             IReadOnlyList<DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow> rows
         )
         {
-            return Service.HasClaimable(eventId, rows);
+            if (rows == null) return false;
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                if (CanClaim(eventId, rows[i])) return true;
+            }
+
+            return false;
         }
 
-        public List<ItemData> ClaimMilestone(
-            int eventId,
+        // ── Mutating actions — gọi RPC, refresh cache, trả reward cho UI hiển thị popup ─────
+
+        /// <summary>Nhận thưởng 1 mốc — tự động nhận CẢ 2 track (free + paid nếu đã mua Premium
+        /// Pass và còn track paid chưa nhận), khớp với UIEventWheelPassItem chỉ có 1 nút Claim.</summary>
+        public async UniTask<(List<ItemData> rewards, string error)> ClaimMilestoneAsync(
             DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row
         )
         {
-            var result = Service.ClaimMilestone(eventId, row);
+            var rewards   = new List<ItemData>();
+            string error = null;
 
-            if (result.Changed)
+            if (CanClaimFree(0, row))
             {
-                OnDataChanged?.Invoke();
+                var (item, err) = await ClaimTrackAsync(row.level, "free");
+                if (item != null) rewards.Add(item); else error = err;
             }
 
-            return result.Rewards;
+            if (CanClaimPaid(0, row))
+            {
+                var (item, err) = await ClaimTrackAsync(row.level, "paid");
+                if (item != null) rewards.Add(item); else error = error ?? err;
+            }
+
+            if (rewards.Count > 0) await RefreshAsync();
+
+            return (rewards, rewards.Count > 0 ? null : error);
         }
 
-        public List<ItemData> ClaimAll(
-            int eventId,
+        public async UniTask<(List<ItemData> rewards, string error)> ClaimAllAsync(
             IReadOnlyList<DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow> rows
         )
         {
-            var result = Service.ClaimAll(eventId, rows);
+            var rewards = new List<ItemData>();
+            if (rows == null) return (rewards, null);
 
-            if (result.Changed)
+            // Chốt danh sách đủ điều kiện trước khi bắt đầu vòng lặp — mỗi lần claim gọi RPC
+            // tuần tự (không song song) để tránh 2 request cùng ghi player_event_wheel storage.
+            var freeClaimLevels = rows.Where(row => CanClaimFree(0, row)).Select(row => row.level).ToList();
+            var paidClaimLevels = rows.Where(row => CanClaimPaid(0, row)).Select(row => row.level).ToList();
+
+            string lastError = null;
+
+            foreach (var level in freeClaimLevels)
             {
-                OnDataChanged?.Invoke();
+                var (item, err) = await ClaimTrackAsync(level, "free");
+                if (item != null) rewards.Add(item); else lastError = err;
             }
 
-            return result.Rewards;
-        }
-
-        public void ResetEvent(int eventId)
-        {
-            if (Service.ResetEvent(eventId))
+            foreach (var level in paidClaimLevels)
             {
-                OnDataChanged?.Invoke();
+                var (item, err) = await ClaimTrackAsync(level, "paid");
+                if (item != null) rewards.Add(item); else lastError = err;
             }
+
+            await RefreshAsync();
+            return (rewards, rewards.Count > 0 ? null : lastError);
         }
 
-        private void Load()
+        private async UniTask<(ItemData item, string error)> ClaimTrackAsync(int level, string track)
         {
-            Storage = new EventWheelPassStorage();
-            Storage.Load();
-            Service = new EventWheelPassService(Storage);
+            EventWheelPassClaimResponse response;
+
+            try
+            {
+                response = await NakamaClient.Instance.EventWheelPassClaimAsync(level, track);
+            }
+            catch (ApiResponseException ex)
+            {
+                Debug.LogError($"[EventWheelPassManager] eventwheel/pass_claim error {ex.StatusCode}: {ex.Message}");
+                return (null, "NETWORK_ERROR");
+            }
+
+            if (!response.Success)
+            {
+                Debug.LogWarning($"[EventWheelPassManager] eventwheel/pass_claim level={level} track={track} failed: {response.Error}");
+                return (null, response.Error);
+            }
+
+            CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
+
+            return response.Item != null
+                ? (new ItemData(response.Item.ItemId, response.Item.Amount), null)
+                : (null, null);
+        }
+
+        public async UniTask<(bool success, List<ItemData> rewards, string error)> ShopBuyAsync(int shopSlotId)
+        {
+            EventWheelShopBuyResponse response;
+
+            try
+            {
+                response = await NakamaClient.Instance.EventWheelShopBuyAsync(shopSlotId);
+            }
+            catch (ApiResponseException ex)
+            {
+                Debug.LogError($"[EventWheelPassManager] eventwheel/shop_buy error {ex.StatusCode}: {ex.Message}");
+                return (false, new List<ItemData>(), "NETWORK_ERROR");
+            }
+
+            if (!response.Success)
+            {
+                return (false, new List<ItemData>(), response.Error);
+            }
+
+            CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
+            await RefreshAsync();
+
+            var rewards = response.Item != null
+                ? new List<ItemData> { new ItemData(response.Item.ItemId, response.Item.Amount) }
+                : new List<ItemData>();
+
+            return (true, rewards, null);
+        }
+
+        /// <summary>Mua Premium Pass qua Unity IAP thật (server: eventwheel/pass_buy_premium).
+        /// storeProductId lấy từ State.PremiumPack (server) — KHÔNG dùng DatabaseManager cục bộ,
+        /// tránh lệch product_id giữa client/server (xem IAPManager.BuyEventPassProduct).</summary>
+        public UniTask<(bool success, string error)> BuyPremiumAsync()
+        {
+            var pack = State?.PremiumPack;
+            if (pack == null)
+            {
+                return UniTask.FromResult((false, "PASS_NOT_CONFIGURED"));
+            }
+
+#if UNITY_IOS
+            var storeProductId = pack.AppleProductId;
+#else
+            var storeProductId = pack.GoogleProductId;
+#endif
+
+            if (string.IsNullOrEmpty(storeProductId))
+            {
+                return UniTask.FromResult((false, "PRODUCT_NOT_CONFIGURED"));
+            }
+
+            var tcs = new UniTaskCompletionSource<(bool, string)>();
+
+            IAPManager.Instance.BuyEventPassProduct(storeProductId, (success, error) =>
+            {
+                tcs.TrySetResult((success, error));
+            });
+
+            return tcs.Task;
+        }
+
+        // ── lookups ──────────────────────────────────────────────────────────────────────
+
+        private EventWheelShopSlotDto FindShopSlot(int shopSlotId)
+        {
+            var shop = State?.Shop;
+            if (shop == null) return null;
+
+            for (int i = 0; i < shop.Count; i++)
+            {
+                if (shop[i].ShopSlotId == shopSlotId) return shop[i];
+            }
+
+            return null;
+        }
+
+        private EventWheelPassMilestoneDto FindMilestone(int milestoneId)
+        {
+            var pass = State?.Pass;
+            if (pass == null) return null;
+
+            // milestone_id và level là 1:1 trong game_event_wheel_pass_config.js (cùng chạy 1..100).
+            for (int i = 0; i < pass.Count; i++)
+            {
+                if (pass[i].MilestoneId == milestoneId) return pass[i];
+            }
+
+            return null;
         }
     }
 }

@@ -45,6 +45,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             return result;
         }
 
+        /// <summary>Exact SummonLevel match (unlike GetLevelEntry's "highest &lt;=" lookup) —
+        /// used to read that level's own milestone reward (ItemId/ItemQuantity).</summary>
+        public HeroSummonLevelEntry GetExactLevelEntry(int summonLevel)
+        {
+            return SummonLevels.Find(x => x != null && x.SummonLevel == summonLevel);
+        }
+
         public SummonLevelRewardEntry GetRewardEntry(int summonLevel)
         {
             for (int i = 0; i < LevelRewards.Count; i++)
@@ -84,6 +91,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [Range(0, 100)] public float EpicRate;
         [Range(0, 100)] public float LegendaryRate;
         [Range(0, 100)] public float MythicRate;
+
+        [Header("Milestone Reward")]
+        public int ItemId;
+        public int ItemQuantity;
     }
 
     [Serializable]

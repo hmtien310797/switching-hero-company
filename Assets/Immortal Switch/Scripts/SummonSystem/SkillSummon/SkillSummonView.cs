@@ -240,7 +240,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (SkillSummonManager.Instance != null)
             {
                 SkillSummonManager.Instance.SaveData.SkipGemFallbackConfirm = value;
-                SkillSummonManager.Instance.Save();
             }
         }
 

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.Level.Stage
 {
@@ -13,6 +15,15 @@ namespace Immortal_Switch.Scripts.Level.Stage
         [SerializeField] private EnemyPatternRuleSO enemyPatternRuleConfig;
         [SerializeField] private BossPatternRuleSO bossPatternRuleConfig;
         [SerializeField] private RewardRuleSO rewardRuleConfig;
+        [SerializeField] private ElementRuleSO elementRuleSo;
+        
+        [field: SerializeField]
+        public int MaxCreepsPerStage { get; private set; } = 40;
+        
+        [field: SerializeField] 
+        public int CreepBatchSize { get; private set; } = 20;
+        
+        public ElementRuleSO ElementRuleSO => elementRuleSo;
 
         public int GetChapterIndexByStage(int globalStage)
         {

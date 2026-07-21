@@ -4,6 +4,7 @@ using System.Linq;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Event.EventWheel.Layout;
 using Immortal_Switch.Scripts.Event.Models;
+using Immortal_Switch.Scripts.Event.Views;
 using Immortal_Switch.Scripts.Shared.Helper;
 using JetBrains.Annotations;
 
@@ -65,23 +66,14 @@ namespace Immortal_Switch.Scripts.Shared
             return _eventsActive.GetValueOrDefault(eventId);
         }
 
-        public double GetRemainTimeEvent(int eventId)
-        {
-            var evt = GetEventIfActive(eventId);
-
-            if (evt != null)
-            {
-                var remainTime = DateTimeHelper.CalculateRemainTime(DateTime.Now, evt.endTime);
-                return remainTime;
-            }
-
-            return -1;
-        }
-
-        public List<DynamicHeroesGlobalSpecificationsConfigEventRow> GetEventActives()
+        public List<DynamicHeroesGlobalSpecificationsConfigEventRow> GetEventActives(EEventDisplayMode mode)
         {
             var list = EventDb.rows
-                .Where(v => /*DateTimeHelper.InTime(DateTime.Now, v.startTime, v.endTime) &&*/ v.status == "Active")
+                .Where(v =>
+                    DateTimeHelper.InTime(DateTime.Now, v.startTime, v.endTime) &&
+                    v.status == "Active" &&
+                    (mode == EEventDisplayMode.All || (int)mode == v.displayMode)
+                )
                 .ToList();
 
             foreach (var row in list)

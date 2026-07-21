@@ -39,7 +39,7 @@ public class StageConfigCsvImporterWindow : EditorWindow
     [Header("Output Folder")] [SerializeField]
     private string outputFolder = "Assets/_Project/Generated/StageConfig";
 
-    [MenuItem("Tools/Stage Config/CSV Importer")]
+    [MenuItem("Tools/Game Data/Stage Chapter Config")]
     private static void Open()
     {
         GetWindow<StageConfigCsvImporterWindow>("Stage Config Importer");

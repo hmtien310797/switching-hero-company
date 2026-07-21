@@ -3,6 +3,8 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
@@ -111,6 +113,19 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
                     }
                     if (entries.Count > 0)
                         UserDataCache.Instance?.ApplySkillSummonEntries(entries.ToArray());
+                }
+
+                if (result.Rewards != null)
+                {
+                    var itemRewards = new List<ItemData>();
+                    foreach (var r in result.Rewards)
+                    {
+                        if (r.ItemId > 0 && r.Amount > 0)
+                            itemRewards.Add(new ItemData(r.ItemId, r.Amount));
+                    }
+
+                    if (itemRewards.Count > 0)
+                        PopupRewardService.Show(itemRewards);
                 }
             }
             catch (System.Exception ex)

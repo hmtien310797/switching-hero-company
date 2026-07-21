@@ -106,7 +106,17 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
         private void AutoSelectFirstDungeon()
         {
-            OnClickDungeon(0);
+            int currentAvailableIndex = 0;
+            for (int i = 0; i < btnDungeons.Count; i++)
+            {
+                var currentBtnDungeon = btnDungeons[i];
+                if (DatabaseManager.Instance.GetDungeonAvailableState(currentBtnDungeon.DungeonId))
+                {
+                    currentAvailableIndex = i;
+                    break;
+                }
+            }
+            OnClickDungeon(currentAvailableIndex);
         }
 
         private void InitDungeon()
@@ -121,6 +131,12 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
         private void OnClickDungeon(int idx)
         {
+            if (!DatabaseManager.Instance.GetDungeonAvailableState(btnDungeons[idx].DungeonId))
+            {
+                UIManager.Instance.ShowToast("Dungeon not available");
+                return;
+            }
+            
             if (_selectedDungeon != null)
             {
                 _selectedDungeon.SetStatus(ETabPresetStatus.Normal);

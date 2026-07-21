@@ -6,6 +6,7 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Boss;
+using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
@@ -47,12 +48,10 @@ namespace Battle
         [Header("Refs")] [SerializeField] FollowHeroController[] enemySpawnerCollection;
         [SerializeField] PvEMapController pvEMapController;
         [SerializeField] BattleCoinView coinPrefab;
+        [SerializeField] private CombatConfig combatConfig;
 
         [Header("Spawn Positions ")] [SerializeField]
         private List<Transform> spawnPoss;
-
-        [SerializeField] private CreepSpawnPatternCollectionSO creepSpawnPatternCollection;
-        [SerializeField] private SpawnRatePatternSO spawnRatePattern;
 
         [Header("Stage")]
         [field: SerializeField]
@@ -61,9 +60,8 @@ namespace Battle
         [SerializeField] private int stagesPerPattern = 10;
         [SerializeField] private int battleTime = 20;
 
-        [Header("Stage Resolver")] [SerializeField]
         private StageDataResolverSO stageDataResolver;
-
+        
         [SerializeField] private RewardSyncService rewardSyncService;
         [SerializeField] private OfflineAfkRewardService offlineAfkRewardService;
 
@@ -104,8 +102,6 @@ namespace Battle
         /// "đang replay/farm stage cũ" (không gọi battle/end, không reward, không resync).
         /// </summary>
         private int serverFrontierStage = 1;
-
-        private GameData gameData;
         private BossActor currentBoss;
 
         private bool isReadyBattle = false;
@@ -176,8 +172,9 @@ namespace Battle
 
         public override async UniTask InitializeAsync()
         {
+            stageDataResolver = DatabaseManager.Instance.StageDataResolver;
+            combatConfig.Apply(stageDataResolver.ElementRuleSO);
             BuildSpawnPositions();
-            gameData = GameData.Instance;
             await StartAsync();
         }
         
@@ -543,7 +540,7 @@ namespace Battle
             playCompletedStage = stage < HighestUnlockedStage;
             aliveCreepCount = 0;
             totalCreepsSpawnedThisStage = 0;
-            deadCreepCount = losingStage || playCompletedStage ? gameData.maxCreepsPerStage : 0;
+            deadCreepCount = losingStage || playCompletedStage ? stageDataResolver.MaxCreepsPerStage : 0;
             CacheStageSpawnData(stage);
 
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
@@ -656,7 +653,7 @@ namespace Battle
 
             int batchSize = Mathf.Max(
                 1,
-                gameData.creepBatchSize
+                stageDataResolver.CreepBatchSize
             );
 
             for (int i = 0; i < enemyIds.Length; i++)
@@ -735,11 +732,11 @@ namespace Battle
                 return;
             }
 
-            int remaining = gameData.maxCreepsPerStage - totalCreepsSpawnedThisStage;
+            int remaining = stageDataResolver.MaxCreepsPerStage - totalCreepsSpawnedThisStage;
             int spawnNow = Mathf.Min(
-                gameData.creepBatchSize,
+                stageDataResolver.CreepBatchSize,
                 losingStage || playCompletedStage
-                    ? gameData.creepBatchSize
+                    ? stageDataResolver.CreepBatchSize
                     : remaining
             );
 
@@ -1160,7 +1157,7 @@ namespace Battle
             creeps.Remove(enemy);
             aliveCreepCount = Mathf.Max(0, aliveCreepCount - 1);
             deadCreepCount = losingStage || playCompletedStage
-                ? GameData.Instance.maxCreepsPerStage
+                ? stageDataResolver.MaxCreepsPerStage
                 : deadCreepCount + 1;
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
             FarmingIdleScreenService.AddMonsterKill();
@@ -1168,7 +1165,7 @@ namespace Battle
                 return;
             if (aliveCreepCount != 0)
                 return;
-            if (totalCreepsSpawnedThisStage < gameData.maxCreepsPerStage || losingStage || playCompletedStage)
+            if (totalCreepsSpawnedThisStage < stageDataResolver.MaxCreepsPerStage || losingStage || playCompletedStage)
             {
                 SpawnNextCreepBatch();
                 return;

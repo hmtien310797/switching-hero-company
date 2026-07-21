@@ -15,21 +15,22 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 Tab = SummonAchievementTab.Heroic
             };
 
-            if (config == null || config.LevelRewards == null)
+            if (config == null || config.SummonLevels == null)
                 return result;
 
-            var sortedRewards = config.LevelRewards
+            // Reward source is each level's own ItemId/ItemQuantity (Hero_Levels), not the
+            // older LevelRewards (Hero_Rewards) table — the two described the same milestone
+            // payout and Hero_Levels is now the authoritative one, matching the server.
+            var sortedLevels = config.SummonLevels
                 .Where(x => x != null)
                 .OrderBy(x => x.SummonLevel)
                 .ToList();
 
-            for (int i = 0; i < sortedRewards.Count; i++)
+            for (int i = 0; i < sortedLevels.Count; i++)
             {
-                var entry = sortedRewards[i];
-                if (entry.RewardItems == null || entry.RewardItems.Count == 0)
+                var entry = sortedLevels[i];
+                if (entry.ItemId <= 0 || entry.ItemQuantity <= 0)
                     continue;
-
-                var reward = entry.RewardItems[0];
 
                 bool isClaimed = saveData != null && saveData.ClaimedRewardLevels.Contains(entry.SummonLevel);
 
@@ -37,8 +38,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 {
                     Level = entry.SummonLevel,
                     Title = $"Summon Level {entry.SummonLevel}",
-                    RewardText = BuildRewardText(reward),
-                    RewardIcon = DatabaseManager.Instance.ItemDb.LoadIconByItemId(reward.ItemId),
+                    RewardText = BuildRewardText(entry.ItemId, entry.ItemQuantity),
+                    RewardIcon = DatabaseManager.Instance.ItemDb.LoadIconByItemId(entry.ItemId),
                     State = isClaimed
                         ? SummonAchievementRewardState.Claimed
                         : SummonAchievementRewardState.Normal
@@ -48,12 +49,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             return result;
         }
 
-        private static string BuildRewardText(SummonRewardItem reward)
+        private static string BuildRewardText(int itemId, int quantity)
         {
-            if (reward == null)
-                return string.Empty;
-
-            return "chưa có key";
+            var item = DatabaseManager.Instance.ItemDb.FindItem(itemId);
+            var name = item != null ? item.itemName : string.Empty;
+            return $"{name} x{quantity}";
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
@@ -90,7 +91,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             _onClickBuy?.Invoke(storeProductId, _iap.iD);
         }
 
-        public void Bind(string title, string price,
+        public void Bind(string key, string price,
             DynamicHeroesGlobalSpecificationsProductIdRow product,
             DynamicHeroesGlobalSpecificationsPackIapRow iap,
             Action<string, int> onClickBuy,
@@ -98,7 +99,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         )
         {
             txtPrice.text = price;
-            txtTitle.text = title;
+            txtTitle.text = LocalizationManager.GetText(key);
 
             _onClickBuy = onClickBuy;
             _product = product;

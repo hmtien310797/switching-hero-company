@@ -74,7 +74,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             if (HeroSummonManager.Instance != null && skipToggle != null)
             {
                 HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm = skipToggle.isOn;
-                HeroSummonManager.Instance.Save();
             }
 
             confirmAction?.Invoke();

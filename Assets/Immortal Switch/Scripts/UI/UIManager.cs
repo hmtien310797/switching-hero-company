@@ -140,6 +140,8 @@ namespace Immortal_Switch.Scripts.UI
             {
                 canvas.worldCamera = Camera.main;
             };
+            PreloadAsync<PopupRewardView>().Forget();
+            PreloadAsync<LoadingView>().Forget();
         }
 
         protected override void OnDestroy()
@@ -989,8 +991,7 @@ namespace Immortal_Switch.Scripts.UI
         {
             await UniTask.WhenAll(
                 OpenPopupAsync<BottomMainView>(withBackdrop: false),
-                OpenPopupAsync<TopMainView>(withBackdrop: false),
-            PreloadAsync<PopupRewardView>(), PreloadAsync<LoadingView>()
+                OpenPopupAsync<TopMainView>(withBackdrop: false)
             );
             
             tapeAnimator.transform.parent = GetLayerRoot(UILayer.Main);

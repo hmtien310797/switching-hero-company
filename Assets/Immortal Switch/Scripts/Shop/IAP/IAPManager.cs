@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Event.EventWheel;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
@@ -47,6 +48,11 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         // true nếu pack_id thuộc pack_iap (bundle nhiều item, vd. Special) — validate qua
         // iap/pack_purchase thay vì iap/purchase (pack_diamond, 1 loại tiền). Set bởi BuyPackProduct.
         private readonly Dictionary<string, bool> _pendingIsBundle = new();
+        // true nếu đây là giao dịch mua Premium Pass của 1 event (vd. Lucky Wheel) — validate qua
+        // eventwheel/pass_buy_premium thay vì iap/purchase. Set bởi BuyEventPassProduct. Không dùng
+        // chung _pendingPackIds vì RPC này không nhận pack_id (server tự tra config_pass_event
+        // theo event đang active, không có chuyện nhầm sang pack_diamond/pack_iap khác).
+        private readonly Dictionary<string, bool> _pendingIsEventPass = new();
 
         /// <summary>True khi IAP đã init xong và store sẵn sàng nhận mua hàng. UI (shop) phải kiểm
         /// tra cờ này trước khi cho mở màn mua hàng — false khi thiết bị không có store khả dụng
@@ -186,6 +192,30 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             _storeController.InitiatePurchase(product);
         }
 
+        /// <summary>Mua Premium Pass của 1 event (vd. Lucky Wheel — config_pass_event.js).
+        /// storeProductId lấy từ EventWheelPassManager.State.PremiumPack (server, không phải
+        /// DatabaseManager cục bộ) để đảm bảo khớp đúng product_id server sẽ validate.</summary>
+        public void BuyEventPassProduct(string storeProductId, Action<bool, string> onComplete)
+        {
+            if (_storeController == null)
+            {
+                onComplete?.Invoke(false, "IAP chưa khởi tạo xong.");
+                return;
+            }
+
+            Product product = _storeController.products.WithID(storeProductId);
+
+            if (product == null || !product.availableToPurchase)
+            {
+                onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
+                return;
+            }
+
+            _pendingCallbacks[storeProductId] = onComplete;
+            _pendingIsEventPass[storeProductId] = true;
+            _storeController.InitiatePurchase(product);
+        }
+
         public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
         {
             _storeController = controller;
@@ -222,6 +252,9 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             _pendingIsBundle.TryGetValue(storeProductId, out bool isBundle);
             _pendingIsBundle.Remove(storeProductId);
 
+            _pendingIsEventPass.TryGetValue(storeProductId, out bool isEventPass);
+            _pendingIsEventPass.Remove(storeProductId);
+
             string payload = ExtractReceiptPayload(product.receipt);
 
             if (string.IsNullOrEmpty(payload))
@@ -239,7 +272,28 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
             try
             {
-                if (isBundle)
+                if (isEventPass)
+                {
+                    // RPC eventwheel/pass_buy_premium: KHÔNG throw khi bị từ chối hợp lệ (event hết
+                    // hạn/đã mua rồi/receipt sai) — trả success=false, phải tự kiểm tra thay vì dựa
+                    // vào catch bên dưới như 2 nhánh còn lại.
+                    var response = await NakamaClient.Instance.EventWheelPassBuyPremiumAsync(store, payload);
+
+                    if (!response.Success)
+                    {
+                        Debug.LogWarning($"[IAPManager] Event pass purchase rejected -> product={storeProductId}: {response.Error}");
+                        callback?.Invoke(false, response.Error);
+                        return;
+                    }
+
+                    _storeController.ConfirmPendingPurchase(product);
+                    await EventWheelPassManager.Instance.RefreshAsync();
+
+                    Debug.Log($"[IAPManager] Event pass purchase validated & confirmed -> product={storeProductId}");
+                    callback?.Invoke(true, null);
+                    OnPurchased?.Invoke(0);
+                }
+                else if (isBundle)
                 {
                     // RPC iap/pack_purchase: bundle nhiều item (pack_iap, vd. Special) — server verify
                     // receipt rồi cộng cả 3 slot item, khác iap/purchase chỉ cộng 1 loại tiền.
@@ -339,6 +393,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                 _pendingCallbacks.Remove(storeProductId);
                 _pendingPackIds.Remove(storeProductId);
                 _pendingIsBundle.Remove(storeProductId);
+                _pendingIsEventPass.Remove(storeProductId);
                 callback?.Invoke(false, failureDescription.message);
             }
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shop.Layouts;
 using Immortal_Switch.Scripts.Shop.Views.UI;
 using UnityEngine;
 

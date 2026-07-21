@@ -38,15 +38,13 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         private PassRecyclableView passRecyclableView;
 
         // --- Private Fields ---
-        private Action<string, int> _onClickBuyProduct;
         private List<DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow> _rows = new();
         private EventWheelPassManager _manager;
 
         private int _eventId;
-        private int _productId;
-        private string _storeProductId;
         private bool _isBound;
         private bool _isSubscribed;
+        private bool _isBuying;
 
         private void Awake()
         {
@@ -78,29 +76,81 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private void OnClickBuyProduct()
         {
-            _onClickBuyProduct?.Invoke(_storeProductId, _productId);
+            if (_isBuying) return;
+            BuyPremiumAsync().Forget();
+        }
+
+        private async UniTaskVoid BuyPremiumAsync()
+        {
+            _isBuying = true;
+            btnBuy.interactable = false;
+
+            try
+            {
+                var (success, error) = await _manager.BuyPremiumAsync();
+
+                if (!success)
+                {
+                    UIManager.Instance.ShowToast(DescribeBuyPremiumError(error));
+                    return;
+                }
+
+                UIManager.Instance.ShowToast("Mua Premium Pass thành công!");
+            }
+            finally
+            {
+                _isBuying = false;
+                RefreshStatus();
+            }
+        }
+
+        private static string DescribeBuyPremiumError(string error)
+        {
+            switch (error)
+            {
+                case "EVENT_NOT_ACTIVE":       return "Sự kiện không còn hoạt động.";
+                case "ALREADY_PURCHASED":      return "Bạn đã mua Premium Pass rồi.";
+                case "PASS_NOT_CONFIGURED":
+                case "PRODUCT_NOT_CONFIGURED": return "Gói chưa mở bán trên thiết bị này.";
+                default:                       return string.IsNullOrEmpty(error) ? "Mua thất bại, vui lòng thử lại." : error;
+            }
         }
 
         private void OnClickClaimAll()
         {
-            var rewards = _manager.ClaimAll(_eventId, _rows);
+            ClaimAllAsync().Forget();
+        }
+
+        private async UniTaskVoid ClaimAllAsync()
+        {
+            var (rewards, error) = await _manager.ClaimAllAsync(_rows);
+
+            if (rewards.Count == 0 && error != null)
+            {
+                UIManager.Instance.ShowToast(DescribeClaimError(error));
+                return;
+            }
+
             ShowRewards(rewards);
+        }
+
+        private static string DescribeClaimError(string error)
+        {
+            switch (error)
+            {
+                case "EVENT_NOT_ACTIVE": return "Sự kiện không còn hoạt động.";
+                default:                 return "Nhận thưởng thất bại, vui lòng thử lại.";
+            }
         }
 
         public void Bind(
             List<DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow> rows,
             int eventId,
-            Action<string, int> onClickBuyProduct,
-            string price,
-            string storeProductId,
-            int productId
+            string price
         )
         {
             _rows = rows ?? new List<DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow>();
             _eventId = eventId;
-            _onClickBuyProduct = onClickBuyProduct;
-            _storeProductId = storeProductId;
-            _productId = productId;
             _manager = EventWheelPassManager.Instance;
             _isBound = true;
             txtBuyPrice.text = price;

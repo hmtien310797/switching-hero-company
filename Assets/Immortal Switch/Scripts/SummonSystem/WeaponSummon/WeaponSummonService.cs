@@ -59,80 +59,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
 
             return false;
         }
-
-        public WeaponSummonResult ExecuteSummon(
-            WeaponSummonOptionEntry option,
-            WeaponSummonPaymentType paymentType)
-        {
-            if (option == null)
-                return null;
-
-            if (!CanSummon(option, out var actualPaymentType, out var paidAmount))
-                return null;
-
-            if (actualPaymentType != paymentType)
-                return null;
-
-            Spend(option, paymentType);
-
-            var result = new WeaponSummonResult
-            {
-                PaymentType = paymentType,
-                PaidAmount = paidAmount,
-                OldTotalRoll = saveData.TotalRoll,
-                OldSummonLevel = GetCurrentSummonLevel()
-            };
-
-            for (int i = 0; i < option.RollCount; i++)
-            {
-                int currentLevel = GetCurrentSummonLevel();
-                var levelEntry = config.GetExactLevelEntry(currentLevel);
-                if (levelEntry == null)
-                    break;
-
-                var tier = RollTier(levelEntry);
-                int star = RollStar(levelEntry);
-
-                saveData.TotalRoll++;
-
-                var weapon = RollWeapon(tier, star);
-                if (weapon == null)
-                {
-                    Debug.LogWarning($"[WeaponSummon] No weapon found for tier={tier}, star={star}");
-                    continue;
-                }
-
-                bool success = weaponManager.AddStandardShardFromSummon(
-                    weapon.WeaponId,
-                    1,
-                    out bool isNewWeapon,
-                    out int totalShardAfter);
-
-                if (!success)
-                    continue;
-
-                result.Entries.Add(new WeaponSummonResultEntry
-                {
-                    RollIndex = i + 1,
-                    Weapon = weapon,
-                    WeaponId = weapon.WeaponId,
-                    WeaponName = string.IsNullOrEmpty(weapon.WeaponName) ? weapon.name : weapon.WeaponName,
-                    Icon = weapon.Icon,
-                    Tier = weapon.Tier,
-                    Star = weapon.Star,
-                    IsNewWeapon = isNewWeapon,
-                    ShardGained = 1,
-                    TotalShardAfter = totalShardAfter
-                });
-            }
-
-            result.NewTotalRoll = saveData.TotalRoll;
-            result.NewSummonLevel = GetCurrentSummonLevel();
-            result.NewlyUnlockedRewardLevels =
-                GetNewlyUnlockedRewardLevels(result.OldSummonLevel, result.NewSummonLevel);
-
-            return result;
-        }
+        
         
         public List<int> GetClaimableRewardLevels()
         {
@@ -194,15 +121,22 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
             return Mathf.Max(0, totalRoll - consumed);
         }
         
+        // Reward source is each level's own ItemId/ItemQuantity (Weapon_Levels), not the older
+        // LevelRewards (Weapon_Rewards) table — see HeroSummonAchievementRewardBuilder for the
+        // same replacement relationship, matching the server.
         public SummonRewardPreviewData GetRewardPreviewData()
         {
-            if (config == null || config.LevelRewards == null)
+            if (config == null || config.SummonLevels == null)
                 return null;
 
             int currentLevel = GetCurrentSummonLevel();
 
-            var sorted = config.LevelRewards
-                .Where(x => x != null)
+            // Chỉ xét các level có ItemId/ItemQuantity hợp lệ — level chưa cấu hình
+            // reward (ItemId=0) không nên hiện preview/claimable (khớp hành vi
+            // HeroSummonService/SkillSummonService), nếu không LoadIconByItemId(0) sẽ
+            // log lỗi "Item 0 not found".
+            var sorted = config.SummonLevels
+                .Where(x => x != null && x.ItemId > 0 && x.ItemQuantity > 0)
                 .OrderBy(x => x.SummonLevel)
                 .ToList();
 
@@ -262,15 +196,15 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
         }
 
         private SummonRewardPreviewData BuildRewardPreview(
-            WeaponSummonLevelRewardEntry entry,
+            WeaponSummonLevelEntry entry,
             bool isClaimable,
             bool isClaimed)
         {
             return new SummonRewardPreviewData
             {
                 SummonLevel = entry.SummonLevel,
-                Quantity = entry.RewardItems[0].Amount,
-                ItemId = entry.RewardItems[0].ItemId,
+                Quantity = entry.ItemQuantity,
+                ItemId = entry.ItemId,
                 IsClaimable = isClaimable,
                 IsClaimed = isClaimed
             };
@@ -288,90 +222,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
                 return 0;
 
             return Mathf.Max(0, currentEntry.TotalRollRequired);
-        }
-
-        private void Spend(WeaponSummonOptionEntry option, WeaponSummonPaymentType paymentType)
-        {
-            if (paymentType == WeaponSummonPaymentType.Ticket)
-                currencyGateway.SpendWeaponTicket(option.TicketCost);
-            else
-                currencyGateway.SpendGem(option.GemCost);
-        }
-
-        private WeaponTier RollTier(WeaponSummonLevelEntry entry)
-        {
-            float roll = Random.Range(0f, 100f);
-            float cumulative = 0f;
-
-            cumulative += entry.GradeDRate;
-            if (roll <= cumulative) return WeaponTier.D;
-
-            cumulative += entry.GradeCRate;
-            if (roll <= cumulative) return WeaponTier.C;
-
-            cumulative += entry.GradeBRate;
-            if (roll <= cumulative) return WeaponTier.B;
-
-            cumulative += entry.GradeARate;
-            if (roll <= cumulative) return WeaponTier.A;
-
-            cumulative += entry.GradeSRate;
-            if (roll <= cumulative) return WeaponTier.S;
-
-            return WeaponTier.SS;
-        }
-
-        private int RollStar(WeaponSummonLevelEntry entry)
-        {
-            float roll = Random.Range(0f, 100f);
-            float cumulative = 0f;
-
-            cumulative += entry.Star1Rate;
-            if (roll <= cumulative) return 1;
-
-            cumulative += entry.Star2Rate;
-            if (roll <= cumulative) return 2;
-
-            cumulative += entry.Star3Rate;
-            if (roll <= cumulative) return 3;
-
-            cumulative += entry.Star4Rate;
-            if (roll <= cumulative) return 4;
-
-            return 5;
-        }
-
-        private StandardWeaponDefinitionSO RollWeapon(WeaponTier tier, int star)
-        {
-            if (config == null || config.WeaponPool == null)
-                return null;
-
-            var pool = config.WeaponPool
-                .Where(x => x != null && x.Tier == tier && x.Star == star)
-                .ToList();
-
-            if (pool.Count == 0)
-                return null;
-
-            int index = Random.Range(0, pool.Count);
-            return pool[index];
-        }
-
-        private List<int> GetNewlyUnlockedRewardLevels(int oldLevel, int newLevel)
-        {
-            var result = new List<int>();
-
-            if (newLevel <= oldLevel || config == null || config.LevelRewards == null)
-                return result;
-
-            for (int rewardLevel = oldLevel; rewardLevel < newLevel; rewardLevel++)
-            {
-                bool exists = config.LevelRewards.Any(x => x != null && x.SummonLevel == rewardLevel);
-                if (exists)
-                    result.Add(rewardLevel);
-            }
-
-            return result;
         }
     }
 }

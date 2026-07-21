@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shop.Layouts;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +29,8 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         private UIShopTabItem shopTabHighlight;
 
         // --- Private Fields ---
-        private List<UIShopTabItem> _tabsItem = new();
+        private List<UIShopTabItem> _tabs = new();
+
         private EShopTab? _selectedShopTab;
         private GameObject _selectedLayout;
         private UIShopTabItem _selectedTab;
@@ -141,17 +143,17 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                     continue;
                 }
 
-                if (_tabsItem.Count > i)
+                if (_tabs.Count > i)
                 {
-                    var clone = _tabsItem[i];
+                    var clone = _tabs[i];
                     clone.gameObject.SetActive(true);
-                    clone.Bind(i, cfg.uiNameVi, OnClickTab);
+                    clone.Bind(i, cfg.tabKey, OnClickTab);
                 }
                 else
                 {
                     var clone = Instantiate(shopTabPrefab, shopTabContainer);
-                    clone.Bind(i, cfg.uiNameVi, OnClickTab);
-                    _tabsItem.Add(clone);
+                    clone.Bind(i, cfg.tabKey, OnClickTab);
+                    _tabs.Add(clone);
                 }
             }
         }
@@ -177,7 +179,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 _selectedTab.SetSelected(false);
             }
 
-            _selectedTab = _tabsItem[tabIdx];
+            _selectedTab = _tabs[tabIdx];
             _selectedTab.SetSelected(true);
 
             // set highlight cho tab đã chọn

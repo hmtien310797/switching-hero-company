@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.Shared;
+﻿using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using TMPro;
@@ -108,8 +109,15 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
             }
 
-            rewardReceiver.ClaimReward(currentPreviewData.SummonLevel, rewardReceiver, category);
+            if (claimButton != null)
+                claimButton.interactable = false;
 
+            HandleClaimAsync().Forget();
+        }
+
+        private async UniTask HandleClaimAsync()
+        {
+            await rewardReceiver.ClaimReward(currentPreviewData.SummonLevel, rewardReceiver, category);
             Refresh();
         }
     }

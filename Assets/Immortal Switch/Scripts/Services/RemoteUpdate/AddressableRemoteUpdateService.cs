@@ -124,6 +124,204 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             return await DownloadOptionalOnlyAsync(handler, cancellationToken);
         }
 
+
+        /// <summary>
+        /// Check/update remote catalogs rồi tải dependencies của một label cụ thể.
+        /// Dùng cho content cần sẵn sàng trước Login Scene, ví dụ label "Preload"
+        /// của Unity Localization. Pipeline này không ghi marker Required.
+        /// </summary>
+        public async UniTask<RemoteContentUpdateResult> CheckAndDownloadLabelAsync(
+            string label,
+            IRemoteUpdateProgressHandler handler = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                var invalidResult = RemoteContentUpdateResult.Failed(
+                    TimeSpan.Zero,
+                    "Addressables label is empty.");
+                handler?.OnComplete(invalidResult);
+                return invalidResult;
+            }
+
+            if (_runningUpdateTcs != null)
+            {
+                var busyResult = RemoteContentUpdateResult.Failed(
+                    TimeSpan.Zero,
+                    "Another Addressables update pipeline is already running.");
+                handler?.OnComplete(busyResult);
+                return busyResult;
+            }
+
+            _runningUpdateTcs =
+                new UniTaskCompletionSource<RemoteContentUpdateResult>();
+
+            var stopwatch = Stopwatch.StartNew();
+            var errors = new List<string>();
+            bool hadUpdates = false;
+            bool catalogUpdated = false;
+            long downloadedBytes = 0;
+
+            _internalCts?.Dispose();
+            _internalCts =
+                CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var token = _internalCts.Token;
+
+            try
+            {
+                token.ThrowIfCancellationRequested();
+
+                ReportPhase(handler, RemoteContentUpdateStatus.Initializing,
+                    "Initialising Addressables…", 0.00f);
+                await InitializeAddressablesAsync(token);
+                ReportPhase(handler, RemoteContentUpdateStatus.Initializing,
+                    "Addressables ready.", 0.10f);
+
+                ReportPhase(handler, RemoteContentUpdateStatus.CheckingForUpdates,
+                    "Checking localization updates…", 0.10f);
+                var catalogUpdates =
+                    await CheckForCatalogUpdatesWithRetryAsync(token);
+
+                ReportPhase(handler, RemoteContentUpdateStatus.CheckingForUpdates,
+                    catalogUpdates.Count > 0
+                        ? $"Found {catalogUpdates.Count} catalog update(s)."
+                        : "Catalog is current.",
+                    0.25f);
+
+                if (catalogUpdates.Count > 0)
+                {
+                    hadUpdates = true;
+                    ReportPhase(handler, RemoteContentUpdateStatus.UpdatingCatalogs,
+                        "Updating localization catalog…", 0.25f);
+                    await UpdateCatalogsWithRetryAsync(catalogUpdates, token);
+                    catalogUpdated = true;
+                }
+
+                ReportPhase(handler, RemoteContentUpdateStatus.UpdatingCatalogs,
+                    catalogUpdated ? "Catalog updated." : "Catalog is up to date.",
+                    0.40f);
+
+                ReportPhase(handler, RemoteContentUpdateStatus.CalculatingDownloadSize,
+                    $"Checking label '{label}'…", 0.40f);
+
+                long downloadSize =
+                    await GetDownloadSizeWithTimeoutAsync(label, token);
+
+                ReportPhase(handler, RemoteContentUpdateStatus.CalculatingDownloadSize,
+                    $"{label}: {FormatBytes(downloadSize)}", 0.50f,
+                    requiredBytes: downloadSize);
+
+                if (downloadSize > 0)
+                {
+                    downloadedBytes = await DownloadContentWithProgressAsync(
+                        label,
+                        label,
+                        downloadSize,
+                        handler,
+                        token,
+                        0.50f,
+                        1.00f);
+                }
+                else
+                {
+                    ReportPhase(handler, RemoteContentUpdateStatus.Downloading,
+                        $"{label} is already cached.", 1.00f);
+                }
+
+                ReportPhase(handler, RemoteContentUpdateStatus.Complete,
+                    $"{label} ready.", 1.00f, isDone: true);
+
+                var result = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Complete,
+                    stopwatch.Elapsed,
+                    hadUpdates,
+                    catalogUpdated,
+                    downloadedBytes,
+                    0,
+                    errors);
+
+                return Finish(result, handler);
+            }
+            catch (OfflineException ex)
+            {
+                var result = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Offline,
+                    stopwatch.Elapsed,
+                    hadUpdates,
+                    catalogUpdated,
+                    downloadedBytes,
+                    0,
+                    new[] { ex.Message });
+                return Finish(result, handler);
+            }
+            catch (TimeoutException ex)
+            {
+                errors.Add(ex.Message);
+                ReportPhase(handler, RemoteContentUpdateStatus.Timeout,
+                    $"Localization update timed out: {ex.Message}",
+                    1.00f, isDone: true, errorMessage: ex.Message);
+
+                var result = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Timeout,
+                    stopwatch.Elapsed,
+                    hadUpdates,
+                    catalogUpdated,
+                    downloadedBytes,
+                    0,
+                    errors);
+                return Finish(result, handler);
+            }
+            catch (OperationCanceledException)
+            {
+                var result = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Cancelled,
+                    stopwatch.Elapsed,
+                    hadUpdates,
+                    catalogUpdated,
+                    downloadedBytes,
+                    0,
+                    new[] { "Operation was cancelled." });
+                return Finish(result, handler);
+            }
+            catch (Exception ex) when (IsOffline(ex))
+            {
+                var result = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Offline,
+                    stopwatch.Elapsed,
+                    hadUpdates,
+                    catalogUpdated,
+                    downloadedBytes,
+                    0,
+                    new[] { ex.Message });
+                return Finish(result, handler);
+            }
+            catch (Exception ex)
+            {
+                errors.Add(ex.Message);
+                Debug.LogError($"[RemoteUpdate] Label '{label}' pipeline failed: {ex}");
+
+                ReportPhase(handler, RemoteContentUpdateStatus.Failed,
+                    $"Localization update failed: {ex.Message}",
+                    1.00f, isDone: true, errorMessage: ex.Message);
+
+                var result = new RemoteContentUpdateResult(
+                    RemoteContentUpdateStatus.Failed,
+                    stopwatch.Elapsed,
+                    hadUpdates,
+                    catalogUpdated,
+                    downloadedBytes,
+                    0,
+                    errors);
+                return Finish(result, handler);
+            }
+            finally
+            {
+                _internalCts?.Dispose();
+                _internalCts = null;
+                _runningUpdateTcs = null;
+            }
+        }
+
         /// <summary>
         /// True while a pipeline is in flight. External code can check this
         /// to avoid starting a duplicate update.
@@ -301,6 +499,11 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
                 ReportPhase(handler, RemoteContentUpdateStatus.Initializing,
                     "Initialising Addressables…", 0.00f);
                 await InitializeAddressablesAsync(token);
+                
+                await DebugPrintRemoteUrlAsync(
+                    _requiredLabel,
+                    token);
+                
                 ReportPhase(handler, RemoteContentUpdateStatus.Initializing,
                     "Addressables ready.", 0.10f);
 
@@ -1007,6 +1210,71 @@ namespace Immortal_Switch.Scripts.RemoteUpdate
             lastException?.Throw();
             throw new InvalidOperationException(
                 $"{operationName} failed after {_maxRetryCount + 1} attempts.");
+        }
+        
+        public async UniTask DebugPrintRemoteUrlAsync(
+            string label,
+            CancellationToken cancellationToken = default)
+        {
+            AsyncOperationHandle<IList<IResourceLocation>> handle = default;
+
+            try
+            {
+                handle = Addressables.LoadResourceLocationsAsync(
+                    (object)label,
+                    null);
+
+                var locations = await handle.ToUniTask(
+                    cancellationToken: cancellationToken);
+
+                if (locations == null || locations.Count == 0)
+                {
+                    Debug.LogWarning(
+                        $"[AddressablesDebug] Không tìm thấy label: {label}");
+                    return;
+                }
+
+                foreach (var location in locations)
+                {
+                    PrintLocationUrl(location);
+                }
+            }
+            finally
+            {
+                if (handle.IsValid())
+                {
+                    Addressables.Release(handle);
+                }
+            }
+        }
+
+        private static void PrintLocationUrl(IResourceLocation location)
+        {
+            if (location == null)
+                return;
+
+            var url = Addressables.InternalIdTransformFunc != null
+                ? Addressables.InternalIdTransformFunc(location)
+                : location.InternalId;
+
+            if (url.StartsWith("http://") ||
+                url.StartsWith("https://"))
+            {
+                Debug.Log(
+                    $"[AddressablesDebug]\n" +
+                    $"Key: {location.PrimaryKey}\n" +
+                    $"URL: {url}");
+
+                return;
+            }
+
+            if (location.Dependencies == null)
+                return;
+
+            foreach (var dependency in location.Dependencies)
+            {
+                PrintLocationUrl(dependency);
+            }
         }
 
         /// <summary>

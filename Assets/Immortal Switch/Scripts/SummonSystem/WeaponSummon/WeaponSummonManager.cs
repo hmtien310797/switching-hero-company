@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Core;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using UnityEngine;
 
@@ -9,9 +10,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
 {
     public class WeaponSummonManager : Singleton<WeaponSummonManager>
     {
-        [Header("Config")]
-        [SerializeField] private WeaponSummonConfigSO config;
-
         [Header("Runtime")]
         [SerializeField] private WeaponManager weaponManager;
 
@@ -26,16 +24,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
         public WeaponSummonService Service => service;
 
         public event Action OnSummonDataChanged;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            Load();
-            InitService();
-        }
+        private WeaponSummonConfigSO config;
 
         public override UniTask InitializeAsync()
         {
+            config = DatabaseManager.Instance.WeaponSummonConfig;
+            Load();
+            InitService();
             return UniTask.CompletedTask;
         }
 
@@ -67,64 +62,14 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
             return service.CanSummon(option, out paymentType, out paidAmount);
         }
         
-        public bool ClaimReward(int rewardLevel, ISummonRewardReceiver receiver)
-        {
-            if (service == null)
-                return false;
-
-            bool success = service.ClaimReward(rewardLevel, receiver);
-            if (!success)
-                return false;
-
-            Save();
-            NotifyChanged();
-
-            return true;
-        }
-
-        public WeaponSummonResult ExecuteSummon(
-            string optionId,
-            WeaponSummonPaymentType paymentType)
-        {
-            if (service == null)
-                return null;
-
-            var option = service.GetOption(optionId);
-            if (option == null)
-                return null;
-
-            var result = service.ExecuteSummon(option, paymentType);
-            if (result == null)
-                return null;
-
-            Save();
-            NotifyChanged();
-
-            return result;
-        }
-
         public int GetCurrentSummonLevel()
         {
             return service != null ? service.GetCurrentSummonLevel() : 1;
         }
 
-        public void Save()
+        private void Load()
         {
-            if (saveData == null)
-                saveData = new WeaponSummonSaveData();
-
-            ES3.Save(saveKey, saveData);
-        }
-
-        public void Load()
-        {
-            saveData = ES3.Load(saveKey, new WeaponSummonSaveData());
-
-            if (saveData == null)
-                saveData = new WeaponSummonSaveData();
-
-            if (saveData.ClaimedRewardLevels == null)
-                saveData.ClaimedRewardLevels = new System.Collections.Generic.List<int>();
+            saveData = new WeaponSummonSaveData();
         }
 
         public void NotifyChanged()
@@ -139,7 +84,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
         {
             saveData.TotalRoll   = response.NewTotalRoll;
             saveData.SummonLevel = response.NewSummonLevel;
-            Save();
             NotifyChanged();
         }
 
@@ -151,18 +95,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon
             saveData.SummonLevel = state.SummonLevel;
             if (state.ClaimedRewardLevels != null)
                 saveData.ClaimedRewardLevels = new System.Collections.Generic.List<int>(state.ClaimedRewardLevels);
-            Save();
-            NotifyChanged();
-        }
-
-        public void ClearSave()
-        {
-            saveData = new WeaponSummonSaveData();
-
-            if (ES3.KeyExists(saveKey))
-                ES3.DeleteKey(saveKey);
-
-            Save();
             NotifyChanged();
         }
     }

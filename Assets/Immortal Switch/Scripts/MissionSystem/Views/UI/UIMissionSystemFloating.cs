@@ -60,10 +60,11 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             switch (arg2)
             {
-                case 12:
-                case 13:
+                // Chỉ step 14 (targetUI: QuestClaimButton) là bước claim thật sự.
+                // Step 12/13 nhắm vào QuestButton (mở màn hình nhiệm vụ) và step 15 là
+                // variant lặp lại của 14 — gọi OnClaim() cho các step này chỉ khiến
+                // MissionClaim fail vì nhiệm vụ chưa xong (12/13) hoặc đã claim rồi (15).
                 case 14:
-                case 15:
                     OnClaim();
                     break;
             }

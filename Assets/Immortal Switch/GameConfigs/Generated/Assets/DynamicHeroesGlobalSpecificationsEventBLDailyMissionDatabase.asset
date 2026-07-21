@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180bf97bc579e114ea85c6cc54c1592d, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsEventBLDailyMissionDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - missionId: EVT_BL_D01
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 10
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_BL_D02
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 2 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 10
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_BL_D03
+    titleVi: "Tri\u1EC7u h\u1ED3i 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 10
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_BL_D04
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 5 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 5
+    points: 10
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_BL_D05
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 10
+    itemId: 4
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_BL_D06
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 10
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 6

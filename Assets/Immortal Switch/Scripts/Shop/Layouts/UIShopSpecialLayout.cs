@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Shop.Views.UI;
+using UnityEngine;
+
+namespace Immortal_Switch.Scripts.Shop.Layouts
+{
+    public class ShopSpecialRuntimeData
+    {
+        public DynamicHeroesGlobalSpecificationsPackIapRow Pack;
+        public DynamicHeroesGlobalSpecificationsProductIdRow Product;
+    }
+
+    public class UIShopSpecialLayout : MonoBehaviour
+    {
+        [SerializeField]
+        private UIShopPackSpecial packSpecial;
+
+        [SerializeField]
+        private Transform productContainer;
+
+        [SerializeField]
+        private UIShopProductLimit productPrefab;
+
+        // --- Private Fields ---
+        private List<UIShopProductLimit> _products = new();
+        private Action<string, int> _onClickBuy;
+
+        public void Bind(List<ShopSpecialRuntimeData> rows, Action<string, int> onClickBuy)
+        {
+            _onClickBuy = onClickBuy;
+
+            RefreshProducts(rows);
+        }
+
+        private void RefreshProducts(List<ShopSpecialRuntimeData> rows)
+        {
+            ShopSpecialRuntimeData packWeekly = null;
+            ShopSpecialRuntimeData packDaily = null;
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var row = rows[i];
+                var packId = row.Pack.iD;
+
+                switch (packId)
+                {
+                    // id 13: gói weekly, 14: daily
+                    case PackIdConstants.ID_WEEKLY_SPECIAL:
+                        packWeekly = row;
+                        continue;
+
+                    case PackIdConstants.ID_DAILY_SPECIAL:
+                        packDaily = row;
+                        continue;
+                }
+
+                if (PackIdConstants.IsPackSpecial(packId))
+                {
+                    continue;
+                }
+
+                var price = row.Product.price.ToString(CultureInfo.InvariantCulture);
+                var rewards = DatabaseManager.Instance.GetShopSpecialRewards(packId);
+
+                if (_products.Count > i)
+                {
+                    var clone = _products[i];
+                    clone.gameObject.SetActive(true);
+                    clone.Bind(row.Pack.nameVi, price, row.Product, row.Pack, _onClickBuy, rewards);
+                }
+                else
+                {
+                    var clone = Instantiate(productPrefab, productContainer);
+                    clone.Bind(row.Pack.nameVi, price, row.Product, row.Pack, _onClickBuy, rewards);
+                    _products.Add(clone);
+                }
+            }
+
+            if (packWeekly != null &&
+                packDaily != null)
+            {
+                packSpecial.Bind(packWeekly, packDaily, _onClickBuy);
+            }
+        }
+    }
+}

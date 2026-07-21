@@ -110,74 +110,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             return false;
         }
-
-        public SkillSummonResult ExecuteSummon(SkillSummonOptionEntry option, SummonPaymentType paymentType)
-        {
-            Debug.Log("1234");
-            if (option == null)
-                return null;
-            Debug.Log("12345");
-            if (!CanSummon(option, out var actualPaymentType, out var paidAmount))
-                return null;
-            Debug.Log("12346");
-            if (actualPaymentType != paymentType)
-                return null;
-            Debug.Log("12347");
-            Spend(option, paymentType);
-
-            var result = new SkillSummonResult
-            {
-                PaymentType = paymentType,
-                PaidAmount = paidAmount,
-                OldTotalRoll = saveData.TotalRoll,
-                OldSummonLevel = GetCurrentSummonLevel()
-            };
-            Debug.Log($"12348: {option.RollCount}");
-
-            for (int i = 0; i < option.RollCount; i++)
-            {
-                int currentLevel = GetCurrentSummonLevel();
-                var levelEntry = config.GetExactLevelEntry(currentLevel);
-                if (levelEntry == null)
-                {
-                    Debug.Log($"Index: {i} - empty");
-                    break;
-                }
-
-                var rolledGrade = RollGrade(levelEntry);
-                var skill = RollSkillByGrade(rolledGrade);
-
-                if (skill == null)
-                {
-                    Debug.LogWarning($"No skill found for grade {rolledGrade}");
-                    continue;
-                }
-
-                bool alreadyOwned = progressionService.HasSkill(skill.SkillId);
-                progressionService.AcquireOrAddDuplicate(skill, 1);
-
-                saveData.TotalRoll++;
-                Debug.Log($"Index: {i} - {JsonConvert.SerializeObject(levelEntry)}");
-
-                result.Entries.Add(new SkillSummonResultEntry
-                {
-                    RollIndex = i + 1,
-                    SkillAsset = skill,
-                    SkillId = skill.SkillId,
-                    SkillName = string.IsNullOrEmpty(skill.SkillName) ? skill.name : skill.SkillName,
-                    Grade = rolledGrade,
-                    IsNewSkill = !alreadyOwned,
-                    ShardGained = alreadyOwned ? 1 : 0
-                });
-            }
-
-            result.NewTotalRoll = saveData.TotalRoll;
-            result.NewSummonLevel = GetCurrentSummonLevel();
-            result.NewlyUnlockedRewardLevels = GetNewlyUnlockedRewardLevels(result.OldSummonLevel, result.NewSummonLevel);
-
-            return result;
-        }
-
+        
         public bool ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver)
         {
             if (rewardReceiver == null)
@@ -241,25 +174,28 @@ namespace Immortal_Switch.Scripts.Skill
         public SummonRewardPreviewData GetRewardPreviewData()
         {
             var entry = GetPreviewRewardEntry();
-            if (entry == null || entry.RewardItems == null || entry.RewardItems.Count == 0)
+            if (entry == null || entry.ItemId <= 0 || entry.ItemQuantity <= 0)
                 return null;
 
             return new SummonRewardPreviewData
             {
                 SummonLevel = entry.SummonLevel,
-                ItemId = entry.RewardItems[0].ItemId,
-                Quantity = entry.RewardItems[0].Amount,
+                ItemId = entry.ItemId,
+                Quantity = entry.ItemQuantity,
                 IsClaimable = IsRewardClaimable(entry.SummonLevel),
                 IsClaimed = IsRewardClaimed(entry.SummonLevel)
             };
         }
 
-        private SummonLevelRewardEntry GetPreviewRewardEntry()
+        // Reward source is each level's own ItemId/ItemQuantity (Skill_Levels), not the older
+        // LevelRewards (Skill_Rewards) table — see HeroSummonAchievementRewardBuilder for the
+        // same replacement relationship, matching the server.
+        private SkillSummonLevelEntry GetPreviewRewardEntry()
         {
-            if (config == null || config.LevelRewards == null || config.LevelRewards.Count == 0)
+            if (config == null || config.SummonLevels == null || config.SummonLevels.Count == 0)
                 return null;
 
-            var sorted = config.LevelRewards
+            var sorted = config.SummonLevels
                 .Where(x => x != null)
                 .OrderBy(x => x.SummonLevel)
                 .ToList();
@@ -271,81 +207,6 @@ namespace Immortal_Switch.Scripts.Skill
             }
 
             return sorted.LastOrDefault();
-        }
-
-        public SkillDataSO GetRandomSkillByGrade(SkillSummonGrade grade)
-        {
-            return RollSkillByGrade(grade);
-        }
-
-        private void Spend(SkillSummonOptionEntry option, SummonPaymentType paymentType)
-        {
-            if (paymentType == SummonPaymentType.Ticket)
-                currencyGateway.SpendSkillTicket(option.TicketCost);
-            else
-                currencyGateway.SpendGem(option.GemCost);
-        }
-
-        private SkillSummonGrade RollGrade(SkillSummonLevelEntry levelEntry)
-        {
-            float roll = Random.Range(0f, 100f);
-            float cumulative = 0f;
-
-            cumulative += levelEntry.GradeBRate;
-            if (roll <= cumulative) return SkillSummonGrade.B;
-
-            cumulative += levelEntry.GradeARate;
-            if (roll <= cumulative) return SkillSummonGrade.A;
-
-            cumulative += levelEntry.GradeSRate;
-            if (roll <= cumulative) return SkillSummonGrade.S;
-
-            return SkillSummonGrade.SS;
-        }
-
-        private SkillDataSO RollSkillByGrade(SkillSummonGrade grade)
-        {
-            if (config == null || config.SkillPool == null)
-                return null;
-
-            var pool = config.SkillPool
-                .Where(x => x != null && ConvertTier(x.SkillTier) == grade)
-                .ToList();
-
-            if (pool.Count == 0)
-                return null;
-
-            int index = Random.Range(0, pool.Count);
-            return pool[index];
-        }
-
-        private SkillSummonGrade ConvertTier(TierSkill tier)
-        {
-            switch (tier)
-            {
-                case TierSkill.B: return SkillSummonGrade.B;
-                case TierSkill.A: return SkillSummonGrade.A;
-                case TierSkill.S: return SkillSummonGrade.S;
-                case TierSkill.SS: return SkillSummonGrade.SS;
-                default: return SkillSummonGrade.B;
-            }
-        }
-
-        private List<int> GetNewlyUnlockedRewardLevels(int oldLevel, int newLevel)
-        {
-            var result = new List<int>();
-
-            if (newLevel <= oldLevel || config == null || config.LevelRewards == null)
-                return result;
-
-            for (int rewardLevel = oldLevel; rewardLevel < newLevel; rewardLevel++)
-            {
-                bool exists = config.LevelRewards.Any(x => x != null && x.SummonLevel == rewardLevel);
-                if (exists)
-                    result.Add(rewardLevel);
-            }
-
-            return result;
         }
     }
 }

@@ -4,24 +4,14 @@ namespace Immortal_Switch.Scripts.Combat
 {
     public class CombatConfig : MonoBehaviour
     {
-        [SerializeField] private ElementRuleSO elementRuleConfig;
         [SerializeField] private string defaultElementRuleId = "default_element_rule";
 
+        private ElementRuleSO elementRuleConfig;
         private static ElementDamageRule currentElementRule;
 
-        private void Awake()
+        public void Apply(ElementRuleSO elementRule)
         {
-            Apply();
-        }
-
-        private void OnValidate()
-        {
-            if (Application.isPlaying)
-                Apply();
-        }
-
-        public void Apply()
-        {
+            elementRuleConfig = elementRule;
             currentElementRule = FindRule(defaultElementRuleId);
         }
 

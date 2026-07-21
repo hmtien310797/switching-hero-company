@@ -2,11 +2,10 @@
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.SkillSummon;
-using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
-using Newtonsoft.Json;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -14,9 +13,6 @@ namespace Immortal_Switch.Scripts.Skill
 {
     public class SkillSummonManager : Singleton<SkillSummonManager>
     {
-        [SerializeField] private SkillSummonConfigSO summonConfig;
-        [SerializeField] private string saveKey = "skill_summon_save";
-
         [ShowInInspector]
         private SkillSummonSaveData saveData;
         [ShowInInspector]
@@ -28,25 +24,18 @@ namespace Immortal_Switch.Scripts.Skill
         public SkillSummonSaveData SaveData => saveData;
         public SkillSummonConfigSO Config => summonConfig;
 
+        private SkillSummonConfigSO summonConfig;
         public event Action OnSummonDataChanged;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            Load();
-        }
 
         public override UniTask InitializeAsync()
         {
+            summonConfig = DatabaseManager.Instance.SkillSummonConfig;
+            Load();
+            Init(new GameSkillSummonCurrencyGateway());
             return UniTask.CompletedTask;
         }
 
-        private void Start()
-        {
-            Init(new GameSkillSummonCurrencyGateway());
-        }
-
-        public void Init(ISkillSummonCurrencyGateway gateway)
+        private void Init(ISkillSummonCurrencyGateway gateway)
         {
             currencyGateway = gateway;
             progressionService = new SkillProgressionService();
@@ -58,17 +47,9 @@ namespace Immortal_Switch.Scripts.Skill
                 progressionService);
         }
 
-        public void Save()
+        private void Load()
         {
-            ES3.Save(saveKey, saveData);
-        }
-
-        public void Load()
-        {
-            if (ES3.KeyExists(saveKey))
-                saveData = ES3.Load<SkillSummonSaveData>(saveKey);
-            else
-                saveData = new SkillSummonSaveData();
+            saveData = new SkillSummonSaveData();
         }
 
         public bool CanSummon(string optionId, out SummonPaymentType paymentType, out int paidAmount)
@@ -83,44 +64,11 @@ namespace Immortal_Switch.Scripts.Skill
             return service.CanSummon(option, out paymentType, out paidAmount);
         }
 
-        public SkillSummonResult ExecuteSummon(string optionId, SummonPaymentType paymentType)
-        {
-            if (service == null)
-                return null;
-
-            var option = service.GetOption(optionId);
-            Debug.Log($"option: {JsonConvert.SerializeObject(option)}");
-            var result = service.ExecuteSummon(option, paymentType);
-
-            if (result != null)
-            {
-                Save();
-                NotifyChanged();
-            }
-
-            return result;
-        }
-
         public int GetCurrentSummonLevel()
         {
             return service != null ? service.GetCurrentSummonLevel() : 1;
         }
-
-        public bool ClaimReward(int summonLevel, ISummonRewardReceiver rewardReceiver)
-        {
-            if (service == null)
-                return false;
-
-            bool result = service.ClaimReward(summonLevel, rewardReceiver);
-            if (result)
-            {
-                Save();
-                NotifyChanged();
-            }
-
-            return result;
-        }
-
+        
         /// <summary>
         /// Cập nhật local save data từ response của server sau mỗi lần summon.
         /// </summary>
@@ -148,8 +96,7 @@ namespace Immortal_Switch.Scripts.Skill
                 SkillInventorySaveService.Save();
                 UserDataCache.Instance?.ApplySkillSummonEntries(response.Entries);
             }
-
-            Save();
+            
             NotifyChanged();
         }
 
@@ -161,23 +108,6 @@ namespace Immortal_Switch.Scripts.Skill
             saveData.SummonLevel = state.SummonLevel;
             if (state.ClaimedRewardLevels != null)
                 saveData.ClaimedRewardLevels = new System.Collections.Generic.List<int>(state.ClaimedRewardLevels);
-            Save();
-            NotifyChanged();
-        }
-
-        public void ResetSummonData()
-        {
-            saveData = new SkillSummonSaveData();
-            progressionService = new SkillProgressionService();
-            service = new SkillSummonService(
-                summonConfig,
-                saveData,
-                currencyGateway,
-                progressionService);
-
-            if (ES3.KeyExists(saveKey))
-                ES3.DeleteKey(saveKey);
-
             NotifyChanged();
         }
 

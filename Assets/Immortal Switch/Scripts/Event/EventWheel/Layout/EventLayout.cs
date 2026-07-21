@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventWheel.Controller;
 using Immortal_Switch.Scripts.Event.EventWheel.UI;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared;
-using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
+using Nakama;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -67,8 +68,6 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         private List<EventLayoutCategory> categories = new();
 
         // --- Private Fields ---
-        private List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow> _normalItems = new();
-        private List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow> _premiumItems = new();
         private EventLayoutCategory _selectedCategory;
 
         private int _normalX1;
@@ -122,9 +121,6 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow> premiumItems
         )
         {
-            _normalItems = new List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow>(normalItems);
-            _premiumItems = new List<DynamicHeroesGlobalSpecificationsEventWheelRewardsPoolRow>(premiumItems);
-
             _normalX1 = normalX1;
             _normalX10 = normalX10;
 
@@ -174,28 +170,54 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
             _isRolling = true;
 
+            var controller = _selectedCategory.controller;
+
+            // Kết quả quay phải lấy từ server TRƯỚC khi chạy animation — server trừ vé và random
+            // có trọng số (weight) 1 lần duy nhất cho cả batch, client chỉ diễn hoạt lại đúng
+            // slot_index server trả về, không tự random nữa.
+            EventWheelSpinResponse response;
+
+            try
+            {
+                response = await NakamaClient.Instance.EventWheelSpinAsync(new EventWheelSpinRequest
+                {
+                    Category = (int)type,
+                    Times    = times,
+                });
+            }
+            catch (ApiResponseException ex)
+            {
+                Debug.LogError($"[EventLayout] eventwheel/spin error {ex.StatusCode}: {ex.Message}");
+                _isRolling = false;
+                return;
+            }
+
+            if (!response.Success ||
+                response.Entries == null ||
+                response.Entries.Count == 0)
+            {
+                Debug.LogWarning($"[EventLayout] eventwheel/spin failed: {response.Error}");
+                UIManager.Instance.ShowToast(DescribeSpinError(response.Error));
+                _isRolling = false;
+                return;
+            }
+
             var spinCancellationTokenSource = new CancellationTokenSource();
 
             _spinCancellationTokenSource = spinCancellationTokenSource;
 
             var cancellationToken = spinCancellationTokenSource.Token;
             var rewards = new List<ItemData>();
-            var controller = _selectedCategory.controller;
             var force = toggleSkipAnimation.isOn;
-
-            EventWheelPassManager.Instance.RecordSpinPurchase(
-                EventIdConstants.EVENT_WHEEL,
-                times
-            );
+            var entries = response.Entries;
 
             try
             {
-                for (int i = 0; i < times; i++)
+                for (int i = 0; i < entries.Count; i++)
                 {
-                    controller.StartSpin();
+                    var entry = entries[i];
 
-                    var rndIdx = Random.Range(0, 5);
-                    Debug.Log($"SpinCount: {i} - {rndIdx} - {DateTime.Now}");
+                    controller.StartSpin();
 
                     if (!force)
                     {
@@ -212,8 +234,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                     var completionSource = new UniTaskCompletionSource();
                     _spinCompletionSource = completionSource;
 
+                    // slot_index (server) đánh số từ 1, WheelController.StopAt cần index 0-based.
                     controller.StopAt(
-                        rndIdx,
+                        entry.SlotIndex - 1,
                         force,
                         () => completionSource.TrySetResult()
                     );
@@ -230,9 +253,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                         return;
                     }
 
-                    AddReward(rndIdx);
+                    AddReward(entry);
 
-                    if (i < times - 1)
+                    if (i < entries.Count - 1)
                     {
                         var stepDelay = Random.Range(1000, 2001);
 
@@ -246,6 +269,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                         }
                     }
                 }
+
+                CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
+                await EventWheelPassManager.Instance.RefreshAsync();
 
                 if (rewards.Count > 0)
                 {
@@ -267,16 +293,23 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 }
             }
 
-            void AddReward(int rewardIndex)
+            void AddReward(EventWheelSpinEntryDto entry)
             {
-                var reward = type == EEventCategory.Premium
-                    ? _premiumItems[rewardIndex]
-                    : _normalItems[rewardIndex];
-
-                if (reward != null)
+                if (entry?.Item != null)
                 {
-                    rewards.Add(new ItemData(reward.itemId, reward.amount));
+                    rewards.Add(new ItemData(entry.Item.ItemId, entry.Item.Amount));
                 }
+            }
+        }
+
+        private static string DescribeSpinError(string error)
+        {
+            switch (error)
+            {
+                case "EVENT_NOT_ACTIVE":    return "Sự kiện không còn hoạt động.";
+                case "INSUFFICIENT_TICKET": return "Không đủ vé để quay.";
+                case "POOL_EMPTY":          return "Vòng quay chưa có phần thưởng, thử lại sau.";
+                default:                    return "Quay thất bại, vui lòng thử lại.";
             }
         }
 

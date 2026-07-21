@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Event.EventWheel.Layout;
-using Immortal_Switch.Scripts.Event.EventWheel.UI;
+using Immortal_Switch.Scripts.Event.Views.UI;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
-using Immortal_Switch.Scripts.Shop.IAP;
 using Immortal_Switch.Scripts.UI;
-using TMPro;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Event.EventWheel
@@ -58,7 +57,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         private List<EventWheelTab> tabs = new();
 
         [SerializeField]
-        private UIEventCountdownTimer countdownTimer;
+        private UICountdownTimer countdownTimer;
 
         // --- Private Fields ---
         private EventWheelTab _selectedTab;
@@ -66,13 +65,42 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         private void Awake()
         {
             BindTabs();
-            OnClickTab(0);
         }
 
         private void OnEnable()
         {
-            var remainTimeEvent = DatabaseManager.Instance.GetRemainTimeEvent(EventIdConstants.EVENT_WHEEL);
-            countdownTimer.Bind(remainTimeEvent);
+            RefreshAndBindAsync().Forget();
+        }
+
+        /// <summary>Tải state server (cửa sổ thời gian, số dư vé/point, tiến trình pass, giới hạn
+        /// shop) mỗi lần view được mở — mọi tab con + đồng hồ đếm ngược đều đọc qua
+        /// EventWheelPassManager.State, không còn dùng DatabaseManager.GetRemainTimeEvent cục bộ.</summary>
+        private async UniTaskVoid RefreshAndBindAsync()
+        {
+            await EventWheelPassManager.Instance.RefreshAsync();
+            BindCountdown();
+            OnClickTab(0);
+        }
+
+        private void BindCountdown()
+        {
+            var window = EventWheelPassManager.Instance.State?.Window;
+            var endMs = window?.WheelEndMs;
+
+            var remainSeconds = -1d;
+
+            if (endMs.HasValue)
+            {
+                var nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                remainSeconds = Math.Max(0d, (endMs.Value - nowMs) / 1000d);
+            }
+
+            countdownTimer.Bind(remainSeconds, OnCountdown);
+        }
+
+        private string OnCountdown(long days, long hours, long minutes, long seconds)
+        {
+            return $"{days:00} ngày {hours:00} giờ {minutes:00} phút";
         }
 
         private void BindTabs()
@@ -163,42 +191,27 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
                     break;
 
                 case EEventWheelTab.Ticket:
-                    var passCfg = DatabaseManager.Instance.GetEventPassConfig(EventIdConstants.EVENT_WHEEL);
+                {
                     var passItems = DatabaseManager.Instance.GetEventPassItem(EventIdConstants.EVENT_WHEEL);
-                    var product = passCfg == null ? null : DatabaseManager.Instance.GetProduct(passCfg.productId);
-
                     passItems.Reverse();
+
+                    // Giá + mua Premium Pass đi qua server (State.PremiumPack /
+                    // EventWheelPassManager.BuyPremiumAsync), KHÔNG dùng
+                    // DatabaseManager.GetEventPassConfig/GetProduct cục bộ nữa — tránh lệch
+                    // product_id giữa client/server (xem EventWheelPassManager.BuyPremiumAsync).
+                    var premiumPack = EventWheelPassManager.Instance.State?.PremiumPack;
+                    var price = premiumPack != null ? $"${premiumPack.PriceUsd}" : "--";
 
                     _selectedTab.layout
                         .GetComponent<TicketLayout>()
-                        .Bind(
-                            passItems,
-                            EventIdConstants.EVENT_WHEEL,
-                            OnClickBuyProduct,
-                            $"{product?.price}",
-                            IAPManager.GetStoreProductId(product),
-                            passCfg?.productId ?? 1
-                        );
+                        .Bind(passItems, EventIdConstants.EVENT_WHEEL, price);
 
                     break;
+                }
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private void OnClickBuyProduct(string storeProductId, int packId)
-        {
-            IAPManager.Instance.BuyProduct(packId, storeProductId, (success, error) =>
-            {
-                if (!success)
-                {
-                    Debug.LogWarning($"[EventWheelView] Purchase failed -> product={storeProductId}, error={error}");
-                    return;
-                }
-
-                EventWheelPassManager.Instance.PurchasePremium(EventIdConstants.EVENT_WHEEL);
-            });
         }
     }
 }

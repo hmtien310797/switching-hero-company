@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
+using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
@@ -67,9 +68,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         private bool isBound;
         private bool isSummoning;
+        private List<StandardWeaponDefinitionSO> normalWeaponPool = new(); 
 
         private void Awake()
         {
+            normalWeaponPool = DatabaseManager.Instance.GetWeaponDatabase().StandardWeapons;
             TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
             TutorialManager.Instance.OnClick += OnClickTutorial;
         }
@@ -266,13 +269,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         private void ShowGemConfirm(string optionId, int gemCost)
         {
-            /*if (confirmPopup == null)
-            {
-                ExecuteSummonAsync(optionId).Forget();
-                return;
-            }
-
-            confirmPopup.Show(gemCost, () => ExecuteSummonAsync(optionId).Forget());*/
             UIManager.Instance
                 .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
                     "Cảnh báo",
@@ -288,7 +284,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (WeaponSummonManager.Instance != null)
             {
                 WeaponSummonManager.Instance.SaveData.SkipGemFallbackConfirm = value;
-                WeaponSummonManager.Instance.Save();
             }
         }
 
@@ -343,7 +338,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 foreach (var entry in response.Entries)
                 {
                     Enum.TryParse<WeaponTier>(entry.Grade, true, out var tier);
-                    var weaponDef = WeaponSummonManager.Instance.Config.GetWeapon(entry.WeaponId, entry.WeaponName);
+                    var weaponDef = WeaponSummonManager.Instance.Config.GetWeapon(normalWeaponPool, entry.WeaponId, entry.WeaponName);
 
                     Enum.TryParse<EItemTier>(entry.Grade, true, out var itemTier);
                     var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);

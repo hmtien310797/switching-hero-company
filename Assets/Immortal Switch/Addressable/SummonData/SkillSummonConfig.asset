@@ -1,0 +1,149 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d7c3130fff14491be52ef52e493a222, type: 3}
+  m_Name: SkillSummonConfig
+  m_EditorClassIdentifier: 
+  SummonOptions:
+  - OptionId: summon_30
+    DisplayName: 10 times
+    RollCount: 10
+    TicketCost: 10
+    GemCost: 50
+    Enabled: 1
+  - OptionId: summon_50
+    DisplayName: 20 times
+    RollCount: 20
+    TicketCost: 20
+    GemCost: 100
+    Enabled: 1
+  SummonLevels:
+  - SummonLevel: 1
+    TotalRollRequired: 10
+    GradeBRate: 90
+    GradeARate: 10
+    GradeSRate: 0
+    GradeSSRate: 0
+    ItemId: 46
+    ItemQuantity: 5
+  - SummonLevel: 2
+    TotalRollRequired: 20
+    GradeBRate: 85
+    GradeARate: 15
+    GradeSRate: 0
+    GradeSSRate: 0
+    ItemId: 46
+    ItemQuantity: 10
+  - SummonLevel: 3
+    TotalRollRequired: 50
+    GradeBRate: 81
+    GradeARate: 18
+    GradeSRate: 1
+    GradeSSRate: 0
+    ItemId: 46
+    ItemQuantity: 15
+  - SummonLevel: 4
+    TotalRollRequired: 100
+    GradeBRate: 76.5
+    GradeARate: 21
+    GradeSRate: 2.5
+    GradeSSRate: 0
+    ItemId: 46
+    ItemQuantity: 20
+  - SummonLevel: 5
+    TotalRollRequired: 200
+    GradeBRate: 71.8
+    GradeARate: 24
+    GradeSRate: 4
+    GradeSSRate: 0
+    ItemId: 46
+    ItemQuantity: 25
+  - SummonLevel: 6
+    TotalRollRequired: 350
+    GradeBRate: 67.1
+    GradeARate: 27
+    GradeSRate: 5.5
+    GradeSSRate: 0
+    ItemId: 46
+    ItemQuantity: 30
+  - SummonLevel: 7
+    TotalRollRequired: 500
+    GradeBRate: 62.2
+    GradeARate: 30
+    GradeSRate: 7
+    GradeSSRate: 1
+    ItemId: 46
+    ItemQuantity: 40
+  - SummonLevel: 8
+    TotalRollRequired: 750
+    GradeBRate: 57.3
+    GradeARate: 33
+    GradeSRate: 8.5
+    GradeSSRate: 1
+    ItemId: 46
+    ItemQuantity: 50
+  - SummonLevel: 9
+    TotalRollRequired: 1000
+    GradeBRate: 52.4
+    GradeARate: 36
+    GradeSRate: 10
+    GradeSSRate: 2
+    ItemId: 46
+    ItemQuantity: 200
+  - SummonLevel: 10
+    TotalRollRequired: 1500
+    GradeBRate: 47
+    GradeARate: 39
+    GradeSRate: 12
+    GradeSSRate: 2
+    ItemId: 54
+    ItemQuantity: 1
+  LevelRewards:
+  - SummonLevel: 1
+    RewardItems:
+    - ItemId: 46
+      Amount: 5
+  - SummonLevel: 2
+    RewardItems:
+    - ItemId: 46
+      Amount: 10
+  - SummonLevel: 3
+    RewardItems:
+    - ItemId: 46
+      Amount: 15
+  - SummonLevel: 4
+    RewardItems:
+    - ItemId: 46
+      Amount: 20
+  - SummonLevel: 5
+    RewardItems:
+    - ItemId: 46
+      Amount: 25
+  - SummonLevel: 6
+    RewardItems:
+    - ItemId: 46
+      Amount: 30
+  - SummonLevel: 7
+    RewardItems:
+    - ItemId: 46
+      Amount: 40
+  - SummonLevel: 8
+    RewardItems:
+    - ItemId: 46
+      Amount: 50
+  - SummonLevel: 9
+    RewardItems:
+    - ItemId: 46
+      Amount: 200
+  - SummonLevel: 10
+    RewardItems:
+    - ItemId: 54
+      Amount: 1

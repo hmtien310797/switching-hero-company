@@ -254,7 +254,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             if (HeroSummonManager.Instance != null)
             {
                 HeroSummonManager.Instance.SaveData.SkipGemFallbackConfirm = value;
-                HeroSummonManager.Instance.Save();
             }
         }
 

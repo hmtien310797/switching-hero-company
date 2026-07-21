@@ -52,13 +52,12 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             RefreshItems();
         }
 
-        /// <summary>Cập nhật lại toàn bộ item shop bằng dữ liệu lượt mua mới nhất.</summary>
+        /// <summary>Cập nhật lại toàn bộ item shop bằng dữ liệu lượt mua và số dư point mới nhất.</summary>
         private void RefreshItems()
         {
-            // TODO: Thay bằng số lượng currency thật trong inventory.
-            var itemCount = 100;
+            var pointBalance = _passManager.State?.Progress?.PointBalance ?? 0;
 
-            txtQuantity.text = $"{itemCount:N0}";
+            txtQuantity.text = $"{pointBalance:N0}";
 
             for (int i = 0; i < _rows.Count; i++)
             {
@@ -75,7 +74,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                     purchased, row.limitValue,
                     row.pricePoint, row.amount,
                     itemDisplay?.ItemIcon,
-                    itemCount >= row.pricePoint,
+                    pointBalance >= row.pricePoint,
                     OnClickBuy
                 );
             }
@@ -83,7 +82,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             _pools.ReleaseFrom(_rows.Count);
         }
 
-        /// <summary>Xử lý mua item theo mã slot và chỉ trao thưởng khi ghi nhận mua thành công.</summary>
+        /// <summary>Gọi eventwheel/shop_buy và chỉ trao thưởng khi server xác nhận mua thành công.</summary>
         private void OnClickBuy(int shopSlotId)
         {
             var item = _rows.Find(row => row.shopSlotId == shopSlotId);
@@ -94,16 +93,19 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 return;
             }
 
-            if (!_passManager.RecordShopPurchase(item))
+            BuyAsync(shopSlotId).Forget();
+        }
+
+        private async UniTaskVoid BuyAsync(int shopSlotId)
+        {
+            var (success, rewards, error) = await _passManager.ShopBuyAsync(shopSlotId);
+
+            if (!success)
             {
-                Debug.LogWarning($"[ShopLayout] Shop slot {shopSlotId} đã đạt giới hạn mua.");
+                Debug.LogWarning($"[ShopLayout] eventwheel/shop_buy shopSlotId={shopSlotId} failed: {error}");
+                UIManager.Instance.ShowToast(DescribeShopBuyError(error));
                 return;
             }
-
-            var rewards = new List<ItemData>
-            {
-                new ItemData(item.itemId, item.amount),
-            };
 
             UIManager.Instance
                 .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
@@ -111,6 +113,17 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                     Rewards = rewards,
                 })
                 .Forget();
+        }
+
+        private static string DescribeShopBuyError(string error)
+        {
+            switch (error)
+            {
+                case "EVENT_NOT_ACTIVE":   return "Cửa hàng sự kiện đã đóng.";
+                case "LIMIT_REACHED":      return "Đã đạt giới hạn mua.";
+                case "INSUFFICIENT_POINT": return "Không đủ điểm để mua.";
+                default:                   return "Mua thất bại, vui lòng thử lại.";
+            }
         }
 
         /// <summary>Đăng ký cập nhật UI ngay khi dữ liệu Event Wheel Pass thay đổi.</summary>

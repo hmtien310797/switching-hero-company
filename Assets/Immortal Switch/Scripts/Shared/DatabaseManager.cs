@@ -124,11 +124,11 @@ namespace Immortal_Switch.Scripts.Shared
             {
                 var splits = reward.Split(':');
 
-                // có 2 key là item key va quantity
+                // có 2 key là item id va quantity
                 if (splits.Length > 1)
                 {
-                    if (BigNumber.TryParse(splits[1], out var quantity) &&
-                        int.TryParse(splits[0], out var itemId))
+                    if (int.TryParse(splits[0], out var itemId) &&
+                        BigNumber.TryParse(splits[1], out var quantity))
                     {
                         entries.Add((itemId, quantity));
                     }

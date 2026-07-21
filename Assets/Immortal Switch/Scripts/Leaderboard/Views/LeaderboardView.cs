@@ -1,14 +1,21 @@
-using Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Leaderboard.Views.UI;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 namespace Immortal_Switch.Scripts.Leaderboard.Views
 {
     public class LeaderboardView : AnimatedUIView
     {
+        // Số record top lấy về mỗi lần refresh — đủ cho top 3 + danh sách cuộn.
+        private const int TopFetchLimit    = 100;
+        private const int AroundMeLimit    = 5;
+        private const float RefreshIntervalSeconds = 5 * 60;
+
         [Header("View references")]
         [SerializeField]
         private Button btnClose;
@@ -35,17 +42,11 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
         [SerializeField]
         private UILeaderboardCountdown countdown;
 
+        private List<LeaderboardRecordDto> _topRecords = new();
+
         private void Awake()
         {
-            // just test UI
-            Bind();
-
             btnClose.onClick.AddListener(OnClickClose);
-        }
-
-        private void OnClickClose()
-        {
-            UIManager.Instance.Close<LeaderboardView>();
         }
 
         private void OnDestroy()
@@ -53,45 +54,86 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
             btnClose.onClick.RemoveListener(OnClickClose);
         }
 
-        public void Bind()
+        public override void OnShow(object args)
         {
-            countdown.Bind(5 * 60, OnRefreshRank);
-
-            OnRefreshRank();
-            RefreshMyRank();
-            RefreshTop();
+            base.OnShow(args);
+            RefreshAsync().Forget();
         }
 
-        private void RefreshTop()
+        private void OnClickClose()
         {
-            top1.Bind("A1", 1000, 1, Random.Range(100, 50000));
-            top2.Bind("A2", 100, 2, Random.Range(100, 50000));
-            top3.Bind("A3", 10, 3, Random.Range(100, 50000));
-        }
-
-        private void RefreshMyRank()
-        {
-            var playerName = UserDataCache.Instance.DisplayName;
-            var stage = 1;
-            var rewardQuantity = Random.Range(100, 50000);
-
-            myRank.Bind(200, playerName, stage, true, rewardQuantity);
+            UIManager.Instance.Close<LeaderboardView>();
         }
 
         private void OnRefreshRank()
         {
-            rankRecyclableView.Bind(100, OnRankResolver);
+            RefreshAsync().Forget();
         }
 
-        private LeaderboardRankResolver OnRankResolver(int arg)
+        private async UniTask RefreshAsync()
         {
-            return new LeaderboardRankResolver
+            countdown.Bind(RefreshIntervalSeconds, OnRefreshRank);
+
+            var topRequest      = NakamaClient.Instance.GetLeaderboardStageTopAsync(TopFetchLimit);
+            var aroundMeRequest = NakamaClient.Instance.GetLeaderboardStageAroundMeAsync(AroundMeLimit);
+
+            LeaderboardStageTopResponse topResponse;
+            LeaderboardStageAroundMeResponse aroundMeResponse;
+            try
             {
-                PlayerName = $"{arg + 1} user",
-                Rank = arg,
-                Stage = (arg + 1) * Random.Range(100, 500),
-                RewardQuantity = Random.Range(100, 500),
-            };
+                topResponse      = await topRequest;
+                aroundMeResponse = await aroundMeRequest;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[LeaderboardView] Refresh failed: {e.Message}");
+                UIManager.Instance.ShowToast("Không thể tải bảng xếp hạng.");
+                return;
+            }
+
+            _topRecords = topResponse?.Records ?? new List<LeaderboardRecordDto>();
+
+            RefreshTop();
+            RefreshRankList();
+            RefreshMyRank(aroundMeResponse?.Records);
+        }
+
+        private void RefreshTop()
+        {
+            BindTop(top1, 0);
+            BindTop(top2, 1);
+            BindTop(top3, 2);
+        }
+
+        private void BindTop(UILeaderboardTop top, int index)
+        {
+            var hasData = index < _topRecords.Count;
+            top.gameObject.SetActive(hasData);
+            if (hasData) top.Bind(_topRecords[index].DisplayName, _topRecords[index].Stage);
+        }
+
+        private void RefreshRankList()
+        {
+            // Danh sách cuộn hiện toàn bộ top (kể cả hạng 1-3, đã hiển thị riêng ở top1/top2/top3
+            // phía trên) — tránh trống trơn khi leaderboard chưa đủ hơn 3 người.
+            rankRecyclableView.Bind(_topRecords.Count, i => new LeaderboardRankResolver
+            {
+                Rank       = _topRecords[i].Rank,
+                PlayerName = _topRecords[i].DisplayName,
+                Stage      = _topRecords[i].Stage,
+            });
+        }
+
+        private void RefreshMyRank(List<LeaderboardRecordDto> aroundMe)
+        {
+            var userId = NakamaClient.Instance.Session?.UserId;
+            var mine   = aroundMe?.FirstOrDefault(r => string.Equals(r.UserId, userId, StringComparison.Ordinal));
+
+            // Người chơi chưa từng thắng 1 trận nào thì chưa có record trên leaderboard.
+            myRank.gameObject.SetActive(mine != null);
+            if (mine == null) return;
+
+            myRank.Bind(mine.Rank, mine.DisplayName, mine.Stage, true);
         }
     }
 }

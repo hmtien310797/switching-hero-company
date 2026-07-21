@@ -14,9 +14,6 @@ namespace Immortal_Switch.Scripts.Skill
         public List<SkillSummonLevelEntry> SummonLevels = new();
         public List<SummonLevelRewardEntry> LevelRewards = new();
 
-        [Header("Skill Pool")]
-        public List<SkillDataSO> SkillPool = new();
-
         public SkillSummonOptionEntry GetOption(string optionId)
         {
             return SummonOptions.Find(x => x != null && x.OptionId == optionId);
@@ -62,6 +59,10 @@ namespace Immortal_Switch.Scripts.Skill
         [Range(0, 100)] public float GradeARate;
         [Range(0, 100)] public float GradeSRate;
         [Range(0, 100)] public float GradeSSRate;
+
+        [Header("Milestone Reward")]
+        public int ItemId;
+        public int ItemQuantity;
     }
 
     [Serializable]

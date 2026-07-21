@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.AFKReward.Views;
 using Immortal_Switch.Scripts.Bag.Views;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Event.EventLeHoiBangLong;
 using Immortal_Switch.Scripts.Event.Views;
 using Immortal_Switch.Scripts.GameSetting.Views;
 using Immortal_Switch.Scripts.UI.Skill;
@@ -36,17 +37,26 @@ namespace Immortal_Switch.Scripts.UI
     {
         public static TopMainView Instance;
 
-        [SerializeField] HeroSkillBarUI heroSkillBarUI;
+        [SerializeField]
+        HeroSkillBarUI heroSkillBarUI;
 
-        [SerializeField] private Button switchMainSubHeroButton;
+        [SerializeField]
+        private Button switchMainSubHeroButton;
 
-        [SerializeField] private Button moveButton;
+        [SerializeField]
+        private Button moveButton;
 
-        [SerializeField] private Button btnBag;
+        [SerializeField]
+        private Button btnBag;
 
-        [SerializeField] private Button btnShop;
+        [SerializeField]
+        private Button btnShop;
 
-        [SerializeField] private Button btnEvent;
+        [SerializeField]
+        private Button btnEvent;
+
+        [SerializeField]
+        private Button btnEventLeHoiBangLong;
 
         [SerializeField]
         private Button btnLeaderboard;
@@ -54,67 +64,101 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private Button btnGoldInfo;
 
-        [SerializeField] private Button btnDiamondInfo;
+        [SerializeField]
+        private Button btnDiamondInfo;
 
-        [SerializeField] CurrencyView currencyView;
+        [SerializeField]
+        CurrencyView currencyView;
 
-        [SerializeField] HeroJoystick heroJostick;
+        [SerializeField]
+        HeroJoystick heroJostick;
 
-        [SerializeField] private Button autoSkillButton;
+        [SerializeField]
+        private Button autoSkillButton;
 
-        [SerializeField] private Button autoSwitchButton;
+        [SerializeField]
+        private Button autoSwitchButton;
 
-        [SerializeField] private Button profileBtn;
+        [SerializeField]
+        private Button profileBtn;
 
-        [Header("Player references")] [SerializeField]
+        [Header("Player references")]
+        [SerializeField]
         private TMP_Text txtPlayerName;
 
-        [SerializeField] private TMP_Text txtPlayerLevel;
+        [SerializeField]
+        private TMP_Text txtPlayerLevel;
 
-        [SerializeField] private Image imgPlayerProgress;
+        [SerializeField]
+        private Image imgPlayerProgress;
 
-        [SerializeField] private GameObject rotateObject;
+        [SerializeField]
+        private GameObject rotateObject;
 
-        [SerializeField] private GameObject[] hideAbleObjects;
+        [SerializeField]
+        private GameObject[] hideAbleObjects;
 
-        [SerializeField] private SkeletonGraphic skeletonGraphic;
+        [SerializeField]
+        private SkeletonGraphic skeletonGraphic;
 
-        [SerializeField] private Button btnActiveFramingClaim;
+        [SerializeField]
+        private Button btnActiveFramingClaim;
 
-        [SerializeField] private RewardSyncService rewardSyncService;
+        [SerializeField]
+        private TMP_Text txtAfkClaimTimer;
+
+        [SerializeField]
+        private RewardSyncService rewardSyncService;
 
         // Phải khớp MIN_CLAIM_SECONDS phía server (nakama/src/handler/afk.js) — nút chỉ
         // interactable khi AFK đã tích lũy đủ ngần này giây kể từ checkpoint gần nhất.
         private const float AfkClaimMinSeconds = 60f;
 
+        // Fallback khi chưa đồng bộ được max_offline_seconds thật từ server (xem MAX_OFFLINE_SECONDS
+        // trong nakama/src/handler/afk.js) — chỉ dùng trước lần sync đầu tiên.
+        private const double DefaultAfkMaxOfflineSeconds = 43200d;
+
         private double afkAccumulatedSeconds;
+        private double afkMaxOfflineSeconds = DefaultAfkMaxOfflineSeconds;
         private bool afkTimerSynced;
 
-        [SerializeField] private GameObject[] disableObjectsWhenPlayDungeon;
+        [SerializeField]
+        private GameObject[] disableObjectsWhenPlayDungeon;
 
-        [SerializeField] private GameObject[] enableObjectsWhenPlayDungeon;
+        [SerializeField]
+        private GameObject[] enableObjectsWhenPlayDungeon;
 
-        [Header("Hero Icon Switch Animation")] [SerializeField]
+        [Header("Hero Icon Switch Animation")]
+        [SerializeField]
         private Image[] iconHeroImage;
 
-        [SerializeField] private Image[] iconHeroClassImage;
+        [SerializeField]
+        private Image[] iconHeroClassImage;
 
-        [SerializeField] private RectTransform[] heroIconAnchors;
+        [SerializeField]
+        private RectTransform[] heroIconAnchors;
 
-        [SerializeField] private RectTransform[] heroClassIconAnchors;
+        [SerializeField]
+        private RectTransform[] heroClassIconAnchors;
 
-        [SerializeField] private RectTransform heroIconAnimationRoot;
+        [SerializeField]
+        private RectTransform heroIconAnimationRoot;
 
-        [SerializeField, Min(0.01f)] private float heroIconSwitchDuration = 0.25f;
+        [SerializeField, Min(0.01f)]
+        private float heroIconSwitchDuration = 0.25f;
 
-        [SerializeField] private Ease heroIconSwitchEase = Ease.OutCubic;
+        [SerializeField]
+        private Ease heroIconSwitchEase = Ease.OutCubic;
 
-        [SerializeField] private Button buttonSetting;
+        [SerializeField]
+        private Button buttonSetting;
 
-        [Header("Performance Overlay")] [SerializeField]
+        [Header("Performance Overlay")]
+        [SerializeField]
         private TMP_Text txtFps;
 
-        [SerializeField, Min(0.05f)] private float perfOverlayRefreshInterval = 0.5f;
+        [SerializeField, Min(0.05f)]
+        private float perfOverlayRefreshInterval = 0.5f;
 
         private ProfilerRecorder drawCallsRecorder;
         private ProfilerRecorder batchesRecorder;
@@ -129,6 +173,11 @@ namespace Immortal_Switch.Scripts.UI
         private int heroIconSwitchVersion;
 
         public HeroSkillBarUI HeroSkillBarUI => heroSkillBarUI;
+
+        // Cho AFKRewardView (popup) dùng chung bộ đếm live này thay vì tự đứng yên
+        // tại ElapsedSeconds snapshot lúc mở popup.
+        public double AfkAccumulatedSeconds => afkAccumulatedSeconds;
+        public double AfkMaxOfflineSeconds => afkMaxOfflineSeconds;
         private bool isAutoActived = false;
         private HeroDataSO currentSelectedHeroData;
         private int heroDeadCount = 0;
@@ -143,6 +192,7 @@ namespace Immortal_Switch.Scripts.UI
             btnDiamondInfo.onClick.AddListener(OnClickDiamondInfo);
             btnGoldInfo.onClick.AddListener(OnClickGoldInfo);
 
+            btnEventLeHoiBangLong.onClick.AddListener(OnClickEventLeHoiBangLong);
             btnEvent.onClick.AddListener(OnClickEvent);
             btnShop.onClick.AddListener(OnClickShop);
             btnBag.onClick.AddListener(OnClickBag);
@@ -187,25 +237,34 @@ namespace Immortal_Switch.Scripts.UI
             UIManager.Instance.TogglePopupAsync<EventView>().Forget();
         }
 
+        private void OnClickEventLeHoiBangLong()
+        {
+            UIManager.Instance.TogglePopupAsync<EventLeHoiBangLongView>().Forget();
+        }
+
         private void Update()
         {
             UpdatePerformanceOverlay();
             UpdateAfkClaimTimer();
         }
 
-        // Tự đếm nội suy phía client giữa hai lần đồng bộ server, để nút không đứng im chờ
-        // response — dừng đếm ngay khi đã đủ ngưỡng, không cần tick tiếp cho tới lần reset kế.
+        // Tự đếm nội suy phía client giữa hai lần đồng bộ server, để nút/text không đứng im chờ
+        // response — vẫn tiếp tục tick (và cập nhật text) cho tới khi chạm trần max_offline_seconds
+        // thật của server, dù nút đã interactable từ lâu (đủ AfkClaimMinSeconds).
         private void UpdateAfkClaimTimer()
         {
             if (!afkTimerSynced ||
-                btnActiveFramingClaim == null ||
-                btnActiveFramingClaim.interactable)
+                btnActiveFramingClaim == null)
             {
                 return;
             }
 
-            afkAccumulatedSeconds += Time.unscaledDeltaTime;
-            UpdateAfkClaimButtonInteractable();
+            if (afkAccumulatedSeconds < afkMaxOfflineSeconds)
+            {
+                afkAccumulatedSeconds = Math.Min(afkMaxOfflineSeconds, afkAccumulatedSeconds + Time.unscaledDeltaTime);
+                UpdateAfkClaimButtonInteractable();
+                RefreshAfkClaimTimerText();
+            }
         }
 
         private void UpdateAfkClaimButtonInteractable()
@@ -218,11 +277,31 @@ namespace Immortal_Switch.Scripts.UI
             btnActiveFramingClaim.interactable = afkTimerSynced && afkAccumulatedSeconds >= AfkClaimMinSeconds;
         }
 
-        private void SyncAfkAccumulatedSeconds(double elapsedSeconds)
+        // maxOfflineSeconds <= 0 nghĩa là caller không có giá trị mới từ server (vd. sau khi claim) —
+        // giữ nguyên trần đã đồng bộ trước đó thay vì rơi về default.
+        private void SyncAfkAccumulatedSeconds(double elapsedSeconds, int maxOfflineSeconds = 0)
         {
             afkAccumulatedSeconds = Math.Max(0d, elapsedSeconds);
+
+            if (maxOfflineSeconds > 0)
+            {
+                afkMaxOfflineSeconds = maxOfflineSeconds;
+            }
+
             afkTimerSynced = true;
             UpdateAfkClaimButtonInteractable();
+            RefreshAfkClaimTimerText();
+        }
+
+        private void RefreshAfkClaimTimerText()
+        {
+            if (txtAfkClaimTimer == null)
+            {
+                return;
+            }
+
+            TimeSpan span = TimeSpan.FromSeconds(afkAccumulatedSeconds);
+            txtAfkClaimTimer.text = $"{(int)span.TotalHours:00}:{span.Minutes:00}:{span.Seconds:00}";
         }
 
         // Kéo elapsed_seconds thật từ afk/preview để seed bộ đếm cục bộ — tránh vừa vào game
@@ -246,7 +325,7 @@ namespace Immortal_Switch.Scripts.UI
                 return;
             }
 
-            SyncAfkAccumulatedSeconds(preview.ElapsedSeconds);
+            SyncAfkAccumulatedSeconds(preview.ElapsedSeconds, preview.MaxOfflineSeconds);
         }
 
         // Cac counter Render (Draw Calls/Batches/SetPass) chi co du lieu trong
@@ -395,6 +474,7 @@ namespace Immortal_Switch.Scripts.UI
                     Rewards = stageRewards,
                     EarnedRewards = earnedRewards,
                     ElapsedSeconds = preview.ElapsedSeconds,
+                    MaxOfflineSeconds = preview.MaxOfflineSeconds,
                 }, false)
                 .Forget();
         }

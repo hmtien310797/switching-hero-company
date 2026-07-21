@@ -1,0 +1,312 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9818c23650b46c1963072de43c7542d, type: 3}
+  m_Name: WeaponSummonConfig
+  m_EditorClassIdentifier: 
+  Options:
+  - OptionId: summon_30
+    Enabled: 1
+    RollCount: 10
+    TicketCost: 10
+    GemCost: 50
+  - OptionId: summon_50
+    Enabled: 1
+    RollCount: 20
+    TicketCost: 20
+    GemCost: 100
+  SummonLevels:
+  - SummonLevel: 1
+    TotalRollRequired: 10
+    GradeDRate: 90
+    GradeCRate: 10
+    GradeBRate: 0
+    GradeARate: 0
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 10
+  - SummonLevel: 2
+    TotalRollRequired: 20
+    GradeDRate: 75
+    GradeCRate: 25
+    GradeBRate: 0
+    GradeARate: 0
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 20
+  - SummonLevel: 3
+    TotalRollRequired: 50
+    GradeDRate: 73
+    GradeCRate: 25
+    GradeBRate: 2
+    GradeARate: 0
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 30
+  - SummonLevel: 4
+    TotalRollRequired: 100
+    GradeDRate: 65
+    GradeCRate: 30
+    GradeBRate: 5
+    GradeARate: 0
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 40
+  - SummonLevel: 5
+    TotalRollRequired: 150
+    GradeDRate: 63
+    GradeCRate: 30
+    GradeBRate: 5
+    GradeARate: 2
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 50
+  - SummonLevel: 6
+    TotalRollRequired: 200
+    GradeDRate: 55
+    GradeCRate: 30
+    GradeBRate: 10
+    GradeARate: 5
+    GradeSRate: 0
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 60
+  - SummonLevel: 7
+    TotalRollRequired: 300
+    GradeDRate: 53
+    GradeCRate: 30
+    GradeBRate: 10
+    GradeARate: 5
+    GradeSRate: 2
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 70
+  - SummonLevel: 8
+    TotalRollRequired: 400
+    GradeDRate: 42
+    GradeCRate: 30
+    GradeBRate: 15
+    GradeARate: 10
+    GradeSRate: 3
+    GradeSSRate: 0
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 80
+  - SummonLevel: 9
+    TotalRollRequired: 500
+    GradeDRate: 41.9
+    GradeCRate: 30
+    GradeBRate: 15
+    GradeARate: 10
+    GradeSRate: 3
+    GradeSSRate: 0.1
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 90
+  - SummonLevel: 10
+    TotalRollRequired: 600
+    GradeDRate: 29.85
+    GradeCRate: 30
+    GradeBRate: 20
+    GradeARate: 15
+    GradeSRate: 5
+    GradeSSRate: 0.15
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 100
+  - SummonLevel: 11
+    TotalRollRequired: 700
+    GradeDRate: 18.8
+    GradeCRate: 30
+    GradeBRate: 25
+    GradeARate: 20
+    GradeSRate: 6
+    GradeSSRate: 0.2
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 150
+  - SummonLevel: 12
+    TotalRollRequired: 800
+    GradeDRate: 12.75
+    GradeCRate: 25
+    GradeBRate: 30
+    GradeARate: 25
+    GradeSRate: 7
+    GradeSSRate: 0.25
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 200
+  - SummonLevel: 13
+    TotalRollRequired: 900
+    GradeDRate: 11.7
+    GradeCRate: 20
+    GradeBRate: 30
+    GradeARate: 30
+    GradeSRate: 8
+    GradeSSRate: 0.4
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 250
+  - SummonLevel: 14
+    TotalRollRequired: 1000
+    GradeDRate: 5.6
+    GradeCRate: 15
+    GradeBRate: 35
+    GradeARate: 35
+    GradeSRate: 9
+    GradeSSRate: 0.4
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 9
+    ItemQuantity: 500
+  - SummonLevel: 15
+    TotalRollRequired: 1100
+    GradeDRate: 0
+    GradeCRate: 9.5
+    GradeBRate: 40
+    GradeARate: 40
+    GradeSRate: 10
+    GradeSSRate: 0.5
+    Star1Rate: 45
+    Star2Rate: 30
+    Star3Rate: 15
+    Star4Rate: 8
+    Star5Rate: 2
+    ItemId: 53
+    ItemQuantity: 1
+  LevelRewards:
+  - SummonLevel: 1
+    RewardItems:
+    - ItemId: 9
+      Amount: 10
+  - SummonLevel: 2
+    RewardItems:
+    - ItemId: 9
+      Amount: 20
+  - SummonLevel: 3
+    RewardItems:
+    - ItemId: 9
+      Amount: 30
+  - SummonLevel: 4
+    RewardItems:
+    - ItemId: 9
+      Amount: 40
+  - SummonLevel: 5
+    RewardItems:
+    - ItemId: 9
+      Amount: 50
+  - SummonLevel: 6
+    RewardItems:
+    - ItemId: 9
+      Amount: 60
+  - SummonLevel: 7
+    RewardItems:
+    - ItemId: 9
+      Amount: 70
+  - SummonLevel: 8
+    RewardItems:
+    - ItemId: 9
+      Amount: 80
+  - SummonLevel: 9
+    RewardItems:
+    - ItemId: 9
+      Amount: 90
+  - SummonLevel: 10
+    RewardItems:
+    - ItemId: 9
+      Amount: 100
+  - SummonLevel: 11
+    RewardItems:
+    - ItemId: 9
+      Amount: 150
+  - SummonLevel: 12
+    RewardItems:
+    - ItemId: 9
+      Amount: 200
+  - SummonLevel: 13
+    RewardItems:
+    - ItemId: 9
+      Amount: 250
+  - SummonLevel: 14
+    RewardItems:
+    - ItemId: 9
+      Amount: 500
+  - SummonLevel: 15
+    RewardItems:
+    - ItemId: 53
+      Amount: 1

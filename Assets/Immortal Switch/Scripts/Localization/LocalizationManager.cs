@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Shared.Constants;
+using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Immortal_Switch.Scripts.Localization
 {
@@ -22,6 +25,8 @@ namespace Immortal_Switch.Scripts.Localization
 
         private bool _isListeningLocaleChanges;
         private int _localeChangeVersion;
+        private bool _suppressLocaleNotifications;
+        private bool _isLocalizationInitialized;
 
         /// <summary>
         /// Tên String Table mặc định cho Default text.
@@ -58,24 +63,146 @@ namespace Immortal_Switch.Scripts.Localization
         {
             SubscribeLocaleChanges();
 
-            // Chờ Unity Localization init xong
             await LocalizationSettings.InitializationOperation.ToUniTask();
 
-            // Áp dụng ngôn ngữ đã lưu trong SettingManager
-            if (SettingManager.Instance != null)
-            {
-                var savedLang = SettingManager.Instance.CurrentSetting.LangCode;
-                var locale = LocalizationSettings.AvailableLocales.GetLocale(savedLang);
+            ApplySavedLocale();
+            EnsureSelectedLocale();
 
-                if (locale != null &&
-                    !locale.Equals(LocalizationSettings.SelectedLocale))
-                {
-                    LocalizationSettings.SelectedLocale = locale;
-                }
+            await PreloadTablesAsync();
+
+            _isLocalizationInitialized = true;
+        }
+
+        /// <summary>
+        /// Giải phóng các String Table đang giữ bundle cũ trước khi Addressables.UpdateCatalogs.
+        /// Bắt buộc gọi trước pipeline update catalog khi app đã từng load Localization.
+        /// Lần mở app đầu tiên chưa có SelectedLocale thì hàm tự bỏ qua.
+        /// </summary>
+        public async UniTask PrepareForRemoteCatalogUpdateAsync(
+            CancellationToken cancellationToken = default)
+        {
+            // Lần đầu mở app chưa có Localization cũ để release.
+            // Tuyệt đối không đọc SelectedLocale khi chưa initialize.
+            if (!_isLocalizationInitialized)
+            {
+                Debug.Log(
+                    "[LocalizationManager] Localization chưa initialize, " +
+                    "bỏ qua release table cũ.");
+
+                return;
             }
 
-            // Preload các String Table cần thiết
-            await PreloadTablesAsync();
+            var locale = LocalizationSettings.SelectedLocale;
+
+            if (locale == null)
+            {
+                return;
+            }
+
+            _suppressLocaleNotifications = true;
+
+            try
+            {
+                foreach (var tableName in _preloadTables)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    LocalizationSettings.StringDatabase.ReleaseTable(
+                        tableName,
+                        locale);
+                }
+
+                LocalizationSettings.StringDatabase.ResetState();
+                LocalizationSettings.AssetDatabase.ResetState();
+
+                _isLocalizationInitialized = false;
+
+                await UniTask.Yield(
+                    PlayerLoopTiming.Update,
+                    cancellationToken);
+
+                await UniTask.Yield(
+                    PlayerLoopTiming.Update,
+                    cancellationToken);
+
+                await Resources.UnloadUnusedAssets()
+                    .ToUniTask(cancellationToken: cancellationToken);
+            }
+            catch
+            {
+                _suppressLocaleNotifications = false;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gọi sau khi Addressables catalog/bundle localization đã được cập nhật.
+        /// Áp lại locale đã lưu, preload table từ catalog mới và refresh UI.
+        /// </summary>
+        public async UniTask ReloadRemoteLocalizationAsync(
+            CancellationToken cancellationToken = default)
+        {
+            SubscribeLocaleChanges();
+
+            try
+            {
+                await LocalizationSettings.InitializationOperation.ToUniTask(
+                    cancellationToken: cancellationToken);
+
+                ApplySavedLocale();
+                EnsureSelectedLocale();
+
+                await PreloadTablesAsync(cancellationToken);
+
+                _isLocalizationInitialized = true;
+            }
+            finally
+            {
+                _suppressLocaleNotifications = false;
+            }
+
+            OnLanguageChanged?.Invoke(CurrentLangCode);
+
+            Debug.Log(
+                $"[LocalizationManager] Remote localization applied. " +
+                $"Locale={CurrentLangCode}");
+        }
+
+        private void EnsureSelectedLocale()
+        {
+            if (LocalizationSettings.SelectedLocale != null)
+            {
+                return;
+            }
+
+            var locales = LocalizationSettings.AvailableLocales.Locales;
+
+            if (locales == null ||
+                locales.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "[LocalizationManager] No runtime Locale is available. " +
+                    "Keep Localization-Locales in a Local group with the Locale label, then rebuild Addressables/Player.");
+            }
+
+            LocalizationSettings.SelectedLocale = locales[0];
+        }
+
+        private void ApplySavedLocale()
+        {
+            if (SettingManager.Instance == null)
+            {
+                return;
+            }
+
+            var savedLang = SettingManager.Instance.CurrentSetting.LangCode;
+            var locale = LocalizationSettings.AvailableLocales.GetLocale(savedLang);
+
+            if (locale != null &&
+                !locale.Equals(LocalizationSettings.SelectedLocale))
+            {
+                LocalizationSettings.SelectedLocale = locale;
+            }
         }
 
         protected override void OnDestroy()
@@ -102,6 +229,11 @@ namespace Immortal_Switch.Scripts.Localization
 
         private void OnSelectedLocaleChanged(Locale locale)
         {
+            if (_suppressLocaleNotifications || locale == null)
+            {
+                return;
+            }
+
             var changeVersion = ++_localeChangeVersion;
             NotifyLanguageChangedAsync(locale, changeVersion).Forget();
         }
@@ -118,14 +250,17 @@ namespace Immortal_Switch.Scripts.Localization
             OnLanguageChanged?.Invoke(locale.Identifier.Code);
         }
 
-        private async UniTask PreloadTablesAsync()
+        private async UniTask PreloadTablesAsync(
+            CancellationToken cancellationToken = default)
         {
             foreach (var tableName in _preloadTables)
             {
-                var tableOp = LocalizationSettings.StringDatabase.GetTableAsync(tableName);
-                await tableOp.ToUniTask();
+                cancellationToken.ThrowIfCancellationRequested();
 
-                if (tableOp.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+                var tableOp = LocalizationSettings.StringDatabase.GetTableAsync(tableName);
+                await tableOp.ToUniTask(cancellationToken: cancellationToken);
+
+                if (tableOp.Status == AsyncOperationStatus.Succeeded)
                 {
                     UnityEngine.Debug.Log($"[LocalizationManager] Preloaded table: {tableName}");
                 }
@@ -171,13 +306,25 @@ namespace Immortal_Switch.Scripts.Localization
         /// </summary>
         public static string GetText(string key, params object[] args)
         {
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrWhiteSpace(key))
             {
                 return key;
             }
 
-            var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync(TABLE_NAME, key, arguments: args);
-            return op.IsDone ? op.Result : key;
+            var operation = LocalizationSettings.StringDatabase
+                .GetTableEntryAsync(TABLE_NAME, key);
+
+            if (!operation.IsDone ||
+                operation.Result.Entry == null)
+            {
+                return key;
+            }
+
+            var localizedText = operation.Result.Entry.GetLocalizedString(args);
+
+            return string.IsNullOrEmpty(localizedText)
+                ? key
+                : localizedText;
         }
     }
 }

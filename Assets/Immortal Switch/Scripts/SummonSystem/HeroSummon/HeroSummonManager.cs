@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Sirenix.OdinInspector;
@@ -11,7 +12,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 {
     public class HeroSummonManager : Singleton<HeroSummonManager>
     {
-        [SerializeField] private HeroSummonConfigSO summonConfig;
         [SerializeField] private string saveKey = "hero_summon_save";
 
         private HeroSummonSaveData saveData;
@@ -23,25 +23,18 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         public HeroSummonSaveData SaveData => saveData;
         public HeroSummonConfigSO Config => summonConfig;
 
+        private HeroSummonConfigSO summonConfig;
         public event Action OnSummonDataChanged;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            Load();
-        }
 
         public override UniTask InitializeAsync()
         {
+            summonConfig = DatabaseManager.Instance.HeroSummonConfig;
+            Load();
+            Init(new GameCurrencyGateway());
             return UniTask.CompletedTask;
         }
 
-        private void Start()
-        {
-            Init(new GameCurrencyGateway());
-        }
-
-        public void Init(IHeroSummonCurrencyGateway gateway)
+        private void Init(IHeroSummonCurrencyGateway gateway)
         {
             currencyGateway = gateway;
 
@@ -51,18 +44,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 currencyGateway,
                 HeroProgressionManager.Instance);
         }
-
-        public void Save()
+        
+        private void Load()
         {
-            ES3.Save(saveKey, saveData);
-        }
-
-        public void Load()
-        {
-            if (ES3.KeyExists(saveKey))
-                saveData = ES3.Load<HeroSummonSaveData>(saveKey);
-            else
-                saveData = new HeroSummonSaveData();
+            saveData = new HeroSummonSaveData();
         }
 
         public bool CanSummon(string optionId, out SummonPaymentType paymentType, out int paidAmount)
@@ -90,7 +75,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
             if (result != null)
             {
-                Save();
                 NotifyChanged();
             }
 
@@ -109,7 +93,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             bool result = service.ClaimReward(summonLevel, rewardReceiver);
             if (result)
             {
-                Save();
                 NotifyChanged();
             }
 
@@ -124,7 +107,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         {
             saveData.TotalRoll   = response.NewTotalRoll;
             saveData.SummonLevel = response.NewSummonLevel;
-            Save();
             NotifyChanged();
         }
 
@@ -137,7 +119,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             saveData.PityMissCounter  = state.PityMissCounter;
             if (state.ClaimedRewardLevels != null)
                 saveData.ClaimedRewardLevels = new System.Collections.Generic.List<int>(state.ClaimedRewardLevels);
-            Save();
             NotifyChanged();
         }
 

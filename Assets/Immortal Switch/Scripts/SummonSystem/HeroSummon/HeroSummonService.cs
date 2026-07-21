@@ -116,40 +116,41 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             return saveData.ClaimedRewardLevels.Contains(summonLevel);
         }
 
-        public SummonLevelRewardEntry GetPreviewRewardEntry()
+        // Reward source is each level's own ItemId/ItemQuantity (Hero_Levels), not the older
+        // LevelRewards (Hero_Rewards) table — see HeroSummonAchievementRewardBuilder for the
+        // same replacement relationship, matching the server.
+        public HeroSummonLevelEntry GetPreviewRewardEntry()
         {
-            if (config == null || config.LevelRewards == null || config.LevelRewards.Count == 0)
+            if (config == null || config.SummonLevels == null || config.SummonLevels.Count == 0)
                 return null;
 
-            var sortedRewards = config.LevelRewards
+            var sortedLevels = config.SummonLevels
                 .Where(x => x != null)
                 .OrderBy(x => x.SummonLevel)
                 .ToList();
 
-            for (int i = 0; i < sortedRewards.Count; i++)
+            for (int i = 0; i < sortedLevels.Count; i++)
             {
-                var entry = sortedRewards[i];
+                var entry = sortedLevels[i];
 
                 if (!saveData.ClaimedRewardLevels.Contains(entry.SummonLevel))
                     return entry;
             }
 
-            return sortedRewards.LastOrDefault();
+            return sortedLevels.LastOrDefault();
         }
 
         public SummonRewardPreviewData GetRewardPreviewData()
         {
             var entry = GetPreviewRewardEntry();
-            if (entry == null || entry.RewardItems == null || entry.RewardItems.Count == 0)
+            if (entry == null || entry.ItemId <= 0 || entry.ItemQuantity <= 0)
                 return null;
-
-            var rewardItem = entry.RewardItems[0];
 
             return new SummonRewardPreviewData
             {
                 SummonLevel = entry.SummonLevel,
-                ItemId = rewardItem.ItemId,
-                Quantity = rewardItem.Amount,
+                ItemId = entry.ItemId,
+                Quantity = entry.ItemQuantity,
                 IsClaimable = IsRewardClaimable(entry.SummonLevel),
                 IsClaimed = IsRewardClaimed(entry.SummonLevel)
             };

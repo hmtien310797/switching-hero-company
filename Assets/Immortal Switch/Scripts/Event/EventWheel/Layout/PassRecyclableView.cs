@@ -90,8 +90,31 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 return;
             }
 
-            var rewards = _manager.ClaimMilestone(_eventId, row);
+            ClaimAsync(row).Forget();
+        }
+
+        private async UniTaskVoid ClaimAsync(DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row)
+        {
+            var (rewards, error) = await _manager.ClaimMilestoneAsync(row);
+
+            if (error != null)
+            {
+                UIManager.Instance.ShowToast(DescribeClaimError(error));
+                return;
+            }
+
             ShowRewards(rewards);
+        }
+
+        private static string DescribeClaimError(string error)
+        {
+            switch (error)
+            {
+                case "EVENT_NOT_ACTIVE":  return "Sự kiện không còn hoạt động.";
+                case "ALREADY_CLAIMED":   return "Đã nhận thưởng mốc này rồi.";
+                case "NOT_YET_ELIGIBLE":  return "Chưa đủ điều kiện nhận thưởng.";
+                default:                  return "Nhận thưởng thất bại, vui lòng thử lại.";
+            }
         }
 
         private static void ShowRewards(List<ItemData> rewards)

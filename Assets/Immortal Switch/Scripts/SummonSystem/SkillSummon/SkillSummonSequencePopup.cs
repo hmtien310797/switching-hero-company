@@ -39,9 +39,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
         [SerializeField] private float highRarityExtraPause = 0.18f;
         [SerializeField] private float lastCardExtraPause = 0.12f;
 
-        [Header("Rarity Visual")]
-        [SerializeField] private SkillSummonRarityVisualConfigSO rarityVisualConfig;
-
         private readonly List<SkillSummonSequenceCardUI> spawnedCards = new();
         private readonly List<SkillSummonSequenceCardUI> cardPool = new();
         private readonly List<SkillSummonGroupedResultEntry> currentGroupedEntries = new();

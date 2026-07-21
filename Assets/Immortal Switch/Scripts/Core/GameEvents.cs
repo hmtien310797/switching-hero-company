@@ -43,6 +43,9 @@
         // summon
         public const string ON_SUMMON_HERO = nameof(ON_SUMMON_HERO);
 
+        // equipment
+        public const string ON_ENHANCE_GEAR = nameof(ON_ENHANCE_GEAR);
+
         // afk reward
         public const string ON_AFK_REWARD_CLAIM_COUNT = nameof(ON_AFK_REWARD_CLAIM_COUNT);
 

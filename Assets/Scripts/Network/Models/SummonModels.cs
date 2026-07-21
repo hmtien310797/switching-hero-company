@@ -94,7 +94,7 @@ public class ClaimRewardResponse
 [Serializable]
 public class NakamaSummonRewardItem
 {
-    /// <summary>"Currency" | "RandomHero" | "RandomSkill"</summary>
+    /// <summary>"Currency" | "RandomHero" | "RandomSkill" | "Item"</summary>
     [JsonProperty("reward_type")]   public string RewardType;
 
     // Currency
@@ -113,6 +113,11 @@ public class NakamaSummonRewardItem
     [JsonProperty("skill_uid")]     public string SkillUid;
     [JsonProperty("is_new")]        public bool   IsNew;
     [JsonProperty("shard_gained")]  public int    ShardGained;
+
+    /// <summary>Item — flat bonus item from that SummonLevel's *_Levels row (game_hero_levels.js
+    /// etc. ItemId/ItemQuantity columns), layered on top of the milestone reward above. Uses
+    /// "amount" (shared with Currency) for the quantity.</summary>
+    [JsonProperty("item_id")]       public int    ItemId;
 }
 
 // ── Response: summon/state ────────────────────────────────────────────────────

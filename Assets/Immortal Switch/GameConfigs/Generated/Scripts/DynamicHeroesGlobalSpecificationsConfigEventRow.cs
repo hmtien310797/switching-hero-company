@@ -84,5 +84,15 @@ namespace Game.Configs.Generated
         /// </summary>
         public string consumedItemId;
 
+        /// <summary>
+        /// CSV Column: point_stone_reward_key
+        /// </summary>
+        public int pointStoneRewardKey;
+
+        /// <summary>
+        /// CSV Column: display_mode
+        /// </summary>
+        public int displayMode;
+
     }
 }

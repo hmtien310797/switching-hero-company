@@ -1,5 +1,3 @@
-using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Shared.Constants;
 using RecyclableScrollRect;
 using TMPro;
 using UnityEngine;
@@ -20,13 +18,14 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views.UI
         [SerializeField]
         private UILeaderboardReward rewardSlot;
 
-        public void Bind(int rank, string playerName, int stage, bool isMyRank, BigNumber rewardQuantity)
+        // Chưa có config phần thưởng theo hạng — ẩn slot reward cho tới khi có.
+        public void Bind(int rank, string playerName, int stage, bool isMyRank)
         {
             txtRank.text = isMyRank ? $"Hạng Tôi\n{rank}th" : $"{rank}th";
             txtPlayerName.text = playerName;
             txtScore.text = $"{stage:N0}";
 
-            rewardSlot.Bind(ItemIdConstants.DIAMOND, rewardQuantity);
+            rewardSlot.gameObject.SetActive(false);
         }
     }
 }

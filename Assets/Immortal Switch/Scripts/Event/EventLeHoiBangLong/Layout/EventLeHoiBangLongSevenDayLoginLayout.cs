@@ -1,0 +1,186 @@
+﻿using System;
+using System.Collections.Generic;
+using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
+using Immortal_Switch.Scripts.Event.Views.UI;
+using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.UI;
+using Immortal_Switch.Scripts.Shared.Views;
+using UnityEngine;
+
+namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
+{
+    public class EventLeHoiBangLongSevenDayLoginLayout : MonoBehaviour
+    {
+        [SerializeField]
+        private UIEventLeHoiBangLongSevenDayRewardPanel rewardPanel;
+
+        [SerializeField]
+        private UICountdownTimer countdownTimer;
+
+        [Header("Seven day references")]
+        [SerializeField]
+        private RectTransform sevenDayContainer;
+
+        [SerializeField]
+        private UIEventLeHoiBangLongSevenDayItem sevenDayPrefab;
+
+        [Header("Event point reward references")]
+        [SerializeField]
+        private RectTransform eventPointRewardContainer;
+
+        [SerializeField]
+        private UIItemSlot eventPointRewardPrefab;
+
+        // --- Private Fields ---
+        private SimpleUIPool<UIEventLeHoiBangLongSevenDayItem> _sevenDayPools;
+        private SimpleUIPool<UIItemSlot> _eventPointRewardPools;
+        private List<DynamicHeroesGlobalSpecificationsEventBLCheckInRow> _rows = new();
+        private IList<int> _eventPointRewards = Array.Empty<int>();
+
+        private void OnEnable()
+        {
+            EventLeHoiBangLongManager.Instance.OnDataChanged += RefreshState;
+        }
+
+        private void OnDisable()
+        {
+            EventLeHoiBangLongManager.Instance.OnDataChanged -= RefreshState;
+        }
+
+        public void Bind(
+            List<DynamicHeroesGlobalSpecificationsEventBLCheckInRow> rows,
+            IList<int> eventPointRewards,
+            double remainTime
+        )
+        {
+            _rows = rows ?? new List<DynamicHeroesGlobalSpecificationsEventBLCheckInRow>();
+            _eventPointRewards = eventPointRewards ?? Array.Empty<int>();
+
+            countdownTimer.Bind(remainTime, OnCountdown);
+            RefreshState();
+        }
+
+        private string OnCountdown(long days, long hours, long minutes, long seconds)
+        {
+            return $"Kết thúc sau: {days} ngày {hours}:{minutes}:{seconds}";
+        }
+
+        private void RefreshEventPointRewards(IList<int> rows)
+        {
+            _eventPointRewardPools ??= new SimpleUIPool<UIItemSlot>(eventPointRewardPrefab, eventPointRewardContainer);
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var reward = rows[i];
+                var clone = _eventPointRewardPools.Get(i);
+
+                clone.Bind(reward);
+            }
+
+            _eventPointRewardPools.ReleaseFrom(rows.Count);
+        }
+
+        private void RefreshSevenDay(
+            List<DynamicHeroesGlobalSpecificationsEventBLCheckInRow> rows,
+            int currentDay
+        )
+        {
+            _sevenDayPools ??= new SimpleUIPool<UIEventLeHoiBangLongSevenDayItem>(sevenDayPrefab, sevenDayContainer);
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var reward = rows[i];
+                var clone = _sevenDayPools.Get(i);
+
+                clone.Bind(
+                    reward,
+                    OnClickClaim,
+                    currentDay,
+                    EventLeHoiBangLongManager.Instance.Service.IsFreeLoginRewardClaimed(reward.day)
+                );
+            }
+
+            _sevenDayPools.ReleaseFrom(rows.Count);
+        }
+
+        private void OnClickClaim(int day)
+        {
+            var reward = _rows.Find(row => row.day == day);
+
+            if (reward == null ||
+                reward.rewardId <= 0 ||
+                reward.quantity <= 0)
+            {
+                return;
+            }
+
+            if (EventLeHoiBangLongManager.Instance.ClaimFreeLoginReward(day))
+            {
+                ShowRewards(new[]
+                {
+                    new ItemData(reward.rewardId, reward.quantity),
+                });
+            }
+        }
+
+        private void OnClickRewardPanel(int day)
+        {
+            var manager = EventLeHoiBangLongManager.Instance;
+            var rewards = DatabaseManager.Instance.GetEventLHBLCheckInBonusRewards(day);
+
+            if (manager.Service.CanClaimFreeBonus(day))
+            {
+                if (manager.ClaimFreeBonus(day))
+                {
+                    ShowRewards(rewards.instantRewards);
+                }
+            }
+            else if (manager.Service.CanPurchaseBonus(day))
+            {
+                manager.RequestBonusPurchase(day, ShowRewards);
+            }
+            else if (manager.Service.CanClaimBonus(day))
+            {
+                if (manager.ClaimBonus(day))
+                {
+                    ShowRewards(rewards.bonusRewards);
+                }
+            }
+        }
+
+        private static void ShowRewards(IReadOnlyList<ItemData> rewards)
+        {
+            if (rewards == null ||
+                rewards.Count == 0)
+            {
+                return;
+            }
+
+            PopupRewardService.Show(rewards);
+        }
+
+        private void RefreshState()
+        {
+            var manager = EventLeHoiBangLongManager.Instance;
+            var currentDay = Math.Clamp(manager.Storage.Data.loginDay, 1, 7);
+            var rewards = DatabaseManager.Instance.GetEventLHBLCheckInBonusRewards(currentDay);
+
+            RefreshSevenDay(_rows, currentDay);
+            RefreshEventPointRewards(_eventPointRewards);
+
+            rewardPanel.Bind(
+                rewards.instantRewards,
+                rewards.bonusRewards,
+                OnClickRewardPanel,
+                manager.Service.IsFreeBonusClaimed(currentDay),
+                manager.Service.IsBonusPurchased(currentDay),
+                manager.Service.IsBonusClaimed(currentDay),
+                rewards.packPrice,
+                currentDay
+            );
+        }
+    }
+}

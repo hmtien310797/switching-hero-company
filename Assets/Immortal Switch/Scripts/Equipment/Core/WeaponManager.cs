@@ -18,7 +18,6 @@ namespace Immortal_Switch.Scripts.Equipment.Core
 {
     public class WeaponManager : Singleton<WeaponManager>
     {
-
         private WeaponSaveData saveData;
         private WeaponInventoryService inventory;
         private WeaponEquipService equip;
@@ -626,6 +625,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             CurrencyManager.Instance.Set(CurrencyType.weapon_ore, response.StoneBalance);
 
             NotifyStandardWeaponChanged(weaponId);
+            GameEventManager.Trigger(GameEvents.ON_ENHANCE_GEAR);
             return true;
         }
 
@@ -658,6 +658,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             CurrencyManager.Instance.Set(CurrencyType.weapon_ore, response.StoneBalance);
 
             NotifyExclusiveWeaponChanged(def.ExclusiveWeaponId, heroId);
+            GameEventManager.Trigger(GameEvents.ON_ENHANCE_GEAR);
             return true;
         }
 
