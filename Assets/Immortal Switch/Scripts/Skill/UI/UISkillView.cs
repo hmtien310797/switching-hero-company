@@ -501,7 +501,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 var hero = activeHeroes[i];
                 bool isSelected = selectedHero != null && hero.HeroId == selectedHero.HeroId;
-                heroTabs[i].Setup(hero.HeroId, hero.HeroIcon, isSelected);
+                heroTabs[i].Setup(hero.HeroId, hero.HeroIcon, hero.classIcon, isSelected);
             }
         }
 
@@ -663,7 +663,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 replacePopupRoot.SetActive(true);
 
             if (replaceHeroPreview != null && selectedHero != null)
-                replaceHeroPreview.Setup(selectedHero.HeroId, selectedHero.HeroIcon, true);
+                replaceHeroPreview.Setup(selectedHero.HeroId, selectedHero.HeroIcon, selectedHero.classIcon, true);
 
             if (replacePendingSkillIcon != null)
                 replacePendingSkillIcon.sprite = SkillImageService.GetSkillIcon(pendingReplaceSkill);

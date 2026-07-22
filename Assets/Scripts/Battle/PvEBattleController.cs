@@ -13,13 +13,10 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Enemy;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items.Models;
-using Immortal_Switch.Scripts.Level.Pattern;
 using Immortal_Switch.Scripts.Level.Stage;
-using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
-using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Immortal_Switch.Scripts.StatSystem;
@@ -410,9 +407,6 @@ namespace Battle
             // qua response battle/end.updated_progression) — không tự "++" cục bộ nữa.
             NotifyIdleScreenStageChanged();
             InitStage(CurrentStage);
-            await pvEMapController.InitChapterMapAsync(
-                GetResolvedChapterIndexByStage(CurrentStage)
-            ).AttachExternalCancellation(cancellationToken);
 
             isReadyBattle = false;
 
@@ -1443,7 +1437,9 @@ namespace Battle
                 userDataCache.inBattleHeroes[i].ResetSpawnPosition(spawnPos);
             }
 
-            await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: cancellationToken);
+            await pvEMapController.InitChapterMapAsync(
+                GetResolvedChapterIndexByStage(CurrentStage)
+            ).AttachExternalCancellation(cancellationToken);
             Transitioner.Instance.TransitionInWithoutChangingScene();
             for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
@@ -1471,13 +1467,15 @@ namespace Battle
                 userDataCache.inBattleHeroes[i]?.ResetSpawnPosition(spawnPos);
             }
 
-            await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: cancellationToken);
+            await pvEMapController.InitChapterMapAsync(
+                GetResolvedChapterIndexByStage(CurrentStage)
+            ).AttachExternalCancellation(cancellationToken);
             Transitioner.Instance.TransitionInWithoutChangingScene();
             await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: cancellationToken);
             for (int i = 0; i < userDataCache.inBattleHeroes.Length; i++)
             {
                 userDataCache.inBattleHeroes[i]?.ResetData();
-                await UniTask.Delay(800, cancellationToken: cancellationToken);
+                await UniTask.Delay(500, cancellationToken: cancellationToken);
             }
 
             await HandleCurrentStageAsync();

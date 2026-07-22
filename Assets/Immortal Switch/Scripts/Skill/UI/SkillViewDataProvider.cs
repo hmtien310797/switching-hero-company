@@ -19,6 +19,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public int HeroId;
         public HeroClass HeroClass;
         public Sprite HeroIcon;
+        public Sprite classIcon;
         public List<int> EquippedSkillIds = new();
         public HeroActor RuntimeController;
     }
@@ -51,9 +52,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private Dictionary<int, SkillDataSO> skillCache;
         private Dictionary<HeroClass, List<SkillDataSO>> poolLookup = new();
         private List<SkillDataSO> allSkills = new();
-
-        private SpriteAtlas heroSpriteAtlas;
-        private const string HeroSpriteAtlasKey = "hero_sprite_atlas";
+        
         public event Action OnDataChanged;
         private UserDataCache userDataCache;
 
@@ -82,7 +81,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
             BuildPoolLookup();
             BuildCacheIfNeeded();
             userDataCache = UserDataCache.Instance;
-            heroSpriteAtlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
         }
 
         private void OnEnable()
@@ -405,7 +403,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 {
                     HeroId = heroId,
                     HeroClass = hero.HeroClass,
-                    HeroIcon = heroSpriteAtlas.GetSprite(hero.HeroData.HeroIconKey),
+                    HeroIcon = HeroImageService.GetHeroIcon(hero.HeroData),
+                    classIcon = HeroImageService.GetHeroClassIcon(hero.HeroData),
                     EquippedSkillIds = equipped,
                     RuntimeController = hero
                 });
@@ -438,7 +437,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
             {
                 HeroId = heroId,
                 HeroClass = heroController.HeroClass,
-                HeroIcon = heroSpriteAtlas.GetSprite(heroController.HeroData.HeroIconKey),
+                HeroIcon = HeroImageService.GetHeroIcon(heroController.HeroData),
+                classIcon = HeroImageService.GetHeroClassIcon(heroController.HeroData),
                 EquippedSkillIds = equipped,
                 RuntimeController = heroController
             };

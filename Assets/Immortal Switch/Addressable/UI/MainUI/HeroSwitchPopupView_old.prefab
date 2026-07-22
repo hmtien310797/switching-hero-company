@@ -1010,13 +1010,14 @@ MonoBehaviour:
   panelRoot: {fileID: 435221962733355344}
   fitMode: 0
   useSafeArea: 1
-  autoDetectDesignSize: 1
-  designSize: {x: 1300, y: 2200}
   minScale: 0.35
   maxScale: 1
+  anchoredY: -11.319092
   changePosY: 0
   yPosPortrait: 1
   yPosLandscape: 1
+  useScaleReduction: 0
+  scaleReductionPercent: 0
 --- !u!1 &5368397312690151188
 GameObject:
   m_ObjectHideFlags: 0
@@ -1773,9 +1774,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35626b6cd92f476fb0af0e87a2dc6e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  btnClose: {fileID: 0}
+  Layer: 2
+  MainMode: 0
+  CloseOnBackdrop: 0
+  CacheOnClose: 0
+  animatedRoot: {fileID: 0}
+  showDuration: 0.25
+  hideDuration: 0.2
+  showFromOffset: {x: 0, y: 900}
+  hideToOffset: {x: 0, y: 900}
+  fade: 1
+  fromAlpha: 0
+  toAlpha: 1
+  ease:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   heroDatabase: {fileID: 11400000, guid: 89ff8b391b9e64c82ac7356834aef25c, type: 2}
-  heroRarityVisualConfig: {fileID: 11400000, guid: 393c7325f388e7f43a3d7d63f09f62e0, type: 2}
   heroUIIconConfig: {fileID: 11400000, guid: 5f88e268420f92c459868bea697969c6, type: 2}
   slot1UI: {fileID: 5745466351006442794}
   slot2UI: {fileID: 8391878568016486516}
@@ -1790,6 +1825,7 @@ MonoBehaviour:
   slot2Arrow: {fileID: 2450169067840699748}
   arrowMoveDistance: 18
   arrowMoveDuration: 0.55
+  btnClose: {fileID: 0}
 --- !u!1 &8592321014374809777
 GameObject:
   m_ObjectHideFlags: 0
@@ -2085,6 +2121,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1452010786021403670, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1452010786021403670, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -2190,6 +2230,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3318758615497940764, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
       propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3318758615497940764, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3318758615497940764, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
@@ -2242,6 +2286,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1452010786021403670, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1452010786021403670, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -2347,6 +2395,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3318758615497940764, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
       propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3318758615497940764, guid: f90befe58f88a1245a04e7a27225c389, type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3318758615497940764, guid: f90befe58f88a1245a04e7a27225c389, type: 3}

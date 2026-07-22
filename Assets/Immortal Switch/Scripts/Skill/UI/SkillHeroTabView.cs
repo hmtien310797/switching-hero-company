@@ -7,6 +7,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
     {
         [SerializeField] private Button button;
         [SerializeField] private Image icon;
+        [SerializeField] private Image iconClass;
         [SerializeField] private GameObject selectedObject;
 
         private int heroId = -1;
@@ -14,12 +15,15 @@ namespace Immortal_Switch.Scripts.Skill.UI
         public Button Button => button;
         public int HeroId => heroId;
 
-        public void Setup(int heroId, Sprite iconSprite, bool isSelected)
+        public void Setup(int heroId, Sprite iconSprite, Sprite classIcon, bool isSelected)
         {
             this.heroId = heroId;
 
             if (icon != null)
                 icon.sprite = iconSprite;
+            
+            if(iconClass != null)
+                iconClass.sprite = classIcon;
 
             SetSelected(isSelected);
             gameObject.SetActive(true);

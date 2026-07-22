@@ -39,6 +39,9 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             int resolvedSelectedWeaponId = selectedWeaponId;
             if (resolvedSelectedWeaponId <= 0)
             {
+                if(_weaponDatabaseSo == null)
+                    _weaponDatabaseSo = DatabaseManager.Instance.GetWeaponDatabase();
+                
                 var standardWeaponDefinitionSos = _weaponDatabaseSo.GetStandardsByClass(selectedClass);
                 if (standardWeaponDefinitionSos != null && standardWeaponDefinitionSos.Count > 0)
                     resolvedSelectedWeaponId = standardWeaponDefinitionSos[0].WeaponId;

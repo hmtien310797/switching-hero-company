@@ -25,9 +25,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [Header("Database")] [SerializeField] private HeroUIIconConfigSO heroUiDb;
         [SerializeField] private HeroProgressionDatabaseSO heroDatabase;
 
-        [Header("References")] [SerializeField]
-        private Image imgShard;
-
         [SerializeField] private TMP_Text txtName;
 
         [Header("Progress shard")] [SerializeField]
@@ -228,7 +225,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
             }
 
             imgRace.sprite = HeroImageService.GetHeroClassIcon(hero);
-            imgShard.sprite = hero.ShardIcon;
             txtHeroName.text = hero.Name;
             heroStatSnapshot = HeroProgressionManager.Instance.Service.GetCurrentStats(heroId);
 
