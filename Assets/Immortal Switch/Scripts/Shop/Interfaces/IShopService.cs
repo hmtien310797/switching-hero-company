@@ -16,6 +16,27 @@ namespace Immortal_Switch.Scripts.Shop.Interfaces
         /// <summary>Kiểm tra daily/weekly/monthly reset, xoá purchase count tương ứng.</summary>
         void CheckAndReset();
 
+        // ── Diamond Topup ───────────────────────────────────────────────────────────
+
+        /// <summary>Kiểm tra gói kim cương đã từng được mua và sử dụng ưu đãi lần đầu chưa.</summary>
+        bool HasPurchasedDiamondPack(int packId);
+
+        /// <summary>Đánh dấu gói kim cương đã mua lần đầu. Thao tác này không reset theo chu kỳ.</summary>
+        void RecordDiamondFirstPurchase(int packId);
+
+        // ── Event Shop ───────────────────────────────────────────────────────────────
+
+        /// <summary>Số lượt mua Event còn lại. limit &lt;= 0 là không giới hạn.</summary>
+        int GetEventRemaining(int packId, int limitFromConfig);
+
+        /// <summary>Số lần gói Event đã được mua trong chu kỳ hiện tại.</summary>
+        int GetEventPurchasedCount(int packId);
+
+        /// <summary>
+        /// Ghi nhận một lượt mua Event nếu chưa đạt giới hạn và trả về kết quả thành công.
+        /// </summary>
+        bool TryRecordEventPurchase(int packId, int limitFromConfig);
+
         // ── Topup / GloryPass ────────────────────────────────────────────────
 
         /// <summary>Tổng số lượt nạp (mỗi lần mua diamond +1).</summary>

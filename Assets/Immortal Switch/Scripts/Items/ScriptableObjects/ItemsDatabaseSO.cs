@@ -124,5 +124,23 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
         {
             return ItemConfig.rows.FirstOrDefault(v => v.itemKey == itemKey);
         }
+        
+        public EItemTier GetItemTier(int itemId)
+        {
+            string eItemTier = ItemConfig.rows.FirstOrDefault(v => v.itemId == itemId)?.rarity;
+            if (string.IsNullOrEmpty(eItemTier))
+            {
+                Debug.LogError($"Item {itemId} not found, return tier D");
+                return EItemTier.D;
+            }
+
+            if (Enum.TryParse(eItemTier, out EItemTier itemTier))
+            {
+                return itemTier;
+            }
+            
+            Debug.LogError($"Item {itemId} not found, return tier D");
+            return EItemTier.D;
+        }
     }
 }

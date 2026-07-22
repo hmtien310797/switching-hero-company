@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08afb208b3bd2354b9458bd377405122, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsConfigLeaderboardRewardDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - bandId: 1
+    rankFrom: 1
+    rankTo: 1
+    itemId: 3
+    itemKey: diamond
+    amount: 100000
+    note: "H\u1EA1ng 1"
+  - bandId: 2
+    rankFrom: 2
+    rankTo: 2
+    itemId: 3
+    itemKey: diamond
+    amount: 70000
+    note: "H\u1EA1ng 2"
+  - bandId: 3
+    rankFrom: 3
+    rankTo: 3
+    itemId: 3
+    itemKey: diamond
+    amount: 50000
+    note: "H\u1EA1ng 3"
+  - bandId: 4
+    rankFrom: 4
+    rankTo: 10
+    itemId: 3
+    itemKey: diamond
+    amount: 30000
+    note: Top 10
+  - bandId: 5
+    rankFrom: 11
+    rankTo: 50
+    itemId: 3
+    itemKey: diamond
+    amount: 15000
+    note: Top 50
+  - bandId: 6
+    rankFrom: 51
+    rankTo: 100
+    itemId: 3
+    itemKey: diamond
+    amount: 8000
+    note: Top 100
+  - bandId: 7
+    rankFrom: 101
+    rankTo: 300
+    itemId: 3
+    itemKey: diamond
+    amount: 4000
+    note: Top 300
+  - bandId: 8
+    rankFrom: 301
+    rankTo: 500
+    itemId: 3
+    itemKey: diamond
+    amount: 2000
+    note: Top 500
+  - bandId: 9
+    rankFrom: 501
+    rankTo: 1000
+    itemId: 3
+    itemKey: diamond
+    amount: 1000
+    note: Top 1000
+  - bandId: 10
+    rankFrom: 1001
+    rankTo: 99999
+    itemId: 3
+    itemKey: diamond
+    amount: 500
+    note: "Ngo\xE0i top 1000 \u2014 ph\u1EA3i \u0111\u1EA1t min_stage_for_reward
+      m\u1EDBi nh\u1EADn"

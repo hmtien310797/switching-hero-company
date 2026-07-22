@@ -1,5 +1,6 @@
 ﻿using System;
 using Immortal_Switch.Scripts.Equipment.Core;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +29,6 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [SerializeField] protected Image tierLabelImage;
         [SerializeField] protected Image tierBackgroundImage;
         [SerializeField] protected Image tierBorderImage;
-        [SerializeField] protected WeaponTierVisualConfigSO tierVisualConfig;
 
         [Header("Star Display")]
         [SerializeField] protected UIWeaponStarDisplay starDisplay;
@@ -88,22 +88,19 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         
         public void BindTierVisual(WeaponTier tier)
         {
-            if (tierVisualConfig == null)
-                return;
-
-            var entry = tierVisualConfig.Get(tier);
+            var entry = ItemTierVisualImageService.GetItemTierEntry(tier);
             if (entry == null)
                 return;
 
             if (tierLabelImage != null)
-                tierLabelImage.sprite = entry.TierLabelSprite;
+                tierLabelImage.sprite = entry.tierIcon;
 
             if (tierBackgroundImage != null)
-                tierBackgroundImage.sprite = entry.TierBackgroundSprite;
+                tierBackgroundImage.sprite = entry.background;
 
             if (tierBorderImage != null)
             {
-                tierBorderImage.sprite = entry.TierBorderSprite;
+                tierBorderImage.sprite = entry.border;
             }
         }
     }

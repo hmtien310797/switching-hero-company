@@ -908,7 +908,7 @@ PrefabInstance:
       objectReference: {fileID: 818825788}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalPosition.y
@@ -916,7 +916,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -14
+      value: -21
       objectReference: {fileID: 0}
     - target: {fileID: 8069284337454377247, guid: a0cf27291ce2c0f4ba3abca3c9211d78, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1082,7 +1082,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DontDestroyOnLoadEnabled: 0
-  summonConfig: {fileID: 11400000, guid: b93f791d5b4a3432d9041644c473f87a, type: 2}
   saveKey: hero_summon_save
 --- !u!4 &1077456036
 Transform:
@@ -1527,7 +1526,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DontDestroyOnLoadEnabled: 0
-  config: {fileID: 11400000, guid: 762a6445c9ee68f45abbb924bb871e9b, type: 2}
   weaponManager: {fileID: 1246934768}
   saveKey: weapon_summon_save
 --- !u!4 &1552892433
@@ -1833,8 +1831,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DontDestroyOnLoadEnabled: 0
-  summonConfig: {fileID: 11400000, guid: 3b957d5b2d48b2f4988cb5ae56977445, type: 2}
-  saveKey: skill_summon_save
 --- !u!4 &1961475120
 Transform:
   m_ObjectHideFlags: 0

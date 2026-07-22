@@ -3,7 +3,6 @@ using System.Linq;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shop.Layouts;
-using Immortal_Switch.Scripts.Shop.Views.UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shared
@@ -11,50 +10,102 @@ namespace Immortal_Switch.Scripts.Shared
     public partial class DatabaseManager
     {
         [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsPackDiamondDatabase packDiamondDb;
+        private DynamicHeroesGlobalSpecificationsPackDiamondDatabase _packDiamondDb;
 
         [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsPackIapDatabase packSpecialDb;
+        private DynamicHeroesGlobalSpecificationsPackIapDatabase _packSpecialDb;
 
         [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsGameRechargeMilestoneDatabase packGloryPassDb;
+        private DynamicHeroesGlobalSpecificationsGameRechargeMilestoneDatabase _packGloryPassDb;
 
         [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsConfigShopDatabase configShopDb;
+        private DynamicHeroesGlobalSpecificationsConfigShopDatabase _configShopDb;
 
         [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsProductIdDatabase productDb;
+        private DynamicHeroesGlobalSpecificationsProductIdDatabase _productDb;
 
         [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsPackMothlyTotalDatabase packMonthlyTotalDb;
+        private DynamicHeroesGlobalSpecificationsPackMothlyTotalDatabase _packMonthlyTotalDb;
 
         [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsPackMonthlyDatabase packMonthlyDb;
+        private DynamicHeroesGlobalSpecificationsPackMonthlyDatabase _packMonthlyDb;
+
+        [DatabaseBinding]
+        private DynamicHeroesGlobalSpecificationsPackEventDatabase _packEventDb;
+
+        public List<ShopEventRuntimeData> GetShopPacksEvent()
+        {
+            var list = new List<ShopEventRuntimeData>();
+
+            foreach (var row in _packEventDb.rows)
+            {
+                var activity = GetEventIfActive(row.eventId);
+
+                if (activity == null)
+                {
+                    continue;
+                }
+
+                var product = _productDb.rows.FirstOrDefault(v => v.iD == row.productID);
+
+                if (product != null)
+                {
+                    var rewards = new List<ItemData>();
+
+                    TryAddReward(row.itemId1, row.quantity1);
+                    TryAddReward(row.itemId2, row.quantity2);
+                    TryAddReward(row.itemId3, row.quantity3);
+
+                    void TryAddReward(int itemId, int quantity)
+                    {
+                        if (itemId > 0 &&
+                            quantity > 0)
+                        {
+                            rewards.Add(new ItemData(itemId, quantity));
+                        }
+                    }
+
+                    list.Add(new ShopEventRuntimeData
+                    {
+                        Pack = row,
+                        Product = product,
+                        Rewards = rewards,
+                    });
+                }
+            }
+
+            return list;
+        }
 
         public List<DynamicHeroesGlobalSpecificationsConfigShopRow> GetAllTabs()
         {
-            return configShopDb.rows;
+            return _configShopDb.rows;
         }
 
         public DynamicHeroesGlobalSpecificationsProductIdRow GetProduct(int productId)
         {
-            return productDb.rows.FirstOrDefault(v => v.iD == productId);
+            return _productDb.rows.FirstOrDefault(v => v.iD == productId);
         }
 
         /// <summary>Toàn bộ product khai báo trong bảng product_id — dùng để đăng ký catalog cho
         /// Unity IAP lúc khởi tạo (IAPManager).</summary>
         public List<DynamicHeroesGlobalSpecificationsProductIdRow> GetAllProducts()
         {
-            return productDb.rows;
+            return _productDb.rows;
+        }
+
+        public DynamicHeroesGlobalSpecificationsPackDiamondRow GetShopPackDiamond(int packId)
+        {
+            return _packDiamondDb.rows.FirstOrDefault(v => v.iD == packId);
         }
 
         public List<ShopTopupRuntimeData> GetShopPacksTopup()
         {
             var list = new List<ShopTopupRuntimeData>();
 
-            foreach (var row in packDiamondDb.rows)
+            foreach (var row in _packDiamondDb.rows)
             {
-                var product = productDb.rows.FirstOrDefault(v => v.iD == row.productId);
+                var product = _productDb.rows.FirstOrDefault(v => v.iD == row.productId);
 
                 if (product != null)
                 {
@@ -73,9 +124,9 @@ namespace Immortal_Switch.Scripts.Shared
         {
             var list = new List<ShopSpecialRuntimeData>();
 
-            foreach (var row in packSpecialDb.rows)
+            foreach (var row in _packSpecialDb.rows)
             {
-                var product = productDb.rows.FirstOrDefault(v => v.iD == row.productID);
+                var product = _productDb.rows.FirstOrDefault(v => v.iD == row.productID);
 
                 if (product != null)
                 {
@@ -92,7 +143,7 @@ namespace Immortal_Switch.Scripts.Shared
 
         public List<DynamicHeroesGlobalSpecificationsGameRechargeMilestoneRow> GetShopPacksGloryPass()
         {
-            return packGloryPassDb.rows;
+            return _packGloryPassDb.rows;
         }
 
         public IReadOnlyList<ItemRewardData> GetShopGloryPassRewards(int packId)
@@ -133,6 +184,22 @@ namespace Immortal_Switch.Scripts.Shared
 
                 result.AddRange(BuildItemRewards(rewards));
             }
+            else
+            {
+                var eventPack = _packEventDb.rows.FirstOrDefault(row => row.iD == packId);
+
+                if (eventPack != null)
+                {
+                    var rewards = new List<(int itemId, int quantity)>
+                    {
+                        (eventPack.itemId1, eventPack.quantity1),
+                        (eventPack.itemId2, eventPack.quantity2),
+                        (eventPack.itemId3, eventPack.quantity3),
+                    };
+
+                    result.AddRange(BuildItemRewards(rewards));
+                }
+            }
 
             return result;
         }
@@ -140,7 +207,7 @@ namespace Immortal_Switch.Scripts.Shared
         public IReadOnlyList<ItemRewardData> GetPackMonthly(int packId, int day)
         {
             var result = new List<ItemRewardData>();
-            var pack = packMonthlyDb.rows.FirstOrDefault(v => v.packId == packId && v.day == day);
+            var pack = _packMonthlyDb.rows.FirstOrDefault(v => v.packId == packId && v.day == day);
 
             if (pack != null)
             {
@@ -160,7 +227,7 @@ namespace Immortal_Switch.Scripts.Shared
         public IReadOnlyList<ItemRewardData> GetPackMonthlyTotal(int packId)
         {
             var result = new List<ItemRewardData>();
-            var pack = packMonthlyTotalDb.rows.FirstOrDefault(v => v.packId == packId);
+            var pack = _packMonthlyTotalDb.rows.FirstOrDefault(v => v.packId == packId);
 
             if (pack != null)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
@@ -69,7 +70,12 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private void OnClickClaimMilestone()
         {
-            var rewards = EventLeHoiBangLongManager.Instance.ClaimAvailableSummonMilestones();
+            OnClickClaimMilestoneAsync().Forget();
+        }
+
+        private async UniTaskVoid OnClickClaimMilestoneAsync()
+        {
+            var rewards = await EventLeHoiBangLongManager.Instance.ClaimAvailableSummonMilestones();
 
             if (rewards.Count > 0)
             {
@@ -82,7 +88,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
             var maxPointRequired = _milestones.LastOrDefault()?.pointsRequired ?? 0;
 
             milestone.Bind(
-                EventLeHoiBangLongManager.Instance.Storage.Data.summonPoints,
+                EventLeHoiBangLongManager.Instance.State?.Progress?.SummonPoints ?? 0,
                 maxPointRequired,
                 OnClickClaimMilestone,
                 _milestones

@@ -1,7 +1,5 @@
 using Immortal_Switch.Scripts.Tutorial.Interfaces;
 using Immortal_Switch.Scripts.Tutorial.Models;
-using Newtonsoft.Json;
-using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Tutorial
 {

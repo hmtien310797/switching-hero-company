@@ -11,6 +11,7 @@ using Cysharp.Threading.Tasks;
 using Google;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
@@ -428,6 +429,7 @@ public class SettingManager : Singleton<SettingManager>
 
         //await Transitioner.Instance.TransitionOutWithoutChangingScene(destroyCancellationToken);
         PvEBattleController.Instance.CleanupBattle(true);
+        DatabaseManager.Instance.ReleaseGameDatabase();
         await UniTask.Yield();
 
         //Transitioner.Instance.TransitionInWithoutChangingScene();

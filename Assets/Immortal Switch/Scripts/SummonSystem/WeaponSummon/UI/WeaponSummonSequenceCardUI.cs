@@ -20,9 +20,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
         [Header("Star")] [SerializeField] private UIWeaponStarDisplay starDisplay;
 
-        [Header("Tier Visual")] [SerializeField]
-        private WeaponTierVisualConfigSO tierVisualConfig;
-
         [Header("Background")] [SerializeField]
         private Image tierBackground;
 
@@ -190,46 +187,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
 
             if (rectTransform != null)
                 rectTransform.localScale = GetFinalScale();
-        }
-
-        private void ApplyTierVisual(WeaponTier tier)
-        {
-            var visual = tierVisualConfig != null ? tierVisualConfig.Get(tier) : null;
-
-            if (tierIcon != null)
-            {
-                tierIcon.sprite = visual != null ? visual.TierLabelSprite : null;
-                tierIcon.enabled = tierIcon.sprite != null;
-            }
-
-            if (tierBackground != null)
-            {
-                tierBackground.sprite = visual != null ? visual.TierBackgroundSprite : null;
-                tierBackground.enabled = tierBackground.sprite != null;
-            }
-        }
-
-        private void ApplyGlowByTier(WeaponTier tier, int star)
-        {
-            var visual = tierVisualConfig != null ? tierVisualConfig.Get(tier) : null;
-
-            bool showGlow = tier >= WeaponTier.S || star >= 4;
-
-            if (glowRoot != null)
-                glowRoot.SetActive(showGlow);
-
-            if (!showGlow)
-                return;
-
-            Color glowColor = visual.GlowColor;
-
-            glowColor.a = 1f;
-
-            if (glowBack != null)
-                glowBack.color = glowColor;
-
-            if (glowRing != null)
-                glowRing.color = glowColor;
         }
 
         private void ResetGlow()

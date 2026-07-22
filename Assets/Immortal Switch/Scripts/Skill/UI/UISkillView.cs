@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -366,7 +367,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 var notInBattleHeroSkillPool = dataProvider.GetSortedPoolForNotInBattleHero(selectedClass);
                 selectedSkill = ValidateSelectedSkill(notInBattleHeroSkillPool, selectedHero);
                 var itemTier1 = EnumHelper.TierSkillToItemTier(selectedSkill.SkillTier);
-                var tierInfo1 = DatabaseManager.Instance.ItemTierDb.Get(itemTier1);
+                var tierInfo1 = ItemTierVisualImageService.GetItemTierEntry(itemTier1);
 
                 if (warningText != null)
                     warningText.text = "Cannot equip skill because this Hero's class is not assigned";
@@ -399,7 +400,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             selectedSkill = ValidateSelectedSkill(pool, selectedHero);
 
             var itemTier = EnumHelper.TierSkillToItemTier(selectedSkill.SkillTier);
-            var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
+            var tierInfo = ItemTierVisualImageService.GetItemTierEntry(itemTier);
 
             LogView(
                 $"SelectedSkill -> {(selectedSkill != null ? $"{selectedSkill.SkillId}-{selectedSkill.SkillName}" : "null")}");
@@ -548,7 +549,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
                 item.name = $"skill_{skillData.SkillClass}_{skillData.SkillId}";
                 var itemTier = EnumHelper.TierSkillToItemTier(skillData.SkillTier);
-                var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
+                var tierInfo = ItemTierVisualImageService.GetItemTierEntry(itemTier);
                 
                 item.Setup(state, tierInfo, isSelected, OnClickGridSkill);
                 spawnedGridItems.Add(item);

@@ -127,8 +127,8 @@ namespace Immortal_Switch.Scripts.Shop.Views
             tabVertical.Initialize();
             tabHorizontal.Initialize();
 
-            tabVertical.Bind(OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
-            tabHorizontal.Bind(OnClickBuyProduct, OnClickBuyBundleProduct, OnChangeTab, OnClickClaim);
+            tabVertical.Bind(OnClickBuyProduct, OnClickBuyBundleProduct, OnClickBuyEventProduct, OnChangeTab, OnClickClaim);
+            tabHorizontal.Bind(OnClickBuyProduct, OnClickBuyBundleProduct, OnClickBuyEventProduct, OnChangeTab, OnClickClaim);
 
             var tab = args is ShopArgs data ? data.DefaultTab : defaultTab;
             OnChangeTab(tab);
@@ -251,17 +251,10 @@ namespace Immortal_Switch.Scripts.Shop.Views
                     return;
                 }
 
-                if (packId > 0)
-                {
-                    // gói IAP special (có limit)
-                    ShopManager.Instance.RecordPurchase(packId);
-                }
-                else
-                {
-                    // gói kim cương (topup) — server đã cộng điểm tích nạp trong iap/purchase,
-                    // sync lại recharge/state để GloryPass phản ánh đúng ngay
-                    ShopManager.Instance.SyncRechargeStateAsync().Forget();
-                }
+                // Callback này chỉ dùng cho pack_diamond. Sau khi server xác thực thành công,
+                // đánh dấu riêng từng pack đã dùng ưu đãi x2 lần đầu rồi refresh Topup UI.
+                ShopManager.Instance.RecordDiamondFirstPurchase(packId);
+                ShopManager.Instance.SyncRechargeStateAsync().Forget();
             });
         }
 
@@ -288,6 +281,55 @@ namespace Immortal_Switch.Scripts.Shop.Views
                     ShopManager.Instance.SyncMonthlyPassStateAsync().Forget();
                 }
             });
+        }
+
+        /// <summary>
+        /// Mua gói Event: gói miễn phí nhận ngay, gói trả phí đi qua IAP và đều cập nhật limit riêng của Event.
+        /// </summary>
+        private void OnClickBuyEventProduct(string storeProductId, int packId)
+        {
+            var runtime = DatabaseManager.Instance.GetShopPacksEvent()
+                .Find(entry => entry.Pack.iD == packId);
+
+            if (runtime?.Pack == null ||
+                runtime.Product == null)
+            {
+                Debug.LogWarning($"[ShopView] Event pack not found: {packId}");
+                return;
+            }
+
+            if (ShopManager.Instance.GetEventRemaining(packId, runtime.Pack.limit) <= 0)
+            {
+                UIManager.Instance.ShowToast("Đã đạt giới hạn mua của gói này.");
+                return;
+            }
+
+            if (Mathf.Approximately(runtime.Product.price, 0f))
+            {
+                if (ShopManager.Instance.TryRecordEventPurchase(packId, runtime.Pack.limit))
+                {
+                    PopupRewardService.Show(runtime.Rewards);
+                }
+
+                return;
+            }
+
+            IAPManager.Instance.BuyEventPackProduct(
+                packId,
+                storeProductId,
+                runtime.Rewards,
+                (success, error) =>
+                {
+                    if (!success)
+                    {
+                        Debug.LogWarning($"[ShopView] Event purchase failed -> product={storeProductId}, error={error}");
+                        return;
+                    }
+
+                    ShopManager.Instance.TryRecordEventPurchase(packId, runtime.Pack.limit);
+                    ShopManager.Instance.SyncRechargeStateAsync().Forget();
+                }
+            );
         }
     }
 }

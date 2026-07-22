@@ -60,8 +60,8 @@ namespace Immortal_Switch.Scripts.Shop.Models
 
             if (sprite == null)
             {
-                throw new KeyNotFoundException(
-                    $"Sprite '{iconKey}' was not found in atlas '{SpriteAtlasConstants.CURRENCY}'.");
+                Debug.LogError($"Sprite '{iconKey}' was not found in atlas '{SpriteAtlasConstants.CURRENCY}'.");
+                return null;
             }
 
             _spriteCache.Add(iconKey, sprite);

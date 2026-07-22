@@ -30,6 +30,31 @@ namespace Immortal_Switch.Scripts.Reward
             return result.ToArray();
         }
 
+        // Ước tính quà từ base rate (per 60s, hiển thị dòng "+X/60s") và số giây đã tích lũy —
+        // dùng để hiển thị EarnedRewards trong popup claim mà không cần gọi thêm afk/preview
+        // riêng, đảm bảo khớp đúng với elapsedSeconds đang hiển thị trên nút ngoài main view
+        // (txtAfkClaimTimer). Số quà thật vẫn do server tính lại khi commit afk/claim.
+        public static StageReward[] FromBaseRewardsElapsed(StageReward[] baseRewardsPerMinute, double elapsedSeconds)
+        {
+            var result = new List<StageReward>();
+            if (baseRewardsPerMinute == null || elapsedSeconds <= 0) return result.ToArray();
+
+            double minutes = elapsedSeconds / 60.0;
+
+            for (int i = 0; i < baseRewardsPerMinute.Length; i++)
+            {
+                StageReward baseReward = baseRewardsPerMinute[i];
+                if (baseReward == null || baseReward.currencyType == CurrencyType.none) continue;
+
+                BigNumber amount = baseReward.Amount * minutes;
+                if (amount <= BigNumber.Zero) continue;
+
+                result.Add(new StageReward(baseReward.currencyType, amount));
+            }
+
+            return result.ToArray();
+        }
+
         public static List<StageReward> ToRewardDtos(StageReward[] rewards)
         {
             List<StageReward> result = new List<StageReward>();

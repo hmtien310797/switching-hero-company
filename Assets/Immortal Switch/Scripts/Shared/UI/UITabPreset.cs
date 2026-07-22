@@ -19,6 +19,9 @@ namespace Immortal_Switch.Scripts.Shared.UI
         [SerializeField]
         private Button btn;
 
+        [SerializeField]
+        private bool keepInteractableOnHover;
+
         [Header("Selected references")]
         [SerializeField]
         private TextMeshProUGUI txtSelected;
@@ -57,29 +60,29 @@ namespace Immortal_Switch.Scripts.Shared.UI
             _onClick?.Invoke(_idx);
         }
 
-        public void Bind(int idx, string txt, Action<int> onClick)
+        public void Bind(int idx, string label, Action<int> onClick)
         {
             _idx = idx;
             _onClick = onClick;
 
-            SetLabel(txt);
+            SetLabel(label);
         }
 
-        public void SetLabel(string txt)
+        public void SetLabel(string label)
         {
-            if (string.IsNullOrWhiteSpace(txt))
+            if (string.IsNullOrWhiteSpace(label))
             {
                 return;
             }
 
             if (txtSelected != null)
             {
-                txtSelected.text = txt;
+                txtSelected.text = label;
             }
 
             if (txtNormal != null)
             {
-                txtNormal.text = txt;
+                txtNormal.text = label;
             }
         }
 
@@ -140,7 +143,10 @@ namespace Immortal_Switch.Scripts.Shared.UI
                 goLock.SetActive(isLock);
             }
 
-            btn.interactable = _status == ETabPresetStatus.Normal;
+            if (!keepInteractableOnHover)
+            {
+                btn.interactable = _status == ETabPresetStatus.Normal;
+            }
         }
     }
 }

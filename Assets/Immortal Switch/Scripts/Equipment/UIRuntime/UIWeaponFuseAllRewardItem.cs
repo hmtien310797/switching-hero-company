@@ -1,5 +1,7 @@
 ﻿using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +15,6 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [SerializeField] private Image tierLabelImage;
         [SerializeField] private Image tierBackgroundImage;
         [SerializeField] private UIWeaponStarDisplay starDisplay;
-        [SerializeField] private WeaponTierVisualConfigSO tierVisualConfig;
 
         [Header("Amount")]
         [SerializeField] private TMP_Text txtAmount;
@@ -42,18 +43,15 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         private void BindTierVisual(WeaponTier tier)
         {
-            if (tierVisualConfig == null)
-                return;
-
-            var entry = tierVisualConfig.Get(tier);
+            var entry = ItemTierVisualImageService.GetItemTierEntry(tier);
             if (entry == null)
                 return;
 
             if (tierLabelImage != null)
-                tierLabelImage.sprite = entry.TierLabelSprite;
+                tierLabelImage.sprite = entry.tierIcon;
 
             if (tierBackgroundImage != null)
-                tierBackgroundImage.sprite = entry.TierBackgroundSprite;
+                tierBackgroundImage.sprite = entry.background;
         }
     }
 }

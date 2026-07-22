@@ -31,7 +31,7 @@ namespace Immortal_Switch.Scripts.Shared
         public DynamicHeroesGlobalSpecificationsEventWheelPassConfigDatabase EventWheelPassConfigDb { get; private set; }
 
         // --- Private Fields ---
-        private Dictionary<int, DynamicHeroesGlobalSpecificationsConfigEventRow> _eventsActive = new();
+        private Dictionary<int, DynamicHeroesGlobalSpecificationsConfigEventRow> _activeEvents = new();
 
         public DynamicHeroesGlobalSpecificationsConfigPassEventRow GetEventPassConfig(int eventId)
         {
@@ -63,25 +63,34 @@ namespace Immortal_Switch.Scripts.Shared
         [CanBeNull]
         public DynamicHeroesGlobalSpecificationsConfigEventRow GetEventIfActive(int eventId)
         {
-            return _eventsActive.GetValueOrDefault(eventId);
+            return _activeEvents.GetValueOrDefault(eventId);
         }
 
-        public List<DynamicHeroesGlobalSpecificationsConfigEventRow> GetEventActives(EEventDisplayMode mode)
+        public void InitEventAsync()
         {
             var list = EventDb.rows
                 .Where(v =>
                     DateTimeHelper.InTime(DateTime.Now, v.startTime, v.endTime) &&
-                    v.status == "Active" &&
-                    (mode == EEventDisplayMode.All || (int)mode == v.displayMode)
+                    v.status == "Active"
                 )
                 .ToList();
 
             foreach (var row in list)
             {
-                _eventsActive.TryAdd(row.eventId, row);
+                _activeEvents.TryAdd(row.eventId, row);
+            }
+        }
+
+        public List<DynamicHeroesGlobalSpecificationsConfigEventRow> GetEventActives(EEventDisplayMode mode)
+        {
+            if (mode == EEventDisplayMode.All)
+            {
+                return _activeEvents.Select(v => v.Value).ToList();
             }
 
-            return list;
+            return _activeEvents.Where(v => v.Value.displayMode == (int)mode)
+                .Select(v => v.Value)
+                .ToList();
         }
     }
 }

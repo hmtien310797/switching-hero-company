@@ -15,6 +15,7 @@ using UnityEngine;
 using UnityEngine.Purchasing;
 
 #pragma warning disable CS0618 // Unity IAP classic (IStoreListener/UnityPurchasing) API — marked
+
 // Obsolete từ IAP 5.x để hướng migrate sang UnityIAPServices, nhưng vẫn được support đầy đủ.
 
 namespace Immortal_Switch.Scripts.Shop.IAP
@@ -41,13 +42,20 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         private UniTaskCompletionSource<bool> _initTcs;
 
         private readonly Dictionary<string, Action<bool, string>> _pendingCallbacks = new();
+
         // pack_id (từ config pack_diamond hoặc pack_iap) — cần gửi kèm receipt lên RPC iap/purchase
         // hoặc iap/pack_purchase để server biết cộng thưởng theo pack nào; Unity IAP chỉ biết
         // storeProductId (google/apple product id).
         private readonly Dictionary<string, int> _pendingPackIds = new();
+
         // true nếu pack_id thuộc pack_iap (bundle nhiều item, vd. Special) — validate qua
         // iap/pack_purchase thay vì iap/purchase (pack_diamond, 1 loại tiền). Set bởi BuyPackProduct.
         private readonly Dictionary<string, bool> _pendingIsBundle = new();
+
+        // Reward của pack_event đang chờ xác thực. Tách riêng để popup sau IAP không lấy nhầm
+        // reward từ pack_iap khi hai bảng dùng trùng pack ID.
+        private readonly Dictionary<string, IReadOnlyList<ItemData>> _pendingEventRewards = new();
+
         // true nếu đây là giao dịch mua Premium Pass của 1 event (vd. Lucky Wheel) — validate qua
         // eventwheel/pass_buy_premium thay vì iap/purchase. Set bởi BuyEventPassProduct. Không dùng
         // chung _pendingPackIds vì RPC này không nhận pack_id (server tự tra config_pass_event
@@ -111,7 +119,8 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
                 if (!hasResult)
                 {
-                    Debug.LogWarning($"[IAPManager] Initialize timeout sau {InitTimeoutSeconds}s — store không phản hồi, tiếp tục flow game không có IAP.");
+                    Debug.LogWarning(
+                        $"[IAPManager] Initialize timeout sau {InitTimeoutSeconds}s — store không phản hồi, tiếp tục flow game không có IAP.");
                 }
                 else if (!success)
                 {
@@ -132,7 +141,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             {
                 return string.Empty;
             }
-            
+
 #if UNITY_IOS
             return product.appleID;
 #elif UNITY_ANDROID
@@ -155,7 +164,8 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
             Product product = _storeController.products.WithID(storeProductId);
 
-            if (product == null || !product.availableToPurchase)
+            if (product == null ||
+                !product.availableToPurchase)
             {
                 onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
                 return;
@@ -180,7 +190,8 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
             Product product = _storeController.products.WithID(storeProductId);
 
-            if (product == null || !product.availableToPurchase)
+            if (product == null ||
+                !product.availableToPurchase)
             {
                 onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
                 return;
@@ -189,6 +200,38 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             _pendingCallbacks[storeProductId] = onComplete;
             _pendingPackIds[storeProductId] = packId;
             _pendingIsBundle[storeProductId] = true;
+            _storeController.InitiatePurchase(product);
+        }
+
+        /// <summary>
+        /// Mua gói thuộc tab Event qua RPC pack purchase và lưu đúng danh sách thưởng để hiển thị
+        /// sau khi server xác thực giao dịch thành công.
+        /// </summary>
+        public void BuyEventPackProduct(
+            int packId,
+            string storeProductId,
+            IReadOnlyList<ItemData> rewards,
+            Action<bool, string> onComplete)
+        {
+            if (_storeController == null)
+            {
+                onComplete?.Invoke(false, "IAP chưa khởi tạo xong.");
+                return;
+            }
+
+            var product = _storeController.products.WithID(storeProductId);
+
+            if (product == null ||
+                !product.availableToPurchase)
+            {
+                onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
+                return;
+            }
+
+            _pendingCallbacks[storeProductId] = onComplete;
+            _pendingPackIds[storeProductId] = packId;
+            _pendingIsBundle[storeProductId] = true;
+            _pendingEventRewards[storeProductId] = rewards;
             _storeController.InitiatePurchase(product);
         }
 
@@ -205,7 +248,8 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
             Product product = _storeController.products.WithID(storeProductId);
 
-            if (product == null || !product.availableToPurchase)
+            if (product == null ||
+                !product.availableToPurchase)
             {
                 onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
                 return;
@@ -255,6 +299,9 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             _pendingIsEventPass.TryGetValue(storeProductId, out bool isEventPass);
             _pendingIsEventPass.Remove(storeProductId);
 
+            _pendingEventRewards.TryGetValue(storeProductId, out var eventRewards);
+            _pendingEventRewards.Remove(storeProductId);
+
             string payload = ExtractReceiptPayload(product.receipt);
 
             if (string.IsNullOrEmpty(payload))
@@ -281,7 +328,9 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
                     if (!response.Success)
                     {
-                        Debug.LogWarning($"[IAPManager] Event pass purchase rejected -> product={storeProductId}: {response.Error}");
+                        Debug.LogWarning(
+                            $"[IAPManager] Event pass purchase rejected -> product={storeProductId}: {response.Error}");
+
                         callback?.Invoke(false, response.Error);
                         return;
                     }
@@ -302,9 +351,18 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                     _storeController.ConfirmPendingPurchase(product);
                     CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
 
-                    PopupRewardService.Show(DatabaseManager.Instance.GetShopSpecialRewards(packId));
+                    if (eventRewards != null)
+                    {
+                        PopupRewardService.Show(eventRewards);
+                    }
+                    else
+                    {
+                        PopupRewardService.Show(DatabaseManager.Instance.GetShopSpecialRewards(packId));
+                    }
 
-                    Debug.Log($"[IAPManager] Pack purchase validated & confirmed -> product={storeProductId} pack={packId} count={response.PurchaseCount}/{response.Limit}");
+                    Debug.Log(
+                        $"[IAPManager] Pack purchase validated & confirmed -> product={storeProductId} pack={packId} count={response.PurchaseCount}/{response.Limit}");
+
                     callback?.Invoke(true, null);
                     OnPurchased?.Invoke(packId);
                 }
@@ -317,16 +375,24 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
                     _storeController.ConfirmPendingPurchase(product);
                     await RefreshCurrencyAsync();
-                    
+
+                    var packDiamond = DatabaseManager.Instance.GetShopPackDiamond(packId);
+                    var rewardQuantity = packDiamond?.quantity ?? response.Balance;
+                    var hasFirstBuyMultiplier = response.IsFirstBuy && packDiamond?.firstBuy > 0;
+
+                    if (hasFirstBuyMultiplier)
+                    {
+                        rewardQuantity *= 2;
+                    }
+
                     PopupRewardService.Show(new List<ItemRewardData>
                     {
-                        new (DatabaseManager.Instance.ItemDb
-                                .FindItem(response.ItemId)
-                                .itemKey,
-                            BigNumber.FromInt(response.Balance))
+                        new(response.ItemId, rewardQuantity),
                     });
-                    
-                    Debug.Log($"[IAPManager] Purchase validated & confirmed -> product={storeProductId} pack={packId} gems={response.GemsGranted}");
+
+                    Debug.Log(
+                        $"[IAPManager] Purchase validated & confirmed -> product={storeProductId} pack={packId} gems={response.GemsGranted} firstBuy={response.IsFirstBuy}");
+
                     callback?.Invoke(true, null);
                     OnPurchased?.Invoke(packId);
                 }
@@ -381,19 +447,22 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
         public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
         {
-            Debug.LogWarning($"[IAPManager] Purchase failed (legacy callback) -> product={product?.definition.id}, reason={failureReason}");
+            Debug.LogWarning(
+                $"[IAPManager] Purchase failed (legacy callback) -> product={product?.definition.id}, reason={failureReason}");
         }
 
         public void OnPurchaseFailed(Product product, PurchaseFailureDescription failureDescription)
         {
             string storeProductId = product?.definition.id;
 
-            if (storeProductId != null && _pendingCallbacks.TryGetValue(storeProductId, out Action<bool, string> callback))
+            if (storeProductId != null &&
+                _pendingCallbacks.TryGetValue(storeProductId, out Action<bool, string> callback))
             {
                 _pendingCallbacks.Remove(storeProductId);
                 _pendingPackIds.Remove(storeProductId);
                 _pendingIsBundle.Remove(storeProductId);
                 _pendingIsEventPass.Remove(storeProductId);
+                _pendingEventRewards.Remove(storeProductId);
                 callback?.Invoke(false, failureDescription.message);
             }
 

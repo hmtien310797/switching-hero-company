@@ -32,10 +32,14 @@ namespace Immortal_Switch.Scripts.Reward
             await SaveCheckpointAsync(currentAfkStage);
         }
 
+        // Chỉ cập nhật stage cục bộ (dùng khi pause/quit) — KHÔNG gọi afk/checkpoint ở đây.
+        // Server bỏ qua afk_stage trong payload (rpcAfkCheckpoint chỉ stamp checkpoint_unix,
+        // xem nakama/src/handler/afk.js), nên gọi RPC mỗi lần đổi stage chỉ có tác dụng phụ
+        // là reset checkpoint_unix liên tục trong lúc chơi — khiến elapsed luôn gần 0 và
+        // popup AFKRewardView luôn hiển thị phần thưởng trống dù đã treo máy bao lâu.
         public void SetCurrentAfkStage(int stage)
         {
             currentAfkStage = Mathf.Max(1, stage);
-            SaveCheckpointAsync(currentAfkStage).Forget();
         }
 
         private async UniTask TryClaimOfflineAfkReward()

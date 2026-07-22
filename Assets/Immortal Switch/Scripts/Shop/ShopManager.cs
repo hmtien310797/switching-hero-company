@@ -62,6 +62,47 @@ namespace Immortal_Switch.Scripts.Shop
             return Service.GetPurchasedCount(packId);
         }
 
+        /// <summary>Kiểm tra gói kim cương còn ưu đãi x2 lần mua đầu hay không.</summary>
+        public bool IsDiamondFirstPurchaseAvailable(int packId)
+        {
+            return !Service.HasPurchasedDiamondPack(packId);
+        }
+
+        /// <summary>Đánh dấu ưu đãi x2 lần đầu của gói kim cương đã được sử dụng và cập nhật UI.</summary>
+        public void RecordDiamondFirstPurchase(int packId)
+        {
+            Service.RecordDiamondFirstPurchase(packId);
+            OnDataChanged?.Invoke();
+        }
+
+        /// <summary>Lấy số lượt mua Event còn lại trong chu kỳ hiện tại.</summary>
+        public int GetEventRemaining(int packId, int limit)
+        {
+            Service.CheckAndReset();
+            return Service.GetEventRemaining(packId, limit);
+        }
+
+        /// <summary>Lấy số lần gói Event đã được mua trong chu kỳ hiện tại.</summary>
+        public int GetEventPurchasedCount(int packId)
+        {
+            Service.CheckAndReset();
+            return Service.GetEventPurchasedCount(packId);
+        }
+
+        /// <summary>Ghi nhận giao dịch Event nếu chưa đạt giới hạn và cập nhật UI ngay.</summary>
+        public bool TryRecordEventPurchase(int packId, int limit)
+        {
+            Service.CheckAndReset();
+
+            if (!Service.TryRecordEventPurchase(packId, limit))
+            {
+                return false;
+            }
+
+            OnDataChanged?.Invoke();
+            return true;
+        }
+
         // ── Topup / GloryPass (recharge/state — server là nguồn sự thật) ──────
 
         /// <summary>Tổng số lượt nạp trong tháng hiện tại, lấy từ recharge/state — không đếm local

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
@@ -54,7 +55,12 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private void OnClickClaimMilestone()
         {
-            var rewards = EventLeHoiBangLongManager.Instance.ClaimAvailableMissionMilestones();
+            OnClickClaimMilestoneAsync().Forget();
+        }
+
+        private async UniTaskVoid OnClickClaimMilestoneAsync()
+        {
+            var rewards = await EventLeHoiBangLongManager.Instance.ClaimAvailableMissionMilestones();
 
             if (rewards.Count > 0)
             {
@@ -91,12 +97,12 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
             {
                 var mission = missions[i];
                 var clone = _missionPools.Get(i);
-                var state = EventLeHoiBangLongManager.Instance.Service.GetMissionState(mission.missionId);
+                var state = EventLeHoiBangLongManager.Instance.FindMission(mission.missionId);
 
                 clone.Bind(
                     mission,
-                    state?.progress ?? 0,
-                    state?.isClaimed ?? false,
+                    state?.Progress ?? 0,
+                    state?.IsClaimed ?? false,
                     OnClaimMission,
                     i == missions.Count - 1
                 );
@@ -115,7 +121,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
             {
                 var milestone = milestones[i];
                 var clone = _milestonePools.Get(i);
-                var isClaimed = EventLeHoiBangLongManager.Instance.Service.IsMissionMilestoneClaimed(milestone.milestone);
+                var isClaimed = EventLeHoiBangLongManager.Instance.IsMissionMilestoneClaimed(milestone.milestone);
 
                 clone.Bind(milestone.itemId1, milestone.pointsRequired);
                 clone.SetClaimed(isClaimed);
@@ -126,7 +132,12 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private void OnClaimMission(DynamicHeroesGlobalSpecificationsEventBLDailyMissionRow row)
         {
-            var rewards = EventLeHoiBangLongManager.Instance.ClaimMission(row);
+            OnClaimMissionAsync(row).Forget();
+        }
+
+        private async UniTaskVoid OnClaimMissionAsync(DynamicHeroesGlobalSpecificationsEventBLDailyMissionRow row)
+        {
+            var rewards = await EventLeHoiBangLongManager.Instance.ClaimMission(row.missionId);
 
             if (rewards.Count > 0)
             {
@@ -136,7 +147,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private void RefreshState()
         {
-            var currentPoint = EventLeHoiBangLongManager.Instance.Storage.Data.missionPoints;
+            var currentPoint = EventLeHoiBangLongManager.Instance.State?.Progress?.MissionPoints ?? 0;
             var maxValue = _milestones.LastOrDefault()?.pointsRequired ?? 1;
 
             imgFill.fillAmount = maxValue <= 0 ? 0f : currentPoint / (maxValue * 1f);
@@ -144,7 +155,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
             btnClaim.interactable = _milestones.Any(milestone =>
                 currentPoint >= milestone.pointsRequired &&
-                !EventLeHoiBangLongManager.Instance.Service.IsMissionMilestoneClaimed(milestone.milestone)
+                !EventLeHoiBangLongManager.Instance.IsMissionMilestoneClaimed(milestone.milestone)
             );
 
             RefreshMissions(_missions);

@@ -430,42 +430,28 @@ namespace Immortal_Switch.Scripts.UI
             FarmingIdleScreenService.Close();
         }
 
-        // Nút gương — chỉ PEEK (afk/preview, không commit) để mở popup với số liệu thật.
-        // Claim thật sự chỉ xảy ra khi player bấm nút Claim bên trong popup (OnClickClaim).
+        // Nút gương — dùng đúng afkAccumulatedSeconds (số giây đang hiển thị trên txtAfkClaimTimer
+        // cạnh nút) để mở popup và tính quà, thay vì gọi thêm 1 lần afk/preview riêng — vì lần gọi
+        // đó có thể trả về elapsed lệch pha với số đang hiển thị (do sync trước đó hoặc do checkpoint
+        // vừa được cập nhật ở nơi khác), khiến nút hiện đã hơn 1 phút mà popup lại trống quà.
+        // Claim thật sự (afk/claim, số liệu do server tính lại) chỉ xảy ra khi bấm nút Claim trong
+        // popup (OnClickClaim).
         private void OnAfkClaimClicked()
         {
-            OnAfkClaimClickedAsync().Forget();
-        }
-
-        private async UniTaskVoid OnAfkClaimClickedAsync()
-        {
-            // Field rewardSyncService của riêng TopMainView không được wire trong prefab gốc
-            // (fileID: 0) — lấy thẳng từ PvEBattleController, nơi nó luôn được gán thật, giống
-            // cách CurrencyTextBinder đang làm.
-            RewardSyncService service = PvEBattleController.Instance != null
-                ? PvEBattleController.Instance.RewardSyncService
-                : rewardSyncService;
-
-            if (service == null)
+            if (!afkTimerSynced)
             {
-                Debug.LogWarning("[TopMainView] RewardSyncService not found — not opening popup.");
+                Debug.LogWarning("[TopMainView] AFK timer chưa đồng bộ với server — chưa mở popup.");
                 return;
             }
 
-            AfkClaimResponse preview = await service.PreviewRewardAsync();
-
-            if (preview == null ||
-                !preview.Success)
+            if (PvEBattleController.Instance == null)
             {
-                Debug.LogWarning("[TopMainView] afk/preview failed — not opening popup.");
+                Debug.LogWarning("[TopMainView] PvEBattleController chưa sẵn sàng — chưa mở popup.");
                 return;
             }
 
-            // Luôn mở popup khi call thành công, kể cả chưa đủ MIN_CLAIM_SECONDS (has_reward=false) —
-            // vẫn hiển thị elapsed_seconds/rewards thật (có thể là 0), thay vì im lặng không phản
-            // hồi gì khiến nút trông như bị đứng.
             var stageRewards = PvEBattleController.Instance.GetStageRuntimeData().BaseRewards;
-            var earnedRewards = StageRewardConverter.FromRewardDtos(preview.Rewards);
+            var earnedRewards = StageRewardConverter.FromBaseRewardsElapsed(stageRewards, afkAccumulatedSeconds);
 
             UIManager.Instance
                 .OpenPopupAsync<AFKRewardView>(new AFKRewardArgs
@@ -473,8 +459,8 @@ namespace Immortal_Switch.Scripts.UI
                     OnClaim = OnClickClaim,
                     Rewards = stageRewards,
                     EarnedRewards = earnedRewards,
-                    ElapsedSeconds = preview.ElapsedSeconds,
-                    MaxOfflineSeconds = preview.MaxOfflineSeconds,
+                    ElapsedSeconds = (int)afkAccumulatedSeconds,
+                    MaxOfflineSeconds = (int)afkMaxOfflineSeconds,
                 }, false)
                 .Forget();
         }

@@ -24,6 +24,7 @@ namespace Immortal_Switch.Scripts.Currency
             [CurrencyType.advanced_summon_ticket] = "advanced_summon_ticket",
 
             [CurrencyType.hero_exp] = "hero_exp",
+            [CurrencyType.user_exp] = "user_exp",
 
             [CurrencyType.hero_fragment] = "hero_fragment",
             [CurrencyType.epic_hero_fragment] = "epic_hero_fragment",

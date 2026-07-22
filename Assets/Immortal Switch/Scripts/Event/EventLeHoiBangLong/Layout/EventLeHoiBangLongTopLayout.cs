@@ -58,6 +58,11 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
             _onHelp = onHelp;
         }
 
+        public void SetEnableBack(bool active)
+        {
+            btnBack.gameObject.SetActive(active);
+        }
+
         public void SetEnableHelp(bool active)
         {
             btnHelp.gameObject.SetActive(active);

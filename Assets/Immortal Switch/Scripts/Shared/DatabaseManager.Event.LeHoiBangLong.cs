@@ -25,9 +25,6 @@ namespace Immortal_Switch.Scripts.Shared
         private DynamicHeroesGlobalSpecificationsEventBLCheckIn2Database _eventBLCheckIn2Db;
 
         [DatabaseBinding]
-        private DynamicHeroesGlobalSpecificationsPackEventDatabase _packEventDb;
-
-        [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsEventBLRateDatabase _eventBLRateDb;
 
         public DynamicHeroesGlobalSpecificationsEventBLRateRow EventBLRandomRate()
@@ -71,7 +68,7 @@ namespace Immortal_Switch.Scripts.Shared
             string packPrice,
             int packId,
             DynamicHeroesGlobalSpecificationsProductIdRow product
-        )
+            )
             GetEventLHBLCheckInBonusRewards(int day)
         {
             var instantRewards = new List<ItemData>();
@@ -100,7 +97,7 @@ namespace Immortal_Switch.Scripts.Shared
             TryAddRewards(bonusRewards, bonus.itemId2, bonus.quantity2);
             TryAddRewards(bonusRewards, bonus.itemId3, bonus.quantity3);
 
-            var product = productDb.rows.Find(v => v.iD == bonus.productID);
+            var product = _productDb.rows.Find(v => v.iD == bonus.productID);
 
             if (product != null)
             {
