@@ -18,10 +18,12 @@ MonoBehaviour:
   skeletonJSON: {fileID: 4900000, guid: 5989e10d42e62d04eaa2d95e605b16f2, type: 3}
   isUpgradingBlendModeMaterials: 0
   blendModeMaterials:
-    requiresBlendModeMaterials: 0
+    requiresBlendModeMaterials: 1
     applyAdditiveMaterial: 0
     additiveMaterials: []
-    multiplyMaterials: []
+    multiplyMaterials:
+    - pageName: hero_13_vorth.png
+      material: {fileID: 2100000, guid: ee853262ca392b24aba6ba601a49b290, type: 2}
     screenMaterials: []
   skeletonDataModifiers: []
   fromAnimation: []

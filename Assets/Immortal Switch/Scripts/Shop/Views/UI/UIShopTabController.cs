@@ -39,6 +39,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         private Action<string, int> _onBuyProduct;
         private Action<string, int> _onBuyBundleProduct;
+        private Action<string, int> _onBuyEventProduct;
         private Action<int, EShopTab> _onClaim;
         private Action<EShopTab> _onChangeTab;
 
@@ -70,6 +71,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         public void Bind(
             Action<string, int> onBuyProduct,
             Action<string, int> onBuyBundleProduct,
+            Action<string, int> onBuyEventProduct,
             Action<EShopTab> onChangeTab,
             Action<int, EShopTab> onClaim
         )
@@ -77,6 +79,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             _onClaim = onClaim;
             _onBuyProduct = onBuyProduct;
             _onBuyBundleProduct = onBuyBundleProduct;
+            _onBuyEventProduct = onBuyEventProduct;
             _onChangeTab = onChangeTab;
 
             DisableHighlight();
@@ -227,6 +230,13 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 {
                     var packs = DatabaseManager.Instance.GetShopPacksSpecial();
                     _selectedLayout.GetComponent<UIShopSpecialLayout>().Bind(packs, _onBuyBundleProduct);
+                    break;
+                }
+
+                case EShopTab.Event:
+                {
+                    var packs = DatabaseManager.Instance.GetShopPacksEvent();
+                    _selectedLayout.GetComponent<UIShopEventLayout>().Bind(packs, _onBuyEventProduct);
                     break;
                 }
 

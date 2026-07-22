@@ -10,15 +10,13 @@ using Immortal_Switch.Scripts.DungeonSystem.Models;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Tutorial.Models;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shared
 {
     public partial class DatabaseManager : Singleton<DatabaseManager>
     {
-        [field: DatabaseBinding]
-        public ItemTierDatabaseSO ItemTierDb { get; private set; }
-
         [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsPlayerExpDatabase playerExpDb;
 
@@ -56,6 +54,8 @@ namespace Immortal_Switch.Scripts.Shared
                     "[DatabaseManager] ItemDb chưa được load."
                 );
             }
+
+            InitEventAsync();
 
             await UniTask.WhenAll(
                 InitHeroDataAsync(),
@@ -236,7 +236,7 @@ namespace Immortal_Switch.Scripts.Shared
         {
             return DungeonDatabase.TryGetDefinition(dungeonId, out var definition) ? definition.DungeonKey : null;
         }
-        
+
         public bool GetDungeonAvailableState(int dungeonId)
         {
             return DungeonDatabase.TryGetDefinition(dungeonId, out var definition) && definition.Available;
@@ -280,10 +280,11 @@ namespace Immortal_Switch.Scripts.Shared
 
             return rewardData;
         }
-        
+
         public ItemDisplayData GetDisplayData(ItemData itemData)
         {
             var item = ItemDb.FindItem(itemData.ItemId);
+
             if (item == null)
             {
                 item = ItemDb.FindItem(itemData.ItemKey);
@@ -314,6 +315,7 @@ namespace Immortal_Switch.Scripts.Shared
         public ItemDisplayData GetDisplayData(int itemId)
         {
             var item = ItemDb.FindItem(itemId);
+
             if (item == null)
             {
                 item = ItemDb.FindItem(itemId);
@@ -371,7 +373,7 @@ namespace Immortal_Switch.Scripts.Shared
         {
             if (Enum.TryParse<EItemTier>(rarity, true, out var result))
             {
-                tierInfo = ItemTierDb.Get(result);
+                tierInfo = ItemTierVisualImageService.GetItemTierEntry(result);
 
                 if (tierInfo != null)
                 {
@@ -397,7 +399,7 @@ namespace Immortal_Switch.Scripts.Shared
             if (!Enum.TryParse(item.rarity, true, out EItemTier itemTier))
                 return false;
 
-            var tierInfo = ItemTierDb.Get(itemTier);
+            var tierInfo = ItemTierVisualImageService.GetItemTierEntry(itemTier);
 
             if (tierInfo == null)
                 return false;
@@ -455,5 +457,6 @@ namespace Immortal_Switch.Scripts.Shared
         }
 
 #endregion
+
     }
 }

@@ -21,6 +21,18 @@ namespace Immortal_Switch.Scripts.Shop.Models
         public Dictionary<int, int> PurchaseCount = new();
 
         /// <summary>
+        /// Key là ID trong bảng pack_event, value là số lần đã mua trong chu kỳ hiện tại.
+        /// Tách riêng với PurchaseCount để tránh trùng ID giữa pack_event và pack_iap.
+        /// </summary>
+        public Dictionary<int, int> EventPurchaseCount = new();
+
+        /// <summary>
+        /// Danh sách ID gói kim cương đã mua ít nhất một lần.
+        /// Mỗi ID trong danh sách đã sử dụng hết ưu đãi x2 lần mua đầu.
+        /// </summary>
+        public List<int> PurchasedDiamondPackIds = new();
+
+        /// <summary>
         /// Ngay reset cuoi cung cho daily limit.
         /// </summary>
         public DateTime? DailyResetDate;

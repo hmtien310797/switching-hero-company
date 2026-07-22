@@ -286,7 +286,12 @@ namespace Immortal_Switch.Scripts.MissionSystem
                 case MissionTypes.DAILY:
                 case MissionTypes.WEEKLY:
                 {
-                    var missions = GetMissions(missionType);
+                    // GetMissions trả về TOÀN BỘ mission của type này, kể cả chưa hoàn thành —
+                    // chỉ claim những mission đã IsCompleted (progress đủ target + chưa claim),
+                    // nếu không MissionClaim sẽ Debug.LogError "Mission claim failed" cho từng
+                    // mission chưa xong (button Claim All chỉ cần AnyCompleted để bật, không phải
+                    // AllCompleted).
+                    var missions = GetMissions(missionType).Where(IsCompleted).ToList();
 
                     foreach (var cfg in missions)
                     {
@@ -305,7 +310,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                 case MissionTypes.REPEAT:
                 {
-                    var missions = GetMissions(missionType);
+                    var missions = GetMissions(missionType).Where(IsCompleted).ToList();
 
                     foreach (var cfg in missions)
                     {

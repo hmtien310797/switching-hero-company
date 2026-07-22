@@ -2,6 +2,7 @@
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,7 +22,6 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
         [SerializeField] private UIWeaponStarDisplay starDisplay;
         [SerializeField] private TMP_Text txtShard;
         [SerializeField] private Image shardSlider;
-        [SerializeField] private WeaponTierVisualConfigSO tierVisualConfig;
 
         [Header("Target Preview")]
         [SerializeField] private Image imgTargetUnknownIcon;
@@ -193,18 +193,15 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         private void BindTierVisual(WeaponTier tier)
         {
-            if (tierVisualConfig == null)
-                return;
-
-            var entry = tierVisualConfig.Get(tier);
+            var entry = ItemTierVisualImageService.GetItemTierEntry(tier);
             if (entry == null)
                 return;
 
             if (imgTierLabel != null)
-                imgTierLabel.sprite = entry.TierLabelSprite;
+                imgTierLabel.sprite = entry.tierIcon;
 
             if (imgTierBackground != null)
-                imgTierBackground.sprite = entry.TierBackgroundSprite;
+                imgTierBackground.sprite = entry.background;
         }
 
         private void SetMin()

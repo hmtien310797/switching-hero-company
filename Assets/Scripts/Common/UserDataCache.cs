@@ -54,6 +54,14 @@ namespace Common
         /// <summary>exp của player — set bởi GameBootstrap từ player/me.</summary>
         public long Exp { get; set; }
 
+        /// <summary>Số lần player đã đổi tên — set bởi GameBootstrap từ player/me, cập nhật lại sau
+        /// mỗi lần player/rename thành công. Dùng để tính giá đổi tên lần tới, xem RenameFeeConfig.</summary>
+        public int RenameCount { get; set; }
+
+        /// <summary>Đã nhận thưởng liên kết Google/Apple chưa — set bởi GameBootstrap từ player/me,
+        /// cập nhật lại sau khi account/claim_link_reward thành công. Xem SettingManager.ClaimLinkRewardAsync.</summary>
+        public bool LinkRewardClaimed { get; set; }
+
         /// <summary>Tổng exp của player — set bởi GameBootstrap từ player/me. Level tự tính từ exp qua UserLevelConfigSO.</summary>
 
         /// <summary>Hero inventory từ server — set bởi GameBootstrap từ player/me (owned + lineup + shards).</summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
@@ -65,7 +66,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private string OnCountdown(long days, long hours, long minutes, long seconds)
         {
-            return $"Kết thúc sau: {days} ngày {hours}:{minutes}:{seconds}";
+            return $"Kết thúc sau: {days:00} ngày {hours:00}:{minutes:00}:{seconds:00}";
         }
 
         private void RefreshEventPointRewards(IList<int> rows)
@@ -99,7 +100,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
                     reward,
                     OnClickClaim,
                     currentDay,
-                    EventLeHoiBangLongManager.Instance.Service.IsFreeLoginRewardClaimed(reward.day)
+                    EventLeHoiBangLongManager.Instance.IsFreeLoginRewardClaimed(reward.day)
                 );
             }
 
@@ -108,44 +109,40 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private void OnClickClaim(int day)
         {
-            var reward = _rows.Find(row => row.day == day);
+            OnClickClaimAsync(day).Forget();
+        }
 
-            if (reward == null ||
-                reward.rewardId <= 0 ||
-                reward.quantity <= 0)
-            {
-                return;
-            }
-
-            if (EventLeHoiBangLongManager.Instance.ClaimFreeLoginReward(day))
-            {
-                ShowRewards(new[]
-                {
-                    new ItemData(reward.rewardId, reward.quantity),
-                });
-            }
+        private async UniTaskVoid OnClickClaimAsync(int day)
+        {
+            var rewards = await EventLeHoiBangLongManager.Instance.ClaimFreeLoginReward(day);
+            ShowRewards(rewards);
         }
 
         private void OnClickRewardPanel(int day)
         {
-            var manager = EventLeHoiBangLongManager.Instance;
-            var rewards = DatabaseManager.Instance.GetEventLHBLCheckInBonusRewards(day);
+            OnClickRewardPanelAsync(day).Forget();
+        }
 
-            if (manager.Service.CanClaimFreeBonus(day))
+        private async UniTaskVoid OnClickRewardPanelAsync(int day)
+        {
+            var manager = EventLeHoiBangLongManager.Instance;
+
+            if (manager.CanClaimFreeBonus(day))
             {
-                if (manager.ClaimFreeBonus(day))
-                {
-                    ShowRewards(rewards.instantRewards);
-                }
+                var rewards = await manager.ClaimFreeBonus(day);
+                ShowRewards(rewards);
             }
-            else if (manager.Service.CanPurchaseBonus(day))
+            else if (manager.CanPurchaseBonus(day))
             {
                 manager.RequestBonusPurchase(day, ShowRewards);
             }
-            else if (manager.Service.CanClaimBonus(day))
+            else if (manager.CanClaimBonus(day))
             {
-                if (manager.ClaimBonus(day))
+                var confirmed = await manager.ClaimBonusPaid(day);
+
+                if (confirmed)
                 {
+                    var rewards = DatabaseManager.Instance.GetEventLHBLCheckInBonusRewards(day);
                     ShowRewards(rewards.bonusRewards);
                 }
             }
@@ -165,7 +162,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
         private void RefreshState()
         {
             var manager = EventLeHoiBangLongManager.Instance;
-            var currentDay = Math.Clamp(manager.Storage.Data.loginDay, 1, 7);
+            var currentDay = Math.Clamp(manager.State?.Progress?.LoginDay ?? 1, 1, 7);
             var rewards = DatabaseManager.Instance.GetEventLHBLCheckInBonusRewards(currentDay);
 
             RefreshSevenDay(_rows, currentDay);
@@ -175,9 +172,9 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
                 rewards.instantRewards,
                 rewards.bonusRewards,
                 OnClickRewardPanel,
-                manager.Service.IsFreeBonusClaimed(currentDay),
-                manager.Service.IsBonusPurchased(currentDay),
-                manager.Service.IsBonusClaimed(currentDay),
+                manager.IsFreeBonusClaimed(currentDay),
+                manager.IsBonusPurchased(currentDay),
+                manager.IsBonusClaimed(currentDay),
                 rewards.packPrice,
                 currentDay
             );

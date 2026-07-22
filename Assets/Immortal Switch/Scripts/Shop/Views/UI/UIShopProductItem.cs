@@ -1,4 +1,5 @@
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Shared;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +22,18 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         public void Bind(Sprite itemIcon, BigNumber quantity)
         {
             imgIcon.sprite = itemIcon;
+            txtQuantity.text = quantity.ToInputString();
+        }
+
+        public void Bind(int itemId, BigNumber quantity)
+        {
+            var display = DatabaseManager.Instance.GetDisplayData(itemId);
+
+            if (display != null)
+            {
+                imgIcon.sprite = display.ItemIcon;
+            }
+
             txtQuantity.text = quantity.ToInputString();
         }
     }

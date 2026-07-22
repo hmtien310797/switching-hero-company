@@ -44,6 +44,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller
 
         // --- Private Fields ---
         private EventLeHoiBangLongLayoutItem _selectedLayout;
+        private Action<EEventLeHoiBangLongLayoutType> _onChangeLayout;
 
         public void DisableLayouts()
         {
@@ -51,6 +52,11 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller
             {
                 layout.layout.SetActive(false);
             }
+        }
+
+        public void Bind(Action<EEventLeHoiBangLongLayoutType> onChangeLayout)
+        {
+            _onChangeLayout = onChangeLayout;
         }
 
         public void ChangeLayout(EEventLeHoiBangLongLayoutType type)
@@ -96,7 +102,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller
 
                     _selectedLayout.layout
                         .GetComponent<EventLeHoiBangLongMainLayout>()
-                        .Bind(milestones, ChangeLayout, remainTime);
+                        .Bind(milestones, _onChangeLayout, remainTime);
 
                     break;
                 }

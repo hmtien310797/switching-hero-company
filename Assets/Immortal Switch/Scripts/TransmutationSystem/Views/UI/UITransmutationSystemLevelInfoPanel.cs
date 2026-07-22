@@ -123,7 +123,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             for (var i = 0; i < dic.Count; i++)
             {
                 var item = dic.ElementAt(i);
-                var cfgTier = DatabaseManager.Instance.ItemTierDb.Get(item.Key);
+                var cfgTier = ItemTierVisualImageService.GetItemTierEntry(item.Key);
 
                 if (_levelInfos.Count > i)
                 {

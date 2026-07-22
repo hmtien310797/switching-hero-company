@@ -1,7 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +20,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         [Header("Icon")]
         [SerializeField] private Image rewardIcon;
+        [SerializeField] private Image rewardTierBorder;
+        [SerializeField] private Image rewardTierBg;
 
         [Header("State")]
         [SerializeField] private CanvasGroup canvasGroup;
@@ -79,6 +83,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 rewardIcon.sprite = visual != null ? visual : null;
                 rewardIcon.enabled = rewardIcon.sprite != null;
             }
+            
+            EItemTier itemTier = DatabaseManager.Instance.ItemDb.GetItemTier(data.ItemId);
+            rewardTierBorder.sprite = ItemTierVisualImageService.GetItemTierFrame(itemTier);
+            rewardTierBg.sprite = ItemTierVisualImageService.GetItemTierBg(itemTier);
 
             ApplyState(data.IsClaimable);
         }

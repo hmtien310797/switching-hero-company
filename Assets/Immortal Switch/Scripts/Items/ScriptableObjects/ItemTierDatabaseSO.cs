@@ -6,20 +6,6 @@ using UnityEngine.Serialization;
 
 namespace Immortal_Switch.Scripts.Items.ScriptableObjects
 {
-    [CreateAssetMenu(fileName = "ItemTierDatabase", menuName = "ScriptableObjects/Shared/ItemTier/Database")]
-    public class ItemTierDatabaseSO : ScriptableObject
-    {
-        /// <summary>
-        /// thong tin tier
-        /// </summary>
-        public ItemTierEntry[] entries;
-
-        public ItemTierEntry Get(EItemTier tier)
-        {
-            return entries.FirstOrDefault(e => e.tier == tier);
-        }
-    }
-
     [Serializable]
     public class ItemTierEntry
     {

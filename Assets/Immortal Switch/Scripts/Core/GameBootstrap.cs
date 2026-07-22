@@ -208,7 +208,7 @@ namespace Immortal_Switch.Scripts.Core
                 await UIManager.Instance.InitializeAsync();
                 progress.CompleteStep("UI initialized");
                 
-                await UniTask.WhenAll(HeroImageService.InitializeAsync(), SkillImageService.InitializeAsync());
+                await UniTask.WhenAll(HeroImageService.InitializeAsync(), SkillImageService.InitializeAsync(), ItemTierVisualImageService.InitializeAsync());
 
                 // 16
                 progress.CompleteStep("Battle data initialized");
@@ -367,6 +367,8 @@ namespace Immortal_Switch.Scripts.Core
             TopMainView.Instance?.SetDisplayName(UserDataCache.Instance.DisplayName);
 
             UserDataCache.Instance.Exp = player.exp;
+            UserDataCache.Instance.RenameCount = player.rename_count;
+            UserDataCache.Instance.LinkRewardClaimed = player.link_reward_claimed;
 
             CurrencyManager.Instance.Set(CurrencyType.gold, player.coins);
             CurrencyManager.Instance.Set(CurrencyType.diamond, player.gems);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using AppleAuth;
 using AppleAuth.Enums;
@@ -10,7 +11,11 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Google;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Skill.UI;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
@@ -428,6 +433,7 @@ public class SettingManager : Singleton<SettingManager>
 
         //await Transitioner.Instance.TransitionOutWithoutChangingScene(destroyCancellationToken);
         PvEBattleController.Instance.CleanupBattle(true);
+        DatabaseManager.Instance.ReleaseGameDatabase();
         await UniTask.Yield();
 
         //Transitioner.Instance.TransitionInWithoutChangingScene();
@@ -539,6 +545,57 @@ public class SettingManager : Singleton<SettingManager>
         {
             Debug.LogError($"[SettingManager] LinkAccount failed: {e.Message}");
             UIManager.Instance.ShowToast("Liên kết tài khoản thất bại. Vui lòng thử lại.");
+            return false;
+        }
+    }
+
+    /// <summary>Nhận thưởng 1 lần cho account đã link Google/Apple qua RPC account/claim_link_reward.
+    /// Trả về true nếu nhận thành công (đã cập nhật UserDataCache.LinkRewardClaimed + diamond).</summary>
+    public async UniTask<bool> ClaimLinkRewardAsync()
+    {
+        if (!IsAccountLinked)
+        {
+            UIManager.Instance.ShowToast("Bạn cần liên kết tài khoản trước khi nhận thưởng.");
+            return false;
+        }
+
+        if (UserDataCache.Instance.LinkRewardClaimed)
+        {
+            UIManager.Instance.ShowToast("Bạn đã nhận thưởng liên kết rồi.");
+            return false;
+        }
+
+        try
+        {
+            var response = await NakamaClient.Instance.ClaimLinkRewardAsync();
+            UserDataCache.Instance.LinkRewardClaimed = true;
+            CurrencyManager.Instance.Set(CurrencyType.diamond, response.gems);
+
+            if (response.rewards != null)
+            {
+                var itemRewards = new List<ItemData>();
+                foreach (var r in response.rewards)
+                {
+                    if (r.ItemId > 0 && r.Amount > 0)
+                        itemRewards.Add(new ItemData(r.ItemId, r.Amount));
+                }
+
+                if (itemRewards.Count > 0)
+                    PopupRewardService.Show(itemRewards);
+            }
+
+            return true;
+        }
+        catch (ApiResponseException e)
+        {
+            Debug.LogError($"[SettingManager] ClaimLinkReward failed: {e.StatusCode} {e.Message}");
+            UIManager.Instance.ShowToast("Nhận thưởng thất bại. Vui lòng thử lại.");
+            return false;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SettingManager] ClaimLinkReward failed: {e.Message}");
+            UIManager.Instance.ShowToast("Nhận thưởng thất bại. Vui lòng thử lại.");
             return false;
         }
     }

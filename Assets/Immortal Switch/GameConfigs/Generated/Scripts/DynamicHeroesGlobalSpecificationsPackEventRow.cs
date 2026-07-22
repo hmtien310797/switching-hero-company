@@ -20,11 +20,6 @@ namespace Game.Configs.Generated
         public int productID;
 
         /// <summary>
-        /// CSV Column: name_en
-        /// </summary>
-        public string nameEn;
-
-        /// <summary>
         /// CSV Column: name_vi
         /// </summary>
         public string nameVi;
@@ -33,6 +28,11 @@ namespace Game.Configs.Generated
         /// CSV Column: shop_tab
         /// </summary>
         public string shopTab;
+
+        /// <summary>
+        /// CSV Column: event_id
+        /// </summary>
+        public int eventId;
 
         /// <summary>
         /// CSV Column: sort_order

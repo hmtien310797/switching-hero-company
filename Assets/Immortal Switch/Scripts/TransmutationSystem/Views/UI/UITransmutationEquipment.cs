@@ -78,7 +78,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
         {
             _vm = vm;
 
-            var cfg = DatabaseManager.Instance.ItemTierDb.Get(vm.ParsedTier);
+            var cfg = ItemTierVisualImageService.GetItemTierEntry(vm.ParsedTier);
 
             SetEmpty(false);
 

@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -192,7 +193,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             {
                 var entry = currentGroupedEntries[i];
                 var itemTier = EnumHelper.GradeToItemTier(entry.Grade);
-                var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
+                var tierInfo = ItemTierVisualImageService.GetItemTierEntry(itemTier);
 
                 var card = GetCardFromPool();
                 card.Bind(

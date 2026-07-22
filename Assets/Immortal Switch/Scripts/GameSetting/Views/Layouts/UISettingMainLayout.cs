@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Common;
 using Cysharp.Threading.Tasks;
@@ -70,8 +69,6 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
 
         // --- Private Fields ---
         private List<UISettingLanguageItem> _languages = new();
-        private Action _onGgLink;
-        private Action _onLinkClaim;
 
         private void Awake()
         {
@@ -89,12 +86,31 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
 
         private void OnClickLink()
         {
-            _onGgLink?.Invoke();
+            LinkAccountAsync().Forget();
+        }
+
+        private async UniTaskVoid LinkAccountAsync()
+        {
+            var linked = await SettingManager.Instance.LinkAccountAsync();
+            if (linked)
+            {
+                SetLinked(true);
+                SetLinkedClaimed(true, UserDataCache.Instance.LinkRewardClaimed);
+            }
         }
 
         private void OnClickLinkClaim()
         {
-            _onLinkClaim?.Invoke();
+            ClaimLinkRewardAsync().Forget();
+        }
+
+        private async UniTaskVoid ClaimLinkRewardAsync()
+        {
+            var claimed = await SettingManager.Instance.ClaimLinkRewardAsync();
+            if (claimed)
+            {
+                SetLinkedClaimed(true, true);
+            }
         }
 
         private void OnEnable()
@@ -116,14 +132,8 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
             btnGiftCode.onClick.RemoveListener(OnClickGiftCode);
         }
 
-        public void Bind(
-            bool isLinkClaimed, bool isLinked,
-            Action onGgLink, Action onLinkClaim
-        )
+        public void Bind(bool isLinkClaimed, bool isLinked)
         {
-            _onGgLink = onGgLink;
-            _onLinkClaim = onLinkClaim;
-
             SetLinked(isLinked);
             SetLinkedClaimed(isLinked, isLinkClaimed);
             RefreshLanguage();

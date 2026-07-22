@@ -188,7 +188,7 @@ namespace Immortal_Switch.Scripts.Shared
             }
         }
 
-        private void ReleaseGameDatabase()
+        public void ReleaseGameDatabase()
         {
             isGameDatabaseLoaded = false;
             gameDatabaseBindings.Clear();
@@ -197,6 +197,11 @@ namespace Immortal_Switch.Scripts.Shared
             {
                 Addressables.Release(gameDatabaseHandle);
             }
+            
+            ReleaseBossData();
+            ReleaseCreepData();
+            ReleaseHeroData();
+            ReleaseSkillData();
         }
     }
 }

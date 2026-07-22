@@ -3,13 +3,32 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Immortal_Switch.Scripts.Shared.UI
 {
+    public enum ECountdownUpdateUnit
+    {
+        Minute = 0,
+        Hour = 1,
+        Second = 2,
+    }
+
     public class UICountdownTimer : MonoBehaviour
     {
         [SerializeField]
         private TextMeshProUGUI txtCountdown;
+
+        [Header("Update Settings")]
+        [SerializeField]
+        private ECountdownUpdateUnit updateUnit = ECountdownUpdateUnit.Minute;
+
+        [SerializeField]
+        [Min(0.01f)]
+        private float updateElapsed = 1f;
+
+        [SerializeField]
+        private UnityEvent onCountdownCompleted;
 
         // --- Private Fields ---
         /// <summary>
@@ -21,9 +40,13 @@ namespace Immortal_Switch.Scripts.Shared.UI
         /// </summary>
         private Func<long, long, long, long, string> _onCountdown;
 
-        private CancellationTokenSource _countdownCts;
+        private Action _onCountdownCompleted;
         private DateTime _endTime;
+
+        private CancellationTokenSource _countdownCts;
+
         private bool _isBound;
+        private bool _hasCompleted;
 
         private void OnEnable()
         {
@@ -43,33 +66,46 @@ namespace Immortal_Switch.Scripts.Shared.UI
             StopCountdown();
         }
 
-        public void Bind(double remainTime, Func<long, long, long, long, string> onCountdown)
+        /// <summary>
+        /// Gán thời gian, callback định dạng và callback runtime được gọi khi countdown kết thúc.
+        /// </summary>
+        public void Bind(
+            double remainTime,
+            Func<long, long, long, long, string> onCountdown,
+            Action onCompleted = null
+        )
         {
             _endTime = DateTime.Now.AddSeconds(Math.Max(0d, remainTime));
             _onCountdown = onCountdown;
+            _onCountdownCompleted = onCompleted;
             _isBound = true;
+            _hasCompleted = false;
 
             StartCountdown();
         }
 
-        /// <summary>Bắt đầu cập nhật thời gian còn lại mỗi phút.</summary>
+        /// <summary>Bắt đầu cập nhật thời gian còn lại theo chu kỳ đã cấu hình.</summary>
         private void StartCountdown()
         {
             StopCountdown();
 
             _countdownCts = new CancellationTokenSource();
 
-            UpdateDisplay();
-            UpdateEveryMinuteAsync(_countdownCts.Token).Forget();
+            if (UpdateDisplay())
+            {
+                return;
+            }
+
+            UpdatePeriodicallyAsync(_countdownCts.Token).Forget();
         }
 
-        /// <summary>Cập nhật nội dung đếm ngược mỗi phút cho đến khi UI bị đóng.</summary>
-        private async UniTaskVoid UpdateEveryMinuteAsync(CancellationToken cancellationToken)
+        /// <summary>Cập nhật nội dung đếm ngược theo đơn vị và khoảng thời gian đã cấu hình.</summary>
+        private async UniTaskVoid UpdatePeriodicallyAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 var isCanceled = await UniTask
-                    .Delay(TimeSpan.FromMinutes(1), cancellationToken: cancellationToken)
+                    .Delay(GetUpdateInterval(), cancellationToken: cancellationToken)
                     .SuppressCancellationThrow();
 
                 if (isCanceled)
@@ -77,12 +113,28 @@ namespace Immortal_Switch.Scripts.Shared.UI
                     return;
                 }
 
-                UpdateDisplay();
+                if (UpdateDisplay())
+                {
+                    return;
+                }
             }
         }
 
-        /// <summary>Hiển thị thời gian còn lại theo định dạng ngày, giờ và phút.</summary>
-        private void UpdateDisplay()
+        /// <summary>Chuyển cấu hình đơn vị và elapsed thành khoảng thời gian giữa hai lần cập nhật.</summary>
+        private TimeSpan GetUpdateInterval()
+        {
+            var elapsed = Math.Max(0.01d, updateElapsed);
+
+            return updateUnit switch
+            {
+                ECountdownUpdateUnit.Hour => TimeSpan.FromHours(elapsed),
+                ECountdownUpdateUnit.Second => TimeSpan.FromSeconds(elapsed),
+                _ => TimeSpan.FromMinutes(elapsed),
+            };
+        }
+
+        /// <summary>Hiển thị thời gian còn lại và trả về true khi countdown đã kết thúc.</summary>
+        private bool UpdateDisplay()
         {
             var remainSeconds = Math.Max(0d, (_endTime - DateTime.Now).TotalSeconds);
             var totalSeconds = (long)Math.Ceiling(remainSeconds);
@@ -97,6 +149,22 @@ namespace Immortal_Switch.Scripts.Shared.UI
             {
                 txtCountdown.text = countdown;
             }
+
+            if (totalSeconds > 0L)
+            {
+                return false;
+            }
+
+            if (!_hasCompleted)
+            {
+                _hasCompleted = true;
+                var runtimeCallback = _onCountdownCompleted;
+
+                onCountdownCompleted?.Invoke();
+                runtimeCallback?.Invoke();
+            }
+
+            return true;
         }
 
         /// <summary>Dừng vòng lặp cập nhật thời gian hiện tại.</summary>
@@ -109,6 +177,7 @@ namespace Immortal_Switch.Scripts.Shared.UI
 
             _countdownCts.Cancel();
             _countdownCts.Dispose();
+
             _countdownCts = null;
         }
     }

@@ -28,6 +28,10 @@ public class PlayerMeResponse
     [JsonProperty("energy")]         public int                energy;
     [JsonProperty("rating")]         public int                rating;
     [JsonProperty("total_summons")]  public int                total_summons;
+    // Số lần đã đổi tên — dùng để tính giá lần đổi tiếp theo, xem RenameFeeConfig.GetFee.
+    [JsonProperty("rename_count")]   public int                rename_count;
+    // Đã nhận thưởng liên kết Google/Apple chưa — xem account/claim_link_reward.
+    [JsonProperty("link_reward_claimed")] public bool          link_reward_claimed;
     [JsonProperty("heroes")]         public HeroInventory      heroes;
     [JsonProperty("skills")]         public SkillListResponse  skills;
     [JsonProperty("weapons")]        public WeaponListResponse weapons;
@@ -63,4 +67,21 @@ public class PlayerRenameRequest
 public class PlayerRenameResponse
 {
     public string display_name;
+    public int    rename_fee;
+    public int    rename_count;
+}
+
+[Serializable]
+public class AccountLinkRewardItem
+{
+    [JsonProperty("item_id")] public int ItemId;
+    [JsonProperty("amount")]  public int Amount;
+}
+
+[Serializable]
+public class AccountClaimLinkRewardResponse
+{
+    [JsonProperty("claimed")] public bool claimed;
+    [JsonProperty("rewards")] public System.Collections.Generic.List<AccountLinkRewardItem> rewards;
+    [JsonProperty("gems")]    public int gems;
 }

@@ -122,9 +122,9 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private void InitTabTiers()
         {
-            var entries = DatabaseManager.Instance.ItemTierDb.entries;
+            var entries = ItemTierVisualImageService.GetItemTierEntries();
 
-            for (var i = 0; i < entries.Length; i++)
+            for (var i = 0; i < entries.Count; i++)
             {
                 var status = TransmutationSystemManager.Instance.IsUnlockGradeOption(entries[i].tier);
 

@@ -24,9 +24,13 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
         private void Awake()
         {
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
-            topLayout.Bind(ChangeLayout, OnClose, OnHelp);
+
             layoutHorizontal.DisableLayouts();
             layoutVertical.DisableLayouts();
+
+            topLayout.Bind(ChangeLayout, OnClose, OnHelp);
+            layoutHorizontal.Bind(ChangeLayout);
+            layoutVertical.Bind(ChangeLayout);
         }
 
         private void OnHelp()
@@ -48,6 +52,15 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
         private void OnEnable()
         {
             OnOrientationChanged(ScreenOrientationTracker.Instance.CurrentMode);
+            RefreshAndBindAsync().Forget();
+        }
+
+        /// <summary>Tải state server (7 ngày check-in, nhiệm vụ, milestone, tỉ lệ gacha) mỗi lần
+        /// view được mở trước khi bind layout — tránh hiện UI rỗng rồi mới cập nhật, cùng cách
+        /// EventWheelView.RefreshAndBindAsync làm.</summary>
+        private async UniTaskVoid RefreshAndBindAsync()
+        {
+            await EventLeHoiBangLongManager.Instance.RefreshAsync();
             ChangeLayout(EEventLeHoiBangLongLayoutType.Main);
         }
 
@@ -58,6 +71,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
 
         private void ChangeLayout(EEventLeHoiBangLongLayoutType type)
         {
+            topLayout.SetEnableBack(type != EEventLeHoiBangLongLayoutType.Main);
             layoutHorizontal.ChangeLayout(type);
             layoutVertical.ChangeLayout(type);
         }

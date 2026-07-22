@@ -882,12 +882,13 @@ MonoBehaviour:
   category: 1
   amountText: {fileID: 987548070668593178}
   rewardIcon: {fileID: 98402273144646418}
+  rewardTierBorder: {fileID: 4666140540725106723}
+  rewardTierBg: {fileID: 3917574764804758775}
   canvasGroup: {fileID: 3803549600243135190}
   claimableHighlight: {fileID: 0}
   redDot: {fileID: 8111195157792433146}
   claimButton: {fileID: 8379876490797971732}
   rewardReceiverBehaviour: {fileID: 7935941486977823183}
-  rewardVisualConfig: {fileID: 11400000, guid: 505d9390a8c24be47a3510e4b0aa8a8d, type: 2}
   claimableAlpha: 1
   claimedAlpha: 0.45
 --- !u!114 &7935941486977823183
@@ -1185,6 +1186,7 @@ PrefabInstance:
     - {fileID: 3236623124387749845, guid: f44524ab8a0d7a447930fd453079b064, type: 3}
     - {fileID: 1814965241709363099, guid: f44524ab8a0d7a447930fd453079b064, type: 3}
     - {fileID: 8000049385936173269, guid: f44524ab8a0d7a447930fd453079b064, type: 3}
+    - {fileID: 6790094309734754060, guid: f44524ab8a0d7a447930fd453079b064, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f44524ab8a0d7a447930fd453079b064, type: 3}
@@ -1199,8 +1201,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3917574764804758775 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6372779485841007183, guid: f44524ab8a0d7a447930fd453079b064, type: 3}
+  m_PrefabInstance: {fileID: 7939472667735490232}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &4034559727341376159 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6472533451895237671, guid: f44524ab8a0d7a447930fd453079b064, type: 3}
   m_PrefabInstance: {fileID: 7939472667735490232}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4666140540725106723 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3382161860730283675, guid: f44524ab8a0d7a447930fd453079b064, type: 3}
+  m_PrefabInstance: {fileID: 7939472667735490232}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

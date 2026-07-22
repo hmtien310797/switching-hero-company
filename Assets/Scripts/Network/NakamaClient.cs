@@ -474,6 +474,14 @@ public class NakamaClient : MonoBehaviour
         await CallRpcAsync("account/delete", "{}");
     }
 
+    /// <summary>Nhận thưởng liên kết Google/Apple (1 lần) qua RPC account/claim_link_reward.
+    /// Server từ chối nếu account chưa link hoặc đã nhận rồi.</summary>
+    public async Task<AccountClaimLinkRewardResponse> ClaimLinkRewardAsync()
+    {
+        var response = await CallRpcAsync("account/claim_link_reward", "{}");
+        return JsonConvert.DeserializeObject<AccountClaimLinkRewardResponse>(response.Payload);
+    }
+
     // ── Summon Execute ────────────────────────────────────────────────────────
 
     public async Task<SummonExecuteResponse> SummonHeroAsync(string optionId)
@@ -776,6 +784,97 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<EventWheelPassBuyPremiumResponse>(response.Payload);
     }
 
+    // ── Event Lễ Hội Băng Long ────────────────────────────────────────────────
+    // Xem handler/event_bl.js. Server là nguồn sự thật duy nhất (thay cho
+    // EventLeHoiBangLongService/Storage ES3 cục bộ trước đây — xem EventLeHoiBangLongManager).
+
+    /// <summary>Snapshot đầy đủ: 7 ngày check-in, bonus theo ngày, nhiệm vụ + mốc điểm nhiệm vụ,
+    /// mốc điểm triệu hồi, bảng tỉ lệ gacha. Gọi khi mở EventLeHoiBangLongView và sau mỗi
+    /// claim/summon thành công để đồng bộ lại.</summary>
+    public async Task<EventBLStateResponse> GetEventBLStateAsync()
+    {
+        var response = await CallRpcAsync("eventbl/state", "{}");
+        return JsonConvert.DeserializeObject<EventBLStateResponse>(response.Payload);
+    }
+
+    /// <summary>Báo tiến độ nhiệm vụ theo trigger (LOGIN được server tự cộng khi sang ngày mới;
+    /// các trigger còn lại — CLEAR_STAGE_COUNT/HERO_SUMMON/ENHANCE_GEAR/KILL_MONSTER/CLAIM_IDLE —
+    /// do client báo khi gameplay event tương ứng xảy ra). Server tự kẹp theo target và bỏ qua
+    /// nhiệm vụ đã claim, không tự tin tưởng điểm/thưởng — chỉ tiến độ.</summary>
+    public async Task<EventBLMissionProgressResponse> EventBLMissionProgressAsync(string trigger, int value)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLMissionProgressRequest { Trigger = trigger, Value = value });
+        var response = await CallRpcAsync("eventbl/mission_progress", payload);
+        return JsonConvert.DeserializeObject<EventBLMissionProgressResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng đăng nhập miễn phí ngày N (game_event_BL_check_in.js).</summary>
+    public async Task<EventBLClaimLoginResponse> EventBLClaimLoginAsync(int day)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLClaimLoginRequest { Day = day });
+        var response = await CallRpcAsync("eventbl/claim_login", payload);
+        return JsonConvert.DeserializeObject<EventBLClaimLoginResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận track bonus miễn phí ("instant") của ngày N — mở khoá nút mua track trả phí.</summary>
+    public async Task<EventBLClaimBonusFreeResponse> EventBLClaimBonusFreeAsync(int day)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLClaimBonusFreeRequest { Day = day });
+        var response = await CallRpcAsync("eventbl/claim_bonus_free", payload);
+        return JsonConvert.DeserializeObject<EventBLClaimBonusFreeResponse>(response.Payload);
+    }
+
+    /// <summary>Đánh dấu đã mua track bonus trả phí ngày N — chỉ ghi trạng thái, vật phẩm đã được
+    /// cấp thật lúc iap/pack_purchase thành công (xem EventBLCheckInBonusDto).</summary>
+    public async Task<EventBLDayResponse> EventBLConfirmBonusPurchaseAsync(int day)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLDayRequest { Day = day });
+        var response = await CallRpcAsync("eventbl/confirm_bonus_purchase", payload);
+        return JsonConvert.DeserializeObject<EventBLDayResponse>(response.Payload);
+    }
+
+    /// <summary>Đánh dấu đã nhận track bonus trả phí ngày N — chỉ ghi trạng thái, xem trên.</summary>
+    public async Task<EventBLDayResponse> EventBLClaimBonusPaidAsync(int day)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLDayRequest { Day = day });
+        var response = await CallRpcAsync("eventbl/claim_bonus_paid", payload);
+        return JsonConvert.DeserializeObject<EventBLDayResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng 1 nhiệm vụ ngày đã hoàn thành. Điểm/thưởng luôn lấy từ config server.</summary>
+    public async Task<EventBLClaimMissionResponse> EventBLClaimMissionAsync(string missionId)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLClaimMissionRequest { MissionId = missionId });
+        var response = await CallRpcAsync("eventbl/claim_mission", payload);
+        return JsonConvert.DeserializeObject<EventBLClaimMissionResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận 1 mốc điểm nhiệm vụ tích luỹ.</summary>
+    public async Task<EventBLMilestoneResponse> EventBLClaimMissionMilestoneAsync(int milestone)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLMilestoneRequest { Milestone = milestone });
+        var response = await CallRpcAsync("eventbl/claim_mission_milestone", payload);
+        return JsonConvert.DeserializeObject<EventBLMilestoneResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận 1 mốc điểm triệu hồi tích luỹ.</summary>
+    public async Task<EventBLMilestoneResponse> EventBLClaimSummonMilestoneAsync(int milestone)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLMilestoneRequest { Milestone = milestone });
+        var response = await CallRpcAsync("eventbl/claim_summon_milestone", payload);
+        return JsonConvert.DeserializeObject<EventBLMilestoneResponse>(response.Payload);
+    }
+
+    /// <summary>Quay Băng Long Summon 1 hoặc 10 lượt. Trừ 1x summon_ticket_hero_banner (item 47)
+    /// mỗi lượt (xem EventBLSummonResponse). Server random có trọng số theo game_event_BL_rate.js
+    /// và trả đúng phần thưởng đã cấp.</summary>
+    public async Task<EventBLSummonResponse> EventBLSummonAsync(int times)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventBLSummonRequest { Times = times });
+        var response = await CallRpcAsync("eventbl/summon", payload);
+        return JsonConvert.DeserializeObject<EventBLSummonResponse>(response.Payload);
+    }
+
     // ── Battle ────────────────────────────────────────────────────────────────
 
     /// <summary>Progression thật từ server (current_stage/current_chapter/highest_stage_cleared). Gọi sau login trước khi vào màn chọn stage.</summary>
@@ -803,7 +902,9 @@ public class NakamaClient : MonoBehaviour
 
     // ── Leaderboard ───────────────────────────────────────────────────────────
     // Xem handler/leaderboard.js — bảng xếp hạng theo highest_stage_cleared, dùng leaderboard
-    // built-in của Nakama. Reward theo hạng chưa có config, chưa trả về từ server.
+    // built-in của Nakama. season_end_at (từ GetLeaderboardStageTopAsync) và thưởng cuối mùa
+    // (GetLeaderboardSeasonRewardStateAsync/ClaimLeaderboardSeasonRewardAsync) đọc từ
+    // game_config_leaderboard*.xlsx.
 
     /// <summary>Top bảng xếp hạng stage (mặc định 100 người đầu). cursor để phân trang tiếp — truyền lại next_cursor của lần gọi trước.</summary>
     public async Task<LeaderboardStageTopResponse> GetLeaderboardStageTopAsync(int limit = 100, string cursor = null)
@@ -819,6 +920,20 @@ public class NakamaClient : MonoBehaviour
         var payload  = JsonConvert.SerializeObject(new { limit });
         var response = await CallRpcAsync("leaderboard/stage/around_me", payload);
         return JsonConvert.DeserializeObject<LeaderboardStageAroundMeResponse>(response.Payload);
+    }
+
+    /// <summary>Gọi khi mở màn Leaderboard — có thưởng mùa trước chưa nhận (has_reward=true) thì hiện banner/claim. Qua expire_at thì server tự cộng vào bag ở lần player/me kế tiếp, không mất thưởng.</summary>
+    public async Task<LeaderboardSeasonRewardStateResponse> GetLeaderboardSeasonRewardStateAsync()
+    {
+        var response = await CallRpcAsync("leaderboard/season_reward/state", "{}");
+        return JsonConvert.DeserializeObject<LeaderboardSeasonRewardStateResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng mùa trước (nếu còn trong hạn) — cộng thẳng vào bag, trả updated_resources để áp qua CurrencyManager.</summary>
+    public async Task<LeaderboardSeasonRewardClaimResponse> ClaimLeaderboardSeasonRewardAsync()
+    {
+        var response = await CallRpcAsync("leaderboard/season_reward/claim", "{}");
+        return JsonConvert.DeserializeObject<LeaderboardSeasonRewardClaimResponse>(response.Payload);
     }
 
     // ── Dungeon ───────────────────────────────────────────────────────────────

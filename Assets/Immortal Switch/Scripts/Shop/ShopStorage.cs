@@ -23,6 +23,11 @@ namespace Immortal_Switch.Scripts.Shop
                 ? ES3.Load<ShopData>(SAVE_KEY)
                 : new ShopData();
 
+            Data ??= new ShopData();
+            Data.PurchaseCount ??= new System.Collections.Generic.Dictionary<int, int>();
+            Data.EventPurchaseCount ??= new System.Collections.Generic.Dictionary<int, int>();
+            Data.PurchasedDiamondPackIds ??= new System.Collections.Generic.List<int>();
+
             Debug.Log($"{SAVE_KEY}: Load {JsonConvert.SerializeObject(Data)}");
         }
     }

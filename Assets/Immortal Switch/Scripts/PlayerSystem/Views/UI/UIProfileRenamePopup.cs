@@ -1,6 +1,7 @@
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
+using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
@@ -26,10 +27,24 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Views.UI
             BindButtons();
         }
 
+        private void OnEnable()
+        {
+            RefreshPrice();
+        }
+
         protected override void BindButtons()
         {
             base.BindButtons();
             btnConfirm.onClick.AddListener(OnConfirm);
+        }
+
+        private void RefreshPrice()
+        {
+            if (txtPrice == null) return;
+
+            var attemptNumber = UserDataCache.Instance.RenameCount + 1;
+            var fee = RenameFeeConfig.GetFee(attemptNumber);
+            txtPrice.text = fee > 0 ? fee.ToString("N0") : "Miễn phí";
         }
 
         private void OnConfirm()
@@ -76,6 +91,7 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Views.UI
                 var response = await NakamaClient.Instance.RenamePlayerAsync(newName);
 
                 UserDataCache.Instance.DisplayName = response.display_name;
+                UserDataCache.Instance.RenameCount = response.rename_count;
                 GetComponentInParent<ProfileView>(true)?.RefreshVisual();
                 TopMainView.Instance?.SetDisplayName(response.display_name);
 

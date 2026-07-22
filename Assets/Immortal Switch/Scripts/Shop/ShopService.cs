@@ -41,6 +41,51 @@ namespace Immortal_Switch.Scripts.Shop
             _storage.Save();
         }
 
+        /// <summary>Kiểm tra gói kim cương đã từng được mua và sử dụng ưu đãi lần đầu chưa.</summary>
+        public bool HasPurchasedDiamondPack(int packId)
+        {
+            return _storage.Data.PurchasedDiamondPackIds.Contains(packId);
+        }
+
+        /// <summary>Đánh dấu gói kim cương đã mua lần đầu và lưu vĩnh viễn theo tài khoản local.</summary>
+        public void RecordDiamondFirstPurchase(int packId)
+        {
+            if (HasPurchasedDiamondPack(packId))
+            {
+                return;
+            }
+
+            _storage.Data.PurchasedDiamondPackIds.Add(packId);
+            _storage.Save();
+        }
+
+        public int GetEventRemaining(int packId, int limitFromConfig)
+        {
+            if (limitFromConfig <= 0)
+            {
+                return int.MaxValue;
+            }
+
+            return Mathf.Max(0, limitFromConfig - GetEventPurchasedCount(packId));
+        }
+
+        public int GetEventPurchasedCount(int packId)
+        {
+            return _storage.Data.EventPurchaseCount.GetValueOrDefault(packId);
+        }
+
+        public bool TryRecordEventPurchase(int packId, int limitFromConfig)
+        {
+            if (GetEventRemaining(packId, limitFromConfig) <= 0)
+            {
+                return false;
+            }
+
+            _storage.Data.EventPurchaseCount[packId] = GetEventPurchasedCount(packId) + 1;
+            _storage.Save();
+            return true;
+        }
+
         public void CheckAndReset()
         {
             var now = DateTime.UtcNow;
@@ -100,18 +145,31 @@ namespace Immortal_Switch.Scripts.Shop
 
         private void ResetPurchasesByCycle(string cycle)
         {
-            var packs = DatabaseManager.Instance.GetShopPacksSpecial();
+            var specialPacks = DatabaseManager.Instance.GetShopPacksSpecial();
 
-            if (packs == null)
+            if (specialPacks != null)
+            {
+                foreach (var pack in specialPacks)
+                {
+                    if (string.Equals(pack.Pack.limitReset, cycle, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _storage.Data.PurchaseCount.Remove(pack.Pack.iD);
+                    }
+                }
+            }
+
+            var eventPacks = DatabaseManager.Instance.GetShopPacksEvent();
+
+            if (eventPacks == null)
             {
                 return;
             }
 
-            foreach (var pack in packs)
+            foreach (var pack in eventPacks)
             {
-                if (pack.Pack.limitReset == cycle)
+                if (string.Equals(pack.Pack.limitReset, cycle, StringComparison.OrdinalIgnoreCase))
                 {
-                    _storage.Data.PurchaseCount.Remove(pack.Pack.iD);
+                    _storage.Data.EventPurchaseCount.Remove(pack.Pack.iD);
                 }
             }
         }

@@ -1,5 +1,6 @@
 using System;
 using Immortal_Switch.Scripts.Leaderboard.Views.UI;
+using Immortal_Switch.Scripts.Shared;
 using RecyclableScrollRect;
 using UnityEngine;
 
@@ -146,7 +147,8 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
 
             if (data != null)
             {
-                ui.Bind(data.Rank, data.PlayerName, data.Stage, false);
+                var leaderboardReward = DatabaseManager.Instance.GetLeaderboardRewardByRank(data.Rank);
+                ui.Bind(data.Rank, data.PlayerName, data.Stage, false, leaderboardReward?.amount ?? 0);
             }
         }
     }

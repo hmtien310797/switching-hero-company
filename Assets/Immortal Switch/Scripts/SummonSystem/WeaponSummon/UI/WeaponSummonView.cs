@@ -341,7 +341,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                     var weaponDef = WeaponSummonManager.Instance.Config.GetWeapon(normalWeaponPool, entry.WeaponId, entry.WeaponName);
 
                     Enum.TryParse<EItemTier>(entry.Grade, true, out var itemTier);
-                    var tierInfo = DatabaseManager.Instance.ItemTierDb.Get(itemTier);
+                    var tierInfo = ItemTierVisualImageService.GetItemTierEntry(itemTier);
 
                     int totalShardAfter = WeaponManager.Instance != null
                         ? WeaponManager.Instance.ApplyStandardSummonEntry(entry.WeaponId, entry.ShardGained)

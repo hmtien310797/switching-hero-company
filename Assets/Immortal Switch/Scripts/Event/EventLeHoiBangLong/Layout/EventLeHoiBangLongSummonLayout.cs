@@ -5,7 +5,6 @@ using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Popup;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
 using Immortal_Switch.Scripts.Items.Models;
-using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -34,6 +33,9 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         [Header("Reward references")]
         [SerializeField]
+        private TextMeshProUGUI txtDropRate;
+
+        [SerializeField]
         private TextMeshProUGUI txtProgress;
 
         [SerializeField]
@@ -60,33 +62,25 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
             btnX10.Bind(10, OnClickSummon);
         }
 
-        private void OnClickSummon(int times)
+        private async void OnClickSummon(int times)
         {
-            UIManager.Instance
-                .OpenPopupAsync<PopupEventLeHoiBangLongSummonView>(new PopupEventLeHoiBangLongSummonArgs(
-                    times,
-                    toggleSkipAnimation.isOn,
-                    TrySummon
-                ))
-                .Forget();
+            var rewards = await TrySummon(times);
+
+            if (rewards.Count > 0)
+            {
+                UIManager.Instance
+                    .OpenPopupAsync<PopupEventLeHoiBangLongSummonView>(new PopupEventLeHoiBangLongSummonArgs(
+                        toggleSkipAnimation.isOn,
+                        TrySummon,
+                        rewards
+                    ))
+                    .Forget();
+            }
         }
 
         private UniTask<List<ItemData>> TrySummon(int times)
         {
-            var result = new List<ItemData>();
-
-            for (int i = 0; i < times; i++)
-            {
-                var rate = DatabaseManager.Instance.EventBLRandomRate();
-
-                if (rate != null)
-                {
-                    result.Add(new ItemData(rate.rewardId, rate.quantity));
-                }
-            }
-
-            EventLeHoiBangLongManager.Instance.RecordEventSummon(times);
-            return UniTask.FromResult(result);
+            return EventLeHoiBangLongManager.Instance.SummonAsync(times);
         }
 
         private void OnDestroy()
@@ -114,14 +108,19 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private string OnCountdown(long days, long hours, long minutes, long seconds)
         {
-            return $"Kết thúc sau: {days} ngày {hours}:{minutes}:{seconds}";
+            return $"Kết thúc sau: {days:00} ngày {hours:00}:{minutes:00}:{seconds:00}";
         }
 
         private void RefreshProgress()
         {
-            var accumulatedPoint = EventLeHoiBangLongManager.Instance.Storage.Data.summonPoints;
+            var accumulatedPoint = EventLeHoiBangLongManager.Instance.State?.Progress?.SummonPoints ?? 0;
             txtProgress.text = $"{accumulatedPoint:N0}/{_maxPoint:N0}";
             imgFill.fillAmount = accumulatedPoint / (_maxPoint * 1f);
+
+            txtDropRate.text =
+                "Tăng tỷ lệ nhận <color=#ff56ed><i><size=55>Băng Long</size></i></color>!\n" +
+                $"Mỗi <color=#ffd200><i><size=55><b>{10 - (accumulatedPoint % 10)}</b></size></i></color> lượt chắc chắn nhận\n" +
+                "<color=#ff56ed><i><size=55>Legend</size></i></color> trở lên";
         }
     }
 }

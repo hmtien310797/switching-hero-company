@@ -60,7 +60,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
 
             btnClaim.interactable = rows.Exists(row =>
                 currentPoint >= row.pointsRequired &&
-                !EventLeHoiBangLongManager.Instance.Service.IsSummonMilestoneClaimed(row.milestone)
+                !EventLeHoiBangLongManager.Instance.IsSummonMilestoneClaimed(row.milestone)
             );
         }
 
@@ -72,7 +72,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
             {
                 var row = rows[i];
                 var clone = _pools.Get(i);
-                var isClaimed = EventLeHoiBangLongManager.Instance.Service.IsSummonMilestoneClaimed(row.milestone);
+                var isClaimed = EventLeHoiBangLongManager.Instance.IsSummonMilestoneClaimed(row.milestone);
 
                 clone.Bind(row.itemId1, row.pointsRequired);
                 clone.SetClaimed(isClaimed);

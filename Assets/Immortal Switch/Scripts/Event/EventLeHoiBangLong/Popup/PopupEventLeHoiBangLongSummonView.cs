@@ -16,11 +16,6 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Popup
     public class PopupEventLeHoiBangLongSummonArgs
     {
         /// <summary>
-        /// so lan dau mo popup va nhan thuong
-        /// </summary>
-        public readonly int Times;
-
-        /// <summary>
         /// co skip animation hay ko
         /// </summary>
         public readonly bool IsSkipAnimation;
@@ -32,10 +27,19 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Popup
         /// </summary>
         public readonly Func<int, UniTask<List<ItemData>>> TrySummon;
 
-        public PopupEventLeHoiBangLongSummonArgs(int times, bool isSkipAnimation, Func<int, UniTask<List<ItemData>>> trySummon)
+        /// <summary>
+        /// ds phan thuong lan dau xuat hien
+        /// </summary>
+        public readonly List<ItemData> FirstRewards;
+
+        public PopupEventLeHoiBangLongSummonArgs(
+            bool isSkipAnimation,
+            Func<int, UniTask<List<ItemData>>> trySummon,
+            List<ItemData> firstRewards
+        )
         {
-            Times = times;
             TrySummon = trySummon;
+            FirstRewards = firstRewards;
             IsSkipAnimation = isSkipAnimation;
         }
     }
@@ -133,14 +137,26 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Popup
 
             btnX1.Bind(1, OnClickSummon);
             btnX10.Bind(10, OnClickSummon);
-
-            OnClickSummon(_args.Times);
+            ShowRewardImmediate();
         }
 
         public override void OnHide()
         {
             CancelSummon();
             base.OnHide();
+        }
+
+        private void ShowRewardImmediate()
+        {
+            var cancellation = CancellationTokenOnDestroy();
+            RefreshRewardsAsync(_args.FirstRewards, cancellation.Token).Forget();
+        }
+
+        private CancellationTokenSource CancellationTokenOnDestroy()
+        {
+            return CancellationTokenSource.CreateLinkedTokenSource(
+                this.GetCancellationTokenOnDestroy()
+            );
         }
 
         private void OnClickSummon(int times)
@@ -153,9 +169,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Popup
 
             _isSummoning = true;
 
-            var cancellation = CancellationTokenSource.CreateLinkedTokenSource(
-                this.GetCancellationTokenOnDestroy()
-            );
+            var cancellation = CancellationTokenOnDestroy();
 
             _summonCancellation = cancellation;
 
@@ -185,12 +199,14 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Popup
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var rewards = await trySummon.Invoke(times);
+                    var rewards = await trySummon(times);
 
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    if (rewards == null)
+                    if (rewards == null ||
+                        rewards.Count < 1)
                     {
+                        Kill();
                         break;
                     }
 
