@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Equipment.UI;
 using Immortal_Switch.Scripts.Loading.Views;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Tutorial;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -243,6 +244,9 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
         private void OnClickFusion()
         {
+            UIManager.Instance.ShowToast("Coming Soon");
+            return;
+            
             if (currentVm == null ||
                 currentVm.IsExclusive ||
                 fusionPopup == null ||

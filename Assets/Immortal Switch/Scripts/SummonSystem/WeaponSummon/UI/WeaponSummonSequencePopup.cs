@@ -169,7 +169,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 summonButtonB.Init(optionBId, HandleSummonButtonClick, SummonCategory.Weapon);
         }
 
-        private void RefreshSummonButtons()
+        public void RefreshSummonButtons()
         {
             summonButtonA?.Refresh();
             summonButtonB?.Refresh();

@@ -165,7 +165,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 summonButtonB.Init(optionBId, HandleSummonButtonClick, SummonCategory.Skill);
         }
 
-        private void RefreshSummonButtons()
+        public void RefreshSummonButtons()
         {
             if (summonButtonA != null)
                 summonButtonA.Refresh();

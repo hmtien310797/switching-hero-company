@@ -91,6 +91,7 @@ namespace Immortal_Switch.Scripts.UI
 
         [SerializeField] private CanvasScaler canvasScaler;
         [SerializeField] private Canvas canvas;
+        [SerializeField] private GameObject loadingScene;
 
         [Header("Toast")] [SerializeField] private ToastMessageView toastMessagePrefab;
 
@@ -136,12 +137,15 @@ namespace Immortal_Switch.Scripts.UI
 
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
             CreateLayerRootsFromEnum();
+            InitLayerLists();
             SceneManager.sceneLoaded += (arg0, mode) =>
             {
                 canvas.worldCamera = Camera.main;
             };
             PreloadAsync<PopupRewardView>().Forget();
             PreloadAsync<LoadingView>().Forget();
+            PreloadAsync<PopupConfirmView>().Forget();
+            loadingScene.transform.parent = GetLayerRoot(UILayer.Popup);
         }
 
         protected override void OnDestroy()
@@ -165,8 +169,6 @@ namespace Immortal_Switch.Scripts.UI
 
         public override async UniTask InitializeAsync()
         {
-            //CreateLayerRootsFromEnum();
-            InitLayerLists();
             await InitMainScene();
         }
 
@@ -706,8 +708,8 @@ namespace Immortal_Switch.Scripts.UI
                 if (layer == UILayer.Main)
                 {
                     // enforce caching on main
-                    entry.cacheOnClose = true;
-                    typed.CacheOnClose = true;
+                    entry.cacheOnClose = typed.CacheOnClose;
+                    //typed.CacheOnClose = true;
 
                     await HandleMainOpenAsync(entry, args, withBackdrop);
 
@@ -989,12 +991,8 @@ namespace Immortal_Switch.Scripts.UI
         // Put BottomMainView on SubMain, TopMainView on OverMain (NOT Main)
         private async UniTask InitMainScene()
         {
-            await UniTask.WhenAll(
-                OpenPopupAsync<BottomMainView>(withBackdrop: false),
-                OpenPopupAsync<TopMainView>(withBackdrop: false)
-            );
-            
             tapeAnimator.transform.parent = GetLayerRoot(UILayer.Main);
+            await OpenPopupAsync<TopMainView>(withBackdrop: false);
         }
 
         #endregion

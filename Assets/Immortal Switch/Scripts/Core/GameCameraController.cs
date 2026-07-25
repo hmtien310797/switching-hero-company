@@ -179,6 +179,9 @@ public class GameCameraController : Singleton<GameCameraController>
     [Button]
     public void ShakeCamera()
     {
+        if(!SettingManager.Instance.CurrentSetting.ScreenShakeEnabled)
+            return;
+            
         shakeTween?.Kill();
 
         followHeroCameraNoise.AmplitudeGain = amplitude;

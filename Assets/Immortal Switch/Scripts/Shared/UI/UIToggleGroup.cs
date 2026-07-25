@@ -45,7 +45,6 @@ namespace Immortal_Switch.Scripts.Shared.UI
 
         private void OnToggleSelected(int index)
         {
-            Debug.Log($"Selected: {index}");
             _onValueChanged?.Invoke(toggles[index].isOn, index);
         }
 

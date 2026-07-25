@@ -470,6 +470,15 @@ namespace Battle
             GameEventManager.Trigger(GameEvents.OnStageSessionChange);
         }
 
+        public void MoveToCurrentStageAfterSurrender()
+        {
+            SetState(BattleState.Ended);
+            result = BattleResult.None;
+            DespawnCreepAndBoss();
+            PlayCurrentStage(battleFlowController.stageFlowCancellationTokenSource.Token).Forget();
+            GameEventManager.Trigger(GameEvents.OnStageSessionChange);
+        }
+
         private int GetResolvedChapterIndexByStage(int stage)
         {
             return stageDataResolver.GetChapterIndexByStage(stage);

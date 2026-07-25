@@ -17,14 +17,22 @@ namespace Immortal_Switch.Scripts.StatSystem
         float MaxHp { get; }
         DamageResult TakeDamage(DamageResult damageResult)
         {
-            Stats.HealthModule.TakeDamage(damageResult);
+            float appliedDamage =
+                Stats.HealthModule.TakeDamage(damageResult);
+
+            if (appliedDamage <= 0f)
+            {
+                return damageResult;
+            }
+
             HealthBarController?.SetHealth(CurrentHp, MaxHp);
+
             DamageNumberService.Instance?.ShowDamage(
-                damageResult.Damage,
+                appliedDamage,
                 Position,
                 damageResult.DamageType
             );
-            
+
             return damageResult;
         }
 

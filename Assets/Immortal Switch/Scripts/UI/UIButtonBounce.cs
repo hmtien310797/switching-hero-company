@@ -11,6 +11,7 @@ public class UIButtonBounce : MonoBehaviour,
     [SerializeField] private float bounceScale = 1.1f;
     [SerializeField] private float pressDuration = 0.08f;
     [SerializeField] private float bounceDuration = 0.15f;
+    [SerializeField] private float normalScale = 1f;
 
     private Tween scaleTween;
 
@@ -39,7 +40,7 @@ public class UIButtonBounce : MonoBehaviour,
                 .SetEase(Ease.OutQuad));
 
         seq.Append(
-            target.DOScale(1f, bounceDuration * 0.5f)
+            target.DOScale(normalScale, bounceDuration * 0.5f)
                 .SetEase(Ease.OutBack));
 
         scaleTween = seq;
@@ -48,6 +49,6 @@ public class UIButtonBounce : MonoBehaviour,
     private void OnDisable()
     {
         scaleTween?.Kill();
-        target.localScale = Vector3.one;
+        target.localScale = Vector3.one * normalScale;
     }
 }

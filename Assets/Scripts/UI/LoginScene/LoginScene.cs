@@ -137,7 +137,7 @@ public class LoginScene : MonoBehaviour
     private void OnInitSceneDataComplete()
     {
         buttonLayout.SetActive(false);
-        loadingSceneCanvasGroup.DOFade(0f, 0.5f).SetEase(Ease.Linear);
+        loadingSceneCanvasGroup.DOFade(0f, 0.5f).SetEase(Ease.Linear).OnComplete(() => loadingSceneCanvasGroup.gameObject.SetActive(false));
         loadingSceneCanvasGroup.blocksRaycasts = false;
         loadingSceneCanvasGroup.interactable = false;
     }
@@ -209,6 +209,7 @@ public class LoginScene : MonoBehaviour
         btnAppleLogin.gameObject.SetActive(!(Application.platform == RuntimePlatform.Android && btnAppleLogin != null));
         _isInitializingLoginLocalization = true;
         buttonLayout.SetActive(false);
+        loadingSceneCanvasGroup.gameObject.SetActive(true);
         loadingSceneCanvasGroup.alpha = 1f;
         loadingSceneCanvasGroup.blocksRaycasts = true;
         loadingSceneCanvasGroup.interactable = true;

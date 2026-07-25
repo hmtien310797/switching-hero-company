@@ -1,4 +1,5 @@
-﻿using Immortal_Switch.Scripts.HeroUIView;
+﻿using Immortal_Switch.Scripts.Addressable;
+using Immortal_Switch.Scripts.HeroUIView;
 using TMPro;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -18,7 +19,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         
         [SerializeField] private HeroUIIconConfigSO iconConfig;
 
-        public void Bind(HeroSummonProbabilityHeroData data, SpriteAtlas heroSpriteAtlas, ElementIconEntry element, HeroClassIconEntry heroClass)
+        public void Bind(HeroSummonProbabilityHeroData data, SpriteAtlas heroSpriteAtlas, ElementIconEntry element)
         {
             if (data == null || data.Hero == null)
                 return;
@@ -33,7 +34,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 probabilityText.text = $"{data.ProbabilityPercent:0.####}%";
 
             elementIcon.sprite = element.Icon;
-            classIcon.sprite = heroClass.Icon;
+            classIcon.sprite = HeroImageService.GetHeroClassIcon(data.Hero);
 
             // if (tierConfig != null)
             // {

@@ -84,8 +84,35 @@ namespace Immortal_Switch.Scripts.Sound
 
             initialized = true;
 
+            // SettingManager.Awake có thể chạy trước hoặc sau SoundManager.Awake. Nếu chạy trước,
+            // các Apply* bên SettingManager đã no-op vì SoundManager chưa sẵn sàng; nếu chạy sau,
+            // Apply* đã set đúng nhưng bị dòng reset bgmVolume/sfxVolume ở trên ghi đè. Sau khi
+            // init xong, kéo setting đã lưu (từ ES3) đè lên default của soundDefinition để phục hồi
+            // volume/mute đúng ý người chơi, trước khi bật BGM theo scene.
+            SyncFromSettingManager();
+
             await PreloadMarkedSfxAsync();
             await PlayBgmBySceneName(SceneManager.GetActiveScene().name);
+        }
+
+        /// <summary>
+        /// Đồng bộ volume/mute BGM &amp; SFX từ SettingManager (đã load từ ES3) xuống SoundManager.
+        /// Bù trừ thứ tự Awake không xác định giữa hai singleton. Idempotent — gọi lại không gây
+        /// tác dụng phụ ngoài việc đặt lại volume/mute.
+        /// </summary>
+        private void SyncFromSettingManager()
+        {
+            if (SettingManager.Instance == null)
+                return;
+
+            GameSettingData setting = SettingManager.Instance.CurrentSetting;
+
+            // Thứ tự: đặt mute trước, volume sau — cả hai đều ApplyBgmVolumeImmediate nên kết quả
+            // cuối cùng đúng (= volume khi chưa mute, 0 khi mute).
+            SetBgmMuted(!setting.BackgroundMusicEnabled);
+            SetBgmVolume(setting.BackgroundMusicVolume);
+            SetSfxMuted(!setting.SfxEnabled);
+            SetSfxVolume(setting.SfxVolume);
         }
         
         private void CreateBgmSources()

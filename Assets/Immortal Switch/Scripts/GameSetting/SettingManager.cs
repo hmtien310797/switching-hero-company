@@ -17,6 +17,7 @@ using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Skill.UI;
+using Immortal_Switch.Scripts.Sound;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
 using Newtonsoft.Json;
@@ -26,6 +27,7 @@ public class SettingManager : Singleton<SettingManager>
 {
     private const string SaveKey = "Game_Setting_Data";
 
+    
     [Header("Runtime Setting")]
     [SerializeField]
     private GameSettingData currentSetting = new GameSettingData();
@@ -688,10 +690,9 @@ public class SettingManager : Singleton<SettingManager>
 
     private void ApplyBackgroundMusicEnabled(bool enabled)
     {
-        // TODO:
-        // Sau này gắn AudioManager ở đây.
-        // Ví dụ:
-        // AudioManager.Instance.SetBgmEnabled(enabled);
+        // Setting dùng semantics "enabled" (true = bật), còn SoundManager dùng "muted"
+        // (true = tắt) nên phải đảo: enabled = false ⇒ muted = true.
+        SoundManager.Instance?.SetBgmMuted(!enabled);
     }
 
     private void ApplyOffscreenEnabled(bool enabled)
@@ -704,26 +705,19 @@ public class SettingManager : Singleton<SettingManager>
 
     private void ApplyBackgroundMusicVolume(float volume)
     {
-        // TODO:
-        // Sau này gắn AudioManager ở đây.
-        // Ví dụ:
-        // AudioManager.Instance.SetBgmVolume(volume);
+        SoundManager.Instance?.SetBgmVolume(volume);
     }
 
     private void ApplySfxEnabled(bool enabled)
     {
-        // TODO:
-        // Sau này gắn AudioManager ở đây.
-        // Ví dụ:
-        // AudioManager.Instance.SetSfxEnabled(enabled);
+        // Setting dùng semantics "enabled" (true = bật), còn SoundManager dùng "muted"
+        // (true = tắt) nên phải đảo: enabled = false ⇒ muted = true.
+        SoundManager.Instance?.SetSfxMuted(!enabled);
     }
 
     private void ApplySfxVolume(float volume)
     {
-        // TODO:
-        // Sau này gắn AudioManager ở đây.
-        // Ví dụ:
-        // AudioManager.Instance.SetSfxVolume(volume);
+        SoundManager.Instance?.SetSfxVolume(volume);
     }
 
     private void ApplyScreenShakeEnabled(bool enabled)

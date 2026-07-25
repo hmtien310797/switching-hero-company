@@ -40,6 +40,11 @@ namespace Immortal_Switch.Scripts.SkillRemake
                     .BulletPatternConfig;
             }
 
+            if (!Context.MainTarget.IsUnityAlive())
+            {
+                return;
+            }
+
             Vector3 direction = GetDirectionToTarget(Context.Caster.transform, Context.MainTarget.Transform);
             transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             TryFire();
@@ -191,9 +196,10 @@ namespace Immortal_Switch.Scripts.SkillRemake
 
             if (EnableDebug)
             {
-                bullet.Setup(
+                bullet.Setup(this,
                     null,
-                    Config,
+                    Context,
+                    Config, Executor, TargetResolver, Spawner,
                     direction,
                     currentPattern.bulletSpeed,
                     currentPattern.bulletLifeTime,
@@ -214,8 +220,10 @@ namespace Immortal_Switch.Scripts.SkillRemake
                 return;
             }
 
-            bullet.Setup(
-                Context.Caster, Config,
+            bullet.Setup(this,
+                Context.Caster,
+                Context,
+                Config, Executor, TargetResolver, Spawner,
                 direction,
                 currentPattern.bulletSpeed,
                 currentPattern.bulletLifeTime,

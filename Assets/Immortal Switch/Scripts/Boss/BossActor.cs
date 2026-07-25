@@ -1,5 +1,6 @@
 ﻿using System;
 using Battle;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Common;
@@ -29,6 +30,7 @@ namespace Immortal_Switch.Scripts.Boss
         [SerializeField] private HeroAnimationDriver animationDriver;
         [SerializeField] private HeroLocomotion locomotion;
         [SerializeField] private HealthBarController healthBarController;
+        [SerializeField] private MeshRenderer meshRenderer;
 
         [Header("Animation")]
         [SerializeField] private string hitEventName = "hit";
@@ -156,6 +158,10 @@ namespace Immortal_Switch.Scripts.Boss
             ChangeState(useSpawnState ? BossState.Spawn : BossState.Idle);
 
             skillLogic.OnBattleStart();
+            if (meshRenderer)
+            {
+                meshRenderer.enabled = SettingManager.Instance.CurrentSetting.MonsterVisualEnabled;
+            }
         }
         
         public void Init(BossDataSO data, ICombatUnit heroA, ICombatUnit heroB, BaseStat cachedBaseStat)
@@ -194,6 +200,10 @@ namespace Immortal_Switch.Scripts.Boss
             ChangeState(useSpawnState ? BossState.Spawn : BossState.Idle);
 
             skillLogic.OnBattleStart();
+            if (meshRenderer)
+            {
+                meshRenderer.enabled = SettingManager.Instance.CurrentSetting.MonsterVisualEnabled;
+            }
         }
 
         private void ApplyBaseStat(BossDataSO data, BaseStat baseStat)
@@ -210,6 +220,7 @@ namespace Immortal_Switch.Scripts.Boss
                 return;
 
             stats.Initialize(baseStat);
+            stats.BuffModule.ApplyBuff(BuffFactory.CreateInvincible(animationDriver.GetAnimationDuration("spawn")));
         }
 
         private void ApplyData(BossDataSO data, StageStatScale scale)
@@ -520,7 +531,7 @@ namespace Immortal_Switch.Scripts.Boss
                 case BossState.Spawn:
                     spawnTimer = 0f;
                     GameEventManager.Trigger(GameEvents.OnBossSpawnAnimationComplete, false);
-                    DOVirtual.DelayedCall(spawnFallbackDuration, OnBossSpawnAnimationComplete);
+                    OnBossSpawnAnimationCompleteAsync().Forget();
                     animationDriver?.PlaySpawn();
                     break;
 
@@ -551,9 +562,11 @@ namespace Immortal_Switch.Scripts.Boss
                     break;
             }
         }
+        
 
-        private void OnBossSpawnAnimationComplete()
+        private async UniTask OnBossSpawnAnimationCompleteAsync()
         {
+            await UniTask.Delay(TimeSpan.FromSeconds(animationDriver.GetAnimationDuration("spawn")));
             GameEventManager.Trigger(GameEvents.OnBossSpawnAnimationComplete, true);
         }
 

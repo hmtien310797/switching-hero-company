@@ -148,7 +148,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
         private void InitUniqueOptions()
         {
             var entries = new List<DynamicHeroesGlobalSpecificationsTransmuationUniqueRow>(
-                DatabaseManager.Instance.TransmutationSystemDatabase.UniqueConfig.rows
+                DatabaseManager.Instance.TransmutationDb.UniqueConfig.rows
             );
 
             entries.Insert(0, new DynamicHeroesGlobalSpecificationsTransmuationUniqueRow

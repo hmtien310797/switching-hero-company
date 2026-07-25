@@ -17,9 +17,30 @@ MonoBehaviour:
   SkillKey: 
   SkillClass: 0
   SkillName: Galtin Arrow
+  SkillNameKey: 
   IconSkillKey: ic_hero_Edward_utimate
-  SkillIcon: {fileID: 21300000, guid: b0f5c98300e54a143b92c4742634e640, type: 3}
   Description: 
+  DescriptionKey: ui_Edward_ultimate_decs
+  legacyValueKey:
+  - 0
+  - 0
+  - 0
+  DescriptionValuesByLevel:
+  - Level: 1
+    Values:
+    - 0
+    - 0
+    - 0
+  - Level: 2
+    Values:
+    - 1
+    - 1
+    - 1
+  - Level: 3
+    Values:
+    - 2
+    - 2
+    - 2
   OwnerType: 1
   MaxLevel: 3
   SkillTier: 1
@@ -116,11 +137,16 @@ MonoBehaviour:
           DamageType: 0
           StackRule: 0
         StatModifier:
+          TargetMask: 1
+          ApplyMode: 0
           ModifierId: 
           StatType: 0
+          Operation: 1
           PercentValue: 0
           ScaleValueWithClassSkillLevel: 1
           Duration: 5
+          StackRule: 3
+          MaxStacks: 1
         Area:
           AreaPrefab: {fileID: 0}
           Shape: 0
@@ -180,7 +206,6 @@ MonoBehaviour:
           Amount: 1
         TriggerSkill: {fileID: 0}
       hasCameraShake: 0
-    Description: 
     PassiveLevelConfig:
       MergeMode: 0
       Modifiers: []
@@ -208,11 +233,16 @@ MonoBehaviour:
           DamageType: 0
           StackRule: 0
         StatModifier:
+          TargetMask: 1
+          ApplyMode: 0
           ModifierId: 
           StatType: 0
+          Operation: 1
           PercentValue: 0
           ScaleValueWithClassSkillLevel: 1
           Duration: 5
+          StackRule: 3
+          MaxStacks: 1
         Area:
           AreaPrefab: {fileID: 0}
           Shape: 0
@@ -272,7 +302,6 @@ MonoBehaviour:
           Amount: 1
         TriggerSkill: {fileID: 0}
       hasCameraShake: 0
-    Description: 
     PassiveLevelConfig:
       MergeMode: 0
       Modifiers: []
@@ -300,11 +329,16 @@ MonoBehaviour:
           DamageType: 0
           StackRule: 0
         StatModifier:
+          TargetMask: 1
+          ApplyMode: 0
           ModifierId: 
           StatType: 0
+          Operation: 1
           PercentValue: 0
           ScaleValueWithClassSkillLevel: 1
           Duration: 5
+          StackRule: 3
+          MaxStacks: 1
         Area:
           AreaPrefab: {fileID: 0}
           Shape: 0
@@ -364,7 +398,6 @@ MonoBehaviour:
           Amount: 1
         TriggerSkill: {fileID: 0}
       hasCameraShake: 0
-    Description: 
     PassiveLevelConfig:
       MergeMode: 0
       Modifiers: []

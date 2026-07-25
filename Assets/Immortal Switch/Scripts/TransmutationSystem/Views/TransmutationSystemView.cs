@@ -122,6 +122,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private void OnDestroy()
         {
+            KillTweener();
+
             TransmutationSystemManager.Instance.OnChanged -= OnTransmutationSystemChanged;
             TransmutationSystemManager.Instance.OnEquipChanged -= OnTransmutationEquipChanged;
             TransmutationSystemManager.Instance.OnSettingChanged -= OnTransmutationSettingChanged;
@@ -148,7 +150,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
         {
             var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationSystemLevelInfoPanel>();
             var manager = TransmutationSystemManager.Instance;
-            ui.Bind(DatabaseManager.Instance.TransmutationSystemDatabase.RateConfig.rows, manager.Storage.Data.Level);
+            ui.Bind(DatabaseManager.Instance.TransmutationDb.RateConfig.rows, manager.Storage.Data.Level);
         }
 
         private void OnClickAuto()
@@ -217,17 +219,23 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
             }
         }
 
-        private void SetRotate(bool value)
+        private void KillTweener()
         {
             _tweenerAutoRotate?.Kill();
             _tweenerAutoRotate = null;
+        }
+
+        private void SetRotate(bool value)
+        {
+            KillTweener();
 
             if (value)
             {
                 _tweenerAutoRotate = rtAutoRotate
-                    .DOLocalRotate(Vector3.forward * 180f, autoRotateDuration, RotateMode.FastBeyond360)
+                    .DOLocalRotate(Vector3.forward * 360f, autoRotateDuration, RotateMode.LocalAxisAdd)
                     .SetEase(Ease.Linear)
-                    .SetLoops(-1, LoopType.Incremental);
+                    .SetLoops(-1, LoopType.Incremental)
+                    .SetLink(rtAutoRotate.gameObject);
             }
             else
             {

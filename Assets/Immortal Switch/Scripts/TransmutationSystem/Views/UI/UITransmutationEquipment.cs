@@ -1,8 +1,5 @@
-using System;
 using Cysharp.Threading.Tasks;
-using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
-using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -27,6 +24,9 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 
         [SerializeField]
         private TMP_Text txtLevel;
+
+        [SerializeField]
+        private GameObject goItem;
 
         [SerializeField]
         private GameObject goEmpty;
@@ -72,6 +72,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             {
                 goEmpty.SetActive(value);
             }
+
+            goItem.SetActive(!value);
         }
 
         public void Bind(PlayerEquipViewData vm, int level)

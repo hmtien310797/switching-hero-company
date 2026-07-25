@@ -10,27 +10,44 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 {
     public class UIMissionEntry : MonoBehaviour
     {
-        [Header("References button")] [SerializeField]
+        [Header("References button")]
+        [SerializeField]
         private Button btnClaim;
 
-        [SerializeField] private Button btnChallenge;
+        [SerializeField]
+        private Button btnChallenge;
 
-        [Header("References overlay")] [SerializeField]
+        [Header("References overlay")]
+        [SerializeField]
         private GameObject goOverlayClaimed;
 
-        [Header("References mission")] [SerializeField]
+        [Header("References mission")]
+        [SerializeField]
         private TextMeshProUGUI txtTitle;
 
-        [SerializeField] private TextMeshProUGUI txtDesc;
-        [SerializeField] private TextMeshProUGUI txtProgress;
-        [SerializeField] private TextMeshProUGUI txtQuantityReward;
-        [SerializeField] private Image imgProgress;
+        [SerializeField]
+        private TextMeshProUGUI txtDesc;
 
-        [Header("References sprites")] [SerializeField]
+        [SerializeField]
+        private TextMeshProUGUI txtProgress;
+
+        [SerializeField]
+        private TextMeshProUGUI txtQuantityReward;
+
+        [SerializeField]
+        private Image imgProgress;
+
+        [Header("References sprites")]
+        [SerializeField]
         private Image imgReward;
 
-        [PreviewField] [SerializeField] private Sprite sprIconDaily;
-        [PreviewField] [SerializeField] private Sprite sprIconWeekly;
+        [PreviewField]
+        [SerializeField]
+        private Sprite sprIconDaily;
+
+        [PreviewField]
+        [SerializeField]
+        private Sprite sprIconWeekly;
 
         // --- Private Fields ---
         public DynamicHeroesGlobalSpecificationsMissionConfigRow Row { get; private set; }
@@ -46,14 +63,23 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void Awake()
         {
-            MissionSystemManager.Instance.OnMissionClaimed += OnMissionSystemMissionClaimed;
-            MissionSystemManager.Instance.OnChangeProgress += OnMissionSystemChangeProgress;
+            MissionSystemManager.Instance.OnMissionClaimed += OnMissionClaimed;
+            MissionSystemManager.Instance.OnChangeProgress += OnMissionChangeProgress;
 
             btnClaim.onClick.AddListener(OnClickClaim);
             btnChallenge.onClick.AddListener(OnClickChallenge);
         }
 
-        private void OnMissionSystemChangeProgress(string arg1, int arg2, string arg3)
+        private void OnDestroy()
+        {
+            MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
+            MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
+
+            btnClaim.onClick.RemoveListener(OnClickClaim);
+            btnChallenge.onClick.RemoveListener(OnClickChallenge);
+        }
+
+        private void OnMissionChangeProgress(string arg1, int arg2, string arg3)
         {
             if (Row == null)
             {
@@ -71,7 +97,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             RefreshVisual();
         }
 
-        private void OnMissionSystemMissionClaimed(string arg1, string arg2)
+        private void OnMissionClaimed(string arg1, string arg2)
         {
             if (Row == null)
             {
@@ -90,7 +116,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void OnClickClaim()
         {
-            MissionSystemManager.Instance.MissionClaimAndNotify(Row);
+            MissionSystemManager.Instance.ClaimAndNotify(Row);
         }
 
         private void OnClickChallenge()

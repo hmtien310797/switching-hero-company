@@ -48,6 +48,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         private bool isDespawning;
         private int skillId;
+        public List<SkillPhaseData> SkillPhaseData => PhaseBuffer;
 
         private void Awake()
         {

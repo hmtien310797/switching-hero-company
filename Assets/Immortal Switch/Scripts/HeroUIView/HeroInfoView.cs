@@ -1,3 +1,4 @@
+using System;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Addressable;
@@ -58,6 +59,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private HeroSkillDetailUI passiveSkillDetailUI;
 
         [SerializeField] private UIHeroAllSkillDetail uiHeroAllSkillDetail;
+        [SerializeField] private Image[] skillImage;
+        [SerializeField] private GameObject[] stars;
         
         private const string HERO_SPRITE_ATLAS_KEY = "hero_sprite_atlas";
         private int _currentHeroIdx;
@@ -83,6 +86,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
             }
 
             base.PlayShowAsync(args).Forget();
+        }
+
+        private void OnDisable()
+        {
+            uiHeroAllSkillDetail.gameObject.SetActive(false);
         }
 
         public void SetHeroCollectionViewData(HeroCollectionItemViewData heroItemViewData)
@@ -189,8 +197,24 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (data != null)
             {
                 txtShard.text = $"{data.CurrentShard} / {data.RequiredShardToNext}";
+                btnUpgrade.gameObject.SetActive(data.RequiredShardToNext != 0);
                 imgProgress.fillAmount = data.ProgressNormalized;
                 tierImage.sprite = HeroImageService.GetHeroTierIcon(data.DisplayTier);
+                switch (data.CurrentStarInTier)
+                {
+                    case 0:
+                        stars[0].SetActive(false);
+                        stars[1].SetActive(false);
+                        break;
+                    case 1:
+                        stars[0].SetActive(true);
+                        stars[1].SetActive(false);
+                        break;
+                    case 2:
+                        stars[0].SetActive(true);
+                        stars[1].SetActive(true);
+                        break;
+                }
             }
 
             if (hero.Spine != null)
@@ -211,7 +235,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
             }
 
             var element = heroUiDb.GetElement(hero.Element);
-            var @class = heroUiDb.GetHeroClass(hero.HeroClass);
 
             if (element != null)
             {
@@ -219,10 +242,8 @@ namespace Immortal_Switch.Scripts.HeroUIView
                 txtElement.text = element.ElementName;
             }
 
-            if (@class != null)
-            {
-                txtClass.text = @class.ClassName;
-            }
+            //dont have localize key
+            txtClass.text = hero.HeroClass.ToString();
 
             imgRace.sprite = HeroImageService.GetHeroClassIcon(hero);
             txtHeroName.text = hero.Name;
@@ -244,15 +265,47 @@ namespace Immortal_Switch.Scripts.HeroUIView
             SkillDataSO ultimateSkillData = DatabaseManager.Instance.GetUltimateSkillDataByHeroId(heroId);
             if (ultimateSkillData != null)
             {
-                ultimateSkillDetailUI.Bind(heroStatSnapshot?.ultimateSkillLevel ?? 1,
+                int ultimateLevel = ultimateSkillData.GetSafeLevel(
+                    heroStatSnapshot?.ultimateSkillLevel ?? 1);
+                ultimateSkillDetailUI.Bind(ultimateLevel,
                     ultimateSkillData, ShowSkillDetail);
             }
-            
+
             SkillDataSO passiveSkillData = DatabaseManager.Instance.GetPassiveSkillDataByHeroId(heroId);
             if (passiveSkillData != null)
             {
-                passiveSkillDetailUI.Bind(heroStatSnapshot?.passiveSkillLevel ?? 1,
+                int passiveLevel = passiveSkillData.GetSafeLevel(
+                    heroStatSnapshot?.passiveSkillLevel ?? 1);
+                passiveSkillDetailUI.Bind(passiveLevel,
                     passiveSkillData, ShowSkillDetail);
+            }
+
+            HeroActor currentHero = null;
+            for (int i = 0; i < UserDataCache.Instance.InBattleHeroIdList.Count; i++)
+            {
+                if (UserDataCache.Instance.InBattleHeroIdList[i] == heroId)
+                {
+                    currentHero = UserDataCache.Instance.inBattleHeroes[i];
+                    break;
+                }
+            }
+
+            if (currentHero == null)
+            {
+                return;
+            }
+
+            var allEquippedSkill = currentHero.HeroSkillController.GetAllEquippedClassSkills();
+            for (int i = 0; i < skillImage.Length; i++)
+            {
+                var currentSkill = allEquippedSkill[i];
+                if (currentSkill == null)
+                {
+                    skillImage[i].gameObject.SetActive(false);
+                    continue;
+                }
+                skillImage[i].gameObject.SetActive(true);
+                skillImage[i].sprite = SkillImageService.GetSkillIcon(currentSkill);
             }
         }
 

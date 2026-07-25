@@ -7,6 +7,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventWheel;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Loading.Views;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Shop.Views;
@@ -161,13 +162,16 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                 onComplete?.Invoke(false, "IAP chưa khởi tạo xong.");
                 return;
             }
-
+            
+            LoadingService.Show(true);
+            
             Product product = _storeController.products.WithID(storeProductId);
 
             if (product == null ||
                 !product.availableToPurchase)
             {
                 onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
+                LoadingService.Hide();
                 return;
             }
 
@@ -182,8 +186,11 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         /// ValidateAndConfirmAsync).</summary>
         public void BuyPackProduct(int packId, string storeProductId, Action<bool, string> onComplete)
         {
+            LoadingService.Show(true);
+
             if (_storeController == null)
             {
+                LoadingService.Hide();
                 onComplete?.Invoke(false, "IAP chưa khởi tạo xong.");
                 return;
             }
@@ -193,6 +200,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             if (product == null ||
                 !product.availableToPurchase)
             {
+                LoadingService.Hide();
                 onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
                 return;
             }
@@ -213,8 +221,11 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             IReadOnlyList<ItemData> rewards,
             Action<bool, string> onComplete)
         {
+            LoadingService.Show(true);
+
             if (_storeController == null)
             {
+                LoadingService.Hide();
                 onComplete?.Invoke(false, "IAP chưa khởi tạo xong.");
                 return;
             }
@@ -224,6 +235,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             if (product == null ||
                 !product.availableToPurchase)
             {
+                LoadingService.Hide();
                 onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
                 return;
             }
@@ -240,8 +252,11 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         /// DatabaseManager cục bộ) để đảm bảo khớp đúng product_id server sẽ validate.</summary>
         public void BuyEventPassProduct(string storeProductId, Action<bool, string> onComplete)
         {
+            LoadingService.Show(true);
+
             if (_storeController == null)
             {
+                LoadingService.Hide();
                 onComplete?.Invoke(false, "IAP chưa khởi tạo xong.");
                 return;
             }
@@ -251,6 +266,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             if (product == null ||
                 !product.availableToPurchase)
             {
+                LoadingService.Hide();
                 onComplete?.Invoke(false, $"Product không khả dụng: {storeProductId}");
                 return;
             }
@@ -307,6 +323,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             if (string.IsNullOrEmpty(payload))
             {
                 Debug.LogError($"[IAPManager] Receipt rỗng cho product={storeProductId}, không thể validate.");
+                LoadingService.Hide();
                 callback?.Invoke(false, "Receipt rỗng, không thể validate.");
                 return;
             }
@@ -404,6 +421,10 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                 Debug.LogError($"[IAPManager] Validate purchase thất bại -> product={storeProductId}: {ex.Message}");
                 callback?.Invoke(false, ex.Message);
             }
+            finally
+            {
+                LoadingService.Hide();
+            }
         }
 
         private static string ExtractReceiptPayload(string rawReceipt)
@@ -447,12 +468,16 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
         public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
         {
+            LoadingService.Hide();
+
             Debug.LogWarning(
                 $"[IAPManager] Purchase failed (legacy callback) -> product={product?.definition.id}, reason={failureReason}");
         }
 
         public void OnPurchaseFailed(Product product, PurchaseFailureDescription failureDescription)
         {
+            LoadingService.Hide();
+
             string storeProductId = product?.definition.id;
 
             if (storeProductId != null &&

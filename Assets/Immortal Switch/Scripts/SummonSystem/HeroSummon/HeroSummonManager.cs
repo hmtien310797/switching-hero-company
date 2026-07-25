@@ -122,6 +122,24 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             NotifyChanged();
         }
 
+        /// <summary>Đánh dấu cục bộ các mốc vừa claim thành công trên server (rewards[].SummonLevel
+        /// từ ClaimRewardResponse) — 1 lần claim_reward giờ có thể trả về nhiều mốc cùng lúc
+        /// (sweep các mốc bị bỏ sót trước đó), không chỉ mốc được request.</summary>
+        public void MarkRewardLevelsClaimed(System.Collections.Generic.IEnumerable<int> levels)
+        {
+            if (levels == null) return;
+            bool changed = false;
+            foreach (var level in levels)
+            {
+                if (level <= 0 || saveData.ClaimedRewardLevels.Contains(level)) continue;
+                saveData.ClaimedRewardLevels.Add(level);
+                changed = true;
+            }
+            if (!changed) return;
+            saveData.ClaimedRewardLevels.Sort();
+            NotifyChanged();
+        }
+
         public void ResetSummonData()
         {
             saveData = new HeroSummonSaveData();

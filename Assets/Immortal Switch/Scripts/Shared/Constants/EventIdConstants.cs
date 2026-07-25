@@ -6,5 +6,20 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         /// event wheel
         /// </summary>
         public const int EVENT_WHEEL = 1001;
+
+        /// <summary>
+        /// event Lễ Hội Băng Long
+        /// </summary>
+        public const int EVENT_BL = 1002;
+
+        /// <summary>
+        /// event newbie 30
+        /// </summary>
+        public const int EVENT_NEWBIE_30 = 1003;
+
+        /// <summary>
+        /// event newbie 7
+        /// </summary>
+        public const int EVENT_NEWBIE_7 = 1004;
     }
 }

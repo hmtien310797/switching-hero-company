@@ -55,6 +55,7 @@ MonoBehaviour:
   animationDriver: {fileID: 2157218445760095175}
   locomotion: {fileID: 2301857392755416939}
   healthBarController: {fileID: 8762698944960301323}
+  meshRenderer: {fileID: 7462449064955687092}
   hitEventName: hit
   skillHitEventName: skill_hit
   useSpawnState: 1
@@ -179,7 +180,7 @@ GameObject:
   - component: {fileID: 1598020925245477483}
   - component: {fileID: 7462449064955687092}
   - component: {fileID: 8866653149286129039}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spine GameObject (boss_ronald)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -252,7 +253,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &8866653149286129039
 MonoBehaviour:

@@ -17,23 +17,28 @@ public class BulletProjectile :
     IAddressableProjectile
 {
     [Header("Collision")]
-    [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private bool despawnOnHit = true;
+    [SerializeField] protected LayerMask enemyLayer;
+    [SerializeField] protected bool despawnOnHit = true;
 
-    private AddressableProjectilePoolable addressablePoolable;
+    protected AddressableProjectilePoolable addressablePoolable;
 
-    private Vector3 direction;
-    private float speed;
-    private float lifeTime;
-    private float timer;
-    private bool isInitialized;
-    private float damage;
+    protected Vector3 direction;
+    protected float speed;
+    protected float lifeTime;
+    protected float timer;
+    protected bool isInitialized;
+    protected float damage;
 
-    private ICombatUnit sourceCombatUnit;
-    private CancellationTokenRegistration _endStageCancelRegistration;
-    private SkillRuntimeObjectConfig config;
-
-    private void Awake()
+    protected SkillRuntimeObject controller;
+    protected ICombatUnit sourceCombatUnit;
+    protected CancellationTokenRegistration _endStageCancelRegistration;
+    protected SkillRuntimeObjectConfig Config;
+    protected SkillRuntimeContext Context;
+    protected SkillExecutor Executor;
+    protected SkillTargetResolver skillTargetResolver;
+    protected ISkillObjectSpawner SkillObjectSpawner;
+    
+    protected void Awake()
     {
         addressablePoolable =
             GetComponent<AddressableProjectilePoolable>();
@@ -48,8 +53,9 @@ public class BulletProjectile :
         }
     }
 
-    public void Setup(
-        ICombatUnit source, SkillRuntimeObjectConfig Config,
+    public virtual void Setup(SkillRuntimeObject controller,
+        ICombatUnit source, SkillRuntimeContext context, SkillRuntimeObjectConfig Config, SkillExecutor executor, SkillTargetResolver targetResolver,
+        ISkillObjectSpawner skillObjectSpawner,
         Vector3 moveDirection,
         float bulletSpeed,
         float bulletLifeTime,
@@ -62,12 +68,17 @@ public class BulletProjectile :
          * giữ sourceCombatUnit từ lần sử dụng trước.
          */
         sourceCombatUnit = source;
-        config = Config;
+        this.Config = Config;
         direction =
             moveDirection.sqrMagnitude > 0.0001f
                 ? moveDirection.normalized
                 : Vector3.zero;
 
+        this.controller = controller;
+        Context = context;
+        Executor = executor;
+        skillTargetResolver = targetResolver;
+        SkillObjectSpawner = skillObjectSpawner;
         speed = bulletSpeed;
         lifeTime = bulletLifeTime;
         this.damage = damage;
@@ -104,7 +115,7 @@ public class BulletProjectile :
         ResetRuntimeData();
     }
     
-    private void Update()
+    protected virtual void Update()
     {
         if (!isInitialized)
             return;
@@ -118,11 +129,11 @@ public class BulletProjectile :
 
         if (timer >= lifeTime)
         {
-            DespawnSelf();
+            DespawnSelfAsync();
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (!isInitialized)
             return;
@@ -154,15 +165,25 @@ public class BulletProjectile :
         targetCombatUnit.TakeDamage(damageResult);
         if (despawnOnHit)
         {
-            DespawnSelf();
+            DespawnSelfAsync().Forget();
         }
     }
 
-    private void DespawnSelf()
+    protected void DespawnSelf()
+    {
+        DespawnSelfAsync(0f).Forget();
+    }
+
+    protected virtual async UniTask DespawnSelfAsync(float delay = 0f)
     {
         if (!isInitialized)
             return;
 
+        if (delay > 0)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+        }
+        
         /*
          * Chặn bullet tiếp tục Update hoặc xử lý trigger khác
          * trong lúc đang được trả về pool.
@@ -192,7 +213,7 @@ public class BulletProjectile :
         addressablePoolable.Despawn();
     }
 
-    private void ResetRuntimeData()
+    protected void ResetRuntimeData()
     {
         isInitialized = false;
 
@@ -207,7 +228,7 @@ public class BulletProjectile :
         
     }
 
-    private static bool IsInLayerMask(
+    protected static bool IsInLayerMask(
         int layer,
         LayerMask layerMask)
     {

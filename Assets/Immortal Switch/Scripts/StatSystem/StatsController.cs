@@ -40,11 +40,20 @@ namespace Immortal_Switch.Scripts.StatSystem
                 { StatType.FinalDmgBonus, 0f },
             });
 
-            HealthModule = new HealthModule(StatModule);
+            StatusEffectModule = new StatusEffectModule();
+
+            HealthModule = new HealthModule(
+                StatModule,
+                StatusEffectModule
+            );
+
             HealthModule.Init();
 
-            StatusEffectModule = new StatusEffectModule();
-            BuffModule = new BuffModule(StatModule, HealthModule, StatusEffectModule);
+            BuffModule = new BuffModule(
+                StatModule,
+                HealthModule,
+                StatusEffectModule
+            );
 
             BindDebug();
         }

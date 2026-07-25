@@ -1,3 +1,4 @@
+using System;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.MissionSystem.Models;
@@ -36,6 +37,12 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             btnClaim.onClick.AddListener(OnClickClaim);
             btnAdsX2.onClick.AddListener(OnClickAdsX2);
             btnAdsX2.gameObject.SetActive(false);
+        }
+
+        private void OnDestroy()
+        {
+            btnClaim.onClick.RemoveListener(OnClickClaim);
+            btnAdsX2.onClick.RemoveListener(OnClickAdsX2);
         }
 
         private void OnClickAdsX2()

@@ -4,6 +4,7 @@ using System.Globalization;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared.UI;
 using TMPro;
 using UnityEngine;
@@ -92,7 +93,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         }
 
         public void Bind(
-            string title, float price,
+            string titleKey, float price,
             DynamicHeroesGlobalSpecificationsProductIdRow product,
             int packId, string type,
             int currentValue, int limit,
@@ -102,7 +103,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         )
         {
             txtPrice.text = Mathf.Approximately(price, 0f) ? "Free" : price.ToString(CultureInfo.InvariantCulture);
-            txtTitle.text = title;
+            txtTitle.text = LocalizationManager.GetText(titleKey);
             txtLimit.text = $"{currentValue:00}/{limit:00}";
             txtCountdown.text = $"Sale time: {endTime.Day:00}d {endTime.Hour:00}h";
 

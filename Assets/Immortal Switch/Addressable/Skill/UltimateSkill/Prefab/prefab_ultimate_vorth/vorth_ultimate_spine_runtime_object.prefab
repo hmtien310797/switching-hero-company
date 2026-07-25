@@ -30,7 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 577235091910467941}
+  - {fileID: 4650002006228022138}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5322428298751216005
@@ -45,14 +45,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55221917133741fabf50d43db1e315c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skillArea: {fileID: 0}
   debugCountRuntimeEvent: 0
   debugCountEventName: hit
   debugLogRuntimeEventCount: 0
   debugLogRuntimeEventTotalOnDespawn: 0
-  skeletonAnimation: {fileID: 7610600262427787311}
+  skeletonAnimation: {fileID: 8344381376890046679}
   fallbackAnimationName: 
   fallbackLoop: 0
---- !u!1 &4591653550781377160
+--- !u!1 &8817095446225702175
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,10 +61,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 577235091910467941}
-  - component: {fileID: 5921650129321350082}
-  - component: {fileID: 99358035388248543}
-  - component: {fileID: 7610600262427787311}
+  - component: {fileID: 4650002006228022138}
+  - component: {fileID: 305582364417234855}
+  - component: {fileID: 1855110456364352911}
+  - component: {fileID: 8344381376890046679}
   m_Layer: 7
   m_Name: Spine GameObject (hero_13_vorth_ulti)
   m_TagString: Untagged
@@ -71,36 +72,36 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &577235091910467941
+--- !u!4 &4650002006228022138
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4591653550781377160}
+  m_GameObject: {fileID: 8817095446225702175}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5114978648311206855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &5921650129321350082
+--- !u!33 &305582364417234855
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4591653550781377160}
+  m_GameObject: {fileID: 8817095446225702175}
   m_Mesh: {fileID: 0}
---- !u!23 &99358035388248543
+--- !u!23 &1855110456364352911
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4591653550781377160}
+  m_GameObject: {fileID: 8817095446225702175}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -137,15 +138,15 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 11
+  m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7610600262427787311
+--- !u!114 &8344381376890046679
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4591653550781377160}
+  m_GameObject: {fileID: 8817095446225702175}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
@@ -181,6 +182,6 @@ MonoBehaviour:
   unscaledTime: 0
   limitRuntimeUpdateRate: 0
   targetRuntimeFps: 20
-  _animationName: ulti
-  loop: 0
+  _animationName: 
+  loop: 1
   timeScale: 1

@@ -41,7 +41,17 @@ public class GameStatView : MonoBehaviour
     {
         Instance = this;
         
-        buttonBoss.onClick.AddListener(PvEBattleController.Instance.SpawnBossDirectly);
+        buttonBoss.onClick.AddListener(() =>
+        {
+            buttonBoss.gameObject.SetActive(false);
+            PvEBattleController.Instance.SpawnBossDirectly();
+        });
+        buttonGiveUp.onClick.AddListener(() =>
+        {
+            buttonGiveUp.gameObject.SetActive(false);
+            BattleFlowController.Instance.SurrenderBattle();
+            battleTimerController.HideTimer();
+        });
         buttonBoss.interactable = false;
         buttonGiveUp.interactable = false;
         
@@ -115,6 +125,7 @@ public class GameStatView : MonoBehaviour
         buttonMap.gameObject.SetActive(true);
         monsterKill.SetActive(true);
         battleTimerController.HideTimer();
+        buttonGiveUp.gameObject.SetActive(false);
         currentChapterStageEnemyCountText.text = string.Empty;
     }
 
@@ -122,12 +133,14 @@ public class GameStatView : MonoBehaviour
     {
         buttonBoss.interactable = false;
         battleTimerController.HideTimer();
+        buttonGiveUp.gameObject.SetActive(false);
     }
 
     private void OnStageLost()
     {
         buttonBoss.interactable = true;
         battleTimerController.HideTimer();
+        buttonGiveUp.gameObject.SetActive(false);
     }
 
     private void OnInitNewStage(bool playCompletedStage, bool isLosingStage, StageRuntimeData stageRuntimeData)
@@ -146,24 +159,15 @@ public class GameStatView : MonoBehaviour
 
     public async UniTask InitTimer(float dur, float delay, Action Act, CancellationToken cancellationToken)
     {
+        buttonMap.gameObject.SetActive(false);
+        monsterKill.SetActive(false);
+        buttonGiveUp.gameObject.SetActive(true);
+        buttonGiveUp.interactable = true;
+        buttonBoss.gameObject.SetActive(false);
         if (delay >= 0)
         {
             await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: cancellationToken);
         }
         battleTimerController.InitTimer(dur, Act, cancellationToken);
-        buttonMap.gameObject.SetActive(false);
-        monsterKill.SetActive(false);
-        buttonGiveUp.gameObject.SetActive(true);
-        buttonBoss.gameObject.SetActive(false);
-    }
-
-    public void SetHeaderName(string name)
-    {
-        currentChapterStageNameText.text = name;
-    }
-
-    public void HideTimer()
-    {
-        battleTimerController.HideTimer();
     }
 }

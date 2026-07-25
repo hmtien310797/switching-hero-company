@@ -84,7 +84,10 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
                     rotateDuration,
                     RotateMode.LocalAxisAdd
                 )
-                .SetEase(Ease.InCubic)
+
+                // Giữ vận tốc đều giữa các loop để khi chuyển sang OutCubic
+                // trong StopAt không bị tụt vận tốc đột ngột và tạo cảm giác khựng.
+                .SetEase(Ease.Linear)
                 .SetLoops(-1, LoopType.Incremental);
         }
 
@@ -118,11 +121,8 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
                     360f
                 );
 
-                // Không dừng ngay nếu target vừa nằm sát phía trước kim.
-                if (clockwiseDistance < SegmentAngle)
-                {
-                    clockwiseDistance += 360f;
-                }
+                // Luôn luôn cộng thêm 1 vòng để tránh bị giật laị
+                clockwiseDistance += 360f;
 
                 // LocalAxisAdd nhận delta. Clockwise luôn là Z âm.
                 float finalZ = -Mathf.Abs(clockwiseDistance);

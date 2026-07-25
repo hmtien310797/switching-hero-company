@@ -55,7 +55,7 @@ namespace Immortal_Switch.Scripts.Shared
                 );
             }
 
-            InitEventAsync();
+            await InitEventAsync();
 
             await UniTask.WhenAll(
                 InitHeroDataAsync(),
@@ -137,7 +137,7 @@ namespace Immortal_Switch.Scripts.Shared
 
             if (entries.Count < 1)
             {
-                Debug.LogError("Rewards not found");
+                Debug.LogWarning($"Rewards {strReward} not found");
                 return new List<ItemRewardData>();
             }
 

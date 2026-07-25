@@ -27,11 +27,14 @@ namespace Immortal_Switch.Scripts.Shared
         [DatabaseBinding]
         private DynamicHeroesGlobalSpecificationsEventBLRateDatabase _eventBLRateDb;
 
-        public DynamicHeroesGlobalSpecificationsEventBLRateRow EventBLRandomRate()
+        [DatabaseBinding]
+        private DynamicHeroesGlobalSpecificationsEventBLSummonMilestoneDatabase _eventBLSummonMilestoneDb;
+
+        public DynamicHeroesGlobalSpecificationsEventBLSummonMilestoneRow GetEventBLSummonMilestone(int summonPoint,
+            List<int> claimedMilestones)
         {
-            var probabilities = _eventBLRateDb.rows.Select(v => v.rate).ToList();
-            var idx = RandomHelper.RandomIndexByWeight(probabilities, v => v);
-            return idx >= 0 ? _eventBLRateDb.rows[idx] : null;
+            return _eventBLSummonMilestoneDb.rows
+                .FirstOrDefault(v => summonPoint >= v.pointsRequired && !claimedMilestones.Contains(v.milestone));
         }
 
         public List<DynamicHeroesGlobalSpecificationsEventBLDailyGachaMilestoneRow> GetEventLHBLMilestone()

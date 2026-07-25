@@ -86,7 +86,8 @@ namespace Common
         public event Action OnBattleLineupChanged;
 
         public event Action<int> OnHeroSkillChanged;
-        public bool AutoSkill;
+        public bool AutoClassSkill;
+        public bool AutoUltimateSkill;
 
         public override UniTask InitializeAsync()
         {
@@ -95,12 +96,21 @@ namespace Common
 
         #region SKILL
         
-        public void SetAutoSkill(bool isAutoSkill)
+        public void SetAutoClassSkill(bool isAutoSkill)
         {
-            AutoSkill = isAutoSkill;
+            AutoClassSkill = isAutoSkill;
             for (int i = 0; i < inBattleHeroes.Length; i++)
             {
-                inBattleHeroes[i]?.SetAutoSkill(isAutoSkill);
+                inBattleHeroes[i]?.SetAutoClassSkill(isAutoSkill);
+            }
+        }
+        
+        public void SetAutoUltimateSkill(bool isAutoSkill)
+        {
+            AutoUltimateSkill = isAutoSkill;
+            for (int i = 0; i < inBattleHeroes.Length; i++)
+            {
+                inBattleHeroes[i]?.SetAutoUltimateSkill(isAutoSkill);
             }
         }
 

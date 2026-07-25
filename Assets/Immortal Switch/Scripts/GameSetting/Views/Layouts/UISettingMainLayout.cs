@@ -1,12 +1,12 @@
-using System.Collections.Generic;
 using Common;
 using Cysharp.Threading.Tasks;
-using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.GameSetting.Views.UI;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,14 +38,30 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
         [SerializeField]
         private Button btnLink;
 
+        [PreviewField]
+        [SerializeField]
+        private Sprite sprGgUnlink;
+
+        [PreviewField]
+        [SerializeField]
+        private Sprite sprGgLinked;
+
+        [PreviewField]
+        [SerializeField]
+        private Sprite sprAppleUnlink;
+
+        [PreviewField]
+        [SerializeField]
+        private Sprite sprAppleLinked;
+
         [SerializeField]
         private GameObject goLinkClaimed;
 
         [SerializeField]
-        private GameObject goAccountLinked;
+        private Image imgAccountLinked;
 
         [SerializeField]
-        private GameObject goAccountUnlink;
+        private Image imgAccountUnlink;
 
         [Header("Language references")]
         [SerializeField]
@@ -68,7 +84,7 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
         private Button btnGiftCode;
 
         // --- Private Fields ---
-        private List<UISettingLanguageItem> _languages = new();
+        private SimpleUIPool<UISettingLanguageItem> _pools;
 
         private void Awake()
         {
@@ -92,6 +108,7 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
         private async UniTaskVoid LinkAccountAsync()
         {
             var linked = await SettingManager.Instance.LinkAccountAsync();
+
             if (linked)
             {
                 SetLinked(true);
@@ -107,6 +124,7 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
         private async UniTaskVoid ClaimLinkRewardAsync()
         {
             var claimed = await SettingManager.Instance.ClaimLinkRewardAsync();
+
             if (claimed)
             {
                 SetLinkedClaimed(true, true);
@@ -141,34 +159,22 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
 
         private void RefreshLanguage()
         {
+            _pools ??= new SimpleUIPool<UISettingLanguageItem>(languagePrefab, languageContainer);
+
             var languages = DatabaseManager.Instance.GetLanguagesReleased();
 
             for (var index = 0; index < languages.Count; index++)
             {
                 var entry = languages[index];
                 var isSelected = SettingManager.Instance.CurrentSetting.LangCode == entry.langCode;
+                var clone = _pools.Get(index);
 
-                if (_languages.Count > index)
-                {
-                    var clone = _languages[index];
-                    clone.gameObject.SetActive(true);
-                    clone.Bind(entry.nameNative, entry.langCode, OnChangeLanguage);
-                    clone.SetSelected(isSelected);
-                }
-                else
-                {
-                    var clone = Instantiate(languagePrefab, languageContainer);
-                    clone.Bind(entry.nameNative, entry.langCode, OnChangeLanguage);
-                    clone.SetSelected(isSelected);
-                    _languages.Add(clone);
-                }
+                clone.Bind(entry.nameNative, entry.langCode, OnChangeLanguage);
+                clone.SetSelected(isSelected);
             }
 
             // hide cac object ko su dung
-            for (int i = languages.Count; i < _languages.Count; i++)
-            {
-                _languages[i].gameObject.SetActive(false);
-            }
+            _pools.ReleaseFrom(languages.Count);
         }
 
         private void OnChangeLanguage(string langCode)
@@ -202,13 +208,13 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
         {
             if (isLinked)
             {
-                goAccountLinked.SetActive(true);
-                goAccountUnlink.SetActive(false);
+                imgAccountLinked.gameObject.SetActive(true);
+                imgAccountUnlink.gameObject.SetActive(false);
             }
             else
             {
-                goAccountLinked.SetActive(false);
-                goAccountUnlink.SetActive(true);
+                imgAccountLinked.gameObject.SetActive(false);
+                imgAccountUnlink.gameObject.SetActive(true);
             }
         }
 
@@ -216,6 +222,14 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
         {
             txtName.text = UserDataCache.Instance.DisplayName;
             txtUid.text = UserDataCache.Instance.Uid;
+
+#if UNITY_EDITOR || UNITY_ANDROID
+            imgAccountLinked.sprite = sprGgLinked;
+            imgAccountUnlink.sprite = sprGgUnlink;
+#elif UNITY_IOS
+            imgAccountLinked.sprite = sprAppleLinked;
+            imgAccountUnlink.sprite = sprAppleUnlink;
+#endif
         }
 
         private void OnClickGiftCode()

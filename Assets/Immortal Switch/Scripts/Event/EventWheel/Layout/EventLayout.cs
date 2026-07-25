@@ -7,14 +7,12 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventWheel.Controller;
 using Immortal_Switch.Scripts.Event.EventWheel.UI;
 using Immortal_Switch.Scripts.Items.Models;
-using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 {
@@ -29,6 +27,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
     {
         public EEventCategory type;
         public WheelController controller;
+        public GameObject currency;
         public UIEventWheelCategory category;
     }
 
@@ -37,9 +36,6 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         [Header("Header references")]
         [SerializeField]
         private TextMeshProUGUI txtTitle;
-
-        [SerializeField]
-        private TextMeshProUGUI txtCountdown;
 
         [SerializeField]
         private Toggle toggleSkipAnimation;
@@ -52,20 +48,22 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         private Button btnPremium;
 
         [SerializeField]
-        private UIEventWheelButtonSpin btnX1Normal;
+        private GameObject categoryTabPanel;
 
         [SerializeField]
-        private UIEventWheelButtonSpin btnX10Normal;
+        private UIEventWheelButtonSpin btnX1;
 
         [SerializeField]
-        private UIEventWheelButtonSpin btnX1Premium;
-
-        [SerializeField]
-        private UIEventWheelButtonSpin btnX10Premium;
+        private UIEventWheelButtonSpin btnX10;
 
         [Header("Wheel references")]
         [SerializeField]
         private List<EventLayoutCategory> categories = new();
+
+        [Header("Animation references")]
+        [SerializeField]
+        [Range(0f, 2f)]
+        private float stepDelay = 1f;
 
         // --- Private Fields ---
         private EventLayoutCategory _selectedCategory;
@@ -76,6 +74,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         private int _premiumX1;
         private int _premiumX10;
         private bool _isRolling;
+
         private CancellationTokenSource _spinCancellationTokenSource;
         private UniTaskCompletionSource _spinCompletionSource;
 
@@ -94,24 +93,30 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private void OnEnable()
         {
+            categoryTabPanel.SetActive(true);
             UnselectCategories();
             OnClickNormal();
         }
 
         private void OnDisable()
         {
+            categoryTabPanel.SetActive(false);
             CancelCurrentSpin();
         }
 
         private void OnClickNormal()
         {
-            txtTitle.text = "Vòng quay cơ bản";
+            txtTitle.text = "Vòng Cơ Bản";
+
+            RefreshBind(EEventCategory.Normal);
             SetSelected(EEventCategory.Normal);
         }
 
         private void OnClickPremium()
         {
-            txtTitle.text = "Vòng quay cao cấp";
+            txtTitle.text = "Vòng Cao Cấp";
+
+            RefreshBind(EEventCategory.Premium);
             SetSelected(EEventCategory.Premium);
         }
 
@@ -127,11 +132,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             _premiumX1 = premiumX1;
             _premiumX10 = premiumX10;
 
-            btnX1Normal.Bind(1, $"{_normalX1}", OnClickSpinNormal);
-            btnX10Normal.Bind(10, $"{_normalX10}", OnClickSpinNormal);
-
-            btnX1Premium.Bind(1, $"{_premiumX1}", OnClickSpinPremium);
-            btnX10Premium.Bind(10, $"{_premiumX10}", OnClickSpinPremium);
+            RefreshBind(EEventCategory.Normal);
 
             foreach (var category in categories)
             {
@@ -145,6 +146,25 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                         category.controller.Bind(premiumItems);
                         break;
                 }
+            }
+        }
+
+        private void RefreshBind(EEventCategory type)
+        {
+            switch (type)
+            {
+                case EEventCategory.Normal:
+                    btnX1.Bind(1, $"{_normalX1}", OnClickSpinNormal);
+                    btnX10.Bind(10, $"{_normalX10}", OnClickSpinNormal);
+                    break;
+
+                case EEventCategory.Premium:
+                    btnX1.Bind(1, $"{_premiumX1}", OnClickSpinPremium);
+                    btnX10.Bind(10, $"{_premiumX10}", OnClickSpinPremium);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
@@ -182,7 +202,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 response = await NakamaClient.Instance.EventWheelSpinAsync(new EventWheelSpinRequest
                 {
                     Category = (int)type,
-                    Times    = times,
+                    Times = times,
                 });
             }
             catch (ApiResponseException ex)
@@ -257,10 +277,11 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
                     if (i < entries.Count - 1)
                     {
-                        var stepDelay = Random.Range(1000, 2001);
-
                         var isCanceled = await UniTask
-                            .Delay(stepDelay, cancellationToken: cancellationToken)
+                            .Delay(
+                                !force ? TimeSpan.FromSeconds(stepDelay) : TimeSpan.FromMilliseconds(250),
+                                cancellationToken: cancellationToken
+                            )
                             .SuppressCancellationThrow();
 
                         if (isCanceled)
@@ -306,10 +327,17 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         {
             switch (error)
             {
-                case "EVENT_NOT_ACTIVE":    return "Sự kiện không còn hoạt động.";
-                case "INSUFFICIENT_TICKET": return "Không đủ vé để quay.";
-                case "POOL_EMPTY":          return "Vòng quay chưa có phần thưởng, thử lại sau.";
-                default:                    return "Quay thất bại, vui lòng thử lại.";
+                case "EVENT_NOT_ACTIVE":
+                    return "Sự kiện không còn hoạt động.";
+
+                case "INSUFFICIENT_TICKET":
+                    return "Không đủ vé để quay.";
+
+                case "POOL_EMPTY":
+                    return "Vòng quay chưa có phần thưởng, thử lại sau.";
+
+                default:
+                    return "Quay thất bại, vui lòng thử lại.";
             }
         }
 
@@ -325,7 +353,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             if (_selectedCategory != null)
             {
                 _selectedCategory.controller.gameObject.SetActive(false);
+                _selectedCategory.currency.gameObject.SetActive(false);
                 _selectedCategory.category.SetSelected(false);
+
                 _selectedCategory = null;
             }
 
@@ -334,7 +364,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 if (category.type == type)
                 {
                     _selectedCategory = category;
+
                     _selectedCategory.controller.gameObject.SetActive(true);
+                    _selectedCategory.currency.gameObject.SetActive(true);
                     _selectedCategory.category.SetSelected(true);
                     break;
                 }
@@ -347,6 +379,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             {
                 category.category.SetSelected(false);
                 category.controller.gameObject.SetActive(false);
+                category.currency.gameObject.SetActive(false);
             }
         }
 

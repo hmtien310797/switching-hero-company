@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 
@@ -54,7 +55,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
         private static string BuildRewardText(int itemId, int quantity)
         {
             var item = DatabaseManager.Instance.ItemDb.FindItem(itemId);
-            var name = item != null ? item.itemName : string.Empty;
+            var name = item != null ? LocalizationManager.GetText(item.itemName) : string.Empty;
             return $"{name} x{quantity}";
         }
     }

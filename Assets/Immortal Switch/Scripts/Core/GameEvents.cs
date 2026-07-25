@@ -45,6 +45,11 @@
 
         // equipment
         public const string ON_ENHANCE_GEAR = nameof(ON_ENHANCE_GEAR);
+        public const string ON_EQUIP_ITEM = nameof(ON_EQUIP_ITEM);
+
+        // progression
+        public const string ON_HERO_LEVEL_UP = nameof(ON_HERO_LEVEL_UP);
+        public const string ON_SKILL_UPGRADE = nameof(ON_SKILL_UPGRADE);
 
         // afk reward
         public const string ON_AFK_REWARD_CLAIM_COUNT = nameof(ON_AFK_REWARD_CLAIM_COUNT);

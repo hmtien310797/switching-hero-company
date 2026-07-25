@@ -1,3 +1,4 @@
+using Immortal_Switch.Scripts.Localization;
 using TMPro;
 using UnityEngine;
 
@@ -5,14 +6,16 @@ namespace Immortal_Switch.Scripts.PlayerSystem.Views.UI
 {
     public class UIProfileRowOption : MonoBehaviour
     {
-        [Header("References")] [SerializeField]
+        [Header("References")]
+        [SerializeField]
         private TMP_Text txtTitle;
 
-        [SerializeField] private TMP_Text txtValue;
+        [SerializeField]
+        private TMP_Text txtValue;
 
-        public void Bind(string title, string value)
+        public void Bind(string titleKey, string value)
         {
-            txtTitle.text = title;
+            txtTitle.text = LocalizationManager.GetText(titleKey);
             txtValue.text = value;
         }
     }

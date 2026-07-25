@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
@@ -30,6 +31,10 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         [SerializeField]
         private Image imgBanner;
 
+        [Header("Button references")]
+        [SerializeField]
+        private Button btnClose;
+
         [SerializeField]
         private Button btnStart;
 
@@ -50,13 +55,13 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
         private RectTransform rewardContainer;
 
         [SerializeField]
-        private UIReward rewardPrefab;
+        private UIRewardQuantity rewardPrefab;
 
         [SerializeField]
         private TextMeshProUGUI txtTicketDungeonPlayer;
 
         // --- Private Fields ---
-        private List<UIReward> _rewards = new();
+        private SimpleUIPool<UIRewardQuantity> _pools;
 
         /// <summary>
         /// thong tin khi stage changed, type dungeon và hướng đi.
@@ -75,11 +80,27 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
         private void Awake()
         {
+            btnClose.onClick.AddListener(OnClickClose);
             btnNext.onClick.AddListener(OnClickNext);
             btnPrev.onClick.AddListener(OnClickPrev);
             btnStart.onClick.AddListener(OnClickStart);
             btnSweep.onClick.AddListener(() => { UIManager.Instance.ShowToast("Coming Soon"); });
             consecutiveChallengeToggle.onValueChanged.AddListener(_ => { UIManager.Instance.ShowToast("Coming Soon"); });
+        }
+
+        private void OnDestroy()
+        {
+            btnClose.onClick.RemoveListener(OnClickClose);
+            btnNext.onClick.RemoveListener(OnClickNext);
+            btnPrev.onClick.RemoveListener(OnClickPrev);
+            btnStart.onClick.RemoveListener(OnClickStart);
+            btnSweep.onClick.RemoveListener(() => { UIManager.Instance.ShowToast("Coming Soon"); });
+            consecutiveChallengeToggle.onValueChanged.RemoveListener(_ => { UIManager.Instance.ShowToast("Coming Soon"); });
+        }
+
+        private void OnClickClose()
+        {
+            UIManager.Instance.Close<DungeonView>();
         }
 
         private void OnClickStart()
@@ -163,31 +184,20 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
 
         private void RefreshRewards(IReadOnlyList<ItemRewardData> rewards)
         {
+            _pools ??= new SimpleUIPool<UIRewardQuantity>(rewardPrefab, rewardContainer);
+
             for (var index = 0; index < rewards.Count; index++)
             {
-                var entry = rewards[index];
+                var item = rewards[index];
+                var clone = _pools.Get(index);
 
-                if (_rewards.Count > index)
-                {
-                    var clone = _rewards[index];
-                    clone.gameObject.SetActive(true);
-                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background, entry.TierInfo.tierIcon);
-                    clone.BindQuantity(entry.Quantity);
-                }
-                else
-                {
-                    var clone = Instantiate(rewardPrefab, rewardContainer);
-                    clone.Bind(entry.ItemIcon, entry.TierInfo.border, entry.TierInfo.background, entry.TierInfo.tierIcon);
-                    clone.BindQuantity(entry.Quantity);
-                    _rewards.Add(clone);
-                }
+                clone.Bind(item.ItemIcon, item.TierInfo.border,
+                    item.TierInfo.background, item.TierInfo.tierIcon,
+                    item.Quantity);
             }
 
             // hide cac object ko su dung
-            for (int i = rewards.Count; i < _rewards.Count; i++)
-            {
-                _rewards[i].gameObject.SetActive(false);
-            }
+            _pools.ReleaseFrom(rewards.Count);
         }
     }
 }

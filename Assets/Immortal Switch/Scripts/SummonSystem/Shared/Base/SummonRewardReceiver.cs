@@ -103,6 +103,32 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
                     CurrencyManager.Instance.Set(CurrencyType.diamond,      result.CurrencyBalances.Diamond);
                 }
 
+                // Server có thể sweep-claim nhiều mốc bị bỏ sót trong 1 lần gọi (không chỉ
+                // summonLevel được request) — đánh dấu đúng những mốc đó cục bộ thay vì chỉ mốc
+                // đã truyền vào, nếu không achievement list sẽ hiện sai trạng thái "chưa nhận".
+                if (result.Rewards != null)
+                {
+                    var claimedLevels = new HashSet<int>();
+                    foreach (var r in result.Rewards)
+                        if (r.SummonLevel > 0) claimedLevels.Add(r.SummonLevel);
+
+                    if (claimedLevels.Count == 0)
+                        claimedLevels.Add(summonLevel);
+
+                    switch (category)
+                    {
+                        case SummonCategory.Hero:
+                            HeroSummonManager.Instance?.MarkRewardLevelsClaimed(claimedLevels);
+                            break;
+                        case SummonCategory.Skill:
+                            SkillSummonManager.Instance?.MarkRewardLevelsClaimed(claimedLevels);
+                            break;
+                        case SummonCategory.Weapon:
+                            WeaponSummonManager.Instance?.MarkRewardLevelsClaimed(claimedLevels);
+                            break;
+                    }
+                }
+
                 if (category == SummonCategory.Skill && result.Rewards != null)
                 {
                     var entries = new List<SummonEntry>();

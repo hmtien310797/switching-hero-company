@@ -31,5 +31,10 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         /// ngon ngu mac dinh cua app
         /// </summary>
         public const string DEFAULT_LANGUAGE = "en";
+
+        /// <summary>
+        /// sl tich luy moi lan
+        /// </summary>
+        public const int ACCUMULATED_STEP = 10;
     }
 }

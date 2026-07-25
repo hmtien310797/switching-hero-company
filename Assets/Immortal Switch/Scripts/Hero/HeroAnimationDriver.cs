@@ -2,6 +2,7 @@
 using Spine;
 using Spine.Unity;
 using UnityEngine;
+using Animation = Spine.Animation;
 
 namespace Immortal_Switch.Scripts.Hero
 {
@@ -251,6 +252,22 @@ namespace Immortal_Switch.Scripts.Hero
             }
 
             return Mathf.Max(0.01f, animation.Duration);
+        }
+        
+        public float GetAnimationDuration(string animationName)
+        {
+            if (skeletonAnimation == null ||
+                skeletonAnimation.SkeletonDataAsset == null)
+            {
+                return 0f;
+            }
+
+            Animation findAnimation = skeletonAnimation
+                .SkeletonDataAsset
+                .GetSkeletonData(true)
+                .FindAnimation(animationName);
+
+            return findAnimation?.Duration ?? 0f;
         }
     }
 }

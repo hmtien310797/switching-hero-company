@@ -62,6 +62,9 @@ namespace Immortal_Switch.Scripts.UI
         private Vector2Int lastScreenSize;
         private Rect lastSafeArea;
         private bool cachedDesignSize;
+        //for demo
+        public bool useConstScale;
+        public float constScale;
 
         /*private const float defaultRatio = 2.05f;
         private const float defaultPortraitHeight = 1440f;*/
@@ -140,6 +143,9 @@ namespace Immortal_Switch.Scripts.UI
             if (isPortrait)
                 return 1f;
 
+            if (useConstScale)
+                return constScale;
+            
             Rect area = useSafeArea
                 ? Screen.safeArea
                 : new Rect(0, 0, Screen.width, Screen.height);

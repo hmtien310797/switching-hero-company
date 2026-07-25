@@ -30,6 +30,7 @@ namespace Immortal_Switch.Scripts.Enemy
         [SerializeField] private HeroAnimationDriver animationDriver;
         [SerializeField] private HeroLocomotion locomotion;
         [SerializeField] private GameObject spineAnimation;
+        [SerializeField] private MeshRenderer meshRenderer;
 
         [Header("Death")] [SerializeField] private bool destroyOnDead = true;
         [SerializeField] private float destroyDelay = 1.2f;
@@ -132,6 +133,10 @@ namespace Immortal_Switch.Scripts.Enemy
             BindAnimationEvents();
 
             ChangeState(EnemyState.Spawn);
+            if (meshRenderer)
+            {
+                meshRenderer.enabled = SettingManager.Instance.CurrentSetting.MonsterVisualEnabled;
+            }
         }
 
         public void Init(CreepDataSo data, ICombatUnit heroA, ICombatUnit heroB, BaseStat cachedBaseStat)
@@ -162,6 +167,10 @@ namespace Immortal_Switch.Scripts.Enemy
             BindAnimationEvents();
 
             ChangeState(EnemyState.Spawn);
+            if (meshRenderer)
+            {
+                meshRenderer.enabled = SettingManager.Instance.CurrentSetting.MonsterVisualEnabled;
+            }
         }
 
         private void ApplyBaseStat(CreepDataSo data, BaseStat baseStat)

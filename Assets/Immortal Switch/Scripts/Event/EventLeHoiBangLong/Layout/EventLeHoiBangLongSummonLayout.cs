@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Popup;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
+using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -36,14 +39,13 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
         private TextMeshProUGUI txtDropRate;
 
         [SerializeField]
-        private TextMeshProUGUI txtProgress;
-
-        [SerializeField]
-        private Image imgFill;
+        private UIEventLeHoiBangLongProgressPanel progressPanel;
 
         // --- Private Fields ---
         private Action<EEventLeHoiBangLongLayoutType> _onChangeLayout;
-        private int _maxPoint = 1;
+        private EventBLMilestoneDto _currentMilestone;
+
+        private bool _isClaimingMilestone;
 
         private void OnEnable()
         {
@@ -95,12 +97,10 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         public void Bind(
             Action<EEventLeHoiBangLongLayoutType> onChangeLayout,
-            int maxPoint,
             double remainTime
         )
         {
             _onChangeLayout = onChangeLayout;
-            _maxPoint = Math.Max(1, maxPoint);
 
             countdownTimer.Bind(remainTime, OnCountdown);
             RefreshProgress();
@@ -111,15 +111,74 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
             return $"Kết thúc sau: {days:00} ngày {hours:00}:{minutes:00}:{seconds:00}";
         }
 
+        private void OnClickClaimAccumulated()
+        {
+            ClaimCurrentMilestoneAsync().Forget();
+        }
+
+        private async UniTaskVoid ClaimCurrentMilestoneAsync()
+        {
+            if (_isClaimingMilestone ||
+                _currentMilestone == null ||
+                _currentMilestone.IsClaimed)
+            {
+                return;
+            }
+
+            _isClaimingMilestone = true;
+
+            var rewards = await EventLeHoiBangLongManager.Instance
+                .ClaimSummonMilestone(_currentMilestone.Milestone);
+
+            _isClaimingMilestone = false;
+
+            if (rewards.Count > 0)
+            {
+                PopupRewardService.Show(rewards);
+            }
+        }
+
         private void RefreshProgress()
         {
-            var accumulatedPoint = EventLeHoiBangLongManager.Instance.State?.Progress?.SummonPoints ?? 0;
-            txtProgress.text = $"{accumulatedPoint:N0}/{_maxPoint:N0}";
-            imgFill.fillAmount = accumulatedPoint / (_maxPoint * 1f);
+            var state = EventLeHoiBangLongManager.Instance.State;
+            var milestones = state?.SummonMilestones;
+            var accumulatedPoint = state?.Progress?.SummonPoints ?? 0;
+            var remainAccumulated = ValueConstants.ACCUMULATED_STEP - (accumulatedPoint % ValueConstants.ACCUMULATED_STEP);
+
+            if (milestones == null ||
+                milestones.Count == 0)
+            {
+                _currentMilestone = null;
+
+                progressPanel.gameObject.SetActive(false);
+                return;
+            }
+
+            progressPanel.gameObject.SetActive(true);
+
+            _currentMilestone = milestones
+                .Where(value => !value.IsClaimed)
+                .OrderBy(value => value.PointsRequired)
+                .FirstOrDefault();
+
+            var displayMilestone = _currentMilestone ??
+                                   milestones
+                                       .OrderByDescending(value => value.PointsRequired)
+                                       .First();
+
+            var isClaimedOrProcessing = _currentMilestone == null ||
+                                        _isClaimingMilestone;
+
+            progressPanel.Bind(
+                OnClickClaimAccumulated, accumulatedPoint,
+                displayMilestone.PointsRequired,
+                isClaimedOrProcessing,
+                displayMilestone.Reward?.ItemId ?? 0
+            );
 
             txtDropRate.text =
                 "Tăng tỷ lệ nhận <color=#ff56ed><i><size=55>Băng Long</size></i></color>!\n" +
-                $"Mỗi <color=#ffd200><i><size=55><b>{10 - (accumulatedPoint % 10)}</b></size></i></color> lượt chắc chắn nhận\n" +
+                $"Mỗi <color=#ffd200><i><size=55><b>{remainAccumulated}</b></size></i></color> lượt chắc chắn nhận\n" +
                 "<color=#ff56ed><i><size=55>Legend</size></i></color> trở lên";
         }
     }

@@ -326,5 +326,36 @@ namespace Immortal_Switch.Scripts.Localization
                 ? key
                 : localizedText;
         }
+
+        /// <summary>
+        /// Lấy raw localized value (template chưa format, giữ nguyên <c>{0}</c>, <c>{1}</c>...)
+        /// từ String Table <see cref="TABLE_NAME"/> tại thời điểm runtime.
+        ///
+        /// Dùng cho caller cần tự format template (ví dụ <see cref="SkillDataSO"/>).
+        /// Trả về <c>false</c> nếu:
+        /// - key rỗng.
+        /// - Localization chưa initialize / table chưa preload (operation chưa done).
+        /// - entry không tồn tại.
+        /// - giá trị rỗng.
+        ///
+        /// Không throw, không spam log mỗi frame.
+        /// </summary>
+        public static bool TryGetRawText(string key, out string localizedValue)
+        {
+            localizedValue = null;
+
+            if (string.IsNullOrWhiteSpace(key))
+                return false;
+
+            var operation = LocalizationSettings.StringDatabase
+                .GetTableEntryAsync(TABLE_NAME, key);
+
+            if (!operation.IsDone || operation.Result.Entry == null)
+                return false;
+
+            localizedValue = operation.Result.Entry.Value;
+
+            return !string.IsNullOrEmpty(localizedValue);
+        }
     }
 }

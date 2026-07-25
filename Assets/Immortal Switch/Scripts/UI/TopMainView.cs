@@ -22,6 +22,7 @@ using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Shop.Views;
 using Immortal_Switch.Scripts.StageSelection;
@@ -31,6 +32,7 @@ using Spine.Unity;
 using TMPro;
 using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.UI
@@ -75,14 +77,16 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         HeroJoystick heroJostick;
 
-        [SerializeField]
-        private Button autoSkillButton;
+        [FormerlySerializedAs("autoSkillButton")] [SerializeField]
+        private Button autoClassSkillButton;
 
-        [SerializeField]
-        private Button autoSwitchButton;
+        [FormerlySerializedAs("autoSwitchButton")] [SerializeField]
+        private Button autoUltimateSkillButton;
 
         [SerializeField]
         private Button profileBtn;
+
+        [SerializeField] private TMP_Text txtTimeCountDownBL;
 
         [Header("Player references")]
         [SerializeField]
@@ -94,8 +98,11 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private Image imgPlayerProgress;
 
+        [FormerlySerializedAs("rotateObject")] [SerializeField]
+        private GameObject classSkillRotateObject;
+        
         [SerializeField]
-        private GameObject rotateObject;
+        private GameObject ultimateSkillRotateObject;
 
         [SerializeField]
         private GameObject[] hideAbleObjects;
@@ -123,6 +130,8 @@ namespace Immortal_Switch.Scripts.UI
         private double afkAccumulatedSeconds;
         private double afkMaxOfflineSeconds = DefaultAfkMaxOfflineSeconds;
         private bool afkTimerSynced;
+
+        private string eventBLEndTime;
 
         [SerializeField]
         private GameObject[] disableObjectsWhenPlayDungeon;
@@ -155,12 +164,14 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private Button buttonSetting;
 
-        [Header("Performance Overlay")]
-        [SerializeField]
-        private TMP_Text txtFps;
-
         [SerializeField, Min(0.05f)]
         private float perfOverlayRefreshInterval = 0.5f;
+
+        //for demo, delete later
+        [SerializeField] private RectTransform gameStatView;
+        [SerializeField] private RectTransform switchPanel;
+        [SerializeField] private RectTransform bottomPanel;
+        [SerializeField] private GridLayoutGroup rightSideLayoutGroup;
 
         private ProfilerRecorder drawCallsRecorder;
         private ProfilerRecorder batchesRecorder;
@@ -180,7 +191,11 @@ namespace Immortal_Switch.Scripts.UI
         // tại ElapsedSeconds snapshot lúc mở popup.
         public double AfkAccumulatedSeconds => afkAccumulatedSeconds;
         public double AfkMaxOfflineSeconds => afkMaxOfflineSeconds;
-        private bool isAutoActived = false;
+        private bool isAutoClassSkillActive;
+        private bool isAutoUltimateSkillActive;
+        private Tween classSkillRotateTween;
+        private Tween ultimateSkillRotateTween;
+
         private HeroDataSO currentSelectedHeroData;
         private int heroDeadCount = 0;
 
@@ -207,6 +222,39 @@ namespace Immortal_Switch.Scripts.UI
             drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Draw Calls Count");
             batchesRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
             setPassCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "SetPass Calls Count");
+            //for demo
+            ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
+            OnOrientationChanged(ScreenOrientationTracker.Instance.CurrentMode);
+        }
+
+        //for demo
+        private void OnOrientationChanged(ScreenOrientationTracker.ScreenViewMode mode)
+        {
+            switch (mode)
+            {
+                case ScreenOrientationTracker.ScreenViewMode.Landscape:
+                    gameStatView.anchoredPosition =
+                        new Vector2(gameStatView.anchoredPosition.x, -76f);
+                    switchPanel.anchoredPosition =
+                        new Vector2(switchPanel.anchoredPosition.x, 70f);
+                    bottomPanel.anchoredPosition =
+                        new Vector2(bottomPanel.anchoredPosition.x, -100f);
+                    rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+                    rightSideLayoutGroup.constraintCount = 4;
+                    rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-83f, -115f);
+                    break;
+                case ScreenOrientationTracker.ScreenViewMode.Portrait:
+                    gameStatView.anchoredPosition =
+                        new Vector2(gameStatView.anchoredPosition.x, -170f);
+                    switchPanel.anchoredPosition =
+                        new Vector2(switchPanel.anchoredPosition.x, 273f);
+                    bottomPanel.anchoredPosition =
+                        new Vector2(bottomPanel.anchoredPosition.x, -15f);
+                    rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+                    rightSideLayoutGroup.constraintCount = 5;
+                    rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-33f, -118.7f);
+                    break;
+            }
         }
 
         private void OnClickLeaderboard()
@@ -246,8 +294,33 @@ namespace Immortal_Switch.Scripts.UI
 
         private void Update()
         {
-            UpdatePerformanceOverlay();
             UpdateAfkClaimTimer();
+            UpdateEventBLCountDown();
+        }
+
+        // Đếm ngược tới lúc kết thúc sự kiện Lễ Hội Băng Long dựa trên endTime lấy từ
+        // GetEventIfActive lúc Start (đã được server xác nhận qua event/config_windows) —
+        // không phụ thuộc thêm callback/event nào khác, tự ẩn nút + text khi hết giờ.
+        private void UpdateEventBLCountDown()
+        {
+            if (txtTimeCountDownBL == null ||
+                string.IsNullOrEmpty(eventBLEndTime))
+            {
+                return;
+            }
+
+            double remainSeconds = DateTimeHelper.CalculateRemainTime(DateTime.Now, eventBLEndTime);
+
+            if (remainSeconds <= 0d)
+            {
+                eventBLEndTime = null;
+                txtTimeCountDownBL.gameObject.SetActive(false);
+                btnEventLeHoiBangLong.gameObject.SetActive(false);
+                return;
+            }
+
+            TimeSpan span = TimeSpan.FromSeconds(remainSeconds);
+            txtTimeCountDownBL.text = $"{(int)span.TotalHours:00}:{span.Minutes:00}:{span.Seconds:00}";
         }
 
         // Tự đếm nội suy phía client giữa hai lần đồng bộ server, để nút/text không đứng im chờ
@@ -329,36 +402,7 @@ namespace Immortal_Switch.Scripts.UI
 
             SyncAfkAccumulatedSeconds(preview.ElapsedSeconds, preview.MaxOfflineSeconds);
         }
-
-        // Cac counter Render (Draw Calls/Batches/SetPass) chi co du lieu trong
-        // Development Build hoac Editor Play Mode - build release thuong tra ve 0.
-        private void UpdatePerformanceOverlay()
-        {
-            if (txtFps == null)
-            {
-                return;
-            }
-
-            perfFpsAccumulator += Time.unscaledDeltaTime;
-            perfFpsFrameCount++;
-            perfRefreshTimer += Time.unscaledDeltaTime;
-
-            if (perfRefreshTimer < perfOverlayRefreshInterval)
-            {
-                return;
-            }
-
-            float avgFps = perfFpsAccumulator > 0f ? perfFpsFrameCount / perfFpsAccumulator : 0f;
-            long drawCalls = drawCallsRecorder.Valid ? drawCallsRecorder.LastValue : 0;
-            long batches = batchesRecorder.Valid ? batchesRecorder.LastValue : 0;
-            long setPassCalls = setPassCallsRecorder.Valid ? setPassCallsRecorder.LastValue : 0;
-
-            txtFps.text = $"FPS: {avgFps:0.0}\nDrawCall: {drawCalls}\nBatches: {batches}\nSetPass: {setPassCalls}";
-
-            perfFpsAccumulator = 0f;
-            perfFpsFrameCount = 0;
-            perfRefreshTimer = 0f;
-        }
+        
 
         private UniTask OnClickTutorial(string arg1, int arg2)
         {
@@ -376,7 +420,7 @@ namespace Immortal_Switch.Scripts.UI
                     break;
 
                 case 8:
-                    OnClickAutoSkill();
+                    OnClickAutoClassSkill();
                     break;
             }
 
@@ -393,10 +437,10 @@ namespace Immortal_Switch.Scripts.UI
                     return switchMainSubHeroButton.transform as RectTransform;
 
                 case 8:
-                    return autoSkillButton.transform as RectTransform;
+                    return autoClassSkillButton.transform as RectTransform;
 
                 case 10:
-                    return autoSwitchButton.transform as RectTransform;
+                    return autoUltimateSkillButton.transform as RectTransform;
 
                 default:
                     return null;
@@ -531,17 +575,50 @@ namespace Immortal_Switch.Scripts.UI
                 PopupRewardService.Show(itemRewards);
         }
 
-        private void OnClickAutoSkill()
+        private void OnClickAutoClassSkill()
         {
-            isAutoActived = !isAutoActived;
-            UserDataCache.Instance.SetAutoSkill(isAutoActived);
+            isAutoClassSkillActive = !isAutoClassSkillActive;
+            UserDataCache.Instance.SetAutoClassSkill(isAutoClassSkillActive);
 
-            rotateObject.transform
-                .DOLocalRotate(new Vector3(0, 0, isAutoActived ? 180 : 0), 0.2f, RotateMode.FastBeyond360)
-                .SetEase(Ease.Linear)
-                .SetLoops(-1, LoopType.Incremental);
+            SetRotateState(
+                classSkillRotateObject,
+                isAutoClassSkillActive,
+                ref classSkillRotateTween);
         }
 
+        private void OnClickAutoUltimateSkill()
+        {
+            isAutoUltimateSkillActive = !isAutoUltimateSkillActive;
+            UserDataCache.Instance.SetAutoUltimateSkill(isAutoUltimateSkillActive);
+
+            SetRotateState(
+                ultimateSkillRotateObject,
+                isAutoUltimateSkillActive,
+                ref ultimateSkillRotateTween);
+        }
+
+        private static void SetRotateState(
+            GameObject rotateObject,
+            bool isActive,
+            ref Tween rotateTween)
+        {
+            rotateTween?.Kill(false);
+            rotateTween = null;
+
+            if (!isActive || rotateObject == null)
+            {
+                return;
+            }
+
+            rotateTween = rotateObject.transform
+                .DOLocalRotate(
+                    new Vector3(0f, 0f, 360f),
+                    1f,
+                    RotateMode.LocalAxisAdd)
+                .SetEase(Ease.Linear)
+                .SetLoops(-1, LoopType.Restart);
+        }
+        
         private void Start()
         {
             var cachedName = UserDataCache.Instance?.DisplayName;
@@ -549,8 +626,22 @@ namespace Immortal_Switch.Scripts.UI
             if (!string.IsNullOrEmpty(cachedName))
                 SetDisplayName(cachedName);
 
+            // Nút chỉ hiện khi event_id 1002 đang active theo server (DatabaseManager.InitEventAsync
+            // đã sync từ event/config_windows lúc boot) — trước đây luôn hiện bất kể thời gian.
+            var eventBL = DatabaseManager.Instance.GetEventIfActive(EventIdConstants.EVENT_BL);
+            btnEventLeHoiBangLong.gameObject.SetActive(eventBL != null);
+
+            eventBLEndTime = eventBL?.endTime;
+            txtTimeCountDownBL.gameObject.SetActive(eventBL != null);
+
+            if (eventBL != null)
+            {
+                UpdateEventBLCountDown();
+            }
+
             RefreshPlayerInfo();
-            autoSkillButton.onClick.AddListener(OnClickAutoSkill);
+            autoClassSkillButton.onClick.AddListener(OnClickAutoClassSkill);
+            autoUltimateSkillButton.onClick.AddListener(OnClickAutoUltimateSkill);
             btnActiveFramingClaim.onClick.AddListener(OnAfkClaimClicked);
             btnActiveFramingClaim.interactable = false;
             RefreshAfkClaimAvailabilityAsync().Forget();
@@ -566,7 +657,7 @@ namespace Immortal_Switch.Scripts.UI
                     .Forget();
             });
 
-            buttonSetting.onClick.AddListener(() => { UIManager.Instance.TogglePopupAsync<SettingView>(); });
+            buttonSetting.onClick.AddListener(() => { UIManager.Instance.TogglePopupAsync<SettingView>().Forget(); });
 
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
@@ -589,12 +680,19 @@ namespace Immortal_Switch.Scripts.UI
             GameEventManager.Unsubscribe(GameEvents.OnWaveStart, OnStageStart);
             GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
             GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
+            ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
 
             for (int i = 0; i < heroIconTweens.Length; i++)
             {
                 heroIconTweens[i]?.Kill(false);
                 heroIconTweens[i] = null;
             }
+
+            classSkillRotateTween?.Kill(false);
+            classSkillRotateTween = null;
+
+            ultimateSkillRotateTween?.Kill(false);
+            ultimateSkillRotateTween = null;
 
             if (Instance == this)
             {

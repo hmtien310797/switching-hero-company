@@ -198,7 +198,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
             return Service.IsCompleted(cfg);
         }
 
-        public void MissionClaimAndNotify(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
+        public void ClaimAndNotify(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
         {
             var rewards = MissionClaim(cfg);
             NotifyIfAllMissionDailyCompleted();
@@ -321,7 +321,9 @@ namespace Immortal_Switch.Scripts.MissionSystem
                 }
             }
 
-            PopupRewardService.Show(rewards);
+            if (rewards.Count > 0)
+                PopupRewardService.Show(rewards);
+
             NotifyIfAllMissionDailyCompleted();
         }
 

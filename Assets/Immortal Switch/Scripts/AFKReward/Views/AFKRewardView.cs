@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.Shared;
@@ -66,7 +67,7 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
         private RectTransform rewardContainer;
 
         [SerializeField]
-        private UIReward rewardPrefab;
+        private UIRewardQuantity rewardPrefab;
 
         [Header("Base reward references")]
         [SerializeField]
@@ -81,7 +82,7 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
         private float autoClaimDelaySeconds = 3f;
 
         // --- Private Fields ---
-        private List<UIReward> _rewards = new();
+        private SimpleUIPool<UIRewardQuantity> _pools;
         private AFKRewardArgs _args;
         private CancellationTokenSource _autoClaimCts;
 
@@ -197,6 +198,7 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
                 : _args.MaxOfflineSeconds;
 
             TimeSpan elapsed = TimeSpan.FromSeconds(elapsedSeconds);
+
             string timeText = elapsed.TotalHours >= 1
                 ? $"{(int)elapsed.TotalHours:00} giờ {elapsed.Minutes:00} phút"
                 : $"{elapsed.Minutes:00} phút {elapsed.Seconds:00}s";
@@ -239,6 +241,8 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
 
         private void RefreshRewards(StageReward[] rewards)
         {
+            _pools ??= new SimpleUIPool<UIRewardQuantity>(rewardPrefab, rewardContainer);
+
             for (var index = 0; index < rewards.Length; index++)
             {
                 var reward = rewards[index];
@@ -246,41 +250,19 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
 
                 if (itemDisplay != null)
                 {
-                    if (_rewards.Count > index)
-                    {
-                        var clone = _rewards[index];
-                        clone.gameObject.SetActive(true);
+                    var clone = _pools.Get(index);
 
-                        clone.Bind(
-                            itemDisplay.ItemIcon,
-                            itemDisplay.TierInfo.border,
-                            itemDisplay.TierInfo.background,
-                            itemDisplay.TierInfo.tierIcon
-                        );
-
-                        clone.BindQuantity(reward.Amount);
-                    }
-                    else
-                    {
-                        var clone = Instantiate(rewardPrefab, rewardContainer);
-
-                        clone.Bind(
-                            itemDisplay.ItemIcon,
-                            itemDisplay.TierInfo.border,
-                            itemDisplay.TierInfo.background,
-                            itemDisplay.TierInfo.tierIcon
-                        );
-
-                        clone.BindQuantity(reward.Amount);
-                        _rewards.Add(clone);
-                    }
+                    clone.Bind(
+                        itemDisplay.ItemIcon,
+                        itemDisplay.TierInfo.border,
+                        itemDisplay.TierInfo.background,
+                        itemDisplay.TierInfo.tierIcon,
+                        reward.Amount
+                    );
                 }
             }
 
-            for (int i = rewards.Length; i < _rewards.Count; i++)
-            {
-                _rewards[i].gameObject.SetActive(false);
-            }
+            _pools.ReleaseFrom(rewards.Length);
         }
     }
 }

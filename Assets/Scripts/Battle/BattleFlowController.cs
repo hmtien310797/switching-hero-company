@@ -153,8 +153,20 @@ namespace Battle
             
             EnterDungeonAsync(dungeonId,stage).Forget();
         }
-        
 
+        public void SurrenderBattle()
+        {
+            if (State != BattleFlowState.ChapterRunning)
+            {
+                ReturnToChapterAfterResultAsync(DungeonBattleResult.None).Forget();
+                return;
+            }
+            
+            chapterBattleController.CleanupBattle();
+            chapterBattleController.MoveToCurrentStageAfterSurrender();
+        }
+        
+        
         public void MarkChapterRunning()
         {
             if (State == BattleFlowState.None)
@@ -242,7 +254,7 @@ namespace Battle
                 if (runtimeData != null && result != DungeonBattleResult.None)
                     await ReportDungeonEndAsync(runtimeData.DungeonKey, runtimeData.Stage, result);
 
-                if (resultHoldSeconds > 0f)
+                if (resultHoldSeconds > 0f && result != DungeonBattleResult.None)
                     await UniTask.Delay(TimeSpan.FromSeconds(resultHoldSeconds));
                 
                 await Transitioner.Instance.TransitionOutWithoutChangingScene(destroyCancellationToken);

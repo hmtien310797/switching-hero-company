@@ -155,6 +155,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
                 return;
 
             RefreshSummonLevel();
+            sequencePopup?.RefreshSummonButtons();
             levelRewardPreviewUI?.Refresh();
             summonButtonA?.Refresh();
             summonButtonB?.Refresh();

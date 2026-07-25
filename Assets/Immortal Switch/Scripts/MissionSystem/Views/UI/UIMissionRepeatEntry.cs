@@ -1,6 +1,8 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Shared.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,24 +11,33 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 {
     public class UIMissionRepeatEntry : MonoBehaviour
     {
-        [Header("References button")] [SerializeField]
+        [Header("References button")]
+        [SerializeField]
         private Button btnClaim;
 
-        [SerializeField] private Button btnChallenge;
+        [SerializeField]
+        private Button btnChallenge;
 
-        [Header("References overlay")] [SerializeField]
+        [Header("References overlay")]
+        [SerializeField]
         private GameObject goOverlayClaimed;
 
-        [Header("References mission")] [SerializeField]
+        [Header("References mission")]
+        [SerializeField]
         private TextMeshProUGUI txtTitle;
 
-        [SerializeField] private TextMeshProUGUI txtProgress;
-        [SerializeField] private Image imgRewardIcon;
-        [SerializeField] private TextMeshProUGUI txtQuantityReward;
-        [SerializeField] private Image imgProgress;
+        [SerializeField]
+        private TextMeshProUGUI txtProgress;
+
+        [SerializeField]
+        private Image imgProgress;
+
+        [Header("Reward references")]
+        [SerializeField]
+        private UIRewardQuantity rewardQuantity;
 
         // --- Private Fields ---
-        public DynamicHeroesGlobalSpecificationsMissionConfigRow Row { get; private set; }
+        private DynamicHeroesGlobalSpecificationsMissionConfigRow _row;
 
         // moc diem cua nhiem vu
         private float _target;
@@ -39,22 +50,31 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void Awake()
         {
-            MissionSystemManager.Instance.OnMissionClaimed += OnMissionSystemMissionClaimed;
-            MissionSystemManager.Instance.OnChangeProgress += OnMissionSystemChangeProgress;
+            MissionSystemManager.Instance.OnMissionClaimed += OnMissionClaimed;
+            MissionSystemManager.Instance.OnChangeProgress += OnMissionChangeProgress;
 
             btnClaim.onClick.AddListener(OnClickClaim);
             btnChallenge.onClick.AddListener(OnClickChallenge);
         }
 
-        private void OnMissionSystemChangeProgress(string arg1, int arg2, string arg3)
+        private void OnDestroy()
         {
-            if (Row == null)
+            MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
+            MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
+
+            btnClaim.onClick.RemoveListener(OnClickClaim);
+            btnChallenge.onClick.RemoveListener(OnClickChallenge);
+        }
+
+        private void OnMissionChangeProgress(string arg1, int arg2, string arg3)
+        {
+            if (_row == null)
             {
                 //Debug.LogError("Row is null");
                 return;
             }
 
-            if (Row.missionId != arg3)
+            if (_row.missionId != arg3)
             {
                 //Debug.Log($"Row not match with {arg3}");
                 return;
@@ -64,15 +84,15 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             RefreshVisual();
         }
 
-        private void OnMissionSystemMissionClaimed(string arg1, string arg2)
+        private void OnMissionClaimed(string arg1, string arg2)
         {
-            if (Row == null)
+            if (_row == null)
             {
                 //Debug.LogError("Row is null");
                 return;
             }
 
-            if (Row.missionId != arg1)
+            if (_row.missionId != arg1)
             {
                 //Debug.Log($"Row not match with {arg1}");
                 return;
@@ -83,44 +103,40 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void OnClickClaim()
         {
-            MissionSystemManager.Instance.MissionClaimAndNotify(Row);
+            MissionSystemManager.Instance.ClaimAndNotify(_row);
         }
 
         private void OnClickChallenge()
         {
-            if (Row == null)
+            if (_row == null)
             {
                 Debug.LogError("Row is null");
                 return;
             }
 
-            _onJump?.Invoke(Row.eventKey);
+            _onJump?.Invoke(_row.eventKey);
         }
 
-        public void Bind(DynamicHeroesGlobalSpecificationsMissionConfigRow row, int currentProgress, Sprite sprite,
-            string quantityFormat, Func<string, UniTask> onJump)
+        public void Bind(DynamicHeroesGlobalSpecificationsMissionConfigRow row, int currentProgress, int rewardItemId,
+            BigNumber rewardAmount, Func<string, UniTask> onJump)
         {
-            Row = row;
+            _row = row;
             _target = row.target;
             _onJump = onJump;
 
             txtTitle.text = row.title;
-            txtQuantityReward.text = quantityFormat;
 
-            if (sprite != null)
-            {
-                imgRewardIcon.sprite = sprite;
-            }
+            rewardQuantity.Bind(rewardItemId, rewardAmount);
 
             SetProgress(currentProgress);
             RefreshVisual();
         }
 
-        public void SetProgress(int currentProgress)
+        public void SetProgress(int newProgress)
         {
-            _currentProgress = currentProgress;
-            txtProgress.text = $"{Mathf.Min(currentProgress, _target)} / {_target:F0}";
-            imgProgress.fillAmount = Mathf.Clamp01(currentProgress / _target);
+            _currentProgress = newProgress;
+            txtProgress.text = $"{Mathf.Min(newProgress, _target)} / {_target:F0}";
+            imgProgress.fillAmount = Mathf.Clamp01(newProgress / _target);
         }
 
         public void RefreshVisual()

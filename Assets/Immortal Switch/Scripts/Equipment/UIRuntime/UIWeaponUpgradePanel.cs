@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
@@ -139,7 +140,17 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
             }
 
             if (txtNextLevelCost != null)
-                txtNextLevelCost.text = $"<color=#93fd36>{CurrencyManager.Instance.Get(CurrencyType.weapon_ore)}</color>/{vm.NextLevelCost}";
+            {
+                var currentWeaponOre = CurrencyManager.Instance.Get(CurrencyType.weapon_ore);
+                if (currentWeaponOre >= vm.NextLevelCost)
+                {
+                    txtNextLevelCost.text = $"<color=#93fd36>{currentWeaponOre}</color>/{BigNumber.FromInt(vm.NextLevelCost)}";   
+                }
+                else
+                {
+                    txtNextLevelCost.text = $"<color=#FF4D4D>{currentWeaponOre}</color>/{BigNumber.FromInt(vm.NextLevelCost)}";  
+                }
+            }
 
             if (txtLevelUpAllCost != null)
                 txtLevelUpAllCost.text = vm.LevelUpAllCost.ToString();

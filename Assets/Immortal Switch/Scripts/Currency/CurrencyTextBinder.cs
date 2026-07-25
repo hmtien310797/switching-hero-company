@@ -15,9 +15,6 @@ namespace Immortal_Switch.Scripts.Currency
         [SerializeField] private TMP_Text amountText;
         [SerializeField] private Image currencyImage;
 
-        [Header("Optional")] 
-        [SerializeField] private bool includeOnlineIdlePreview = true;
-
         private RewardSyncService rewardSyncService;
 
         private void Start()

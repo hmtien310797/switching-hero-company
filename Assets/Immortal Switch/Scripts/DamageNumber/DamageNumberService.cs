@@ -30,6 +30,9 @@ namespace Immortal_Switch.Scripts.DamageNumber
 
         public void ShowDamage(float value, Vector3 position, DamageType type)
         {
+            if(!SettingManager.Instance.CurrentSetting.DamageFontEnabled)
+                return;
+            
             if (value <= 1)
             {
                 return;

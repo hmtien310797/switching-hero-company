@@ -313,6 +313,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             ApplyEquipResult(response);
 
             NotifyHeroWeaponChanged(heroId);
+            GameEventManager.Trigger(GameEvents.ON_EQUIP_ITEM);
             return true;
         }
 
@@ -340,6 +341,7 @@ namespace Immortal_Switch.Scripts.Equipment.Core
             ApplyEquipResult(response);
 
             NotifyHeroWeaponChanged(heroId);
+            GameEventManager.Trigger(GameEvents.ON_EQUIP_ITEM);
             return true;
         }
 

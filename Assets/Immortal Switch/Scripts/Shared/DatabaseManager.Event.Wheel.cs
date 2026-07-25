@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Event.EventWheel.Layout;
 using Immortal_Switch.Scripts.Event.Models;
 using Immortal_Switch.Scripts.Event.Views;
 using Immortal_Switch.Scripts.Shared.Helper;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shared
 {
@@ -66,14 +68,31 @@ namespace Immortal_Switch.Scripts.Shared
             return _activeEvents.GetValueOrDefault(eventId);
         }
 
-        public void InitEventAsync()
+        // Quyết định event nào đang active dựa trên server (event/config_windows — xem
+        // handler/event_config.js), KHÔNG dùng đồng hồ máy nữa: config Addressable cục bộ
+        // (EventDb) chỉ còn được dùng để lấy metadata hiển thị (nameVi/displayMode/...), là bản
+        // sao độc lập có thể lệch với config thật trên server (cùng rủi ro đã ghi nhận với
+        // game_item.js — xem project memory "Item config client sync"). Fallback về check cục bộ
+        // cũ nếu RPC lỗi (vd. mất mạng lúc boot), để icon event không biến mất hẳn khi offline.
+        public async UniTask InitEventAsync()
         {
-            var list = EventDb.rows
-                .Where(v =>
+            Dictionary<int, bool> serverActive = null;
+
+            try
+            {
+                var response = await NakamaClient.Instance.GetEventConfigWindowsAsync();
+                serverActive = response?.Events?.ToDictionary(v => v.EventId, v => v.IsActive);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[DatabaseManager] event/config_windows failed, fallback to local device-time check: {ex.Message}");
+            }
+
+            IEnumerable<DynamicHeroesGlobalSpecificationsConfigEventRow> list = serverActive != null
+                ? EventDb.rows.Where(v => serverActive.TryGetValue(v.eventId, out var active) && active)
+                : EventDb.rows.Where(v =>
                     DateTimeHelper.InTime(DateTime.Now, v.startTime, v.endTime) &&
-                    v.status == "Active"
-                )
-                .ToList();
+                    v.status == 1);
 
             foreach (var row in list)
             {

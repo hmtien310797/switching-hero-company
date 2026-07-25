@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.GrowthSystem.UI
@@ -35,6 +37,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         private StatTierViewData BuildOne(StatType stat, BigNumber gold, int amount)
         {
             var ui = uiDb.Get(stat);
+            var cfgStat = DatabaseManager.Instance.GetConfigStats(ui.Stat);
 
             int cur = service.GetCurrentStack(stat);
             int max = service.GetMaxAvailableStack(stat);
@@ -48,7 +51,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
             {
                 Stat = stat,
                 Icon = ui.Icon,
-                Name = ui.DisplayName,
+                Name = cfgStat != null ? LocalizationManager.GetText(cfgStat.uiKey) : ui.Stat.ToString(),
                 StatProgressPercent = max > 0 ? (float)cur / max : 0,
                 StatCurrentStack = cur,
                 StatMaxStack = max,

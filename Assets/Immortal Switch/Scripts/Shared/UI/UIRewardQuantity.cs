@@ -19,5 +19,12 @@ namespace Immortal_Switch.Scripts.Shared.UI
 
             txtQuantity.text = quantity.ToInputString();
         }
+
+        public void Bind(Sprite itemIcon, Sprite borderIcon, Sprite bgIcon, Sprite tierIcon, BigNumber quantity)
+        {
+            rewardSlot.Bind(itemIcon, borderIcon, bgIcon, tierIcon);
+
+            txtQuantity.text = quantity.ToInputString();
+        }
     }
 }

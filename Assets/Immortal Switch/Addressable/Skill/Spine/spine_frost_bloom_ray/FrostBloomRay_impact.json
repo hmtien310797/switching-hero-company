@@ -1,0 +1,137 @@
+{
+"skeleton": { "hash": "LpIBr/vAXk4", "spine": "4.2.33", "images": "../Archer/Ice Arrow/", "audio": "./audio" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "1", "parent": "root" },
+	{ "name": "liux6", "parent": "1", "scaleX": 2.4796, "scaleY": 2.4796 },
+	{ "name": "glow16", "parent": "liux6" },
+	{ "name": "xhit11", "parent": "liux6" },
+	{ "name": "xhit12", "parent": "liux6" },
+	{ "name": "glow17", "parent": "liux6" }
+],
+"slots": [
+	{ "name": "glow16", "bone": "glow16", "blend": "additive" },
+	{ "name": "xhit11", "bone": "xhit11" },
+	{ "name": "xhit12", "bone": "xhit12", "blend": "additive" },
+	{ "name": "glow17", "bone": "glow17", "blend": "additive" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"glow16": {
+				"chutu/attack/5/glow_0034": { "x": 0.45, "y": 0.45, "width": 59, "height": 60 }
+			},
+			"glow17": {
+				"chutu/skill/7/glow_0098": { "y": 0.45, "width": 49, "height": 49 }
+			},
+			"xhit11": {
+				"chutu/skill/7/hit_0098": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0099": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0101": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0103": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0105": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0108": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0111": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0114": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0117": { "y": 0.45, "width": 239, "height": 214 }
+			},
+			"xhit12": {
+				"chutu/skill/7/hit_0098": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0099": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0101": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0103": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0105": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0108": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0111": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0114": { "y": 0.45, "width": 239, "height": 214 },
+				"chutu/skill/7/hit_0117": { "y": 0.45, "width": 239, "height": 214 }
+			}
+		}
+	}
+],
+"animations": {
+	"animation": {
+		"slots": {
+			"glow16": {
+				"rgba": [
+					{ "color": "0c69ffff", "curve": "stepped" },
+					{ "time": 0.3333, "color": "0c69ffff" },
+					{ "time": 0.7333, "color": "0b69ff00" }
+				],
+				"attachment": [
+					{ "name": "chutu/attack/5/glow_0034" },
+					{ "time": 0.7333 }
+				]
+			},
+			"glow17": {
+				"rgba": [
+					{ "color": "ffffffff" },
+					{ "time": 0.0333, "color": "ffffff82" }
+				],
+				"attachment": [
+					{ "name": "chutu/skill/7/glow_0098" },
+					{ "time": 0.0667 }
+				]
+			},
+			"xhit11": {
+				"rgba": [
+					{ "color": "ffffffdc" }
+				],
+				"attachment": [
+					{ "name": "chutu/skill/7/hit_0098" },
+					{ "time": 0.0333, "name": "chutu/skill/7/hit_0099" },
+					{ "time": 0.1, "name": "chutu/skill/7/hit_0101" },
+					{ "time": 0.1667, "name": "chutu/skill/7/hit_0103" },
+					{ "time": 0.2333, "name": "chutu/skill/7/hit_0105" },
+					{ "time": 0.3333, "name": "chutu/skill/7/hit_0108" },
+					{ "time": 0.4333, "name": "chutu/skill/7/hit_0111" },
+					{ "time": 0.5333, "name": "chutu/skill/7/hit_0114" },
+					{ "time": 0.6333, "name": "chutu/skill/7/hit_0117" },
+					{ "time": 0.7667 }
+				]
+			},
+			"xhit12": {
+				"rgba": [
+					{ "color": "ffffff2a" }
+				],
+				"attachment": [
+					{ "name": "chutu/skill/7/hit_0098" },
+					{ "time": 0.0333, "name": "chutu/skill/7/hit_0099" },
+					{ "time": 0.1, "name": "chutu/skill/7/hit_0101" },
+					{ "time": 0.1667, "name": "chutu/skill/7/hit_0103" },
+					{ "time": 0.2333, "name": "chutu/skill/7/hit_0105" },
+					{ "time": 0.3333, "name": "chutu/skill/7/hit_0108" },
+					{ "time": 0.4333, "name": "chutu/skill/7/hit_0111" },
+					{ "time": 0.5333, "name": "chutu/skill/7/hit_0114" },
+					{ "time": 0.6333, "name": "chutu/skill/7/hit_0117" },
+					{ "time": 0.7667 }
+				]
+			}
+		},
+		"bones": {
+			"glow16": {
+				"scale": [
+					{ "x": 8, "y": 8 }
+				]
+			},
+			"glow17": {
+				"scale": [
+					{ "x": 7.6, "y": 7.6 },
+					{ "time": 0.0333, "x": 13, "y": 13 }
+				]
+			},
+			"xhit11": {
+				"scale": [
+					{ "x": 2.22, "y": 2.22 }
+				]
+			},
+			"xhit12": {
+				"scale": [
+					{ "x": 2.22, "y": 2.22 }
+				]
+			}
+		}
+	}
+}
+}

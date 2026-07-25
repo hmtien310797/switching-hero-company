@@ -75,7 +75,7 @@ namespace Immortal_Switch.Scripts.DungeonSystem.Views
             var maxStage = startIdx + 1;
             var ticketOwned = (int)state.TicketBalance;
 
-            var ui = await UIManager.Instance.OpenPopupAsync<DungeonView>();
+            var ui = await UIManager.Instance.OpenPopupAsync<DungeonView>(withBackdrop: true);
             var title = DatabaseManager.Instance.GetDungeonTitle(dungeonId);
             var visual = DatabaseManager.Instance.DungeonVisualDb.Get(dungeonId);
 

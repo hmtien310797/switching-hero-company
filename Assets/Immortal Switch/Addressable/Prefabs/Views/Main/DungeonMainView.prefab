@@ -305,7 +305,7 @@ MonoBehaviour:
   Layer: 2
   MainMode: 0
   CloseOnBackdrop: 0
-  CacheOnClose: 0
+  CacheOnClose: 1
   animatedRoot: {fileID: 636782170411461632}
   showDuration: 0.25
   hideDuration: 0.2
@@ -359,6 +359,7 @@ GameObject:
   - component: {fileID: 6773406624074656491}
   - component: {fileID: 3300519342494329126}
   - component: {fileID: 4987869468192942756}
+  - component: {fileID: 4660598325157808166}
   m_Layer: 5
   m_Name: txt
   m_TagString: Untagged
@@ -485,6 +486,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &4660598325157808166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5047719536919390476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68762568d3e5a8e48b8785a3d2ddd72b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: ui_item_drop
+  txtLabel: {fileID: 4987869468192942756}
 --- !u!1 &5655856026480875944
 GameObject:
   m_ObjectHideFlags: 0
@@ -535,6 +550,7 @@ GameObject:
   - component: {fileID: 2451496921391354066}
   - component: {fileID: 5095282630847553219}
   - component: {fileID: 24125820910182102}
+  - component: {fileID: 5408866091259979202}
   m_Layer: 5
   m_Name: txt
   m_TagString: Untagged
@@ -661,6 +677,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &5408866091259979202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5684385392758970706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68762568d3e5a8e48b8785a3d2ddd72b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: ui_start_dungeon
+  txtLabel: {fileID: 24125820910182102}
 --- !u!1 &5766930108066032528
 GameObject:
   m_ObjectHideFlags: 0
@@ -1268,6 +1298,7 @@ MonoBehaviour:
   bounceScale: 1.1
   pressDuration: 0.08
   bounceDuration: 0.15
+  normalScale: 1
 --- !u!1 &8974320435359363678
 GameObject:
   m_ObjectHideFlags: 0
@@ -1425,6 +1456,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 8e027007fc63dcd4db1481cfbd7910e1, type: 3}
+    - target: {fileID: 1811899299641190643, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
+      propertyPath: m_EdgeShinyRate
+      value: 0.82335913
+      objectReference: {fileID: 0}
+    - target: {fileID: 1811899299641190643, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
+      propertyPath: m_TransitionRate
+      value: 0.82335913
+      objectReference: {fileID: 0}
     - target: {fileID: 2143634164770256177, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1610,6 +1649,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: cb1dad7244b43fc42827b09ef428db99, type: 3}
+    - target: {fileID: 1811899299641190643, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
+      propertyPath: m_EdgeShinyRate
+      value: 0.82335913
+      objectReference: {fileID: 0}
+    - target: {fileID: 1811899299641190643, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
+      propertyPath: m_TransitionRate
+      value: 0.82335913
+      objectReference: {fileID: 0}
     - target: {fileID: 2143634164770256177, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1779,6 +1826,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2212571942283522069}
     m_Modifications:
+    - target: {fileID: 1811899299641190643, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
+      propertyPath: m_EdgeShinyRate
+      value: 0.82335913
+      objectReference: {fileID: 0}
+    - target: {fileID: 1811899299641190643, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
+      propertyPath: m_TransitionRate
+      value: 0.82335913
+      objectReference: {fileID: 0}
     - target: {fileID: 2143634164770256177, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1896,6 +1951,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 188c7972940e70b41ac890fdee684df6, type: 3}
+    - target: {fileID: 1811899299641190643, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
+      propertyPath: m_EdgeShinyRate
+      value: 0.82335913
+      objectReference: {fileID: 0}
+    - target: {fileID: 1811899299641190643, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
+      propertyPath: m_TransitionRate
+      value: 0.82335913
+      objectReference: {fileID: 0}
     - target: {fileID: 2143634164770256177, guid: 809c6cad000e65743ae9c76e78226874, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

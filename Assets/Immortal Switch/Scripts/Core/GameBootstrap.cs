@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong;
+using Immortal_Switch.Scripts.Event.EventLogin;
 using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items;
@@ -67,6 +68,7 @@ namespace Immortal_Switch.Scripts.Core
 
                 // Khởi tạo sớm để tiến trình nhiệm vụ event vẫn được ghi nhận khi UI chưa mở.
                 EventLeHoiBangLongManager.Instance.InitializeAsync().Forget();
+                EventLoginManager.Instance.InitializeAsync().Forget();
 
                 TransmutationSystemManager.Instance.InitializeAsync().Forget();
                 HeroProgressionManager.Instance.InitializeAsync().Forget();

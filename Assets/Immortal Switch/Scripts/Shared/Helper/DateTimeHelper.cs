@@ -5,6 +5,23 @@ namespace Immortal_Switch.Scripts.Shared.Helper
 {
     public static class DateTimeHelper
     {
+        public static bool TryParse(string time, out DateTime result)
+        {
+            const string FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+            if (!DateTime.TryParseExact(
+                    time,
+                    FORMAT,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out result))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// lay ra thoi gian con lai
         /// </summary>
@@ -13,41 +30,22 @@ namespace Immortal_Switch.Scripts.Shared.Helper
         /// <returns>-1 neu endtime khong dung format, tra ve tong giay con lai</returns>
         public static double CalculateRemainTime(DateTime now, string endTime)
         {
-            const string FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-            if (!DateTime.TryParseExact(
-                    endTime,
-                    FORMAT,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var end))
+            if (!TryParse(endTime, out var result))
             {
                 return -1;
             }
 
-            return (end - now).TotalSeconds;
+            return (result - now).TotalSeconds;
         }
 
         public static bool InTime(DateTime now, string startTime, string endTime)
         {
-            const string FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-            if (!DateTime.TryParseExact(
-                    startTime,
-                    FORMAT,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var start))
+            if (!TryParse(startTime, out var start))
             {
                 return false;
             }
 
-            if (!DateTime.TryParseExact(
-                    endTime,
-                    FORMAT,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var end))
+            if (!TryParse(endTime, out var end))
             {
                 return false;
             }

@@ -3293,6 +3293,8 @@ GameObject:
   - component: {fileID: 4384829649874524765}
   - component: {fileID: 8349129839092092534}
   - component: {fileID: 1035513274782359474}
+  - component: {fileID: 3111360309064132893}
+  - component: {fileID: 6770202763471948936}
   m_Layer: 5
   m_Name: ChapterStageView
   m_TagString: Untagged
@@ -3334,8 +3336,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd2f8fd0f13b41b4aec87312538d08fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Layer: 4
-  MainMode: 0
+  Layer: 2
+  MainMode: 1
   CloseOnBackdrop: 1
   CacheOnClose: 0
   animatedRoot: {fileID: 0}
@@ -3418,6 +3420,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageDataResolver: {fileID: 11400000, guid: 6d9d4acc8f4b647b195eccc1c726ae13, type: 2}
   towerView: {fileID: 4921593103925159259}
+--- !u!223 &3111360309064132893
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4376724182652545493}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 6
+  m_TargetDisplay: 0
+--- !u!114 &6770202763471948936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4376724182652545493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 0
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4087
 --- !u!1 &4418121487161467427
 GameObject:
   m_ObjectHideFlags: 0

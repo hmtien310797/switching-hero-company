@@ -103,5 +103,21 @@ namespace Immortal_Switch.Scripts.StatSystem
                 }
             };
         }
+        
+        public static BuffData CreateInvincible(
+            float duration,
+            string id = "invincible")
+        {
+            return new BuffData
+            {
+                Id = id,
+                Name = "Invincible",
+                Kind = BuffKind.Buff,
+                Duration = duration,
+                MaxStacks = 1,
+                StackRule = BuffStackRule.Refresh,
+                StatusEffects = StatusEffectType.Invincible
+            };
+        }
     }
 }

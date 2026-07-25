@@ -1,5 +1,6 @@
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Core;
 using Nakama;
 using TMPro;
 using UnityEngine;
@@ -134,6 +135,11 @@ namespace Immortal_Switch.Scripts.Skill.UI
             }
 
             ApplySummary(response);
+
+            if (response.UpgradedSkillCount > 0)
+            {
+                GameEventManager.Trigger(GameEvents.ON_SKILL_UPGRADE, response.UpgradedSkillCount);
+            }
 
             Log(
                 $"EnhanceAll -> processed={response.ProcessedSkillCount}, " +

@@ -80,6 +80,13 @@ namespace Immortal_Switch.Scripts.Currency
         summon_ticket_hero,
         summon_ticket_weapon,
         summon_ticket_skill,
+        
+        // event lehoibanglong
+        summon_ticket_hero_banner,
+        
+        // event wheel
+        lucky_wheel_ticket_silver,
+        lucky_wheel_ticket_gold,
 
         // ===== Legacy =====
 

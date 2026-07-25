@@ -1,4 +1,14 @@
-Shader "Custom/StarrySkyUI"
+// Ho tro "Soft Maskable" cua package com.coffee.softmask-for-ugui: shader phai tu khai
+// bao ho tro (khong tu dong hoat dong voi shader tuy bien). Da them theo dung huong dan
+// chinh thuc cua package (cach "Hybrid" - sua truc tiep tren shader goc):
+//   - Them hau to " (SoftMaskable)" vao ten shader.
+//   - Include SoftMask.cginc + 2 dong #pragma shader_feature.
+//   - Nhan alpha cuoi cung voi SoftMask(...) truoc khi return.
+// Sau khi save, bat toggle "Soft Maskable" tren Image/RawImage dung material nay se hoat
+// dong binh thuong. Neu Unity bao khong tim thay shader trong dropdown, chon lai shader
+// "Custom/StarrySkyUI (SoftMaskable)" cho material starskyUI.mat (van la file shader nay,
+// chi doi ten hien thi, khong anh huong reference vi Unity luu theo GUID).
+Shader "Custom/StarrySkyUI (SoftMaskable)"
 {
     Properties
     {
@@ -15,22 +25,52 @@ Shader "Custom/StarrySkyUI"
         _StarColorRare ("Rare Star Color",     Color)         = (1.0,  0.6,  0.9, 1)
         _Aspect        ("Aspect Ratio (W/H)",  Float)         = 0.5
         _StarRegionY   ("Star Region Bottom Y",Range(0,1))   = 0.0
+        _StarRegionTopY("Star Region Top Y",   Range(0,1))    = 1.0
         _StarFade      ("Star Fade Width",     Range(0,0.3))  = 0.10
+
+        [Header(UI Mask Ho tro chuan Mask RectMask2D cua Unity UI)]
+        _StencilComp ("Stencil Comparison", Float) = 8
+        _Stencil ("Stencil ID", Float) = 0
+        _StencilOp ("Stencil Operation", Float) = 0
+        _StencilWriteMask ("Stencil Write Mask", Float) = 255
+        _StencilReadMask ("Stencil Read Mask", Float) = 255
+        _ColorMask ("Color Mask", Float) = 15
+        [Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
     }
 
     SubShader
     {
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" "IgnoreProjector" = "True" }
+
+        Stencil
+        {
+            Ref [_Stencil]
+            Comp [_StencilComp]
+            Pass [_StencilOp]
+            ReadMask [_StencilReadMask]
+            WriteMask [_StencilWriteMask]
+        }
+
         Blend SrcAlpha OneMinusSrcAlpha
         Cull Off
         ZWrite Off
+        ZTest [unity_GUIZTestMode]
+        ColorMask [_ColorMask]
 
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_local _ UNITY_UI_CLIP_RECT
+            #pragma multi_compile_local _ UNITY_UI_ALPHACLIP
             #include "UnityCG.cginc"
+            #include "UnityUI.cginc"
+
+            // Ho tro Soft Mask (bat buoc theo package com.coffee.softmask-for-ugui)
+            #include "Packages/com.coffee.softmask-for-ugui/Shaders/SoftMask.cginc"
+            #pragma shader_feature _ SOFTMASK_EDITOR
+            #pragma shader_feature_local _ SOFTMASKABLE
 
             sampler2D _MainTex;
             float4    _MainTex_ST;
@@ -47,7 +87,10 @@ Shader "Custom/StarrySkyUI"
             float4 _StarColorRare;
             float  _Aspect;
             float  _StarRegionY;
+            float  _StarRegionTopY;
             float  _StarFade;
+
+            float4 _ClipRect;
 
             struct appdata {
                 float4 vertex : POSITION;
@@ -57,6 +100,7 @@ Shader "Custom/StarrySkyUI"
             struct v2f {
                 float4 vertex : SV_POSITION;
                 float2 uv     : TEXCOORD0;
+                float4 worldPosition : TEXCOORD1;
             };
 
             // Ham hash ngau nhien tu toa do o luoi
@@ -106,7 +150,8 @@ Shader "Custom/StarrySkyUI"
             v2f vert(appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.worldPosition = v.vertex;
+                o.vertex = UnityObjectToClipPos(o.worldPosition);
                 o.uv     = TRANSFORM_TEX(v.uv, _MainTex);
                 return o;
             }
@@ -119,8 +164,9 @@ Shader "Custom/StarrySkyUI"
                 // Anh nen
                 fixed4 col = tex2D(_MainTex, uv);
 
-                // Mask: sao chi hien tu StarRegionY tro len
-                float mask = smoothstep(_StarRegionY, _StarRegionY + _StarFade, uv.y);
+                // Mask: sao chi hien trong dai tu StarRegionY (duoi) den StarRegionTopY (tren)
+                float mask = smoothstep(_StarRegionY, _StarRegionY + _StarFade, uv.y)
+                           * (1.0 - smoothstep(_StarRegionTopY - _StarFade, _StarRegionTopY, uv.y));
 
                 // Kiem tra 3x3 o luoi xung quanh pixel
                 float3 stars    = float3(0, 0, 0);
@@ -137,7 +183,19 @@ Shader "Custom/StarrySkyUI"
                 stars += StarCell(baseCell + float2( 1, 1), uv, t);
 
                 col.rgb += stars * mask;
-                return col * _Color;
+
+                fixed4 finalColor = col * _Color;
+                finalColor.a *= SoftMask(i.vertex, i.worldPosition, finalColor.a);
+
+                #ifdef UNITY_UI_CLIP_RECT
+                finalColor.a *= UnityGet2DClipping(i.worldPosition.xy, _ClipRect);
+                #endif
+
+                #ifdef UNITY_UI_ALPHACLIP
+                clip(finalColor.a - 0.001);
+                #endif
+
+                return finalColor;
             }
             ENDCG
         }

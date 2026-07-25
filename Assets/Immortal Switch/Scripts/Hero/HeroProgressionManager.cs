@@ -153,6 +153,7 @@ namespace Immortal_Switch.Scripts.Hero
             }
 
             ApplyUpgradeResult(response);
+            GameEventManager.Trigger(GameEvents.ON_HERO_LEVEL_UP);
             return true;
         }
 

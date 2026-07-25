@@ -125,11 +125,9 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller
 
                 case EEventLeHoiBangLongLayoutType.Summon:
                 {
-                    var maxPoint = DatabaseManager.Instance.GetEventLHBLMilestone().LastOrDefault()?.pointsRequired ?? 1;
-
                     _selectedLayout.layout
                         .GetComponent<EventLeHoiBangLongSummonLayout>()
-                        .Bind(ChangeLayout, maxPoint, remainTime);
+                        .Bind(ChangeLayout, remainTime);
 
                     break;
                 }

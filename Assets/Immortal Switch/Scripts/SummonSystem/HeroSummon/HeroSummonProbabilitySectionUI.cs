@@ -43,15 +43,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 var hero = data.Heroes[i];
                 var item = itemPool.Get(i);
                 var element = heroUIConfig.GetElement(hero.Hero.Element);
-                var heroClass = heroUIConfig.GetHeroClass(hero.Hero.HeroClass);
 
-                if (element == null ||
-                    heroClass == null)
+                if (element == null)
                 {
                     Debug.LogError($"Element {i} of hero {hero.Hero.Name} not found");
                     continue;
                 }
-                item.Bind(hero, heroSpriteAtlas, element, heroClass);
+                item.Bind(hero, heroSpriteAtlas, element);
             }
 
             itemPool.ReleaseFrom(data.Heroes.Count);

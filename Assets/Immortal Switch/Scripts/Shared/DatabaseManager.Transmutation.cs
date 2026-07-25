@@ -5,6 +5,6 @@ namespace Immortal_Switch.Scripts.Shared
     public partial class DatabaseManager
     {
         [field: DatabaseBinding]
-        public TransmutationSystemDatabaseSO TransmutationSystemDatabase { get; private set; }
+        public TransmutationSystemDatabaseSO TransmutationDb { get; private set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -38,6 +40,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                     continue;
 
                 var ui = uiDb.Get(stat);
+                var cfgStat = DatabaseManager.Instance.GetConfigStats(ui.Stat);
 
                 bool hasCurrentTierVersion = service.TryGetStatGrowthAtTier(currentTier, stat, out _);
                 bool hasAnyPreviousVersion = service.TryGetPreviousKnownStatGrowthBeforeTier(nextTier, stat, out int previousTier, out _);
@@ -45,7 +48,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
                 var row = new GrowthTierUpgradeRowData
                 {
                     Stat = stat,
-                    StatName = string.IsNullOrEmpty(ui.DisplayName) ? stat.ToString() : ui.DisplayName,
+                    StatName = cfgStat != null ? LocalizationManager.GetText(cfgStat.uiKey) : ui.Stat.ToString(),
                     StatIcon = ui.Icon,
                     ShowArrow = false,
                     LeftValueText = string.Empty,

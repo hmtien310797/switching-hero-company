@@ -33,7 +33,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
         private RectTransform rewardContainer;
 
         [SerializeField]
-        private UIReward rewardPrefab;
+        private UIRewardQuantity rewardPrefab;
 
         [SerializeField]
         private TMP_Text remainingText;
@@ -42,7 +42,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
         private Button buttonClose;
 
         // --- Private Fields ---
-        private List<UIReward> _rewards = new();
+        private List<UIRewardQuantity> _rewards = new();
         private PopupRewardArgs _args;
         private Tween countdownTween;
 
@@ -112,7 +112,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
                     var itemDisplay = DatabaseManager.Instance.GetDisplayData(reward);
 
                     // TierInfo null cũng chỉ bỏ qua item đó.
-                    if (itemDisplay.TierInfo == null)
+                    if (itemDisplay?.TierInfo == null)
                     {
                         Debug.LogWarning(
                             $"[PopupRewardView] TierInfo bị null. " +
@@ -121,7 +121,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
                         continue;
                     }
 
-                    UIReward clone;
+                    UIRewardQuantity clone;
 
                     if (displayIndex < _rewards.Count)
                     {
@@ -162,10 +162,9 @@ namespace Immortal_Switch.Scripts.Shared.Views
                         itemDisplay.ItemIcon,
                         itemDisplay.TierInfo.border,
                         itemDisplay.TierInfo.background,
-                        itemDisplay.TierInfo.tierIcon
+                        itemDisplay.TierInfo.tierIcon,
+                        reward.Quantity
                     );
-
-                    clone.BindQuantity(reward.Quantity);
 
                     displayIndex++;
                 }

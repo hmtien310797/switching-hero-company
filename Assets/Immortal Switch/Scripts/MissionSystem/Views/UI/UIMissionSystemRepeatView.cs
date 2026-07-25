@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.MissionSystem.Models;
 using Immortal_Switch.Scripts.Shared;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,22 +26,24 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         private GameObject goBtnClaimAllRedDot;
 
         // --- Private Fields ---
-        private readonly List<UIMissionRepeatEntry> _taskObjects = new();
+        private readonly List<UIMissionRepeatEntry> _tasks = new();
+
         private string _missionType;
 
         private void Awake()
         {
-            MissionSystemManager.Instance.OnMissionClaimed += OnMissionSystemMissionClaimed;
-            MissionSystemManager.Instance.OnChangeProgress += OnMissionSystemChangeProgress;
+            MissionSystemManager.Instance.OnMissionClaimed += OnMissionClaimed;
+            MissionSystemManager.Instance.OnChangeProgress += OnMissionChangeProgress;
             btnClaimAll.onClick.AddListener(OnClickClaimAll);
         }
 
         private void OnDestroy()
         {
-            MissionSystemManager.Instance.OnChangeProgress -= OnMissionSystemChangeProgress;
+            MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
+            MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
         }
 
-        private void OnMissionSystemMissionClaimed(string arg1, string arg2)
+        private void OnMissionClaimed(string arg1, string arg2)
         {
             if (_missionType != arg2)
             {
@@ -50,10 +51,11 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             }
 
             var anyCompleted = MissionSystemManager.Instance.AnyCompleted(arg2);
+
             RefreshBtnClaimAll(anyCompleted);
         }
 
-        private void OnMissionSystemChangeProgress(string arg1, int arg2, string arg3)
+        private void OnMissionChangeProgress(string arg1, int arg2, string arg3)
         {
             if (_missionType != arg1)
             {
@@ -61,6 +63,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             }
 
             var anyCompleted = MissionSystemManager.Instance.AnyCompleted(arg1);
+
             RefreshBtnClaimAll(anyCompleted);
         }
 
@@ -95,13 +98,12 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             // check btn claim trang thai
             var anyCompleted = MissionSystemManager.Instance.AnyCompleted(_missionType);
             RefreshBtnClaimAll(anyCompleted);
-            CreateMissions(rows, tasks, missionType, onJump);
+            CreateMissions(rows, tasks, onJump);
         }
 
         private void CreateMissions(
             List<DynamicHeroesGlobalSpecificationsMissionConfigRow> rows,
             List<MissionSystemEntry> tasks,
-            string missionType,
             Func<string, UniTask> onJump)
         {
             for (var i = 0; i < rows.Count; i++)
@@ -110,43 +112,41 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
                 if (currentTask == null)
                 {
-                    Debug.LogError($"MissionType: {missionType} with {JsonConvert.SerializeObject(rows[i])}");
+                    Debug.LogError($"Mission: {rows[i].missionId} not have task");
                     continue;
                 }
 
                 var rewards = DatabaseManager.Instance.GetRewards(rows[i].rewards);
-                Sprite sprite = null;
-                var quantityFormat = string.Empty;
+                var reward = rewards.Count > 0 ? rewards[0] : null;
 
-                if (rewards.Count > 0)
+                if (reward == null)
                 {
-                    var reward = rewards[0];
-                    sprite = DatabaseManager.Instance.ItemDb.LoadIconByItemId(reward.ItemId);
-                    quantityFormat = reward.Quantity.ToInputString();
+                    Debug.LogError($"Mission: {rows[i].missionId}");
+                    continue;
                 }
 
-                if (_taskObjects.Count > i)
+                if (_tasks.Count > i)
                 {
-                    _taskObjects[i].gameObject.SetActive(true);
-                    _taskObjects[i].Bind(rows[i], currentTask.Progress, sprite, quantityFormat, onJump);
+                    _tasks[i].gameObject.SetActive(true);
+                    _tasks[i].Bind(rows[i], currentTask.Progress, reward.ItemId, reward.Quantity, onJump);
 
                     if (currentTask.IsClaimed)
                     {
-                        _taskObjects[i].ApplyStateClaimed();
+                        _tasks[i].ApplyStateClaimed();
                     }
                 }
                 else
                 {
                     var clone = Instantiate(taskPrefab, taskContainer);
                     clone.gameObject.SetActive(true);
-                    clone.Bind(rows[i], currentTask.Progress, sprite, quantityFormat, onJump);
+                    clone.Bind(rows[i], currentTask.Progress, reward.ItemId, reward.Quantity, onJump);
 
                     if (currentTask.IsClaimed)
                     {
                         clone.ApplyStateClaimed();
                     }
 
-                    _taskObjects.Add(clone);
+                    _tasks.Add(clone);
                 }
             }
         }

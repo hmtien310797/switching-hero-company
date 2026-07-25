@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Addler.Runtime.Core.Pooling;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Immortal_Switch.Scripts.Pooling
 {
@@ -22,6 +25,16 @@ namespace Immortal_Switch.Scripts.Pooling
             activeHandles = new();
 
         private bool initialized;
+
+        private static readonly FieldInfo UsableObjectsField =
+            typeof(AddressablePool).GetField(
+                "_usableObjects",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+        private static readonly PropertyInfo CapacityProperty =
+            typeof(AddressablePool).GetProperty(
+                "Capacity",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         private void Awake()
         {
@@ -198,11 +211,38 @@ namespace Immortal_Switch.Scripts.Pooling
                 return null;
             }
 
-            PooledObject pooledObject; 
-            
+            PooledObject pooledObject;
+
             try
             {
                 pooledObject = pool.Use();
+            }
+            catch (InvalidOperationException)
+            {
+                /*
+                 * Pool đã hết usable object. Thử mở rộng pool đồng bộ
+                 * (sinh thêm instance rồi đẩy vào _usableObjects) rồi
+                 * dùng lại. Tránh crash khi spawn ồ ạt — VD: AOE phủ
+                 * full map kill toàn bộ creep cùng lúc.
+                 */
+                if (!TryExpandPoolSynchronously(key, pool))
+                {
+                    Debug.LogError(
+                        $"[AddressablePoolService] Pool exhausted and could not expand. Key={key}"
+                    );
+
+                    return null;
+                }
+
+                try
+                {
+                    pooledObject = pool.Use();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError(exception);
+                    return null;
+                }
             }
             catch (Exception exception)
             {
@@ -278,6 +318,80 @@ namespace Immortal_Switch.Scripts.Pooling
 
                 handle.Despawn();
                 return null;
+            }
+        }
+
+        /// <summary>
+        ///     Sinh đồng bộ thêm một instance và đẩy vào _usableObjects
+        ///     của AddressablePool khi pool cạn kiệt. Dùng reflection vì
+        ///     _usableObjects là private. Giúp pool tự mở rộng lúc runtime
+        ///     thay vì crash với InvalidOperationException.
+        /// </summary>
+        private bool TryExpandPoolSynchronously(
+            string key,
+            AddressablePool pool)
+        {
+            if (pool == null || pool.IsDisposed)
+                return false;
+
+            if (UsableObjectsField == null ||
+                CapacityProperty == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var usableObjects =
+                    UsableObjectsField.GetValue(pool) as Stack<GameObject>;
+
+                if (usableObjects == null)
+                    return false;
+
+                Transform parentTransform =
+                    parents.TryGetValue(
+                            key,
+                            out Transform registeredParent)
+                        ? registeredParent
+                        : defaultPoolParent;
+
+                var opHandle = Addressables.InstantiateAsync(
+                    key,
+                    parentTransform);
+
+                GameObject instance =
+                    opHandle.WaitForCompletion() as GameObject;
+
+                if (instance == null)
+                {
+                    Addressables.Release(opHandle);
+                    return false;
+                }
+
+                instance.SetActive(false);
+                usableObjects.Push(instance);
+
+                int currentCapacity =
+                    (int)CapacityProperty.GetValue(pool);
+                CapacityProperty.SetValue(
+                    pool,
+                    currentCapacity + 1);
+
+                Debug.LogWarning(
+                    $"[AddressablePoolService] Pool dynamically expanded. " +
+                    $"Key={key}, NewCapacity={currentCapacity + 1}"
+                );
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(
+                    $"[AddressablePoolService] Failed to expand pool synchronously. Key={key}"
+                );
+
+                Debug.LogException(exception);
+                return false;
             }
         }
 

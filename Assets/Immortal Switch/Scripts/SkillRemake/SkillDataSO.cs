@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.SkillSystem.Description;
 using Immortal_Switch.Scripts.Sound;
 using Immortal_Switch.Scripts.StatSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor.Localization;
+using UnityEngine.Localization.Tables;
+#endif
 
 namespace Immortal_Switch.Scripts.Skill
 {
@@ -251,6 +256,20 @@ namespace Immortal_Switch.Scripts.Skill
         public int DecimalPlaces = 0;
     }
 
+    /// <summary>
+    /// Giá trị mô tả (ValueKey) cho riêng một level của Ultimate/Passive skill.
+    /// Mỗi entry lưu <see cref="Level"/> (1-3) và mảng <see cref="Values"/>
+    /// dùng để format localized description template tại level đó.
+    /// </summary>
+    [Serializable]
+    public class SkillDescriptionLevelValues
+    {
+        [Range(1, 3)]
+        public int Level = 1;
+
+        public float[] Values;
+    }
+
     [Serializable]
     public class SkillLevelData
     {
@@ -258,9 +277,7 @@ namespace Immortal_Switch.Scripts.Skill
         public int Level = 1;
 
         public List<SkillPhaseData> Phases = new();
-        [TextArea(3,12)]
-        public String Description;
-
+        
         [ShowIf("@$root.OwnerType == SkillOwnerType.PassiveSkill")]
         public SkillPassiveLevelConfig PassiveLevelConfig;
     }
@@ -321,9 +338,28 @@ namespace Immortal_Switch.Scripts.Skill
         public string SkillKey;
         public HeroClass SkillClass;
         public string SkillName;
+        public string SkillNameKey;
         public string IconSkillKey;
         [TextArea(3,12)]
         public String Description;
+        public String DescriptionKey;
+
+        /// <summary>
+        /// Legacy field (từ version cũ khi Ultimate/Passive dùng chung một
+        /// <c>float[] ValueKey</c> cho mọi level). Giữ lại hidden để migrate
+        /// dữ liệu cũ sang <see cref="DescriptionValuesByLevel"/>.
+        /// </summary>
+        [SerializeField]
+        [HideInInspector]
+        [FormerlySerializedAs("ValueKey")]
+        private float[] legacyValueKey;
+
+        /// <summary>
+        /// Giá trị mô tả theo từng level (1-3) cho Ultimate/Passive skill.
+        /// Chỉ hiển thị với skill đặc biệt (không phải Class skill).
+        /// </summary>
+        [ShowIf(nameof(IsSpecialSkill))]
+        public SkillDescriptionLevelValues[] DescriptionValuesByLevel;
 
         [Header("Type")]
         public SkillOwnerType OwnerType = SkillOwnerType.ClassSkill;
@@ -363,6 +399,21 @@ namespace Immortal_Switch.Scripts.Skill
             return GetSafeLevel(level) >= Mathf.Max(1, MaxLevel);
         }
 
+        public bool IsNotClassSkill()
+        {
+            return OwnerType != SkillOwnerType.ClassSkill;
+        }
+
+        /// <summary>
+        /// Skill đặc biệt (Ultimate hoặc Passive) — có cấu trúc description 3 level
+        /// (<see cref="DescriptionValuesByLevel"/>) và dùng localized template.
+        /// </summary>
+        public bool IsSpecialSkill()
+        {
+            return OwnerType == SkillOwnerType.UltimateSkill ||
+                   OwnerType == SkillOwnerType.PassiveSkill;
+        }
+
         public string BuildDescription(int level)
         {
             switch (RuntimeObjectConfig.RuntimeVisualType)
@@ -374,7 +425,284 @@ namespace Immortal_Switch.Scripts.Skill
 
             return null;
         }
-        
+
+        /// <summary>
+        /// Lấy localized skill name. Fallback theo thứ tự:
+        /// 1. <see cref="SkillNameKey"/> localized value.
+        /// 2. <see cref="SkillName"/>.
+        /// 3. <see cref="SkillKey"/>.
+        /// 4. <see cref="string.Empty"/>.
+        /// Không trả về null.
+        /// </summary>
+        public string GetLocalizedSkillName()
+        {
+            if (!string.IsNullOrWhiteSpace(SkillNameKey) &&
+                LocalizationManager.TryGetRawText(SkillNameKey, out string localized) &&
+                !string.IsNullOrEmpty(localized))
+            {
+                return localized;
+            }
+
+            if (!string.IsNullOrWhiteSpace(SkillName))
+                return SkillName;
+
+            if (!string.IsNullOrWhiteSpace(SkillKey))
+                return SkillKey;
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Lấy raw localized description template (giữ nguyên <c>{0}</c>, <c>{1}</c>...).
+        /// Fallback về <see cref="Description"/> nếu key rỗng, entry không tồn tại
+        /// hoặc localization chưa sẵn sàng. Không trả về null.
+        /// </summary>
+        public string GetLocalizedDescriptionTemplate()
+        {
+            if (!string.IsNullOrWhiteSpace(DescriptionKey) &&
+                LocalizationManager.TryGetRawText(DescriptionKey, out string localized) &&
+                !string.IsNullOrEmpty(localized))
+            {
+                return localized;
+            }
+
+            return Description ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Giá trị mặc định khi khởi tạo thêm một phần tử Values cho level.
+        /// Level 1 → 0, Level 2 → 1, Level 3 → 2 (dễ nhận biết = level - 1).
+        /// Không dùng công thức tổng quát để dễ điều chỉnh từng level riêng biệt.
+        /// </summary>
+        public static float GetDefaultDescriptionValue(int level)
+        {
+            return level switch
+            {
+                1 => 0f,
+                2 => 1f,
+                3 => 2f,
+                _ => 0f
+            };
+        }
+
+        /// <summary>
+        /// Đảm bảo <see cref="DescriptionValuesByLevel"/> có đủ entry cho level 1, 2, 3,
+        /// sắp xếp theo thứ tự level, giữ nguyên giá trị designer đã nhập.
+        /// Xử lý entry null, level trùng (giữ entry đầu tiên), level ngoài 1-3.
+        /// Trả về true nếu cấu trúc thay đổi.
+        /// </summary>
+        public bool EnsureDescriptionLevelStructure()
+        {
+            bool changed = false;
+
+            List<SkillDescriptionLevelValues> list =
+                DescriptionValuesByLevel == null
+                    ? new List<SkillDescriptionLevelValues>()
+                    : new List<SkillDescriptionLevelValues>(DescriptionValuesByLevel);
+
+            bool hasValidEntry = false;
+            for (int i = 0; i < list.Count; i++)
+            {
+                SkillDescriptionLevelValues entry = list[i];
+                if (entry != null && entry.Level >= 1 && entry.Level <= 3)
+                {
+                    hasValidEntry = true;
+                    break;
+                }
+            }
+
+            // Migration: khi chưa có level hợp lệ nào và có legacy ValueKey
+            // chứa data thật (≠ 0) → copy legacy sang cả 3 level (giữ mô tả đang hiển thị).
+            // Legacy toàn 0 (artifact do sync cũ) được coi như không có data → bỏ qua,
+            // để tạo entry mới với default per-level (0/1/2).
+            if (!hasValidEntry && LegacyHasMeaningfulData())
+            {
+                list.Clear();
+
+                for (int lvl = 1; lvl <= 3; lvl++)
+                {
+                    list.Add(new SkillDescriptionLevelValues
+                    {
+                        Level = lvl,
+                        Values = (float[])legacyValueKey.Clone()
+                    });
+                }
+
+                Debug.Log(
+                    $"[SkillDataSO] Migrated legacy ValueKey (length {legacyValueKey.Length}) " +
+                    $"to all 3 levels for '{name}'.");
+
+                changed = true;
+            }
+
+            // Bỏ entry null và level ngoài 1-3.
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                SkillDescriptionLevelValues entry = list[i];
+
+                if (entry == null)
+                {
+                    list.RemoveAt(i);
+                    changed = true;
+                    continue;
+                }
+
+                if (entry.Level < 1 || entry.Level > 3)
+                {
+                    Debug.LogWarning(
+                        $"[SkillDataSO] '{name}' has out-of-range level {entry.Level}; removed.");
+                    list.RemoveAt(i);
+                    changed = true;
+                }
+            }
+
+            // Xử lý level trùng: giữ entry đầu tiên (theo thứ tự duyệt xuôi), bỏ phần còn lại.
+            HashSet<int> seen = new HashSet<int>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (!seen.Add(list[i].Level))
+                {
+                    Debug.LogWarning(
+                        $"[SkillDataSO] '{name}' has duplicate level {list[i].Level}; removed.");
+                    list.RemoveAt(i);
+                    i--;
+                    changed = true;
+                }
+            }
+
+            // Đảm bảo đủ level 1, 2, 3.
+            for (int lvl = 1; lvl <= 3; lvl++)
+            {
+                bool exists = false;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i].Level == lvl)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                {
+                    list.Add(new SkillDescriptionLevelValues { Level = lvl });
+                    changed = true;
+                }
+            }
+
+            // Sắp xếp theo level.
+            list.Sort((a, b) => a.Level.CompareTo(b.Level));
+
+            // Đảm bảo Values không null.
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].Values == null)
+                {
+                    list[i].Values = Array.Empty<float>();
+                    changed = true;
+                }
+            }
+
+            if (changed)
+                DescriptionValuesByLevel = list.ToArray();
+
+            return changed;
+        }
+
+        /// <summary>
+        /// Legacy <c>ValueKey</c> có data thật (ít nhất 1 phần tử ≠ 0) để migrate.
+        /// Toàn 0 (artifact do sync cũ) hoặc rỗng → false.
+        /// </summary>
+        private bool LegacyHasMeaningfulData()
+        {
+            if (legacyValueKey == null || legacyValueKey.Length == 0)
+                return false;
+
+            for (int i = 0; i < legacyValueKey.Length; i++)
+            {
+                if (!Mathf.Approximately(legacyValueKey[i], 0f))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Lấy Values (chỉ đọc) cho level, clamp 1-3, tìm theo field
+        /// <see cref="SkillDescriptionLevelValues.Level"/>. Không trả về null; empty nếu thiếu.
+        /// </summary>
+        public IReadOnlyList<float> GetDescriptionValues(int level)
+        {
+            int safeLevel = Mathf.Clamp(level, 1, 3);
+
+            if (DescriptionValuesByLevel != null)
+            {
+                for (int i = 0; i < DescriptionValuesByLevel.Length; i++)
+                {
+                    SkillDescriptionLevelValues entry = DescriptionValuesByLevel[i];
+
+                    if (entry != null && entry.Level == safeLevel && entry.Values != null)
+                        return entry.Values;
+                }
+            }
+
+            return Array.Empty<float>();
+        }
+
+        private float[] GetDescriptionValuesArray(int level)
+        {
+            int safeLevel = Mathf.Clamp(level, 1, 3);
+
+            if (DescriptionValuesByLevel != null)
+            {
+                for (int i = 0; i < DescriptionValuesByLevel.Length; i++)
+                {
+                    SkillDescriptionLevelValues entry = DescriptionValuesByLevel[i];
+
+                    if (entry != null && entry.Level == safeLevel && entry.Values != null)
+                        return entry.Values;
+                }
+            }
+
+            return Array.Empty<float>();
+        }
+
+        /// <summary>
+        /// Luồng hiển thị description dùng cho UI:
+        /// - Special skill (Ultimate/Passive): clamp level 1-3, lấy localized template,
+        ///   format bằng <see cref="GetDescriptionValues"/> của level đó.
+        /// - Class skill: dùng <see cref="BuildDescription"/> (Spine {hit} builder).
+        /// Fallback cuối: <see cref="Description"/> raw → <see cref="string.Empty"/>.
+        /// Không throw, không trả về null.
+        /// </summary>
+        public string GetDisplayDescription(int level)
+        {
+            if (IsSpecialSkill())
+            {
+                int safeLevel = Mathf.Clamp(level, 1, 3);
+                string template = GetLocalizedDescriptionTemplate();
+
+                if (!string.IsNullOrEmpty(template))
+                {
+                    float[] values = GetDescriptionValuesArray(safeLevel);
+                    string formatted = SkillDescriptionFormatUtility.FormatDescription(template, values);
+
+                    if (!string.IsNullOrEmpty(formatted))
+                        return formatted;
+                }
+            }
+
+            string built = BuildDescription(level);
+
+            if (!string.IsNullOrEmpty(built))
+                return built;
+
+            if (!string.IsNullOrEmpty(Description))
+                return Description;
+
+            return string.Empty;
+        }
+
         public SoundId[] GetAllNeedSound()
         {
             return new []{RuntimeObjectConfig.soundDefinition.startSound, RuntimeObjectConfig.soundDefinition.hitSound, RuntimeObjectConfig.soundDefinition.finalHitSound};
@@ -669,5 +997,333 @@ namespace Immortal_Switch.Scripts.Skill
 
             return best;
         }
+
+#if UNITY_EDITOR
+        public enum SkillValueKeySyncStatus
+        {
+            Unchanged,
+            Updated,
+            MissingLocalizationKey
+        }
+
+        /// <summary>
+        /// Sync <see cref="DescriptionValuesByLevel"/> với số placeholder của localized
+        /// description template (chỉ Ultimate/Passive).
+        /// - Safe Sync (forceMatch=false): chỉ grow, không xóa data designer.
+        /// - Force Match (forceMatch=true): shrink về đúng số placeholder (warn nếu mất data ≠ 0).
+        /// Đọc String Table trực tiếp qua editor API (không cần Play Mode).
+        /// </summary>
+        public SkillValueKeySyncStatus SyncDescriptionValuesWithLocalizedTemplate(bool forceMatch)
+        {
+            if (!IsSpecialSkill())
+            {
+                UnityEngine.Debug.Log(
+                    $"[SkillDataSO] '{name}' is not a special skill (ultimate/passive); nothing to sync.");
+
+                return SkillValueKeySyncStatus.Unchanged;
+            }
+
+            // TryGetEditorLocalizedTemplate đã log lý do cụ thể nếu template rỗng.
+            string template = TryGetEditorLocalizedTemplate(DescriptionKey);
+            int required = string.IsNullOrEmpty(template)
+                ? -1
+                : SkillDescriptionFormatUtility.GetRequiredArgumentCount(template);
+
+            bool structureChanged = EnsureDescriptionLevelStructure();
+            bool valuesChanged = false;
+
+            if (!string.IsNullOrEmpty(template) && DescriptionValuesByLevel != null)
+            {
+                foreach (SkillDescriptionLevelValues entry in DescriptionValuesByLevel)
+                {
+                    if (entry == null)
+                        continue;
+
+                    if (ResizeValuesEditor(entry, required, forceMatch))
+                        valuesChanged = true;
+                }
+            }
+
+            bool changed = structureChanged || valuesChanged;
+
+            if (changed)
+            {
+                UnityEditor.EditorUtility.SetDirty(this);
+
+                UnityEngine.Debug.Log(
+                    $"[SkillDataSO] Synced '{name}': DescriptionKey='{DescriptionKey}', "
+                    + $"placeholders={required}, forceMatch={forceMatch}.");
+            }
+
+            if (string.IsNullOrEmpty(template))
+                return SkillValueKeySyncStatus.MissingLocalizationKey;
+
+            return changed ? SkillValueKeySyncStatus.Updated : SkillValueKeySyncStatus.Unchanged;
+        }
+
+        /// <summary>Safe Sync (chỉ grow) — API công khai tương thích MD section 13.</summary>
+        public bool SyncDescriptionValuesWithLocalizedTemplate()
+        {
+            return SyncDescriptionValuesWithLocalizedTemplate(false)
+                == SkillValueKeySyncStatus.Updated;
+        }
+
+        [Button("Sync Localized Description Values")]
+        public void SyncLocalizedDescriptionValues()
+        {
+            SyncDescriptionValuesWithLocalizedTemplate(false);
+        }
+
+        [Button("Force Match Description Values")]
+        public void ForceMatchDescriptionValues()
+        {
+            SyncDescriptionValuesWithLocalizedTemplate(true);
+        }
+
+        /// <summary>
+        /// Ghi đè toàn bộ Values của mỗi level bằng default per-level (L1=0, L2=1, L3=2),
+        /// độ dài = số placeholder của localized template.
+        /// Khác với Sync (chỉ grow, giữ data cũ) — Reinitialize XÓA data hiện tại.
+        /// Dùng để fix asset đã bị migrate artifact 0, hoặc setup lại từ đầu.
+        /// </summary>
+        [Button("Reinitialize Description Values")]
+        public SkillValueKeySyncStatus ReinitializeDescriptionValues()
+        {
+            if (!IsSpecialSkill())
+            {
+                UnityEngine.Debug.Log(
+                    $"[SkillDataSO] '{name}' is not a special skill (ultimate/passive); nothing to reinitialize.");
+
+                return SkillValueKeySyncStatus.Unchanged;
+            }
+
+            // TryGetEditorLocalizedTemplate đã log lý do nếu template rỗng.
+            string template = TryGetEditorLocalizedTemplate(DescriptionKey);
+
+            if (string.IsNullOrEmpty(template))
+                return SkillValueKeySyncStatus.MissingLocalizationKey;
+
+            int required = SkillDescriptionFormatUtility.GetRequiredArgumentCount(template);
+
+            EnsureDescriptionLevelStructure();
+
+            bool changed = false;
+
+            if (DescriptionValuesByLevel != null)
+            {
+                foreach (SkillDescriptionLevelValues entry in DescriptionValuesByLevel)
+                {
+                    if (entry == null)
+                        continue;
+
+                    int safeLevel = Mathf.Clamp(entry.Level, 1, 3);
+                    float[] fresh = new float[required];
+                    for (int i = 0; i < required; i++)
+                        fresh[i] = GetDefaultDescriptionValue(safeLevel);
+                    entry.Values = fresh;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                UnityEditor.EditorUtility.SetDirty(this);
+
+                UnityEngine.Debug.Log(
+                    $"[SkillDataSO] Reinitialized '{name}': {required} values/level "
+                    + "(L1=0, L2=1, L3=2). Existing values overwritten.");
+            }
+
+            return changed ? SkillValueKeySyncStatus.Updated : SkillValueKeySyncStatus.Unchanged;
+        }
+
+        private static string TryGetEditorLocalizedTemplate(string descriptionKey)
+        {
+            if (string.IsNullOrWhiteSpace(descriptionKey))
+                return null;
+
+            StringTableCollection collection = FindEditorStringTableCollection();
+
+            if (collection == null)
+            {
+                UnityEngine.Debug.LogWarning(
+                    $"[SkillDataSO] String Table Collection '{LocalizationManager.TABLE_NAME}' not found. "
+                    + "Open Window > Asset Management > Localization > Tables, "
+                    + "or ensure Localization Settings + 'Default' collection exist.");
+                return null;
+            }
+
+            if (collection.SharedData == null)
+            {
+                UnityEngine.Debug.LogWarning(
+                    $"[SkillDataSO] Collection '{LocalizationManager.TABLE_NAME}' has no SharedData.");
+                return null;
+            }
+
+            StringTable table = PickEditorStringTable(collection);
+
+            if (table == null)
+            {
+                UnityEngine.Debug.LogWarning(
+                    $"[SkillDataSO] Collection '{LocalizationManager.TABLE_NAME}' has no locale table.");
+                return null;
+            }
+
+            StringTableEntry entry = table.GetEntry(descriptionKey);
+
+            if (entry == null || string.IsNullOrEmpty(entry.Value))
+            {
+                UnityEngine.Debug.LogWarning(
+                    $"[SkillDataSO] No entry for DescriptionKey '{descriptionKey}' "
+                    + $"in table '{LocalizationManager.TABLE_NAME}'. Check key spelling.");
+                return null;
+            }
+
+            return entry.Value;
+        }
+
+        private static StringTableCollection FindEditorStringTableCollection()
+        {
+            StringTableCollection collection = LocalizationEditorSettings
+                .GetStringTableCollection(LocalizationManager.TABLE_NAME);
+
+            if (collection != null)
+                return collection;
+
+            // Fallback: editor cache lạnh → tìm asset trực tiếp qua AssetDatabase.
+            string[] guids = UnityEditor.AssetDatabase.FindAssets("t:StringTableCollection");
+
+            foreach (string guid in guids)
+            {
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                StringTableCollection candidate =
+                    UnityEditor.AssetDatabase.LoadAssetAtPath<StringTableCollection>(path);
+
+                if (candidate != null
+                    && candidate.SharedData != null
+                    && string.Equals(
+                        candidate.TableCollectionName,
+                        LocalizationManager.TABLE_NAME,
+                        StringComparison.Ordinal))
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
+        }
+
+        private static StringTable PickEditorStringTable(StringTableCollection collection)
+        {
+            StringTable fallback = null;
+
+            foreach (StringTable table in collection.StringTables)
+            {
+                if (table == null)
+                    continue;
+
+                if (fallback == null)
+                    fallback = table;
+
+                if (string.Equals(
+                        table.LocaleIdentifier.Code,
+                        "en",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return table;
+                }
+            }
+
+            return fallback;
+        }
+
+        /// <summary>
+        /// Resize mảng Values về đúng số placeholder (required) cho level, giữ data cũ.
+        /// - grow: giữ giá trị cũ, pad bằng <see cref="GetDefaultDescriptionValue"/> của level.
+        /// - forceMatch=true: shrink về required (warn nếu mất giá trị ≠ 0).
+        /// - forceMatch=false: không shrink (Safe Sync).
+        /// Trả về true nếu mảng thay đổi. Pure function — test độc lập được.
+        /// </summary>
+        public static bool ResizeDescriptionValues(
+            ref float[] values,
+            int required,
+            int level,
+            bool forceMatch)
+        {
+            if (required < 0)
+                required = 0;
+
+            int safeLevel = Mathf.Clamp(level, 1, 3);
+
+            if (values == null)
+            {
+                if (required == 0)
+                    return false;
+
+                values = new float[required];
+                for (int i = 0; i < required; i++)
+                    values[i] = GetDefaultDescriptionValue(safeLevel);
+                return true;
+            }
+
+            int current = values.Length;
+
+            if (current == required)
+                return false;
+
+            if (current < required)
+            {
+                float[] grown = new float[required];
+                Array.Copy(values, grown, current);
+                for (int i = current; i < required; i++)
+                    grown[i] = GetDefaultDescriptionValue(safeLevel);
+                values = grown;
+                return true;
+            }
+
+            // current > required
+            if (!forceMatch)
+                return false; // Safe Sync: không shrink.
+
+            bool removedNonZero = false;
+            for (int i = required; i < current; i++)
+            {
+                if (!Mathf.Approximately(values[i], 0f))
+                {
+                    removedNonZero = true;
+                    break;
+                }
+            }
+
+            if (removedNonZero)
+            {
+                UnityEngine.Debug.LogWarning(
+                    $"[SkillDataSO] Force-match trimming Values (level {safeLevel}, "
+                    + $"length {current} -> {required}); non-zero data may be lost.");
+            }
+
+            float[] trimmed = new float[required];
+            Array.Copy(values, trimmed, required);
+            values = trimmed;
+            return true;
+        }
+
+        private static bool ResizeValuesEditor(
+            SkillDescriptionLevelValues entry,
+            int required,
+            bool forceMatch)
+        {
+            if (entry == null)
+                return false;
+
+            float[] values = entry.Values;
+            bool changed = ResizeDescriptionValues(ref values, required, entry.Level, forceMatch);
+
+            if (changed)
+                entry.Values = values;
+
+            return changed;
+        }
+#endif
     }
 }

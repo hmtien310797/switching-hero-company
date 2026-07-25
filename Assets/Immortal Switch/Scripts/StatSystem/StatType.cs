@@ -55,7 +55,8 @@ namespace Immortal_Switch.Scripts.StatSystem
         None = 0,
         Stun = 1 << 0,
         Silence = 1 << 1,
-        Freeze = 1 << 2
+        Freeze = 1 << 2,
+        Invincible  = 1 << 3
     }
 
     public enum PeriodicEffectType

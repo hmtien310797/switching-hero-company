@@ -462,7 +462,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public async UniTask<bool> TryCastSkillAsync(SkillDataSO skillData, bool isUltimate = false)
         {
-            if (owner.StateMachine.CurrentStateId == HeroStateId.BossSpawn)
+            if (owner.StateMachine.CurrentStateId == HeroStateId.BossSpawn || owner.StateMachine.CurrentStateId == HeroStateId.Win)
                 return false;
             
             if (skillData == null || owner == null || owner.IsDead)

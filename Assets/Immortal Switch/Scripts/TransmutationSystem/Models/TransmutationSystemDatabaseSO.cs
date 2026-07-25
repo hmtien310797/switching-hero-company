@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Game.Configs.Generated;
-using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Models
@@ -56,43 +53,5 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         /// </summary>
         [field: SerializeField]
         public DynamicHeroesGlobalSpecificationsTransmutationCountSettingDatabase CountConfig { get; private set; }
-
-        /// <summary>
-        /// key: tier
-        /// value: list item in tier
-        /// </summary>
-        private readonly Dictionary<EItemTier, List<DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow>> _itemTiers =
-            new();
-
-        public void Load()
-        {
-            foreach (var entry in ItemConfig.rows)
-            {
-                var tier = Enum.TryParse<EItemTier>(entry.tier, true, out var result) ? result : EItemTier.D;
-
-                if (_itemTiers.TryGetValue(tier, out var rows))
-                {
-                    rows.Add(entry);
-                }
-                else
-                {
-                    _itemTiers.Add(tier, new List<DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow>
-                    {
-                        entry,
-                    });
-                }
-            }
-        }
-
-        public DynamicHeroesGlobalSpecificationsTransmuationItemConfigRow RandomItem(EItemTier tier)
-        {
-            if (!_itemTiers.TryGetValue(tier, out var rows))
-            {
-                return null;
-            }
-
-            var rnd = UnityEngine.Random.Range(0, rows.Count);
-            return rows[rnd];
-        }
     }
 }

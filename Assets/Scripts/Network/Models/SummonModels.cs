@@ -118,6 +118,11 @@ public class NakamaSummonRewardItem
     /// etc. ItemId/ItemQuantity columns), layered on top of the milestone reward above. Uses
     /// "amount" (shared with Currency) for the quantity.</summary>
     [JsonProperty("item_id")]       public int    ItemId;
+
+    /// <summary>Milestone level this reward entry came from. A single claim_reward call can
+    /// now return rewards for several skipped milestones at once — use this to mark each one
+    /// claimed locally instead of assuming it's always the level that was requested.</summary>
+    [JsonProperty("summon_level")]  public int    SummonLevel;
 }
 
 // ── Response: summon/state ────────────────────────────────────────────────────

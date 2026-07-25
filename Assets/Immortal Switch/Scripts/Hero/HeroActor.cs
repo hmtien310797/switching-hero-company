@@ -135,9 +135,14 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     
     public HeroStateMachine StateMachine => stateMachine;
 
-    public void SetAutoSkill(bool active)
+    public void SetAutoClassSkill(bool active)
     {
-        autoSkillController.AutoCastEnabled = active;
+        autoSkillController.AutoCastClassSkill = active;
+    }
+    
+    public void SetAutoUltimateSkill(bool active)
+    {
+        autoSkillController.AutoCastUltimate = active;
     }
 
     private void Awake()
@@ -198,7 +203,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         UserDataCache.Instance?.ApplyServerLoadoutToHero(this, heroData.Id);
 
         ResetData();
-        SetAutoSkill(useAutoSkill);
+        SetAutoClassSkill(useAutoSkill);
         await skillController.InitializeUltimateSkillDataAndClassSkillData();
     }
 

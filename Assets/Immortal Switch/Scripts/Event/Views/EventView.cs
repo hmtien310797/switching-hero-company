@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Event.EventLogin;
 using Immortal_Switch.Scripts.Event.EventWheel;
 using Immortal_Switch.Scripts.Event.Views.UI;
 using Immortal_Switch.Scripts.Shared;
@@ -68,6 +69,11 @@ namespace Immortal_Switch.Scripts.Event.Views
             {
                 case EventIdConstants.EVENT_WHEEL:
                     UIManager.Instance.OpenPopupAsync<EventWheelView>().Forget();
+                    break;
+
+                case EventIdConstants.EVENT_NEWBIE_7:
+                case EventIdConstants.EVENT_NEWBIE_30:
+                    UIManager.Instance.OpenPopupAsync<EventLoginView>(new EventLoginArgs(eventId)).Forget();
                     break;
             }
         }

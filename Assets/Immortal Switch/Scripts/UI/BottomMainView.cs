@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.DungeonSystem.Views;
+using Immortal_Switch.Scripts.Event.EventLeHoiBangLong;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.MissionSystem.Views;
@@ -13,27 +14,43 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.UI
 {
-    public class BottomMainView : UIView
+    public class BottomMainView : MonoBehaviour
     {
-        [SerializeField] private BottomMainButton ButtonShop;
-        [SerializeField] private BottomMainButton ButtonHero;
-        [SerializeField] private BottomMainButton ButtonGrowth;
-        [SerializeField] private BottomMainButton ButtonEquip;
-        [SerializeField] private BottomMainButton ButtonMission;
-        [SerializeField] private BottomMainButton ButtonDungeon;
-        [SerializeField] private Button ButtonGem;
-        [SerializeField] private Button ButtonClose;
-        [SerializeField] private GameObject Gem;
-        [SerializeField] private GameObject[] disableObjectsWhenPlayDungeon;
+        [SerializeField]
+        private BottomMainButton ButtonShop;
+
+        [SerializeField]
+        private BottomMainButton ButtonHero;
+
+        [SerializeField]
+        private BottomMainButton ButtonGrowth;
+
+        [SerializeField]
+        private BottomMainButton ButtonEquip;
+
+        [SerializeField]
+        private BottomMainButton ButtonMission;
+
+        [SerializeField]
+        private BottomMainButton ButtonDungeon;
+
+        [SerializeField]
+        private Button ButtonGem;
+
+        [SerializeField]
+        private Button ButtonClose;
+
+        [SerializeField]
+        private GameObject Gem;
+
+        [SerializeField]
+        private GameObject[] disableObjectsWhenPlayDungeon;
 
         // --- Private Field ---
         private BottomMainButton _selectedBtn;
 
         private void Awake()
         {
-            // Ensure persistent layer (recommended)
-            Layer = UILayer.SubMain;
-
             if (ButtonGrowth != null)
                 ButtonGrowth.AddListener(OnClickBtnGrowth);
 
@@ -77,7 +94,7 @@ namespace Immortal_Switch.Scripts.UI
             GameEventManager.Subscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
             GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
         }
-        
+
         private void OnDestroy()
         {
             TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
@@ -85,7 +102,7 @@ namespace Immortal_Switch.Scripts.UI
             GameEventManager.Unsubscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
             GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
         }
-        
+
         private void OnPlayDungeon(bool result)
         {
             for (int i = 0; i < disableObjectsWhenPlayDungeon.Length; i++)
@@ -169,7 +186,6 @@ namespace Immortal_Switch.Scripts.UI
                 _selectedBtn = selected;
             }
 
-            Debug.Log($"Typeof: {typeof(T).Name}");
             await UIManager.Instance.TogglePopupAsync<T>(withBackdrop: withBackdrop);
         }
 
@@ -182,13 +198,24 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             UIManager.Instance.CloseTopMain();
-            TriggerButtonCloseAndGem(false);
+            RefreshCloseAndGem();
         }
 
         private void RefreshCloseAndGem()
         {
-            bool hasAnyMain = UIManager.Instance != null && UIManager.Instance.IsAnyMainVisible();
-            TriggerButtonCloseAndGem(hasAnyMain);
+            if (UIManager.Instance != null)
+            {
+                bool hasAnyMain = UIManager.Instance.IsAnyMainVisible();
+                TriggerButtonCloseAndGem(hasAnyMain);
+
+                var hasMainEventLeHoiBangLongVisible = UIManager.Instance.IsOpen<EventLeHoiBangLongView>();
+
+                if (hasMainEventLeHoiBangLongVisible)
+                {
+                    ButtonClose.gameObject.SetActive(false);
+                    Gem.SetActive(false);
+                }
+            }
         }
 
         private void TriggerButtonCloseAndGem(bool value)

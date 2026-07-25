@@ -46,6 +46,16 @@ ShaderVariantCollection:
         passType: 0
       - keywords: COLOR_FILTER GRADATION_GRADIENT TRANSITION_SHINY
         passType: 0
+      - keywords: COLOR_FILTER SAMPLING_BLUR_FAST
+        passType: 0
+      - keywords: COLOR_FILTER SAMPLING_BLUR_FAST TONE_GRAYSCALE
+        passType: 0
+      - keywords: COLOR_FILTER SAMPLING_BLUR_FAST TONE_SEPIA
+        passType: 0
+      - keywords: COLOR_FILTER SOFTMASKABLE
+        passType: 0
+      - keywords: COLOR_FILTER TONE_NEGATIVE
+        passType: 0
       - keywords: COLOR_FILTER TRANSITION_SHINY
         passType: 0
       - keywords: DETAIL_ADDITIVE EDGE_SHINY
@@ -93,6 +103,8 @@ ShaderVariantCollection:
       - keywords: SAMPLING_BLUR_MEDIUM TRANSITION_SHINY
         passType: 0
       - keywords: SAMPLING_EDGE_LUMINANCE
+        passType: 0
+      - keywords: SOFTMASKABLE TRANSITION_CUTOFF
         passType: 0
       - keywords: TONE_GRAYSCALE
         passType: 0

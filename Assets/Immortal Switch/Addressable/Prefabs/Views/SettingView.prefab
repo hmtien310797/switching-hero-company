@@ -224,6 +224,8 @@ GameObject:
   m_Component:
   - component: {fileID: 9006135570468988690}
   - component: {fileID: 2462530947333634075}
+  - component: {fileID: 3826006333047649833}
+  - component: {fileID: 1911799048983524612}
   m_Layer: 5
   m_Name: SettingView
   m_TagString: Untagged
@@ -263,7 +265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 384fd54009f94158a60fe5d3b2747e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Layer: 4
+  Layer: 2
   MainMode: 0
   CloseOnBackdrop: 1
   CacheOnClose: 0
@@ -308,6 +310,46 @@ MonoBehaviour:
   accountSegment: {fileID: 1210779256268283596}
   otherSegment: {fileID: 5563010926673896617}
   mainLayout: {fileID: 1773127381696033728}
+--- !u!223 &3826006333047649833
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283424509924219701}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 6
+  m_TargetDisplay: 0
+--- !u!114 &1911799048983524612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283424509924219701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4087
 --- !u!1 &312304857763207636
 GameObject:
   m_ObjectHideFlags: 0
@@ -3466,7 +3508,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -9.179512}
+  m_AnchoredPosition: {x: 0, y: -9.179565}
   m_SizeDelta: {x: 0.000015258789, y: 1604.398}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &321652017994830889
@@ -4866,7 +4908,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -9.179512}
+  m_AnchoredPosition: {x: 0, y: -9.179565}
   m_SizeDelta: {x: 0.000015258789, y: 1604.398}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8069362698180935524
@@ -4887,7 +4929,7 @@ MonoBehaviour:
   tgQuality: {fileID: 142229937338436938}
   toggleBgMusic: {fileID: 8175903046258899425}
   toggleOffscreen: {fileID: 3725409247485008768}
-  toggleBattleMusic: {fileID: 6183758517136602695}
+  toggleSfxSound: {fileID: 6183758517136602695}
   toggleScreenShake: {fileID: 8812788942187913743}
   toggleDamageFont: {fileID: 8081316227105149083}
   toggleContentNoty: {fileID: 6399737705704524443}
@@ -5465,11 +5507,11 @@ RectTransform:
   - {fileID: 4579739370352378946}
   m_Father: {fileID: 9006135570468988690}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 200}
   m_SizeDelta: {x: 861.323, y: 1664.241}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &2281658673464690201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5487,12 +5529,14 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 5
-  anchoredY: 0
-  changePosY: 0
-  yPosPortrait: 0
-  yPosLandscape: 0
+  anchoredY: 200
+  changePosY: 1
+  yPosPortrait: 200
+  yPosLandscape: 160
   useScaleReduction: 0
   scaleReductionPercent: 0
+  useConstScale: 0
+  constScale: 0
 --- !u!1 &5720743407930023576
 GameObject:
   m_ObjectHideFlags: 0
@@ -6439,7 +6483,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 50,000
+  m_text: 5,000
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cddccfe23e35d654e86e8e9791fc5af3, type: 2}
   m_sharedMaterial: {fileID: 6882651087998995454, guid: cddccfe23e35d654e86e8e9791fc5af3, type: 2}
@@ -7237,7 +7281,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -9.179512}
+  m_AnchoredPosition: {x: 0, y: -9.179565}
   m_SizeDelta: {x: 0.000015258789, y: 1604.398}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1773127381696033728
@@ -7259,9 +7303,13 @@ MonoBehaviour:
   btnDeleteAccount: {fileID: 8931512189327818607}
   btnLinkClaim: {fileID: 8546720115669890834}
   btnLink: {fileID: 2573109671377639631}
+  sprGgUnlink: {fileID: 21300000, guid: fed77c887809997469211e6c5c8f9c5d, type: 3}
+  sprGgLinked: {fileID: 21300000, guid: 666c056e0ca67034595301e26b7776fb, type: 3}
+  sprAppleUnlink: {fileID: 21300000, guid: a0c0341489c682d4bb16a907ad28950f, type: 3}
+  sprAppleLinked: {fileID: 21300000, guid: e09135d2f00897e48b3855408a0d85fb, type: 3}
   goLinkClaimed: {fileID: 2356408900918306649}
-  goAccountLinked: {fileID: 8281966566368889283}
-  goAccountUnlink: {fileID: 312304857763207636}
+  imgAccountLinked: {fileID: 6736515358808697957}
+  imgAccountUnlink: {fileID: 2690301355628002651}
   languageContainer: {fileID: 877710295031016513}
   languagePrefab: {fileID: 1321725610204297939, guid: 88ba1ae3ba96d914fb618150c605e6bc, type: 3}
   btnTerms: {fileID: 3175373878390847055}
@@ -9389,6 +9437,7 @@ MonoBehaviour:
   bounceScale: 1.1
   pressDuration: 0.08
   bounceDuration: 0.15
+  normalScale: 1
 --- !u!114 &5563010926673896617 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4711205986194812939, guid: 95bcd4eb8b8b376479c73543a0795cf5, type: 3}
@@ -9815,6 +9864,7 @@ MonoBehaviour:
   bounceScale: 1.1
   pressDuration: 0.08
   bounceDuration: 0.15
+  normalScale: 1
 --- !u!114 &5657876879477095858 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4711205986194812939, guid: 95bcd4eb8b8b376479c73543a0795cf5, type: 3}
@@ -11805,6 +11855,7 @@ MonoBehaviour:
   bounceScale: 1.1
   pressDuration: 0.08
   bounceDuration: 0.15
+  normalScale: 1
 --- !u!1001 &6460985912945697385
 PrefabInstance:
   m_ObjectHideFlags: 0

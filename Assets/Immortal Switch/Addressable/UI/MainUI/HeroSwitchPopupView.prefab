@@ -846,6 +846,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2663186766209792494}
   - component: {fileID: 3369825942376734449}
+  - component: {fileID: 4802610581296277457}
+  - component: {fileID: 4669491035731656300}
   m_Layer: 5
   m_Name: HeroSwitchPopupView
   m_TagString: Untagged
@@ -885,7 +887,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35626b6cd92f476fb0af0e87a2dc6e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Layer: 4
+  Layer: 2
   MainMode: 1
   CloseOnBackdrop: 1
   CacheOnClose: 0
@@ -922,8 +924,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   heroDatabase: {fileID: 11400000, guid: 89ff8b391b9e64c82ac7356834aef25c, type: 2}
-  heroRarityVisualConfig: {fileID: 11400000, guid: 393c7325f388e7f43a3d7d63f09f62e0, type: 2}
-  heroSummonRarityVisualConfig: {fileID: 11400000, guid: d3049491bfac04d41a37c53d44ad2fc2, type: 2}
   heroUIIconConfig: {fileID: 11400000, guid: 5f88e268420f92c459868bea697969c6, type: 2}
   slot1UI: {fileID: 2712505665048107634}
   slot2UI: {fileID: 1969575578155945270}
@@ -939,6 +939,46 @@ MonoBehaviour:
   arrowMoveDistance: 18
   arrowMoveDuration: 0.55
   btnClose: {fileID: 6232617110669203456}
+--- !u!223 &4802610581296277457
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2281458783245651463}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 7
+  m_TargetDisplay: 0
+--- !u!114 &4669491035731656300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2281458783245651463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4087
 --- !u!1 &2671271688212133228
 GameObject:
   m_ObjectHideFlags: 0
@@ -1089,11 +1129,16 @@ MonoBehaviour:
   panelRoot: {fileID: 7788138426816282120}
   fitMode: 2
   useSafeArea: 1
-  minScale: 0.65
+  minScale: 0.35
   maxScale: 1
+  anchoredY: 0
   changePosY: 0
   yPosPortrait: 1
   yPosLandscape: 1
+  useScaleReduction: 0
+  scaleReductionPercent: 0
+  useConstScale: 0
+  constScale: 0
 --- !u!1 &3945846858901279189
 GameObject:
   m_ObjectHideFlags: 0

@@ -72,7 +72,7 @@ namespace Game.Configs.Generated
         /// <summary>
         /// CSV Column: status
         /// </summary>
-        public string status;
+        public int status;
 
         /// <summary>
         /// CSV Column: note

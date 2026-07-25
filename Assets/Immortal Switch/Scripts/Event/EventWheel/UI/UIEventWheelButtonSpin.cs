@@ -59,6 +59,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
             _onClickSpin = onClickSpin;
 
             txtTicket.text = ticket;
+
             RefreshLocalizedText();
         }
 

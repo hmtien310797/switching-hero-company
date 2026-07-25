@@ -2,6 +2,7 @@ using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
@@ -28,8 +29,8 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
         [SerializeField]
         private UIToggle toggleOffscreen;
 
-        [SerializeField]
-        private UIToggle toggleBattleMusic;
+        [FormerlySerializedAs("toggleBattleMusic")] [SerializeField]
+        private UIToggle toggleSfxSound;
 
         [SerializeField]
         private UIToggle toggleScreenShake;
@@ -80,7 +81,7 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
             var current = SettingManager.Instance.CurrentSetting;
             toggleOffscreen.Bind(OnOffscreenToggleChanged, current.OffscreenEnabled);
             toggleBgMusic.Bind(OnBgMusicToggleChanged, current.BackgroundMusicEnabled);
-            toggleBattleMusic.Bind(OnBattleMusicToggleChanged, current.BattleMusicEnabled);
+            toggleSfxSound.Bind(OnSfxToggleChanged, current.SfxEnabled);
             toggleScreenShake.Bind(OnScreenShakeToggleChanged, current.ScreenShakeEnabled);
             toggleDamageFont.Bind(OnDamageFontToggleChanged, current.DamageFontEnabled);
             toggleContentNoty.Bind(OnContentNotyToggleChanged, current.ContentNotiEnabled);
@@ -167,9 +168,9 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
             SettingManager.Instance.SetBackgroundMusicEnabled(isOn);
         }
 
-        private void OnBattleMusicToggleChanged(bool isOn)
+        private void OnSfxToggleChanged(bool isOn)
         {
-            SettingManager.Instance.SetBattleMusicEnabled(isOn);
+            SettingManager.Instance.SetSfxEnabled(isOn);
         }
 
         private void OnScreenShakeToggleChanged(bool isOn)

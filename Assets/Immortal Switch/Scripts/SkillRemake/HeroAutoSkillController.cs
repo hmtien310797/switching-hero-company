@@ -12,13 +12,6 @@ namespace Immortal_Switch.Scripts.Skill
     [DisallowMultipleComponent]
     public sealed class HeroAutoSkillController : MonoBehaviour
     {
-        [Header("Auto Skill")]
-        [SerializeField] private bool autoCastEnabled = true;
-
-        [Header("Skill Types")]
-        [SerializeField] private bool autoCastClassSkills = true;
-        [SerializeField] private bool autoCastUltimate = true;
-
         [Header("Priority")]
         [SerializeField] private bool ultimateHasPriority = true;
         [SerializeField] private AutoClassSkillOrder classSkillOrder = AutoClassSkillOrder.SlotOrder;
@@ -37,24 +30,9 @@ namespace Immortal_Switch.Scripts.Skill
         private HeroSkillController skillController;
         private float scanTimer;
         private int nextRoundRobinSlot;
-
-        public bool AutoCastEnabled
-        {
-            get => autoCastEnabled;
-            set => autoCastEnabled = value;
-        }
-
-        public bool AutoCastClassSkills
-        {
-            get => autoCastClassSkills;
-            set => autoCastClassSkills = value;
-        }
-
-        public bool AutoCastUltimate
-        {
-            get => autoCastUltimate;
-            set => autoCastUltimate = value;
-        }
+        
+        public bool AutoCastClassSkill { get; set; }
+        public bool AutoCastUltimate { get; set; }
 
         public void Init(HeroSkillController controller)
         {
@@ -81,7 +59,12 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void Tick(float deltaTime)
         {
-            if (!autoCastEnabled || owner.StateMachine.CurrentStateId == HeroStateId.ManualMove || 
+            if (!AutoCastClassSkill && !AutoCastUltimate)
+            {
+                return;
+            }
+            
+            if (owner.StateMachine.CurrentStateId == HeroStateId.ManualMove || 
                 owner.StateMachine.CurrentStateId == HeroStateId.Spawn ||
                 owner.IsDead || owner.StateMachine.CurrentStateId == HeroStateId.Dead)
                 return;
@@ -91,7 +74,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             scanTimer = scanInterval;
-            TryAutoCastNow();
+            TryAutoCastNow().Forget();
         }
 
         [ContextMenu("Debug Auto Cast Now")]
@@ -102,20 +85,21 @@ namespace Immortal_Switch.Scripts.Skill
 
             bool result;
 
-            if (autoCastUltimate && ultimateHasPriority)
+            if (AutoCastUltimate && ultimateHasPriority)
             {
                 result = await TryCastUltimateAsync();
                 if (result)
                     return true;
             }
 
-            if (autoCastClassSkills)
+            if (AutoCastClassSkill)
             {
                 result = await TryCastClassSkill();
+                if (result)
                     return true;
             }
 
-            if (autoCastUltimate && !ultimateHasPriority)
+            if (AutoCastUltimate && !ultimateHasPriority)
             {
                 result = await TryCastUltimateAsync();
                 if(result)

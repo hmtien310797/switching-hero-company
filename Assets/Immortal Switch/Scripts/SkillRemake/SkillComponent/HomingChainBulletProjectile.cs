@@ -92,6 +92,13 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
         StartFirstTarget();
 
+        // Nếu StartFirstTarget không tìm thấy target alive,
+        // DespawnSelf() đã được gọi và bullet đã về pool.
+        // Không được tiếp tục đăng ký cancellation callback
+        // trên bullet đã despawn.
+        if (!isInitialized)
+            return;
+
         DisposeEndStageCancelRegistration();
 
         if (BattleFlowController.Instance != null &&

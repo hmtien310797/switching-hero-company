@@ -94,8 +94,7 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         private async UniTask ReconcileGuideFromServerAsync(int guideId)
         {
-            if (NakamaClient.Instance == null ||
-                !NakamaClient.Instance.IsLoggedIn)
+            if (NakamaClient.Instance == null)
                 return;
 
             try

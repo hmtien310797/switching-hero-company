@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Game.Configs.Generated
 {
     /// <summary>
-    /// Auto generated row data from CSV: DynamicHeroes-GlobalSpecifications-pack_mothly_total
+    /// Auto generated row data from CSV: Dynamic Heroes - Global Specifications - pack_mothly_total
     /// </summary>
     [Serializable]
     public class DynamicHeroesGlobalSpecificationsPackMothlyTotalRow

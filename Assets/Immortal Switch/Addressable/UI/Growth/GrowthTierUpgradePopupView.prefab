@@ -58,9 +58,12 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 1
+  anchoredY: 200
   changePosY: 0
   yPosPortrait: 300
   yPosLandscape: 270
+  useScaleReduction: 0
+  scaleReductionPercent: 0
 --- !u!1 &1376627981171212292
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,8 +266,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc0d7e39222d4ca9adeb740d47dde632, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Layer: 3
-  MainMode: 0
+  Layer: 2
+  MainMode: 1
   CloseOnBackdrop: 0
   CacheOnClose: 0
   animatedRoot: {fileID: 5591901405614663904}
@@ -318,6 +321,7 @@ GameObject:
   - component: {fileID: 4013338675792084659}
   - component: {fileID: 1672942642047424765}
   - component: {fileID: 194070409922905345}
+  - component: {fileID: 8520588400121510201}
   m_Layer: 5
   m_Name: TierText
   m_TagString: Untagged
@@ -444,6 +448,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &8520588400121510201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2870096639223989718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68762568d3e5a8e48b8785a3d2ddd72b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: ui_upgrade
+  txtLabel: {fileID: 194070409922905345}
 --- !u!1 &2913667193602323037
 GameObject:
   m_ObjectHideFlags: 0
@@ -729,6 +747,7 @@ GameObject:
   - component: {fileID: 8317725715720590513}
   - component: {fileID: 124363328326847751}
   - component: {fileID: 5194056371564914351}
+  - component: {fileID: 3895428811029932306}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -855,6 +874,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3895428811029932306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5993802777649602454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68762568d3e5a8e48b8785a3d2ddd72b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: ui_level_up
+  txtLabel: {fileID: 5194056371564914351}
 --- !u!1 &6107236166337880684
 GameObject:
   m_ObjectHideFlags: 0

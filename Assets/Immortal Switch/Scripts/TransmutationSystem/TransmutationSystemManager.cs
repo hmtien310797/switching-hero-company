@@ -102,7 +102,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
         private void Load()
         {
-            _database = DatabaseManager.Instance.TransmutationSystemDatabase;
+            _database = DatabaseManager.Instance.TransmutationDb;
             Storage = new TransmutationSystemStorage(_database);
             Service = new TransmutationSystemService(Storage);
 

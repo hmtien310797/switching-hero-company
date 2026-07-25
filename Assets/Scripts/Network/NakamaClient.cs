@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Shared.Views;
 using Nakama;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -377,7 +378,10 @@ public class NakamaClient : MonoBehaviour
         }
         catch (ApiResponseException e) when (e.StatusCode == 401)
         {
-            HandleForceLogout("Tài khoản đã đăng nhập ở thiết bị khác.");
+            PopupConfirmService.ShowNotice(string.Empty,"Tài khoản đã đăng nhập ở thiết bị khác.", () =>
+            {
+                HandleForceLogout("Tài khoản đã đăng nhập ở thiết bị khác.").Forget();
+            },"OK" );
             throw;
         }
     }
@@ -737,6 +741,17 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<MonthlyPassClaimResponse>(response.Payload);
     }
 
+    // ── Event config windows (all events) ────────────────────────────────────
+    // Xem handler/event_config.js. Snapshot nhẹ chỉ gồm event_id/is_active/start_ms/end_ms cho
+    // MỌI event đang Active trong game_config_event.js — dùng để quyết định ẩn/hiện icon/nút sự
+    // kiện ở màn chính (DatabaseManager.InitEventAsync) trước khi bất kỳ popup event nào được mở,
+    // thay vì tin vào đồng hồ máy + config Addressable cục bộ (có thể lệch với server thật).
+    public async Task<EventConfigWindowsResponse> GetEventConfigWindowsAsync()
+    {
+        var response = await CallRpcAsync("event/config_windows", "{}");
+        return JsonConvert.DeserializeObject<EventConfigWindowsResponse>(response.Payload);
+    }
+
     // ── Event Wheel (Lucky Wheel) ────────────────────────────────────────────
     // Xem handler/event_wheel.js. Premium (paid) pass track chưa có RPC mua — server chưa có
     // pack_iap row cho nó, xem comment đầu file server.
@@ -873,6 +888,63 @@ public class NakamaClient : MonoBehaviour
         var payload  = JsonConvert.SerializeObject(new EventBLSummonRequest { Times = times });
         var response = await CallRpcAsync("eventbl/summon", payload);
         return JsonConvert.DeserializeObject<EventBLSummonResponse>(response.Payload);
+    }
+
+    // ── Event Tân Thủ (7 ngày / 30 ngày) ─────────────────────────────────────
+    // Xem handler/event_login.js. Server là nguồn sự thật duy nhất (thay cho
+    // EventMissionManager/Service/Storage ES3 cục bộ trước đây — xem EventLoginManager).
+
+    /// <summary>Snapshot đầy đủ 1 event (7 ngày id 1004 hoặc 30 ngày id 1003): ngày hiện tại,
+    /// danh sách nhiệm vụ theo ngày, danh sách mốc điểm. Gọi khi mở EventLoginView và sau mỗi
+    /// claim thành công để đồng bộ lại.</summary>
+    public async Task<EventLoginStateResponse> GetEventLoginStateAsync(int eventId)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventLoginStateRequest { EventId = eventId });
+        var response = await CallRpcAsync("eventlogin/state", payload);
+        return JsonConvert.DeserializeObject<EventLoginStateResponse>(response.Payload);
+    }
+
+    /// <summary>Báo tiến độ nhiệm vụ theo trigger — áp dụng cho MỌI event Tân Thủ đang active của
+    /// tài khoản (không cần truyền event_id, xem handler/event_login.js). Server tự kẹp theo
+    /// target và bỏ qua nhiệm vụ đã claim, không tự tin tưởng điểm/thưởng — chỉ tiến độ.</summary>
+    public async Task<EventLoginMissionProgressResponse> EventLoginMissionProgressAsync(string trigger, int value)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventLoginMissionProgressRequest { Trigger = trigger, Value = value });
+        var response = await CallRpcAsync("eventlogin/mission_progress", payload);
+        return JsonConvert.DeserializeObject<EventLoginMissionProgressResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng 1 nhiệm vụ đã hoàn thành. Điểm/thưởng luôn lấy từ config server.</summary>
+    public async Task<EventLoginClaimMissionResponse> EventLoginClaimMissionAsync(int eventId, string missionId)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventLoginClaimMissionRequest { EventId = eventId, MissionId = missionId });
+        var response = await CallRpcAsync("eventlogin/claim_mission", payload);
+        return JsonConvert.DeserializeObject<EventLoginClaimMissionResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận tất cả nhiệm vụ đã hoàn thành trong 1 ngày cụ thể (nút "Nhận tất cả" của tab
+    /// ngày đang chọn).</summary>
+    public async Task<EventLoginClaimAllMissionsResponse> EventLoginClaimAllMissionsAsync(int eventId, int day)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventLoginClaimAllMissionsRequest { EventId = eventId, Day = day });
+        var response = await CallRpcAsync("eventlogin/claim_all_missions", payload);
+        return JsonConvert.DeserializeObject<EventLoginClaimAllMissionsResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận 1 mốc điểm nhiệm vụ tích luỹ.</summary>
+    public async Task<EventLoginMilestoneResponse> EventLoginClaimMilestoneAsync(int eventId, int milestone)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventLoginMilestoneRequest { EventId = eventId, Milestone = milestone });
+        var response = await CallRpcAsync("eventlogin/claim_milestone", payload);
+        return JsonConvert.DeserializeObject<EventLoginMilestoneResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận tất cả mốc điểm nhiệm vụ đang đủ điều kiện trong 1 lần gọi.</summary>
+    public async Task<EventLoginClaimAllMilestonesResponse> EventLoginClaimAllMilestonesAsync(int eventId)
+    {
+        var payload  = JsonConvert.SerializeObject(new EventLoginClaimAllMilestonesRequest { EventId = eventId });
+        var response = await CallRpcAsync("eventlogin/claim_all_milestones", payload);
+        return JsonConvert.DeserializeObject<EventLoginClaimAllMilestonesResponse>(response.Payload);
     }
 
     // ── Battle ────────────────────────────────────────────────────────────────

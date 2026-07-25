@@ -158,6 +158,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 return;
 
             RefreshSummonLevel();
+            sequencePopup?.RefreshSummonButtons();
             levelRewardPreviewUI?.Refresh();
             summonButtonA?.Refresh();
             summonButtonB?.Refresh();

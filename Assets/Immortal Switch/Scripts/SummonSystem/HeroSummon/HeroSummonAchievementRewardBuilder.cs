@@ -1,4 +1,5 @@
 using System.Linq;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 
@@ -15,7 +16,8 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 Tab = SummonAchievementTab.Heroic
             };
 
-            if (config == null || config.SummonLevels == null)
+            if (config == null ||
+                config.SummonLevels == null)
                 return result;
 
             // Reward source is each level's own ItemId/ItemQuantity (Hero_Levels), not the
@@ -29,7 +31,9 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             for (int i = 0; i < sortedLevels.Count; i++)
             {
                 var entry = sortedLevels[i];
-                if (entry.ItemId <= 0 || entry.ItemQuantity <= 0)
+
+                if (entry.ItemId <= 0 ||
+                    entry.ItemQuantity <= 0)
                     continue;
 
                 bool isClaimed = saveData != null && saveData.ClaimedRewardLevels.Contains(entry.SummonLevel);
@@ -52,7 +56,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         private static string BuildRewardText(int itemId, int quantity)
         {
             var item = DatabaseManager.Instance.ItemDb.FindItem(itemId);
-            var name = item != null ? item.itemName : string.Empty;
+            var name = item != null ? LocalizationManager.GetText(item.itemName) : string.Empty;
             return $"{name} x{quantity}";
         }
     }

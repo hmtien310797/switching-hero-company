@@ -107,6 +107,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 return;
 
             RefreshSummonLevel();
+            sequencePopup?.RefreshSummonButtons();
             levelRewardPreviewUI?.Refresh();
             summonButtonA?.Refresh();
             summonButtonB?.Refresh();

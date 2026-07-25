@@ -77,7 +77,7 @@ namespace Immortal_Switch.Scripts.Reward
 
         public void CalculateAndShowOnReturn()
         {
-            CalculateAndShowAsync().Forget();
+            //CalculateAndShowAsync().Forget();
         }
 
         private async UniTaskVoid CalculateAndShowAsync()

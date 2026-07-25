@@ -416,6 +416,15 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
         /// <summary>Nhận một milestone tích lũy triệu hồi.</summary>
         public async UniTask<List<ItemData>> ClaimSummonMilestone(int milestone)
         {
+            var milestoneState = State?.SummonMilestones?.FirstOrDefault(value => value.Milestone == milestone);
+
+            if (milestoneState == null ||
+                milestoneState.IsClaimed ||
+                (State?.Progress?.SummonPoints ?? 0) < milestoneState.PointsRequired)
+            {
+                return new List<ItemData>();
+            }
+
             EventBLMilestoneResponse response;
 
             try

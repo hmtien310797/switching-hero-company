@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -72,7 +73,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
         public void Bind(
             int itemId,
             int shopIdx,
-            string title,
+            string titleKey,
             string subtitle,
             EEventWheelShopLimitType limitType,
             int limitCurrentValue,
@@ -93,7 +94,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
 
             btnBuy.interactable = limitTargetValue <= 0 || limitCurrentValue < limitTargetValue;
             imgIcon.sprite = itemIcon;
-            txtTitle.text = title;
+            txtTitle.text = LocalizationManager.GetText(titleKey);
             txtPrice.text = $"{priceValue:N0}";
             txtAmount.text = $"{amountValue}";
             txtSubtitle.text = subtitle;

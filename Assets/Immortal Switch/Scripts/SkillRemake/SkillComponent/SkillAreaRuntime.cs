@@ -65,9 +65,6 @@ namespace Immortal_Switch.Scripts.Skill
                 Tick();
                 tickTimer = Mathf.Max(0.01f, data.TickInterval);
             }
-
-            // if (lifeTimer <= 0f)
-            //     DespawnSelf();
         }
 
         private void Tick()

@@ -164,7 +164,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                 summonButtonB.Init(optionBId, HandleSummonButtonClick, SummonCategory.Hero);
         }
 
-        private void RefreshSummonButtons()
+        public void RefreshSummonButtons()
         {
             if (summonButtonA != null)
                 summonButtonA.Refresh();
