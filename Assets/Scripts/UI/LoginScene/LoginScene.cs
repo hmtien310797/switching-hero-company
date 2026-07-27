@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Google;
 using AppleAuth;
@@ -39,6 +41,8 @@ public class LoginScene : MonoBehaviour
     [SerializeField] private TMP_InputField ipPasswordConfirmRegister;
     [SerializeField] private Button btnRegister;
     [SerializeField] private Button btnBackToLogin;
+    [SerializeField] private int minLength = 6;
+    [SerializeField] private int maxLength = 18;
     
     [SerializeField] private TMP_Text progressTextVertical;
     [SerializeField] private TMP_Text progressTextHorizontal;
@@ -56,9 +60,7 @@ public class LoginScene : MonoBehaviour
     private bool _isInitializingLoginLocalization;
 
     // Object controller
-    [SerializeField] private GameObject loginPanel;
-    [SerializeField] private GameObject registerPanel;
-    [SerializeField] private GameObject buttonLayout;
+    [SerializeField] private SelectAccount selectAccount;
 
     [SerializeField] private GameObject goLoadingHorizontal;
     [SerializeField] private GameObject goLoadingVertical;
@@ -136,7 +138,7 @@ public class LoginScene : MonoBehaviour
 
     private void OnInitSceneDataComplete()
     {
-        buttonLayout.SetActive(false);
+        selectAccount.HideAll();
         loadingSceneCanvasGroup.DOFade(0f, 0.5f).SetEase(Ease.Linear).OnComplete(() => loadingSceneCanvasGroup.gameObject.SetActive(false));
         loadingSceneCanvasGroup.blocksRaycasts = false;
         loadingSceneCanvasGroup.interactable = false;
@@ -208,13 +210,11 @@ public class LoginScene : MonoBehaviour
 
         btnAppleLogin.gameObject.SetActive(!(Application.platform == RuntimePlatform.Android && btnAppleLogin != null));
         _isInitializingLoginLocalization = true;
-        buttonLayout.SetActive(false);
+        selectAccount.HideAll();
         loadingSceneCanvasGroup.gameObject.SetActive(true);
         loadingSceneCanvasGroup.alpha = 1f;
         loadingSceneCanvasGroup.blocksRaycasts = true;
         loadingSceneCanvasGroup.interactable = true;
-        loginPanel.SetActive(false);
-        registerPanel.SetActive(false);
         Debug.Log($"[LoginScene] btnGoogleLogin={btnGoogleLogin}, btnAppleLogin={btnAppleLogin}");
 
         var cancellationToken = this.GetCancellationTokenOnDestroy();
@@ -285,7 +285,7 @@ public class LoginScene : MonoBehaviour
             }
         }
         _isInitializingLoginLocalization = false;
-        buttonLayout.SetActive(true);
+        selectAccount.ShowLogin();
     }
 
     private void OnLoginLocalizationProgress(
@@ -334,6 +334,18 @@ public class LoginScene : MonoBehaviour
 
     private void OnClickLogin()
     {
+        if (string.IsNullOrWhiteSpace(ipUsername.text))
+        {
+            UIManager.Instance.ShowToast(LocalizationManager.GetText("ui_missing_id"));
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(ipPassword.text))
+        {
+            UIManager.Instance.ShowToast(LocalizationManager.GetText("ui_missing_password"));
+            return;
+        }
+        
         var badwordMatches = IllegalWordDetection.DetectIllegalWords(ipUsername.text);
 
         if (badwordMatches.Count > 0)
@@ -343,6 +355,7 @@ public class LoginScene : MonoBehaviour
                 var matchedWord = ipUsername.text.Substring(match.Key, match.Value);
                 Debug.LogError($"[LoginScene] Username \"{ipUsername.text}\" bị chặn do khớp badword \"{matchedWord}\" tại vị trí {match.Key} (dài {match.Value})");
             }
+            UIManager.Instance.ShowToast(LocalizationManager.GetText("ui_content_contains_prohibited_words"));
             return;
         }
 
@@ -351,57 +364,56 @@ public class LoginScene : MonoBehaviour
 
     private void OnClickRegister()
     {
-        loginPanel.SetActive(false);
-        registerPanel.SetActive(true);
+        selectAccount.ShowRegister();
     }
 
     private void OnClickLoginBD()
     {
         Debug.Log("[LoginScene] Login with BD");
-        loginPanel.SetActive(true);
-        buttonLayout.SetActive(false);
+        selectAccount.HideAll();
     }
 
     private void OnClickLoginBackdrop()
     {
-        loginPanel.SetActive(false);
-        buttonLayout.SetActive(false);
+        selectAccount.HideAll();
     }
 
     private void OnClickSubmitRegister()
     {
-        var badwordMatches = IllegalWordDetection.DetectIllegalWords(ipUsernameRegister.text);
+        if (!selectAccount.ValidateSignUp())
+            return;
+        
+        var badWordMatches = IllegalWordDetection.DetectIllegalWords(ipUsernameRegister.text);
 
-        if (badwordMatches.Count > 0)
+        if (badWordMatches.Count > 0)
         {
-            foreach (var match in badwordMatches)
+            foreach (var match in badWordMatches)
             {
                 var matchedWord = ipUsernameRegister.text.Substring(match.Key, match.Value);
                 Debug.LogError($"[LoginScene] Username đăng ký \"{ipUsernameRegister.text}\" bị chặn do khớp badword \"{matchedWord}\" tại vị trí {match.Key} (dài {match.Value})");
             }
+            UIManager.Instance.ShowToast(LocalizationManager.GetText("ui_content_contains_prohibited_words"));
             return;
         }
 
         DoRegister(ipUsernameRegister.text, ipPasswordRegister.text, ipPasswordConfirmRegister.text).Forget();
     }
-
+    
     private void OnClickBackToLogin()
     {
-        registerPanel.SetActive(false);
-        loginPanel.SetActive(true);
+        selectAccount.ShowLogin();
     }
 
     private async UniTask DoLogin(string username, string password)
     {
         try
         {
-            loginPanel.SetActive(false);
-            buttonLayout.SetActive(false);
+            selectAccount.HideAll();
             await NakamaClient.Instance.LoginAsync(username, password);
         }
         catch (ApiResponseException e)
         {
-            PopupConfirmService.ShowNotice("Error", "Login failed, please try again", () => buttonLayout.SetActive(true),
+            PopupConfirmService.ShowNotice("Error", "Login failed, please try again", () => selectAccount.ShowLogin(),
                 "OK");
             Debug.LogError($"[LoginScene] Login failed ({e.StatusCode}): {e.Message}");
             return;
@@ -413,29 +425,27 @@ public class LoginScene : MonoBehaviour
 
     private async UniTask DoRegister(string username, string password, string confirmPassword)
     {
-        if (password != confirmPassword)
-        {
-            Debug.LogError("[LoginScene] Password and confirm password do not match");
-            return;
-        }
+        // if (password != confirmPassword)
+        // {
+        //     Debug.LogError("[LoginScene] Password and confirm password do not match");
+        //     return;
+        // }
 
         try
         {
+            selectAccount.HideAll();
             btnRegister.interactable = false;
             await NakamaClient.Instance.RegisterAsync(username, password);
             await NakamaClient.Instance.LoginAsync(username, password);
-            registerPanel.SetActive(false);
-            await SceneManager.LoadSceneAsync("MainBattleScene");
-            await RunBootstrapAsync();
         }
         catch (ApiResponseException e)
         {
+            selectAccount.ShowRegister();
             Debug.LogError($"[LoginScene] Register failed ({e.StatusCode}): {e.Message}");
+            return;
         }
-        finally
-        {
-            btnRegister.interactable = true;
-        }
+        await SceneManager.LoadSceneAsync("MainBattleScene");
+        await RunBootstrapAsync();
     }
 
     private void OnClickLoginGuest()
@@ -447,12 +457,12 @@ public class LoginScene : MonoBehaviour
     {
         try
         {
-            buttonLayout.SetActive(false);
+            selectAccount.HideAll();
             await NakamaClient.Instance.AuthenticateDeviceAsync();
         }
         catch (Exception e)
         {
-            PopupConfirmService.ShowNotice("Error", "Can not login guest, please try again", () => buttonLayout.SetActive(true),
+            PopupConfirmService.ShowNotice("Error", "Can not login guest, please try again", () => selectAccount.ShowLogin(),
                 "OK");
             Debug.LogError($"[LoginScene] Guest login failed: {e.Message}");
             return;
@@ -465,7 +475,6 @@ public class LoginScene : MonoBehaviour
 
     public void OnClickGoogleLogin()
     {
-        Debug.Log("[LoginScene] Login with Google");
         DoLoginGoogle().Forget();
     }
 
@@ -473,11 +482,11 @@ public class LoginScene : MonoBehaviour
     {
         try
         {
-            buttonLayout.SetActive(false);
+            selectAccount.HideAll();
             var user = await GoogleSignIn.DefaultInstance.SignIn();
             if (user == null)
             {
-                buttonLayout.SetActive(true);
+                selectAccount.ShowLogin();
                 return;
             }
             Debug.Log($"[LoginScene] Google sign-in success. Email={user.Email}");
@@ -486,14 +495,14 @@ public class LoginScene : MonoBehaviour
         }
         catch (GoogleSignIn.SignInException e)
         {
-            PopupConfirmService.ShowNotice("Error", "Can not login google, please try again", () => buttonLayout.SetActive(true),
+            PopupConfirmService.ShowNotice("Error", "Can not login google, please try again", () => selectAccount.ShowLogin(),
                 "OK");
             Debug.LogError($"[LoginScene] Google login failed. Status={e.Status} Message={e.Message}");
             return;
         }
         catch (Exception e)
         {
-            PopupConfirmService.ShowNotice("Error", "Can not login google, please try again", () => buttonLayout.SetActive(true),
+            PopupConfirmService.ShowNotice("Error", "Can not login google, please try again", () => selectAccount.ShowLogin(),
                 "OK");
             Debug.LogError($"[LoginScene] Google login failed: {e.GetType().Name} {e.Message}");
             return;
@@ -514,13 +523,15 @@ public class LoginScene : MonoBehaviour
     {
         if (_appleAuthManager == null)
         {
+            PopupConfirmService.ShowNotice("Error", "Can not login apple, please try again", () => selectAccount.ShowLogin(),
+                "OK");
             Debug.LogError("[LoginScene] Apple Sign-In is not supported on this platform");
             return;
         }
 
         try
         {
-            buttonLayout.SetActive(false);
+            selectAccount.HideAll();
             var tcs = new UniTaskCompletionSource<string>();
 
             _appleAuthManager.LoginWithAppleId(
@@ -544,7 +555,7 @@ public class LoginScene : MonoBehaviour
         }
         catch (Exception e)
         {
-            PopupConfirmService.ShowNotice("Error", "Can not login apple, please try again", () => buttonLayout.SetActive(true),
+            PopupConfirmService.ShowNotice("Error", "Can not login apple, please try again", () => selectAccount.ShowLogin(),
                 "OK");
             Debug.LogError($"[LoginScene] Apple login failed: {e.Message}");
             return;
