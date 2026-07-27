@@ -24,10 +24,5 @@ namespace Game.Configs.Generated
         /// </summary>
         public string expCumulative;
 
-        /// <summary>
-        /// CSV Column: unlocks
-        /// </summary>
-        public string unlocks;
-
     }
 }

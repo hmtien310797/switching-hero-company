@@ -96,7 +96,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             {
                 if (tabs[i].tab == tab)
                 {
-                    OnClickTab(i);
+                    OnClickTab((int)tabs[i].tab);
                     break;
                 }
             }
@@ -150,28 +150,41 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 {
                     var clone = _tabs[i];
                     clone.gameObject.SetActive(true);
-                    clone.Bind(i, cfg.tabKey, OnClickTab);
+                    clone.Bind(cfg.tabId, cfg.tabKey, OnClickTab);
                 }
                 else
                 {
                     var clone = Instantiate(shopTabPrefab, shopTabContainer);
-                    clone.Bind(i, cfg.tabKey, OnClickTab);
+                    clone.Bind(cfg.tabId, cfg.tabKey, OnClickTab);
                     _tabs.Add(clone);
                 }
             }
         }
 
-        private void OnClickTab(int tabIdx)
+        private void OnClickTab(int tabId)
         {
+            var selectedData = tabs.FirstOrDefault(v => (int)v.tab == tabId);
+
+            if (selectedData == null)
+            {
+                return;
+            }
+
+            var selectedItem = _tabs.FirstOrDefault(v => v.IsTab(tabId));
+
+            if (selectedItem == null)
+            {
+                return;
+            }
+
             if (_selectedLayout != null)
             {
                 _selectedLayout.gameObject.SetActive(false);
             }
 
-            var selected = tabs[tabIdx];
+            _selectedLayout = selectedData.go;
+            _selectedShopTab = selectedData.tab;
 
-            _selectedLayout = selected.go;
-            _selectedShopTab = selected.tab;
             _selectedLayout.SetActive(true);
 
             // refresh giao diện layout
@@ -182,7 +195,8 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 _selectedTab.SetSelected(false);
             }
 
-            _selectedTab = _tabs[tabIdx];
+            _selectedTab = selectedItem;
+
             _selectedTab.SetSelected(true);
 
             // set highlight cho tab đã chọn

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.StatSystem;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Interfaces

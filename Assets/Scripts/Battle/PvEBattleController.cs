@@ -52,6 +52,7 @@ namespace Battle
 
         [Header("Stage")]
         [field: SerializeField]
+        [ReadOnly]
         public int CurrentStage { get; private set; } = 1;
 
         [SerializeField] private int stagesPerPattern = 10;
@@ -219,6 +220,7 @@ namespace Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(GameEvents.OnInitNewStage, playCompletedStage, losingStage, stageRuntimeData);
             GameEventManager.Trigger(GameEvents.OnWaveStart);
             battleFlowController?.MarkChapterRunning();
         }
@@ -426,6 +428,7 @@ namespace Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(GameEvents.OnInitNewStage, playCompletedStage, losingStage, stageRuntimeData);
             GameEventManager.Trigger(
                 GameEvents.OnWaveStart
             );
@@ -454,6 +457,7 @@ namespace Battle
             SpawnNextCreepBatch();
             isReadyBattle = true;
             SetState(BattleState.FightingCreeps);
+            GameEventManager.Trigger(GameEvents.OnInitNewStage, playCompletedStage, losingStage, stageRuntimeData);
             GameEventManager.Trigger(
                 GameEvents.OnWaveStart
             );
@@ -547,7 +551,6 @@ namespace Battle
             CacheStageSpawnData(stage);
 
             GameEventManager.Trigger(GameEvents.OnEnemyDead, deadCreepCount);
-            GameEventManager.Trigger(GameEvents.OnInitNewStage, playCompletedStage, losingStage, stageRuntimeData);
 
             isBossAlive = false;
             if (currentBoss != null && currentBoss.gameObject.activeInHierarchy)
@@ -1096,6 +1099,12 @@ namespace Battle
                 {
                     foreach (var kv in response.Rewards)
                         Debug.Log($"[PvE] battle/end clear reward: {kv.Key} = {kv.Value}");
+
+                    // "user_exp" là player EXP (server cộng thẳng vào profile.exp, không phải bag
+                    // item — xem applyPlayerReward, handler/player.js) nên không đi qua
+                    // CurrencyManager.ApplyServerBalances như các resourceType khác ở trên.
+                    if (response.Rewards.TryGetValue("user_exp", out double expGained) && expGained > 0)
+                        UserDataCache.Instance.AddExp((long)expGained);
                 }
             }
             else if (response != null && (response.Error == "STAGE_MISMATCH" || response.Error == "INVALID_STAGE"))

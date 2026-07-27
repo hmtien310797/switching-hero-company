@@ -226,9 +226,13 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
 #if UNITY_EDITOR || UNITY_ANDROID
             imgAccountLinked.sprite = sprGgLinked;
             imgAccountUnlink.sprite = sprGgUnlink;
+
+            btnGiftCode.gameObject.SetActive(false);
 #elif UNITY_IOS
             imgAccountLinked.sprite = sprAppleLinked;
             imgAccountUnlink.sprite = sprAppleUnlink;
+
+            btnGiftCode.gameObject.SetActive(false);
 #endif
         }
 

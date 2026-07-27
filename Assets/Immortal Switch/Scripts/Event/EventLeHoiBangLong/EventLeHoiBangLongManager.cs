@@ -7,7 +7,6 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.MissionSystem;
-using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shop.IAP;
 using Immortal_Switch.Scripts.UI;
@@ -559,11 +558,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
 
         private void SubscribeEvents()
         {
-            if (PlayerSystemManager.Instance != null)
-            {
-                PlayerSystemManager.Instance.OnLoginNewDay += OnLoginNewDay;
-            }
-
+            GameEventManager.Subscribe(GameEvents.OnLoginNewDay, OnLoginNewDay);
             GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe<int>(GameEvents.ON_SUMMON_HERO, OnSummonHero);
@@ -573,11 +568,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
 
         private void UnsubscribeEvents()
         {
-            if (PlayerSystemManager.Instance != null)
-            {
-                PlayerSystemManager.Instance.OnLoginNewDay -= OnLoginNewDay;
-            }
-
+            GameEventManager.Unsubscribe(GameEvents.OnLoginNewDay, OnLoginNewDay);
             GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Unsubscribe<int>(GameEvents.ON_SUMMON_HERO, OnSummonHero);

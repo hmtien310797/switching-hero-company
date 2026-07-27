@@ -65,6 +65,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         [Range(0f, 2f)]
         private float stepDelay = 1f;
 
+        // --- Public Fields ---
+        public bool IsRolling { get; private set; }
+
         // --- Private Fields ---
         private EventLayoutCategory _selectedCategory;
 
@@ -73,7 +76,6 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private int _premiumX1;
         private int _premiumX10;
-        private bool _isRolling;
 
         private CancellationTokenSource _spinCancellationTokenSource;
         private UniTaskCompletionSource _spinCompletionSource;
@@ -106,6 +108,12 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private void OnClickNormal()
         {
+            if (IsRolling)
+            {
+                UIManager.Instance.ShowToast("Vòng quay đang xoay");
+                return;
+            }
+
             txtTitle.text = "Vòng Cơ Bản";
 
             RefreshBind(EEventCategory.Normal);
@@ -114,6 +122,12 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private void OnClickPremium()
         {
+            if (IsRolling)
+            {
+                UIManager.Instance.ShowToast("Vòng quay đang xoay");
+                return;
+            }
+
             txtTitle.text = "Vòng Cao Cấp";
 
             RefreshBind(EEventCategory.Premium);
@@ -180,7 +194,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private async UniTask StartSpin(EEventCategory type, int times)
         {
-            if (_isRolling ||
+            if (IsRolling ||
                 times <= 0 ||
                 _selectedCategory == null ||
                 _selectedCategory.type != type)
@@ -188,7 +202,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 return;
             }
 
-            _isRolling = true;
+            IsRolling = true;
 
             var controller = _selectedCategory.controller;
 
@@ -208,7 +222,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             catch (ApiResponseException ex)
             {
                 Debug.LogError($"[EventLayout] eventwheel/spin error {ex.StatusCode}: {ex.Message}");
-                _isRolling = false;
+                IsRolling = false;
                 return;
             }
 
@@ -218,7 +232,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             {
                 Debug.LogWarning($"[EventLayout] eventwheel/spin failed: {response.Error}");
                 UIManager.Instance.ShowToast(DescribeSpinError(response.Error));
-                _isRolling = false;
+                IsRolling = false;
                 return;
             }
 
@@ -310,7 +324,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                     _spinCancellationTokenSource.Dispose();
                     _spinCancellationTokenSource = null;
                     _spinCompletionSource = null;
-                    _isRolling = false;
+                    IsRolling = false;
                 }
             }
 
@@ -343,7 +357,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private void SetSelected(EEventCategory type)
         {
-            if (_isRolling &&
+            if (IsRolling &&
                 _selectedCategory != null &&
                 _selectedCategory.type != type)
             {
@@ -392,7 +406,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
             _spinCompletionSource?.TrySetCanceled();
             _spinCompletionSource = null;
-            _isRolling = false;
+            IsRolling = false;
         }
     }
 }

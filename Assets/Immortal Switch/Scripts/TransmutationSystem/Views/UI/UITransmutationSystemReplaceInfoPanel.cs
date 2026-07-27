@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.StatSystem;
 using JetBrains.Annotations;
 using TMPro;

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Localization;
@@ -24,7 +23,7 @@ public class SignUpPanel : BouncePanel
     [SerializeField]
     private LoginPanel loginPanel;
 
-    [Header("Indicators (order: length, upper, lower, digit, special)")]
+    [Header("Indicators (fill left-to-right by number of conditions met)")]
     public DifficultObject[] indicators;
 
     [Header("Colors")]
@@ -72,10 +71,10 @@ public class SignUpPanel : BouncePanel
 
     void OnPasswordChanged(string value)
     {
-        // Giới hạn tối đa 19 ký tự
+        // Giới hạn tối đa maxLength ký tự
         if (value.Length > maxLength)
         {
-            passwordInput.text = value.Substring(0, 19);
+            passwordInput.text = value.Substring(0, maxLength);
             passwordInput.caretPosition = maxLength;
             value = passwordInput.text;
         }
@@ -89,10 +88,10 @@ public class SignUpPanel : BouncePanel
 
     void OnRePasswordChanged(string value)
     {
-        // Giới hạn tối đa 19 ký tự
+        // Giới hạn tối đa maxLength ký tự
         if (value.Length > maxLength)
         {
-            rePasswordInput.text = value.Substring(0, 19);
+            rePasswordInput.text = value.Substring(0, maxLength);
             rePasswordInput.caretPosition = maxLength;
             value = rePasswordInput.text;
         }
@@ -124,17 +123,21 @@ public class SignUpPanel : BouncePanel
         bool hasDigit = Regex.IsMatch(pwd, "\\d");
         bool hasSpecial = Regex.IsMatch(pwd, "[^a-zA-Z0-9]"); // any non-alphanumeric
 
-        bool[] states = { lengthOk, hasUpper, hasDigit, hasSpecial };
-        bool[] sorted = states.OrderByDescending(x => x).ToArray();
-        for (int i = 0; i < indicators.Length && i < sorted.Length; i++)
+        // Số điều kiện đạt được -> sáng lần lượt từ trái qua phải (không để khoảng trống).
+        int satisfied = (lengthOk ? 1 : 0) + (hasUpper ? 1 : 0)
+                      + (hasDigit ? 1 : 0) + (hasSpecial ? 1 : 0);
+
+        for (int i = 0; i < indicators.Length; i++)
         {
             var difficultObject = indicators[i];
-            if (difficultObject == null) continue;
+            if (difficultObject == null || difficultObject.highLightImage == null) continue;
 
-            bool target = sorted[i];
+            bool wasOn = difficultObject.highLightImage.activeSelf;
+            bool target = i < satisfied;
             difficultObject.Show(target);
 
-            if (sorted[i] && animateOnChange)
+            // Chỉ chạy hiệu ứng khi chuyển off -> on, tránh rung mỗi lần gõ phím
+            if (target && !wasOn && animateOnChange)
             {
                 difficultObject.rectTransform.DOKill();
                 difficultObject.rectTransform.DOPunchScale(Vector3.one * (animScale - 1f), animDur, 6, 0.5f);

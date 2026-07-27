@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared.UI;
 using TMPro;
 using UnityEngine;
@@ -124,7 +125,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             _target = row.target;
             _onJump = onJump;
 
-            txtTitle.text = row.title;
+            txtTitle.text = LocalizationManager.GetText(row.title);
 
             rewardQuantity.Bind(rewardItemId, rewardAmount);
 

@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.Tutorial;
@@ -76,10 +77,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             switch (arg2)
             {
-                case 12:
-                case 13:
                 case 14:
-                case 15:
                     return transform as RectTransform;
 
                 default:
@@ -96,8 +94,8 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                 if (cfg != null)
                 {
                     _cfg = cfg;
-                    txtTitle.text = cfg.title;
-                    txtDescription.text = cfg.description;
+                    txtTitle.text = LocalizationManager.GetText(cfg.title);
+                    txtDescription.text = LocalizationManager.GetText(cfg.description);
                     txtProgress.text = $"( {arg2} / {cfg.target:F0} )";
                     RefreshVisual(cfg);
                 }

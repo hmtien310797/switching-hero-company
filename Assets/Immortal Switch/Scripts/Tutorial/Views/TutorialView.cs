@@ -3,6 +3,7 @@ using DG.Tweening;
 using EasyTextEffects;
 using Immortal_Switch.Scripts.UI;
 using JetBrains.Annotations;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +14,6 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
     {
         public string LocalizeKey;
         public string NarratorId;
-        public string ActionType;
 
         [CanBeNull]
         public RectTransform Target;
@@ -216,6 +216,7 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
             txtEffectStory.Refresh();
         }
 
+        [Button]
         public void Focus(RectTransform target)
         {
             if (target == null)
@@ -310,14 +311,9 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
                 var spaceAbove = canvasRect.height - (maskBounds.max.y + canvasRect.height * 0.5f);
                 var spaceBelow = maskBounds.min.y + canvasRect.height * 0.5f;
 
-                if (spaceAbove >= spaceBelow)
-                {
-                    pos.y = Mathf.Min(yAbove, canvasRect.height - storyHeight - screenPadding);
-                }
-                else
-                {
-                    pos.y = Mathf.Max(yBelow, screenPadding);
-                }
+                pos.y = spaceAbove >= spaceBelow
+                    ? Mathf.Min(yAbove, canvasRect.height - storyHeight - screenPadding)
+                    : Mathf.Max(yBelow, screenPadding);
             }
 
             rtStory.anchoredPosition = pos;

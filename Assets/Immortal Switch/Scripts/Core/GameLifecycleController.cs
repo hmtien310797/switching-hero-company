@@ -61,6 +61,7 @@ namespace Immortal_Switch.Scripts.Core
                 if (enableDebugLog)
                     Debug.Log("[GameLifecycle] App Resumed");
 
+                LoginDayService.CheckAndNotify();
                 GameEventManager.Trigger(GameEvents.OnAppResumed);
             }
         }

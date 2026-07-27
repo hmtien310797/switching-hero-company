@@ -183,6 +183,7 @@ public class LoginScene : MonoBehaviour
         {
             NakamaClient.Instance.LastForceLogoutReason = null;
             Debug.LogWarning($"[LoginScene] Đã đăng xuất: {reason}");
+            PopupConfirmService.ShowNotice("Thông báo", reason, null, "OK");
         }
         
         GameEventManager.Subscribe(GameEvents.OnInitSceneDataComplete, OnInitSceneDataComplete);
@@ -419,6 +420,7 @@ public class LoginScene : MonoBehaviour
             return;
         }
         
+        selectAccount.SaveLoginInfo();
         await SceneManager.LoadSceneAsync("MainBattleScene");
         await RunBootstrapAsync();
     }
@@ -434,7 +436,6 @@ public class LoginScene : MonoBehaviour
         try
         {
             selectAccount.HideAll();
-            btnRegister.interactable = false;
             await NakamaClient.Instance.RegisterAsync(username, password);
             await NakamaClient.Instance.LoginAsync(username, password);
         }
@@ -442,7 +443,12 @@ public class LoginScene : MonoBehaviour
         {
             selectAccount.ShowRegister();
             Debug.LogError($"[LoginScene] Register failed ({e.StatusCode}): {e.Message}");
+            var description = e.Message != null && e.Message.Contains("already taken")
+                ? "Tài khoản này đã được sử dụng, vui lòng chọn tên khác"
+                : "Đăng ký thất bại, vui lòng thử lại";
+            PopupConfirmService.ShowNotice("Thông báo", description, null, "OK");
             return;
+
         }
         await SceneManager.LoadSceneAsync("MainBattleScene");
         await RunBootstrapAsync();

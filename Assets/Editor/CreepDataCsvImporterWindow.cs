@@ -355,12 +355,6 @@ public class CreepDataCsvImporterWindow : EditorWindow
         string name =
             GetCell(row, headers, "name");
 
-        string addressKey =
-            GetCell(row, headers, "key");
-
-        string iconKey =
-            GetCell(row, headers, "icon_key");
-
         string elementText =
             GetCell(row, headers, "element");
 
@@ -386,18 +380,6 @@ public class CreepDataCsvImporterWindow : EditorWindow
                 $"name bị trống tại dòng {csvRowNumber}.");
         }
 
-        if (string.IsNullOrWhiteSpace(addressKey))
-        {
-            throw new FormatException(
-                $"key bị trống tại dòng {csvRowNumber}.");
-        }
-
-        if (string.IsNullOrWhiteSpace(iconKey))
-        {
-            throw new FormatException(
-                $"icon_key bị trống tại dòng {csvRowNumber}.");
-        }
-
         if (!Enum.TryParse(
                 elementText,
                 true,
@@ -412,8 +394,6 @@ public class CreepDataCsvImporterWindow : EditorWindow
         {
             EnemyId = enemyId,
             Name = name,
-            AddressKey = addressKey,
-            IconKey = iconKey,
             Element = element,
 
             BaseHp = ParseFloat(
@@ -490,8 +470,8 @@ public class CreepDataCsvImporterWindow : EditorWindow
         creepData.Id = row.EnemyId;
         creepData.Name = row.Name;
 
-        creepData.IconKey = row.IconKey;
-        creepData.CreepAddressKey = row.AddressKey;
+        creepData.IconKey = $"icon_{row.Name}".ToLower().Replace(" ", "");
+        creepData.CreepAddressKey = $"creep_{row.Name}".ToLower().Replace(" ", "");
 
         creepData.Element = row.Element;
 
@@ -556,8 +536,6 @@ public class CreepDataCsvImporterWindow : EditorWindow
         {
             "enemyId",
             "name",
-            "key",
-            "icon_key",
             "element",
             "health",
             "attack",
@@ -663,9 +641,6 @@ public class CreepDataCsvImporterWindow : EditorWindow
     {
         public int EnemyId;
         public string Name;
-
-        public string IconKey;
-        public string AddressKey;
 
         public Element Element;
 

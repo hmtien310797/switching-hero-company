@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Items.Models;
 using UnityEngine;
 
@@ -44,6 +46,11 @@ namespace Immortal_Switch.Scripts.Items
             }
 
             return 0;
+        }
+
+        public BigNumber GetQuantity(ECurrencyType itemId)
+        {
+            return GetQuantity((int)itemId);
         }
 
         public Dictionary<int, ItemData> GetAllItem()

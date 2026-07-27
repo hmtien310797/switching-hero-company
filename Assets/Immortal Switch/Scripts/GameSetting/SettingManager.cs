@@ -420,11 +420,10 @@ public class SettingManager : Singleton<SettingManager>
 
     private async UniTask LogoutAsync()
     {
-        await UIManager.Instance.DespawnAllSessionViewsAsync();
-
         // Đợi request hero/set_lineup (nếu vừa swap hero giữa trận) ghi xong lên server trước
-        // khi dọn battle session — CleanupBattle huỷ session ngay, không chờ request nào đang
-        // chạy nền, nên logout ngay sau khi swap có thể làm mất thay đổi lineup vừa rồi.
+        // khi đăng xuất — session còn sống nên vẫn kịp flush, khác với force-logout (mất mạng/401)
+        // nơi kết nối đã chết nên không có gì để flush. Phải làm TRƯỚC HandleForceLogout vì nó xoá
+        // session ngay khi gọi.
         if (BattleHeroSessionController.Instance != null)
             await BattleHeroSessionController.Instance.FlushPendingLineupSyncAsync();
 
@@ -433,12 +432,9 @@ public class SettingManager : Singleton<SettingManager>
         if (SkillViewDataProvider.Instance != null)
             await SkillViewDataProvider.Instance.FlushPendingSkillSyncAsync();
 
-        //await Transitioner.Instance.TransitionOutWithoutChangingScene(destroyCancellationToken);
-        PvEBattleController.Instance.CleanupBattle(true);
-        DatabaseManager.Instance.ReleaseGameDatabase();
-        await UniTask.Yield();
-
-        //Transitioner.Instance.TransitionInWithoutChangingScene();
+        // Dọn battle scene (hero/creep actor, popup, database Addressable...) và chuyển về
+        // LoginScene — xem CleanupGameplayStateIfAny trong NakamaClient.HandleForceLogout, dùng
+        // chung cho cả logout thủ công lẫn force-logout (mất mạng, session bị invalidate...).
         await NakamaClient.Instance.HandleForceLogout("Nothing");
     }
 
@@ -464,11 +460,8 @@ public class SettingManager : Singleton<SettingManager>
             return;
         }
 
-        await UIManager.Instance.DespawnAllSessionViewsAsync();
-
-        PvEBattleController.Instance.CleanupBattle(true);
-        await UniTask.Yield();
-
+        // Dọn battle scene + chuyển về LoginScene — xem CleanupGameplayStateIfAny trong
+        // NakamaClient.HandleForceLogout.
         await NakamaClient.Instance.HandleForceLogout("Tài khoản đã được xoá.");
     }
 

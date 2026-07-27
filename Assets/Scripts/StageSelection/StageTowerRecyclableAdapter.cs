@@ -93,7 +93,7 @@ namespace Immortal_Switch.Scripts.StageSelection
 
                 if (DatabaseManager.Instance.TryGetBossData(data.BossId, out BossDataSO bossDataSo))
                 {
-                    bossIcon = bossDataSo.Icon;
+                    bossIcon = CreepBossImageService.GetBossIcon(bossDataSo);
                 }
                 
                 return bossIcon;

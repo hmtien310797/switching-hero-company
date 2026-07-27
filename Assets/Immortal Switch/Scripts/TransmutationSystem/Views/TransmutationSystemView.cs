@@ -6,6 +6,7 @@ using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.TransmutationSystem.Models;
 using Immortal_Switch.Scripts.TransmutationSystem.Views.UI;

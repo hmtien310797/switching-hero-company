@@ -8,7 +8,6 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
-using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
 using Newtonsoft.Json;
@@ -55,8 +54,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         protected override void OnSingletonAwake()
         {
-            PlayerSystemManager.Instance.OnLoginNewDay += OnPlayerLoginNewDay;
-
+            GameEventManager.Subscribe(GameEvents.OnLoginNewDay, OnPlayerLoginNewDay);
             GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe<int>(GameEvents.ON_SUMMON_HERO, OnSummonHero);
@@ -72,6 +70,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         protected override void OnDestroy()
         {
+            GameEventManager.Unsubscribe(GameEvents.OnLoginNewDay, OnPlayerLoginNewDay);
             GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Unsubscribe<int>(GameEvents.ON_SUMMON_HERO, OnSummonHero);

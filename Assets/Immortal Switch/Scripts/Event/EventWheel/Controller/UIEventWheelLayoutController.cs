@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventWheel.Layout;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
@@ -73,6 +76,12 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
 
         private void OnClickTab(int idx)
         {
+            if (IsRolling)
+            {
+                UIManager.Instance.ShowToast("Vòng quay đang xoay");
+                return;
+            }
+
             if (_selectedTab != null)
             {
                 _selectedTab.preset.SetStatus(ETabPresetStatus.Normal);
@@ -84,6 +93,22 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
             _selectedTab.preset.SetStatus(ETabPresetStatus.Selected);
             _selectedTab.layout.SetActive(true);
             BindTab();
+        }
+
+        public bool IsRolling
+        {
+            get
+            {
+                if (_selectedTab == null ||
+                    _selectedTab.layout == null ||
+                    _selectedTab.tab != EEventWheelTab.Event)
+                {
+                    return false;
+                }
+
+                var layout = _selectedTab.layout.GetComponent<EventLayout>();
+                return layout != null && layout.IsRolling;
+            }
         }
 
         private void BindTab()
@@ -119,11 +144,11 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
                             {
                                 switch (itemId)
                                 {
-                                    case ItemIdConstants.WHEEL_TICKET_NORMAL:
+                                    case (int)ECurrencyType.lucky_wheel_ticket_silver:
                                         normalX1 = consume;
                                         break;
 
-                                    case ItemIdConstants.WHEEL_TICKET_PREMIUM:
+                                    case (int)ECurrencyType.lucky_wheel_ticket_gold:
                                         premiumX1 = consume;
                                         break;
                                 }

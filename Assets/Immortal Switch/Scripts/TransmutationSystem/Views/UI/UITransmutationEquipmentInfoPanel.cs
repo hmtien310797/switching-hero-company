@@ -1,4 +1,5 @@
 using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 

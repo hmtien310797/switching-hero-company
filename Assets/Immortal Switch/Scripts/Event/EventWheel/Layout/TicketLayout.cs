@@ -76,7 +76,11 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private void OnClickBuyProduct()
         {
-            if (_isBuying) return;
+            if (_isBuying)
+            {
+                return;
+            }
+
             BuyPremiumAsync().Forget();
         }
 

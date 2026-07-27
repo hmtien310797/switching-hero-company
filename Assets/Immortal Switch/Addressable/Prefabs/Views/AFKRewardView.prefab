@@ -345,6 +345,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3874507601341629951}
   - component: {fileID: 4567644551169970963}
+  - component: {fileID: 2458411994204810843}
+  - component: {fileID: 1553740264233376028}
   m_Layer: 5
   m_Name: AFKRewardView
   m_TagString: Untagged
@@ -430,6 +432,46 @@ MonoBehaviour:
   txtGoldPs: {fileID: 7355157718181978513}
   txtDiamondPs: {fileID: 3606764139348623933}
   autoClaimDelaySeconds: 3
+--- !u!223 &2458411994204810843
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3400697689346787623}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 2
+  m_TargetDisplay: 0
+--- !u!114 &1553740264233376028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3400697689346787623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4087
 --- !u!1 &3529722274863303562
 GameObject:
   m_ObjectHideFlags: 0
@@ -1304,6 +1346,8 @@ MonoBehaviour:
   yPosLandscape: 0
   useScaleReduction: 1
   scaleReductionPercent: 20
+  useConstScale: 0
+  constScale: 0
 --- !u!1 &8987779254467653801
 GameObject:
   m_ObjectHideFlags: 0

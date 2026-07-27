@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.DungeonSystem.Views;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong;
+using Immortal_Switch.Scripts.Event.EventWheel;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.MissionSystem.Views;
@@ -186,11 +187,29 @@ namespace Immortal_Switch.Scripts.UI
                 _selectedBtn = selected;
             }
 
+            var eventWheelView = UIManager.Instance.Get<EventWheelView>();
+
+            if (eventWheelView != null &&
+                eventWheelView.IsRolling)
+            {
+                UIManager.Instance.ShowToast("Vòng quay đang xoay");
+                return;
+            }
+
             await UIManager.Instance.TogglePopupAsync<T>(withBackdrop: withBackdrop);
         }
 
         private void OnClickClose()
         {
+            var eventWheelView = UIManager.Instance.Get<EventWheelView>();
+
+            if (eventWheelView != null &&
+                eventWheelView.IsRolling)
+            {
+                UIManager.Instance.ShowToast("Vòng quay đang xoay");
+                return;
+            }
+
             if (_selectedBtn != null)
             {
                 _selectedBtn.SetStateByManager(NavState.Closed);

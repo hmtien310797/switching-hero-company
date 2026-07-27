@@ -32,6 +32,7 @@ public class BulletProjectile :
     protected SkillRuntimeObject controller;
     protected ICombatUnit sourceCombatUnit;
     protected CancellationTokenRegistration _endStageCancelRegistration;
+    protected CancellationToken _endStageCancellationToken;
     protected SkillRuntimeObjectConfig Config;
     protected SkillRuntimeContext Context;
     protected SkillExecutor Executor;
@@ -97,11 +98,10 @@ public class BulletProjectile :
         
         if (BattleFlowController.Instance.endStageSessionCancellationTokenSource != null)
         {
+            _endStageCancellationToken =
+                BattleFlowController.Instance.endStageSessionCancellationTokenSource.Token;
             _endStageCancelRegistration =
-                BattleFlowController.Instance
-                    .endStageSessionCancellationTokenSource
-                    .Token
-                    .Register(DespawnSelf);
+                _endStageCancellationToken.Register(DespawnSelf);
         }
     }
 
@@ -181,8 +181,22 @@ public class BulletProjectile :
 
         if (delay > 0)
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+            // Gắn token end-stage: nếu stage kết thúc (Give Up / clear / lost)
+            // trong lúc đang chờ delay, delay sẽ bị huỷ và không resume despawn cũ.
+            // Tránh despawn "zombie" chạy trễ vô tình giết bullet đã được spawn lại
+            // cho stage kế tiếp.
+            await UniTask.Delay(
+                TimeSpan.FromSeconds(delay),
+                cancellationToken: _endStageCancellationToken);
         }
+
+        /*
+         * Trong lúc chờ delay, bullet có thể đã bị despawn qua đường khác
+         * (registration end-stage, lifetime, hoặc trigger khác). Tránh gọi
+         * Despawn lần thứ hai khi PoolHandle đã bị clear.
+         */
+        if (!isInitialized)
+            return;
         
         /*
          * Chặn bullet tiếp tục Update hoặc xử lý trigger khác

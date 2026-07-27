@@ -1,4 +1,5 @@
 using System;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
@@ -69,6 +70,20 @@ namespace Immortal_Switch.Scripts.Reward
 
                 if (response != null && response.Success && response.Balances != null)
                     CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
+
+                // "user_exp" là player EXP (server cộng thẳng vào profile.exp, không phải bag item —
+                // xem applyPlayerReward, handler/player.js) nên bị loại khỏi response.Balances, chỉ
+                // còn nằm trong response.Rewards (delta granted).
+                if (response != null && response.Success && response.Rewards != null)
+                {
+                    foreach (var r in response.Rewards)
+                    {
+                        if (r.CurrencyType != "user_exp") continue;
+                        if (double.TryParse(r.Amount, System.Globalization.NumberStyles.Float,
+                                System.Globalization.CultureInfo.InvariantCulture, out double expGained) && expGained > 0)
+                            UserDataCache.Instance.AddExp((long)expGained);
+                    }
+                }
 
                 OnOnlineIdlePreviewChanged?.Invoke();
 

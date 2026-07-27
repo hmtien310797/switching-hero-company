@@ -21,6 +21,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         // --- Private Fields ---
         private int _tabIdx;
+
         private Action<int> _onClick;
 
         private void Awake()
@@ -47,6 +48,11 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         public void SetSelected(bool selected)
         {
             btn.interactable = !selected;
+        }
+
+        public bool IsTab(int tabId)
+        {
+            return _tabIdx == tabId;
         }
 
         public void Bind(int idx, string key, Action<int> onClick)

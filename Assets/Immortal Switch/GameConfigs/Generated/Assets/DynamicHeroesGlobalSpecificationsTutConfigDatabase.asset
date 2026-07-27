@@ -80,27 +80,9 @@ MonoBehaviour:
     arrowFrom: none
     arrowTo: none
     isBlocking: 1
-    nextStepId: 5
-    narratorId: kata
-    localizeKey: TUT.1_2.variant
-    rewardRef: none
-    rewardItems: 
-  - tutorialId: TUT_002
-    stepId: 5
-    stepKey: 2_1.main
-    tutorialGroup: SKILL_SWITCH
-    triggerType: OnScreenOpen
-    triggerValue: SkillScreen
-    conditionKey: 2_1_main
-    actionType: FocusClick
-    highlightType: Circle
-    targetUI: HeroPortrait_Main
-    arrowFrom: GuideNPC
-    arrowTo: HeroPortrait_Main
-    isBlocking: 1
     nextStepId: 6
     narratorId: kata
-    localizeKey: TUT.2_1.main
+    localizeKey: TUT.1_2.variant
     rewardRef: none
     rewardItems: 
   - tutorialId: TUT_002
@@ -170,27 +152,9 @@ MonoBehaviour:
     arrowFrom: none
     arrowTo: none
     isBlocking: 1
-    nextStepId: 10
-    narratorId: kata
-    localizeKey: TUT.3_1.variant
-    rewardRef: none
-    rewardItems: 
-  - tutorialId: TUT_003
-    stepId: 10
-    stepKey: 3_2.main
-    tutorialGroup: AUTO_MODE
-    triggerType: AfterStep
-    triggerValue: 9
-    conditionKey: 3_2_main
-    actionType: FocusClick
-    highlightType: Circle
-    targetUI: AutoUltButton
-    arrowFrom: GuideNPC
-    arrowTo: AutoUltButton
-    isBlocking: 1
     nextStepId: 11
     narratorId: kata
-    localizeKey: TUT.3_2.main
+    localizeKey: TUT.3_1.variant
     rewardRef: none
     rewardItems: 
   - tutorialId: TUT_003
@@ -278,7 +242,7 @@ MonoBehaviour:
     arrowFrom: GuideNPC
     arrowTo: QuestClaimButton
     isBlocking: 1
-    nextStepId: 16
+    nextStepId: 0
     narratorId: kata
     localizeKey: TUT.4_2.variant
     rewardRef: none
@@ -494,7 +458,7 @@ MonoBehaviour:
     arrowFrom: GuideNPC
     arrowTo: ConfirmTeamButton
     isBlocking: 1
-    nextStepId: 28
+    nextStepId: 0
     narratorId: kata
     localizeKey: TUT.5_6.variant
     rewardRef: none
@@ -746,7 +710,7 @@ MonoBehaviour:
     arrowFrom: none
     arrowTo: none
     isBlocking: 1
-    nextStepId: 42
+    nextStepId: 0
     narratorId: kata
     localizeKey: TUT.7_3.variant
     rewardRef: none

@@ -12,6 +12,13 @@ namespace Immortal_Switch.Scripts.Modules.Power.Services.Interfaces
         double CalculatePlayerCp();
 
         /// <summary>
+        /// tinh toan stat
+        /// </summary>
+        /// <param name="stat">stat can tinh</param>
+        /// <returns>gia trị stat</returns>
+        double GetFinalStat(StatType stat);
+
+        /// <summary>
         /// tinh toan luc chien cua hero
         /// </summary>
         double CalculateHeroCp(StatsController stats, int playerLevel, SummonRarity rarity);

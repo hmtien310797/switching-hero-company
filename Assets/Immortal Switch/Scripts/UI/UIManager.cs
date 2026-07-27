@@ -20,6 +20,7 @@ using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Loading.Views;
 using Immortal_Switch.Scripts.Shared.Views;
+using JetBrains.Annotations;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -392,6 +393,36 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             return false;
+        }
+        
+        [CanBeNull]
+        public T Get<T>() where T : UIView
+        {
+            // main page
+            if (_activeMainPage != null && !_activeMainPage.closed && _activeMainPage.view is T view &&
+                _activeMainPage.view.gameObject.activeSelf)
+                return view;
+
+            // main stack
+            foreach (var e in _mainStack)
+            {
+                if (e != null && !e.closed && e.view is T view1 && e.view.gameObject.activeSelf)
+                    return view1;
+            }
+
+            // other layers
+            foreach (var kv in _entriesByLayer)
+            {
+                var list = kv.Value;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var e = list[i];
+                    if (e == null || e.closed || e.view == null) continue;
+                    if (e.view is T view2 && e.view.gameObject.activeSelf) return view2;
+                }
+            }
+
+            return null;
         }
 
         #endregion

@@ -1,0 +1,130 @@
+using Common;
+using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Equipment.UIRuntime;
+using Immortal_Switch.Scripts.PlayerSystem.Models;
+using Immortal_Switch.Scripts.PlayerSystem.Views;
+using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.UI;
+using Nakama;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Immortal_Switch.Scripts.Profile.Views.UI
+{
+    public class UIProfileRenamePopup : BaseUIPopup
+    {
+        [Header("References")]
+        [SerializeField]
+        private TMP_Text txtPrice;
+
+        [SerializeField]
+        private TMP_InputField inputName;
+
+        [SerializeField]
+        private Button btnConfirm;
+
+        private bool isRenaming;
+
+        private void Awake()
+        {
+            BindButtons();
+        }
+
+        private void OnEnable()
+        {
+            RefreshPrice();
+        }
+
+        protected override void BindButtons()
+        {
+            base.BindButtons();
+            btnConfirm.onClick.AddListener(OnConfirm);
+        }
+
+        private void RefreshPrice()
+        {
+            if (txtPrice == null)
+                return;
+
+            var attemptNumber = UserDataCache.Instance.RenameCount + 1;
+            var fee = RenameFeeConfig.GetFee(attemptNumber);
+            txtPrice.text = fee > 0 ? fee.ToString("N0") : "Miễn phí";
+        }
+
+        private void OnConfirm()
+        {
+            if (isRenaming)
+                return;
+
+            var newName = inputName != null ? inputName.text.Trim() : null;
+
+            if (string.IsNullOrEmpty(newName))
+            {
+                UIManager.Instance.ShowToast("Vui lòng nhập tên");
+                return;
+            }
+
+            if (newName.Length < 2 ||
+                newName.Length > 20)
+            {
+                UIManager.Instance.ShowToast("Tên phải từ 2-20 ký tự");
+                return;
+            }
+
+            var badwordMatches = IllegalWordDetection.DetectIllegalWords(newName);
+
+            if (badwordMatches.Count > 0)
+            {
+                foreach (var match in badwordMatches)
+                {
+                    var matchedWord = newName.Substring(match.Key, match.Value);
+
+                    Debug.LogError(
+                        $"[UIProfileRenamePopup] Tên \"{newName}\" bị chặn do khớp badword \"{matchedWord}\" tại vị trí {match.Key} (dài {match.Value})");
+                }
+
+                UIManager.Instance.ShowToast("Tên chứa từ ngữ không phù hợp");
+                return;
+            }
+
+            RenameAsync(newName).Forget();
+        }
+
+        private async UniTaskVoid RenameAsync(string newName)
+        {
+            isRenaming = true;
+            btnConfirm.interactable = false;
+
+            try
+            {
+                var response = await NakamaClient.Instance.RenamePlayerAsync(newName);
+
+                UserDataCache.Instance.DisplayName = response.display_name;
+                UserDataCache.Instance.RenameCount = response.rename_count;
+                GetComponentInParent<ProfileView>(true)?.RefreshVisual();
+                TopMainView.Instance?.SetDisplayName(response.display_name);
+
+                UIManager.Instance.ShowToast("Đổi tên thành công");
+                gameObject.SetActive(false);
+            }
+            catch (ApiResponseException ex)
+            {
+                Debug.LogError($"[UIProfileRenamePopup] player/rename failed: {ex.StatusCode} {ex.Message}");
+
+                var description = ex.Message != null && ex.Message.Contains("already taken")
+                    ? "Tên này đã có người sử dụng, vui lòng chọn tên khác"
+                    : ex.Message;
+
+                PopupConfirmService.ShowNotice("Thông báo", description, null, "OK");
+            }
+            finally
+            {
+                isRenaming = false;
+
+                if (btnConfirm != null)
+                    btnConfirm.interactable = true;
+            }
+        }
+    }
+}

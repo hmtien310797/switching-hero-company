@@ -1,7 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Shop.Interfaces;
 using Immortal_Switch.Scripts.Shop.Models;
 using UnityEngine;
@@ -196,12 +195,12 @@ namespace Immortal_Switch.Scripts.Shop
 
         private void SubscribeEvents()
         {
-            PlayerSystemManager.Instance.OnLoginNewDay += OnLoginNewDay;
+            GameEventManager.Subscribe(GameEvents.OnLoginNewDay, OnLoginNewDay);
         }
 
         private void UnsubscribeEvents()
         {
-            PlayerSystemManager.Instance.OnLoginNewDay -= OnLoginNewDay;
+            GameEventManager.Unsubscribe(GameEvents.OnLoginNewDay, OnLoginNewDay);
         }
 
         private void OnLoginNewDay()

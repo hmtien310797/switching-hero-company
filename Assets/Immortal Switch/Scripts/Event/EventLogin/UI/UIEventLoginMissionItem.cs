@@ -17,6 +17,12 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.UI
         [SerializeField]
         private Button btnClaim;
 
+        [SerializeField]
+        private Button btnGo;
+
+        [SerializeField]
+        private GameObject goClaimed;
+
         [Header("Info references")]
         [SerializeField]
         private TextMeshProUGUI txtTitle;
@@ -74,7 +80,43 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.UI
 
             _mission = mission;
             _onClaim = onClaim;
-            btnClaim.interactable = isUnlockedDay && !mission.IsClaimed && mission.Progress >= mission.Target;
+
+            if (isUnlockedDay)
+            {
+                if (mission.Progress < mission.Target)
+                {
+                    btnClaim.interactable = false;
+                    btnGo.interactable = true;
+
+                    btnClaim.gameObject.SetActive(false);
+                    btnGo.gameObject.SetActive(false);
+                    goClaimed.SetActive(true);
+                }
+                else if (mission.IsClaimed)
+                {
+                    btnClaim.interactable = false;
+                    btnGo.interactable = false;
+
+                    btnClaim.gameObject.SetActive(false);
+                    btnGo.gameObject.SetActive(false);
+                    goClaimed.SetActive(true);
+                }
+                else
+                {
+                    btnClaim.interactable = true;
+                    btnGo.interactable = false;
+
+                    btnClaim.gameObject.SetActive(true);
+                    btnGo.gameObject.SetActive(false);
+                    goClaimed.SetActive(false);
+                }
+            }
+            else
+            {
+                btnClaim.gameObject.SetActive(false);
+                btnGo.gameObject.SetActive(false);
+                goClaimed.SetActive(false);
+            }
 
             RefreshRewards(new List<ItemData>
             {

@@ -27,7 +27,7 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.UI
         private RectTransform vfx;
 
         [SerializeField]
-        [Range(0f, 1f)]
+        [Range(0f, float.MaxValue)]
         private float rotateDuration = 0.25f;
 
         // --- Private Fields ---
@@ -73,6 +73,7 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.UI
         private void Kill()
         {
             _vfxTweener?.Kill();
+            _vfxTweener = null;
         }
 
         public void RefreshVfx(bool active)
@@ -86,7 +87,7 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.UI
                     .DOLocalRotate(
                         Vector3.forward * 360f,
                         rotateDuration,
-                        RotateMode.FastBeyond360
+                        RotateMode.LocalAxisAdd
                     )
                     .SetEase(Ease.Linear)
                     .SetLoops(-1, LoopType.Incremental);

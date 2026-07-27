@@ -55,6 +55,7 @@ public class GameStatView : MonoBehaviour
         buttonBoss.interactable = false;
         buttonGiveUp.interactable = false;
         
+        GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayingDungeon);
         GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         GameEventManager.Subscribe(GameEvents.OnWaveStart, OnInitNewStage);
         GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
@@ -71,6 +72,7 @@ public class GameStatView : MonoBehaviour
 
     private void OnDestroy()
     {
+        GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayingDungeon);
         GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
         GameEventManager.Unsubscribe(GameEvents.OnWaveStart, OnInitNewStage);
         GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
@@ -89,6 +91,8 @@ public class GameStatView : MonoBehaviour
         currentDeadMonsterQuantityText.text = string.Format(DeadMonsterQuantityKey, deadCount, stageDataResolverSo.MaxCreepsPerStage);
         progressSlide.fillAmount = (float)deadCount / stageDataResolverSo.MaxCreepsPerStage;
     }
+    
+    
 
     private void OnKillAllDungeonInit(DungeonKillAllDto data)
     {
@@ -161,13 +165,31 @@ public class GameStatView : MonoBehaviour
     {
         buttonMap.gameObject.SetActive(false);
         monsterKill.SetActive(false);
-        buttonGiveUp.gameObject.SetActive(true);
         buttonGiveUp.interactable = true;
         buttonBoss.gameObject.SetActive(false);
         if (delay >= 0)
         {
             await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: cancellationToken);
         }
+        buttonGiveUp.gameObject.SetActive(true);
         battleTimerController.InitTimer(dur, Act, cancellationToken);
     }
+    
+    private void OnPlayingDungeon(bool result)
+    {
+        if (!result)
+            return;
+        buttonBoss.gameObject.SetActive(false);
+        buttonGiveUp.gameObject.SetActive(false);
+        buttonMap.gameObject.SetActive(false);
+    }
+
+    public void ExitDungeonGamePlay()
+    {
+        buttonBoss.gameObject.SetActive(false);
+        buttonGiveUp.gameObject.SetActive(false);
+        buttonMap.gameObject.SetActive(false);
+        battleTimerController.HideTimer();
+    }
+    
 }

@@ -28,7 +28,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                     
                     if(DatabaseManager.Instance.TryGetCreepData(enemyId, out CreepDataSo creepData))
                     {
-                        icon = await AddressableSpawnService.LoadSpriteAsync(creepData.IconKey);
+                        icon = CreepBossImageService.GetCreepIcon(creepData);
                     }
 
                     item.Bind(enemyId, icon, isBoss: false);
@@ -43,7 +43,7 @@ namespace Immortal_Switch.Scripts.StageSelection
                 
                 if(DatabaseManager.Instance.TryGetBossData(bossId, out BossDataSO bossDataSo))
                 {
-                    bossIcon = bossDataSo.Icon;
+                    bossIcon = CreepBossImageService.GetBossIcon(bossDataSo);
                 }
 
                 bossItem.Bind(bossId, bossIcon, isBoss: true);

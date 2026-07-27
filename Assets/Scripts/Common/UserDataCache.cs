@@ -54,6 +54,20 @@ namespace Common
         /// <summary>exp của player — set bởi GameBootstrap từ player/me.</summary>
         public long Exp { get; set; }
 
+        /// <summary>Bắn khi Exp thay đổi giữa session (xem AddExp) — TopMainView subscribe để
+        /// refresh Lv./progress bar ngay, không cần chờ login lại.</summary>
+        public event Action OnExpChanged;
+
+        /// <summary>Cộng dồn exp nhận được giữa session (battle/end, afk/claim reward "user_exp")
+        /// vào cache cục bộ. Chỉ ghi cục bộ — server đã cộng thẳng vào profile.exp lúc build
+        /// reward (xem applyPlayerReward, handler/player.js), không cần gọi RPC nào thêm ở đây.</summary>
+        public void AddExp(long amount)
+        {
+            if (amount <= 0) return;
+            Exp += amount;
+            OnExpChanged?.Invoke();
+        }
+
         /// <summary>Số lần player đã đổi tên — set bởi GameBootstrap từ player/me, cập nhật lại sau
         /// mỗi lần player/rename thành công. Dùng để tính giá đổi tên lần tới, xem RenameFeeConfig.</summary>
         public int RenameCount { get; set; }

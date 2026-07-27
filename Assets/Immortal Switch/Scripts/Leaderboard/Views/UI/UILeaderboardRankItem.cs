@@ -1,4 +1,6 @@
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Shared.Constants;
 using RecyclableScrollRect;
 using TMPro;
@@ -26,7 +28,7 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views.UI
             txtPlayerName.text = playerName;
             txtScore.text = $"{stage:N0}";
 
-            rewardSlot.Bind(ItemIdConstants.DIAMOND, rewardQuantity);
+            rewardSlot.Bind((int)ECurrencyType.diamond, rewardQuantity);
         }
     }
 }

@@ -1,0 +1,2427 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 987b78a03aa66b1429fe03450ab6c4b6, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsEventNewbie30Database
+  m_EditorClassIdentifier: 
+  rows:
+  - missionId: EVT_NB_D01_M1
+    eventId: 1003
+    day: 1
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D01_M2
+    eventId: 1003
+    day: 1
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D01_M3
+    eventId: 1003
+    day: 1
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 200 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 200
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D01_M4
+    eventId: 1003
+    day: 1
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 3 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 3
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D01_M5
+    eventId: 1003
+    day: 1
+    slot: 5
+    titleVi: "Trang b\u1ECB 1 v\u0169 kh\xED cho anh h\xF9ng"
+    trigger: EQUIP_ITEM
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D01_M6
+    eventId: 1003
+    day: 1
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D02_M1
+    eventId: 1003
+    day: 2
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D02_M2
+    eventId: 1003
+    day: 2
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D02_M3
+    eventId: 1003
+    day: 2
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 200 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 200
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D02_M4
+    eventId: 1003
+    day: 2
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 3 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 3
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D02_M5
+    eventId: 1003
+    day: 2
+    slot: 5
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D02_M6
+    eventId: 1003
+    day: 2
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D03_M1
+    eventId: 1003
+    day: 3
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D03_M2
+    eventId: 1003
+    day: 3
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D03_M3
+    eventId: 1003
+    day: 3
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 200 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 200
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D03_M4
+    eventId: 1003
+    day: 3
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 1 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 1
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D03_M5
+    eventId: 1003
+    day: 3
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 5 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 5
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D03_M6
+    eventId: 1003
+    day: 3
+    slot: 6
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 8 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 8
+    points: 50
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D04_M1
+    eventId: 1003
+    day: 4
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D04_M2
+    eventId: 1003
+    day: 4
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D04_M3
+    eventId: 1003
+    day: 4
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 200 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 200
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D04_M4
+    eventId: 1003
+    day: 4
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 3 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 3
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D04_M5
+    eventId: 1003
+    day: 4
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 5 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 5
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D04_M6
+    eventId: 1003
+    day: 4
+    slot: 6
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 8 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 8
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D05_M1
+    eventId: 1003
+    day: 5
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D05_M2
+    eventId: 1003
+    day: 5
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D05_M3
+    eventId: 1003
+    day: 5
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 200 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 200
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D05_M4
+    eventId: 1003
+    day: 5
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 3 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 3
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D05_M5
+    eventId: 1003
+    day: 5
+    slot: 5
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D05_M6
+    eventId: 1003
+    day: 5
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D06_M1
+    eventId: 1003
+    day: 6
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D06_M2
+    eventId: 1003
+    day: 6
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D06_M3
+    eventId: 1003
+    day: 6
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 200 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 200
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D06_M4
+    eventId: 1003
+    day: 6
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 1 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 1
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D06_M5
+    eventId: 1003
+    day: 6
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 5 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 5
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D06_M6
+    eventId: 1003
+    day: 6
+    slot: 6
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 8 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 8
+    points: 50
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D07_M1
+    eventId: 1003
+    day: 7
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D07_M2
+    eventId: 1003
+    day: 7
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D07_M3
+    eventId: 1003
+    day: 7
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 200 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 200
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D07_M4
+    eventId: 1003
+    day: 7
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 3 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 3
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D07_M5
+    eventId: 1003
+    day: 7
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 5 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 5
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D07_M6
+    eventId: 1003
+    day: 7
+    slot: 6
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 8 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 8
+    points: 50
+    itemId: 8
+    quantity: 5
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D08_M1
+    eventId: 1003
+    day: 8
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D08_M2
+    eventId: 1003
+    day: 8
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D08_M3
+    eventId: 1003
+    day: 8
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D08_M4
+    eventId: 1003
+    day: 8
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 5 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 5
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D08_M5
+    eventId: 1003
+    day: 8
+    slot: 5
+    titleVi: "Th\u1EAFng 1 tr\u1EADn \u0110\u1EA5u tr\u01B0\u1EDDng"
+    trigger: ARENA_WIN
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D08_M6
+    eventId: 1003
+    day: 8
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 12 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 12
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D09_M1
+    eventId: 1003
+    day: 9
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D09_M2
+    eventId: 1003
+    day: 9
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D09_M3
+    eventId: 1003
+    day: 9
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D09_M4
+    eventId: 1003
+    day: 9
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 2 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 2
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D09_M5
+    eventId: 1003
+    day: 9
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 8 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 8
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D09_M6
+    eventId: 1003
+    day: 9
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D10_M1
+    eventId: 1003
+    day: 10
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D10_M2
+    eventId: 1003
+    day: 10
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D10_M3
+    eventId: 1003
+    day: 10
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 30
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D10_M4
+    eventId: 1003
+    day: 10
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 5 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 5
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D10_M5
+    eventId: 1003
+    day: 10
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 8 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 8
+    points: 40
+    itemId: 3
+    quantity: 30
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D10_M6
+    eventId: 1003
+    day: 10
+    slot: 6
+    titleVi: "Ho\xE0n th\xE0nh 1 l\u01B0\u1EE3t Dungeon"
+    trigger: DUNGEON_CLEAR
+    target: 1
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D11_M1
+    eventId: 1003
+    day: 11
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D11_M2
+    eventId: 1003
+    day: 11
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D11_M3
+    eventId: 1003
+    day: 11
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D11_M4
+    eventId: 1003
+    day: 11
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 5 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 5
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D11_M5
+    eventId: 1003
+    day: 11
+    slot: 5
+    titleVi: "Th\u1EAFng 1 tr\u1EADn \u0110\u1EA5u tr\u01B0\u1EDDng"
+    trigger: ARENA_WIN
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D11_M6
+    eventId: 1003
+    day: 11
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 12 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 12
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D12_M1
+    eventId: 1003
+    day: 12
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D12_M2
+    eventId: 1003
+    day: 12
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D12_M3
+    eventId: 1003
+    day: 12
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D12_M4
+    eventId: 1003
+    day: 12
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 2 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 2
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D12_M5
+    eventId: 1003
+    day: 12
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 8 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 8
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D12_M6
+    eventId: 1003
+    day: 12
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D13_M1
+    eventId: 1003
+    day: 13
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D13_M2
+    eventId: 1003
+    day: 13
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D13_M3
+    eventId: 1003
+    day: 13
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D13_M4
+    eventId: 1003
+    day: 13
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 5 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 5
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D13_M5
+    eventId: 1003
+    day: 13
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 8 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 8
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D13_M6
+    eventId: 1003
+    day: 13
+    slot: 6
+    titleVi: "Ho\xE0n th\xE0nh 1 l\u01B0\u1EE3t Dungeon"
+    trigger: DUNGEON_CLEAR
+    target: 1
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D14_M1
+    eventId: 1003
+    day: 14
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D14_M2
+    eventId: 1003
+    day: 14
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D14_M3
+    eventId: 1003
+    day: 14
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D14_M4
+    eventId: 1003
+    day: 14
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 5 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 5
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D14_M5
+    eventId: 1003
+    day: 14
+    slot: 5
+    titleVi: "Th\u1EAFng 1 tr\u1EADn \u0110\u1EA5u tr\u01B0\u1EDDng"
+    trigger: ARENA_WIN
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D14_M6
+    eventId: 1003
+    day: 14
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 12 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 12
+    points: 50
+    itemId: 46
+    quantity: 5
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D15_M1
+    eventId: 1003
+    day: 15
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D15_M2
+    eventId: 1003
+    day: 15
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D15_M3
+    eventId: 1003
+    day: 15
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 400 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 400
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D15_M4
+    eventId: 1003
+    day: 15
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 3 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 3
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D15_M5
+    eventId: 1003
+    day: 15
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D15_M6
+    eventId: 1003
+    day: 15
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D16_M1
+    eventId: 1003
+    day: 16
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D16_M2
+    eventId: 1003
+    day: 16
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D16_M3
+    eventId: 1003
+    day: 16
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 400 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 400
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D16_M4
+    eventId: 1003
+    day: 16
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 5 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 5
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D16_M5
+    eventId: 1003
+    day: 16
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D16_M6
+    eventId: 1003
+    day: 16
+    slot: 6
+    titleVi: "Ho\xE0n th\xE0nh 1 l\u01B0\u1EE3t Dungeon"
+    trigger: DUNGEON_CLEAR
+    target: 1
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D17_M1
+    eventId: 1003
+    day: 17
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D17_M2
+    eventId: 1003
+    day: 17
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D17_M3
+    eventId: 1003
+    day: 17
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 400 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 400
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D17_M4
+    eventId: 1003
+    day: 17
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 8 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 8
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D17_M5
+    eventId: 1003
+    day: 17
+    slot: 5
+    titleVi: "Th\u1EAFng 1 tr\u1EADn \u0110\u1EA5u tr\u01B0\u1EDDng"
+    trigger: ARENA_WIN
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D17_M6
+    eventId: 1003
+    day: 17
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 15 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 15
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D18_M1
+    eventId: 1003
+    day: 18
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D18_M2
+    eventId: 1003
+    day: 18
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D18_M3
+    eventId: 1003
+    day: 18
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 400 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 400
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D18_M4
+    eventId: 1003
+    day: 18
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 3 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 3
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D18_M5
+    eventId: 1003
+    day: 18
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D18_M6
+    eventId: 1003
+    day: 18
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D19_M1
+    eventId: 1003
+    day: 19
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D19_M2
+    eventId: 1003
+    day: 19
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D19_M3
+    eventId: 1003
+    day: 19
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 400 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 400
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D19_M4
+    eventId: 1003
+    day: 19
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 5 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 5
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D19_M5
+    eventId: 1003
+    day: 19
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D19_M6
+    eventId: 1003
+    day: 19
+    slot: 6
+    titleVi: "Ho\xE0n th\xE0nh 1 l\u01B0\u1EE3t Dungeon"
+    trigger: DUNGEON_CLEAR
+    target: 1
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D20_M1
+    eventId: 1003
+    day: 20
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D20_M2
+    eventId: 1003
+    day: 20
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 300
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D20_M3
+    eventId: 1003
+    day: 20
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 400 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 400
+    points: 30
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D20_M4
+    eventId: 1003
+    day: 20
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 8 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 8
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D20_M5
+    eventId: 1003
+    day: 20
+    slot: 5
+    titleVi: "Th\u1EAFng 1 tr\u1EADn \u0110\u1EA5u tr\u01B0\u1EDDng"
+    trigger: ARENA_WIN
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D20_M6
+    eventId: 1003
+    day: 20
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 15 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 15
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D21_M1
+    eventId: 1003
+    day: 21
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D21_M2
+    eventId: 1003
+    day: 21
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D21_M3
+    eventId: 1003
+    day: 21
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 400 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 400
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D21_M4
+    eventId: 1003
+    day: 21
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 3 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 3
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D21_M5
+    eventId: 1003
+    day: 21
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D21_M6
+    eventId: 1003
+    day: 21
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 9
+    quantity: 5
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D22_M1
+    eventId: 1003
+    day: 22
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D22_M2
+    eventId: 1003
+    day: 22
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D22_M3
+    eventId: 1003
+    day: 22
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D22_M4
+    eventId: 1003
+    day: 22
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 8 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 8
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D22_M5
+    eventId: 1003
+    day: 22
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D22_M6
+    eventId: 1003
+    day: 22
+    slot: 6
+    titleVi: "Ho\xE0n th\xE0nh 1 l\u01B0\u1EE3t Dungeon"
+    trigger: DUNGEON_CLEAR
+    target: 1
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D23_M1
+    eventId: 1003
+    day: 23
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D23_M2
+    eventId: 1003
+    day: 23
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D23_M3
+    eventId: 1003
+    day: 23
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D23_M4
+    eventId: 1003
+    day: 23
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 10 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 10
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D23_M5
+    eventId: 1003
+    day: 23
+    slot: 5
+    titleVi: "Th\u1EAFng 1 tr\u1EADn \u0110\u1EA5u tr\u01B0\u1EDDng"
+    trigger: ARENA_WIN
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D23_M6
+    eventId: 1003
+    day: 23
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 15 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 15
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D24_M1
+    eventId: 1003
+    day: 24
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D24_M2
+    eventId: 1003
+    day: 24
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D24_M3
+    eventId: 1003
+    day: 24
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D24_M4
+    eventId: 1003
+    day: 24
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 3 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 3
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D24_M5
+    eventId: 1003
+    day: 24
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D24_M6
+    eventId: 1003
+    day: 24
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D25_M1
+    eventId: 1003
+    day: 25
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D25_M2
+    eventId: 1003
+    day: 25
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D25_M3
+    eventId: 1003
+    day: 25
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D25_M4
+    eventId: 1003
+    day: 25
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 8 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 8
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D25_M5
+    eventId: 1003
+    day: 25
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D25_M6
+    eventId: 1003
+    day: 25
+    slot: 6
+    titleVi: "Ho\xE0n th\xE0nh 1 l\u01B0\u1EE3t Dungeon"
+    trigger: DUNGEON_CLEAR
+    target: 1
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D26_M1
+    eventId: 1003
+    day: 26
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D26_M2
+    eventId: 1003
+    day: 26
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D26_M3
+    eventId: 1003
+    day: 26
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D26_M4
+    eventId: 1003
+    day: 26
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 10 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 10
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D26_M5
+    eventId: 1003
+    day: 26
+    slot: 5
+    titleVi: "Th\u1EAFng 1 tr\u1EADn \u0110\u1EA5u tr\u01B0\u1EDDng"
+    trigger: ARENA_WIN
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D26_M6
+    eventId: 1003
+    day: 26
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 15 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 15
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D27_M1
+    eventId: 1003
+    day: 27
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D27_M2
+    eventId: 1003
+    day: 27
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D27_M3
+    eventId: 1003
+    day: 27
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D27_M4
+    eventId: 1003
+    day: 27
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 3 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 3
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D27_M5
+    eventId: 1003
+    day: 27
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D27_M6
+    eventId: 1003
+    day: 27
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D28_M1
+    eventId: 1003
+    day: 28
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D28_M2
+    eventId: 1003
+    day: 28
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D28_M3
+    eventId: 1003
+    day: 28
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D28_M4
+    eventId: 1003
+    day: 28
+    slot: 4
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 8 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 8
+    points: 30
+    itemId: 14
+    quantity: 20
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D28_M5
+    eventId: 1003
+    day: 28
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D28_M6
+    eventId: 1003
+    day: 28
+    slot: 6
+    titleVi: "Ho\xE0n th\xE0nh 1 l\u01B0\u1EE3t Dungeon"
+    trigger: DUNGEON_CLEAR
+    target: 1
+    points: 50
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D29_M1
+    eventId: 1003
+    day: 29
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D29_M2
+    eventId: 1003
+    day: 29
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D29_M3
+    eventId: 1003
+    day: 29
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D29_M4
+    eventId: 1003
+    day: 29
+    slot: 4
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 10 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 10
+    points: 30
+    itemId: 15
+    quantity: 5
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D29_M5
+    eventId: 1003
+    day: 29
+    slot: 5
+    titleVi: "Th\u1EAFng 1 tr\u1EADn \u0110\u1EA5u tr\u01B0\u1EDDng"
+    trigger: ARENA_WIN
+    target: 1
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D29_M6
+    eventId: 1003
+    day: 29
+    slot: 6
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 15 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 15
+    points: 50
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB_D30_M1
+    eventId: 1003
+    day: 30
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB_D30_M2
+    eventId: 1003
+    day: 30
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 30
+    itemId: 10
+    quantity: 500
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB_D30_M3
+    eventId: 1003
+    day: 30
+    slot: 3
+    titleVi: "Ti\xEAu di\u1EC7t 500 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 500
+    points: 30
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB_D30_M4
+    eventId: 1003
+    day: 30
+    slot: 4
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 3 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 3
+    points: 30
+    itemId: 16
+    quantity: 2
+    limitReset: daily
+    sortOrder: 4
+  - missionId: EVT_NB_D30_M5
+    eventId: 1003
+    day: 30
+    slot: 5
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 10 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 10
+    points: 40
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 5
+  - missionId: EVT_NB_D30_M6
+    eventId: 1003
+    day: 30
+    slot: 6
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 50
+    itemId: 52
+    quantity: 1
+    limitReset: daily
+    sortOrder: 6
+  - missionId: EVT_NB7_D1_M1
+    eventId: 1004
+    day: 1
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB7_D1_M2
+    eventId: 1004
+    day: 1
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 1 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 1
+    points: 20
+    itemId: 10
+    quantity: 200
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB7_D1_M3
+    eventId: 1004
+    day: 1
+    slot: 3
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 20
+    itemId: 8
+    quantity: 1
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB7_D2_M1
+    eventId: 1004
+    day: 2
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 50000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB7_D2_M2
+    eventId: 1004
+    day: 2
+    slot: 2
+    titleVi: "Ti\xEAu di\u1EC7t 200 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 200
+    points: 20
+    itemId: 3
+    quantity: 40
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB7_D2_M3
+    eventId: 1004
+    day: 2
+    slot: 3
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 3 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 3
+    points: 20
+    itemId: 46
+    quantity: 1
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB7_D3_M1
+    eventId: 1004
+    day: 3
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 80000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB7_D3_M2
+    eventId: 1004
+    day: 3
+    slot: 2
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 5 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 5
+    points: 20
+    itemId: 3
+    quantity: 50
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB7_D3_M3
+    eventId: 1004
+    day: 3
+    slot: 3
+    titleVi: "L\xEAn c\u1EA5p anh h\xF9ng 5 l\u1EA7n"
+    trigger: HERO_LEVELUP
+    target: 5
+    points: 20
+    itemId: 9
+    quantity: 1
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB7_D4_M1
+    eventId: 1004
+    day: 4
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 80000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB7_D4_M2
+    eventId: 1004
+    day: 4
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 20
+    itemId: 3
+    quantity: 60
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB7_D4_M3
+    eventId: 1004
+    day: 4
+    slot: 3
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 1 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 1
+    points: 20
+    itemId: 8
+    quantity: 2
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB7_D5_M1
+    eventId: 1004
+    day: 5
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 100000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB7_D5_M2
+    eventId: 1004
+    day: 5
+    slot: 2
+    titleVi: "Ti\xEAu di\u1EC7t 300 qu\xE1i"
+    trigger: KILL_MONSTER
+    target: 300
+    points: 20
+    itemId: 3
+    quantity: 80
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB7_D5_M3
+    eventId: 1004
+    day: 5
+    slot: 3
+    titleVi: "N\xE2ng c\u1EA5p k\u1EF9 n\u0103ng 2 l\u1EA7n"
+    trigger: SKILL_UPGRADE
+    target: 2
+    points: 20
+    itemId: 46
+    quantity: 3
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB7_D6_M1
+    eventId: 1004
+    day: 6
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 120000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB7_D6_M2
+    eventId: 1004
+    day: 6
+    slot: 2
+    titleVi: "V\u01B0\u1EE3t \u1EA3i 8 l\u1EA7n"
+    trigger: CLEAR_STAGE_COUNT
+    target: 8
+    points: 20
+    itemId: 3
+    quantity: 100
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB7_D6_M3
+    eventId: 1004
+    day: 6
+    slot: 3
+    titleVi: "C\u01B0\u1EDDng h\xF3a trang b\u1ECB 8 l\u1EA7n"
+    trigger: ENHANCE_GEAR
+    target: 8
+    points: 20
+    itemId: 9
+    quantity: 3
+    limitReset: daily
+    sortOrder: 3
+  - missionId: EVT_NB7_D7_M1
+    eventId: 1004
+    day: 7
+    slot: 1
+    titleVi: "\u0110\u0103ng nh\u1EADp h\xF4m nay"
+    trigger: LOGIN
+    target: 1
+    points: 20
+    itemId: 1
+    quantity: 150000
+    limitReset: daily
+    sortOrder: 1
+  - missionId: EVT_NB7_D7_M2
+    eventId: 1004
+    day: 7
+    slot: 2
+    titleVi: "Nh\u1EADn Idle Reward 2 l\u1EA7n"
+    trigger: CLAIM_IDLE
+    target: 2
+    points: 20
+    itemId: 3
+    quantity: 120
+    limitReset: daily
+    sortOrder: 2
+  - missionId: EVT_NB7_D7_M3
+    eventId: 1004
+    day: 7
+    slot: 3
+    titleVi: "Tri\u1EC7u h\u1ED3i anh h\xF9ng 3 l\u1EA7n (m\u1ECDi banner)"
+    trigger: HERO_SUMMON
+    target: 3
+    points: 20
+    itemId: 8
+    quantity: 5
+    limitReset: daily
+    sortOrder: 3

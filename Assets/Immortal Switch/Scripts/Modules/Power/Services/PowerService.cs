@@ -27,6 +27,13 @@ namespace Immortal_Switch.Scripts.Modules.Power.Services
             return playerCp;
         }
 
+        public double GetFinalStat(StatType stat)
+        {
+            var heroes = UserDataCache.Instance.inBattleHeroes;
+            var totalStat = heroes.Sum(hero => hero.Stats.StatModule.GetFinalStat(stat));
+            return totalStat;
+        }
+
         /// <summary>
         /// tinh toan cp step 1: OFFENSE_BASE = ATK × 14 + ATK × (SPD − 1) × 8
         /// </summary>

@@ -54,6 +54,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         [SerializeField]
         private UIEventWheelLayoutController layoutVertical;
 
+        // --- Public Fields ---
+        public bool IsRolling => layoutVertical.IsRolling || layoutHorizontal.IsRolling;
+
         private void Awake()
         {
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;

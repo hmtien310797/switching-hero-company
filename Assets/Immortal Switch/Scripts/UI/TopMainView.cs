@@ -5,10 +5,12 @@ using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.AFKReward.Views;
 using Immortal_Switch.Scripts.Bag.Views;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong;
 using Immortal_Switch.Scripts.Event.Views;
 using Immortal_Switch.Scripts.GameSetting.Views;
@@ -173,14 +175,6 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField] private RectTransform bottomPanel;
         [SerializeField] private GridLayoutGroup rightSideLayoutGroup;
 
-        private ProfilerRecorder drawCallsRecorder;
-        private ProfilerRecorder batchesRecorder;
-        private ProfilerRecorder setPassCallsRecorder;
-
-        private float perfFpsAccumulator;
-        private int perfFpsFrameCount;
-        private float perfRefreshTimer;
-
         private readonly Tween[] heroIconTweens = new Tween[2];
         private bool isHeroIconSwapped;
         private int heroIconSwitchVersion;
@@ -218,13 +212,11 @@ namespace Immortal_Switch.Scripts.UI
 
             HideAbleObjects();
             skeletonGraphic.gameObject.SetActive(false);
-
-            drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Draw Calls Count");
-            batchesRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
-            setPassCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "SetPass Calls Count");
             //for demo
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
             OnOrientationChanged(ScreenOrientationTracker.Instance.CurrentMode);
+
+            UserDataCache.Instance.OnExpChanged += RefreshPlayerInfo;
         }
 
         //for demo
@@ -264,12 +256,12 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnClickDiamondInfo()
         {
-            ShowItemInfo(ItemIdConstants.DIAMOND);
+            ShowItemInfo((int)ECurrencyType.diamond);
         }
 
         private void OnClickGoldInfo()
         {
-            ShowItemInfo(ItemIdConstants.GOLD);
+            ShowItemInfo((int)ECurrencyType.gold);
         }
 
         private void ShowItemInfo(int itemId)
@@ -669,10 +661,6 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnDestroy()
         {
-            drawCallsRecorder.Dispose();
-            batchesRecorder.Dispose();
-            setPassCallsRecorder.Dispose();
-
             TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
             TutorialManager.Instance.OnClick -= OnClickTutorial;
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
@@ -681,6 +669,7 @@ namespace Immortal_Switch.Scripts.UI
             GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
             GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
             ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
+            UserDataCache.Instance.OnExpChanged -= RefreshPlayerInfo;
 
             for (int i = 0; i < heroIconTweens.Length; i++)
             {

@@ -17,7 +17,7 @@ namespace Immortal_Switch.Scripts.Addressable
         }
 
         private const string AtlasSuffixKey =
-            "Assets/Immortal Switch/Addressable/UI/atlas/{0}";
+            "Assets/Immortal Switch/Addressable/UI/atlas/{0}.spriteatlasv2";
 
         private static readonly Dictionary<string, AtlasCacheEntry> Cache = new();
 

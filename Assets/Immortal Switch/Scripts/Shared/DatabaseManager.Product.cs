@@ -79,7 +79,7 @@ namespace Immortal_Switch.Scripts.Shared
 
         public List<DynamicHeroesGlobalSpecificationsConfigShopRow> GetAllTabs()
         {
-            return _configShopDb.rows;
+            return _configShopDb.rows.Where(v => v.enable == 1).ToList();
         }
 
         public DynamicHeroesGlobalSpecificationsProductIdRow GetProduct(int productId)

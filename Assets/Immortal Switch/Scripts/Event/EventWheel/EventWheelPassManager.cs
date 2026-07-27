@@ -55,7 +55,12 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         public int GetShopRemaining(DynamicHeroesGlobalSpecificationsEventWheelShopConfigRow row)
         {
             var slot = FindShopSlot(row.shopSlotId);
-            if (slot == null) return row.limitValue;
+
+            if (slot == null)
+            {
+                return row.limitValue;
+            }
+
             return Math.Max(0, slot.LimitValue - slot.PurchasedCount);
         }
 
@@ -65,7 +70,12 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         )
         {
             var slot = FindShopSlot(row.shopSlotId);
-            if (slot == null) return true;
+
+            if (slot == null)
+            {
+                return true;
+            }
+
             return slot.LimitValue <= 0 || slot.PurchasedCount + purchaseCount <= slot.LimitValue;
         }
 
@@ -110,11 +120,17 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
             IReadOnlyList<DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow> rows
         )
         {
-            if (rows == null) return false;
+            if (rows == null)
+            {
+                return false;
+            }
 
             for (int i = 0; i < rows.Count; i++)
             {
-                if (CanClaim(eventId, rows[i])) return true;
+                if (CanClaim(eventId, rows[i]))
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -128,22 +144,41 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
             DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow row
         )
         {
-            var rewards   = new List<ItemData>();
+            var rewards = new List<ItemData>();
             string error = null;
 
             if (CanClaimFree(0, row))
             {
                 var (item, err) = await ClaimTrackAsync(row.level, "free");
-                if (item != null) rewards.Add(item); else error = err;
+
+                if (item != null)
+                {
+                    rewards.Add(item);
+                }
+                else
+                {
+                    error = err;
+                }
             }
 
             if (CanClaimPaid(0, row))
             {
                 var (item, err) = await ClaimTrackAsync(row.level, "paid");
-                if (item != null) rewards.Add(item); else error = error ?? err;
+
+                if (item != null)
+                {
+                    rewards.Add(item);
+                }
+                else
+                {
+                    error = error ?? err;
+                }
             }
 
-            if (rewards.Count > 0) await RefreshAsync();
+            if (rewards.Count > 0)
+            {
+                await RefreshAsync();
+            }
 
             return (rewards, rewards.Count > 0 ? null : error);
         }
@@ -153,7 +188,11 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         )
         {
             var rewards = new List<ItemData>();
-            if (rows == null) return (rewards, null);
+
+            if (rows == null)
+            {
+                return (rewards, null);
+            }
 
             // Chốt danh sách đủ điều kiện trước khi bắt đầu vòng lặp — mỗi lần claim gọi RPC
             // tuần tự (không song song) để tránh 2 request cùng ghi player_event_wheel storage.
@@ -165,13 +204,29 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
             foreach (var level in freeClaimLevels)
             {
                 var (item, err) = await ClaimTrackAsync(level, "free");
-                if (item != null) rewards.Add(item); else lastError = err;
+
+                if (item != null)
+                {
+                    rewards.Add(item);
+                }
+                else
+                {
+                    lastError = err;
+                }
             }
 
             foreach (var level in paidClaimLevels)
             {
                 var (item, err) = await ClaimTrackAsync(level, "paid");
-                if (item != null) rewards.Add(item); else lastError = err;
+
+                if (item != null)
+                {
+                    rewards.Add(item);
+                }
+                else
+                {
+                    lastError = err;
+                }
             }
 
             await RefreshAsync();
@@ -194,7 +249,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
 
             if (!response.Success)
             {
-                Debug.LogWarning($"[EventWheelPassManager] eventwheel/pass_claim level={level} track={track} failed: {response.Error}");
+                Debug.LogWarning(
+                    $"[EventWheelPassManager] eventwheel/pass_claim level={level} track={track} failed: {response.Error}");
+
                 return (null, response.Error);
             }
 
@@ -240,6 +297,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         public UniTask<(bool success, string error)> BuyPremiumAsync()
         {
             var pack = State?.PremiumPack;
+
             if (pack == null)
             {
                 return UniTask.FromResult((false, "PASS_NOT_CONFIGURED"));
@@ -258,10 +316,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
 
             var tcs = new UniTaskCompletionSource<(bool, string)>();
 
-            IAPManager.Instance.BuyEventPassProduct(storeProductId, (success, error) =>
-            {
-                tcs.TrySetResult((success, error));
-            });
+            IAPManager.Instance.BuyEventPassProduct(storeProductId, (success, error) => { tcs.TrySetResult((success, error)); });
 
             return tcs.Task;
         }
@@ -271,11 +326,18 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         private EventWheelShopSlotDto FindShopSlot(int shopSlotId)
         {
             var shop = State?.Shop;
-            if (shop == null) return null;
+
+            if (shop == null)
+            {
+                return null;
+            }
 
             for (int i = 0; i < shop.Count; i++)
             {
-                if (shop[i].ShopSlotId == shopSlotId) return shop[i];
+                if (shop[i].ShopSlotId == shopSlotId)
+                {
+                    return shop[i];
+                }
             }
 
             return null;
@@ -284,12 +346,19 @@ namespace Immortal_Switch.Scripts.Event.EventWheel
         private EventWheelPassMilestoneDto FindMilestone(int milestoneId)
         {
             var pass = State?.Pass;
-            if (pass == null) return null;
+
+            if (pass == null)
+            {
+                return null;
+            }
 
             // milestone_id và level là 1:1 trong game_event_wheel_pass_config.js (cùng chạy 1..100).
             for (int i = 0; i < pass.Count; i++)
             {
-                if (pass[i].MilestoneId == milestoneId) return pass[i];
+                if (pass[i].MilestoneId == milestoneId)
+                {
+                    return pass[i];
+                }
             }
 
             return null;

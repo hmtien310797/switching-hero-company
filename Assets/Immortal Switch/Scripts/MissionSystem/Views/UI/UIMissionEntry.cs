@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Localization;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -138,7 +139,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             _onJump = onJump;
 
             txtTitle.text = title;
-            txtDesc.text = row.title;
+            txtDesc.text = LocalizationManager.GetText(row.title);
             txtQuantityReward.text = row.points.ToString();
 
             SetProgress(currentProgress);

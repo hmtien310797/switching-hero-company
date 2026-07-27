@@ -3,9 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Battle;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.UI;
 using Nakama;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -27,6 +30,12 @@ public class NakamaClient : MonoBehaviour
     /// <summary>Chủ động refresh khi AuthToken còn cách hạn dưới ngần này (giây), để không phải
     /// chờ tới khi nó hết hạn hẳn rồi mới phát hiện refresh token cũng đã chết.</summary>
     private const int SessionRefreshLeadSec = 120;
+
+    /// <summary>Tần suất kiểm tra Application.internetReachability (giây) — phát hiện mất mạng
+    /// chủ động thay vì đợi socket timeout (có thể mất nhiều giây/phút tuỳ heartbeat).</summary>
+    private const float NetworkWatchdogIntervalSec = 5f;
+
+    private const string NoNetworkReason = "Mất kết nối mạng. Vui lòng kiểm tra kết nối Internet và đăng nhập lại.";
 
     [Header("Server Config")]
     [SerializeField] private string scheme = "http";
@@ -68,6 +77,7 @@ public class NakamaClient : MonoBehaviour
     public string LastForceLogoutReason { get; set; }
 
     private bool _forceLogoutHandled;
+    private bool _forceLogoutPopupShown;
     private bool _intentionalSocketClose;
 
     private void Awake()
@@ -96,12 +106,40 @@ public class NakamaClient : MonoBehaviour
             var wasIntentional = _intentionalSocketClose;
             _intentionalSocketClose = false;
             if (!wasIntentional)
-                HandleForceLogout("Mất kết nối với server — có thể tài khoản đã đăng nhập ở thiết bị khác.");
+                RequestForceLogout(BuildUnintentionalDisconnectReason());
         };
         Socket.ReceivedError += ex => Debug.LogError($"[NakamaClient] Socket error: {ex.Message}");
 
         _ = TryRestoreSessionAsync();
         StartCoroutine(SessionWatchdogRoutine());
+        StartCoroutine(NetworkWatchdogRoutine());
+    }
+
+    /// <summary>Socket đóng ngoài ý muốn có 2 nguyên nhân phổ biến: mất mạng cục bộ (phát hiện
+    /// qua Application.internetReachability) hoặc server chủ động đóng (thường do tài khoản vừa
+    /// đăng nhập ở thiết bị khác) — phân biệt để hiện đúng thông báo trên LoginScene. Lưu ý:
+    /// internetReachability không đáng tin cậy trong Unity Editor (luôn trả về có mạng dù đã tắt
+    /// wifi máy) — chỉ chính xác trên build thật (Android/iOS).</summary>
+    private static string BuildUnintentionalDisconnectReason()
+    {
+        return Application.internetReachability == NetworkReachability.NotReachable
+            ? NoNetworkReason
+            : "Mất kết nối với server — có thể tài khoản đã đăng nhập ở thiết bị khác.";
+    }
+
+    /// <summary>Chủ động phát hiện mất mạng trong khi đang đăng nhập/kết nối, thay vì chỉ chờ
+    /// Socket.Closed (có thể đến trễ vài giây/phút tuỳ heartbeat timeout của Nakama SDK).</summary>
+    private IEnumerator NetworkWatchdogRoutine()
+    {
+        var wait = new WaitForSeconds(NetworkWatchdogIntervalSec);
+        while (true)
+        {
+            yield return wait;
+            if (Session == null || !IsSocketConnected) continue;
+            if (Application.internetReachability != NetworkReachability.NotReachable) continue;
+
+            RequestForceLogout(NoNetworkReason);
+        }
     }
 
     /// <summary>
@@ -152,26 +190,74 @@ public class NakamaClient : MonoBehaviour
     private void SaveSession(ISession session)
     {
         _forceLogoutHandled = false;
+        _forceLogoutPopupShown = false;
         PlayerPrefs.SetString(SessionPrefKey, session.AuthToken);
         PlayerPrefs.SetString(RefreshTokenPrefKey, session.RefreshToken ?? "");
         PlayerPrefs.Save();
     }
 
     /// <summary>
+    /// Hiện popup thông báo NGAY TRÊN scene hiện tại (Battle, Main...) rồi mới gọi HandleForceLogout
+    /// khi người chơi bấm OK — không tự chuyển scene ngay lập tức, để người chơi kịp đọc lý do thay
+    /// vì bị bứt về LoginScene giữa chừng (vd: đang trong trận). Là điểm gọi chung cho mọi nguyên
+    /// nhân force-logout (401, socket đóng ngoài ý muốn, mất mạng) — dùng _forceLogoutPopupShown để
+    /// tránh hiện nhiều popup chồng nhau nếu vài nguyên nhân trên trigger gần như cùng lúc.
+    /// </summary>
+    private void RequestForceLogout(string reason)
+    {
+        if (_forceLogoutHandled || _forceLogoutPopupShown) return;
+        _forceLogoutPopupShown = true;
+
+        PopupConfirmService.ShowNotice(string.Empty, reason, () =>
+        {
+            // alreadyNotified: true — người chơi vừa đọc/OK đúng reason này rồi, LoginScene
+            // không cần hiện lại lần nữa qua LastForceLogoutReason (xem LoginScene.cs Start()).
+            HandleForceLogout(reason, alreadyNotified: true).Forget();
+        }, "OK");
+    }
+
+    /// <summary>
     /// Server đã invalidate session hiện tại (sessionLogout/sessionDisconnect khi login ở thiết bị
     /// khác, hoặc socket bị đóng ngoài ý muốn). Xoá session local, bắn event và quay về LoginScene.
+    /// Gọi trực tiếp (không qua popup) chỉ nên dùng khi đã hỏi ý người chơi rồi (vd: nút Đăng xuất/
+    /// Xoá tài khoản trong Settings đã có confirm riêng) — mọi trường hợp force-logout khác nên gọi
+    /// RequestForceLogout để hiện popup trước khi rời scene.
     /// </summary>
-    public async UniTask HandleForceLogout(string reason)
+    /// <param name="alreadyNotified">true nếu người chơi đã thấy popup với đúng reason này rồi
+    /// (qua RequestForceLogout) — bỏ qua LastForceLogoutReason để LoginScene không hiện lại lần 2.</param>
+    public async UniTask HandleForceLogout(string reason, bool alreadyNotified = false)
     {
         if (_forceLogoutHandled) return;
         _forceLogoutHandled = true;
 
         Debug.LogWarning($"[NakamaClient] Force logout: {reason}");
+        await CleanupGameplayStateIfAny();
         ClearSession();
-        LastForceLogoutReason = reason;
+        if (!alreadyNotified)
+            LastForceLogoutReason = reason;
         ForceLoggedOut?.Invoke(reason);
         await ReturnToLoginSceneAsync();
         GameEventManager.Trigger(GameEvents.OnUserLogOut);
+    }
+
+    /// <summary>
+    /// Dọn state gameplay trước khi rời scene — cùng cơ chế SettingManager.LogoutAsync dùng cho
+    /// nút "Đăng xuất" thủ công (SettingManager giờ gọi qua HandleForceLogout thay vì tự lặp lại).
+    /// Bắt buộc phải làm chủ động ở đây: PvEBattleController/UIManager/DatabaseManager đều là
+    /// Singleton DontDestroyOnLoad, nên SceneManager.LoadSceneAsync(LoginScene) KHÔNG tự destroy
+    /// hero/creep actor đã spawn hay asset Addressable đã load trong Battle scene — nếu bỏ qua,
+    /// chúng rò rỉ sang phiên chơi kế tiếp (vd: mất mạng giữa trận rồi đăng nhập lại thấy actor cũ
+    /// còn kẹt lại). Chỉ chạy khi KHÔNG đang ở LoginScene — chưa vào gameplay thì không có gì để
+    /// dọn, và gọi *.Instance ở đó sẽ khiến Singleton&lt;T&gt; tự spawn 1 instance rỗng không cần thiết.
+    /// </summary>
+    private async UniTask CleanupGameplayStateIfAny()
+    {
+        if (SceneManager.GetActiveScene().name == LoginSceneName) return;
+
+        await UIManager.Instance.DespawnAllSessionViewsAsync();
+        PvEBattleController.Instance.CleanupBattle(true);
+        DatabaseManager.Instance.ReleaseGameDatabase();
+        await UniTask.Yield();
     }
 
     private async UniTask ReturnToLoginSceneAsync()
@@ -359,14 +445,23 @@ public class NakamaClient : MonoBehaviour
         }
         catch (ApiResponseException e) when (e.StatusCode == 401)
         {
-            HandleForceLogout("Tài khoản đã đăng nhập ở thiết bị khác.");
+            RequestForceLogout("Tài khoản của bạn đang được đăng nhập trên 1 thiết bị khác.");
             throw;
         }
     }
 
     /// <summary>
-    /// Gọi RPC đã authenticate, tự phát hiện trường hợp session bị server invalidate (401 —
-    /// thường do tài khoản vừa đăng nhập ở thiết bị khác) và chuyển về LoginScene.
+    /// Gọi RPC đã authenticate. Đây là điểm gọi chung cho hầu hết mọi RPC trong game (battle/*,
+    /// afk/*, mission/*, ...) nên cũng là nơi duy nhất cần bắt 2 trường hợp mất kết nối:
+    /// - 401 (ApiResponseException): server ĐÃ trả lời — session bị invalidate, thường do tài
+    ///   khoản vừa đăng nhập ở thiết bị khác.
+    /// - Mọi exception khác: KHÔNG nhận được response nào từ server (mất mạng, timeout, DNS
+    ///   fail...). Trước đây các call site (vd. PvEBattleController.OnStageClearedAsync) chỉ
+    ///   Debug.LogError rồi bỏ qua lỗi này — khiến người chơi bị "kẹt" trong Battle scene mà
+    ///   không có thông báo gì khi mất mạng giữa trận. Bắt ở đây để luôn đưa về LoginScene kèm
+    ///   thông báo, bất kể đang ở scene nào hay RPC nào đang gọi.
+    /// ApiResponseException với status khác 401 (400/500...) là lỗi nghiệp vụ hợp lệ từ server
+    /// đã trả lời — KHÔNG phải mất mạng, để nguyên cho caller tự xử lý.
     /// </summary>
     private async Task<IApiRpc> CallRpcAsync(string id, string payload = null)
     {
@@ -378,10 +473,17 @@ public class NakamaClient : MonoBehaviour
         }
         catch (ApiResponseException e) when (e.StatusCode == 401)
         {
-            PopupConfirmService.ShowNotice(string.Empty,"Tài khoản đã đăng nhập ở thiết bị khác.", () =>
-            {
-                HandleForceLogout("Tài khoản đã đăng nhập ở thiết bị khác.").Forget();
-            },"OK" );
+            RequestForceLogout("Tài khoản đã đăng nhập ở thiết bị khác.");
+            throw;
+        }
+        catch (ApiResponseException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[NakamaClient] RPC '{id}' failed without a server response (likely no network): {e.Message}");
+            RequestForceLogout(NoNetworkReason);
             throw;
         }
     }

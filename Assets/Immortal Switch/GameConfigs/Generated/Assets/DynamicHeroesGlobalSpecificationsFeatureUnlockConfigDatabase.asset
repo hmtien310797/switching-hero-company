@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea18863c84c69fd4f9dfa558a8451e79, type: 3}
+  m_Name: DynamicHeroesGlobalSpecificationsFeatureUnlockConfigDatabase
+  m_EditorClassIdentifier: 
+  rows:
+  - featureId: 1
+    featureKey: summon
+    requiredLevel: 2
+    tutorialStepId: 16
+  - featureId: 2
+    featureKey: hero
+    requiredLevel: 1
+    tutorialStepId: 0
+  - featureId: 3
+    featureKey: growth
+    requiredLevel: 4
+    tutorialStepId: 28
+  - featureId: 4
+    featureKey: missions
+    requiredLevel: 5
+    tutorialStepId: 0
+  - featureId: 5
+    featureKey: equip
+    requiredLevel: 3
+    tutorialStepId: 42
+  - featureId: 6
+    featureKey: dungeon_treasure
+    requiredLevel: 7
+    tutorialStepId: 0
+  - featureId: 7
+    featureKey: dungeon_artifact
+    requiredLevel: 15
+    tutorialStepId: 0
+  - featureId: 8
+    featureKey: dungeon_diamond
+    requiredLevel: 10
+    tutorialStepId: 0
+  - featureId: 9
+    featureKey: dungeon_equipment
+    requiredLevel: 12
+    tutorialStepId: 0
+  - featureId: 10
+    featureKey: activity
+    requiredLevel: 20
+    tutorialStepId: 0

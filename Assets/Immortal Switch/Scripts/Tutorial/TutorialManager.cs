@@ -274,7 +274,6 @@ namespace Immortal_Switch.Scripts.Tutorial
 
             var args = new TutorialArgs
             {
-                ActionType = row.actionType,
                 LocalizeKey = row.localizeKey,
                 Target = target,
                 NarratorId = row.narratorId,

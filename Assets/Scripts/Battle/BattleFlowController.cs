@@ -186,6 +186,7 @@ namespace Battle
 
             transitionInProgress = true;
             State = BattleFlowState.EnteringDungeon;
+            GameEventManager.Trigger(GameEvents.OnPlayDungeon, true);
 
             try
             {
@@ -200,7 +201,7 @@ namespace Battle
                     State = BattleFlowState.ChapterRunning;
                     return false;
                 }
-                GameEventManager.Trigger(GameEvents.OnPlayDungeon, true);
+                
                 Transitioner.Instance.TransitionInWithoutChangingScene();
 
                 State = BattleFlowState.DungeonRunning;
@@ -244,7 +245,7 @@ namespace Battle
             {
                 // fire event clear dungeon, ko tính thắng thua.
                 GameEventManager.Trigger(GameEvents.ON_DUNGEON_CLEAR);
-                
+                GameStatView.Instance.ExitDungeonGamePlay();
                 CreateDungeonBattleCancellationToken();
                 CreateEndStageSessionCancellationToken();
                 Debug.Log($"[BattleFlow] Dungeon ended. Result={result}");
@@ -256,9 +257,8 @@ namespace Battle
 
                 if (resultHoldSeconds > 0f && result != DungeonBattleResult.None)
                     await UniTask.Delay(TimeSpan.FromSeconds(resultHoldSeconds));
-                
-                await Transitioner.Instance.TransitionOutWithoutChangingScene(destroyCancellationToken);
                 dungeonBattleController.CleanupBattle();
+                await Transitioner.Instance.TransitionOutWithoutChangingScene(destroyCancellationToken);
 
                 await chapterBattleController.ResumeAfterDungeonAsync();
                 Transitioner.Instance.TransitionInWithoutChangingScene();

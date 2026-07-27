@@ -364,12 +364,6 @@ public class BossDataCsvImporterWindow : EditorWindow
         string name =
             GetCell(row, headers, "name");
 
-        string bossAddressKey =
-            GetCell(row, headers, "key");
-
-        string iconKey =
-            GetCell(row, headers, "icon_key");
-
         string elementText =
             GetCell(row, headers, "element");
 
@@ -394,19 +388,7 @@ public class BossDataCsvImporterWindow : EditorWindow
             throw new FormatException(
                 $"name bị trống tại dòng {csvRowNumber}.");
         }
-
-        if (string.IsNullOrWhiteSpace(bossAddressKey))
-        {
-            throw new FormatException(
-                $"key bị trống tại dòng {csvRowNumber}.");
-        }
-
-        if (string.IsNullOrWhiteSpace(iconKey))
-        {
-            throw new FormatException(
-                $"icon_key bị trống tại dòng {csvRowNumber}.");
-        }
-
+        
         if (string.IsNullOrWhiteSpace(elementText))
         {
             throw new FormatException(
@@ -427,8 +409,6 @@ public class BossDataCsvImporterWindow : EditorWindow
         {
             Id = id,
             Name = name.Trim(),
-            BossAddressKey = bossAddressKey.Trim(),
-            IconKey = iconKey.Trim(),
             Element = element,
 
             BaseHp = ParseFloat(
@@ -563,10 +543,9 @@ public class BossDataCsvImporterWindow : EditorWindow
         bossData.Id = row.Id;
         bossData.Name = row.Name;
         bossData.Element = row.Element;
-
-        bossData.IconKey = row.IconKey;
-        bossData.BossAddressKey = row.BossAddressKey;
-
+        bossData.IconKey = $"icon_{row.Name}".ToLower().Replace(" ", "");
+        bossData.BossAddressKey = $"boss_{row.Name}".ToLower().Replace(" ", "");
+        
         /*
          * Không gán bossData.Icon.
          *
@@ -645,8 +624,6 @@ public class BossDataCsvImporterWindow : EditorWindow
         {
             "id",
             "name",
-            "key",
-            "icon_key",
             "element",
             "health",
             "attack",
@@ -752,10 +729,7 @@ public class BossDataCsvImporterWindow : EditorWindow
     {
         public int Id;
         public string Name;
-
-        public string BossAddressKey;
-        public string IconKey;
-
+        
         public Element Element;
 
         public float BaseHp;

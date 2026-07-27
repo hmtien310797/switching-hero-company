@@ -2,7 +2,6 @@ using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.AFKReward.Interfaces;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Shared.Constants;
 using UnityEngine;
 
@@ -21,12 +20,12 @@ namespace Immortal_Switch.Scripts.AFKReward
             _storage = new AFKRewardStorage();
             _storage.Load();
             CheckDailyReset();
-            PlayerSystemManager.Instance.OnLoginNewDay += OnLoginNewDay;
+            GameEventManager.Subscribe(GameEvents.OnLoginNewDay, OnLoginNewDay);
         }
 
         protected override void OnDestroy()
         {
-            PlayerSystemManager.Instance.OnLoginNewDay -= OnLoginNewDay;
+            GameEventManager.Unsubscribe(GameEvents.OnLoginNewDay, OnLoginNewDay);
             base.OnDestroy();
         }
 

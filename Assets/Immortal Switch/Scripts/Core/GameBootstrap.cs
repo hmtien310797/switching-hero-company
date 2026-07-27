@@ -85,7 +85,7 @@ namespace Immortal_Switch.Scripts.Core
                 progress.CompleteStep("Shop initialized");
 
                 // 5
-                await PlayerSystemManager.Instance.InitializeAsync();
+                LoginDayService.Initialize();
                 progress.CompleteStep("Player system initialized");
 
                 // WeaponManager.saveData chỉ được gán trong InitializeAsync() (Load()) — phải
@@ -210,7 +210,8 @@ namespace Immortal_Switch.Scripts.Core
                 await UIManager.Instance.InitializeAsync();
                 progress.CompleteStep("UI initialized");
                 
-                await UniTask.WhenAll(HeroImageService.InitializeAsync(), SkillImageService.InitializeAsync(), ItemTierVisualImageService.InitializeAsync());
+                await UniTask.WhenAll(HeroImageService.InitializeAsync(), SkillImageService.InitializeAsync(), ItemTierVisualImageService.InitializeAsync(),
+                    CreepBossImageService.InitializeAsync());
 
                 // 16
                 progress.CompleteStep("Battle data initialized");

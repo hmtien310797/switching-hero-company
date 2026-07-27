@@ -1,6 +1,8 @@
 using System;
 using Battle;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
 using TMPro;
@@ -12,6 +14,7 @@ namespace Immortal_Switch.Scripts.Currency
     public class CurrencyTextBinder : MonoBehaviour
     {
         [SerializeField] private CurrencyType currencyType;
+        [SerializeField] private ECurrencyType eCurrencyType;
         [SerializeField] private TMP_Text amountText;
         [SerializeField] private Image currencyImage;
 
@@ -70,6 +73,11 @@ namespace Immortal_Switch.Scripts.Currency
                 return;
             
             BigNumber displayAmount = CurrencyLedgerService.Instance != null ? CurrencyLedgerService.Instance.GetDisplayBalance(currencyType) : BigNumber.Zero;
+
+            if (displayAmount == 0)
+            {
+                displayAmount = ItemsManager.Instance.GetQuantity(eCurrencyType);
+            }
 
             amountText.text = displayAmount.ToInputString();
         }
