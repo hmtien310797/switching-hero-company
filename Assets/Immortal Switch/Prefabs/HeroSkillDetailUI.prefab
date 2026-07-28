@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3559301311855770098}
   - component: {fileID: 7930512760194819704}
   - component: {fileID: 7930053076435361883}
+  - component: {fileID: 3863469584057811809}
   m_Layer: 5
   m_Name: TxtSub
   m_TagString: Untagged
@@ -137,6 +138,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3863469584057811809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247989668781844424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68762568d3e5a8e48b8785a3d2ddd72b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizationKey: ui_skill_heroes
+  txtLabel: {fileID: 7930053076435361883}
 --- !u!1 &1117381177458899736
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,6 +348,7 @@ MonoBehaviour:
   bounceScale: 1.1
   pressDuration: 0.08
   bounceDuration: 0.15
+  normalScale: 1
 --- !u!1 &3031590220730465656
 GameObject:
   m_ObjectHideFlags: 0
@@ -755,8 +771,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 436.69, y: -37.233}
-  m_SizeDelta: {x: 565.17, y: 33.2238}
+  m_AnchoredPosition: {x: 436.69, y: -28.299}
+  m_SizeDelta: {x: 565.17, y: 98.461}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &172923824561639184
 CanvasRenderer:
@@ -786,8 +802,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "T\u0103ng kh\u1EA3 n\u0103ng Crit t\u1EA5t c\u1EA3 c\xE1c \u0111\xF2n
-    \u0111\xE1nh l\xEAn 50%"
+  m_text: sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cddccfe23e35d654e86e8e9791fc5af3, type: 2}
   m_sharedMaterial: {fileID: 6882651087998995454, guid: cddccfe23e35d654e86e8e9791fc5af3, type: 2}
@@ -814,8 +829,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -833,7 +848,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
