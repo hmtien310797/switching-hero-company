@@ -76,24 +76,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private SkillDataSO pendingReplaceSkill;
         private bool isReplaceMode;
         private bool isAutoEquipping;
-        [SerializeField] private bool enableDebugLog = true;
-
-        private void LogView(string message)
-        {
-            if (!enableDebugLog) return;
-            Debug.Log($"[UISkillView] {message}", this);
-        }
-
-        private void LogWarningView(string message)
-        {
-            if (!enableDebugLog) return;
-            Debug.LogWarning($"[UISkillView] {message}", this);
-        }
-
-        private void LogErrorView(string message)
-        {
-            Debug.LogError($"[UISkillView] {message}", this);
-        }
 
         private void Awake()
         {
@@ -155,7 +137,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
             }
             if (classButtons == null || classButtons.Length == 0)
             {
-                LogErrorView("ClassButtons is null or empty.");
                 return;
             }
 
@@ -168,8 +149,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             selectedHero = null;
             selectedSkill = null;
-
-            LogView($"OpenDefaultClass -> selectedClass={selectedClass}");
+            
             RefreshCurrentContext();
         }
 
@@ -177,16 +157,13 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (isReplaceMode)
             {
-                LogView($"Closing replace popup before switching class to {heroClass}");
                 CloseReplacePopup();
             }
 
             selectedClass = heroClass;
             selectedHero = dataProvider != null ? dataProvider.GetAssignedHeroByClass(heroClass) : null;
             selectedSkill = null;
-
-            LogView(
-                $"OnClickClass -> selectedClass={selectedClass}, hero={(selectedHero != null ? selectedHero.HeroId.ToString() : "null")}");
+            
             RefreshCurrentContext();
         }
 
@@ -194,22 +171,19 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (isReplaceMode)
             {
-                LogWarningView("Ignored hero tab click because replace mode is active.");
                 return;
             }
 
             var activeHeroes = dataProvider.GetAssignedHeroes();
             if (heroIndex < 0 || heroIndex >= activeHeroes.Count)
             {
-                LogErrorView($"OnClickHeroTab invalid index={heroIndex}, activeHeroesCount={activeHeroes.Count}");
                 return;
             }
 
             selectedHero = activeHeroes[heroIndex];
             selectedClass = selectedHero.HeroClass;
             selectedSkill = null;
-
-            LogView($"OnClickHeroTab -> heroId={selectedHero.HeroId}, class={selectedClass}");
+            
             RefreshCurrentContext();
         }
         
@@ -217,25 +191,21 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (isAutoEquipping)
             {
-                LogWarningView("Auto equip ignored because another auto equip is running.");
                 return;
             }
 
             if (isReplaceMode)
             {
-                LogWarningView("Auto equip ignored because replace mode is active.");
                 return;
             }
 
             if (selectedHero == null)
             {
-                LogWarningView("Auto equip failed because selectedHero is null.");
                 return;
             }
 
             if (dataProvider == null)
             {
-                LogErrorView("Auto equip failed because dataProvider is null.");
                 return;
             }
 
@@ -245,27 +215,16 @@ namespace Immortal_Switch.Scripts.Skill.UI
             try
             {
                 int heroId = selectedHero.HeroId;
-
-                LogView(
-                    $"OnClickAutoEquip started -> " +
-                    $"heroId={selectedHero.HeroId}, class={selectedHero.HeroClass}");
+                
 
                 SkillAutoEquipResult result =
                     await dataProvider.TryAutoEquipSkillsToHero(selectedHero);
 
                 if (!result.Success)
                 {
-                    LogWarningView(
-                        $"Auto equip failed -> heroId={heroId}");
                     return;
                 }
-
-                LogView(
-                    $"Auto equip completed -> " +
-                    $"heroId={heroId}, " +
-                    $"hasChanged={result.HasChanged}, " +
-                    $"equippedCount={result.EquippedCount}, " +
-                    $"skills=[{string.Join(",", result.EquippedSkillIds)}]");
+                
 
                 /*
                  * Lấy lại context mới từ DataProvider.
@@ -325,18 +284,15 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (isReplaceMode)
             {
-                LogWarningView("Ignored grid skill click because replace mode is active.");
                 return;
             }
 
             if (skillData == null)
             {
-                LogErrorView("OnClickGridSkill received null skillData.");
                 return;
             }
 
             selectedSkill = skillData;
-            LogView($"OnClickGridSkill -> skillId={skillData.SkillId}, skillName={skillData.SkillName}");
             RefreshCurrentContext();
         }
 
@@ -350,9 +306,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
             RefreshClassButtons();
 
             bool hasAssignedHero = dataProvider.HasAssignedHero(selectedClass);
-
-            LogView(
-                $"RefreshCurrentContext -> selectedClass={selectedClass}, hasAssignedHero={hasAssignedHero}, isReplaceMode={isReplaceMode}");
 
             if (assignedContentRoot != null)
                 assignedContentRoot.SetActive(hasAssignedHero);
@@ -377,8 +330,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 RebuildGridByClass(selectedClass, null);
                 BindDetail(null, selectedSkill, tierInfo1);
                 CloseReplacePopup();
-
-                LogWarningView($"Class {selectedClass} has no assigned hero. Showing warning mode.");
+                
                 return;
             }
 
@@ -386,12 +338,8 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             if (selectedHero == null)
             {
-                LogErrorView($"ResolveSelectedHero returned null while class {selectedClass} is assigned.");
                 return;
             }
-
-            LogView(
-                $"ResolvedHero -> heroId={selectedHero.HeroId}, class={selectedHero.HeroClass}, equippedCount={selectedHero.EquippedSkillIds?.Count(id => id > 0) ?? 0}");
 
             BindHeroTabs();
             BindEquippedSlots();
@@ -402,9 +350,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
             var itemTier = EnumHelper.TierSkillToItemTier(selectedSkill.SkillTier);
             var tierInfo = ItemTierVisualImageService.GetItemTierEntry(itemTier);
 
-            LogView(
-                $"SelectedSkill -> {(selectedSkill != null ? $"{selectedSkill.SkillId}-{selectedSkill.SkillName}" : "null")}");
-
             RebuildGridByClass(selectedClass, selectedHero);
             BindDetail(selectedHero, selectedSkill, tierInfo);
 
@@ -412,7 +357,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
             {
                 if (selectedHero == null || pendingReplaceSkill == null)
                 {
-                    LogWarningView("ReplaceMode invalid state. Auto closing popup.");
                     CloseReplacePopup();
                 }
                 else
@@ -425,31 +369,24 @@ namespace Immortal_Switch.Scripts.Skill.UI
         private SkillViewHeroContext ResolveSelectedHero()
         {
             var activeHeroes = dataProvider.GetAssignedHeroes();
-            LogView($"ResolveSelectedHero -> activeHeroesCount={activeHeroes.Count}");
 
             if (selectedHero != null)
             {
                 var matched = activeHeroes.FirstOrDefault(x => x != null && x.HeroId == selectedHero.HeroId);
                 if (matched != null)
                 {
-                    LogView($"ResolveSelectedHero -> keep current heroId={matched.HeroId}");
                     return matched;
                 }
-
-                LogWarningView($"Previously selected heroId={selectedHero.HeroId} is no longer active.");
+                
             }
 
             var heroByClass = dataProvider.GetAssignedHeroByClass(selectedClass);
             if (heroByClass != null)
             {
-                LogView($"ResolveSelectedHero -> fallback by class heroId={heroByClass.HeroId}");
                 return heroByClass;
             }
 
             var first = activeHeroes.FirstOrDefault();
-            if (first != null)
-                LogWarningView($"ResolveSelectedHero -> fallback to first active heroId={first.HeroId}");
-
             return first;
         }
 
@@ -587,7 +524,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
             }
 
             if (detailLevelText != null) detailLevelText.text = $"Cấp.{state.Level}";
-            if (detailNameText != null) detailNameText.text = skillData.SkillName;
+            if (detailNameText != null) detailNameText.text = skillData.GetLocalizedSkillName();
             //if (detailTypeText != null) detailTypeText.text = $"{skillData.CastType} kỹ năng";
             if (detailDescText != null) detailDescText.text = skillData.BuildDescription(state.Level);
             if (detailShardText != null) detailShardText.text = $"{state.CurrentShard}/{state.RequiredShard}";
@@ -610,35 +547,28 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (selectedHero == null)
             {
-                LogErrorView("OnClickEquipOrUnequip failed because selectedHero is null.");
                 return;
             }
 
             if (selectedSkill == null)
             {
-                LogErrorView("OnClickEquipOrUnequip failed because selectedSkill is null.");
                 return;
             }
 
             var state = dataProvider.BuildSkillState(selectedHero, selectedSkill);
             if (state == null)
             {
-                LogErrorView($"BuildSkillState returned null for heroId={selectedHero.HeroId}, skillId={selectedSkill.SkillId}");
                 return;
             }
 
-            LogView($"OnClickEquipOrUnequip -> heroId={selectedHero.HeroId}, skillId={selectedSkill.SkillId}, isOwned={state.IsOwned}, isEquipped={state.IsEquipped}");
-
             if (!state.IsOwned)
             {
-                LogWarningView($"Skill {selectedSkill.SkillId} is not owned. Equip ignored.");
                 return;
             }
 
             if (state.IsEquipped)
             {
-                bool success = dataProvider.TryUnequipSkillFromHero(selectedHero, selectedSkill.SkillId);
-                LogView($"Unequip result -> success={success}");
+                dataProvider.TryUnequipSkillFromHero(selectedHero, selectedSkill.SkillId);
                 return;
             }
 
@@ -653,7 +583,6 @@ namespace Immortal_Switch.Scripts.Skill.UI
 
             pendingReplaceSkill = selectedSkill;
             isReplaceMode = true;
-            LogView($"Open replace mode -> heroId={selectedHero.HeroId}, pendingSkillId={pendingReplaceSkill.SkillId}");
             OpenReplacePopupInternal();
         }
 
@@ -696,33 +625,26 @@ namespace Immortal_Switch.Scripts.Skill.UI
         {
             if (!isReplaceMode)
             {
-                LogWarningView("OnClickReplaceSlot ignored because not in replace mode.");
                 return;
             }
 
             if (selectedHero == null)
             {
-                LogErrorView("OnClickReplaceSlot failed because selectedHero is null.");
                 return;
             }
 
             if (pendingReplaceSkill == null)
             {
-                LogErrorView("OnClickReplaceSlot failed because pendingReplaceSkill is null.");
                 return;
             }
-
-            LogView($"OnClickReplaceSlot -> heroId={selectedHero.HeroId}, slotIndex={slotIndex}, newSkillId={pendingReplaceSkill.SkillId}");
 
             bool success = await dataProvider.TryReplaceSkillOnHero(selectedHero, slotIndex, pendingReplaceSkill.SkillId);
             if (!success)
             {
-                LogWarningView($"Replace failed -> heroId={selectedHero.HeroId}, slotIndex={slotIndex}, skillId={pendingReplaceSkill.SkillId}");
                 return;
             }
 
             selectedSkill = pendingReplaceSkill;
-            LogView($"Replace success -> selectedSkillId={selectedSkill.SkillId}");
 
             CloseReplacePopup();
             RefreshCurrentContext();

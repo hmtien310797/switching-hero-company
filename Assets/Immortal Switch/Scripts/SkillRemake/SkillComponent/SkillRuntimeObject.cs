@@ -367,7 +367,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             string skillName = Context != null && Context.SkillData != null
-                ? Context.SkillData.SkillName
+                ? Context.SkillData.SkillId.ToString()
                 : "NULL_SKILL";
 
             string casterName = Context != null && Context.Caster != null
@@ -395,7 +395,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             string skillName = Context != null && Context.SkillData != null
-                ? Context.SkillData.SkillName
+                ? Context.SkillData.GetLocalizedSkillName()
                 : "NULL_SKILL";
 
             string casterName = Context != null && Context.Caster != null

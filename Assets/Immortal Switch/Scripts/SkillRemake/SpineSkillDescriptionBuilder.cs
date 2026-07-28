@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 
@@ -16,8 +17,8 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
     /// </summary>
     public static class SpineSkillDescriptionBuilder
     {
-        private const string HitParameter = "{hit}";
-        private const string FinalHitParameter = "{finalhit}";
+        private const string HitParameter = "{0}";
+        private const string FinalHitParameter = "{1}";
 
         private const string HitEventPrefix = "hit";
         private const string FinalHitEventName = "finalhit";
@@ -27,9 +28,7 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
         /// </summary>
         public static string Build(
             SkillDataSO skillData,
-            int currentSkillLevel,
-            Color hitColor,
-            Color finalHitColor)
+            int currentSkillLevel, ClassSkillDescriptionLevelValues[] classSkillDescriptionLevelValues)
         {
             if (skillData == null)
             {
@@ -39,7 +38,7 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
                 return string.Empty;
             }
 
-            string descriptionTemplate = skillData.Description;
+            string descriptionTemplate = LocalizationManager.GetText(skillData.DescriptionKey);
 
             if (string.IsNullOrWhiteSpace(descriptionTemplate))
                 return string.Empty;
@@ -54,8 +53,7 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
                 currentSkillLevel,
                 HitParameter,
                 HitEventPrefix,
-                EventSearchMode.HitPhase,
-                hitColor);
+                EventSearchMode.HitPhase);
 
             ReplaceDamageParameter(
                 builder,
@@ -63,8 +61,7 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
                 currentSkillLevel,
                 FinalHitParameter,
                 FinalHitEventName,
-                EventSearchMode.Exact,
-                finalHitColor);
+                EventSearchMode.Exact);
 
             return builder.ToString();
         }
@@ -75,8 +72,7 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
             int currentSkillLevel,
             string parameter,
             string targetEventName,
-            EventSearchMode searchMode,
-            Color valueColor)
+            EventSearchMode searchMode)
         {
             string currentDescription = builder.ToString();
 
@@ -108,24 +104,10 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
 
             string formattedDamage = FormatPercent(damagePercent);
 
-            string coloredDamage = WrapColor(
-                formattedDamage,
-                valueColor);
-
             ReplaceIgnoreCase(
                 builder,
                 parameter,
-                coloredDamage);
-        }
-        
-        private static string WrapColor(
-            string value,
-            Color color)
-        {
-            string hexColor =
-                ColorUtility.ToHtmlStringRGBA(color);
-
-            return $"<color=#{hexColor}>{value}</color>";
+                formattedDamage);
         }
         
         private static bool TryGetDamagePercent(
@@ -137,33 +119,12 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
         {
             damagePercent = 0f;
 
-            switch (skillData.OwnerType)
-            {
-                case SkillOwnerType.ClassSkill:
-                    return TryGetClassSkillDamagePercent(
-                        skillData,
-                        currentSkillLevel,
-                        targetEventName,
-                        searchMode,
-                        out damagePercent);
-
-                case SkillOwnerType.UltimateSkill:
-                    return TryGetUltimateSkillDamagePercent(
-                        skillData,
-                        currentSkillLevel,
-                        targetEventName,
-                        searchMode,
-                        out damagePercent);
-
-                default:
-#if UNITY_EDITOR
-                    Debug.LogWarning(
-                        $"[SpineSkillDescriptionBuilder] OwnerType " +
-                        $"'{skillData.OwnerType}' chưa được hỗ trợ. " +
-                        $"Skill: '{skillData.name}'.");
-#endif
-                    return false;
-            }
+            return TryGetClassSkillDamagePercent(
+                skillData,
+                currentSkillLevel,
+                targetEventName,
+                searchMode,
+                out damagePercent);
         }
         
         private static bool TryGetClassSkillDamagePercent(
@@ -209,43 +170,6 @@ namespace Immortal_Switch.Scripts.SkillSystem.Description
 
             return baseDamagePercent *
                    (1f + additionalLevel * growthPercentPerLevel / 100f);
-        }
-        
-        private static bool TryGetUltimateSkillDamagePercent(
-            SkillDataSO skillData,
-            int currentSkillLevel,
-            string targetEventName,
-            EventSearchMode searchMode,
-            out float damagePercent)
-        {
-            damagePercent = 0f;
-
-            if (skillData.Levels == null ||
-                skillData.Levels.Count == 0)
-            {
-#if UNITY_EDITOR
-                Debug.LogWarning(
-                    $"[SpineSkillDescriptionBuilder] Ultimate Skill " +
-                    $"'{skillData.name}' không có Levels data.");
-#endif
-                return false;
-            }
-
-            int levelIndex = Mathf.Clamp(
-                currentSkillLevel - 1,
-                0,
-                skillData.Levels.Count - 1);
-
-            var levelData = skillData.Levels[levelIndex];
-
-            if (levelData == null)
-                return false;
-
-            return TryGetDamageFromPhases(
-                levelData.Phases,
-                targetEventName,
-                searchMode,
-                out damagePercent);
         }
         
         private static bool TryGetDamageFromPhases(

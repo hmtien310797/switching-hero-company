@@ -664,7 +664,7 @@ namespace Immortal_Switch.Scripts.Skill
             if (remaining > 0f)
             {
                 if (debugLogCastResult)
-                    Debug.Log($"[HeroSkillController] {skillData.SkillName} is on cooldown: {remaining:0.00}s", this);
+                    Debug.Log($"[HeroSkillController] {skillData.SkillId} is on cooldown: {remaining:0.00}s", this);
 
                 return false;
             }
@@ -751,7 +751,7 @@ namespace Immortal_Switch.Scripts.Skill
 
             cooldownDebugView.Add(new SkillCooldownDebugView
             {
-                Label = string.IsNullOrEmpty(skillData.SkillName) ? label : $"{label} - {skillData.SkillName}",
+                Label = skillData.SkillId.ToString(),
                 Skill = skillData,
                 Cooldown = cooldown,
                 Remaining = remaining,

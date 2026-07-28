@@ -16,13 +16,15 @@ MonoBehaviour:
   HeroId: 0
   SkillKey: skilldata_assassin_204
   SkillClass: 2
-  SkillName: Shadow Cleave Field
+  SkillNameKey: ui_skill_class_assasin_204
   IconSkillKey: ic_class_assassin_Shadow_Cleave_Field
-  SkillIcon: {fileID: 21300000, guid: a81d0a09e37212949a876de5fa12aae5, type: 3}
   Description: "T\u1EA1o v\xF9ng ch\xE9m li\xEAn t\u1EE5c quanh b\u1EA3n th\xE2n,
     g\xE2y s\xE1t th\u01B0\u01A1ng nhi\u1EC1u l\u1EA7n l\xEAn t\u1EA5t c\u1EA3 k\u1EBB
     \u0111\u1ECBch xung quanh. M\u1ED7i hit g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
     k\u1EF9 n\u0103ng."
+  DescriptionKey: ui_skill_class_assasin_204_decs
+  legacyValueKey: []
+  DescriptionValuesByLevel: []
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 2
@@ -94,11 +96,16 @@ MonoBehaviour:
         DamageType: 0
         StackRule: 0
       StatModifier:
+        TargetMask: 1
+        ApplyMode: 0
         ModifierId: 
         StatType: 0
+        Operation: 1
         PercentValue: 0
         ScaleValueWithClassSkillLevel: 1
         Duration: 5
+        StackRule: 3
+        MaxStacks: 1
       Area:
         AreaPrefab: {fileID: 0}
         Shape: 0

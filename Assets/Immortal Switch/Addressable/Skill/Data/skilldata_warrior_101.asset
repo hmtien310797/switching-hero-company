@@ -16,9 +16,8 @@ MonoBehaviour:
   HeroId: 0
   SkillKey: skilldata_warrior_101
   SkillClass: 1
-  SkillName: Holy Blade Pierce
+  SkillNameKey: ui_skill_class_warrior_101
   IconSkillKey: ic_class_knight_Holy_Blade_Pierce
-  SkillIcon: {fileID: 21300000, guid: b0f5c98300e54a143b92c4742634e640, type: 3}
   Description: "Tri\u1EC7u h\u1ED3i c\xE1c l\u01B0\u1EE1i ki\u1EBFm \u1EA3o \u1EA3nh
     t\u1EEB c\u1ED5ng kh\xF4ng gian, lao t\u1EDBi k\u1EBB \u0111\u1ECBch v\xE0 ch\xE9m
     li\xEAn t\u1EE5c, g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng
@@ -26,6 +25,9 @@ MonoBehaviour:
     li\u1EC5u h\xECnh ch\u1EEF X, g\xE2y th\xEAm {finalhit}% ATK s\xE1t th\u01B0\u01A1ng
     k\u1EF9 n\u0103ng l\xEAn c\xE1c k\u1EBB \u0111\u1ECBch xung quanh m\u1EE5c ti\xEAu
     ch\xEDnh."
+  DescriptionKey: ui_skill_class_warrior_101_decs
+  legacyValueKey: []
+  DescriptionValuesByLevel: []
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 3
@@ -97,11 +99,16 @@ MonoBehaviour:
         DamageType: 0
         StackRule: 0
       StatModifier:
+        TargetMask: 1
+        ApplyMode: 0
         ModifierId: 
         StatType: 0
+        Operation: 1
         PercentValue: 0
         ScaleValueWithClassSkillLevel: 1
         Duration: 5
+        StackRule: 3
+        MaxStacks: 1
       Area:
         AreaPrefab: {fileID: 0}
         Shape: 0
@@ -183,11 +190,16 @@ MonoBehaviour:
         DamageType: 0
         StackRule: 0
       StatModifier:
+        TargetMask: 1
+        ApplyMode: 0
         ModifierId: 
         StatType: 0
+        Operation: 1
         PercentValue: 0
         ScaleValueWithClassSkillLevel: 1
         Duration: 5
+        StackRule: 3
+        MaxStacks: 1
       Area:
         AreaPrefab: {fileID: 0}
         Shape: 0
@@ -269,11 +281,16 @@ MonoBehaviour:
         DamageType: 0
         StackRule: 0
       StatModifier:
+        TargetMask: 1
+        ApplyMode: 0
         ModifierId: 
         StatType: 0
+        Operation: 1
         PercentValue: 0
         ScaleValueWithClassSkillLevel: 1
         Duration: 5
+        StackRule: 3
+        MaxStacks: 1
       Area:
         AreaPrefab: {fileID: 0}
         Shape: 0

@@ -16,14 +16,16 @@ MonoBehaviour:
   HeroId: 0
   SkillKey: skilldata_archer_305
   SkillClass: 3
-  SkillName: Tempest Arrow Storm
+  SkillNameKey: ui_skill_class_archer_305
   IconSkillKey: ic_class_archer_Tempest_ArrowStorm
-  SkillIcon: {fileID: 21300000, guid: 5bdeeab694a8feb42a193987d56827f8, type: 3}
   Description: "M\u1ED7i khi k\xEDch ho\u1EA1t k\u1EF9 n\u0103ng, nh\u1EADn 1 stack
     M\u0169i T\xEAn S\xE9t. Khi \u0111\u1EA1t \u0111\u1EE7 stack, c\xE1c m\u0169i
     t\xEAn t\u1EF1 \u0111\u1ED9ng b\u1EAFn v\xE0o k\u1EBB \u0111\u1ECBch g\u1EA7n
     nh\u1EA5t, m\u1ED7i m\u0169i t\xEAn g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
     k\u1EF9 n\u0103ng."
+  DescriptionKey: ui_skill_class_archer_305_decs
+  legacyValueKey: []
+  DescriptionValuesByLevel: []
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 1
@@ -95,11 +97,16 @@ MonoBehaviour:
         DamageType: 0
         StackRule: 0
       StatModifier:
+        TargetMask: 1
+        ApplyMode: 0
         ModifierId: 
         StatType: 0
+        Operation: 1
         PercentValue: 0
         ScaleValueWithClassSkillLevel: 1
         Duration: 5
+        StackRule: 3
+        MaxStacks: 1
       Area:
         AreaPrefab: {fileID: 0}
         Shape: 0

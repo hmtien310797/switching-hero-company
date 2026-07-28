@@ -269,6 +269,12 @@ namespace Immortal_Switch.Scripts.Skill
 
         public float[] Values;
     }
+    
+    public class ClassSkillDescriptionLevelValues
+    {
+        public float Values;
+        public bool ScaleWithSkillLevel;
+    }
 
     [Serializable]
     public class SkillLevelData
@@ -337,11 +343,8 @@ namespace Immortal_Switch.Scripts.Skill
         public int HeroId;
         public string SkillKey;
         public HeroClass SkillClass;
-        public string SkillName;
         public string SkillNameKey;
         public string IconSkillKey;
-        [TextArea(3,12)]
-        public String Description;
         public String DescriptionKey;
 
         /// <summary>
@@ -360,6 +363,9 @@ namespace Immortal_Switch.Scripts.Skill
         /// </summary>
         [ShowIf(nameof(IsSpecialSkill))]
         public SkillDescriptionLevelValues[] DescriptionValuesByLevel;
+        
+        [ShowIf(nameof(IsSpecialSkill), false)]
+        public ClassSkillDescriptionLevelValues[] classSkillDescriptionLevelValuesByLevel;
 
         [Header("Type")]
         public SkillOwnerType OwnerType = SkillOwnerType.ClassSkill;
@@ -385,9 +391,6 @@ namespace Immortal_Switch.Scripts.Skill
 
         [Header("Levels")]
         public List<SkillLevelData> Levels = new();
-        
-        [SerializeField]
-        private Color hitDamageColor = new Color(1f, 0.25f, 0.25f);
 
         public int GetSafeLevel(int level)
         {
@@ -416,14 +419,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public string BuildDescription(int level)
         {
-            switch (RuntimeObjectConfig.RuntimeVisualType)
-            {
-                case SkillRuntimeVisualType.SpawnedSkillObject:
-                case SkillRuntimeVisualType.HeroSpineAndSpawnedSkillObject:
-                    return SpineSkillDescriptionBuilder.Build(this, level, hitDamageColor, hitDamageColor);
-            }
-
-            return null;
+            return SpineSkillDescriptionBuilder.Build(this, level, classSkillDescriptionLevelValuesByLevel);
         }
 
         /// <summary>
@@ -442,9 +438,6 @@ namespace Immortal_Switch.Scripts.Skill
             {
                 return localized;
             }
-
-            if (!string.IsNullOrWhiteSpace(SkillName))
-                return SkillName;
 
             if (!string.IsNullOrWhiteSpace(SkillKey))
                 return SkillKey;
@@ -466,7 +459,7 @@ namespace Immortal_Switch.Scripts.Skill
                 return localized;
             }
 
-            return Description ?? string.Empty;
+            return string.Empty;
         }
 
         /// <summary>
@@ -696,9 +689,6 @@ namespace Immortal_Switch.Scripts.Skill
 
             if (!string.IsNullOrEmpty(built))
                 return built;
-
-            if (!string.IsNullOrEmpty(Description))
-                return Description;
 
             return string.Empty;
         }

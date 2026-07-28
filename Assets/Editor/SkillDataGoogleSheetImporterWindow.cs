@@ -496,10 +496,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                 rowData.SkillKey,
                 StringComparison.Ordinal) ||
             !string.Equals(
-                skillData.SkillName,
-                rowData.SkillName,
-                StringComparison.Ordinal) ||
-            !string.Equals(
                 skillData.IconSkillKey,
                 rowData.IconSkillKey,
                 StringComparison.Ordinal) ||
@@ -511,7 +507,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
 
         skillData.SkillId = rowData.SkillId;
         skillData.SkillKey = rowData.SkillKey;
-        skillData.SkillName = rowData.SkillName;
         skillData.IconSkillKey = rowData.IconSkillKey;
         skillData.OwnerType = SkillOwnerType.ClassSkill;
         skillData.SkillTier = rowData.SkillTier;

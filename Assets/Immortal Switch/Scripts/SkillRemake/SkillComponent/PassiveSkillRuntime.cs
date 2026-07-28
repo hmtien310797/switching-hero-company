@@ -240,9 +240,7 @@ namespace Immortal_Switch.Scripts.Skill
             BuffData buffData = new BuffData
             {
                 Id = RuntimeBuffId,
-                Name = string.IsNullOrEmpty(skillData.SkillName)
-                    ? skillData.name
-                    : skillData.SkillName,
+                Name = skillData.SkillId.ToString(),
                 Kind = BuffKind.Buff,
                 Duration = Mathf.Max(0f, config.BuffDuration),
                 MaxStacks = 1,

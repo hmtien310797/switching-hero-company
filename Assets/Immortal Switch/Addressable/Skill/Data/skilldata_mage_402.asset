@@ -16,15 +16,17 @@ MonoBehaviour:
   HeroId: 0
   SkillKey: skilldata_mage_402
   SkillClass: 4
-  SkillName: Frost Nova Prison
+  SkillNameKey: ui_skill_class_mage_402
   IconSkillKey: ic_class_mage_Frost_Nova_Prison
-  SkillIcon: {fileID: 21300000, guid: 618c32e396cf8a84bbe9b98f8438612c, type: 3}
   Description: "T\u1EA1o v\xF2ng b\u0103ng d\u01B0\u1EDBi ch\xE2n k\u1EBB \u0111\u1ECBch,
     sau \u0111\xF3 tri\u1EC7u h\u1ED3i c\xE1c c\u1ED9t b\u0103ng b\xF9ng n\u1ED5
     trong ph\u1EA1m vi, g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng
     v\xE0 l\xE0m ch\u1EADm k\u1EBB \u0111\u1ECBch tr\xFAng chi\xEAu. N\u1EBFu m\u1EE5c
     ti\xEAu \u0111ang b\u1ECB Burn ho\u1EB7c Electrified, g\xE2y th\xEAm {bonusHit}%
     ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng."
+  DescriptionKey: ui_skill_class_mage_402_decs
+  legacyValueKey: []
+  DescriptionValuesByLevel: []
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 0
@@ -96,11 +98,16 @@ MonoBehaviour:
         DamageType: 0
         StackRule: 0
       StatModifier:
+        TargetMask: 1
+        ApplyMode: 0
         ModifierId: 
         StatType: 0
+        Operation: 1
         PercentValue: 0
         ScaleValueWithClassSkillLevel: 1
         Duration: 5
+        StackRule: 3
+        MaxStacks: 1
       Area:
         AreaPrefab: {fileID: 0}
         Shape: 0
