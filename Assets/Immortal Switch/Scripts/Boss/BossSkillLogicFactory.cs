@@ -9,6 +9,7 @@
                 3001 => new Boss3001SkillLogic(),
                 3002 => new Boss3002SkillLogic(),
                 3003 => new Boss3003SkillLogic(),
+                5001 => new BossSeaMonsterSkillLogic(),
                 _ => new EmptyBossSkillLogic()
             };
         }

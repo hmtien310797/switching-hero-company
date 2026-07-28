@@ -151,8 +151,7 @@ public class SignUpPanel : BouncePanel
         bool lengthOk = pwd.Length >= minLength && pwd.Length <= maxLength;
         bool hasUpper = Regex.IsMatch(pwd, "[A-Z]");
         bool hasDigit = Regex.IsMatch(pwd, "\\d");
-        bool hasSpecial = Regex.IsMatch(pwd, "[^a-zA-Z0-9]"); // any non-alphanumeric
-        return lengthOk && hasUpper && hasDigit && hasSpecial;
+        return lengthOk && hasUpper && hasDigit;
     }
 
     public bool ValidateRegistrationInput()

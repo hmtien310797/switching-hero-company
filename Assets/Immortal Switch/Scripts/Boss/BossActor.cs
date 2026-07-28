@@ -47,6 +47,8 @@ namespace Immortal_Switch.Scripts.Boss
         [Header("Properties")]
         [field: SerializeField] public ActorType ActorType { get; private set;}
 
+        [SerializeField] private bool isRangedAttacker = false;
+
         private IEnemyTargetProvider targetProvider;
 
         private BossState currentState;
@@ -471,8 +473,13 @@ namespace Immortal_Switch.Scripts.Boss
                 return;
             }
             
-            DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
-            currentTarget.TakeDamage(damageResult);
+            // Ranged attacker: damage is dealt by the projectile on impact,
+            // not directly on the animation hit event.
+            if (!isRangedAttacker)
+            {
+                DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
+                currentTarget.TakeDamage(damageResult);
+            }
 
             NormalAttackCount++;
             skillLogic?.OnNormalAttack();
@@ -515,8 +522,8 @@ namespace Immortal_Switch.Scripts.Boss
             self.y = 0f;
             target.y = 0f;
 
-            float sqr = (target - self).sqrMagnitude;
-            return sqr <= bossData.AttackRange;
+            //float sqr = (target - self).sqrMagnitude;
+            return Vector3.Distance(self, target) <= bossData.AttackRange;
         }
 
         private void ChangeState(BossState nextState)
