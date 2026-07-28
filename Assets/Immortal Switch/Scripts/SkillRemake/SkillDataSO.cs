@@ -270,6 +270,7 @@ namespace Immortal_Switch.Scripts.Skill
         public float[] Values;
     }
     
+    [Serializable]
     public class ClassSkillDescriptionLevelValues
     {
         public float Values;
@@ -364,7 +365,7 @@ namespace Immortal_Switch.Scripts.Skill
         [ShowIf(nameof(IsSpecialSkill))]
         public SkillDescriptionLevelValues[] DescriptionValuesByLevel;
         
-        [ShowIf(nameof(IsSpecialSkill), false)]
+        [HideIf(nameof(IsSpecialSkill))]
         public ClassSkillDescriptionLevelValues[] classSkillDescriptionLevelValuesByLevel;
 
         [Header("Type")]
@@ -1125,6 +1126,157 @@ namespace Immortal_Switch.Scripts.Skill
             }
 
             return changed ? SkillValueKeySyncStatus.Updated : SkillValueKeySyncStatus.Unchanged;
+        }
+
+        /// <summary>
+        /// Resize mảng <see cref="classSkillDescriptionLevelValuesByLevel"/> về đúng số placeholder
+        /// (required) từ localized description template.
+        /// - grow: giữ phần tử cũ, pad bằng <see cref="ClassSkillDescriptionLevelValues"/> mới
+        ///   với <c>Values = 0</c>, <c>ScaleWithSkillLevel = false</c>.
+        /// - forceMatch=true: shrink về required (warn nếu mất data ≠ 0).
+        /// - forceMatch=false: không shrink (Safe Sync).
+        /// Trả về true nếu mảng thay đổi. Pure function — test độc lập được.
+        /// </summary>
+        public static bool ResizeClassSkillDescriptionValues(
+            ref ClassSkillDescriptionLevelValues[] array,
+            int required,
+            bool forceMatch)
+        {
+            if (required < 0)
+                required = 0;
+
+            if (array == null)
+            {
+                if (required == 0)
+                    return false;
+
+                array = new ClassSkillDescriptionLevelValues[required];
+                for (int i = 0; i < required; i++)
+                    array[i] = new ClassSkillDescriptionLevelValues();
+
+                return true;
+            }
+
+            int current = array.Length;
+
+            if (current == required)
+                return false;
+
+            if (current < required)
+            {
+                ClassSkillDescriptionLevelValues[] grown =
+                    new ClassSkillDescriptionLevelValues[required];
+
+                for (int i = 0; i < current; i++)
+                    grown[i] = array[i];
+
+                for (int i = current; i < required; i++)
+                    grown[i] = new ClassSkillDescriptionLevelValues();
+
+                array = grown;
+                return true;
+            }
+
+            // current > required
+            if (!forceMatch)
+                return false; // Safe Sync: không shrink.
+
+            bool removedNonZero = false;
+            for (int i = required; i < current; i++)
+            {
+                ClassSkillDescriptionLevelValues entry = array[i];
+
+                if (entry != null &&
+                    !Mathf.Approximately(entry.Values, 0f))
+                {
+                    removedNonZero = true;
+                    break;
+                }
+            }
+
+            if (removedNonZero)
+            {
+                UnityEngine.Debug.LogWarning(
+                    $"[SkillDataSO] Force-match trimming class skill description values "
+                    + $"(length {current} -> {required}); non-zero data may be lost.");
+            }
+
+            ClassSkillDescriptionLevelValues[] trimmed =
+                new ClassSkillDescriptionLevelValues[required];
+
+            for (int i = 0; i < required; i++)
+                trimmed[i] = array[i];
+
+            array = trimmed;
+            return true;
+        }
+
+        /// <summary>
+        /// Sync <see cref="classSkillDescriptionLevelValuesByLevel"/> với số placeholder của localized
+        /// description template (chỉ Class Skill).
+        /// - Safe Sync (forceMatch=false): chỉ grow, không xóa data designer.
+        /// - Force Match (forceMatch=true): shrink về đúng số placeholder (warn nếu mất data ≠ 0).
+        /// Đọc String Table trực tiếp qua editor API (không cần Play Mode).
+        /// </summary>
+        public SkillValueKeySyncStatus SyncClassSkillDescriptionValuesWithLocalizedTemplate(
+            bool forceMatch)
+        {
+            if (IsSpecialSkill())
+            {
+                UnityEngine.Debug.Log(
+                    $"[SkillDataSO] '{name}' is a special skill (ultimate/passive); "
+                    + "use SyncDescriptionValuesWithLocalizedTemplate instead.");
+
+                return SkillValueKeySyncStatus.Unchanged;
+            }
+
+            // TryGetEditorLocalizedTemplate đã log lý do cụ thể nếu template rỗng.
+            string template = TryGetEditorLocalizedTemplate(DescriptionKey);
+            int required = string.IsNullOrEmpty(template)
+                ? -1
+                : SkillDescriptionFormatUtility.GetRequiredArgumentCount(template);
+
+            ClassSkillDescriptionLevelValues[] currentArray =
+                classSkillDescriptionLevelValuesByLevel;
+
+            bool changed = ResizeClassSkillDescriptionValues(
+                ref currentArray,
+                required,
+                forceMatch);
+
+            if (changed)
+            {
+                classSkillDescriptionLevelValuesByLevel = currentArray;
+                UnityEditor.EditorUtility.SetDirty(this);
+
+                UnityEngine.Debug.Log(
+                    $"[SkillDataSO] Synced class skill '{name}': DescriptionKey='{DescriptionKey}', "
+                    + $"placeholders={required}, forceMatch={forceMatch}.");
+            }
+
+            if (string.IsNullOrEmpty(template))
+                return SkillValueKeySyncStatus.MissingLocalizationKey;
+
+            return changed ? SkillValueKeySyncStatus.Updated : SkillValueKeySyncStatus.Unchanged;
+        }
+
+        /// <summary>Safe Sync (chỉ grow) cho class skill — API công khai.</summary>
+        public bool SyncClassSkillDescriptionValuesWithLocalizedTemplate()
+        {
+            return SyncClassSkillDescriptionValuesWithLocalizedTemplate(false)
+                == SkillValueKeySyncStatus.Updated;
+        }
+
+        [Button("Sync Class Skill Description Values")]
+        public void SyncClassSkillLocalizedDescriptionValues()
+        {
+            SyncClassSkillDescriptionValuesWithLocalizedTemplate(false);
+        }
+
+        [Button("Force Match Class Skill Description Values")]
+        public void ForceMatchClassSkillDescriptionValues()
+        {
+            SyncClassSkillDescriptionValuesWithLocalizedTemplate(true);
         }
 
         private static string TryGetEditorLocalizedTemplate(string descriptionKey)

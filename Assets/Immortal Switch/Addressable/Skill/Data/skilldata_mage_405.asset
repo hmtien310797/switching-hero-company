@@ -18,14 +18,12 @@ MonoBehaviour:
   SkillClass: 4
   SkillNameKey: ui_skill_class_mage_405
   IconSkillKey: ic_class_mage_Celestial_Prism_Storm
-  Description: "Tri\u1EC7u h\u1ED3i c\xE1c tinh th\u1EC3 ma ph\xE1p xoay quanh b\u1EA3n
-    th\xE2n, li\xEAn t\u1EE5c b\u1EAFn laser qu\xE9t chi\u1EBFn tr\u01B0\u1EDDng.
-    K\u1EBB \u0111\u1ECBch ch\u1EA1m tia laser nh\u1EADn {hit}% ATK s\xE1t th\u01B0\u01A1ng
-    k\u1EF9 n\u0103ng. Trong th\u1EDDi gian thi tri\u1EC3n, b\u1EA3n th\xE2n \u0111\u01B0\u1EE3c
-    gi\u1EA3m s\xE1t th\u01B0\u01A1ng nh\u1EADn v\xE0o."
   DescriptionKey: ui_skill_class_mage_405_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 3
@@ -207,4 +205,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

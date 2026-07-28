@@ -18,14 +18,12 @@ MonoBehaviour:
   SkillClass: 1
   SkillNameKey: ui_skill_class_warrior_102
   IconSkillKey: ic_class_knight_Divine_Blade_Fall
-  Description: "Tri\u1EC7u h\u1ED3i th\xE1nh ki\u1EBFm r\u01A1i xu\u1ED1ng khu v\u1EF1c
-    k\u1EBB \u0111\u1ECBch, g\xE2y nhi\u1EC1u \u0111\u1EE3t s\xE1t th\u01B0\u01A1ng
-    li\xEAn ti\u1EBFp. M\u1ED7i th\xE1nh ki\u1EBFm g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
-    k\u1EF9 n\u0103ng l\xEAn c\xE1c k\u1EBB \u0111\u1ECBch trong ph\u1EA1m vi \u1EA3nh
-    h\u01B0\u1EDFng."
   DescriptionKey: ui_skill_class_warrior_102_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 2
@@ -207,4 +205,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

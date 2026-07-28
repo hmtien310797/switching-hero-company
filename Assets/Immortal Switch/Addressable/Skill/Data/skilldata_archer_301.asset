@@ -18,13 +18,12 @@ MonoBehaviour:
   SkillClass: 3
   SkillNameKey: ui_skill_class_archer_301
   IconSkillKey: ic_class_archer_GaltinArrow
-  Description: "B\u1EAFn nhi\u1EC1u m\u0169i t\xEAn \u0111i\u1EC7n v\u1EC1 ph\xEDa
-    tr\u01B0\u1EDBc, t\u1EA5n c\xF4ng k\u1EBB \u0111\u1ECBch b\u1EB1ng nhi\u1EC1u
-    ki\u1EC3u b\u1EAFn kh\xE1c nhau. M\u1ED7i m\u0169i t\xEAn g\xE2y {hit}% ATK s\xE1t
-    th\u01B0\u01A1ng k\u1EF9 n\u0103ng."
   DescriptionKey: ui_skill_class_archer_301_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 0
@@ -302,4 +301,3 @@ MonoBehaviour:
     PassiveLevelConfig:
       MergeMode: 0
       Modifiers: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

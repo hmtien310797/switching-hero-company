@@ -18,13 +18,12 @@ MonoBehaviour:
   SkillClass: 3
   SkillNameKey: ui_skill_class_archer_304
   IconSkillKey: ic_class_archer_ThunderStorm
-  Description: "Tri\u1EC7u h\u1ED3i m\u1ED9t c\u01A1n b\xE3o l\u1EEDa trong khu v\u1EF1c
-    m\u1EE5c ti\xEAu, li\xEAn t\u1EE5c gi\xE1ng s\xE9t xu\u1ED1ng k\u1EBB \u0111\u1ECBch
-    trong ph\u1EA1m vi. M\u1ED7i tia s\xE9t g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
-    k\u1EF9 n\u0103ng."
   DescriptionKey: ui_skill_class_archer_304_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 3
@@ -206,4 +205,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

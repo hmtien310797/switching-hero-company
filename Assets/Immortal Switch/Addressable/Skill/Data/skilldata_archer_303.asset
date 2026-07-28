@@ -18,13 +18,18 @@ MonoBehaviour:
   SkillClass: 3
   SkillNameKey: ui_skill_class_archer_303
   IconSkillKey: ic_class_archer_Phoenix
-  Description: "Tri\u1EC7u h\u1ED3i Ph\u01B0\u1EE3ng Ho\xE0ng l\u1EEDa bay th\u1EB3ng
-    v\u1EC1 ph\xEDa tr\u01B0\u1EDBc, li\xEAn t\u1EE5c t\u1EA5n c\xF4ng k\u1EBB \u0111\u1ECBch
-    tr\xEAn \u0111\u01B0\u1EDDng bay. M\u1ED7i l\u1EA7n t\u1EA5n c\xF4ng g\xE2y {hit}%
-    ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng."
   DescriptionKey: ui_skill_class_archer_303_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
+  - Values: 0
+    ScaleWithSkillLevel: 0
+  - Values: 0
+    ScaleWithSkillLevel: 0
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 2
@@ -206,4 +211,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

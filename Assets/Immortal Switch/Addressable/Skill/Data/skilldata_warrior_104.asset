@@ -18,13 +18,12 @@ MonoBehaviour:
   SkillClass: 1
   SkillNameKey: ui_skill_class_warrior_104
   IconSkillKey: ic_class_knight_Blade_Vortex
-  Description: "T\u1EA1o m\u1ED9t v\xF2ng ki\u1EBFm xoay t\u1EA1i v\u1ECB tr\xED
-    m\u1EE5c ti\xEAu, g\xE2y s\xE1t th\u01B0\u01A1ng li\xEAn t\u1EE5c l\xEAn k\u1EBB
-    \u0111\u1ECBch trong v\xF9ng. M\u1ED7i nh\u1ECBp g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
-    k\u1EF9 n\u0103ng v\xE0 c\xF3 th\u1EC3 l\xE0m ch\u1EADm k\u1EBB \u0111\u1ECBch."
   DescriptionKey: ui_skill_class_warrior_104_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 0
@@ -206,4 +205,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

@@ -18,13 +18,12 @@ MonoBehaviour:
   SkillClass: 3
   SkillNameKey: ui_skill_class_archer_302
   IconSkillKey: ic_class_archer_LightningDragon
-  Description: "Tri\u1EC7u h\u1ED3i R\u1ED3ng S\u1EA5m t\u1EA1o v\xF9ng xo\xE1y \u0111i\u1EC7n
-    t\u1EA5n c\xF4ng k\u1EBB \u0111\u1ECBch xung quanh, m\u1ED7i l\u1EA7n g\xE2y
-    {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng. K\u1EBB \u0111\u1ECBch
-    c\xF2n th\u1EA5p HP c\xF3 th\u1EC3 b\u1ECB ti\xEAu di\u1EC7t ngay l\u1EADp t\u1EE9c."
   DescriptionKey: ui_skill_class_archer_302_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 3
@@ -297,4 +296,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

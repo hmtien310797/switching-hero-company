@@ -18,13 +18,12 @@ MonoBehaviour:
   SkillClass: 2
   SkillNameKey: ui_skill_class_assasin_201
   IconSkillKey: ic_class_assassin_lade_Storm_Circle
-  Description: "T\u1EA1o v\xF9ng l\u01B0\u1EE1i \u0111ao xoay quanh m\u1EE5c ti\xEAu,
-    li\xEAn t\u1EE5c g\xE2y s\xE1t th\u01B0\u01A1ng l\xEAn k\u1EBB \u0111\u1ECBch
-    trong ph\u1EA1m vi. M\u1ED7i hit g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9
-    n\u0103ng."
   DescriptionKey: ui_skill_class_assasin_201_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 0
@@ -206,4 +205,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

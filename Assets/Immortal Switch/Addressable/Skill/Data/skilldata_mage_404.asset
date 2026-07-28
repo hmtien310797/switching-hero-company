@@ -18,14 +18,14 @@ MonoBehaviour:
   SkillClass: 4
   SkillNameKey: ui_skill_class_mage_404
   IconSkillKey: ic_class_mage_Abyss_Gravity_Collapse
-  Description: "T\u1EA1o m\u1ED9t h\u1ED1 \u0111en h\u01B0 kh\xF4ng h\xFAt k\u1EBB
-    \u0111\u1ECBch v\xE0o trung t\xE2m v\xE0 g\xE2y s\xE1t th\u01B0\u01A1ng li\xEAn
-    t\u1EE5c. M\u1ED7i \u0111\u1EE3t g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9
-    n\u0103ng. Khi k\u1EBFt th\xFAc, h\u1ED1 \u0111en ph\xE1t n\u1ED5, g\xE2y th\xEAm
-    {finalhit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng di\u1EC7n r\u1ED9ng."
   DescriptionKey: ui_skill_class_mage_404_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 2
@@ -207,4 +207,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

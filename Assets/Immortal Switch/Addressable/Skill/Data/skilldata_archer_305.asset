@@ -18,14 +18,12 @@ MonoBehaviour:
   SkillClass: 3
   SkillNameKey: ui_skill_class_archer_305
   IconSkillKey: ic_class_archer_Tempest_ArrowStorm
-  Description: "M\u1ED7i khi k\xEDch ho\u1EA1t k\u1EF9 n\u0103ng, nh\u1EADn 1 stack
-    M\u0169i T\xEAn S\xE9t. Khi \u0111\u1EA1t \u0111\u1EE7 stack, c\xE1c m\u0169i
-    t\xEAn t\u1EF1 \u0111\u1ED9ng b\u1EAFn v\xE0o k\u1EBB \u0111\u1ECBch g\u1EA7n
-    nh\u1EA5t, m\u1ED7i m\u0169i t\xEAn g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng
-    k\u1EF9 n\u0103ng."
   DescriptionKey: ui_skill_class_archer_305_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 1
@@ -207,4 +205,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

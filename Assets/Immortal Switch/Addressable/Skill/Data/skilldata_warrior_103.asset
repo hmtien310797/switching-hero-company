@@ -18,14 +18,14 @@ MonoBehaviour:
   SkillClass: 1
   SkillNameKey: ui_skill_class_warrior_103
   IconSkillKey: ic_class_knight_Shadow_Dash
-  Description: "Tung chu\u1ED7i ch\xE9m c\u1EF1c nhanh v\u1EC1 ph\xEDa m\u1EE5c ti\xEAu,
-    m\u1ED7i nh\xE1t g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng.
-    Sau \u0111\xF3 tung m\u1ED9t nh\xE1t ch\xE9m m\u1EA1nh, g\xE2y th\xEAm {finalhit}%
-    ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng l\xEAn k\u1EBB \u0111\u1ECBch ph\xEDa
-    tr\u01B0\u1EDBc."
   DescriptionKey: ui_skill_class_warrior_103_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 1
@@ -298,4 +298,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

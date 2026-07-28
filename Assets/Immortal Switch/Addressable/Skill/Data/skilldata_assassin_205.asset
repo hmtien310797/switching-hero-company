@@ -18,13 +18,12 @@ MonoBehaviour:
   SkillClass: 2
   SkillNameKey: ui_skill_class_assasin_205
   IconSkillKey: ic_class_assassin_Thousand_Shadow_Domain
-  Description: "T\u1EA1o v\xF9ng s\xE1t th\u01B0\u01A1ng l\u1EDBn t\u1EA1i khu v\u1EF1c
-    \u0111\xF4ng k\u1EBB \u0111\u1ECBch nh\u1EA5t, li\xEAn t\u1EE5c g\xE2y s\xE1t
-    th\u01B0\u01A1ng l\xEAn t\u1EA5t c\u1EA3 k\u1EBB \u0111\u1ECBch trong v\xF9ng.
-    M\u1ED7i tick g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng."
   DescriptionKey: ui_skill_class_assasin_205_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 3
@@ -297,4 +296,3 @@ MonoBehaviour:
   - Level: 9
     RequiredShard: 2
   Levels: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}

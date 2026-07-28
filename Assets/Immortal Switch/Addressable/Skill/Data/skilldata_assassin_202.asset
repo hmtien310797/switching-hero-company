@@ -18,13 +18,12 @@ MonoBehaviour:
   SkillClass: 2
   SkillNameKey: ui_skill_class_assasin_202
   IconSkillKey: ic_class_assassin_Fatal_Mark_Detonation
-  Description: "G\u1EAFn \u1EA5n k\xFD l\xEAn m\u1EE5c ti\xEAu, sau \u0111\xF3 ph\xE1t
-    n\u1ED5 g\xE2y {hit}% ATK s\xE1t th\u01B0\u01A1ng k\u1EF9 n\u0103ng. M\u1EE5c
-    ti\xEAu ch\xEDnh nh\u1EADn to\xE0n b\u1ED9 s\xE1t th\u01B0\u01A1ng, k\u1EBB \u0111\u1ECBch
-    xung quanh nh\u1EADn m\u1ED9t ph\u1EA7n s\xE1t th\u01B0\u01A1ng."
   DescriptionKey: ui_skill_class_assasin_202_decs
   legacyValueKey: []
   DescriptionValuesByLevel: []
+  classSkillDescriptionLevelValuesByLevel:
+  - Values: 0
+    ScaleWithSkillLevel: 0
   OwnerType: 0
   MaxLevel: 10
   SkillTier: 2
@@ -211,4 +210,3 @@ MonoBehaviour:
     PassiveLevelConfig:
       MergeMode: 0
       Modifiers: []
-  hitDamageColor: {r: 1, g: 0.25, b: 0.25, a: 1}
