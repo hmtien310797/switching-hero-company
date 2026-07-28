@@ -16,6 +16,19 @@ namespace Immortal_Switch.Scripts.Helper
                 _ => EItemTier.B,
             };
         }
+        
+        public static EItemTier GradeToItemTier(string grade)
+        {
+            string finalValue = grade.ToUpper();
+            return finalValue switch
+            {
+                "b" => EItemTier.B,
+                "a" => EItemTier.A,
+                "s" => EItemTier.S,
+                "ss" => EItemTier.SS,
+                _ => EItemTier.B,
+            };
+        }
 
         public static EItemTier TierSkillToItemTier(TierSkill tier)
         {

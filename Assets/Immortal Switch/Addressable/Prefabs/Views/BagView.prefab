@@ -225,6 +225,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6431064948637812742}
   - component: {fileID: 8768147108350047208}
+  - component: {fileID: 7441019593731892977}
   m_Layer: 5
   m_Name: BagView
   m_TagString: Untagged
@@ -301,6 +302,21 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   recyclableView: {fileID: 3338508843234474635}
+--- !u!114 &7441019593731892977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3393787365476727744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &3496541357188750904
 GameObject:
   m_ObjectHideFlags: 0
@@ -357,12 +373,15 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 1
-  anchoredY: 140
+  offsetAnchoredY: -70
   changePosY: 1
   yPosPortrait: 140
   yPosLandscape: 100
   useScaleReduction: 1
   scaleReductionPercent: 20
+  children: []
+  useConstScale: 0
+  constScale: 0
 --- !u!1 &4803444948885377595
 GameObject:
   m_ObjectHideFlags: 0

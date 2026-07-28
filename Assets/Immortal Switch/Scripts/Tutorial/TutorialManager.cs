@@ -44,6 +44,9 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         // --- Private Fields ---
         private List<DynamicHeroesGlobalSpecificationsTutConfigRow> _rows = new();
+        private List<int> _pendingTutorialGuideIds = new();
+
+        private int _currentPendingGuideId;
         private int _guideId;
         private int _currentStep;
 
@@ -58,7 +61,13 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         public void ClearTutorial()
         {
+            if (_currentPendingGuideId != 0)
+            {
+                _pendingTutorialGuideIds.Remove(_currentPendingGuideId);
+            }
+
             _rows.Clear();
+
             _currentStep = 0;
             _guideId = 0;
         }
@@ -81,6 +90,13 @@ namespace Immortal_Switch.Scripts.Tutorial
         /// </summary>
         public async UniTask TryGuide(int guideId)
         {
+            if (_currentStep != 0)
+            {
+                // dang thuc hien 1 guide khac. luu vao pending de thuc hien.
+                _pendingTutorialGuideIds.Add(guideId);
+                return;
+            }
+
             if (!IsComplete(guideId))
             {
                 await ReconcileGuideFromServerAsync(guideId);
@@ -258,7 +274,17 @@ namespace Immortal_Switch.Scripts.Tutorial
         {
             Service.Complete(_guideId);
             ClearTutorial();
-            OnCompleteTutorial?.Invoke();
+
+            if (_pendingTutorialGuideIds.Count > 0)
+            {
+                _currentPendingGuideId = _pendingTutorialGuideIds[0];
+
+                TryGuide(_currentPendingGuideId).Forget();
+            }
+            else
+            {
+                OnCompleteTutorial?.Invoke();
+            }
         }
 
         private void ShowTutorial(DynamicHeroesGlobalSpecificationsTutConfigRow row)
@@ -321,7 +347,7 @@ namespace Immortal_Switch.Scripts.Tutorial
                 OnClosePopupReward();
                 return;
             }
-            
+
             PopupRewardService.Show(rewards, OnClosePopupReward);
 
             return;

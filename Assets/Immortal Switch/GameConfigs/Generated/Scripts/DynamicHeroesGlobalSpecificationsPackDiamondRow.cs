@@ -20,14 +20,9 @@ namespace Game.Configs.Generated
         public int productId;
 
         /// <summary>
-        /// CSV Column: name_en
+        /// CSV Column: name
         /// </summary>
-        public string nameEn;
-
-        /// <summary>
-        /// CSV Column: name_vi
-        /// </summary>
-        public string nameVi;
+        public string name;
 
         /// <summary>
         /// CSV Column: shop_tab

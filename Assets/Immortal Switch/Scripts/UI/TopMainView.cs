@@ -10,7 +10,6 @@ using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.AFKReward.Views;
 using Immortal_Switch.Scripts.Bag.Views;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong;
 using Immortal_Switch.Scripts.Event.Views;
 using Immortal_Switch.Scripts.GameSetting.Views;
@@ -32,7 +31,6 @@ using Immortal_Switch.Scripts.Tutorial;
 using Sirenix.OdinInspector;
 using Spine.Unity;
 using TMPro;
-using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -79,16 +77,19 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         HeroJoystick heroJostick;
 
-        [FormerlySerializedAs("autoSkillButton")] [SerializeField]
+        [FormerlySerializedAs("autoSkillButton")]
+        [SerializeField]
         private Button autoClassSkillButton;
 
-        [FormerlySerializedAs("autoSwitchButton")] [SerializeField]
+        [FormerlySerializedAs("autoSwitchButton")]
+        [SerializeField]
         private Button autoUltimateSkillButton;
 
         [SerializeField]
         private Button profileBtn;
 
-        [SerializeField] private TMP_Text txtTimeCountDownBL;
+        [SerializeField]
+        private TMP_Text txtTimeCountDownBL;
 
         [Header("Player references")]
         [SerializeField]
@@ -100,9 +101,10 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private Image imgPlayerProgress;
 
-        [FormerlySerializedAs("rotateObject")] [SerializeField]
+        [FormerlySerializedAs("rotateObject")]
+        [SerializeField]
         private GameObject classSkillRotateObject;
-        
+
         [SerializeField]
         private GameObject ultimateSkillRotateObject;
 
@@ -169,17 +171,42 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField, Min(0.05f)]
         private float perfOverlayRefreshInterval = 0.5f;
 
+        [Header("Height references")]
+        [SerializeField]
+        private RectTransform pointA;
+
+        [SerializeField]
+        private RectTransform pointB;
+
         //for demo, delete later
-        [SerializeField] private RectTransform gameStatView;
-        [SerializeField] private RectTransform switchPanel;
-        [SerializeField] private RectTransform bottomPanel;
-        [SerializeField] private GridLayoutGroup rightSideLayoutGroup;
+        [SerializeField]
+        private RectTransform gameStatView;
+
+        [SerializeField]
+        private RectTransform switchPanel;
+
+        [SerializeField]
+        private GridLayoutGroup rightSideLayoutGroup;
 
         private readonly Tween[] heroIconTweens = new Tween[2];
         private bool isHeroIconSwapped;
         private int heroIconSwitchVersion;
 
         public HeroSkillBarUI HeroSkillBarUI => heroSkillBarUI;
+
+        // lay ra vi tri neo o goc tren cua button close
+        public float BottomAnchorY
+        {
+            get
+            {
+                InitRoot();
+
+                // position là tọa độ world, sau đó chuyển về local của cùng một parent
+                Vector2 a = _root.InverseTransformPoint(pointA.position);
+                Vector2 b = _root.InverseTransformPoint(pointB.position);
+                return Mathf.Abs(a.y - b.y);
+            }
+        }
 
         // Cho AFKRewardView (popup) dùng chung bộ đếm live này thay vì tự đứng yên
         // tại ElapsedSeconds snapshot lúc mở popup.
@@ -192,6 +219,22 @@ namespace Immortal_Switch.Scripts.UI
 
         private HeroDataSO currentSelectedHeroData;
         private int heroDeadCount = 0;
+
+        // --- Private Fields ---
+        private RectTransform _root;
+
+        private void InitRoot()
+        {
+            if (_root == null)
+            {
+                var rt = transform as RectTransform;
+
+                if (rt != null)
+                {
+                    _root = rt.root as RectTransform;
+                }
+            }
+        }
 
         private void Awake()
         {
@@ -210,8 +253,10 @@ namespace Immortal_Switch.Scripts.UI
             profileBtn.onClick.AddListener(OnClickProfile);
             switchMainSubHeroButton.onClick.AddListener(OnSwitchMainSubHeroButtonClicked);
 
+            InitRoot();
             HideAbleObjects();
             skeletonGraphic.gameObject.SetActive(false);
+
             //for demo
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
             OnOrientationChanged(ScreenOrientationTracker.Instance.CurrentMode);
@@ -227,24 +272,27 @@ namespace Immortal_Switch.Scripts.UI
                 case ScreenOrientationTracker.ScreenViewMode.Landscape:
                     gameStatView.anchoredPosition =
                         new Vector2(gameStatView.anchoredPosition.x, -76f);
-                    switchPanel.anchoredPosition =
+
+                    /*switchPanel.anchoredPosition =
                         new Vector2(switchPanel.anchoredPosition.x, 70f);
                     bottomPanel.anchoredPosition =
-                        new Vector2(bottomPanel.anchoredPosition.x, -100f);
+                        new Vector2(bottomPanel.anchoredPosition.x, -100f);*/
                     rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
                     rightSideLayoutGroup.constraintCount = 4;
-                    rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-83f, -115f);
+                    /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-83f, -115f);*/
                     break;
+
                 case ScreenOrientationTracker.ScreenViewMode.Portrait:
                     gameStatView.anchoredPosition =
                         new Vector2(gameStatView.anchoredPosition.x, -170f);
-                    switchPanel.anchoredPosition =
+
+                    /*switchPanel.anchoredPosition =
                         new Vector2(switchPanel.anchoredPosition.x, 273f);
                     bottomPanel.anchoredPosition =
-                        new Vector2(bottomPanel.anchoredPosition.x, -15f);
+                        new Vector2(bottomPanel.anchoredPosition.x, -15f);*/
                     rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
                     rightSideLayoutGroup.constraintCount = 5;
-                    rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-33f, -118.7f);
+                    /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-33f, -118.7f);*/
                     break;
             }
         }
@@ -394,7 +442,6 @@ namespace Immortal_Switch.Scripts.UI
 
             SyncAfkAccumulatedSeconds(preview.ElapsedSeconds, preview.MaxOfflineSeconds);
         }
-        
 
         private UniTask OnClickTutorial(string arg1, int arg2)
         {
@@ -539,13 +586,16 @@ namespace Immortal_Switch.Scripts.UI
         // claim, summon claim reward, account/claim_link_reward đều làm vậy).
         private void ShowAfkClaimRewardPopup(List<RewardDto> rewards)
         {
-            if (rewards == null || rewards.Count == 0)
+            if (rewards == null ||
+                rewards.Count == 0)
                 return;
 
             var itemRewards = new List<ItemData>();
+
             foreach (var r in rewards)
             {
-                if (!BigNumber.TryParse(r.Amount, out var amount) || amount <= BigNumber.Zero)
+                if (!BigNumber.TryParse(r.Amount, out var amount) ||
+                    amount <= BigNumber.Zero)
                     continue;
 
                 // ItemData(string itemKey, ...) không dùng ở đâu khác trong codebase — mọi chỗ
@@ -554,6 +604,7 @@ namespace Immortal_Switch.Scripts.UI
                 // dựa vào nhánh fallback ItemKey của DatabaseManager.GetDisplayData, tránh trường
                 // hợp currency_type ("gold"/"diamond"...) không match được item và bị skip lặng lẽ.
                 var itemRow = DatabaseManager.Instance.ItemDb.FindItem(r.CurrencyType);
+
                 if (itemRow == null)
                 {
                     Debug.LogWarning($"[TopMainView] AFK reward currency_type '{r.CurrencyType}' not found in ItemDb.");
@@ -597,7 +648,8 @@ namespace Immortal_Switch.Scripts.UI
             rotateTween?.Kill(false);
             rotateTween = null;
 
-            if (!isActive || rotateObject == null)
+            if (!isActive ||
+                rotateObject == null)
             {
                 return;
             }
@@ -610,7 +662,7 @@ namespace Immortal_Switch.Scripts.UI
                 .SetEase(Ease.Linear)
                 .SetLoops(-1, LoopType.Restart);
         }
-        
+
         private void Start()
         {
             var cachedName = UserDataCache.Instance?.DisplayName;

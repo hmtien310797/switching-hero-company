@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Shared;
-using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.Tutorial;
 using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
@@ -15,7 +13,7 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.HeroUIView
 {
-    public class HeroCollectionView : AnimatedUIView
+    public class HeroCollectionView : UIView
     {
         [Header("References")] [SerializeField]
         private HeroProgressionDatabaseSO heroDatabase;

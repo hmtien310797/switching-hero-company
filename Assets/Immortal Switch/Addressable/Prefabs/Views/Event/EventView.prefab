@@ -250,6 +250,9 @@ MonoBehaviour:
   yPosLandscape: 160
   useScaleReduction: 0
   scaleReductionPercent: 0
+  children: []
+  useConstScale: 0
+  constScale: 0
 --- !u!1 &3579607263197363707
 GameObject:
   m_ObjectHideFlags: 0
@@ -397,6 +400,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2968655291688799135}
   - component: {fileID: 6433924829518673052}
+  - component: {fileID: 3225842970271188499}
   m_Layer: 5
   m_Name: EventView
   m_TagString: Untagged
@@ -474,6 +478,21 @@ MonoBehaviour:
     m_RotationOrder: 4
   eventContainer: {fileID: 4758130838189537418}
   eventPrefab: {fileID: 480471167611592485, guid: 2c46f6c5fd702714fb71caa2491460cf, type: 3}
+--- !u!114 &3225842970271188499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5826434957968923200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &6441921909838441796
 GameObject:
   m_ObjectHideFlags: 0

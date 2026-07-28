@@ -58,14 +58,17 @@ namespace Immortal_Switch.Scripts.MissionSystem
             GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Subscribe<int>(GameEvents.ON_SUMMON_HERO, OnSummonHero);
+            GameEventManager.Subscribe(GameEvents.ON_ENHANCE_GEAR, OnEnhanceGear);
+            GameEventManager.Subscribe(GameEvents.ON_EQUIP_ITEM, OnEquipItem);
+            GameEventManager.Subscribe(GameEvents.ON_HERO_LEVEL_UP, OnHeroLevelUp);
+            GameEventManager.Subscribe<int>(GameEvents.ON_SKILL_UPGRADE, OnSkillUpgrade);
             GameEventManager.Subscribe(GameEvents.ON_AFK_REWARD_CLAIM_COUNT, OnAfkRewardClaimCount);
             GameEventManager.Subscribe(GameEvents.ON_DUNGEON_CLEAR, OnDungeonClear);
         }
 
         private void OnPlayerLoginNewDay()
         {
-            var matches = Service.ChangeProgress(MissionEventKeys.EVENT_LOGIN, 1);
-            DispatchChangeProgress(matches);
+            ChangeProgress(MissionEventKeys.EVENT_LOGIN, 1);
         }
 
         protected override void OnDestroy()
@@ -74,6 +77,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
             GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Unsubscribe<int>(GameEvents.ON_SUMMON_HERO, OnSummonHero);
+            GameEventManager.Unsubscribe(GameEvents.ON_ENHANCE_GEAR, OnEnhanceGear);
+            GameEventManager.Unsubscribe(GameEvents.ON_EQUIP_ITEM, OnEquipItem);
+            GameEventManager.Unsubscribe(GameEvents.ON_HERO_LEVEL_UP, OnHeroLevelUp);
+            GameEventManager.Unsubscribe<int>(GameEvents.ON_SKILL_UPGRADE, OnSkillUpgrade);
             GameEventManager.Unsubscribe(GameEvents.ON_AFK_REWARD_CLAIM_COUNT, OnAfkRewardClaimCount);
             GameEventManager.Unsubscribe(GameEvents.ON_DUNGEON_CLEAR, OnDungeonClear);
             base.OnDestroy();
@@ -83,36 +90,49 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             if (deadCnt >= 1)
             {
-                var matches = Service.ChangeProgress(MissionEventKeys.EVENT_KILL_MONSTER, 1);
-                DispatchChangeProgress(matches);
+                ChangeProgress(MissionEventKeys.EVENT_KILL_MONSTER, 1);
             }
+        }
+
+        private void OnEquipItem()
+        {
+            ChangeProgress(MissionEventKeys.EVENT_EQUIP_ITEM, 1);
+        }
+
+        private void OnEnhanceGear()
+        {
+            ChangeProgress(MissionEventKeys.EVENT_ENHANCE_GEAR, 1);
+        }
+
+        private void OnHeroLevelUp()
+        {
+            ChangeProgress(MissionEventKeys.EVENT_HERO_LEVELUP, 1);
+        }
+
+        private void OnSkillUpgrade(int count)
+        {
+            ChangeProgress(MissionEventKeys.EVENT_SKILL_UPGRADE, count);
         }
 
         private void OnDungeonClear()
         {
-            var matches = Service.ChangeProgress(MissionEventKeys.EVENT_DUNGEON_CLEAR, 1);
-            DispatchChangeProgress(matches);
+            ChangeProgress(MissionEventKeys.EVENT_DUNGEON_CLEAR, 1);
         }
 
         private void OnAfkRewardClaimCount()
         {
-            var matches = Service.ChangeProgress(MissionEventKeys.EVENT_CLAIM_IDLE, 1);
-            DispatchChangeProgress(matches);
+            ChangeProgress(MissionEventKeys.EVENT_CLAIM_IDLE, 1);
         }
 
         private void OnSummonHero(int times)
         {
-            var matches = Service.ChangeProgress(MissionEventKeys.EVENT_HERO_SUMMON, times);
-            DispatchChangeProgress(matches);
+            ChangeProgress(MissionEventKeys.EVENT_HERO_SUMMON, times);
         }
 
         private void OnStageCleared(int stage)
         {
-            var matchClearStage = Service.ChangeProgress(MissionEventKeys.EVENT_CLEAR_STAGE, stage);
-            var matchKillBoss = Service.ChangeProgress(MissionEventKeys.EVENT_KILL_BOSS, 1);
-            var matches = matchClearStage.Concat(matchKillBoss);
-
-            DispatchChangeProgress(matches);
+            ChangeProgress(MissionEventKeys.EVENT_CLEAR_STAGE, stage);
+            ChangeProgress(MissionEventKeys.EVENT_KILL_BOSS, 1);
         }
 
         public override async UniTask InitializeAsync()
@@ -199,8 +219,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void ClaimAndNotify(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
         {
-            var rewards = MissionClaim(cfg);
-            NotifyIfAllMissionDailyCompleted();
+            MissionClaim(cfg);
         }
 
         public List<ItemRewardData> MissionClaim(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
@@ -246,11 +265,11 @@ namespace Immortal_Switch.Scripts.MissionSystem
                             cfg.type == MissionTypes.DAILY ? Storage.Data.DailyTask.Point : Storage.Data.WeeklyTask.Point,
                             cfg.type
                         );
-                    }
 
-                    if (cfg.type == MissionTypes.DAILY)
-                    {
-                        NotifyIfAllMissionDailyCompleted();
+                        if (cfg.type == MissionTypes.DAILY)
+                        {
+                            TryReportDailyCompletion();
+                        }
                     }
 
                     break;
@@ -272,7 +291,15 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
             var rewards = DatabaseManager.Instance.GetRewards(cfg.rewards);
             ClaimMissionOnServerAsync(cfg, rewards).Forget();
-            PopupRewardService.Show(rewards);
+
+            // DAILY/WEEKLY chỉ hiển thị điểm trên UI (UIMissionEntry.txtQuantityReward = points),
+            // item đi kèm (nếu có) chỉ là cộng ngầm — quà chỉ pop up khi nhận thưởng ở mốc điểm
+            // (RewardGroupClaim), không phải mỗi lần hoàn thành 1 nhiệm vụ lẻ để tích điểm.
+            var showPopup = cfg.type != MissionTypes.DAILY && cfg.type != MissionTypes.WEEKLY;
+
+            if (showPopup && rewards.Count > 0)
+                PopupRewardService.Show(rewards);
+
             return rewards;
         }
 
@@ -301,7 +328,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
                     foreach (var cfg in milesStones)
                     {
-                        rewards.AddRange(RewardGroupClaim(cfg, false));
+                        rewards.AddRange(RewardGroupClaim(cfg, false, showPopup: false));
                     }
 
                     break;
@@ -322,11 +349,12 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
             if (rewards.Count > 0)
                 PopupRewardService.Show(rewards);
-
-            NotifyIfAllMissionDailyCompleted();
         }
 
-        public List<ItemRewardData> RewardGroupClaim(DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row, bool useAds)
+        public List<ItemRewardData> RewardGroupClaim(
+            DynamicHeroesGlobalSpecificationsMissionPointMilesStoneRow row,
+            bool useAds,
+            bool showPopup = true)
         {
             var rewards = Service.RewardGroupClaim(row, useAds);
 
@@ -344,6 +372,12 @@ namespace Immortal_Switch.Scripts.MissionSystem
                 }
 
                 ClaimMissionGroupOnServerAsync(row, useAds).Forget();
+
+                // Đây là nơi "quà" thực sự hiện popup — mốc điểm đã tích đủ (khác với claim
+                // từng nhiệm vụ lẻ ở trên, chỉ cộng điểm âm thầm). ClaimAll tự gom rewards và
+                // show 1 popup tổng nên truyền showPopup=false để tránh hiện popup 2 lần.
+                if (showPopup)
+                    PopupRewardService.Show(rewards);
             }
 
             return rewards;
@@ -376,16 +410,6 @@ namespace Immortal_Switch.Scripts.MissionSystem
             OnRewardGroupClaimed?.Invoke(Storage.Data.WeeklyTask.PointsClaimed, MissionTypes.WEEKLY);
         }
 
-        public void NotifyIfAllMissionDailyCompleted()
-        {
-            var missions = GetMissions(MissionTypes.DAILY);
-
-            if (missions.All(IsCompleted))
-            {
-                Service.ChangeProgress(MissionEventKeys.EVENT_COMPLETE_DAILY, 1);
-            }
-        }
-
         private void DispatchChangeProgress(
             IEnumerable<KeyValuePair<string, MissionSystemEntry>> matches
         )
@@ -394,6 +418,52 @@ namespace Immortal_Switch.Scripts.MissionSystem
             {
                 OnChangeProgress?.Invoke(entry.Key, entry.Value.Progress, entry.Value.Id);
             }
+        }
+
+        private void ChangeProgress(string eventKey, int value)
+        {
+            if (Service == null ||
+                value <= 0)
+            {
+                return;
+            }
+
+            var matches = Service.ChangeProgress(eventKey, value);
+            DispatchChangeProgress(matches);
+
+            if (eventKey != MissionEventKeys.EVENT_COMPLETE_DAILY &&
+                matches.Any(entry => entry.Key == MissionTypes.DAILY))
+            {
+                TryReportDailyCompletion();
+            }
+        }
+
+        private void TryReportDailyCompletion()
+        {
+            var dailyTask = Storage?.Data?.DailyTask;
+
+            if (dailyTask?.Tasks == null ||
+                dailyTask.CompletionReported)
+            {
+                return;
+            }
+
+            var dailyMissions = GetMissions(MissionTypes.DAILY);
+
+            if (dailyMissions.Count == 0 ||
+                dailyMissions.Any(cfg =>
+                {
+                    var entry = dailyTask.Tasks.Find(task => task.Id == cfg.missionId);
+                    return entry == null || entry.Progress < cfg.target;
+                }))
+            {
+                return;
+            }
+
+            dailyTask.CompletionReported = true;
+
+            Storage.Save();
+            ChangeProgress(MissionEventKeys.EVENT_COMPLETE_DAILY, 1);
         }
 
         private void DispatchProgressMainMission()
@@ -422,7 +492,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
                 MissionSystemData serverData = response.State.ToObject<MissionSystemData>();
 
                 if (serverData?.Main != null)
+                {
                     Storage.LoadFromData(serverData);
+                    Storage.Initialize();
+                }
             }
             catch (Exception e)
             {

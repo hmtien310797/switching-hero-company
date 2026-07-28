@@ -208,6 +208,7 @@ GameObject:
   - component: {fileID: 6905351439572182154}
   - component: {fileID: 5569475171010487869}
   - component: {fileID: 8041671335076347201}
+  - component: {fileID: 7552675017473309027}
   m_Layer: 5
   m_Name: EquipView
   m_TagString: Untagged
@@ -310,8 +311,24 @@ MonoBehaviour:
   yPosLandscape: 150
   useScaleReduction: 0
   scaleReductionPercent: 0
+  children: []
   useConstScale: 0
   constScale: 0
+--- !u!114 &7552675017473309027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2929085150058529109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1001 &604861976215392942
 PrefabInstance:
   m_ObjectHideFlags: 0

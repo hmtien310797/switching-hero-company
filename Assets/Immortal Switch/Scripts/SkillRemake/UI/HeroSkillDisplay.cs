@@ -1,5 +1,7 @@
 using System;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Addressable;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,15 +11,27 @@ namespace Immortal_Switch.Scripts.UI.Skill
     public sealed class HeroSkillDisplay : MonoBehaviour
     {
         [Header("UI References")]
-        [SerializeField] private Button button;
-        [SerializeField] private Image iconImage;
-        [SerializeField] private Image cooldownOverlay;
-        [SerializeField] private GameObject emptyVisual;
-        [SerializeField] private GameObject lockedVisual;
+        [SerializeField]
+        private Button button;
+
+        [SerializeField]
+        private Image iconImage;
+
+        [SerializeField]
+        private Image cooldownOverlay;
+
+        [SerializeField]
+        private GameObject emptyVisual;
+
+        [SerializeField]
+        private GameObject lockedVisual;
 
         [Header("Fallback")]
-        [SerializeField] private Sprite emptyClassSkillSprite;
-        [SerializeField] private Sprite missingSkillSprite;
+        [SerializeField]
+        private Sprite emptyClassSkillSprite;
+
+        [SerializeField]
+        private Sprite missingSkillSprite;
 
         public event Action<HeroSkillDisplay> Clicked;
 
@@ -73,7 +87,10 @@ namespace Immortal_Switch.Scripts.UI.Skill
             SkillData = skillData;
             IsEmptyClassSlot = false;
 
-            Sprite sprite = skillData != null ? GetSkillIcon(skillData) : (missingSprite != null ? missingSprite : missingSkillSprite);
+            Sprite sprite = skillData != null
+                ? GetSkillIcon(skillData)
+                : (missingSprite != null ? missingSprite : missingSkillSprite);
+
             SetIcon(sprite);
             SetEmptyVisual(false);
         }
@@ -106,7 +123,23 @@ namespace Immortal_Switch.Scripts.UI.Skill
 
         private void HandleClick()
         {
-            Clicked?.Invoke(this);
+            if (SlotKind == HeroSkillSlotKind.UltimateSkill)
+            {
+                Clicked?.Invoke(this);
+                return;
+            }
+
+            var cfg = DatabaseManager.Instance.TryCheckFeatureUnlockConfig(EFeatureUnlockType.equip, out var unlocked);
+
+            if (unlocked ||
+                cfg == null)
+            {
+                Clicked?.Invoke(this);
+            }
+            else
+            {
+                UIManager.Instance.ShowToast($"Bạn cần đạt level {cfg.requiredLevel} để mở khoá tính năng này!!!");
+            }
         }
 
         private void SetIcon(Sprite sprite)

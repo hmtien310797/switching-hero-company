@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
-using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.UI;
@@ -273,7 +272,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
                         if (oldEquip != null)
                         {
-                            var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationSystemReplaceStuckPanel>();
+                            var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationReplaceStuckPanel>();
                             ui.Setup(newEquip, oldEquip);
                         }
                         else

@@ -60,6 +60,11 @@ namespace Game.Configs.Generated
         public int maxStack;
 
         /// <summary>
+        /// CSV Column: open_item
+        /// </summary>
+        public string openItem;
+
+        /// <summary>
         /// CSV Column: use_type
         /// </summary>
         public string useType;

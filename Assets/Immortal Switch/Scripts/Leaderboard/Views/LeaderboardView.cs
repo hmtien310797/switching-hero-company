@@ -85,7 +85,7 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
 
         private void OnClickClose()
         {
-            UIManager.Instance.Close<LeaderboardView>();
+            UIManager.Instance.TogglePopupAsync<LeaderboardView>().Forget();
         }
 
         private void OnRefreshRank()

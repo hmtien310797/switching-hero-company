@@ -1,4 +1,5 @@
 using System.Linq;
+using Common;
 using Game.Configs.Generated;
 
 namespace Immortal_Switch.Scripts.Shared
@@ -11,6 +12,24 @@ namespace Immortal_Switch.Scripts.Shared
         public DynamicHeroesGlobalSpecificationsFeatureUnlockConfigRow GetFeatureUnlockConfig(EFeatureUnlockType unlockType)
         {
             return _featureUnlockConfigDb.rows.FirstOrDefault(v => v.featureId == (int)unlockType);
+        }
+
+        public DynamicHeroesGlobalSpecificationsFeatureUnlockConfigRow TryCheckFeatureUnlockConfig(
+            EFeatureUnlockType unlockType,
+            out bool isUnlocked
+        )
+        {
+            var cfg = GetFeatureUnlockConfig(unlockType);
+
+            if (cfg == null)
+            {
+                isUnlocked = false;
+                return null;
+            }
+
+            var playerLevelInfo = GetLevelByTotalExp(UserDataCache.Instance.Exp);
+            isUnlocked = playerLevelInfo.level >= cfg.requiredLevel;
+            return cfg;
         }
     }
 }

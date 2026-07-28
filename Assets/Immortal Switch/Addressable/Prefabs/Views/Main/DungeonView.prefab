@@ -283,6 +283,7 @@ MonoBehaviour:
   yPosLandscape: 160
   useScaleReduction: 0
   scaleReductionPercent: 0
+  children: []
   useConstScale: 0
   constScale: 0
 --- !u!1 &1772823483786355301
@@ -2244,6 +2245,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6766455621919345938}
   - component: {fileID: 4075638090811206340}
+  - component: {fileID: 3909048648090477919}
   m_Layer: 5
   m_Name: DungeonView
   m_TagString: Untagged
@@ -2335,6 +2337,21 @@ MonoBehaviour:
   rewardContainer: {fileID: 8193467596061372545}
   rewardPrefab: {fileID: 8677915180638215341, guid: f19e7f0da1cb8eb40b3a00cab3b572df, type: 3}
   txtTicketDungeonPlayer: {fileID: 8334989438333979174}
+--- !u!114 &3909048648090477919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7946683521248741670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &8593192707317055661
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using System;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Localization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -78,7 +79,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             txtFirstTopupMultiplierQuantity.text = baseValue.ToString();
             txtBaseValue.text = baseValue.ToString();
             txtPrice.text = price;
-            txtTitle.text = title;
+            txtTitle.text = LocalizationManager.GetText(title);
 
             _onClickBuy = onClickBuy;
             _product = product;

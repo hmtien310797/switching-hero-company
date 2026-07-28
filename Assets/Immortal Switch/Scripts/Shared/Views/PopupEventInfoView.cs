@@ -1,7 +1,9 @@
+using System;
 using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.Shared.Views
 {
@@ -24,6 +26,9 @@ namespace Immortal_Switch.Scripts.Shared.Views
     public class PopupEventInfoView : AnimatedUIView
     {
         [SerializeField]
+        private Button btnClose;
+
+        [SerializeField]
         private TMP_Text txtDesc;
 
         [SerializeField]
@@ -31,6 +36,21 @@ namespace Immortal_Switch.Scripts.Shared.Views
 
         // --- Private Fields ---
         private PopupEventInfoArgs _args;
+
+        private void Awake()
+        {
+            btnClose.onClick.AddListener(OnClickClose);
+        }
+
+        private void OnDestroy()
+        {
+            btnClose.onClick.RemoveListener(OnClickClose);
+        }
+
+        private void OnClickClose()
+        {
+            UIManager.Instance.Close<PopupEventInfoView>();
+        }
 
         public override void OnShow(object args)
         {

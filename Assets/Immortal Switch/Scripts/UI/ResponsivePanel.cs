@@ -1,4 +1,4 @@
-using System.Collections;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -24,11 +24,6 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private bool useSafeArea = true;
 
-        /*[Header("Auto Detect Design Size")] [SerializeField]
-        private bool autoDetectDesignSize = true;*/
-
-        /*[SerializeField] private Vector2 designSize = new Vector2(1300, 2200);*/
-
         [Header("Clamp")]
         [SerializeField]
         private float minScale = 0.35f;
@@ -36,20 +31,13 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private float maxScale = 1f;
 
-        [Header("Fixed anchored position, unity auto fill value")]
-        [ReadOnly]
+        [Header("Anchored position for some case")]
         [SerializeField]
-        private float anchoredY;
+        private float offsetAnchoredY;
 
         [Header("Optional Y Offset")]
         [SerializeField]
         private bool changePosY = false;
-
-        [SerializeField]
-        private float yPosPortrait = 0f;
-
-        [SerializeField]
-        private float yPosLandscape = 0f;
 
         [Header("Optional Scale Reduction")]
         [SerializeField]
@@ -59,9 +47,15 @@ namespace Immortal_Switch.Scripts.UI
         [Range(0f, 100f)]
         private float scaleReductionPercent = 0f;
 
+        [Header("References child")]
+        [SerializeField]
+        private List<RectTransform> children = new();
+
         private Vector2Int lastScreenSize;
         private Rect lastSafeArea;
+
         private bool cachedDesignSize;
+
         //for demo
         public bool useConstScale;
         public float constScale;
@@ -74,16 +68,6 @@ namespace Immortal_Switch.Scripts.UI
             CacheDesignSize();
             Apply();
         }*/
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (panelRoot != null)
-            {
-                anchoredY = panelRoot.anchoredPosition.y;
-            }
-        }
-#endif
 
         private void Start()
         {
@@ -119,17 +103,33 @@ namespace Immortal_Switch.Scripts.UI
             // yeu cau update canvas truoc khi apply
             Canvas.ForceUpdateCanvases();
 
-            bool isPortrait = Screen.height >= Screen.width;
+            /*bool isPortrait = Screen.height >= Screen.width;*/
 
             float scale = CalculateScale();
+            var lastScale = Vector3.one * scale;
 
-            panelRoot.localScale = Vector3.one * scale;
+            panelRoot.localScale = lastScale;
 
             if (changePosY)
             {
                 Vector2 pos = panelRoot.anchoredPosition;
+                pos.y = TopMainView.Instance.BottomAnchorY + offsetAnchoredY;
+                panelRoot.anchoredPosition = pos;
+            }
+
+            /*if (changePosY)
+            {
+                Vector2 pos = panelRoot.anchoredPosition;
                 pos.y = isPortrait ? yPosPortrait : yPosLandscape;
                 panelRoot.anchoredPosition = pos;
+            }*/
+
+            if (children.Count > 0)
+            {
+                foreach (var child in children)
+                {
+                    child.localScale = lastScale;
+                }
             }
 
             lastScreenSize = new Vector2Int(Screen.width, Screen.height);
@@ -141,18 +141,18 @@ namespace Immortal_Switch.Scripts.UI
             bool isPortrait = Screen.height >= Screen.width;
 
             if (isPortrait)
-                return 1f;
+                return panelRoot.localScale.x;
 
             if (useConstScale)
                 return constScale;
-            
+
             Rect area = useSafeArea
                 ? Screen.safeArea
                 : new Rect(0, 0, Screen.width, Screen.height);
 
             // ko su dung dynamic vi moi lan thay doi orientation, UI can thoi gian hien thi
             //float yOffset = Mathf.Max(0f, panelRoot.anchoredPosition.y);
-            float yOffset = Mathf.Max(0f, changePosY ? (isPortrait ? yPosPortrait : yPosLandscape) : anchoredY);
+            float yOffset = TopMainView.Instance.BottomAnchorY + offsetAnchoredY;
             float finalY = (panelRoot.root as RectTransform)!.rect.height;
 
             var sizeDelta = panelRoot.sizeDelta;

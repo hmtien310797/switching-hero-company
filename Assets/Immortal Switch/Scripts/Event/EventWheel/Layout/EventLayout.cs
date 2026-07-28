@@ -10,6 +10,7 @@ using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,6 +56,14 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         [SerializeField]
         private UIEventWheelButtonSpin btnX10;
+
+        [PreviewField]
+        [SerializeField]
+        private Sprite sprTicketSilver;
+
+        [PreviewField]
+        [SerializeField]
+        private Sprite sprTicketGold;
 
         [Header("Wheel references")]
         [SerializeField]
@@ -168,13 +177,13 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
             switch (type)
             {
                 case EEventCategory.Normal:
-                    btnX1.Bind(1, $"{_normalX1}", OnClickSpinNormal);
-                    btnX10.Bind(10, $"{_normalX10}", OnClickSpinNormal);
+                    btnX1.Bind(1, $"{_normalX1}", OnClickSpinNormal, sprTicketSilver);
+                    btnX10.Bind(10, $"{_normalX10}", OnClickSpinNormal, sprTicketSilver);
                     break;
 
                 case EEventCategory.Premium:
-                    btnX1.Bind(1, $"{_premiumX1}", OnClickSpinPremium);
-                    btnX10.Bind(10, $"{_premiumX10}", OnClickSpinPremium);
+                    btnX1.Bind(1, $"{_premiumX1}", OnClickSpinPremium, sprTicketGold);
+                    btnX10.Bind(10, $"{_premiumX10}", OnClickSpinPremium, sprTicketGold);
                     break;
 
                 default:

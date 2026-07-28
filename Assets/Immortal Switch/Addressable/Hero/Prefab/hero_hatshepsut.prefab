@@ -308,6 +308,8 @@ MonoBehaviour:
   classSkills: []
   ultimateSkill: {fileID: 11400000, guid: 77009dfc15a5a114c92b1249a11a822d, type: 2}
   passiveSkill: {fileID: 11400000, guid: da1cfcc1c7055af4cab0d5baf5dbfca0, type: 2}
+  ultimateHasAura: 0
+  ultimateAuraTime: 0
   autoBindOnAwake: 1
   autoSkillController: {fileID: 1751907790690962492}
   autoCreateAutoSkillController: 1
@@ -333,9 +335,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a43e878b59b45f1ab20e87d298365d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  autoCastEnabled: 0
-  autoCastClassSkills: 1
-  autoCastUltimate: 1
   ultimateHasPriority: 1
   classSkillOrder: 0
   scanInterval: 0.15
@@ -374,6 +373,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4785834991424550208}
     m_Modifications:
+    - target: {fileID: 883789372701347768, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 883789372701347768, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
+      propertyPath: m_Color.r
+      value: 0.28235295
+      objectReference: {fileID: 0}
     - target: {fileID: 6740417167127500171, guid: e51e25b5e67b3af4d928503b56f5ad84, type: 3}
       propertyPath: m_Name
       value: HealthBarController

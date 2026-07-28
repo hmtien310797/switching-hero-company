@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
 using Immortal_Switch.Scripts.SummonSystem.WeaponSummon;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
@@ -66,13 +70,34 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
             switch (summonCategory)
             {
                 case SummonCategory.Hero:
-                    await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    if (summonLevel == DatabaseManager.Instance.HeroSummonConfig.LevelRewards.Count)
+                    {
+                        await PeekAsync(nameof(SummonCategory.Hero).ToLower());
+                    }
+                    else
+                    {
+                        await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    }
                     break;
                 case SummonCategory.Skill:
-                    await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    if (summonLevel == DatabaseManager.Instance.SkillSummonConfig.LevelRewards.Count)
+                    {
+                        await PeekAsync(nameof(SummonCategory.Skill).ToLower());
+                    }
+                    else
+                    {
+                        await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    }
                     break;
                 case SummonCategory.Weapon:
-                    await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    if (summonLevel == DatabaseManager.Instance.WeaponSummonConfig.LevelRewards.Count)
+                    {
+                        await PeekAsync(nameof(SummonCategory.Weapon).ToLower());
+                    }
+                    else
+                    {
+                        await PersistClaimOnServerAsync(summonLevel, summonCategory);
+                    }
                     break;
             }
         }
@@ -159,38 +184,49 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.Base
                 Debug.LogWarning($"[ClaimReward] Server call failed level={summonLevel} category={category}: {ex.Message}");
             }
         }
-
-
-        private void GrantCurrency(SummonRewardItem rewardItem)
+        
+        
+        /// <summary>Xem trước 1 kết quả roll ngẫu nhiên theo tỉ lệ hiện tại — không tốn tiền,
+        /// không ghi nhận vào summon_state hay kho đồ (xem NakamaClient.SummonPeekAsync).</summary>
+        private async UniTask PeekAsync(string type)
         {
-            // đồng bộ trên server
-            // CurrencyLedgerService.Instance.AddOrMergeIncome(
-            //     rewardItem.ItemId,
-            //     rewardItem.Amount,
-            //     CurrencyTransactionReason.Summon
-            // );
-        }
+            if (!NakamaClient.Instance.IsLoggedIn)
+            {
+                Debug.LogWarning("[HeroSummon] No active session — not logged in.");
+                return;
+            }
 
-        private void GrantRandomHero(SummonRewardItem rewardItem)
-        {
-            // if (HeroSummonManager.Instance == null || HeroSummonManager.Instance.Service == null)
-            //     return;
-            //
-            // for (int i = 0; i < rewardItem.Amount; i++)
-            // {
-            //     var hero = HeroSummonManager.Instance.Service.GetRandomHeroByRarity(rewardItem.HeroRarity);
-            //     if (hero == null)
-            //     {
-            //         Debug.LogWarning($"No hero found for rarity {rewardItem.HeroRarity}");
-            //         continue;
-            //     }
-            //
-            //     bool alreadyOwned = HeroProgressionManager.Instance.Service.HasHero(hero.Id);
-            //     if (alreadyOwned)
-            //         HeroProgressionManager.Instance.AddShardToHero(hero, 1, true);
-            //     else
-            //         HeroProgressionManager.Instance.AcquireHeroIfNeeded(hero);
-            // }
+            try
+            {
+                var response = await NakamaClient.Instance.SummonPeekAsync(type);
+
+                if (!response.Success)
+                {
+                    Debug.LogWarning($"[HeroSummon] summon/peek failed: {response.Error}");
+                    return;
+                }
+
+                switch (type)
+                {
+                    case "hero":
+                        PopupRewardService.ShowHeroItemReward(new []{new HeroItemData(response.HeroId, 1)});
+                        break;
+                    case "skill":
+                        if (Enum.TryParse<SkillSummonGrade>(response.Grade, out var grade))
+                        {
+                            PopupRewardService.ShowSkillItemReward(new []{new SkillItemData(response.SkillId, 1, grade)});
+                        }
+                        break;
+                    case "weapon":
+                        PopupRewardService.ShowWeaponItemReward(new []{new WeaponItemData(response.WeaponId, 1, response.Grade, response.Star)});
+                        break;
+                        
+                }
+            }
+            catch (Nakama.ApiResponseException ex)
+            {
+                Debug.LogError($"[HeroSummon] summon/peek error {ex.StatusCode}: {ex.Message}");
+            }
         }
     }
 }

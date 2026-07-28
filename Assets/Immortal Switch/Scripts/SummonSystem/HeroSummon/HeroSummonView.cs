@@ -58,15 +58,14 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         [Header("Probability")]
         [SerializeField]
         private Button probabilityInfoButton;
-
+        
         [Header("Option Id")]
         [SerializeField]
         private string optionAId = "summon_30";
 
         [SerializeField]
         private string optionBId = "summon_50";
-
-        private SpriteAtlas heroSpriteAtlas;
+        
         private bool isBound;
         private bool isSummoning;
 
@@ -81,13 +80,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         {
             UnsubscribeEvents();
             HideAllPopups();
-        }
-
-        public void SetHeroSpriteAtlas(SpriteAtlas spriteAtlas)
-        {
-            heroSpriteAtlas = spriteAtlas;
-            probabilityPopup.SetHeroSpriteAtlas(spriteAtlas);
-            sequencePopup.SetHeroSpriteAtlas(spriteAtlas);
         }
 
         public override bool HasNotification()

@@ -42,17 +42,15 @@ namespace Immortal_Switch.Scripts.Shared.UI
 
         private void RefreshView()
         {
-            var cfg = DatabaseManager.Instance.GetFeatureUnlockConfig(unlockType);
+            var cfg = DatabaseManager.Instance.TryCheckFeatureUnlockConfig(unlockType, out var unlocked);
 
             if (cfg == null)
             {
                 return;
             }
 
-            var playerLevelInfo = DatabaseManager.Instance.GetLevelByTotalExp(UserDataCache.Instance.Exp);
-
             _cfg = cfg;
-            _isUnlocked = playerLevelInfo.level >= cfg.requiredLevel;
+            _isUnlocked = unlocked;
             btn.interactable = _isUnlocked;
 
             locked.SetActive(!_isUnlocked);

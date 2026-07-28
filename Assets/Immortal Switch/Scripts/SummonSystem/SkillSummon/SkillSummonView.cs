@@ -126,7 +126,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
                 probabilityInfoButton.onClick.RemoveAllListeners();
                 probabilityInfoButton.onClick.AddListener(OpenProbabilityPopup);
             }
-
+            
             isBound = true;
         }
 

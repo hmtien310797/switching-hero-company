@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -90,10 +91,82 @@ namespace Immortal_Switch.Scripts.Addressable
 
             return GetHeroIcon(heroData.HeroIconKey);
         }
+        
+        public static Sprite GetHeroIcon(int heroId)
+        {
+            if (heroId == 0)
+                return null;
+
+            HeroDataSO resultHeroDataSO = null;
+            for (int i = 0; i < DatabaseManager.Instance.GetAllHeroData().Count; i++)
+            {
+                HeroDataSO currentHeroData = DatabaseManager.Instance.GetAllHeroData()[i];
+                if (currentHeroData.Id == heroId)
+                {
+                    resultHeroDataSO = currentHeroData;
+                    break;
+                }
+            }
+
+            if (resultHeroDataSO == null)
+                return null;
+
+            return GetHeroIcon(resultHeroDataSO.HeroIconKey);
+        }
 
         public static Sprite GetHeroTierIcon(SummonRarity rarity)
         {
             string rarityKey = $"tier_{rarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
+
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
+        public static Sprite GetHeroTierIcon(int heroId)
+        {
+            if (heroId == 0)
+                return null;
+
+            HeroDataSO resultHeroDataSO = null;
+            for (int i = 0; i < DatabaseManager.Instance.GetAllHeroData().Count; i++)
+            {
+                HeroDataSO currentHeroData = DatabaseManager.Instance.GetAllHeroData()[i];
+                if (currentHeroData.Id == heroId)
+                {
+                    resultHeroDataSO = currentHeroData;
+                    break;
+                }
+            }
+
+            if (resultHeroDataSO == null)
+                return null;
+            
+            string rarityKey = $"tier_{resultHeroDataSO.SummonRarity.ToString().ToLower()}";
             
             if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
                 return cachedSprite;
@@ -223,9 +296,109 @@ namespace Immortal_Switch.Scripts.Addressable
             return sprite;
         }
         
+        public static Sprite GetHeroTierFrame(int heroId)
+        {
+            if (heroId == 0)
+                return null;
+
+            HeroDataSO resultHeroDataSO = null;
+            for (int i = 0; i < DatabaseManager.Instance.GetAllHeroData().Count; i++)
+            {
+                HeroDataSO currentHeroData = DatabaseManager.Instance.GetAllHeroData()[i];
+                if (currentHeroData.Id == heroId)
+                {
+                    resultHeroDataSO = currentHeroData;
+                    break;
+                }
+            }
+
+            if (resultHeroDataSO == null)
+                return null;
+            
+            string rarityKey = $"frame_{resultHeroDataSO.SummonRarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
+
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
         public static Sprite GetHeroTierBackground(SummonRarity rarity)
         {
             string rarityKey = $"background_{rarity.ToString().ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
+
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
+        public static Sprite GetHeroTierBackground(int heroId)
+        {
+            if (heroId == 0)
+                return null;
+
+            HeroDataSO resultHeroDataSO = null;
+            for (int i = 0; i < DatabaseManager.Instance.GetAllHeroData().Count; i++)
+            {
+                HeroDataSO currentHeroData = DatabaseManager.Instance.GetAllHeroData()[i];
+                if (currentHeroData.Id == heroId)
+                {
+                    resultHeroDataSO = currentHeroData;
+                    break;
+                }
+            }
+
+            if (resultHeroDataSO == null)
+                return null;
+            
+            string rarityKey = $"background_{resultHeroDataSO.SummonRarity.ToString().ToLower()}";
             
             if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
                 return cachedSprite;

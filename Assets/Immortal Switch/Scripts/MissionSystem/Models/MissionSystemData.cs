@@ -32,6 +32,11 @@ namespace Immortal_Switch.Scripts.MissionSystem.Models
     public class MissionSystemTask
     {
         /// <summary>
+        /// Đã ghi nhận hoàn thành toàn bộ nhiệm vụ trong chu kỳ hiện tại.
+        /// </summary>
+        public bool CompletionReported;
+
+        /// <summary>
         /// tong diem
         /// </summary>
         public int Point;

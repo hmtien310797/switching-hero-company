@@ -347,6 +347,7 @@ GameObject:
   - component: {fileID: 4567644551169970963}
   - component: {fileID: 2458411994204810843}
   - component: {fileID: 1553740264233376028}
+  - component: {fileID: 7048342443879841183}
   m_Layer: 5
   m_Name: AFKRewardView
   m_TagString: Untagged
@@ -450,7 +451,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 2
@@ -472,6 +473,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4087
+--- !u!114 &7048342443879841183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3400697689346787623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &3529722274863303562
 GameObject:
   m_ObjectHideFlags: 0
@@ -1340,12 +1356,11 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 1
-  anchoredY: 0
+  offsetAnchoredY: 0
   changePosY: 0
-  yPosPortrait: 0
-  yPosLandscape: 0
   useScaleReduction: 1
   scaleReductionPercent: 20
+  children: []
   useConstScale: 0
   constScale: 0
 --- !u!1 &8987779254467653801

@@ -3568,6 +3568,7 @@ GameObject:
   - component: {fileID: 8695355720364785043}
   - component: {fileID: 6951887701801107863}
   - component: {fileID: 6379694199722428881}
+  - component: {fileID: 564678952249031495}
   m_Layer: 5
   m_Name: HeroInfoView
   m_TagString: Untagged
@@ -3721,6 +3722,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4087
+--- !u!114 &564678952249031495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7280878172262413310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &7428853002854688631
 GameObject:
   m_ObjectHideFlags: 0
@@ -4536,12 +4552,11 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.65
   maxScale: 1
-  anchoredY: 0
-  changePosY: 0
-  yPosPortrait: 1
-  yPosLandscape: 1
+  offsetAnchoredY: 0
+  changePosY: 1
   useScaleReduction: 0
   scaleReductionPercent: 0
+  children: []
   useConstScale: 0
   constScale: 0
 --- !u!1 &8160361397677346833

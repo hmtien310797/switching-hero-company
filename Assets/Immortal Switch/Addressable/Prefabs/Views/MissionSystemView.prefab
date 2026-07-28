@@ -981,6 +981,7 @@ GameObject:
   - component: {fileID: 8725116991309460178}
   - component: {fileID: 3956835294722896193}
   - component: {fileID: 188012970637793598}
+  - component: {fileID: 4868486974684728138}
   m_Layer: 5
   m_Name: MissionSystemView
   m_TagString: Untagged
@@ -1085,8 +1086,24 @@ MonoBehaviour:
   yPosLandscape: 160
   useScaleReduction: 0
   scaleReductionPercent: 0
+  children: []
   useConstScale: 0
   constScale: 0
+--- !u!114 &4868486974684728138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2854949072125150460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &2969026814006074645
 GameObject:
   m_ObjectHideFlags: 0

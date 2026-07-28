@@ -1,24 +1,29 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.UI;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 {
-    public class UITransmutationSystemReplaceStuckPanel : AnimatedUIView
+    public class UITransmutationReplaceStuckPanel : UIView
     {
-        [SerializeField] private Button btnEquip;
-        [SerializeField] private Button btnDismantle;
+        [SerializeField]
+        private Button btnEquip;
 
-        [Header("Equip & Unique Effect")] [SerializeField]
+        [SerializeField]
+        private Button btnDismantle;
+
+        [Header("Equip & Unique Effect")]
+        [SerializeField]
         private UITransmutationSystemReplaceInfoPanel currentReplaceInfo;
 
-        [SerializeField] private UITransmutationSystemReplaceInfoPanel newReplaceInfo;
-        [SerializeField] private float replaceInfoSwitchDuration = 0.25f;
+        [SerializeField]
+        private UITransmutationSystemReplaceInfoPanel newReplaceInfo;
+
+        [SerializeField]
+        private float replaceInfoSwitchDuration = 0.25f;
 
         // --- Private Field ---
         private PlayerEquipViewData _newEquip;
@@ -76,7 +81,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 
         private void OnClickClose()
         {
-            UIManager.Instance.TogglePopupAsync<UITransmutationSystemReplaceStuckPanel>().Forget();
+            UIManager.Instance.TogglePopupAsync<UITransmutationReplaceStuckPanel>().Forget();
         }
 
         private async void OnClickEquip()
@@ -104,9 +109,13 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 
         private async void OnClickDismantle()
         {
-            TransmutationSystemManager.Instance.ChangeStuck(_newEquip);
-            await TransmutationSystemManager.Instance.EquipAsync();
-            await TransmutationSystemManager.Instance.DismantleAsync();
+            var success = await TransmutationSystemManager.Instance.DismantleAsync();
+
+            if (!success)
+            {
+                return;
+            }
+
             OnClickClose();
 
             _newEquip = null;
@@ -123,7 +132,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
                 .Join(_rtCurrentReplaceInfo.DOSizeDelta(_orgSizeNewReplaceInfo, replaceInfoSwitchDuration))
                 .Join(_rtNewReplaceInfo.DOAnchorPosY(_orgPosYCurrentReplaceInfo, replaceInfoSwitchDuration))
                 .Join(_rtNewReplaceInfo.DOSizeDelta(_orgSizeCurrentReplaceInfo, replaceInfoSwitchDuration))
-                .OnComplete(SwitchEquipComplete);
+                .OnComplete(() => SwitchEquipCompleteAsync().Forget());
         }
 
         private void SwitchEquipStart()
@@ -133,14 +142,12 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             newReplaceInfo.HideUsedLayout();
         }
 
-        private void SwitchEquipComplete()
+        private async UniTaskVoid SwitchEquipCompleteAsync()
         {
             (_orgSizeCurrentReplaceInfo, _orgSizeNewReplaceInfo) = (_orgSizeNewReplaceInfo, _orgSizeCurrentReplaceInfo);
             (_orgPosYCurrentReplaceInfo, _orgPosYNewReplaceInfo) = (_orgPosYNewReplaceInfo, _orgPosYCurrentReplaceInfo);
             (_oldEquip, _newEquip) = (_newEquip, _oldEquip);
             _isNewInfoMovingUp = !_isNewInfoMovingUp;
-
-            RefreshButton(true);
 
             if (_isNewInfoMovingUp)
             {
@@ -152,6 +159,21 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
                 currentReplaceInfo.Bind(_oldEquip, _newEquip, true);
                 newReplaceInfo.Bind(_newEquip, _oldEquip, false);
             }
+
+            // Sau khi anim doi vi tri xong, chot equip that su voi server (server chi biet
+            // 1 pending item duy nhat, luon la item vua fuse ra bat ke da doi vi tri hien thi hay chua).
+            var success = await TransmutationSystemManager.Instance.EquipAsync();
+
+            if (!success)
+            {
+                RefreshButton(true);
+                return;
+            }
+
+            OnClickClose();
+
+            _newEquip = null;
+            _oldEquip = null;
         }
 
         private void RefreshButton(bool value)

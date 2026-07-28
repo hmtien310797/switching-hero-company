@@ -315,6 +315,7 @@ GameObject:
   - component: {fileID: 1260282995728836605}
   - component: {fileID: 4690028899026311952}
   - component: {fileID: 2532419162202224166}
+  - component: {fileID: 2496896404647352852}
   m_Layer: 5
   m_Name: PopupRewardView
   m_TagString: Untagged
@@ -481,6 +482,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4087
+--- !u!114 &2496896404647352852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2797338480762556466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &4284516530858632219
 GameObject:
   m_ObjectHideFlags: 0
@@ -818,7 +834,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2.139, y: -98}
+  m_AnchoredPosition: {x: 0, y: -98}
   m_SizeDelta: {x: 815.028, y: 211.29}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5470786118073476191

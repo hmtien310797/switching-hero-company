@@ -1,8 +1,9 @@
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
-using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
+using Immortal_Switch.Scripts.Profile.Models;
+using Immortal_Switch.Scripts.Shared.Badword;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
@@ -72,19 +73,8 @@ namespace Immortal_Switch.Scripts.Profile.Views.UI
                 return;
             }
 
-            var badwordMatches = IllegalWordDetection.DetectIllegalWords(newName);
-
-            if (badwordMatches.Count > 0)
+            if (BadwordManager.CheckSpecial(newName))
             {
-                foreach (var match in badwordMatches)
-                {
-                    var matchedWord = newName.Substring(match.Key, match.Value);
-
-                    Debug.LogError(
-                        $"[UIProfileRenamePopup] Tên \"{newName}\" bị chặn do khớp badword \"{matchedWord}\" tại vị trí {match.Key} (dài {match.Value})");
-                }
-
-                UIManager.Instance.ShowToast("Tên chứa từ ngữ không phù hợp");
                 return;
             }
 

@@ -848,6 +848,7 @@ GameObject:
   - component: {fileID: 3369825942376734449}
   - component: {fileID: 4802610581296277457}
   - component: {fileID: 4669491035731656300}
+  - component: {fileID: 3126852013625387144}
   m_Layer: 5
   m_Name: HeroSwitchPopupView
   m_TagString: Untagged
@@ -979,6 +980,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4087
+--- !u!114 &3126852013625387144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2281458783245651463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &2671271688212133228
 GameObject:
   m_ObjectHideFlags: 0
@@ -1131,12 +1147,11 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 1
-  anchoredY: 0
-  changePosY: 0
-  yPosPortrait: 1
-  yPosLandscape: 1
+  offsetAnchoredY: 0
+  changePosY: 1
   useScaleReduction: 0
   scaleReductionPercent: 0
+  children: []
   useConstScale: 0
   constScale: 0
 --- !u!1 &3945846858901279189

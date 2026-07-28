@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 {
-    public class TransmutationSystemAutoSettingView : AnimatedUIView
+    public class TransmutationSystemAutoSettingView : UIView
     {
         [Header("View references")] [SerializeField]
         private Toggle toggleWaitingMaterial;

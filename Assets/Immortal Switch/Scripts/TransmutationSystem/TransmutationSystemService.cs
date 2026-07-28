@@ -4,7 +4,6 @@ using System.Linq;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
-using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.StatSystem;

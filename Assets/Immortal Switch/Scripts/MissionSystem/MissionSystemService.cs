@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game.Configs.Generated;
@@ -17,67 +18,72 @@ namespace Immortal_Switch.Scripts.MissionSystem
             _storage = storage;
         }
 
-        private MissionSystemEntry SetProgress(List<MissionSystemEntry> tasks, bool needSetProgress, string eventKey, int value)
+        private static void ApplyProgress(MissionSystemEntry mission, bool needSetProgress, int value)
         {
-            foreach (var mission in tasks.Where(entry => entry.EventKey == eventKey))
+            if (needSetProgress)
             {
-                if (!mission.IsClaimed)
-                {
-                    if (needSetProgress)
-                    {
-                        mission.Progress = value;
-                    }
-                    else
-                    {
-                        mission.Progress += value;
-                    }
-
-                    return mission;
-                }
+                // Giá trị dạng mốc (ví dụ CLEAR_STAGE) không được giảm khi replay stage cũ.
+                mission.Progress = Math.Max(mission.Progress, value);
+                return;
             }
 
-            return null;
+            mission.Progress = (int)Math.Min(int.MaxValue, (long)mission.Progress + value);
         }
 
-        public Dictionary<string, MissionSystemEntry> ChangeProgress(string eventKey, int value)
+        private static List<MissionSystemEntry> SetProgress(
+            List<MissionSystemEntry> tasks,
+            bool needSetProgress,
+            string eventKey,
+            int value)
         {
-            var matches = new Dictionary<string, MissionSystemEntry>();
+            var matches = new List<MissionSystemEntry>();
+
+            if (tasks == null)
+            {
+                return matches;
+            }
+
+            foreach (var mission in tasks.Where(entry => entry.EventKey == eventKey && !entry.IsClaimed))
+            {
+                ApplyProgress(mission, needSetProgress, value);
+                matches.Add(mission);
+            }
+
+            return matches;
+        }
+
+        public List<KeyValuePair<string, MissionSystemEntry>> ChangeProgress(string eventKey, int value)
+        {
+            var matches = new List<KeyValuePair<string, MissionSystemEntry>>();
+
+            if (string.IsNullOrWhiteSpace(eventKey) ||
+                value <= 0)
+            {
+                return matches;
+            }
+
             var needSetProgress = NeedSetProgress(eventKey);
 
             if (!_storage.Data.Main.IsClaimed &&
                 _storage.Data.Main.EventKey == eventKey)
             {
-                if (needSetProgress)
-                {
-                    _storage.Data.Main.Progress = value;
-                }
-                else
-                {
-                    _storage.Data.Main.Progress += value;
-                }
-
-                matches.Add(MissionTypes.MAIN, _storage.Data.Main);
+                ApplyProgress(_storage.Data.Main, needSetProgress, value);
+                matches.Add(new KeyValuePair<string, MissionSystemEntry>(MissionTypes.MAIN, _storage.Data.Main));
             }
 
-            var mission = SetProgress(_storage.Data.DailyTask.Tasks, needSetProgress, eventKey, value);
-
-            if (mission != null)
+            foreach (var mission in SetProgress(_storage.Data.DailyTask.Tasks, needSetProgress, eventKey, value))
             {
-                matches.Add(MissionTypes.DAILY, mission);
+                matches.Add(new KeyValuePair<string, MissionSystemEntry>(MissionTypes.DAILY, mission));
             }
 
-            mission = SetProgress(_storage.Data.WeeklyTask.Tasks, needSetProgress, eventKey, value);
-
-            if (mission != null)
+            foreach (var mission in SetProgress(_storage.Data.WeeklyTask.Tasks, needSetProgress, eventKey, value))
             {
-                matches.Add(MissionTypes.WEEKLY, mission);
+                matches.Add(new KeyValuePair<string, MissionSystemEntry>(MissionTypes.WEEKLY, mission));
             }
 
-            mission = SetProgress(_storage.Data.RepeatTask, needSetProgress, eventKey, value);
-
-            if (mission != null)
+            foreach (var mission in SetProgress(_storage.Data.RepeatTask, needSetProgress, eventKey, value))
             {
-                matches.Add(MissionTypes.REPEAT, mission);
+                matches.Add(new KeyValuePair<string, MissionSystemEntry>(MissionTypes.REPEAT, mission));
             }
 
             if (matches.Count > 0)
@@ -293,7 +299,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         private bool NeedSetProgress(string eventKey)
         {
-            return eventKey is MissionEventKeys.EVENT_CLEAR_STAGE or MissionEventKeys.EVENT_HERO_LEVELUP;
+            return eventKey == MissionEventKeys.EVENT_CLEAR_STAGE;
         }
     }
 }

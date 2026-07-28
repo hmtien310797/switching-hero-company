@@ -1,4 +1,4 @@
-namespace Immortal_Switch.Scripts.PlayerSystem.Models
+namespace Immortal_Switch.Scripts.Profile.Models
 {
     /// <summary>
     /// Mirror của nakama/src/config/game_rename_fee.js (server, nguồn sự thật) — bảng nhỏ và hiếm khi

@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items;
-using Immortal_Switch.Scripts.PlayerSystem.Models;
 using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.TransmutationSystem.Models;
@@ -17,7 +16,7 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 {
-    public class TransmutationSystemView : AnimatedUIView
+    public class TransmutationSystemView : UIView
     {
         [Header("Progress")]
         [SerializeField]
@@ -121,6 +120,15 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
             TransmutationSystemManager.Instance.NotifyReady();
         }
 
+        public override void OnHide()
+        {
+            UIManager.Instance.Close<UITransmutationReplaceStuckPanel>();
+            UIManager.Instance.Close<UITransmutationEquipmentInfoPanel>();
+            UIManager.Instance.Close<UITransmutationLevelInfoPanel>();
+            UIManager.Instance.Close<UITransmutationTotalStatPanel>();
+            base.OnHide();
+        }
+
         private void OnDestroy()
         {
             KillTweener();
@@ -149,7 +157,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private async UniTask OnClickHelp()
         {
-            var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationSystemLevelInfoPanel>();
+            var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationLevelInfoPanel>();
             var manager = TransmutationSystemManager.Instance;
             ui.Bind(DatabaseManager.Instance.TransmutationDb.RateConfig.rows, manager.Storage.Data.Level);
         }
@@ -204,7 +212,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
             if (newEquip != null)
             {
                 var oldEquip = TransmutationSystemManager.Instance.GetEquip(newEquip.ItemType);
-                var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationSystemReplaceStuckPanel>();
+                var ui = await UIManager.Instance.OpenPopupAsync<UITransmutationReplaceStuckPanel>();
                 ui.Setup(newEquip, oldEquip);
             }
         }

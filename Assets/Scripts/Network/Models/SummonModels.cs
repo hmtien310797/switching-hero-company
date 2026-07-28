@@ -125,6 +125,45 @@ public class NakamaSummonRewardItem
     [JsonProperty("summon_level")]  public int    SummonLevel;
 }
 
+// ── Request/Response: summon/peek ───────────────────────────────────────────────
+// Random preview roll using the player's current rates (incl. hero pity) — costs nothing,
+// writes no state/inventory. See nakama/src/handler/summon.js doPeekRandom.
+
+[Serializable]
+public class SummonPeekRequest
+{
+    /// <summary>"hero" | "skill" | "weapon"</summary>
+    [JsonProperty("type")] public string Type;
+}
+
+[Serializable]
+public class SummonPeekResponse
+{
+    [JsonProperty("success")] public bool   Success;
+    [JsonProperty("error")]   public string Error;
+
+    /// <summary>"hero" | "skill" | "weapon"</summary>
+    [JsonProperty("type")] public string Type;
+
+    // Hero peek
+    [JsonProperty("hero_id")]   public int    HeroId;
+    [JsonProperty("hero_name")] public string HeroName;
+    /// <summary>Hero: "Common"|"UnCommon"|"Rare"|"Epic"|"Legendary"|"Mythic" — Weapon: "D"|"C"|"B"|"A"|"S"|"SS"</summary>
+    [JsonProperty("rarity")] public string Rarity;
+
+    // Skill peek
+    [JsonProperty("skill_id")]   public int    SkillId;
+    [JsonProperty("skill_name")] public string SkillName;
+
+    // Weapon peek
+    [JsonProperty("weapon_id")]   public int    WeaponId;
+    [JsonProperty("weapon_name")] public string WeaponName;
+    [JsonProperty("star")]        public int    Star;
+
+    /// <summary>Skill grade: "B"|"A"|"S"|"SS" — Weapon grade: "D"|"C"|"B"|"A"|"S"|"SS"</summary>
+    [JsonProperty("grade")] public string Grade;
+}
+
 // ── Response: summon/state ────────────────────────────────────────────────────
 
 [Serializable]

@@ -177,8 +177,9 @@ public class IllegalWordDetection
 
     unsafe public static bool Check(string text)
     {
-        Dictionary<int, int> dic = DetectIllegalWords(text);
-        return dic.Count != 0;
+        if (string.IsNullOrEmpty(text)) return false;
+        if (EnsuranceLower(text)) text = text.ToLower();
+        return wordsSet.Contains(text);
     }
 
     ///// <summary>
@@ -257,82 +258,17 @@ public class IllegalWordDetection
     //}
 
     /// <summary>
-    /// 判断text是否有敏感词汇,如果有返回敏感的词汇的位置,利用指针操作来加快运算速度
+    /// Check if the entire input text is exactly a bad word (whole phrase match only)
     /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
     unsafe public static Dictionary<int, int> DetectIllegalWords(string text)
     {
         var findResult = new Dictionary<int, int>();
         if (string.IsNullOrEmpty(text)) return findResult;
         if (EnsuranceLower(text)) text = text.ToLower();
-        var bufferLength = dectectedBuffer.Length;
-        if (text.Length > bufferLength) dectectedBuffer = new char[bufferLength << 1];
 
-        fixed (char* ptext = text, detectedStrStart = dectectedBuffer)
+        if (wordsSet.Contains(text))
         {
-            ///缓存字符串的初始位置
-            char* itor = (fastCheck[*ptext] & 0x01) == 0 ? ptext + 1 : ptext;
-            ///缓存字符串的末尾位置
-            char* end = ptext + text.Length;
-
-            while (itor < end)
-            {
-                ///如果text的第一个词不是敏感词汇或者当前遍历到了text第一个词的后面的词，则循环检测到text词汇的倒数第二个词，看看这一段子字符串中有没有敏感词汇
-                if ((fastCheck[*itor] & 0x01) == 0)
-                {
-                    while (itor < end - 1 && (fastCheck[*(++itor)] & 0x01) == 0) ;
-                }
-
-                ///如果有只有一个词的敏感词，且当前的字符串的“非第一个词”满足这个敏感词，则先加入已检测到的敏感词列表
-                if (startCache[*itor] != 0 && (fastLength[*itor] & 0x01) > 0)
-                {
-                    ///返回敏感词在text中的位置，以及敏感词的长度，供过滤功能用
-                    findResult.Add((int)(itor - ptext), 1);
-                }
-
-                char* strItor = detectedStrStart;
-                *strItor++ = *itor;
-                int remainLength = (int)(end - itor - 1);
-                int skipCount = 0;
-                ///此时已经检测到一个敏感词的“首词”了,记录下第一个检测到的敏感词的位置
-                ///从当前的位置检测到字符串末尾
-                for (int i = 1; i <= remainLength; ++i)
-                {
-                    char* subItor = itor + i;
-                    /// 跳过一些过滤的字符,比如空格特殊符号之类的
-                    if (SkipBitArray[*subItor])
-                    {
-                        ++skipCount;
-                        continue;
-                    }
-                    ///如果检测到当前的词在所有敏感词中的位置信息中没有处在第i位的，则马上跳出遍历
-                    if ((fastCheck[*subItor] >> Math.Min(i - skipCount, 7)) == 0)
-                    {
-                        break;
-                    }
-
-                    *strItor++ = *subItor;
-                    ///如果有检测到敏感词的最后一个词，并且此时的“检测到的敏感词汇”的长度也符合要求，则才进一步查看检测到的敏感词汇是否是真的敏感
-                    if ((fastLength[*itor] >> Math.Min(i - 1 - skipCount, 7)) > 0 && endCache[*subItor])
-                    {
-                        ///如果此子字符串在敏感词字典中存在，则记录。做此判断是避免敏感词中夹杂了其他敏感词的单词，而上面的算法无法剔除，故先用hash数组来剔除
-                        ///上述算法是用于减少大部分的比较消耗
-                        if (wordsSet.Contains(new string(dectectedBuffer, 0, (int)(strItor - detectedStrStart))))
-                        {
-                            int curDectectedStartIndex = (int)(itor - ptext);
-                            findResult[curDectectedStartIndex] = i + 1;
-                            itor = subItor;
-                            break;
-                        }
-                    }
-                    else if (i - skipCount > startCache[*itor] && startCache[*itor] < 0x80)///如果超过了以该词为首的一系列的敏感词汇的最大的长度，则不继续判断(前提是该词对应的所有敏感词汇没有超过8个词的)
-                    {
-                        break;
-                    }
-                }
-                ++itor;
-            }
+            findResult.Add(0, text.Length);
         }
 
         return findResult;

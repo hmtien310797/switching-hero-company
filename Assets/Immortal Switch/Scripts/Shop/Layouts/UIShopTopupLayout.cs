@@ -69,7 +69,7 @@ namespace Immortal_Switch.Scripts.Shop.Layouts
                 var clone = _pools.Get(i);
 
                 clone.Bind(
-                    row.Pack.nameVi, price,
+                    row.Pack.name, price,
                     row.Product, row.Pack.iD, row.Pack.quantity,
                     hasFirstBuyMultiplier, _onClickBuy,
                     row.Pack.iconId

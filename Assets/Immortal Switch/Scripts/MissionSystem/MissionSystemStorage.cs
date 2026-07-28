@@ -51,6 +51,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             Data.DailyTask = new MissionSystemTask
             {
+                CompletionReported = false,
                 Tasks = _db.MissionConfig.rows
                     .FindAll(v => v.type == MissionTypes.DAILY)
                     .Select(v => new MissionSystemEntry
@@ -117,15 +118,94 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void Initialize()
         {
+            var changed = false;
+
+            if (Data == null)
+            {
+                Data = new MissionSystemData();
+                changed = true;
+            }
+
             if (Data.Main == null ||
                 string.IsNullOrWhiteSpace(Data.Main.Id))
             {
                 InitMain();
+                changed = true;
+            }
+
+            if (Data.DailyTask?.Tasks == null)
+            {
                 ResetDaily();
+                changed = true;
+            }
+            else
+            {
+                changed |= ReconcileTaskEntries(Data.DailyTask.Tasks, MissionTypes.DAILY);
+
+                if (Data.DailyTask.PointsClaimed == null)
+                {
+                    Data.DailyTask.PointsClaimed = new List<MissionSystemPoint>();
+                    changed = true;
+                }
+            }
+
+            if (Data.WeeklyTask?.Tasks == null)
+            {
                 ResetWeekly();
+                changed = true;
+            }
+            else
+            {
+                changed |= ReconcileTaskEntries(Data.WeeklyTask.Tasks, MissionTypes.WEEKLY);
+
+                if (Data.WeeklyTask.PointsClaimed == null)
+                {
+                    Data.WeeklyTask.PointsClaimed = new List<MissionSystemPoint>();
+                    changed = true;
+                }
+            }
+
+            if (Data.RepeatTask == null)
+            {
                 InitRepeat();
+                changed = true;
+            }
+            else
+            {
+                changed |= ReconcileTaskEntries(Data.RepeatTask, MissionTypes.REPEAT);
+            }
+
+            if (changed)
+            {
                 Save();
             }
+        }
+
+        private bool ReconcileTaskEntries(List<MissionSystemEntry> tasks, string missionType)
+        {
+            var changed = false;
+            var configs = _db.MissionConfig.rows.FindAll(v => v.type == missionType);
+
+            foreach (var cfg in configs)
+            {
+                var entry = tasks.Find(v => v.Id == cfg.missionId);
+
+                if (entry == null)
+                {
+                    tasks.Add(new MissionSystemEntry
+                    {
+                        Id = cfg.missionId,
+                        Progress = 0,
+                        EventKey = cfg.eventKey,
+                        IsClaimed = false,
+                    });
+                    changed = true;
+                    continue;
+                }
+
+            }
+
+            return changed;
         }
     }
 }

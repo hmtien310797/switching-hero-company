@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
+using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Items.Models
@@ -69,6 +70,48 @@ namespace Immortal_Switch.Scripts.Items.Models
         {
             ItemId = itemId;
             Quantity = quantity;
+        }
+    }
+    
+    public class HeroItemData
+    {
+        public int HeroId;
+        public BigNumber Quantity;
+        
+        public HeroItemData(int heroId, BigNumber quantity)
+        {
+            HeroId = heroId;
+            Quantity = quantity;
+        }
+    }
+    
+    public class SkillItemData
+    {
+        public int SkillId;
+        public SkillSummonGrade Grade;
+        public BigNumber Quantity;
+        
+        public SkillItemData(int skillId, BigNumber quantity, SkillSummonGrade grade)
+        {
+            SkillId = skillId;
+            Quantity = quantity;
+            Grade = grade;
+        }
+    }
+    
+    public class WeaponItemData
+    {
+        public int WeaponId;
+        public BigNumber Quantity;
+        public string Grade;
+        public int Star;
+        
+        public WeaponItemData(int weaponId, BigNumber quantity, string grade, int star)
+        {
+            WeaponId = weaponId;
+            Quantity = quantity;
+            Grade = grade;
+            Star = star;
         }
     }
 }

@@ -127,6 +127,11 @@ namespace Immortal_Switch.Scripts.Shared.Views
             toggleDoNotShowAgain.onValueChanged.AddListener(OnDoNotShowAgainChanged);
         }
 
+        private void OnDisable()
+        {
+            toggleDoNotShowAgain.SetIsOnWithoutNotify(false);
+        }
+
         private void OnDestroy()
         {
             btnConfirm.onClick.RemoveListener(OnClickConfirm);
@@ -182,7 +187,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
             OnClickCancel();
         }
     }
-    
+
     public static class PopupConfirmService
     {
         public static void Show(

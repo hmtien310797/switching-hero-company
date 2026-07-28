@@ -25,9 +25,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
         [SerializeField] private bool useSliderHighlight = true;
 
         private BaseSummonPanelView currentPanel;
-        private SpriteAtlas heroSpriteAtlas;
         private bool firstShow = true;
-        private const string HeroSpriteAtlasKey = "hero_sprite_atlas";
 
         private static readonly List<string> DefaultLabels = new()
         {
@@ -102,11 +100,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         public override async UniTask PlayShowAsync(object args)
         {
-            if (heroSpriteAtlas == null)
-            {
-                heroSpriteAtlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HeroSpriteAtlasKey);
-            }
-
             base.PlayShowAsync(args).Forget();
         }
 
@@ -123,17 +116,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             {
                 SwitchTo(defaultCategory);
             }
-
-            for (int i = 0; i < panels.Count; i++)
-            {
-                var baseSummonPanelView = panels[i];
-
-                if (baseSummonPanelView.TryGetComponent(out HeroSummonView heroSummonView))
-                {
-                    heroSummonView.SetHeroSpriteAtlas(heroSpriteAtlas);
-                }
-            }
-
+            
             firstShow = false;
             base.OnShow(args);
         }

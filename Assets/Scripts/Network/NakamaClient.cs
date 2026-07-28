@@ -641,6 +641,15 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<SummonStateResponse>(response.Payload);
     }
 
+    /// <summary>Xem trước 1 kết quả roll ngẫu nhiên theo tỉ lệ hiện tại (kể cả pity của hero) —
+    /// không trừ tiền, không ghi summon_state/inventory. type: "hero" | "skill" | "weapon".</summary>
+    public async Task<SummonPeekResponse> SummonPeekAsync(string type)
+    {
+        var payload  = JsonConvert.SerializeObject(new SummonPeekRequest { Type = type });
+        var response = await CallRpcAsync("summon/peek", payload);
+        return JsonConvert.DeserializeObject<SummonPeekResponse>(response.Payload);
+    }
+
     // ── Skill Management ──────────────────────────────────────────────────────
 
     /// <summary>Lấy toàn bộ skill sở hữu, shard và trang bị (gọi sau login).</summary>

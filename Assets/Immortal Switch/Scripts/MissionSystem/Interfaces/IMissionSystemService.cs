@@ -13,7 +13,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Interfaces
         /// <param name="eventKey">loai nhiem vu can tang tien du lieu</param>
         /// <param name="value">so luong can cap nhat.</param>
         /// <returns>ds nhiem vu da duoc cap nhat</returns>
-        Dictionary<string, MissionSystemEntry> ChangeProgress(string eventKey, int value);
+        List<KeyValuePair<string, MissionSystemEntry>> ChangeProgress(string eventKey, int value);
 
         /// <summary>
         /// hoàn thành mission hien tai. va chuyen sang mission moi.

@@ -241,6 +241,7 @@ GameObject:
   - component: {fileID: 2462530947333634075}
   - component: {fileID: 3826006333047649833}
   - component: {fileID: 1911799048983524612}
+  - component: {fileID: 7249188422604051339}
   m_Layer: 5
   m_Name: SettingView
   m_TagString: Untagged
@@ -365,6 +366,21 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4087
+--- !u!114 &7249188422604051339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283424509924219701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &312304857763207636
 GameObject:
   m_ObjectHideFlags: 0
@@ -5679,12 +5695,11 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 5
-  anchoredY: 200
+  offsetAnchoredY: 0
   changePosY: 1
-  yPosPortrait: 200
-  yPosLandscape: 160
   useScaleReduction: 0
   scaleReductionPercent: 0
+  children: []
   useConstScale: 0
   constScale: 0
 --- !u!1 &5720743407930023576

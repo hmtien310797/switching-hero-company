@@ -19,7 +19,7 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
         public RectTransform Target;
     }
 
-    public class TutorialView : AnimatedUIView
+    public class TutorialView : UIView
     {
         [Header("View references")]
         [SerializeField]

@@ -290,8 +290,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 255}
-  m_SizeDelta: {x: 861.3228, y: 1601.8809}
+  m_AnchoredPosition: {x: 0, y: 204.29443}
+  m_SizeDelta: {x: 861.3228, y: 1652.5864}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &1671260351971618172
 GameObject:
@@ -328,7 +328,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 20}
+  m_AnchoredPosition: {x: 0, y: 70.70557}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1638418894691780459
@@ -523,8 +523,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 25.352783}
+  m_SizeDelta: {x: 0, y: -50.705566}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7465907830791700508
 CanvasRenderer:
@@ -575,6 +575,7 @@ GameObject:
   - component: {fileID: 8725116991309460178}
   - component: {fileID: 5032510141244166133}
   - component: {fileID: 5509193579302583367}
+  - component: {fileID: 4143881326946672663}
   m_Layer: 5
   m_Name: GrowthView
   m_TagString: Untagged
@@ -676,14 +677,30 @@ MonoBehaviour:
   useSafeArea: 1
   minScale: 0.35
   maxScale: 2
-  anchoredY: 255
+  anchoredY: 204.29443
   changePosY: 1
   yPosPortrait: 255
   yPosLandscape: 185
   useScaleReduction: 0
   scaleReductionPercent: 0
+  children: []
   useConstScale: 0
   constScale: 0
+--- !u!114 &4143881326946672663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2854949072125150460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &3077170351175656059
 GameObject:
   m_ObjectHideFlags: 0
@@ -935,6 +952,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currencyType: 1
+  eCurrencyType: 0
   amountText: {fileID: 5038398303572378919}
   currencyImage: {fileID: 0}
 --- !u!1 &6533793629489501308
@@ -1047,8 +1065,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 25.352783}
+  m_SizeDelta: {x: 0, y: -50.705566}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &5427790038406068870
 MonoBehaviour:

@@ -331,6 +331,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6042116832460269119}
+  - component: {fileID: 1695934522706395931}
   m_Layer: 5
   m_Name: Root
   m_TagString: Untagged
@@ -360,6 +361,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1128, y: 1034}
   m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &1695934522706395931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301274847585835576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df38ebce50a9aee4ea257ee941d79c42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panelRoot: {fileID: 6042116832460269119}
+  fitMode: 2
+  useSafeArea: 1
+  minScale: 0.35
+  maxScale: 1
+  offsetAnchoredY: 0
+  changePosY: 1
+  useScaleReduction: 1
+  scaleReductionPercent: 15
+  children: []
+  useConstScale: 0
+  constScale: 0
 --- !u!1 &2405314311716236583
 GameObject:
   m_ObjectHideFlags: 0
@@ -491,8 +516,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8082021479057492555}
   - component: {fileID: 4227839123392251409}
+  - component: {fileID: 7275108217190058394}
   m_Layer: 5
-  m_Name: UITransmutationSystemReplaceStuckPanel
+  m_Name: UITransmutationReplaceStuckPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -513,10 +539,10 @@ RectTransform:
   - {fileID: 6042116832460269119}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1080, y: 1034.111}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4227839123392251409
 MonoBehaviour:
@@ -532,45 +558,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Layer: 4
   MainMode: 0
-  CloseOnBackdrop: 1
+  CloseOnBackdrop: 0
   CacheOnClose: 0
-  animatedRoot: {fileID: 6042116832460269119}
-  showDuration: 0.25
-  hideDuration: 0.2
-  showFromOffset: {x: 0, y: 900}
-  hideToOffset: {x: 0, y: 900}
-  fade: 1
-  fromAlpha: 0
-  toAlpha: 1
-  ease:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   btnEquip: {fileID: 7041009201431872083}
   btnDismantle: {fileID: 3639678105248522427}
   currentReplaceInfo: {fileID: 2348020522456324976}
   newReplaceInfo: {fileID: 5542477931660562201}
   replaceInfoSwitchDuration: 0.25
+--- !u!114 &7275108217190058394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8816881326050340382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c97afc556caea1c44969477eb7ddec74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConformX: 1
+  ConformY: 0
+  Logging: 0
 --- !u!1 &9014392040231672635
 GameObject:
   m_ObjectHideFlags: 0

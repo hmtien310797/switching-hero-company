@@ -18,6 +18,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
         [SerializeField]
         private TextMeshProUGUI txtTicket;
 
+        [SerializeField]
+        private Image imgTicket;
+
         // --- Private Fields ---
         private Action<int> _onClickSpin;
         private int _times;
@@ -53,12 +56,13 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
             _onClickSpin?.Invoke(_times);
         }
 
-        public void Bind(int times, string ticket, Action<int> onClickSpin)
+        public void Bind(int times, string ticket, Action<int> onClickSpin, Sprite icTicket)
         {
             _times = times;
             _onClickSpin = onClickSpin;
 
             txtTicket.text = ticket;
+            imgTicket.sprite = icTicket;
 
             RefreshLocalizedText();
         }

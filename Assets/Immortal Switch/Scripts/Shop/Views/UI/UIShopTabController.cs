@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shop.Layouts;
 using Immortal_Switch.Scripts.UI;
@@ -109,7 +110,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         private void OnClickClose()
         {
-            UIManager.Instance.Close<ShopView>();
+            UIManager.Instance.TogglePopupAsync<ShopView>().Forget();
         }
 
         private void ShowHighlight(UIShopTabItem parent)

@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 {
-    public class UITransmutationSystemLevelInfoPanel : AnimatedUIView
+    public class UITransmutationLevelInfoPanel : AnimatedUIView
     {
         [Header("References")] [SerializeField]
         private TextMeshProUGUI txtLevel;

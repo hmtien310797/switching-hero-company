@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Immortal_Switch.Scripts.Addressable;
+using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -19,6 +22,13 @@ namespace Immortal_Switch.Scripts.Shared.Views
         /// <summary>
         /// ds item thuong
         /// </summary>
+
+        public PopupRewardType RewardType;
+        
+        public List<HeroItemData> HeroItemRewards { get; set; }
+        public List<SkillItemData> SkillItemRewards { get; set; }
+        public List<WeaponItemData> WeaponItemRewards { get; set; }
+        
         public List<ItemData> Rewards { get; set; }
 
         /// <summary>
@@ -65,7 +75,22 @@ namespace Immortal_Switch.Scripts.Shared.Views
 
             _args = runtime;
 
-            RefreshRewards(runtime.Rewards);
+            switch (_args.RewardType)
+            {
+                case PopupRewardType.NormalItem:
+                    RefreshRewards(runtime.Rewards);
+                    break;
+                case  PopupRewardType.HeroItem:
+                    RefreshRewards(_args.HeroItemRewards);
+                    break;
+                case PopupRewardType.SkillItem:
+                    RefreshRewards(_args.SkillItemRewards);
+                    break;
+                case PopupRewardType.WeaponItem:
+                    RefreshRewards(_args.WeaponItemRewards);
+                    break;
+            }
+            
             StartCountdown(3);
         }
 
@@ -179,6 +204,240 @@ namespace Immortal_Switch.Scripts.Shared.Views
                 }
             }
         }
+        
+        private void RefreshRewards(List<HeroItemData> rewards)
+        {
+            int displayIndex = 0;
+
+            if (rewards != null)
+            {
+                for (int i = 0; i < rewards.Count; i++)
+                {
+                    var reward = rewards[i];
+
+                    // Reward null thì bỏ qua, vẫn tiếp tục hiển thị item khác.
+                    if (reward == null)
+                    {
+                        Debug.LogWarning($"[PopupRewardView] Reward tại index {i} bị null.");
+                        continue;
+                    }
+                    
+                    UIRewardQuantity clone;
+
+                    if (displayIndex < _rewards.Count)
+                    {
+                        clone = _rewards[displayIndex];
+
+                        if (clone == null)
+                        {
+                            Debug.LogWarning(
+                                $"[PopupRewardView] UIReward cache null tại index {displayIndex}.");
+
+                            continue;
+                        }
+
+                        clone.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        if (rewardPrefab == null ||
+                            rewardContainer == null)
+                        {
+                            Debug.LogError(
+                                "[PopupRewardView] rewardPrefab hoặc rewardContainer chưa được gán.");
+
+                            break;
+                        }
+
+                        clone = Instantiate(
+                            rewardPrefab,
+                            rewardContainer,
+                            false);
+
+                        _rewards.Add(clone);
+                    }
+
+                    clone.transform.SetSiblingIndex(displayIndex);
+
+                    clone.Bind(
+                        HeroImageService.GetHeroIcon(reward.HeroId),
+                        HeroImageService.GetHeroTierFrame(reward.HeroId),
+                        HeroImageService.GetHeroTierBackground(reward.HeroId),
+                        HeroImageService.GetHeroTierIcon(reward.HeroId),
+                        reward.Quantity
+                    );
+
+                    displayIndex++;
+                }
+            }
+
+            // Tắt những UI cũ không còn được sử dụng.
+            for (int i = displayIndex; i < _rewards.Count; i++)
+            {
+                if (_rewards[i] != null)
+                {
+                    _rewards[i].gameObject.SetActive(false);
+                }
+            }
+        }
+        
+        private void RefreshRewards(List<SkillItemData> rewards)
+        {
+            int displayIndex = 0;
+
+            if (rewards != null)
+            {
+                for (int i = 0; i < rewards.Count; i++)
+                {
+                    var reward = rewards[i];
+
+                    // Reward null thì bỏ qua, vẫn tiếp tục hiển thị item khác.
+                    if (reward == null)
+                    {
+                        Debug.LogWarning($"[PopupRewardView] Reward tại index {i} bị null.");
+                        continue;
+                    }
+                    
+                    UIRewardQuantity clone;
+
+                    if (displayIndex < _rewards.Count)
+                    {
+                        clone = _rewards[displayIndex];
+
+                        if (clone == null)
+                        {
+                            Debug.LogWarning(
+                                $"[PopupRewardView] UIReward cache null tại index {displayIndex}.");
+
+                            continue;
+                        }
+
+                        clone.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        if (rewardPrefab == null ||
+                            rewardContainer == null)
+                        {
+                            Debug.LogError(
+                                "[PopupRewardView] rewardPrefab hoặc rewardContainer chưa được gán.");
+
+                            break;
+                        }
+
+                        clone = Instantiate(
+                            rewardPrefab,
+                            rewardContainer,
+                            false);
+
+                        _rewards.Add(clone);
+                    }
+
+                    clone.transform.SetSiblingIndex(displayIndex);
+                    
+                    var itemTier = EnumHelper.GradeToItemTier(reward.Grade);
+                    var tierInfo = ItemTierVisualImageService.GetItemTierEntry(itemTier);
+                    
+                    clone.Bind(
+                        SkillImageService.GetSkillIcon(reward.SkillId),
+                        tierInfo.border,
+                        tierInfo.background,
+                        tierInfo.tierIcon,
+                        reward.Quantity
+                    );
+
+                    displayIndex++;
+                }
+            }
+
+            // Tắt những UI cũ không còn được sử dụng.
+            for (int i = displayIndex; i < _rewards.Count; i++)
+            {
+                if (_rewards[i] != null)
+                {
+                    _rewards[i].gameObject.SetActive(false);
+                }
+            }
+        }
+        
+        private void RefreshRewards(List<WeaponItemData> rewards)
+        {
+            int displayIndex = 0;
+
+            if (rewards != null)
+            {
+                for (int i = 0; i < rewards.Count; i++)
+                {
+                    var reward = rewards[i];
+
+                    // Reward null thì bỏ qua, vẫn tiếp tục hiển thị item khác.
+                    if (reward == null)
+                    {
+                        Debug.LogWarning($"[PopupRewardView] Reward tại index {i} bị null.");
+                        continue;
+                    }
+                    
+                    UIRewardQuantity clone;
+
+                    if (displayIndex < _rewards.Count)
+                    {
+                        clone = _rewards[displayIndex];
+
+                        if (clone == null)
+                        {
+                            Debug.LogWarning(
+                                $"[PopupRewardView] UIReward cache null tại index {displayIndex}.");
+
+                            continue;
+                        }
+
+                        clone.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        if (rewardPrefab == null ||
+                            rewardContainer == null)
+                        {
+                            Debug.LogError(
+                                "[PopupRewardView] rewardPrefab hoặc rewardContainer chưa được gán.");
+
+                            break;
+                        }
+
+                        clone = Instantiate(
+                            rewardPrefab,
+                            rewardContainer,
+                            false);
+
+                        _rewards.Add(clone);
+                    }
+
+                    clone.transform.SetSiblingIndex(displayIndex);
+                    
+                    var tier = EnumHelper.GradeToItemTier(reward.Grade);
+                    var tierInfo = ItemTierVisualImageService.GetItemTierEntry(tier);
+                    
+                    clone.Bind(
+                        DatabaseManager.Instance.GetWeaponDatabase().GetStandard(reward.WeaponId).Icon,
+                        tierInfo.border,
+                        tierInfo.background,
+                        tierInfo.tierIcon,
+                        reward.Quantity, reward.Star
+                    );
+
+                    displayIndex++;
+                }
+            }
+
+            // Tắt những UI cũ không còn được sử dụng.
+            for (int i = displayIndex; i < _rewards.Count; i++)
+            {
+                if (_rewards[i] != null)
+                {
+                    _rewards[i].gameObject.SetActive(false);
+                }
+            }
+        }
 
         private void StartCountdown(int durationSeconds)
         {
@@ -248,11 +507,35 @@ namespace Immortal_Switch.Scripts.Shared.Views
         {
             ShowAsync(rewards, onClose, withBackdrop).Forget();
         }
+        
+        public static void ShowHeroItemReward(
+            IReadOnlyList<HeroItemData> rewards,
+            Action onClose = null,
+            bool withBackdrop = false)
+        {
+            ShowAsync(rewards, onClose, withBackdrop).Forget();
+        }
+        
+        public static void ShowSkillItemReward(
+            IReadOnlyList<SkillItemData> rewards,
+            Action onClose = null,
+            bool withBackdrop = false)
+        {
+            ShowAsync(rewards, onClose, withBackdrop).Forget();
+        }
+        
+        public static void ShowWeaponItemReward(
+            IReadOnlyList<WeaponItemData> rewards,
+            Action onClose = null,
+            bool withBackdrop = false)
+        {
+            ShowAsync(rewards, onClose, withBackdrop).Forget();
+        }
 
         private static async UniTask<PopupRewardView> ShowAsync(
             IReadOnlyList<ItemData> rewards,
             Action onClose = null,
-            bool withBackdrop = true)
+            bool withBackdrop = true, PopupRewardType rewardType = PopupRewardType.NormalItem)
         {
             if (UIManager.Instance == null)
             {
@@ -265,13 +548,90 @@ namespace Immortal_Switch.Scripts.Shared.Views
                 Rewards = rewards == null
                     ? new List<ItemData>()
                     : new List<ItemData>(rewards),
-                OnClose = onClose
+                OnClose = onClose,
+                RewardType = rewardType
             };
 
             return await UIManager.Instance.OpenPopupAsync<PopupRewardView>(
                 args,
                 withBackdrop);
         }
+        
+        private static async UniTask<PopupRewardView> ShowAsync(
+            IReadOnlyList<SkillItemData> rewards,
+            Action onClose = null,
+            bool withBackdrop = true, PopupRewardType rewardType = PopupRewardType.SkillItem)
+        {
+            if (UIManager.Instance == null)
+            {
+                Debug.LogError("[PopupRewardService] UIManager instance was not found.");
+                return null;
+            }
+
+            var args = new PopupRewardArgs
+            {
+                SkillItemRewards = rewards == null
+                    ? new List<SkillItemData>()
+                    : new List<SkillItemData>(rewards),
+                OnClose = onClose,
+                RewardType = rewardType
+            };
+
+            return await UIManager.Instance.OpenPopupAsync<PopupRewardView>(
+                args,
+                withBackdrop);
+        }
+        
+        private static async UniTask<PopupRewardView> ShowAsync(
+            IReadOnlyList<HeroItemData> rewards,
+            Action onClose = null,
+            bool withBackdrop = true)
+        {
+            if (UIManager.Instance == null)
+            {
+                Debug.LogError("[PopupRewardService] UIManager instance was not found.");
+                return null;
+            }
+
+            var args = new PopupRewardArgs
+            {
+                HeroItemRewards = rewards == null
+                    ? new List<HeroItemData>()
+                    : new List<HeroItemData>(rewards),
+                OnClose = onClose,
+                RewardType = PopupRewardType.HeroItem
+            };
+
+            return await UIManager.Instance.OpenPopupAsync<PopupRewardView>(
+                args,
+                withBackdrop);
+        }
+        
+        private static async UniTask<PopupRewardView> ShowAsync(
+            IReadOnlyList<WeaponItemData> rewards,
+            Action onClose = null,
+            bool withBackdrop = true)
+        {
+            if (UIManager.Instance == null)
+            {
+                Debug.LogError("[PopupRewardService] UIManager instance was not found.");
+                return null;
+            }
+
+            var args = new PopupRewardArgs
+            {
+                WeaponItemRewards = rewards == null
+                    ? new List<WeaponItemData>()
+                    : new List<WeaponItemData>(rewards),
+                OnClose = onClose,
+                RewardType = PopupRewardType.HeroItem
+            };
+
+            return await UIManager.Instance.OpenPopupAsync<PopupRewardView>(
+                args,
+                withBackdrop);
+        }
+        
 
         public static void Close()
         {
@@ -280,5 +640,14 @@ namespace Immortal_Switch.Scripts.Shared.Views
 
             UIManager.Instance.Close<PopupRewardView>();
         }
+    }
+
+    public enum PopupRewardType
+    {
+        None = 0,
+        NormalItem = 1,
+        HeroItem = 2,
+        SkillItem = 3,
+        WeaponItem = 4
     }
 }

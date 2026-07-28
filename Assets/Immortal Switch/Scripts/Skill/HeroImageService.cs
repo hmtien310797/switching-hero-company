@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Skill;
 using UnityEngine;
 using UnityEngine.U2D;
@@ -82,6 +83,25 @@ namespace Immortal_Switch.Scripts.Addressable
                 return null;
 
             return GetSkillIcon(skillData.IconSkillKey);
+        }
+        
+        public static Sprite GetSkillIcon(int skillId)
+        {
+            if (skillId == 0)
+                return null;
+
+            SkillDataSO resultSkillDataSO = null;
+            for (int i = 0; i < DatabaseManager.Instance.GetAllHeroData().Count; i++)
+            {
+                SkillDataSO currentSkillData = DatabaseManager.Instance.GetAllSkillData()[i];
+                if (currentSkillData.SkillId == skillId)
+                {
+                    resultSkillDataSO = currentSkillData;
+                    break;
+                }
+            }
+
+            return GetSkillIcon(resultSkillDataSO.IconSkillKey);
         }
         
         public static void Release()
