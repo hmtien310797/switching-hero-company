@@ -81,7 +81,7 @@ namespace Immortal_Switch.Scripts.Boss
 
             SeaMonsterBossBullet bullet = poolService.Spawn<SeaMonsterBossBullet>(
                 BulletAddressableKey,
-                boss.Position,
+                boss.FirePointPosition,
                 Quaternion.identity);
 
             if (bullet == null)

@@ -49,6 +49,9 @@ namespace Immortal_Switch.Scripts.Boss
 
         [SerializeField] private bool isRangedAttacker = false;
 
+        [Tooltip("Điểm spawn đạn cho boss đánh xa. Có thể gán BoneFollower Transform để đạn bay từ vị trí bone.")]
+        [SerializeField] private Transform firePoint;
+
         private IEnemyTargetProvider targetProvider;
 
         private BossState currentState;
@@ -73,6 +76,13 @@ namespace Immortal_Switch.Scripts.Boss
         public Transform Transform => transform;
 
         public Vector3 Position => transform.position;
+
+        /// <summary>
+        /// Vị trí spawn đạn. Nếu <see cref="firePoint"/> được gán (vd: BoneFollower Transform)
+        /// thì dùng vị trí đó, ngược lại fallback về <see cref="Position"/>.
+        /// </summary>
+        public Vector3 FirePointPosition =>
+            firePoint != null ? firePoint.position : Position;
 
         public bool IsDead => stats != null &&
                               stats.HealthModule != null &&
