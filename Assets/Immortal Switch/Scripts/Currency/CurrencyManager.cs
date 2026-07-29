@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
@@ -132,6 +134,8 @@ namespace Immortal_Switch.Scripts.Currency
                     TryParseAmount(b.Amount, out BigNumber amount))
                     Set(type, amount);
             }
+            
+            ItemsManager.Instance?.SyncFromReward(balances);
         }
 
         /// <summary>

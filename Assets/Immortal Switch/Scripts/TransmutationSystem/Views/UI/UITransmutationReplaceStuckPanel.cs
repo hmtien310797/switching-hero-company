@@ -38,7 +38,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 
         private Vector2 _orgSizeCurrentReplaceInfo;
         private Vector2 _orgSizeNewReplaceInfo;
-        private bool _isNewInfoMovingUp;
+        private bool _isNewEquipMovingUp;
 
         private void Awake()
         {
@@ -63,6 +63,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
         {
             _newEquip = newEquip;
             _oldEquip = oldEquip;
+            _isNewEquipMovingUp = false;
 
             if (oldEquip != null)
             {
@@ -109,7 +110,14 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 
         private async void OnClickDismantle()
         {
-            var success = await TransmutationSystemManager.Instance.DismantleAsync();
+            // Sau khi toggle bang nut Equip nhieu lan, _isNewEquipMovingUp cho biet item pending
+            // (that su duoc server track) dang nam o vi tri nao. Le lan toggle -> pending dang o
+            // slot "current" (nghia la nguoi choi muon giu no) nen nut nay phai goi Equip de ap
+            // dung pending do. Chan lan (mac dinh) -> pending van o slot "new" nen goi Dismantle
+            // se huy no, giu nguyen do dang deo.
+            var success = _isNewEquipMovingUp
+                ? await TransmutationSystemManager.Instance.EquipAsync()
+                : await TransmutationSystemManager.Instance.DismantleAsync();
 
             if (!success)
             {
@@ -132,7 +140,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
                 .Join(_rtCurrentReplaceInfo.DOSizeDelta(_orgSizeNewReplaceInfo, replaceInfoSwitchDuration))
                 .Join(_rtNewReplaceInfo.DOAnchorPosY(_orgPosYCurrentReplaceInfo, replaceInfoSwitchDuration))
                 .Join(_rtNewReplaceInfo.DOSizeDelta(_orgSizeCurrentReplaceInfo, replaceInfoSwitchDuration))
-                .OnComplete(() => SwitchEquipCompleteAsync().Forget());
+                .OnComplete(SwitchEquipComplete);
         }
 
         private void SwitchEquipStart()
@@ -142,14 +150,16 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
             newReplaceInfo.HideUsedLayout();
         }
 
-        private async UniTaskVoid SwitchEquipCompleteAsync()
+        private void SwitchEquipComplete()
         {
             (_orgSizeCurrentReplaceInfo, _orgSizeNewReplaceInfo) = (_orgSizeNewReplaceInfo, _orgSizeCurrentReplaceInfo);
             (_orgPosYCurrentReplaceInfo, _orgPosYNewReplaceInfo) = (_orgPosYNewReplaceInfo, _orgPosYCurrentReplaceInfo);
             (_oldEquip, _newEquip) = (_newEquip, _oldEquip);
-            _isNewInfoMovingUp = !_isNewInfoMovingUp;
+            _isNewEquipMovingUp = !_isNewEquipMovingUp;
 
-            if (_isNewInfoMovingUp)
+            RefreshButton(true);
+
+            if (_isNewEquipMovingUp)
             {
                 currentReplaceInfo.Bind(_newEquip, _oldEquip, false);
                 newReplaceInfo.Bind(_oldEquip, _newEquip, true);
@@ -159,21 +169,6 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
                 currentReplaceInfo.Bind(_oldEquip, _newEquip, true);
                 newReplaceInfo.Bind(_newEquip, _oldEquip, false);
             }
-
-            // Sau khi anim doi vi tri xong, chot equip that su voi server (server chi biet
-            // 1 pending item duy nhat, luon la item vua fuse ra bat ke da doi vi tri hien thi hay chua).
-            var success = await TransmutationSystemManager.Instance.EquipAsync();
-
-            if (!success)
-            {
-                RefreshButton(true);
-                return;
-            }
-
-            OnClickClose();
-
-            _newEquip = null;
-            _oldEquip = null;
         }
 
         private void RefreshButton(bool value)

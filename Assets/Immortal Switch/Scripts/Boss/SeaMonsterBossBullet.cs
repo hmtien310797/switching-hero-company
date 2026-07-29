@@ -41,6 +41,7 @@ namespace Immortal_Switch.Scripts.Boss
         private float elapsed;
         private bool isFlying;
         private bool hasReachedTarget;
+        private bool isDespawned;
 
         private CancellationTokenRegistration endStageCancelRegistration;
 
@@ -127,13 +128,16 @@ namespace Immortal_Switch.Scripts.Boss
 
         public void DespawnSelf()
         {
-            if (!isFlying && hasReachedTarget)
-            {
-                // Already handled — avoid double despawn
-                ReturnToPool();
+            // Idempotent: cả DespawnAllActiveBullets (từ skill logic) lẫn
+            // endStageCancelRegistration của từng bullet đều gọi hàm này khi
+            // endStageSession CTS bị cancel. Pool handle đã được trả về pool ở
+            // lần despawn đầu tiên (OnDespawned reset isDespawning & gán
+            // PoolHandle = null), nên lần thứ hai phải chặn sớm để tránh
+            // "Missing AddressablePoolHandle".
+            if (isDespawned)
                 return;
-            }
 
+            isDespawned = true;
             isFlying = false;
             hasReachedTarget = true;
             ReturnToPool();
@@ -172,6 +176,7 @@ namespace Immortal_Switch.Scripts.Boss
         {
             isFlying = false;
             hasReachedTarget = false;
+            isDespawned = false;
             elapsed = 0f;
             source = null;
             target = null;

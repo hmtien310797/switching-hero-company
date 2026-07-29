@@ -1,7 +1,5 @@
 using Common;
-using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
-using Immortal_Switch.Scripts.Tutorial;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -54,12 +52,6 @@ namespace Immortal_Switch.Scripts.Shared.UI
             btn.interactable = _isUnlocked;
 
             locked.SetActive(!_isUnlocked);
-
-            if (_isUnlocked &&
-                _cfg.tutorialStepId > 0)
-            {
-                TutorialManager.Instance.TryGuide(_cfg.tutorialStepId).Forget();
-            }
         }
 
         /// <summary>

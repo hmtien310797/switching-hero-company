@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Common;
 using Game.Configs.Generated;
@@ -30,6 +31,22 @@ namespace Immortal_Switch.Scripts.Shared
             var playerLevelInfo = GetLevelByTotalExp(UserDataCache.Instance.Exp);
             isUnlocked = playerLevelInfo.level >= cfg.requiredLevel;
             return cfg;
+        }
+
+        public List<DynamicHeroesGlobalSpecificationsFeatureUnlockConfigRow> GetFeatureUnlocks()
+        {
+            var playerLevelInfo = GetLevelByTotalExp(UserDataCache.Instance.Exp);
+            var unlocks = new List<DynamicHeroesGlobalSpecificationsFeatureUnlockConfigRow>();
+
+            foreach (var row in _featureUnlockConfigDb.rows)
+            {
+                if (playerLevelInfo.level >= row.requiredLevel)
+                {
+                    unlocks.Add(row);
+                }
+            }
+
+            return unlocks;
         }
     }
 }

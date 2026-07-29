@@ -121,11 +121,10 @@ public class SignUpPanel : BouncePanel
         bool lengthOk = pwd.Length >= minLength && pwd.Length <= maxLength;
         bool hasUpper = Regex.IsMatch(pwd, "[A-Z]");
         bool hasDigit = Regex.IsMatch(pwd, "\\d");
-        bool hasSpecial = Regex.IsMatch(pwd, "[^a-zA-Z0-9]"); // any non-alphanumeric
 
         // Số điều kiện đạt được -> sáng lần lượt từ trái qua phải (không để khoảng trống).
         int satisfied = (lengthOk ? 1 : 0) + (hasUpper ? 1 : 0)
-                      + (hasDigit ? 1 : 0) + (hasSpecial ? 1 : 0);
+                      + (hasDigit ? 1 : 0);
 
         for (int i = 0; i < indicators.Length; i++)
         {

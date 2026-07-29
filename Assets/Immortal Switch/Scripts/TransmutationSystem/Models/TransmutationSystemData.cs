@@ -30,18 +30,18 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Models
         public BigInteger Exp;
 
         /// <summary>
-        /// energy
+        /// crystal - currency de roll fuse
         /// </summary>
-        public BigInteger Energy;
+        public BigInteger Crystal;
 
         /// <summary>
         /// level hien tai
         /// </summary>
         public int Level;
 
-        public void UpdateEnergy(BigInteger energy)
+        public void UpdateCrystal(BigInteger crystal)
         {
-            Energy = energy;
+            Crystal = crystal;
         }
 
         public void UpdateExp(BigInteger exp)

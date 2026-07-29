@@ -226,7 +226,7 @@ namespace Battle
                 oldHero.transform.position,
                 battleContext,
                 heroTeamController,
-                userDataCache.AutoClassSkill,
+                userDataCache.AutoClassSkill, userDataCache.AutoUltimateSkill,
                 OnHeroDead
             );
 
@@ -322,7 +322,7 @@ namespace Battle
                 spawnPositionProvider(slotIndex),
                 battleContext,
                 heroTeamController,
-                userDataCache.AutoClassSkill,
+                userDataCache.AutoClassSkill, userDataCache.AutoUltimateSkill,
                 OnHeroDead
             );
 

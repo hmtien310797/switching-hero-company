@@ -16,11 +16,11 @@ namespace Battle
             Vector3 spawnPosition,
             IHeroBattleContext battleContext,
             HeroTeamController heroTeamController,
-            bool autoSkill,
+            bool autoClassSkill, bool autoUltimateSkill,
             Action<HeroActor> onHeroDead = null)
         {
             HeroDataSO heroData = DatabaseManager.Instance.GetHeroDataById(heroId);
-            return await SpawnAsync(heroData, spawnPosition, battleContext, heroTeamController, autoSkill, onHeroDead);
+            return await SpawnAsync(heroData, spawnPosition, battleContext, heroTeamController, autoClassSkill, autoUltimateSkill, onHeroDead);
         }
 
         public async UniTask<HeroActor> SpawnAsync(
@@ -28,7 +28,7 @@ namespace Battle
             Vector3 spawnPosition,
             IHeroBattleContext battleContext,
             HeroTeamController heroTeamController,
-            bool autoSkill,
+            bool autoClassSkill, bool autoUltimateSkill,
             Action<HeroActor> onHeroDead = null)
         {
             if (heroData == null)
@@ -67,7 +67,7 @@ namespace Battle
 
                 hero.transform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
                 hero.gameObject.SetActive(true);
-                await hero.Init(heroData, battleContext, heroTeamController, autoSkill);
+                await hero.Init(heroData, battleContext, heroTeamController, autoClassSkill, autoUltimateSkill);
 
                 if (onHeroDead != null)
                 {

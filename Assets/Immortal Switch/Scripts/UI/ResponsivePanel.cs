@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -20,6 +21,9 @@ namespace Immortal_Switch.Scripts.UI
         [Header("Mode")]
         [SerializeField]
         private FitMode fitMode = FitMode.FitInside;
+
+        [SerializeField]
+        private Vector3 originScalePortrait = Vector3.one;
 
         [SerializeField]
         private bool useSafeArea = true;
@@ -69,6 +73,16 @@ namespace Immortal_Switch.Scripts.UI
             Apply();
         }*/
 
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (originScalePortrait == Vector3.one)
+            {
+                originScalePortrait = transform.localScale;
+            }
+        }
+#endif
+
         private void Start()
         {
             Apply();
@@ -105,10 +119,8 @@ namespace Immortal_Switch.Scripts.UI
 
             /*bool isPortrait = Screen.height >= Screen.width;*/
 
-            float scale = CalculateScale();
-            var lastScale = Vector3.one * scale;
-
-            panelRoot.localScale = lastScale;
+            var scale = CalculateScale();
+            panelRoot.localScale = scale;
 
             if (changePosY)
             {
@@ -128,7 +140,7 @@ namespace Immortal_Switch.Scripts.UI
             {
                 foreach (var child in children)
                 {
-                    child.localScale = lastScale;
+                    child.localScale = scale;
                 }
             }
 
@@ -136,15 +148,15 @@ namespace Immortal_Switch.Scripts.UI
             lastSafeArea = Screen.safeArea;
         }
 
-        private float CalculateScale()
+        private Vector3 CalculateScale()
         {
             bool isPortrait = Screen.height >= Screen.width;
 
             if (isPortrait)
-                return panelRoot.localScale.x;
+                return originScalePortrait;
 
             if (useConstScale)
-                return constScale;
+                return Vector3.one * constScale;
 
             Rect area = useSafeArea
                 ? Screen.safeArea
@@ -182,7 +194,7 @@ namespace Immortal_Switch.Scripts.UI
                 scale *= 1f - scaleReductionPercent / 100f;
             }
 
-            return Mathf.Clamp(scale, minScale, maxScale);
+            return Vector3.one * Mathf.Clamp(scale, minScale, maxScale);
         }
     }
 }

@@ -273,10 +273,10 @@ namespace Immortal_Switch.Scripts.UI
                     gameStatView.anchoredPosition =
                         new Vector2(gameStatView.anchoredPosition.x, -76f);
 
-                    /*switchPanel.anchoredPosition =
-                        new Vector2(switchPanel.anchoredPosition.x, 70f);
-                    bottomPanel.anchoredPosition =
-                        new Vector2(bottomPanel.anchoredPosition.x, -100f);*/
+                    switchPanel.anchoredPosition =
+                        new Vector2(switchPanel.anchoredPosition.x, 136f);
+                    // bottomPanel.anchoredPosition =
+                    //     new Vector2(bottomPanel.anchoredPosition.x, -100f);
                     rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
                     rightSideLayoutGroup.constraintCount = 4;
                     /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-83f, -115f);*/
@@ -286,10 +286,10 @@ namespace Immortal_Switch.Scripts.UI
                     gameStatView.anchoredPosition =
                         new Vector2(gameStatView.anchoredPosition.x, -170f);
 
-                    /*switchPanel.anchoredPosition =
+                    switchPanel.anchoredPosition =
                         new Vector2(switchPanel.anchoredPosition.x, 273f);
-                    bottomPanel.anchoredPosition =
-                        new Vector2(bottomPanel.anchoredPosition.x, -15f);*/
+                    //bottomPanel.anchoredPosition =
+                        //new Vector2(bottomPanel.anchoredPosition.x, -15f);*/
                     rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
                     rightSideLayoutGroup.constraintCount = 5;
                     /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-33f, -118.7f);*/

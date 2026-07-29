@@ -57,8 +57,8 @@ public class TransmutationListResponse
     /// <summary>Level hệ thống Luyện Hóa — KHÁC level account/hero.</summary>
     [JsonProperty("level")]        public int  Level;
     [JsonProperty("exp")]          public long Exp;
-    /// <summary>Currency riêng để roll — KHÁC field "energy" của player/me (xem Docs/be-transmutation-rpc-spec.md mục 7).</summary>
-    [JsonProperty("energy")]       public long Energy;
+    /// <summary>Currency riêng để roll — bag balance của item_key "crystal" (xem Docs/be-transmutation-rpc-spec.md mục 7).</summary>
+    [JsonProperty("crystal")]      public long Crystal;
     /// <summary>Tối đa 1 entry mỗi item_type.</summary>
     [JsonProperty("equips")]       public List<TransmutationItemDto> Equips;
     /// <summary>null nếu không có item nào đang chờ resolve.</summary>
@@ -74,17 +74,17 @@ public class TransmutationListResponse
 public class TransmutationFuseResponse
 {
     [JsonProperty("success")] public bool   Success;
-    /// <summary>"NOT_ENOUGH_ENERGY" | "CONFIG_NOT_FOUND"</summary>
+    /// <summary>"NOT_ENOUGH_CRYSTAL" | "CONFIG_NOT_FOUND"</summary>
     [JsonProperty("error")]   public string Error;
 
-    /// <summary>false nếu đây là pending cũ trả lại (chưa resolve) — không phải lỗi, không tốn thêm energy.</summary>
+    /// <summary>false nếu đây là pending cũ trả lại (chưa resolve) — không phải lỗi, không tốn thêm crystal.</summary>
     [JsonProperty("is_new_pending")] public bool IsNewPending;
     [JsonProperty("pending")]        public TransmutationItemDto     Pending;
     /// <summary>Item đang mặc cùng item_type với pending — null nếu slot đang trống.</summary>
     [JsonProperty("current_equip")]  public TransmutationItemBaseDto CurrentEquip;
 
-    [JsonProperty("energy_spent")]   public long EnergySpent;
-    [JsonProperty("energy_balance")] public long EnergyBalance;
+    [JsonProperty("crystal_spent")]   public long CrystalSpent;
+    [JsonProperty("crystal_balance")] public long CrystalBalance;
     [JsonProperty("exp_gained")]     public long ExpGained;
     /// <summary>Exp còn lại sau khi server xử lý level-up (phần dư). Client dùng để set Data.Exp trực tiếp — không dùng += ExpGained.</summary>
     [JsonProperty("exp_balance")]    public long ExpBalance;
@@ -124,8 +124,8 @@ public class TransmutationDismantleResponse
     [JsonProperty("dismantled")]     public TransmutationDismantledItemDto Dismantled;
 
     /// <summary>Hoàn lại theo tier của item bị huỷ — 0 nếu BE chưa implement phần refund (vẫn hợp lệ, xem Docs/be-transmutation-rpc-spec.md mục 6-7).</summary>
-    [JsonProperty("energy_refund")]  public long EnergyRefund;
-    [JsonProperty("energy_balance")] public long EnergyBalance;
+    [JsonProperty("crystal_refund")]  public long CrystalRefund;
+    [JsonProperty("crystal_balance")] public long CrystalBalance;
     [JsonProperty("exp_gained")]     public long ExpGained;
     /// <summary>Exp còn lại sau khi server xử lý level-up (phần dư). Client dùng để set Data.Exp trực tiếp — không dùng += ExpGained.</summary>
     [JsonProperty("exp_balance")]    public long ExpBalance;

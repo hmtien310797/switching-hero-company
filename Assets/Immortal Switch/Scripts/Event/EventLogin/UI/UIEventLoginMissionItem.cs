@@ -89,8 +89,8 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.UI
                     btnGo.interactable = true;
 
                     btnClaim.gameObject.SetActive(false);
-                    btnGo.gameObject.SetActive(false);
-                    goClaimed.SetActive(true);
+                    btnGo.gameObject.SetActive(true);
+                    goClaimed.SetActive(false);
                 }
                 else if (mission.IsClaimed)
                 {

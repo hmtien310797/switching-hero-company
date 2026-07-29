@@ -25,7 +25,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             itemPool = new SimpleUIPool<HeroSummonProbabilityHeroItemUI>(itemPrefab, itemRoot);
         }
 
-        public void Bind(HeroSummonProbabilitySectionData data, SpriteAtlas heroSpriteAtlas)
+        public void Bind(HeroSummonProbabilitySectionData data)
         {
             imgRarity.sprite = HeroImageService.GetHeroTierIcon(data.Rarity);
 
@@ -49,7 +49,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
                     Debug.LogError($"Element {i} of hero {hero.Hero.Name} not found");
                     continue;
                 }
-                item.Bind(hero, heroSpriteAtlas, element);
+                item.Bind(hero, element);
             }
 
             itemPool.ReleaseFrom(data.Heroes.Count);

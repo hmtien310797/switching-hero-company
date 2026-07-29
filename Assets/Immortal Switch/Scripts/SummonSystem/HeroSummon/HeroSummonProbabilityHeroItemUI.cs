@@ -19,13 +19,13 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
         
         [SerializeField] private HeroUIIconConfigSO iconConfig;
 
-        public void Bind(HeroSummonProbabilityHeroData data, SpriteAtlas heroSpriteAtlas, ElementIconEntry element)
+        public void Bind(HeroSummonProbabilityHeroData data, ElementIconEntry element)
         {
             if (data == null || data.Hero == null)
                 return;
 
             if (portraitImage != null)
-                portraitImage.sprite = heroSpriteAtlas.GetSprite(data.Hero.HeroIconKey);
+                portraitImage.sprite = HeroImageService.GetHeroIcon(data.Hero);
 
             if (heroNameText != null)
                 heroNameText.text = data.Hero.Name;

@@ -26,7 +26,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         {
             _storage.Data.Level = response.Level;
             _storage.Data.Exp = response.Exp;
-            _storage.Data.Energy = response.Energy;
+            _storage.Data.Crystal = response.Crystal;
 
             _storage.Data.Equips.Clear();
             if (response.Equips != null)
@@ -54,7 +54,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
         public void ApplyFuseResult(TransmutationFuseResponse response)
         {
-            _storage.Data.Energy = response.EnergyBalance;
+            _storage.Data.Crystal = response.CrystalBalance;
             _storage.Data.Exp = response.ExpBalance;
             _storage.Data.Level = response.Level;
             _storage.Data.StuckEquip = TransmutationSystemHelper.ToPlayerEquipItem(response.Pending);
@@ -73,7 +73,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
         public void ApplyDismantleResult(TransmutationDismantleResponse response)
         {
-            _storage.Data.Energy = response.EnergyBalance;
+            _storage.Data.Crystal = response.CrystalBalance;
             _storage.Data.Exp = response.ExpBalance;
             _storage.Data.Level = response.Level;
             _storage.Data.StuckEquip = null;

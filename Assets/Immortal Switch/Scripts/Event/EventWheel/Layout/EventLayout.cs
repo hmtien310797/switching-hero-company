@@ -319,11 +319,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
                 if (rewards.Count > 0)
                 {
-                    await UIManager.Instance
-                        .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
-                        {
-                            Rewards = rewards,
-                        });
+                    PopupRewardService.Show(rewards);
                 }
             }
             finally

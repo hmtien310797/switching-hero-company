@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -18,6 +19,51 @@ namespace Immortal_Switch.Scripts.Items
             return UniTask.CompletedTask;
         }
 
+        public void SyncFromReward(IReadOnlyList<RewardDto> rewards)
+        {
+            if (rewards == null)
+            {
+                return;
+            }
+
+            foreach (var b in rewards)
+            {
+                if (Enum.TryParse(b.CurrencyType, true, out ECurrencyType type) &&
+                    TryParseAmount(b.Amount, out var amount))
+                {
+                    SetQuantity(type, amount);
+                }
+            }
+        }
+
+        private bool TryParseAmount(string value, out BigNumber amount)
+        {
+            amount = BigNumber.Zero;
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            // Ưu tiên format server nếu đã có: "mantissa|tier"
+            // if (BigNumber.TryParseServerString(value, out amount))
+            //     return true;
+
+            // Fallback tạm thời: server/client gửi số thường dạng string "1200".
+            if (double.TryParse(
+                    value,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out double number))
+            {
+                amount = BigNumber.FromDouble(number);
+                return true;
+            }
+
+            Debug.LogError($"[ItemsManager] Cannot parse amount: {value}");
+            return false;
+        }
+
         public void SyncFromServer(BagResponse rsp)
         {
             if (rsp == null)
@@ -31,6 +77,18 @@ namespace Immortal_Switch.Scripts.Items
                 if (int.TryParse(entry.ItemId, out var itemId))
                 {
                     _runtime.Items[itemId] = new ItemData(itemId, entry.Quantity);
+                }
+            }
+        }
+
+        public void SetQuantity(ECurrencyType currencyType, BigNumber quantity)
+        {
+            foreach (var item in _runtime.Items)
+            {
+                if (item.Key == (int)currencyType)
+                {
+                    item.Value.Quantity = quantity;
+                    return;
                 }
             }
         }

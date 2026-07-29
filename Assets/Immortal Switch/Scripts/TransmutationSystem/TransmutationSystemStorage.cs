@@ -37,7 +37,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 Data.Level < first.level)
             {
                 Data.UpdateLevel(first.level);
-                Data.UpdateEnergy(0);
+                Data.UpdateCrystal(0);
                 Data.UpdateExp(0);
                 Save();
             }

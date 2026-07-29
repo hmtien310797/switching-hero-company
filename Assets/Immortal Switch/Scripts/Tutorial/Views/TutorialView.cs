@@ -87,10 +87,12 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         // --- Private Fields ---
         private Sequence _fingerSequence;
+        private TutorialArgs _args;
         private RectTransform _rtCanvas;
         private RectTransform _rtBtnMask;
         private Canvas _canvas;
         private Material _material;
+
         private Vector2 _canvasSize;
         private Vector2 _orgStoryAnchoredPosition;
 
@@ -102,6 +104,7 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         private void Awake()
         {
+            ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
             TutorialManager.Instance.OnCompleteTutorial += OnCompleteTutorial;
             TutorialManager.Instance.OnChangeStep += OnChangeStep;
 
@@ -121,6 +124,24 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
             CacheCanvas();
         }
 
+        private void OnOrientationChanged(ScreenOrientationTracker.ScreenViewMode obj)
+        {
+            UniTask.WaitForEndOfFrame(destroyCancellationToken)
+                .ContinueWith(EndOfFrame)
+                .Forget();
+        }
+
+        private void EndOfFrame()
+        {
+            Canvas.ForceUpdateCanvases();
+            CacheCanvas();
+
+            if (_args != null)
+            {
+                RefreshVisual(_args);
+            }
+        }
+
         private void OnClickSkip()
         {
             TutorialManager.Instance.OnSkip();
@@ -138,10 +159,13 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         private void OnDestroy()
         {
+            KillFinger();
+
             btnSkip.onClick.RemoveListener(OnClickSkip);
             btnStory.onClick.RemoveListener(OnClickFocus);
             btnMask.onClick.RemoveListener(OnClickFocus);
 
+            ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
             TutorialManager.Instance.OnCompleteTutorial -= OnCompleteTutorial;
             TutorialManager.Instance.OnChangeStep -= OnChangeStep;
         }
@@ -176,6 +200,8 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         private void RefreshVisual(TutorialArgs args)
         {
+            _args = args;
+
             if (!string.IsNullOrWhiteSpace(args.LocalizeKey))
             {
                 ShowStory(args.LocalizeKey, args.NarratorId);
@@ -231,7 +257,8 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
             var center = (Vector2)bounds.center + _canvasSize * 0.5f;
             var size = (Vector2)bounds.size;
-            size += Vector2.one * padding * 2f;
+
+            size += Vector2.one * (padding * 2f);
 
             var normalizedCenter = new Vector2(
                 center.x / _canvasSize.x,
@@ -319,9 +346,15 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
             rtStory.anchoredPosition = pos;
         }
 
-        private void PlayFingerAnimation()
+        private void KillFinger()
         {
             _fingerSequence?.Kill();
+            _fingerSequence = null;
+        }
+
+        private void PlayFingerAnimation()
+        {
+            KillFinger();
 
             // vi tri bat dau
             var targetPos = finger.anchoredPosition;

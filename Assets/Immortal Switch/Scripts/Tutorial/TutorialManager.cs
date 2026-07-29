@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
@@ -52,11 +53,45 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         protected override void OnSingletonAwake()
         {
+            UserDataCache.Instance.OnExpChanged += RefreshUnlock;
+
             Storage = new TutorialStorage();
             Service = new TutorialService(Storage);
 
             Storage.Load();
             base.OnSingletonAwake();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            UserDataCache.Instance.OnExpChanged -= RefreshUnlock;
+        }
+
+        private void RefreshUnlock()
+        {
+            var featureUnlocks = DatabaseManager.Instance.GetFeatureUnlocks();
+            var pendingGuideIds = new List<int>();
+
+            foreach (var row in featureUnlocks)
+            {
+                if (row.tutorialStepId > 0)
+                {
+                    pendingGuideIds.Add(row.tutorialStepId);
+                }
+            }
+
+            pendingGuideIds.Sort((a, b) => a - b);
+
+            for (int i = 1; i < pendingGuideIds.Count; i++)
+            {
+                _pendingTutorialGuideIds.Add(pendingGuideIds[i]);
+            }
+
+            if (pendingGuideIds.Count > 0)
+            {
+                TryGuide(pendingGuideIds[0]).Forget();
+            }
         }
 
         public void ClearTutorial()
@@ -90,13 +125,6 @@ namespace Immortal_Switch.Scripts.Tutorial
         /// </summary>
         public async UniTask TryGuide(int guideId)
         {
-            if (_currentStep != 0)
-            {
-                // dang thuc hien 1 guide khac. luu vao pending de thuc hien.
-                _pendingTutorialGuideIds.Add(guideId);
-                return;
-            }
-
             if (!IsComplete(guideId))
             {
                 await ReconcileGuideFromServerAsync(guideId);
@@ -183,7 +211,8 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         public void NextStep()
         {
-            if (_rows.Count < _currentStep)
+            if (_rows.Count < 1 ||
+                _rows.Count < _currentStep)
             {
                 ClearTutorial();
                 return;
@@ -195,7 +224,8 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         public void OnSkip()
         {
-            if (_rows.Count < _currentStep)
+            if (_rows.Count < 1 ||
+                _rows.Count < _currentStep)
             {
                 Debug.LogError($"[Tutorial] current step: {_currentStep} must smaller rows: {_rows.Count}");
                 return;
@@ -213,6 +243,7 @@ namespace Immortal_Switch.Scripts.Tutorial
                 void ContinueTutorial()
                 {
                     _currentStep++;
+
                     OnSkip();
                 }
 
@@ -254,6 +285,7 @@ namespace Immortal_Switch.Scripts.Tutorial
                 void ContinueTutorial()
                 {
                     _currentStep++;
+
                     NextStep();
                 }
 

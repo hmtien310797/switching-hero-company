@@ -23,7 +23,6 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
 
         private List<int> availableLevels = new();
         private int currentIndex;
-        private SpriteAtlas heroSpriteAtlas;
 
         private void Awake()
         {
@@ -46,12 +45,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             SetVisible(true);
             Refresh();
         }
-
-        public void SetHeroSpriteAtlas(SpriteAtlas spriteAtlas)
-        {
-            heroSpriteAtlas = spriteAtlas;
-        }
-
+        
         private void BuildLevels()
         {
             availableLevels.Clear();
@@ -81,7 +75,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             for (int i = 0; i < data.Sections.Count; i++)
             {
                 var section = sectionPool.Get(i);
-                section.Bind(data.Sections[i], heroSpriteAtlas);
+                section.Bind(data.Sections[i]);
             }
 
             sectionPool.ReleaseFrom(data.Sections.Count);

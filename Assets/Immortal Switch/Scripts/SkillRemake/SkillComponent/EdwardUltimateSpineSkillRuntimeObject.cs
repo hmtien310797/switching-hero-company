@@ -66,7 +66,22 @@ namespace Immortal_Switch.Scripts.SkillRemake.SkillComponent
 
         public async UniTask Play(Vector3 direction, Action onCompleted = null)
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(1f));
+            if (cts == null)
+                return;
+
+            // Capture token trước khi await: object có thể bị despawn về pool
+            // trong lúc chờ 1s (OnDespawnedToPool → CancelEmitRuntimeEvent
+            // cancel & gán cts = null). token đã capture sẽ bị cancel — Play
+            // thoát sạch sẽ thay vì NRE khi truy cập cts.Token ở bên dưới.
+            CancellationToken token = cts.Token;
+
+            await UniTask.Delay(
+                TimeSpan.FromSeconds(1f),
+                cancellationToken: token);
+
+            if (token.IsCancellationRequested)
+                return;
+
             skeletonAnimation.gameObject.SetActive(true);
             if (!string.IsNullOrEmpty(animationName))
                 skeletonAnimation.AnimationState.SetAnimation(0, animationName, loop);
@@ -80,7 +95,7 @@ namespace Immortal_Switch.Scripts.SkillRemake.SkillComponent
             float totalDistance = CalculatePathDistance(Context.Caster.Position);
 
             float duration = totalDistance / moveSpeed;
-            ExecuteSkillAction(cts.Token).Forget();
+            ExecuteSkillAction(token).Forget();
             moveTween = transform
                 .DOPath(
                     pathPoints,

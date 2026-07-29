@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.Shared;
@@ -96,6 +97,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             }
 
             Service.ApplyListResponse(response);
+            CurrencyManager.Instance.Set(CurrencyType.crystal, response.Crystal);
             _DispatchChanged();
             return true;
         }
@@ -387,6 +389,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             }
 
             Service.ApplyFuseResult(response);
+            CurrencyManager.Instance.Set(CurrencyType.crystal, response.CrystalBalance);
             _DispatchChanged();
 
             var itemCfg = _database.ItemConfig.rows.Find(v => v.configId == response.Pending.CfgId);
@@ -472,6 +475,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             }
 
             Service.ApplyDismantleResult(response);
+            CurrencyManager.Instance.Set(CurrencyType.crystal, response.CrystalBalance);
             _DispatchChanged();
             return true;
         }

@@ -190,7 +190,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         stateMachine.ChangeState(HeroStateId.Dead);
     }
 
-    public async UniTask Init(HeroDataSO data, IHeroBattleContext battleContext, HeroTeamController heroTeamController, bool useAutoSkill)
+    public async UniTask Init(HeroDataSO data, IHeroBattleContext battleContext, HeroTeamController heroTeamController, bool useAutoClassSkill,bool useAutoUltimateSkill)
     {
         heroData = data;
         
@@ -203,7 +203,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         UserDataCache.Instance?.ApplyServerLoadoutToHero(this, heroData.Id);
 
         ResetData();
-        SetAutoClassSkill(useAutoSkill);
+        SetAutoClassSkill(useAutoClassSkill);
+        SetAutoUltimateSkill(useAutoUltimateSkill);
         await skillController.InitializeUltimateSkillDataAndClassSkillData();
     }
 
