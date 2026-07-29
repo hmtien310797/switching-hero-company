@@ -56,6 +56,8 @@ namespace Immortal_Switch.Scripts.Skill
         private readonly SkillTargetResolver targetResolver = new();
         private readonly Dictionary<SkillDataSO, float> cooldownRemainingBySkill = new();
 
+        private NottinghamwoodPassiveSkill _nottinghamwoodPassive;
+
         private HeroActor owner;
         private HeroAnimationDriver animationDriver;
         private IHeroBattleContext battleContext;
@@ -347,6 +349,7 @@ namespace Immortal_Switch.Scripts.Skill
             executor = new SkillExecutor(targetResolver, objectSpawner);
             EnsureClassSkillSlotCapacity();
             autoSkillController.Init(this);
+            _nottinghamwoodPassive = GetComponent<NottinghamwoodPassiveSkill>();
         }
 
         private void Update()
@@ -390,6 +393,7 @@ namespace Immortal_Switch.Scripts.Skill
             executor = new SkillExecutor(targetResolver, objectSpawner);
             EnsureClassSkillSlotCapacity();
             autoSkillController.Init(this);
+            _nottinghamwoodPassive = GetComponent<NottinghamwoodPassiveSkill>();
             BuildPassiveRuntime();
             BindEvents();
         }
@@ -649,6 +653,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         public void ResetRuntimeOnSwitchOut()
         {
+            _nottinghamwoodPassive?.Reset();
             passiveRuntime?.Reset();
             ClearPassiveAura();
 
@@ -1203,6 +1208,13 @@ namespace Immortal_Switch.Scripts.Skill
             passiveRuntime?.Reset();
             passiveRuntime = null;
 
+            // If Nottinghamwood custom passive handler exists, delegate to it.
+            if (_nottinghamwoodPassive != null)
+            {
+                _nottinghamwoodPassive.Init(passiveSkill, battleContext);
+                return;
+            }
+
             if (passiveSkill == null ||
                 owner == null)
             {
@@ -1332,6 +1344,13 @@ namespace Immortal_Switch.Scripts.Skill
             if (context == null || owner == null || owner.IsDead || !gameObject.activeInHierarchy)
                 return;
 
+            // If Nottinghamwood custom passive handler exists, delegate to it.
+            if (_nottinghamwoodPassive != null)
+            {
+                _nottinghamwoodPassive.HandleEvent(context);
+                return;
+            }
+
             passiveRuntime?.HandleEvent(context);
         }
 
@@ -1366,6 +1385,20 @@ namespace Immortal_Switch.Scripts.Skill
                 return;
 
             cooldownRemainingBySkill.Remove(skillData);
+        }
+
+        /// <summary>
+        /// Public wrapper for starting cooldown on a skill.
+        /// Used by custom passive handlers (e.g. NottinghamwoodPassiveSkill)
+        /// to integrate with the existing cooldown system.
+        /// </summary>
+        public void StartCooldownForPassive(SkillDataSO skillData)
+        {
+            if (skillData == null || owner == null)
+                return;
+
+            int level = levelProvider.GetSkillLevel(skillData, owner);
+            StartCooldown(skillData, level);
         }
 
         private void OnStageLost()
