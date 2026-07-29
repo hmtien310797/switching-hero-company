@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Battle;
 using DG.Tweening;
+using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Enemy;
+using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -24,6 +26,7 @@ namespace Immortal_Switch.Scripts.Skill
         [SerializeField, Min(1)] private int maxJumpCount = 4;
         [SerializeField] private string animationName = "ultimate";
         [SerializeField] private string hitEventName = "hit";
+        [SerializeField] private float[] damages;
 
         [Header("Movement")]
         [SerializeField, Min(0f)] private float moveDuration = 0.35f;
@@ -161,7 +164,10 @@ namespace Immortal_Switch.Scripts.Skill
 
                 float animationDuration = PlayUltimateAnimation();
                 yield return new WaitForSeconds(0.3f);
-                yield return MoveTweenRoutine(landingPosition);
+                yield return MoveTweenRoutine(landingPosition); 
+                HeroStatSnapshot heroStatSnapshot = HeroProgressionManager.Instance.Service.GetCurrentStats(Context.Caster.HeroData.Id);
+                DamageResult damageResult = DamageCalculator.CalculateDamage(Context.Caster, currentTarget, damages[heroStatSnapshot.ultimateSkillLevel - 1]);
+                currentTarget.TakeDamage(damageResult);
                 GameCameraController.Instance.ShakeCamera();
 
                 if (waitAnimationCompleteBeforeNextJump)

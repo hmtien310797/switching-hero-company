@@ -32,19 +32,9 @@ namespace Immortal_Switch.Scripts.Hero
             database = DatabaseManager.Instance.HeroProgressionDatabase;
             saveData = new HeroCollectionSaveData();
         }
-
-        public void ResetData()
-        {
-            saveData = new HeroCollectionSaveData();
-            service = new HeroProgressionService(database, saveData);
-
-            if (ES3.KeyExists(saveKey))
-                ES3.DeleteKey(saveKey);
-        }
         
-
         /// <summary>Sync shard count tuyệt đối từ server (hero/list, player/me).</summary>
-        public void SetShard(int heroId, int amount)
+        private void SetShard(int heroId, int amount)
         {
             if (service == null) return;
 

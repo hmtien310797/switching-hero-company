@@ -44,9 +44,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5da3e2900217142ffb42e7c01c698eb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxJumpCount: 4
+  maxJumpCount: 5
   animationName: ulti
   hitEventName: hit
+  damages:
+  - 250
+  - 270
+  - 290
   moveDuration: 0.35
   moveEase: 6
   landingOffset: {x: 0, y: 0, z: 0}

@@ -116,33 +116,6 @@ namespace Immortal_Switch.Scripts.Hero
             return config.GetMaxStarInTier(owned.CurrentTier);
         }
 
-        public bool CanUpgrade(int heroId)
-        {
-            var owned = GetOrCreateOwnedHero(heroId);
-            if (!owned.IsUnlocked) return false;
-
-            var currentNode = GetCurrentNode(heroId);
-            if (currentNode == null || currentNode.IsMaxNode) return false;
-
-            return owned.CurrentShard >= currentNode.ShardCostToNext;
-        }
-
-        public bool UpgradeHero(int heroId)
-        {
-            var owned = GetOrCreateOwnedHero(heroId);
-            if (!owned.IsUnlocked) return false;
-
-            var currentNode = GetCurrentNode(heroId);
-            if (currentNode == null || currentNode.IsMaxNode) return false;
-            if (owned.CurrentShard < currentNode.ShardCostToNext) return false;
-
-            owned.CurrentShard -= currentNode.ShardCostToNext;
-            owned.CurrentTier = currentNode.NextTier;
-            owned.CurrentStarInTier = currentNode.NextStarInTier;
-            
-            return true;
-        }
-
         public HeroStatSnapshot GetCurrentStats(int heroId)
         {
             var hero = database.GetHero(heroId);
