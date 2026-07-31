@@ -299,7 +299,7 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         private bool NeedSetProgress(string eventKey)
         {
-            return eventKey == MissionEventKeys.EVENT_CLEAR_STAGE;
+            return eventKey == EventKeys.EVENT_CLEAR_STAGE;
         }
     }
 }

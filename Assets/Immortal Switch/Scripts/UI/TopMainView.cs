@@ -360,7 +360,7 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             TimeSpan span = TimeSpan.FromSeconds(remainSeconds);
-            txtTimeCountDownBL.text = $"{(int)span.TotalHours:00}:{span.Minutes:00}:{span.Seconds:00}";
+            txtTimeCountDownBL.text = $"{(int)span.TotalDays:00}:{span.Hours:00}:{span.Minutes:00}:{span.Seconds:00}";
         }
 
         // Tự đếm nội suy phía client giữa hai lần đồng bộ server, để nút/text không đứng im chờ
@@ -441,6 +441,13 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             SyncAfkAccumulatedSeconds(preview.ElapsedSeconds, preview.MaxOfflineSeconds);
+
+            // Vừa đăng nhập mà rương AFK đã tích lũy đủ AfkClaimMinSeconds (1 phút) thì hiện luôn
+            // popup nhận quà, không bắt player phải tự bấm nút gương.
+            if (afkAccumulatedSeconds >= AfkClaimMinSeconds)
+            {
+                OpenAfkRewardPopup();
+            }
         }
 
         private UniTask OnClickTutorial(string arg1, int arg2)
@@ -529,13 +536,44 @@ namespace Immortal_Switch.Scripts.UI
                 return;
             }
 
+            OpenAfkRewardPopup();
+        }
+
+        private void OpenAfkRewardPopup()
+        {
+            OpenAfkRewardPopupAsync().Forget();
+        }
+
+        // Ngay lúc login (RefreshAfkClaimAvailabilityAsync ở Start) afk/preview có thể trả lời
+        // trước khi PvEBattleController kịp resolve StageRuntimeData của stage hiện tại — nên phải
+        // đợi tối đa vài giây thay vì đọc null ngay (NRE) hoặc âm thầm bỏ qua popup.
+        private async UniTaskVoid OpenAfkRewardPopupAsync()
+        {
+            const float waitTimeoutSeconds = 5f;
+
             if (PvEBattleController.Instance == null)
             {
                 Debug.LogWarning("[TopMainView] PvEBattleController chưa sẵn sàng — chưa mở popup.");
                 return;
             }
 
-            var stageRewards = PvEBattleController.Instance.GetStageRuntimeData().BaseRewards;
+            StageRuntimeData stageRuntimeData = PvEBattleController.Instance.GetStageRuntimeData();
+            float waited = 0f;
+
+            while (stageRuntimeData == null && waited < waitTimeoutSeconds)
+            {
+                await UniTask.Yield();
+                waited += Time.unscaledDeltaTime;
+                stageRuntimeData = PvEBattleController.Instance.GetStageRuntimeData();
+            }
+
+            if (stageRuntimeData == null)
+            {
+                Debug.LogWarning("[TopMainView] StageRuntimeData chưa sẵn sàng — chưa mở popup.");
+                return;
+            }
+
+            var stageRewards = stageRuntimeData.BaseRewards;
             var earnedRewards = StageRewardConverter.FromBaseRewardsElapsed(stageRewards, afkAccumulatedSeconds);
 
             UIManager.Instance
@@ -586,36 +624,7 @@ namespace Immortal_Switch.Scripts.UI
         // claim, summon claim reward, account/claim_link_reward đều làm vậy).
         private void ShowAfkClaimRewardPopup(List<RewardDto> rewards)
         {
-            if (rewards == null ||
-                rewards.Count == 0)
-                return;
-
-            var itemRewards = new List<ItemData>();
-
-            foreach (var r in rewards)
-            {
-                if (!BigNumber.TryParse(r.Amount, out var amount) ||
-                    amount <= BigNumber.Zero)
-                    continue;
-
-                // ItemData(string itemKey, ...) không dùng ở đâu khác trong codebase — mọi chỗ
-                // show PopupRewardService khác đều resolve ra item_id số trước (xem
-                // SummonRewardReceiver/SettingManager). Resolve item_id ở đây cho chắc thay vì
-                // dựa vào nhánh fallback ItemKey của DatabaseManager.GetDisplayData, tránh trường
-                // hợp currency_type ("gold"/"diamond"...) không match được item và bị skip lặng lẽ.
-                var itemRow = DatabaseManager.Instance.ItemDb.FindItem(r.CurrencyType);
-
-                if (itemRow == null)
-                {
-                    Debug.LogWarning($"[TopMainView] AFK reward currency_type '{r.CurrencyType}' not found in ItemDb.");
-                    continue;
-                }
-
-                itemRewards.Add(new ItemData(itemRow.itemId, amount));
-            }
-
-            if (itemRewards.Count > 0)
-                PopupRewardService.Show(itemRewards);
+            AfkRewardPopupPresenter.ShowClaimedRewardPopup(rewards);
         }
 
         private void OnClickAutoClassSkill()

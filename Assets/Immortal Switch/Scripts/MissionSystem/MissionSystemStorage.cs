@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.MissionSystem.Interfaces;
 using Immortal_Switch.Scripts.MissionSystem.Models;
-using Newtonsoft.Json;
-using UnityEngine;
 
 namespace Immortal_Switch.Scripts.MissionSystem
 {
@@ -18,8 +16,6 @@ namespace Immortal_Switch.Scripts.MissionSystem
         /// </summary>
         public Action OnAfterSave { get; set; }
 
-        private const string SAVE_KEY = nameof(MissionSystem);
-
         public MissionSystemStorage(MissionSystemDatabaseSO db)
         {
             _db = db;
@@ -27,15 +23,15 @@ namespace Immortal_Switch.Scripts.MissionSystem
 
         public void Save()
         {
-            ES3.Save(SAVE_KEY, Data);
             //Debug.Log($"{SAVE_KEY}: Save {JsonConvert.SerializeObject(Data)}");
             OnAfterSave?.Invoke();
         }
 
         public void Load()
         {
-            Data = ES3.KeyExists(SAVE_KEY) ? ES3.Load<MissionSystemData>(SAVE_KEY) : new MissionSystemData();
-            Debug.Log($"{SAVE_KEY}: Load {JsonConvert.SerializeObject(Data)}");
+            Data = new MissionSystemData();
+
+            //Debug.Log($"{SAVE_KEY}: Load {JsonConvert.SerializeObject(Data)}");
         }
 
         /// <summary>
@@ -51,7 +47,6 @@ namespace Immortal_Switch.Scripts.MissionSystem
         {
             Data.DailyTask = new MissionSystemTask
             {
-                CompletionReported = false,
                 Tasks = _db.MissionConfig.rows
                     .FindAll(v => v.type == MissionTypes.DAILY)
                     .Select(v => new MissionSystemEntry
@@ -199,10 +194,10 @@ namespace Immortal_Switch.Scripts.MissionSystem
                         EventKey = cfg.eventKey,
                         IsClaimed = false,
                     });
+
                     changed = true;
                     continue;
                 }
-
             }
 
             return changed;

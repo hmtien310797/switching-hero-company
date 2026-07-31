@@ -22,7 +22,7 @@ MonoBehaviour:
   legacyValueKey: []
   DescriptionValuesByLevel: []
   classSkillDescriptionLevelValuesByLevel:
-  - Values: 0
+  - Values: 362
     ScaleWithSkillLevel: 0
   - Values: 0
     ScaleWithSkillLevel: 0
@@ -37,7 +37,7 @@ MonoBehaviour:
     RequireTarget: 1
     MoveToCastRange: 0
     CastRange: 8
-    Cooldown: 10
+    Cooldown: 9.45
     TargetSelectType: 0
     HeroAnimationName: 
   RuntimeObjectConfig:
@@ -87,9 +87,9 @@ MonoBehaviour:
     Actions:
     - ActionType: 0
       ChancePercent: 100
-      TargetTypeOverride: 0
+      TargetTypeOverride: 10
       Damage:
-        SkillDamageBonusPercent: 140
+        SkillDamageBonusPercent: 362
         ScaleWithClassSkillLevel: 1
         CountAsSkillDamage: 1
       Dot:
@@ -116,11 +116,95 @@ MonoBehaviour:
         Shape: 0
         PositionType: 1
         Anchor: 0
-        Radius: 9
+        Radius: 8
         BoxSize: {x: 2, y: 2}
         Duration: 0
         TickInterval: 0
         HitOncePerTarget: 0
+        OnHitActions: []
+      Projectile:
+        BulletPatternConfig:
+          patternType: 0
+          bulletAddressableKey: 
+          bulletSpeed: 0
+          bulletLifeTime: 0
+          totalWaves: 0
+          timeBetweenWaves: 0
+          bulletsPerWave: 0
+          spreadAngle: 0
+          rotationSpeedPerWave: 0
+          bulletSpawnDelay: 0
+          alternateBulletOrderEachWave: 0
+          damage: 0
+          delayWhenStartFiring: 0
+        HomingChainBulletConfig:
+          bulletAddressableKey: 
+          bulletCount: 1
+          delayBetweenBullets: 0.05
+          enemyLayer:
+            serializedVersion: 2
+            m_Bits: 0
+          searchRadius: 20
+          maxTargetsPerBullet: 4
+          straightSpeed: 18
+          curveSpeed: 22
+          arriveDistance: 0.2
+          curveTangentLength: 3
+          damage: 100
+          drawDebugPath: 0
+          curveHeight: 4
+          alternateCurveSide: 1
+          useVerticalArc: 1
+          alternateVerticalArc: 1
+          verticalArcOnFirstChainMove: 1
+          verticalArcHeightRange: {x: 0.5, y: 3}
+          UseShortDistanceDetour: 1
+          minDetourDistance: 5
+          virtualPointXRange: {x: 8, y: 12}
+          virtualPointZRange: {x: 5, y: 9}
+          virtualPointYRange: {x: 2, y: 3}
+          virtualPointFindAttempts: 12
+        OnHitActions: []
+      Stack:
+        StackKey: 
+        Amount: 1
+      TriggerSkill: {fileID: 0}
+    - ActionType: 1
+      ChancePercent: 100
+      TargetTypeOverride: 10
+      Damage:
+        SkillDamageBonusPercent: 0
+        ScaleWithClassSkillLevel: 1
+        CountAsSkillDamage: 1
+      Dot:
+        EffectId: DOT
+        TickDamageBonusPercent: 80
+        ScaleDamageWithClassSkillLevel: 1
+        TickInterval: 1
+        Duration: 3
+        DamageType: 0
+        StackRule: 0
+      StatModifier:
+        TargetMask: 1
+        ApplyMode: 0
+        ModifierId: skill_stat_modifier
+        StatType: 0
+        Operation: 1
+        PercentValue: 0
+        ScaleValueWithClassSkillLevel: 1
+        Duration: 5
+        StackRule: 3
+        MaxStacks: 1
+      Area:
+        AreaPrefab: {fileID: 0}
+        Shape: 0
+        PositionType: 1
+        Anchor: 0
+        Radius: 8
+        BoxSize: {x: 2, y: 2}
+        Duration: 0
+        TickInterval: 0
+        HitOncePerTarget: 1
         OnHitActions: []
       Projectile:
         BulletPatternConfig:

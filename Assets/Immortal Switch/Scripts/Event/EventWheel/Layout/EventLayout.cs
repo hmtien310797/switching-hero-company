@@ -245,6 +245,10 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 return;
             }
 
+            CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
+            await EventWheelPassManager.Instance.RefreshAsync();
+            ScreenOrientationTracker.Instance.LockCurrentOrientation();
+
             var spinCancellationTokenSource = new CancellationTokenSource();
 
             _spinCancellationTokenSource = spinCancellationTokenSource;
@@ -314,9 +318,6 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                     }
                 }
 
-                CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
-                await EventWheelPassManager.Instance.RefreshAsync();
-
                 if (rewards.Count > 0)
                 {
                     PopupRewardService.Show(rewards);
@@ -331,6 +332,8 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                     _spinCompletionSource = null;
                     IsRolling = false;
                 }
+
+                ScreenOrientationTracker.Instance.UnlockOrientation();
             }
 
             void AddReward(EventWheelSpinEntryDto entry)

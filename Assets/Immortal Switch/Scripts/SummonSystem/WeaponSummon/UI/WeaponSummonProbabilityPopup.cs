@@ -2,6 +2,8 @@
 using System.Linq;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -151,12 +153,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (summonLevelText != null)
                 summonLevelText.text = $"Lv.{levelData.SummonLevel}";
 
-            gradeDRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common) , levelData.GradeDRate);
-            gradeCRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), levelData.GradeCRate);
-            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Rare), levelData.GradeBRate);
-            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Epic), levelData.GradeARate);
-            gradeSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Legendary), levelData.GradeSRate);
-            gradeSSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Mythic), levelData.GradeSSRate);
+            gradeDRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.D) , levelData.GradeDRate);
+            gradeCRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.C), levelData.GradeCRate);
+            gradeBRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.B), levelData.GradeBRate);
+            gradeARow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.A), levelData.GradeARate);
+            gradeSRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.S), levelData.GradeSRate);
+            gradeSSRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.SS), levelData.GradeSSRate);
 
             /*star1Row?.Bind(1, levelData.Star1Rate);
             star2Row?.Bind(2, levelData.Star2Rate);
@@ -176,12 +178,12 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             if (summonLevelText != null)
                 summonLevelText.text = "Lv.-";
 
-            gradeDRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common) , 0f);
-            gradeCRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), 0f);
-            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Rare), 0f);
-            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Epic), 0f);
-            gradeSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Legendary), 0f);
-            gradeSSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Mythic) , 0f);
+            gradeDRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.D) , 0f);
+            gradeCRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.C), 0f);
+            gradeBRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.B), 0f);
+            gradeARow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.A), 0f);
+            gradeSRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.S), 0f);
+            gradeSSRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.SS) , 0f);
 
             /*star1Row?.Bind(1, 0f);
             star2Row?.Bind(2, 0f);

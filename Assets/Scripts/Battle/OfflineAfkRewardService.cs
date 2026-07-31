@@ -19,17 +19,16 @@ namespace Immortal_Switch.Scripts.Reward
         /// </summary>
         public event Action<AfkClaimResponse> AfkRewardClaimed;
 
+        // KHÔNG claim/checkpoint ở đây (boot/login) — nếu không, checkpoint bị reset về "now" gần
+        // như ngay khi vào game, khiến elapsed luôn gần 0 (đúng như comment ở SetCurrentAfkStage
+        // bên dưới đã cảnh báo cho trường hợp tương tự) và AFKRewardView popup mở lúc login
+        // (TopMainView.RefreshAfkClaimAvailabilityAsync) mất luôn phần thưởng thật trước khi
+        // player kịp claim qua UI. Chỉ claim khi resume từ background (xem OnApplicationPause) —
+        // đó là trường hợp duy nhất không có UI nào khác để hiện popup AFK.
         public void Initialize(int currentStage)
         {
             currentAfkStage = Mathf.Max(1, currentStage);
             initialized     = true;
-            InitializeAsync().Forget();
-        }
-
-        private async UniTaskVoid InitializeAsync()
-        {
-            await TryClaimOfflineAfkReward();
-            await SaveCheckpointAsync(currentAfkStage);
         }
 
         // Chỉ cập nhật stage cục bộ (dùng khi pause/quit) — KHÔNG gọi afk/checkpoint ở đây.
@@ -69,6 +68,7 @@ namespace Immortal_Switch.Scripts.Reward
                 if (response.Balances != null && CurrencyManager.Instance != null)
                     CurrencyManager.Instance.ApplyServerBalances(response.Balances);
 
+                AfkRewardPopupPresenter.ShowClaimedRewardPopup(response.Rewards);
                 AfkRewardClaimed?.Invoke(response);
             }
             catch (Exception e)

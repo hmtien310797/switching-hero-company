@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.MissionSystem.Models;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Helper;
 using Newtonsoft.Json;
 using TMPro;
@@ -178,7 +180,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             if (missionType == MissionTypes.DAILY)
             {
                 var remain = DateTimeHelper.GetRemainingTimeToday();
-                txtTitle.text = string.Format(_GetTitle(missionType), $"{remain.Hours:D2}h{remain.Minutes:D2}m");
+                txtTitle.text = _GetTitle(missionType, $"{remain.Hours:D2}h{remain.Minutes:D2}m");
             }
             else
             {
@@ -230,32 +232,24 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             }
         }
 
-        private string _GetTitle(string missionType)
+        private string _GetTitle(string missionType, params object[] args)
         {
-            switch (missionType)
+            return missionType switch
             {
-                case MissionTypes.WEEKLY:
-                    return "Nhiệm Vụ Hằng Tuần Trong 7 Ngày";
-
-                case MissionTypes.DAILY:
-                    return "Nhiệm Vụ Hằng Ngày trong {0}";
-            }
-
-            return string.Empty;
+                MissionTypes.WEEKLY => LocalizationManager.GetText(LocalizationKeys.UI_MISSION_DAILY_DECS),
+                MissionTypes.DAILY => LocalizationManager.GetText(LocalizationKeys.UI_MISSION_DAILY_IN, args),
+                _ => string.Empty,
+            };
         }
 
-        private string _GetMissionTitle(string missionType)
+        private string _GetMissionTitle(string type)
         {
-            switch (missionType)
+            return type switch
             {
-                case MissionTypes.WEEKLY:
-                    return "[Hằng Tuần]";
-
-                case MissionTypes.DAILY:
-                    return "[Hằng Ngày]";
-            }
-
-            return string.Empty;
+                MissionTypes.WEEKLY => LocalizationManager.GetText(LocalizationKeys.UI_MISSION_WEEK2),
+                MissionTypes.DAILY => LocalizationManager.GetText(LocalizationKeys.UI_MISSION_DAI2),
+                _ => string.Empty,
+            };
         }
     }
 }

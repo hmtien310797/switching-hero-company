@@ -107,22 +107,27 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
                 return;
             }
 
-            UIManager.Instance
-                .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
-                {
-                    Rewards = rewards,
-                })
-                .Forget();
+            if (rewards.Count > 0)
+            {
+                PopupRewardService.Show(rewards);
+            }
         }
 
         private static string DescribeShopBuyError(string error)
         {
             switch (error)
             {
-                case "EVENT_NOT_ACTIVE":   return "Cửa hàng sự kiện đã đóng.";
-                case "LIMIT_REACHED":      return "Đã đạt giới hạn mua.";
-                case "INSUFFICIENT_POINT": return "Không đủ điểm để mua.";
-                default:                   return "Mua thất bại, vui lòng thử lại.";
+                case "EVENT_NOT_ACTIVE":
+                    return "Cửa hàng sự kiện đã đóng.";
+
+                case "LIMIT_REACHED":
+                    return "Đã đạt giới hạn mua.";
+
+                case "INSUFFICIENT_POINT":
+                    return "Không đủ điểm để mua.";
+
+                default:
+                    return "Mua thất bại, vui lòng thử lại.";
             }
         }
 

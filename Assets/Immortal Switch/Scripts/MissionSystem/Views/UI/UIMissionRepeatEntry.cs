@@ -125,7 +125,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             _target = row.target;
             _onJump = onJump;
 
-            txtTitle.text = LocalizationManager.GetText(row.title);
+            txtTitle.text = LocalizationManager.GetText(row.title, _target);
 
             rewardQuantity.Bind(rewardItemId, rewardAmount);
 

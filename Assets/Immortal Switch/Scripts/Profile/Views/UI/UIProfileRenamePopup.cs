@@ -1,5 +1,6 @@
 using Common;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.Profile.Models;
@@ -92,6 +93,7 @@ namespace Immortal_Switch.Scripts.Profile.Views.UI
 
                 UserDataCache.Instance.DisplayName = response.display_name;
                 UserDataCache.Instance.RenameCount = response.rename_count;
+                CurrencyManager.Instance?.ApplyServerBalances(response.balances);
                 GetComponentInParent<ProfileView>(true)?.RefreshVisual();
                 TopMainView.Instance?.SetDisplayName(response.display_name);
 

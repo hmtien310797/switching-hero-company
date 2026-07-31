@@ -14,9 +14,14 @@ namespace Immortal_Switch.Scripts.UI
         }
 
         [Header("Debug")]
-        [SerializeField] private bool logChanged = true;
+        [SerializeField]
+        private bool logChanged = true;
 
         public ScreenViewMode CurrentMode { get; private set; }
+
+        public bool IsOrientationLocked { get; private set; }
+
+        public ScreenOrientation LockedOrientation { get; private set; }
 
         public event Action<ScreenViewMode> OnOrientationChanged;
 
@@ -28,7 +33,6 @@ namespace Immortal_Switch.Scripts.UI
             base.Awake();
             ForceRefresh();
         }
-        
 
         private void Update()
         {
@@ -78,6 +82,53 @@ namespace Immortal_Switch.Scripts.UI
             return Screen.height >= Screen.width
                 ? ScreenViewMode.Portrait
                 : ScreenViewMode.Landscape;
+        }
+
+        /// <summary>
+        /// Khóa màn hình theo đúng orientation hiện tại của thiết bị.
+        /// </summary>
+        public void LockCurrentOrientation()
+        {
+            LockedOrientation = GetCurrentScreenOrientation();
+            Screen.orientation = LockedOrientation;
+            IsOrientationLocked = true;
+        }
+
+        /// <summary>
+        /// Mở khóa orientation và cho phép thiết bị tự động xoay lại.
+        /// </summary>
+        public void UnlockOrientation()
+        {
+            Screen.orientation = ScreenOrientation.AutoRotation;
+            IsOrientationLocked = false;
+        }
+
+        private ScreenOrientation GetCurrentScreenOrientation()
+        {
+            if (Screen.orientation != ScreenOrientation.AutoRotation)
+            {
+                return Screen.orientation;
+            }
+
+            switch (Input.deviceOrientation)
+            {
+                case DeviceOrientation.Portrait:
+                    return ScreenOrientation.Portrait;
+
+                case DeviceOrientation.PortraitUpsideDown:
+                    return ScreenOrientation.PortraitUpsideDown;
+
+                case DeviceOrientation.LandscapeLeft:
+                    return ScreenOrientation.LandscapeLeft;
+
+                case DeviceOrientation.LandscapeRight:
+                    return ScreenOrientation.LandscapeRight;
+
+                default:
+                    return GetCurrentMode() == ScreenViewMode.Portrait
+                        ? ScreenOrientation.Portrait
+                        : ScreenOrientation.LandscapeLeft;
+            }
         }
 
         public override UniTask InitializeAsync()

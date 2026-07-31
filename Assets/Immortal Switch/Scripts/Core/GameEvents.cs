@@ -41,6 +41,9 @@
 
         public const string OnSelectedDungeonStage = "OnSelectedDungeonStage";
 
+        // navigation
+        public const string ON_NAVIGATION_REQUESTED = nameof(ON_NAVIGATION_REQUESTED);
+
         // summon
         public const string ON_SUMMON_HERO = nameof(ON_SUMMON_HERO);
 

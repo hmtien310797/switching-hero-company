@@ -462,8 +462,14 @@ public class NakamaClient : MonoBehaviour
     ///   thông báo, bất kể đang ở scene nào hay RPC nào đang gọi.
     /// ApiResponseException với status khác 401 (400/500...) là lỗi nghiệp vụ hợp lệ từ server
     /// đã trả lời — KHÔNG phải mất mạng, để nguyên cho caller tự xử lý.
+    ///
+    /// suppressForceLogoutOnNetworkError: dùng cho các RPC IAP (iap/purchase, iap/pack_purchase,
+    /// eventwheel/pass_buy_premium) — receipt đã được store xác nhận thanh toán, Unity IAP giữ
+    /// giao dịch ở trạng thái Pending để tự redeliver, và IAPManager.ValidateAndConfirmAsync đã tự
+    /// bắt exception này (không confirm, báo lỗi cho người chơi bấm mua lại). Force-logout cả app
+    /// giữa lúc đang xác nhận 1 giao dịch tiền thật chỉ gây gián đoạn thừa, không giúp ích gì thêm.
     /// </summary>
-    private async Task<IApiRpc> CallRpcAsync(string id, string payload = null)
+    private async Task<IApiRpc> CallRpcAsync(string id, string payload = null, bool suppressForceLogoutOnNetworkError = false)
     {
         try
         {
@@ -483,7 +489,10 @@ public class NakamaClient : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogWarning($"[NakamaClient] RPC '{id}' failed without a server response (likely no network): {e.Message}");
-            RequestForceLogout(NoNetworkReason);
+
+            if (!suppressForceLogoutOnNetworkError)
+                RequestForceLogout(NoNetworkReason);
+
             throw;
         }
     }
@@ -566,12 +575,15 @@ public class NakamaClient : MonoBehaviour
         return JsonUtility.FromJson<PlayerUpdateResponse>(response.Payload);
     }
 
-    /// <summary>Đổi display_name qua RPC player/rename. Server validate độ dài 2-20 ký tự.</summary>
+    /// <summary>Đổi display_name qua RPC player/rename. Server validate độ dài 2-20 ký tự.
+    /// Dùng JsonConvert (không phải JsonUtility) để deserialize vì response.balances là
+    /// List&lt;RewardDto&gt; — JsonUtility bỏ qua [JsonProperty] nên không map được
+    /// currency_type/amount snake_case sang CurrencyType/Amount.</summary>
     public async Task<PlayerRenameResponse> RenamePlayerAsync(string displayName)
     {
         var payload = JsonUtility.ToJson(new PlayerRenameRequest { display_name = displayName });
         var response = await CallRpcAsync("player/rename", payload);
-        return JsonUtility.FromJson<PlayerRenameResponse>(response.Payload);
+        return JsonConvert.DeserializeObject<PlayerRenameResponse>(response.Payload);
     }
 
     /// <summary>Xoá vĩnh viễn tài khoản qua RPC account/delete. Không thể hoàn tác.</summary>
@@ -791,7 +803,7 @@ public class NakamaClient : MonoBehaviour
             Store   = store,
             Receipt = receipt,
         });
-        var response = await CallRpcAsync("iap/purchase", payload);
+        var response = await CallRpcAsync("iap/purchase", payload, suppressForceLogoutOnNetworkError: true);
         return JsonConvert.DeserializeObject<IapPurchaseResponse>(response.Payload);
     }
 
@@ -806,7 +818,7 @@ public class NakamaClient : MonoBehaviour
             Store   = store,
             Receipt = receipt,
         });
-        var response = await CallRpcAsync("iap/pack_purchase", payload);
+        var response = await CallRpcAsync("iap/pack_purchase", payload, suppressForceLogoutOnNetworkError: true);
         return JsonConvert.DeserializeObject<IapPackPurchaseResponse>(response.Payload);
     }
 
@@ -906,7 +918,7 @@ public class NakamaClient : MonoBehaviour
     public async Task<EventWheelPassBuyPremiumResponse> EventWheelPassBuyPremiumAsync(string store, string receipt)
     {
         var payload  = JsonConvert.SerializeObject(new EventWheelPassBuyPremiumRequest { Store = store, Receipt = receipt });
-        var response = await CallRpcAsync("eventwheel/pass_buy_premium", payload);
+        var response = await CallRpcAsync("eventwheel/pass_buy_premium", payload, suppressForceLogoutOnNetworkError: true);
         return JsonConvert.DeserializeObject<EventWheelPassBuyPremiumResponse>(response.Payload);
     }
 

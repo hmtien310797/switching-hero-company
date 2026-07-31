@@ -1,6 +1,8 @@
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using EasyTextEffects;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.UI;
 using JetBrains.Annotations;
 using Sirenix.OdinInspector;
@@ -95,6 +97,7 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         private Vector2 _canvasSize;
         private Vector2 _orgStoryAnchoredPosition;
+        private bool _isProcessingStepClick;
 
         private static readonly int CanvasSize = Shader.PropertyToID("__canvasSize");
         private static readonly int HoleCenter = Shader.PropertyToID("_HoleCenter");
@@ -172,7 +175,60 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         private void OnClickFocus()
         {
-            TutorialManager.Instance.FireOnClick().Forget();
+            if (TryCompleteStoryEffect() || _isProcessingStepClick)
+            {
+                return;
+            }
+
+            FireStepClick().Forget();
+        }
+
+        private async UniTask FireStepClick()
+        {
+            _isProcessingStepClick = true;
+
+            try
+            {
+                await TutorialManager.Instance.FireOnClick();
+            }
+            finally
+            {
+                _isProcessingStepClick = false;
+            }
+        }
+
+        private bool TryCompleteStoryEffect()
+        {
+            if (!IsStoryEffectRunning())
+            {
+                return false;
+            }
+
+            txtEffectStory.StopOnStartEffects();
+            txtStory.ForceMeshUpdate(true, true);
+            return true;
+        }
+
+        private bool IsStoryEffectRunning()
+        {
+            var globalEffects = txtEffectStory
+                .QueryEffectStatuses(
+                    TextEffectType.Global,
+                    TextEffectEntry.TriggerWhen.OnStart
+                );
+
+            if (globalEffects.Any(status => status.Started && !status.IsComplete))
+            {
+                return true;
+            }
+
+            var tagEffects = txtEffectStory
+                .QueryEffectStatuses(
+                    TextEffectType.Tag,
+                    TextEffectEntry.TriggerWhen.OnStart
+                );
+
+            return tagEffects.Any(status => status.Started && !status.IsComplete);
         }
 
         private void CacheCanvas()
@@ -232,13 +288,13 @@ namespace Immortal_Switch.Scripts.Tutorial.Views
 
         private void ShowStory(string story, string narrator)
         {
+            txtEffectStory.StopOnStartEffects();
             rtStory.gameObject.SetActive(true);
 
             txtNarrator.text = narrator;
-            txtStory.text = story;
+            txtStory.text = LocalizationManager.GetText(story);
             btnStory.interactable = true;
 
-            txtEffectStory.StopOnStartEffects();
             txtEffectStory.Refresh();
         }
 

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Modules.Services;
 using Immortal_Switch.Scripts.Shared.UI;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -62,12 +65,27 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
         {
             if (_hasCanJump)
             {
-                // todo: jump tới ui cần
+                JumpToMission();
             }
             else if (_hasCanClaim)
             {
                 _onClaim?.Invoke(_row);
             }
+        }
+
+        /// <summary>
+        /// Đóng giao diện event và điều hướng đến nơi thực hiện nhiệm vụ.
+        /// </summary>
+        private void JumpToMission()
+        {
+            if (_row == null ||
+                string.IsNullOrWhiteSpace(_row.trigger))
+            {
+                return;
+            }
+
+            UIManager.Instance.Close<EventLeHoiBangLongView>();
+            NavigationService.JumpToAsync(_row.trigger).Forget();
         }
 
         public void Bind(

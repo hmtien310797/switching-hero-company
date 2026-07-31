@@ -112,11 +112,18 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         {
             switch (error)
             {
-                case "EVENT_NOT_ACTIVE":       return "Sự kiện không còn hoạt động.";
-                case "ALREADY_PURCHASED":      return "Bạn đã mua Premium Pass rồi.";
+                case "EVENT_NOT_ACTIVE":
+                    return "Sự kiện không còn hoạt động.";
+
+                case "ALREADY_PURCHASED":
+                    return "Bạn đã mua Premium Pass rồi.";
+
                 case "PASS_NOT_CONFIGURED":
-                case "PRODUCT_NOT_CONFIGURED": return "Gói chưa mở bán trên thiết bị này.";
-                default:                       return string.IsNullOrEmpty(error) ? "Mua thất bại, vui lòng thử lại." : error;
+                case "PRODUCT_NOT_CONFIGURED":
+                    return "Gói chưa mở bán trên thiết bị này.";
+
+                default:
+                    return string.IsNullOrEmpty(error) ? "Mua thất bại, vui lòng thử lại." : error;
             }
         }
 
@@ -129,7 +136,8 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         {
             var (rewards, error) = await _manager.ClaimAllAsync(_rows);
 
-            if (rewards.Count == 0 && error != null)
+            if (rewards.Count == 0 &&
+                error != null)
             {
                 UIManager.Instance.ShowToast(DescribeClaimError(error));
                 return;
@@ -142,8 +150,11 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         {
             switch (error)
             {
-                case "EVENT_NOT_ACTIVE": return "Sự kiện không còn hoạt động.";
-                default:                 return "Nhận thưởng thất bại, vui lòng thử lại.";
+                case "EVENT_NOT_ACTIVE":
+                    return "Sự kiện không còn hoạt động.";
+
+                default:
+                    return "Nhận thưởng thất bại, vui lòng thử lại.";
             }
         }
 
@@ -212,18 +223,11 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
 
         private static void ShowRewards(List<ItemData> rewards)
         {
-            if (rewards == null ||
-                rewards.Count == 0)
+            if (rewards != null &&
+                rewards.Count != 0)
             {
-                return;
+                PopupRewardService.Show(rewards);
             }
-
-            UIManager.Instance
-                .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
-                {
-                    Rewards = rewards,
-                })
-                .Forget();
         }
 
         private DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow OnResolveItem(int itemIdx)

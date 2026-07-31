@@ -1,3 +1,5 @@
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 
@@ -5,29 +7,27 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 {
     public class UIMissionTotalPoint : MonoBehaviour
     {
-        [Header("References")] [SerializeField]
+        [Header("References")]
+        [SerializeField]
         private TextMeshProUGUI txtPoint;
 
-        [SerializeField] private TextMeshProUGUI txtTitle;
+        [SerializeField]
+        private TextMeshProUGUI txtTitle;
 
         public void Bind(int point, string missionType)
         {
-            txtPoint.text = point.ToString();
+            txtPoint.SetText(point.ToString());
             txtTitle.SetText(_GetTitle(missionType));
         }
 
         private string _GetTitle(string missionType)
         {
-            switch (missionType)
+            return missionType switch
             {
-                case MissionTypes.WEEKLY:
-                    return "Điểm Nhiệm Vụ Hằng Tuần";
-
-                case MissionTypes.DAILY:
-                    return "Điểm Nhiệm Vụ Hằng Ngày";
-            }
-
-            return string.Empty;
+                MissionTypes.WEEKLY => LocalizationManager.GetText(LocalizationKeys.UI_MISSION_WEEKLY_DECS),
+                MissionTypes.DAILY => LocalizationManager.GetText(LocalizationKeys.UI_MISSION_DAILY_DECS2),
+                _ => string.Empty,
+            };
         }
     }
 }

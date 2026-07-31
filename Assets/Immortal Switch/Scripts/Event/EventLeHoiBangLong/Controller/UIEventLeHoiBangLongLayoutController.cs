@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Shared.Helper;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller
@@ -92,7 +94,8 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller
                 return;
             }
 
-            var remainTime = DateTime.Now.AddMinutes(30).TimeOfDay.TotalSeconds;
+            var activity = DatabaseManager.Instance.GetEventIfActive(EventIdConstants.EVENT_BL);
+            var remainTime = activity == null ? 0 : DateTimeHelper.CalculateRemainTime(DateTime.Now, activity.endTime);
 
             switch (_selectedLayout.type)
             {

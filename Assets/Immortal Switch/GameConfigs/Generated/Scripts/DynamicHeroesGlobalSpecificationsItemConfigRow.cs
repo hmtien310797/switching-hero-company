@@ -62,7 +62,7 @@ namespace Game.Configs.Generated
         /// <summary>
         /// CSV Column: open_item
         /// </summary>
-        public string openItem;
+        public int openItem;
 
         /// <summary>
         /// CSV Column: use_type

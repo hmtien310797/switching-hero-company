@@ -273,7 +273,7 @@ namespace Immortal_Switch.Scripts.Event.EventLogin
 
         private void OnEnemyDead(int count)
         {
-            ChangeMissionProgress(MissionEventKeys.EVENT_KILL_MONSTER, count > 0 ? 1 : 0);
+            ChangeMissionProgress(EventKeys.EVENT_KILL_MONSTER, count > 0 ? 1 : 0);
         }
 
         private void OnStageCleared(int stage)
@@ -283,37 +283,37 @@ namespace Immortal_Switch.Scripts.Event.EventLogin
 
         private void OnSummonHero(int times)
         {
-            ChangeMissionProgress(MissionEventKeys.EVENT_HERO_SUMMON, times);
+            ChangeMissionProgress(EventKeys.EVENT_HERO_SUMMON, times);
         }
 
         private void OnEnhanceGear()
         {
-            ChangeMissionProgress(MissionEventKeys.EVENT_ENHANCE_GEAR, 1);
+            ChangeMissionProgress(EventKeys.EVENT_ENHANCE_GEAR, 1);
         }
 
         private void OnEquipItem()
         {
-            ChangeMissionProgress(MissionEventKeys.EVENT_EQUIP_ITEM, 1);
+            ChangeMissionProgress(EventKeys.EVENT_EQUIP_ITEM, 1);
         }
 
         private void OnHeroLevelUp()
         {
-            ChangeMissionProgress(MissionEventKeys.EVENT_HERO_LEVELUP, 1);
+            ChangeMissionProgress(EventKeys.EVENT_HERO_LEVELUP, 1);
         }
 
         private void OnSkillUpgrade(int count)
         {
-            ChangeMissionProgress(MissionEventKeys.EVENT_SKILL_UPGRADE, count);
+            ChangeMissionProgress(EventKeys.EVENT_SKILL_UPGRADE, count);
         }
 
         private void OnClaimIdleReward()
         {
-            ChangeMissionProgress(MissionEventKeys.EVENT_CLAIM_IDLE, 1);
+            ChangeMissionProgress(EventKeys.EVENT_CLAIM_IDLE, 1);
         }
 
         private void OnDungeonClear()
         {
-            ChangeMissionProgress(MissionEventKeys.EVENT_DUNGEON_CLEAR, 1);
+            ChangeMissionProgress(EventKeys.EVENT_DUNGEON_CLEAR, 1);
         }
 
         // ── helpers ──────────────────────────────────────────────────────────────────────

@@ -109,6 +109,9 @@ namespace Immortal_Switch.Scripts.Shared.Views
         private Button btnCancel;
 
         [SerializeField]
+        private Button btnClose;
+
+        [SerializeField]
         private TMP_Text txtBtnConfirm;
 
         [SerializeField]
@@ -122,9 +125,16 @@ namespace Immortal_Switch.Scripts.Shared.Views
 
         private void Awake()
         {
+            btnClose.onClick.AddListener(OnClickClose);
             btnConfirm.onClick.AddListener(OnClickConfirm);
             btnCancel.onClick.AddListener(OnClickCancel);
             toggleDoNotShowAgain.onValueChanged.AddListener(OnDoNotShowAgainChanged);
+        }
+
+        private void OnClickClose()
+        {
+            _args.OnCancel?.Invoke();
+            UIManager.Instance.Close<PopupConfirmView>();
         }
 
         private void OnDisable()
@@ -134,6 +144,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
 
         private void OnDestroy()
         {
+            btnClose.onClick.RemoveListener(OnClickClose);
             btnConfirm.onClick.RemoveListener(OnClickConfirm);
             btnCancel.onClick.RemoveListener(OnClickCancel);
             toggleDoNotShowAgain.onValueChanged.RemoveListener(OnDoNotShowAgainChanged);

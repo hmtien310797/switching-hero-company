@@ -5,6 +5,7 @@ using Immortal_Switch.Scripts.Event.EventLeHoiBangLong;
 using Immortal_Switch.Scripts.Event.EventWheel;
 using Immortal_Switch.Scripts.GrowthSystem.UI;
 using Immortal_Switch.Scripts.HeroUIView;
+using Immortal_Switch.Scripts.MissionSystem;
 using Immortal_Switch.Scripts.MissionSystem.Views;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.TransmutationSystem.Views;
@@ -92,7 +93,9 @@ namespace Immortal_Switch.Scripts.UI
         {
             TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
             TutorialManager.Instance.OnClick += OnClickTutorial;
+
             GameEventManager.Subscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
+            GameEventManager.Subscribe<string>(GameEvents.ON_NAVIGATION_REQUESTED, OnNavigationRequested);
             GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
         }
 
@@ -100,8 +103,58 @@ namespace Immortal_Switch.Scripts.UI
         {
             TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
             TutorialManager.Instance.OnClick -= OnClickTutorial;
+
             GameEventManager.Unsubscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
+            GameEventManager.Unsubscribe<string>(GameEvents.ON_NAVIGATION_REQUESTED, OnNavigationRequested);
             GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
+        }
+
+        /// <summary>
+        /// Đồng bộ trạng thái bottom button khi NavigationService điều hướng theo event key.
+        /// </summary>
+        private void OnNavigationRequested(string eventKey)
+        {
+            BottomMainButton targetButton = null;
+
+            switch (eventKey)
+            {
+                case EventKeys.EVENT_HERO_SUMMON:
+                    targetButton = ButtonShop;
+                    break;
+
+                case EventKeys.EVENT_HERO_LEVELUP:
+                case EventKeys.EVENT_OWN_HERO:
+                case EventKeys.EVENT_REACH_POWER:
+                    targetButton = ButtonHero;
+                    break;
+
+                case EventKeys.EVENT_EQUIP_ITEM:
+                case EventKeys.EVENT_ENHANCE_GEAR:
+                case EventKeys.EVENT_FORGE_GEAR:
+                case EventKeys.EVENT_SKILL_UPGRADE:
+                    targetButton = ButtonEquip;
+                    break;
+
+                case EventKeys.EVENT_DUNGEON_CLEAR:
+                    targetButton = ButtonDungeon;
+                    break;
+            }
+
+            if (targetButton == null)
+            {
+                TriggerButtonCloseAndGem(false);
+                return;
+            }
+
+            if (_selectedBtn != null &&
+                _selectedBtn != targetButton)
+            {
+                _selectedBtn.SetStateByManager(NavState.Closed);
+            }
+
+            _selectedBtn = targetButton;
+
+            _selectedBtn.SetStateByManager(NavState.Hover);
         }
 
         private void OnPlayDungeon(bool result)

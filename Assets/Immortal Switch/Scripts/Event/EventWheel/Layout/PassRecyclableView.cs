@@ -110,27 +110,27 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         {
             switch (error)
             {
-                case "EVENT_NOT_ACTIVE":  return "Sự kiện không còn hoạt động.";
-                case "ALREADY_CLAIMED":   return "Đã nhận thưởng mốc này rồi.";
-                case "NOT_YET_ELIGIBLE":  return "Chưa đủ điều kiện nhận thưởng.";
-                default:                  return "Nhận thưởng thất bại, vui lòng thử lại.";
+                case "EVENT_NOT_ACTIVE":
+                    return "Sự kiện không còn hoạt động.";
+
+                case "ALREADY_CLAIMED":
+                    return "Đã nhận thưởng mốc này rồi.";
+
+                case "NOT_YET_ELIGIBLE":
+                    return "Chưa đủ điều kiện nhận thưởng.";
+
+                default:
+                    return "Nhận thưởng thất bại, vui lòng thử lại.";
             }
         }
 
         private static void ShowRewards(List<ItemData> rewards)
         {
-            if (rewards == null ||
-                rewards.Count == 0)
+            if (rewards != null &&
+                rewards.Count != 0)
             {
-                return;
+                PopupRewardService.Show(rewards);
             }
-
-            UIManager.Instance
-                .OpenPopupAsync<PopupRewardView>(new PopupRewardArgs
-                {
-                    Rewards = rewards,
-                })
-                .Forget();
         }
 
         public int ItemsCount => _rows.Count;

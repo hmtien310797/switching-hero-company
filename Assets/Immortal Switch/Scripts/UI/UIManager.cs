@@ -131,10 +131,7 @@ namespace Immortal_Switch.Scripts.UI
 
         private void Start()
         {
-            canvasScaler.matchWidthOrHeight = ScreenOrientationTracker.Instance.CurrentMode ==
-                                              ScreenOrientationTracker.ScreenViewMode.Landscape
-                ? 0.5f
-                : 0f;
+            ApplyCanvasScalerForOrientation(ScreenOrientationTracker.Instance.CurrentMode);
 
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
             CreateLayerRootsFromEnum();
@@ -157,14 +154,30 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnOrientationChanged(ScreenOrientationTracker.ScreenViewMode newOrientation)
         {
-            switch (newOrientation)
+            ApplyCanvasScalerForOrientation(newOrientation);
+        }
+
+        // Reference resolution la 1080x1920 (portrait). Khi xoay ngang, phai hoan doi
+        // truc va match theo Height thay vi chi blend matchWidthOrHeight=0.5, neu khong
+        // canvas se chi con cao ~1080 don vi (thay vi ~1920 luc portrait) khien toan bo
+        // UI thiet ke theo chieu doc bi ep scale nho lai rat nhieu.
+        private void ApplyCanvasScalerForOrientation(ScreenOrientationTracker.ScreenViewMode mode)
+        {
+            var refRes = canvasScaler.referenceResolution;
+
+            if (mode == ScreenOrientationTracker.ScreenViewMode.Landscape)
             {
-                case ScreenOrientationTracker.ScreenViewMode.Landscape:
-                    canvasScaler.matchWidthOrHeight = 0.5f;
-                    break;
-                case ScreenOrientationTracker.ScreenViewMode.Portrait:
-                    canvasScaler.matchWidthOrHeight = 0f;
-                    break;
+                canvasScaler.referenceResolution = new Vector2(
+                    Mathf.Max(refRes.x, refRes.y),
+                    Mathf.Min(refRes.x, refRes.y));
+                canvasScaler.matchWidthOrHeight = 1f;
+            }
+            else
+            {
+                canvasScaler.referenceResolution = new Vector2(
+                    Mathf.Min(refRes.x, refRes.y),
+                    Mathf.Max(refRes.x, refRes.y));
+                canvasScaler.matchWidthOrHeight = 0f;
             }
         }
 

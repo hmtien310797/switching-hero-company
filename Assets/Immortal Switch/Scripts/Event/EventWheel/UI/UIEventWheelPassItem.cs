@@ -22,6 +22,9 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
         [SerializeField]
         private GameObject goNormalClaimedStatus;
 
+        [SerializeField]
+        private GameObject goNormalLockStatus;
+
         [Header("Premium references")]
         [SerializeField]
         private UIItemSlot premiumSlot;
@@ -51,6 +54,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
 
         private EventWheelPassManager _manager;
         private DynamicHeroesGlobalSpecificationsEventWheelPassConfigRow _row;
+
         private int _eventId;
         private bool _isSubscribed;
 
@@ -110,11 +114,15 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
                 return;
             }
 
+            var isUnlocked = _manager.GetSpinTotal() >= _row.spinRequired;
+
             txtTarget.text = $"{_row.spinRequired:N0}";
+            btn.interactable = _manager.CanClaim(_eventId, _row);
+
+            goNormalLockStatus.SetActive(!isUnlocked);
             goNormalClaimedStatus.SetActive(_manager.IsFreeClaimed(_eventId, _row.milestoneId));
             goPremiumClaimedStatus.SetActive(_manager.IsPremiumClaimed(_eventId, _row.milestoneId));
-            goPremiumLockStatus.SetActive(!_manager.IsPremiumPurchased(_eventId));
-            btn.interactable = _manager.CanClaim(_eventId, _row);
+            goPremiumLockStatus.SetActive(!_manager.IsPremiumPurchased(_eventId) || !isUnlocked);
         }
 
         /// <summary>Lắng nghe thay đổi dữ liệu khi item đang được hiển thị.</summary>

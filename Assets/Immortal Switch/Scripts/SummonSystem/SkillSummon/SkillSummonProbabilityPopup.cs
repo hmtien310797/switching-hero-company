@@ -2,8 +2,10 @@
 using System.Linq;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Items.ScriptableObjects;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -152,10 +154,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (summonLevelText != null)
                 summonLevelText.text = $"Lv.{levelData.SummonLevel}";
 
-            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common), levelData.GradeBRate);
-            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), levelData.GradeARate);
-            gradeSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Legendary), levelData.GradeSRate);
-            gradeSSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Mythic) , levelData.GradeSSRate);
+            gradeBRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.B), levelData.GradeBRate);
+            gradeARow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.A), levelData.GradeARate);
+            gradeSRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.S), levelData.GradeSRate);
+            gradeSSRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.SS) , levelData.GradeSSRate);
 
             if (prevButton != null)
                 prevButton.interactable = currentIndex > 0;
@@ -169,10 +171,10 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             if (summonLevelText != null)
                 summonLevelText.text = "Lv.-";
 
-            gradeBRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Common) , 0f);
-            gradeARow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.UnCommon), 0f);
-            gradeSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Legendary), 0f);
-            gradeSSRow?.Bind(HeroImageService.GetHeroTierIcon(HeroProgressTier.Mythic), 0f);
+            gradeBRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.B) , 0f);
+            gradeARow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.A), 0f);
+            gradeSRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.S), 0f);
+            gradeSSRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.SS), 0f);
 
             if (prevButton != null)
                 prevButton.interactable = false;

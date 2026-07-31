@@ -51,12 +51,8 @@ namespace Battle
         private List<Transform> spawnPoss;
 
         [Header("Stage")]
-        [field: SerializeField]
-        [ReadOnly]
+        [field: SerializeField, ReadOnly]
         public int CurrentStage { get; private set; } = 1;
-
-        [SerializeField] private int stagesPerPattern = 10;
-        [SerializeField] private int battleTime = 20;
 
         private StageDataResolverSO stageDataResolver;
         
@@ -999,7 +995,7 @@ namespace Battle
 
             ///---------------------------------------------------------
 
-            GameStatView.Instance.InitTimer(battleTime, 2f,() =>
+            GameStatView.Instance.InitTimer(stageDataResolver.NormalBattleTime, 2f,() =>
             {
                 if (State == BattleState.Ended)
                 {

@@ -23,6 +23,9 @@ namespace Immortal_Switch.Scripts.Level.Stage
         [field: SerializeField] 
         public int CreepBatchSize { get; private set; } = 20;
         
+        [field: SerializeField] 
+        public int NormalBattleTime { get; private set; } = 40;
+        
         public ElementRuleSO ElementRuleSO => elementRuleSo;
 
         public int GetChapterIndexByStage(int globalStage)

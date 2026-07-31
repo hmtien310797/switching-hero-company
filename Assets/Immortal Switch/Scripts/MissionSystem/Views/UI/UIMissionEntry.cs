@@ -139,7 +139,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             _onJump = onJump;
 
             txtTitle.text = title;
-            txtDesc.text = LocalizationManager.GetText(row.title);
+            txtDesc.text = LocalizationManager.GetText(row.title, row.target);
             txtQuantityReward.text = row.points.ToString();
 
             SetProgress(currentProgress);

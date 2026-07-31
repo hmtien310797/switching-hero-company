@@ -66,10 +66,16 @@ namespace Immortal_Switch.Scripts.Items
 
         public void SyncFromServer(BagResponse rsp)
         {
-            if (rsp == null)
+            if (rsp == null ||
+                _runtime == null)
             {
                 Debug.LogError("[ItemsManager]: Sync returned null");
                 return;
+            }
+
+            if (_runtime.Items.Count > 0)
+            {
+                _runtime.Items.Clear();
             }
 
             foreach (var entry in rsp.Items)

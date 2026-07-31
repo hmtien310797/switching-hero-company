@@ -29,6 +29,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         private readonly List<UIMissionRepeatEntry> _tasks = new();
 
         private string _missionType;
+        private Func<string, UniTask> _onJump;
 
         private void Awake()
         {
@@ -41,6 +42,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
             MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
+            btnClaimAll.onClick.RemoveListener(OnClickClaimAll);
         }
 
         private void OnMissionClaimed(string arg1, string arg2)
@@ -53,6 +55,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             var anyCompleted = MissionSystemManager.Instance.AnyCompleted(arg2);
 
             RefreshBtnClaimAll(anyCompleted);
+            RefreshMissions();
         }
 
         private void OnMissionChangeProgress(string arg1, int arg2, string arg3)
@@ -70,7 +73,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         private void OnClickClaimAll()
         {
             MissionSystemManager.Instance.ClaimAll(_missionType);
-            RefreshBtnClaimAll(false);
+            RefreshMissions();
         }
 
         private void RefreshBtnClaimAll(bool active)
@@ -94,11 +97,25 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             Func<string, UniTask> onJump)
         {
             _missionType = missionType;
+            _onJump = onJump;
 
             // check btn claim trang thai
             var anyCompleted = MissionSystemManager.Instance.AnyCompleted(_missionType);
             RefreshBtnClaimAll(anyCompleted);
             CreateMissions(rows, tasks, onJump);
+        }
+
+        /// <summary>
+        /// Tải lại danh sách repeat mission để hiển thị tier tiếp theo sau khi claim.
+        /// </summary>
+        private void RefreshMissions()
+        {
+            var manager = MissionSystemManager.Instance;
+            var rows = manager.GetMissions(_missionType);
+            var tasks = manager.GetTasks(_missionType);
+
+            RefreshBtnClaimAll(manager.AnyCompleted(_missionType));
+            CreateMissions(rows, tasks, _onJump);
         }
 
         private void CreateMissions(
@@ -148,6 +165,11 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
                     _tasks.Add(clone);
                 }
+            }
+
+            for (var i = rows.Count; i < _tasks.Count; i++)
+            {
+                _tasks[i].gameObject.SetActive(false);
             }
         }
     }

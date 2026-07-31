@@ -69,6 +69,7 @@ public class PlayerRenameResponse
     public string display_name;
     public int    rename_fee;
     public int    rename_count;
+    public System.Collections.Generic.List<RewardDto> balances;
 }
 
 [Serializable]

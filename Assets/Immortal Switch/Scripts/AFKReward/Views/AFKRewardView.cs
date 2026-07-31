@@ -122,6 +122,7 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
             {
                 CancelAutoClaim();
                 _args?.OnClaim?.Invoke(true);
+                UIManager.Instance.Close<AFKRewardView>();
             }
         }
 

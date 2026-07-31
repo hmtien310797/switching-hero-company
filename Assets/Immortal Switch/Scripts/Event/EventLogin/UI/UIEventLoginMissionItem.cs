@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Modules.Services;
 using Immortal_Switch.Scripts.Shop.Views.UI;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,11 +54,25 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.UI
         private void Awake()
         {
             btnClaim.onClick.AddListener(OnClickClaim);
+            btnGo.onClick.AddListener(OnClickJump);
+        }
+
+        private void OnClickJump()
+        {
+            if (_mission == null ||
+                string.IsNullOrWhiteSpace(_mission.Trigger))
+            {
+                return;
+            }
+
+            UIManager.Instance.Close<EventLoginView>();
+            NavigationService.JumpToAsync(_mission.Trigger).Forget();
         }
 
         private void OnDestroy()
         {
             btnClaim.onClick.RemoveListener(OnClickClaim);
+            btnGo.onClick.RemoveListener(OnClickJump);
         }
 
         private void OnClickClaim()
