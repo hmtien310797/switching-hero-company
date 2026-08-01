@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Runtime;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.PowerUpSystem;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.Sound;
 using Immortal_Switch.Scripts.StatSystem;
@@ -57,7 +58,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     [Header("Attack")]
     [SerializeField] private HeroAttackMode attackMode = HeroAttackMode.Melee;
     [SerializeField] private Transform projectileSpawnPoint;
-    [SerializeField] private HeroProjectile projectilePrefab;
+    [SerializeField] private string projectileAddressKey;
 
     [SerializeField] private float targetSearchRange = 8f;
     [SerializeField] private float targetSearchInterval = 0.2f;
@@ -159,6 +160,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void OnDestroy()
     {
+        DespawnAndDisposeProjectilePool();
         GameEventManager.Unsubscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
         GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageClearEvent);
         GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLostEvent);
@@ -181,12 +183,14 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void OnStageClearEvent(int stage)
     {
+        DespawnActiveProjectiles();
         ActiveHealthBar(false);
         stateMachine.ChangeState(HeroStateId.Win);
     }
 
     private void OnStageLostEvent()
     {
+        DespawnActiveProjectiles();
         stateMachine.ChangeState(HeroStateId.Dead);
     }
 
@@ -206,6 +210,9 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         SetAutoClassSkill(useAutoClassSkill);
         SetAutoUltimateSkill(useAutoUltimateSkill);
         await skillController.InitializeUltimateSkillDataAndClassSkillData();
+
+        if (!string.IsNullOrEmpty(projectileAddressKey))
+            AddressablePoolService.Instance.CreatePoolAsync(projectileAddressKey, 10).Forget();
     }
 
     public void SetChosen(bool chosen)
@@ -553,34 +560,26 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         if (!HasValidTarget())
             return;
 
-        if (projectilePrefab == null)
-        {
-            DamageResult damageResult = DamageCalculator.CalculateDamage(this, currentTarget);
-            currentTarget.TakeDamage(damageResult);
-            SkillEventBus.Raise(new SkillEventContext
-            {
-                EventType = SkillTriggerEventType.OnHit,
-                Owner = this,
-                Source = this,
-                Target = currentTarget,
-                Skill = null,
-
-                DamageResult = damageResult
-            });
-            return;
-        }
-
         Vector3 spawnPosition = projectileSpawnPoint != null
             ? projectileSpawnPoint.position
             : transform.position + Vector3.up * 0.8f;
 
-        HeroProjectile projectile = Instantiate(
-            projectilePrefab,
-            spawnPosition,
-            Quaternion.identity
-        );
+        HeroProjectile projectile = null;
 
-        projectile.Init(currentTarget, this, Attack);
+        if (!string.IsNullOrEmpty(projectileAddressKey) &&
+            AddressablePoolService.Instance.HasPool(projectileAddressKey))
+        {
+            projectile = AddressablePoolService.Instance.Spawn<HeroProjectile>(
+                projectileAddressKey,
+                spawnPosition,
+                Quaternion.identity
+            );
+        }
+        
+        if (projectile != null)
+        {
+            projectile.Init(currentTarget, this, Attack);
+        }
     }
 
     public void Heal(float amount)
@@ -672,6 +671,18 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         MoveMode = HeroMoveMode.Auto;
         locomotion?.Stop();
         stateMachine.ChangeState(HeroStateId.Win, true);
+    }
+
+    private void DespawnActiveProjectiles()
+    {
+        if (!string.IsNullOrEmpty(projectileAddressKey))
+            AddressablePoolService.Instance.DespawnAllActive(projectileAddressKey);
+    }
+
+    private void DespawnAndDisposeProjectilePool()
+    {
+        if (!string.IsNullOrEmpty(projectileAddressKey))
+            AddressablePoolService.Instance.DespawnAndDisposePool(projectileAddressKey);
     }
 
     public void OnSpawnedFromPool()

@@ -2,6 +2,7 @@ using Battle;
 using Immortal_Switch.Scripts.Combat;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.StatSystem;
 using Spine.Unity;
 using UnityEngine;
@@ -18,6 +19,7 @@ namespace Immortal_Switch.Scripts.Skill
     {
         [Header("Projectile")]
         [SerializeField] private HeroProjectile projectilePrefab;
+        [SerializeField] private string projectileAddressKey;
         [SerializeField] private float damageValue = 100f;
 
         [Header("Animation")]
@@ -52,6 +54,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void OnDisable()
         {
+            DespawnActiveProjectiles();
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
             GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLost);
             ClearPassiveAnimations();
@@ -167,7 +170,7 @@ namespace Immortal_Switch.Scripts.Skill
 
         private void FireProjectiles()
         {
-            if (projectilePrefab == null || owner == null || battleContext == null)
+            if (owner == null || battleContext == null)
                 return;
 
             for (int i = 0; i < maxStacks; i++)
@@ -177,8 +180,28 @@ namespace Immortal_Switch.Scripts.Skill
                     continue;
 
                 Vector3 spawnPosition = owner.Position + Vector3.up * 0.8f;
-                HeroProjectile projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
-                projectile.Init(target, owner, damageValue);
+
+                HeroProjectile projectile = null;
+
+                if (!string.IsNullOrEmpty(projectileAddressKey) &&
+                    AddressablePoolService.Instance.HasPool(projectileAddressKey))
+                {
+                    projectile = AddressablePoolService.Instance.Spawn<HeroProjectile>(
+                        projectileAddressKey,
+                        spawnPosition,
+                        Quaternion.identity
+                    );
+                }
+
+                if (projectile == null && projectilePrefab != null)
+                {
+                    projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
+                }
+
+                if (projectile != null)
+                {
+                    projectile.Init(target, owner, damageValue);
+                }
             }
         }
 
@@ -195,17 +218,25 @@ namespace Immortal_Switch.Scripts.Skill
             currentStack = 0;
         }
 
+        private void DespawnActiveProjectiles()
+        {
+            if (!string.IsNullOrEmpty(projectileAddressKey))
+                AddressablePoolService.Instance.DespawnAllActive(projectileAddressKey);
+        }
+
         #endregion
 
         #region Game Event Handlers
 
         private void OnStageCleared(int stage)
         {
+            DespawnActiveProjectiles();
             Reset();
         }
 
         private void OnStageLost()
         {
+            DespawnActiveProjectiles();
             Reset();
         }
 
