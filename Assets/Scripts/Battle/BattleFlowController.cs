@@ -275,6 +275,29 @@ namespace Battle
                 transitionInProgress = false;
             }
         }
+        
+        public async UniTaskVoid PlayNormalChapter()
+        {
+            State = BattleFlowState.ReturningToChapter;
+
+            try
+            {
+                CreateDungeonBattleCancellationToken();
+                CreateEndStageSessionCancellationToken();
+
+                await Transitioner.Instance.TransitionOutWithoutChangingScene(destroyCancellationToken);
+
+                await chapterBattleController.ResumeAfterDungeonAsync();
+                Transitioner.Instance.TransitionInWithoutChangingScene();
+                GameEventManager.Trigger(GameEvents.OnPlayDungeon, false);
+                State = BattleFlowState.ChapterRunning;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                State = BattleFlowState.None;
+            }
+        }
 
         /// <summary>
         /// Báo kết quả trận Dungeon lên server — server trừ vé (dù thắng hay thua) + tính

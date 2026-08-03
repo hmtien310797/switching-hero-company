@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Battle;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
@@ -203,6 +204,7 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
                 UIManager.Instance.OpenPopupAsync<PvpBattleResultView>(request).Forget();
             }
             GameEventManager.Trigger(GameEvents.ON_PVP_BATTLE_END);
+            BattleFlowController.Instance.PlayNormalChapter().Forget();
         }
 
         // ── Spawn ───────────────────────────────────────────────────────────────────
