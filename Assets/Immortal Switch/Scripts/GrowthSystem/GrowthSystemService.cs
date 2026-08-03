@@ -567,7 +567,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 case StatType.DamageReduction:
                 case StatType.ClassSkillDamage:
                 case StatType.ExclusiveSkillDamage:
-                case StatType.SwitchSkillDamage:
+                case StatType.UltimateSkillDamage:
                 case StatType.FlatAtkBonus:
                 case StatType.AtkPercentBonus:
                 default:
@@ -635,7 +635,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem
                 case StatType.DamageToHeroMonster:
                 case StatType.ClassSkillDamage:
                 case StatType.ExclusiveSkillDamage:
-                case StatType.SwitchSkillDamage:
+                case StatType.UltimateSkillDamage:
                 case StatType.AtkPercentBonus:
                 case StatType.Accuracy:
                 case StatType.AttackSpeed:

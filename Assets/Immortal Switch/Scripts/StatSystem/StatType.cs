@@ -18,7 +18,7 @@ namespace Immortal_Switch.Scripts.StatSystem
         DamageReduction,
         ClassSkillDamage,
         ExclusiveSkillDamage,
-        SwitchSkillDamage,
+        UltimateSkillDamage,
         FlatAtkBonus,
         AtkPercentBonus,
         FinalDmgBonus = 17,
@@ -27,6 +27,10 @@ namespace Immortal_Switch.Scripts.StatSystem
         SkillDmgBonus = 20,
         HealEffect = 21,
         Evasion = 22,
+        Penetration,
+        LifeSteal,
+        ShieldPower,
+        CooldownReduction
     }
 
     public enum ModifierOp
