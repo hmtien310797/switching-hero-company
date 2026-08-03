@@ -23,9 +23,6 @@ namespace Immortal_Switch.Scripts.Hero
         public HeroClass HeroClass;
         public Element Element;
         
-        [Header("UI")]
-        [PreviewField] public Sprite PortraitIcon;
-        [PreviewField] public Sprite ShardIcon;
         public SkeletonDataAsset SkeletonDataAsset;
 
         [Header("Summon")] 

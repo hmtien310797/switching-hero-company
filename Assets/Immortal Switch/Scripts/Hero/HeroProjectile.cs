@@ -1,9 +1,11 @@
 ﻿using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
-public class HeroProjectile : MonoBehaviour
+[RequireComponent(typeof(AddressableProjectilePoolable))]
+public class HeroProjectile : MonoBehaviour, IAddressableProjectile
 {
     [SerializeField] private float speed = 12f;
     [SerializeField] private float hitDistance = 0.15f;
@@ -13,6 +15,7 @@ public class HeroProjectile : MonoBehaviour
     private ICombatUnit attacker;
     private float damage;
     private float timer;
+    private AddressableProjectilePoolable addressablePoolable;
 
     public void Init(ICombatUnit target, ICombatUnit attacker, float damage)
     {
@@ -24,11 +27,29 @@ public class HeroProjectile : MonoBehaviour
         gameObject.SetActive(true);
     }
 
+    public void OnProjectileSpawnedFromPool()
+    {
+        timer = lifeTime;
+    }
+
+    public void OnProjectileDespawnedToPool()
+    {
+        target = null;
+        attacker = null;
+        damage = 0f;
+        timer = 0f;
+    }
+
+    private void Awake()
+    {
+        addressablePoolable = GetComponent<AddressableProjectilePoolable>();
+    }
+
     private void Update()
     {
         if (!IsTargetValid())
         {
-            Destroy(gameObject);
+            addressablePoolable.Despawn();
             return;
         }
 
@@ -36,7 +57,7 @@ public class HeroProjectile : MonoBehaviour
 
         if (timer <= 0f)
         {
-            Destroy(gameObject);
+            addressablePoolable.Despawn();
             return;
         }
 
@@ -66,7 +87,7 @@ public class HeroProjectile : MonoBehaviour
 
                 DamageResult = damageResult
             });
-            Destroy(gameObject);
+            addressablePoolable.Despawn();
         }
     }
 

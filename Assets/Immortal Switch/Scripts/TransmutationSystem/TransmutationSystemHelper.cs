@@ -131,7 +131,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 StatModifierConstants.MODIFIER_FINAL_DMG_BONUS,
                 new ModifierStatMapping
                 {
-                    StatType = StatType.SwitchSkillDamage,
+                    StatType = StatType.UltimateSkillDamage,
                     Op = ModifierOp.Multiply
                 }
             },
