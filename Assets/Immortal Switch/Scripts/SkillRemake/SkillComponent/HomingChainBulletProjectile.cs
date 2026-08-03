@@ -537,11 +537,37 @@ public class HomingChainBulletProjectile : MonoBehaviour,
 
         if (!combatUnit.IsUnityAlive())
             return;
-        
+
+        // FLAGGED PvP: chỉ hit hostile của caster (chống friendly fire khi bật Bullet×Player).
+        // Hero đồng đội (Player layer, không trong opposing registry) → skip. caster/registry null
+        // → allow (legacy PvE behavior).
+        if (caster != null && ReferenceEquals(combatUnit, caster))
+            return;
+
+        if (!IsHostileTarget(combatUnit))
+            return;
+
         HitEffectManager.Instance.Play(combatUnit);
         SoundManager.Instance.PlaySfx(_skillRuntimeObjectConfig.soundDefinition.hitSound);
         DamageResult damageResult = DamageCalculator.CalculateDamage(caster, combatUnit, config.damage);
         combatUnit.TakeDamage(damageResult);
+    }
+
+    private bool IsHostileTarget(ICombatUnit target)
+    {
+        IBattleTargetRegistry registry = iHeroBattleContext?.TargetRegistry;
+        if (registry == null)
+            return true;   // no context → legacy allow all.
+
+        IReadOnlyList<ICombatUnit> hostiles = registry.HostileTargets;
+        if (hostiles == null)
+            return true;
+
+        for (int i = 0; i < hostiles.Count; i++)
+            if (ReferenceEquals(hostiles[i], target))
+                return true;
+
+        return false;
     }
 
     private float GetFlatSqrDistance(Vector3 a, Vector3 b)

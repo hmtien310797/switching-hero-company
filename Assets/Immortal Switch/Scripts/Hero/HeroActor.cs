@@ -421,7 +421,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         Vector3 direction = targetPosition - transform.position;
         direction.y = 0f;
 
-        float moveSpeed = heroTeamController.TeamMoveSpeed;
+        float moveSpeed = heroTeamController != null ? heroTeamController.TeamMoveSpeed : (stats != null ? stats.StatModule.GetFinalStat(StatType.MoveSpeed) : 0f);
 
         locomotion.MoveByDirection(direction, moveSpeed);
 

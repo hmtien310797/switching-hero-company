@@ -15,6 +15,9 @@ namespace Immortal_Switch.Scripts.Skill
         public IHeroBattleContext BattleContext;
         public HeroSkillController SkillController;
         public SkillRuntimeObject RuntimeObject;
+        /// <summary>FLAGGED (PvP thêm): allies per-team. Null = PvE fallback (UserDataCache.inBattleHeroes).
+        /// Phải copy ở cả 2 Clone* để không mất sau clone.</summary>
+        public IAllyProvider AllyProvider;
 
         public SkillRuntimeContext CloneForTarget(ICombatUnit target)
         {
@@ -28,7 +31,8 @@ namespace Immortal_Switch.Scripts.Skill
                 TargetPosition = target != null ? target.Position : TargetPosition,
                 BattleContext = BattleContext,
                 SkillController = SkillController,
-                RuntimeObject = RuntimeObject
+                RuntimeObject = RuntimeObject,
+                AllyProvider = AllyProvider
             };
         }
 
@@ -48,7 +52,8 @@ namespace Immortal_Switch.Scripts.Skill
                     : TargetPosition,
                 BattleContext = BattleContext,
                 SkillController = SkillController,
-                RuntimeObject = runtimeObject
+                RuntimeObject = runtimeObject,
+                AllyProvider = AllyProvider
             };
         }
     }

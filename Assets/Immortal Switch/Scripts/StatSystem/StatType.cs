@@ -27,6 +27,15 @@ namespace Immortal_Switch.Scripts.StatSystem
         SkillDmgBonus = 20,
         HealEffect = 21,
         Evasion = 22,
+
+        // ── DOCX §19 liệt kê các stat này nhưng enum cũ chưa có — thêm (additive, non-breaking).
+        // FLAGGED: DOCX nói "use the existing enum values" nhưng 5 giá trị này chưa tồn tại trong
+        // enum; thêm theo DOCX (source of truth). UltimateSkillDamage tách khỏi SwitchSkillDamage.
+        Penetration = 23,
+        LifeSteal = 24,
+        ShieldPower = 25,
+        CooldownReduction = 26,
+        UltimateSkillDamage = 27
     }
 
     public enum ModifierOp

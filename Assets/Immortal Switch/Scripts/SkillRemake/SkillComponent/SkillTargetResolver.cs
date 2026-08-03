@@ -99,7 +99,7 @@ namespace Immortal_Switch.Scripts.Skill
                     break;
 
                 case SkillTargetType.AllAllies:
-                    ResolveAllAllies();
+                    ResolveAllAllies(context);
                     break;
             }
 
@@ -157,8 +157,17 @@ namespace Immortal_Switch.Scripts.Skill
         }
 
 
-        private void ResolveAllAllies()
+        private void ResolveAllAllies(SkillRuntimeContext context)
         {
+            // FLAGGED (PvP): prefer per-team AllyProvider; fallback UserDataCache (PvE behavior cũ).
+            var allies = context?.AllyProvider?.GetAllies();
+            if (allies != null)
+            {
+                for (int i = 0; i < allies.Count; i++)
+                    AddIfValid(allies[i]);
+                return;
+            }
+
             UserDataCache cache = UserDataCache.Instance;
             if (cache == null || cache.inBattleHeroes == null)
                 return;

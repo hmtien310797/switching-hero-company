@@ -19,6 +19,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Loading.Views;
+using Immortal_Switch.Scripts.Pvp;
 using Immortal_Switch.Scripts.Shared.Views;
 using JetBrains.Annotations;
 using Sirenix.OdinInspector;
@@ -672,6 +673,12 @@ namespace Immortal_Switch.Scripts.UI
                 CloseEntryAsync(e).Forget();
                 return;
             }
+        }
+
+        [Button]
+        public void SpawnPvPBattle()
+        {
+            PvpQuickBattle.StartAsync();
         }
 
         #endregion

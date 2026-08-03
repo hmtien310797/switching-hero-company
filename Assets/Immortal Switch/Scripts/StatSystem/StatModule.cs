@@ -143,6 +143,10 @@ namespace Immortal_Switch.Scripts.StatSystem
                 StatType.CritDamage => new RuntimeStat(baseValue, 1f, 100f),
                 StatType.Accuracy => new RuntimeStat(baseValue, 0f, 999999f),
                 StatType.DamageReduction => new RuntimeStat(baseValue, 0f, 0.95f),
+                // DOCX §19 — "configurable caps for CooldownReduction". Hardcode cap 0.8 (80%)
+                // theo convention hiện tại (DamageReduction hardcode 0.95). Config-SO configurability
+                // cho Phase sau. FLAGGED.
+                StatType.CooldownReduction => new RuntimeStat(baseValue, 0f, 0.8f),
                 _ => new RuntimeStat(baseValue)
             };
         }

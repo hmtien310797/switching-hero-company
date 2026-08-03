@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Battle;
 using Cysharp.Threading.Tasks;
@@ -138,17 +139,20 @@ public class BulletProjectile :
         if (!isInitialized)
             return;
 
-        if (!IsInLayerMask(
-                other.gameObject.layer,
-                enemyLayer))
-        {
-            return;
-        }
-
         ICombatUnit targetCombatUnit =
             other.GetComponent<ICombatUnit>();
 
         if (targetCombatUnit == null)
+            return;
+
+        // FLAGGED PvP: không hit caster + team-aware. Khi bật Bullet×Player trong Physics matrix,
+        // hero địch (Player layer) nằm trong opposing registry → hit; hero đồng đội (Player layer,
+        // không trong registry, không trong enemyLayer mask) → skip (chống friendly fire). PvE giữ
+        // nguyên: creep/boss nằm trong registry + Enemy/Boss layer → hit.
+        if (ReferenceEquals(targetCombatUnit, sourceCombatUnit))
+            return;
+
+        if (!IsValidTarget(targetCombatUnit, other.gameObject.layer))
             return;
 
         /*
@@ -167,6 +171,28 @@ public class BulletProjectile :
         {
             DespawnSelfAsync().Forget();
         }
+    }
+
+    /// <summary>
+    /// Team-aware target filter (FLAGGED PvP). Hit nếu target nằm trong hostile registry của caster
+    /// (PvE: creep/boss; PvP: hero đối phương ở Player layer) HOẶC khớp legacy <see cref="enemyLayer"/>
+    /// (Enemy/Boss). Hero đồng đội (Player layer, không trong registry + không trong mask) → skip.
+    /// </summary>
+    protected bool IsValidTarget(ICombatUnit target, int layer)
+    {
+        IBattleTargetRegistry registry = Context?.BattleContext?.TargetRegistry;
+        if (registry != null)
+        {
+            IReadOnlyList<ICombatUnit> hostiles = registry.HostileTargets;
+            if (hostiles != null)
+            {
+                for (int i = 0; i < hostiles.Count; i++)
+                    if (ReferenceEquals(hostiles[i], target))
+                        return true;
+            }
+        }
+
+        return IsInLayerMask(layer, enemyLayer);
     }
 
     protected void DespawnSelf()

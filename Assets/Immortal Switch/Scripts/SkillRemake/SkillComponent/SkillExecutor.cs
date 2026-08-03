@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Battle;
 using Common;
 using Immortal_Switch.Scripts.Combat;
 using UnityEngine;
@@ -204,7 +205,7 @@ namespace Immortal_Switch.Scripts.Skill
                 AddBuffTarget(context.Caster, results);
 
             if ((mask & SkillBuffTargetMask.Allies) != 0)
-                ResolveAllyTargets(results);
+                ResolveAllyTargets(context, results);
 
             if ((mask & SkillBuffTargetMask.Enemies) != 0)
             {
@@ -230,8 +231,17 @@ namespace Immortal_Switch.Scripts.Skill
             }
         }
 
-        private void ResolveAllyTargets(List<ICombatUnit> results)
+        private void ResolveAllyTargets(SkillRuntimeContext context, List<ICombatUnit> results)
         {
+            // FLAGGED (PvP): prefer per-team AllyProvider; fallback UserDataCache (PvE behavior cũ).
+            var allies = context?.AllyProvider?.GetAllies();
+            if (allies != null)
+            {
+                for (int i = 0; i < allies.Count; i++)
+                    AddBuffTarget(allies[i], results);
+                return;
+            }
+
             UserDataCache cache = UserDataCache.Instance;
             if (cache == null || cache.inBattleHeroes == null)
                 return;

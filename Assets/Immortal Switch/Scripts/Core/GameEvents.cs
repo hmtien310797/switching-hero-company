@@ -60,5 +60,14 @@
 
         // dungeon
         public const string ON_DUNGEON_CLEAR = nameof(ON_DUNGEON_CLEAR);
+
+        // pvp (local Phase-1; DOCX §37 — UI flow + service events)
+        public const string ON_PVP_DATA_CHANGED = nameof(ON_PVP_DATA_CHANGED);
+        public const string ON_PVP_FORMATION_CHANGED = nameof(ON_PVP_FORMATION_CHANGED);
+        public const string ON_PVP_TICKET_CHANGED = nameof(ON_PVP_TICKET_CHANGED);
+        public const string ON_PVP_RANK_CHANGED = nameof(ON_PVP_RANK_CHANGED);
+        public const string ON_PVP_MATCH_FOUND = nameof(ON_PVP_MATCH_FOUND);
+        public const string ON_PVP_BATTLE_END = nameof(ON_PVP_BATTLE_END);
+        public const string ON_PVP_GACHA_ROLL_RESOLVED = nameof(ON_PVP_GACHA_ROLL_RESOLVED);
     }
 }

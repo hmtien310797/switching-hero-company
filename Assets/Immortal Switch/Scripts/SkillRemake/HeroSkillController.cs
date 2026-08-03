@@ -1087,7 +1087,8 @@ namespace Immortal_Switch.Scripts.Skill
                 CastPosition = ownerPos,
                 TargetPosition = target != null ? target.Position : ownerPos,
                 BattleContext = battleContext,
-                SkillController = this
+                SkillController = this,
+                AllyProvider = battleContext as IAllyProvider
             };
         }
 

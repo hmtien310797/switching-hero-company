@@ -676,7 +676,8 @@ MonoBehaviour:
   DontDestroyOnLoadEnabled: 0
   userLevelConfigSO: {fileID: 11400000, guid: 83402f0160b1b804f98ecc99a0456268, type: 2}
   enableLog: 1
-  AutoSkill: 0
+  AutoClassSkill: 0
+  AutoUltimateSkill: 0
 --- !u!1 &635895492
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,6 +850,7 @@ Transform:
   - {fileID: 5408286878858936553}
   - {fileID: 742417281}
   - {fileID: 1166379209}
+  - {fileID: 866797836}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &811213265
@@ -1007,6 +1009,55 @@ MonoBehaviour:
   - {fileID: 1105610674}
   - {fileID: 192462841}
   - {fileID: 1484817586}
+--- !u!1 &866797835
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 866797836}
+  - component: {fileID: 866797837}
+  m_Layer: 0
+  m_Name: PvpBattleController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &866797836
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 866797835}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 811213264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &866797837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 866797835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f869b342f32b23b47a28ef1da41652c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DontDestroyOnLoadEnabled: 0
+  enableLog: 1
+  attackerSpawnCenter: {x: 0, y: 0, z: 5}
+  defenderSpawnCenter: {x: 0, y: 0, z: -5}
+  heroSpacing: 1.5
 --- !u!1 &1026343336
 GameObject:
   m_ObjectHideFlags: 0
@@ -2107,8 +2158,6 @@ MonoBehaviour:
   - {fileID: 143903049028867935}
   - {fileID: 9183962341258276791}
   <CurrentStage>k__BackingField: 1
-  stagesPerPattern: 10
-  battleTime: 20
   rewardSyncService: {fileID: 6465121174229784494}
   offlineAfkRewardService: {fileID: 5527692342869175952}
   battleHeroSessionController: {fileID: 811213265}

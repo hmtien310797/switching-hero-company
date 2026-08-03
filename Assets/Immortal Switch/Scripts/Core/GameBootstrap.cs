@@ -14,6 +14,7 @@ using Immortal_Switch.Scripts.MissionSystem;
 using Immortal_Switch.Scripts.PlayerSystem;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.PowerUpSystem;
+using Immortal_Switch.Scripts.Pvp;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shop;
 using Immortal_Switch.Scripts.Shop.IAP;
@@ -43,7 +44,7 @@ namespace Immortal_Switch.Scripts.Core
         {
             // Chỉ tính các bước khởi tạo game.
             // Addressables remote update được chạy thành một phase riêng trước RunAsync().
-            const int totalSteps = 16;
+            const int totalSteps = 17;
 
             var progress = new BootstrapProgress(
                 totalSteps,
@@ -216,7 +217,12 @@ namespace Immortal_Switch.Scripts.Core
                 // 16
                 progress.CompleteStep("Battle data initialized");
                 await PvEBattleController.Instance.InitializeAsync();
-                
+
+                // 17 — PvP local-first init (ES3 repo + bootstrap). Phase-1 chạy hoàn toàn local,
+                // không đụng server (DOCX §38).
+                await PvpManager.Instance.InitializeAsync();
+                progress.CompleteStep("PvP system initialized");
+
                 await TutorialManager.Instance.TryGuide(
                     TutorialGuideIds.NEW_USER_GUIDE
                 );
