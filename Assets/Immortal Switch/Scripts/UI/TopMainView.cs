@@ -792,7 +792,7 @@ namespace Immortal_Switch.Scripts.UI
             skeletonGraphic.AnimationState.SetAnimation(0, "animation", false);
         }
 
-        public void SetHeroImage()
+        private void SetHeroImage()
         {
             for (int i = 0; i < UserDataCache.Instance.inBattleHeroes.Length; i++)
             {
@@ -906,6 +906,42 @@ namespace Immortal_Switch.Scripts.UI
                 iconRect: iconHero2, iconHeroClass2,
                 targetAnchor: hero2TargetAnchor, hero2ClassTargetAnchor,
                 switchVersion: currentVersion);
+        }
+
+        /// <summary>
+        /// Reset vị trí iconHeroImage[] + iconHeroClassImage[] về home anchor (như mới vào game).
+        /// Kill tweens + snap localPosition/Scale về heroIconAnchors[i] / heroClassIconAnchors[i].
+        /// Gọi sau khi vào PvP (SetHeroes) hoặc khi icon ở trạng thái swapped sai.
+        /// </summary>
+        public void ResetHeroIconPositions()
+        {
+            for (int i = 0; i < heroIconTweens.Length; i++)
+            {
+                heroIconTweens[i]?.Kill(false);
+                heroIconTweens[i] = null;
+            }
+
+            isHeroIconSwapped = false;
+            heroIconSwitchVersion++;
+
+            for (int i = 0; i < 2; i++)
+            {
+                if (iconHeroImage[i] != null && heroIconAnchors[i] != null && heroIconAnimationRoot != null)
+                {
+                    RectTransform iconRect = iconHeroImage[i].rectTransform;
+                    iconRect.SetParent(heroIconAnchors[i].transform, true);
+                    iconRect.anchoredPosition = Vector3.zero;
+                    iconRect.localScale = Vector3.one;
+                }
+
+                if (iconHeroClassImage[i] != null && heroClassIconAnchors[i] != null && heroIconAnimationRoot != null)
+                {
+                    RectTransform classRect = iconHeroClassImage[i].rectTransform;
+                    classRect.SetParent(heroClassIconAnchors[i].transform, true);
+                    classRect.anchoredPosition = Vector3.zero;
+                    classRect.localScale = Vector3.one;
+                }
+            }
         }
 
         private void MoveHeroIcon(

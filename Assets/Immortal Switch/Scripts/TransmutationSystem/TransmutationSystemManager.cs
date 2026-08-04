@@ -21,7 +21,6 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 {
     public class TransmutationSystemManager : Singleton<TransmutationSystemManager>
     {
-
         /// <summary>
         /// thoi gian fuse tu dong neu bat.
         /// </summary>
@@ -51,19 +50,14 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public event Action<TransmutationSystemAutoSettingData> OnSettingChanged;
 
         // --- Private Fields ---
+        private TransmutationSystemDatabaseSO _db;
+
         private float _lastAutoFuseTime;
-        
-        private TransmutationSystemDatabaseSO _database;
 
         protected override void OnSingletonAwake()
         {
             var now = Time.unscaledTime;
             _lastAutoFuseTime = now + autoFuseInterval;
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
         }
 
         public override UniTask InitializeAsync()
@@ -99,13 +93,19 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             Service.ApplyListResponse(response);
             CurrencyManager.Instance.Set(CurrencyType.crystal, response.Crystal);
             _DispatchChanged();
+
+            // Thông báo cho PowerUpManager re-apply toàn bộ equips vừa sync vào các hero
+            // đã bound (vd. lobby preview). Truyền null vì đây là bulk-resync, không phải
+            // thay đổi 1 item đơn lẻ — các subscriber cần handle null (xem PowerUpManager
+            // & TransmutationSystemView).
+            OnEquipChanged?.Invoke(null, null);
             return true;
         }
 
         private void Load()
         {
-            _database = DatabaseManager.Instance.TransmutationDb;
-            Storage = new TransmutationSystemStorage(_database);
+            _db = DatabaseManager.Instance.TransmutationDb;
+            Storage = new TransmutationSystemStorage();
             Service = new TransmutationSystemService(Storage);
 
             Storage.Load();
@@ -128,7 +128,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             {
                 return;
             }
-            
+
             if (!Storage.Data.Setting.Enabled)
             {
                 //Debug.Log("Transmutation: AutoFuse: Stop by disabled");
@@ -161,7 +161,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 return null;
             }
 
-            var cfg = _database.ItemConfig.rows.Find(v => v.configId == equip.CfgId);
+            var cfg = _db.ItemConfig.rows.Find(v => v.configId == equip.CfgId);
 
             return new PlayerEquipViewData
             {
@@ -176,7 +176,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
         public ETabPresetStatus IsUnlockGradeOption(EItemTier tier)
         {
-            var firstCfg = _database.GradeConfig.rows.Find(v => v.highestUnlockedGrade == tier.ToString());
+            var firstCfg = _db.GradeConfig.rows.Find(v => v.highestUnlockedGrade == tier.ToString());
 
             // ko co cfg thi unlock false.
             if (firstCfg == null)
@@ -215,7 +215,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
                 { 2, ETabPresetStatus.Normal },
             };
 
-            foreach (var row in _database.CountConfig.rows
+            foreach (var row in _db.CountConfig.rows
 
                          // neu ko chua key
                          .Where(row => !result.ContainsKey(row.maxAutoCount))
@@ -232,7 +232,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         public DynamicHeroesGlobalSpecificationsTransmuationUniqueRow GetUniqueCfg(StatType stat, ModifierOp op)
         {
             var mapping = TransmutationSystemHelper.ToModifier(stat, op);
-            return _database.UniqueConfig.rows.Find(v => v.uniqueId == mapping);
+            return _db.UniqueConfig.rows.Find(v => v.uniqueId == mapping);
         }
 
         public List<KeyValuePair<StatType, (float pct, bool isUnique, ModifierOp op)>> GetAllModifiers()
@@ -329,7 +329,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
         {
             if (Storage.Data.StuckEquip != null)
             {
-                var stuckCfg = _database.ItemConfig.rows.Find(v => v.configId == Storage.Data.StuckEquip.CfgId);
+                var stuckCfg = _db.ItemConfig.rows.Find(v => v.configId == Storage.Data.StuckEquip.CfgId);
 
                 if (stuckCfg != null)
                 {
@@ -392,7 +392,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
             CurrencyManager.Instance.Set(CurrencyType.crystal, response.CrystalBalance);
             _DispatchChanged();
 
-            var itemCfg = _database.ItemConfig.rows.Find(v => v.configId == response.Pending.CfgId);
+            var itemCfg = _db.ItemConfig.rows.Find(v => v.configId == response.Pending.CfgId);
 
             return new PlayerEquipViewData
             {
@@ -507,7 +507,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem
 
         private void _DispatchChanged()
         {
-            var cfg = _database.LevelConfig.rows.Find(v => v.level == Storage.Data.Level);
+            var cfg = _db.LevelConfig.rows.Find(v => v.level == Storage.Data.Level);
             var targetExp = cfg?.totalExp ?? 0;
 
             var changed = new TransmutationSystemChanged

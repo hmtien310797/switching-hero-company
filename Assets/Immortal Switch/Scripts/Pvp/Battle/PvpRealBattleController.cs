@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Battle;
+using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
@@ -14,6 +15,8 @@ using Immortal_Switch.Scripts.Pvp.Views;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
+using NUnit.Framework;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Pvp.Battle
@@ -46,6 +49,10 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
         private bool _ended;
         private bool _openUi = true;
         private float _debugLogTimer;
+        private bool _ending;
+        private float _endDelayTimer;
+        private PvPBattleResult _pendingOutcome;
+        [SerializeField] private float endBattleDelay = 2f;
 
         public bool IsRunning => _running && !_ended;
 
@@ -68,6 +75,8 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
             _battleStartReal = Time.realtimeSinceStartup;
             _ended = false;
+            _ending = false;
+            _endDelayTimer = 0f;
             _heroTeam = new Dictionary<HeroActor, PvpBattleTeam>();
 
             _attacker = new PvpBattleTeam();
@@ -83,11 +92,42 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             {
                 // Clear PvE chapter stage (creep/boss + live hero). Snapshot đã build từ live hero stats
                 // trong matchmaking (trước RunAsync), nên despawn live hero bây giờ không mất dữ liệu attacker.
+                await Transitioner.Instance.TransitionOutWithoutChangingScene(token);
                 PvpStageTransition.ClearPveStage();
-
+                GameCameraController.Instance.ResetCamera();
+                Transitioner.Instance.TransitionInWithoutChangingScene();
+                await UniTask.Delay(1000, cancellationToken: token);
                 await SpawnTeamAsync(_attacker, snapshot.Attacker, true);
+                if (_attacker.Actors.Count >= 2)
+                {
+                    UserDataCache.Instance.SetBattleLineup(new[]
+                        { _attacker.Actors[0].HeroData.Id, _attacker.Actors[1].HeroData.Id });
+                    UserDataCache.Instance.TrySetInBattleHeroActor(0, _attacker.Actors[0]);
+                    UserDataCache.Instance.TrySetInBattleHeroActor(1, _attacker.Actors[1]);
+                    HeroTeamController.Instance?.SetHeroes(_attacker.Actors[0], _attacker.Actors[1]);
+                    BattleHeroSessionController.Instance.SelectControlledHeroSlotForPvp();
+                    TopMainView.Instance.ResetHeroIconPositions();
+                    GameEventManager.Trigger(GameEvents.OnActiveLineupChanged);
+                    foreach (var h in _attacker.Actors)
+                    {
+                        h?.SetAutoClassSkill(UserDataCache.Instance != null && UserDataCache.Instance.AutoClassSkill);
+                        h?.SetAutoUltimateSkill(UserDataCache.Instance != null && UserDataCache.Instance.AutoUltimateSkill);
+                    }
+                }
                 await SpawnTeamAsync(_defender, snapshot.Defender, false);
-
+                List<CinemachineTargetGroup.Target> targets = new List<CinemachineTargetGroup.Target>();
+                for (int i = 0; i < _attacker.Actors.Count; i++)
+                {
+                    targets.Add(new CinemachineTargetGroup.Target{Object = _attacker.Actors[i].transform});
+                }
+                
+                for (int i = 0; i < _defender.Actors.Count; i++)
+                {
+                    targets.Add(new CinemachineTargetGroup.Target{Object = _defender.Actors[i].transform});
+                }
+                
+                await UniTask.Delay(200, cancellationToken: token);
+                GameCameraController.Instance.SetFollowPvpHero(targets);
                 // Cross-register hostiles: A's heroes are hostiles to B, and vice versa.
                 RegisterHostiles(_attacker, _defender);
                 RegisterHostiles(_defender, _attacker);
@@ -154,13 +194,22 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
                 LogTeamStates(_defender, "D");
             }
 
+            if (_ending)
+            {
+                _endDelayTimer -= Time.deltaTime;
+                if (_endDelayTimer <= 0f)
+                    EndBattle(_pendingOutcome);
+                return;
+            }
+
             bool aDead = _attacker.AllDead;
             bool bDead = _defender.AllDead;
             if (!aDead && !bDead) return;
 
-            var outcome = (aDead && bDead) ? PvPBattleResult.Draw
+            _pendingOutcome = (aDead && bDead) ? PvPBattleResult.Draw
                 : (bDead ? PvPBattleResult.Victory : PvPBattleResult.Defeat);
-            EndBattle(outcome);
+            _ending = true;
+            _endDelayTimer = endBattleDelay;
         }
 
         private static void LogTeamStates(PvpBattleTeam team, string label)
@@ -178,6 +227,7 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             if (_ended) return;
             _ended = true;
             _running = false;
+            _ending = false;
 
             PvPBattleResultRequest request;
             try { request = BuildResult(outcome); }
@@ -215,11 +265,12 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             Vector3 center = isAttacker ? attackerSpawnCenter : defenderSpawnCenter;
             Vector3 frontPos = center + Vector3.left * heroSpacing;
             Vector3 backPos = center + Vector3.right * heroSpacing;
-            await SpawnHeroAsync(team, teamSnap.FrontHero, frontPos);
-            await SpawnHeroAsync(team, teamSnap.BackHero, backPos);
+            HeroTeamController teamCtrl = isAttacker ? HeroTeamController.Instance : null;
+            await SpawnHeroAsync(team, teamSnap.FrontHero, frontPos, teamCtrl);
+            await SpawnHeroAsync(team, teamSnap.BackHero, backPos, teamCtrl);
         }
 
-        private async UniTask SpawnHeroAsync(PvpBattleTeam team, HeroBattleSnapshot heroSnap, Vector3 pos)
+        private async UniTask SpawnHeroAsync(PvpBattleTeam team, HeroBattleSnapshot heroSnap, Vector3 pos, HeroTeamController teamCtrl)
         {
             if (heroSnap == null || heroSnap.HeroId <= 0) return;
 
@@ -242,16 +293,21 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             }
 
             hero.gameObject.SetActive(true);
-            await hero.Init(data, team.Context, null, true, true);
+            await hero.Init(data, team.Context, teamCtrl, true, true);
             hero.OnDead += OnHeroDead;
 
             // Override base stats from snapshot FinalStats (bypass progression/equipment bridges —
             // bridges non-fatal for enemy ids, then overwritten here).
-            ApplySnapshotStats(hero, heroSnap.FinalStats);
+            if (teamCtrl == null)
+            {
+                // Defender (AI, fake data) - override base stats from snapshot FinalStats.
+                ApplySnapshotStats(hero, heroSnap.FinalStats);
+                hero.BindDeathEvent();
+            }
+            // Attacker (player) - KEEP Init stats (PowerUp + progression + equipment + growth +
+            // transmutation bridges applied in ResetData). Do NOT call ApplySnapshotStats (Initialize
+            // would wipe bridges + lose mechanics: equipment procs, growth passives, transmutation).
 
-            // HeroActor.Init → Spawn state set IsActionLocked(true) (spawn anim 2s) nhưng Spawn.Exit
-            // KHÔNG reset → MoveTowards (Run state) return sớm ở "if (IsDead || IsActionLocked || ...)"
-            // → hero đứng im, không lao vào đánh. Unlock ở đây để hero hành động sau khi Spawn→Idle.
             hero.SetActionLocked(false);
 
             _heroTeam[hero] = team;
@@ -394,3 +450,4 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
         }
     }
 }
+

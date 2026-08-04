@@ -5,7 +5,7 @@ using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Localization;
-using Immortal_Switch.Scripts.Shared.UI;
+using Immortal_Switch.Scripts.Modules;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -116,7 +116,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             RefreshPurchaseState();
             RefreshRewards(rewards);
 
-            var icon = ShopManager.Instance.Atlas.LoadIcon(iconId);
+            var icon = ModuleManager.ShopAtlas.LoadIcon(iconId);
 
             if (icon != null)
             {
@@ -147,7 +147,8 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 _ => string.Empty,
             };
 
-            if (limit <= 0 || string.IsNullOrEmpty(type))
+            if (limit <= 0 ||
+                string.IsNullOrEmpty(type))
             {
                 goLimit.SetActive(false);
             }

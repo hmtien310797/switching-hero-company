@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
-using Immortal_Switch.Scripts.Addressable;
-using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Modules;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.U2D;
 
 namespace Immortal_Switch.Scripts.Items.ScriptableObjects
 {
@@ -20,34 +17,7 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
         [field: SerializeField]
         public DynamicHeroesGlobalSpecificationsItemConfigDatabase ItemConfig { get; private set; }
 
-        private SpriteAtlas _itemAtlas;
-        private UniTask<SpriteAtlas>? _loadAtlasTask;
-
-        private readonly Dictionary<string, Sprite> _spriteCache = new();
         private readonly Dictionary<int, DynamicHeroesGlobalSpecificationsItemConfigRow> _itemsCache = new();
-
-        public UniTask InitializeAsync()
-        {
-            return LoadItemAtlasAsync().AsUniTask();
-        }
-
-        private async UniTask<SpriteAtlas> LoadItemAtlasAsync()
-        {
-            if (_itemAtlas != null)
-            {
-                return _itemAtlas;
-            }
-
-            if (_loadAtlasTask.HasValue)
-            {
-                _itemAtlas = await _loadAtlasTask.Value;
-                return _itemAtlas;
-            }
-
-            _loadAtlasTask = AddressableSpriteAtlasService.AcquireAtlasAsync(SpriteAtlasConstants.CURRENCY);
-            _itemAtlas = await _loadAtlasTask.Value;
-            return _itemAtlas;
-        }
 
         public Sprite LoadIconByItemId(int itemId)
         {
@@ -79,28 +49,7 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
         public Sprite LoadIcon(string rarity, string itemType, string itemKey)
         {
             var key = $"ic_{itemType}_{itemKey}_{rarity}".ToLower();
-
-            if (_itemAtlas == null)
-            {
-                throw new InvalidOperationException(
-                    $"{nameof(ItemsDatabaseSO)} has not been initialized. Call {nameof(InitializeAsync)}() before loading icons.");
-            }
-
-            if (_spriteCache.TryGetValue(key, out var sprite))
-            {
-                return sprite;
-            }
-
-            sprite = _itemAtlas.GetSprite(key);
-
-            if (sprite == null)
-            {
-                Debug.LogError($"Sprite '{key}' was not found in atlas '{SpriteAtlasConstants.CURRENCY}'.");
-                return null;
-            }
-
-            _spriteCache.Add(key, sprite);
-            return sprite;
+            return ModuleManager.CurrencyAtlas.LoadSprite(key);
         }
 
         public DynamicHeroesGlobalSpecificationsItemConfigRow FindItem(int itemId)
@@ -124,21 +73,22 @@ namespace Immortal_Switch.Scripts.Items.ScriptableObjects
         {
             return ItemConfig.rows.FirstOrDefault(v => v.itemKey == itemKey);
         }
-        
+
         public EItemTier GetItemTier(int itemId)
         {
-            string eItemTier = ItemConfig.rows.FirstOrDefault(v => v.itemId == itemId)?.rarity;
-            if (string.IsNullOrEmpty(eItemTier))
+            var rarity = ItemConfig.rows.FirstOrDefault(v => v.itemId == itemId)?.rarity;
+
+            if (string.IsNullOrEmpty(rarity))
             {
                 Debug.LogError($"Item {itemId} not found, return tier D");
                 return EItemTier.D;
             }
 
-            if (Enum.TryParse(eItemTier, out EItemTier itemTier))
+            if (Enum.TryParse(rarity, out EItemTier itemTier))
             {
                 return itemTier;
             }
-            
+
             Debug.LogError($"Item {itemId} not found, return tier D");
             return EItemTier.D;
         }

@@ -297,6 +297,18 @@ namespace Battle
             TopMainView.Instance?.SetHeroSkeletonAnimationGraphic(hero.HeroData);
             return hero.HeroData;
         }
+        
+        public void SelectControlledHeroSlotForPvp()
+        {
+            HeroActor hero = userDataCache.GetInBattleHeroActorAt(0);
+            if (hero == null || hero.IsDead)
+                return ;
+
+            controlledHeroSlotIndex = 0;
+            RefreshTeamAndSelection();
+            RefreshControlledHeroSkillUI();
+            TopMainView.Instance?.SetHeroSkeletonAnimationGraphic(hero.HeroData);
+        }
 
         public HeroDataSO SwitchControlledHero()
         {

@@ -4,5 +4,7 @@ namespace Immortal_Switch.Scripts.Shared.Constants
     {
         public const string CURRENCY = "currency_sprite_atlas";
         public const string SHOP = "shop_sprite_atlas";
+        public const string GEAR = "gear_sprite_atlas";
+        public const string EVENT = "event_sprite_atlas";
     }
 }

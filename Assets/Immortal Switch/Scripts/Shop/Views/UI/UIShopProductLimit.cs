@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Modules;
 using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
@@ -120,7 +121,8 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             {
                 rewardContainer.gameObject.SetActive(false);
                 imgChest.gameObject.SetActive(true);
-                imgChest.sprite = ShopManager.Instance.Atlas.LoadIcon(iap.iconId);
+
+                imgChest.sprite = ModuleManager.ShopAtlas.LoadIcon(iap.iconId);
             }
         }
 

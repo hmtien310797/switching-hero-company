@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.DungeonSystem.Views;
 using Immortal_Switch.Scripts.HeroUIView;
 using Immortal_Switch.Scripts.MissionSystem.Views.UI;
-using Immortal_Switch.Scripts.Modules.Services;
+using Immortal_Switch.Scripts.Modules.Navigation;
 using Immortal_Switch.Scripts.SummonSystem.Shared.UI;
 using Immortal_Switch.Scripts.TransmutationSystem.Views;
 using Immortal_Switch.Scripts.UI;

@@ -179,6 +179,48 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
                 service.RebuildSnapshot();
 
             service.ApplyToStatModule(statsController.StatModule);
+            ApplyTransmutationTo(statsController);
+        }
+
+        /// <summary>
+        /// Apply toàn bộ trang bị transmutation đang có trong storage vào hero.
+        /// Clear-and-reapply qua source id cố định (POWERUP:TRANSMUTATION) — idempotent,
+        /// không phụ thuộc reference equality của <see cref="StatModifier"/> (vốn là class
+        /// không override Equals). Xử lý đúng cả trường hợp load game với equips cũ, sync
+        /// server, và replace equip cùng slot (tránh double-count modifier cũ).
+        /// </summary>
+        private void ApplyTransmutationTo(StatsController statsController)
+        {
+            if (statsController == null ||
+                statsController.StatModule == null)
+                return;
+
+            var module = statsController.StatModule;
+
+            // Xoá toàn bộ modifier transmutation cũ rồi re-add từ storage hiện tại.
+            module.RemoveModifiersBySource(StatSourceIds.Transmutation);
+
+            if (_transmutationSystemManager == null)
+                return;
+
+            foreach (var equip in _transmutationSystemManager.GetEquips())
+            {
+                if (equip?.Modifiers == null)
+                    continue;
+
+                foreach (var mod in equip.Modifiers)
+                {
+                    // Clone với source id riêng để RemoveModifiersBySource xoá sạch —
+                    // không đụng modifier của growth (POWERUP:SYSTEM) hay weapon
+                    // (EQUIPMENT:HERO_*).
+                    module.AddModifier(new StatModifier(
+                        mod.StatType,
+                        mod.Operation,
+                        mod.Value,
+                        StatSourceIds.Transmutation,
+                        mod.IsUnique));
+                }
+            }
         }
 
         private void CleanupNullPlayers()
@@ -200,28 +242,9 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
             PlayerEquipItem newEquip
         )
         {
-            if (oldEquip != null)
-            {
-                foreach (var entry in oldEquip.Modifiers)
-                {
-                    foreach (var stats in boundPlayerStats)
-                    {
-                        stats.StatModule.RemoveModifier(entry);
-                    }
-                }
-            }
-
-            if (newEquip != null)
-            {
-                foreach (var entry in newEquip.Modifiers)
-                {
-                    foreach (var stats in boundPlayerStats)
-                    {
-                        stats.StatModule.AddModifier(entry);
-                    }
-                }
-            }
-
+            // RebuildAndApply sẽ clear-and-reapply toàn bộ equips (xem ApplyTransmutationTo)
+            // cho mọi bound player — không cần phân biệt old/new, không phụ thuộc reference
+            // equality. Cũng cover trường hợp SyncFromServerAsync fire (null, null).
             RebuildAndApply();
         }
 

@@ -4,7 +4,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Event.EventWheel.Layout;
-using Immortal_Switch.Scripts.Event.Models;
 using Immortal_Switch.Scripts.Event.Views;
 using Immortal_Switch.Scripts.Shared.Helper;
 using JetBrains.Annotations;
@@ -16,9 +15,6 @@ namespace Immortal_Switch.Scripts.Shared
     {
         [field: DatabaseBinding]
         public DynamicHeroesGlobalSpecificationsConfigEventDatabase EventDb { get; private set; }
-
-        [field: DatabaseBinding]
-        public EventDisplayDatabaseSO EventDisplayDb { get; private set; }
 
         [field: DatabaseBinding]
         public DynamicHeroesGlobalSpecificationsConfigPassEventDatabase EventPassConfigDb { get; private set; }
@@ -34,11 +30,6 @@ namespace Immortal_Switch.Scripts.Shared
 
         // --- Private Fields ---
         private Dictionary<int, DynamicHeroesGlobalSpecificationsConfigEventRow> _activeEvents = new();
-
-        public DynamicHeroesGlobalSpecificationsConfigPassEventRow GetEventPassConfig(int eventId)
-        {
-            return EventPassConfigDb.rows.FirstOrDefault(v => v.eventId == eventId);
-        }
 
         public List<DynamicHeroesGlobalSpecificationsEventWheelShopConfigRow> GetEventShopItem(int eventId)
         {
@@ -85,7 +76,8 @@ namespace Immortal_Switch.Scripts.Shared
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[DatabaseManager] event/config_windows failed, fallback to local device-time check: {ex.Message}");
+                Debug.LogWarning(
+                    $"[DatabaseManager] event/config_windows failed, fallback to local device-time check: {ex.Message}");
             }
 
             IEnumerable<DynamicHeroesGlobalSpecificationsConfigEventRow> list = serverActive != null

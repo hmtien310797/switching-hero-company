@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Localization;
-using Immortal_Switch.Scripts.Modules.Services;
+using Immortal_Switch.Scripts.Modules.Navigation;
 using Immortal_Switch.Scripts.Shop.Views.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;

@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
-using Immortal_Switch.Scripts.Modules.Services;
+using Immortal_Switch.Scripts.Modules.Navigation;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;

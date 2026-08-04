@@ -306,7 +306,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         HealthBarController.ResetHealth();
     }
 
-    private void BindDeathEvent()
+    public void BindDeathEvent()
     {
         stats.HealthModule.OnDead -= Die;
         stats.HealthModule.OnDead += Die;

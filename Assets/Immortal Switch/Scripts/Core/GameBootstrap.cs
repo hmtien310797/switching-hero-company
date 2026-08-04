@@ -11,7 +11,7 @@ using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.MissionSystem;
-using Immortal_Switch.Scripts.PlayerSystem;
+using Immortal_Switch.Scripts.Modules;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Pvp;
@@ -65,6 +65,7 @@ namespace Immortal_Switch.Scripts.Core
 
                 // 2
                 await DatabaseManager.Instance.InitializeAsync();
+                await ModuleManager.Instance.InitializeAsync();
                 progress.CompleteStep("Database initialized");
 
                 // Khởi tạo sớm để tiến trình nhiệm vụ event vẫn được ghi nhận khi UI chưa mở.

@@ -1070,6 +1070,69 @@ public class NakamaClient : MonoBehaviour
         return JsonConvert.DeserializeObject<EventLoginClaimAllMilestonesResponse>(response.Payload);
     }
 
+    // ── Event Xúc Xắc (Dice) ──────────────────────────────────────────────────
+    // Xem handler/event_dice.js. Server là nguồn sự thật duy nhất (thay cho
+    // EventDiceManager/Service/Storage ES3 cục bộ trước đây — xem EventDiceManager).
+
+    /// <summary>Snapshot đầy đủ: board 20 ô, mốc điểm, pending rewards, số dư vé. Gọi khi mở
+    /// EventDiceView và sau mỗi roll/claim thành công để đồng bộ lại.</summary>
+    public async Task<EventDiceStateResponse> EventDiceStateAsync()
+    {
+        var response = await CallRpcAsync("eventdice/state", "{}");
+        return JsonConvert.DeserializeObject<EventDiceStateResponse>(response.Payload);
+    }
+
+    /// <summary>Trừ 1 vé (item_id 60 "bingo_dice"), server random 1-6 và trả về ô đáp xuống —
+    /// client chỉ chạy animation flag theo Result, không tự random.</summary>
+    public async Task<EventDiceRollResponse> EventDiceRollAsync()
+    {
+        var response = await CallRpcAsync("eventdice/roll", "{}");
+        return JsonConvert.DeserializeObject<EventDiceRollResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận toàn bộ phần thưởng đang chờ (tích luỹ từ các lượt roll trước đó).</summary>
+    public async Task<EventDiceClaimPendingResponse> EventDiceClaimPendingAsync()
+    {
+        var response = await CallRpcAsync("eventdice/claim_pending", "{}");
+        return JsonConvert.DeserializeObject<EventDiceClaimPendingResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng 1 mốc điểm đã đủ điều kiện (current_progress &gt;= points_required).</summary>
+    public async Task<EventDiceClaimMilestoneResponse> EventDiceClaimMilestoneAsync(EventDiceClaimMilestoneRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await CallRpcAsync("eventdice/claim_milestone", payload);
+        return JsonConvert.DeserializeObject<EventDiceClaimMilestoneResponse>(response.Payload);
+    }
+
+    // ── Event Câu Cá (Fishing) ────────────────────────────────────────────────
+    // Xem handler/event_fishing.js. Server là nguồn sự thật duy nhất (thay cho
+    // EventFishingManager/Service/Storage ES3 cục bộ trước đây — xem EventFishingManager).
+
+    /// <summary>Snapshot đầy đủ: bộ sưu tập (đã câu được con nào), shop, số dư mồi. Gọi khi mở
+    /// EventFishingView và sau mỗi cast/shop_buy thành công để đồng bộ lại.</summary>
+    public async Task<EventFishingStateResponse> EventFishingStateAsync()
+    {
+        var response = await CallRpcAsync("eventfishing/state", "{}");
+        return JsonConvert.DeserializeObject<EventFishingStateResponse>(response.Payload);
+    }
+
+    /// <summary>Trừ 1 mồi (item_id 60 "fishing_food"), server tự random thắng/thua (50%) và random
+    /// có trọng số con cá nếu thắng — client không tự random kết quả.</summary>
+    public async Task<EventFishingCastResponse> EventFishingCastAsync()
+    {
+        var response = await CallRpcAsync("eventfishing/cast", "{}");
+        return JsonConvert.DeserializeObject<EventFishingCastResponse>(response.Payload);
+    }
+
+    /// <summary>Mua 1 item trong shop sự kiện câu cá — is_premium=false trừ gold, true trừ diamond, cả 2 đều cấp fishing_food (xem EventFishingShopEntryDto.Currency).</summary>
+    public async Task<EventFishingShopBuyResponse> EventFishingShopBuyAsync(EventFishingShopBuyRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await CallRpcAsync("eventfishing/shop_buy", payload);
+        return JsonConvert.DeserializeObject<EventFishingShopBuyResponse>(response.Payload);
+    }
+
     // ── Battle ────────────────────────────────────────────────────────────────
 
     /// <summary>Progression thật từ server (current_stage/current_chapter/highest_stage_cleared). Gọi sau login trước khi vào màn chọn stage.</summary>

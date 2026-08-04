@@ -2,7 +2,6 @@ using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Shop.Interfaces;
-using Immortal_Switch.Scripts.Shop.Models;
 using UnityEngine;
 
 namespace Immortal_Switch.Scripts.Shop
@@ -11,7 +10,6 @@ namespace Immortal_Switch.Scripts.Shop
     {
         public IShopService Service { get; private set; }
         public IShopStorage Storage { get; private set; }
-        public ShopAtlasService Atlas { get; private set; }
 
         /// <summary>Kết quả recharge/state gần nhất — nguồn sự thật cho số lượt tích nạp/milestone
         /// đã nhận, không lưu local (xem <see cref="SyncRechargeStateAsync"/>).</summary>
@@ -187,10 +185,7 @@ namespace Immortal_Switch.Scripts.Shop
         {
             Storage = new ShopStorage();
             Service = new ShopService(Storage);
-            Atlas = new ShopAtlasService();
-
             Storage.Load();
-            Atlas.InitializeAsync().Forget();
         }
 
         private void SubscribeEvents()

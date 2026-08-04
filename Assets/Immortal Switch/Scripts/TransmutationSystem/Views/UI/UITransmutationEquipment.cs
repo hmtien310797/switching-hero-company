@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Modules;
 using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -91,6 +92,8 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
                 imgBorder.sprite = cfg.border;
                 imgTier.sprite = cfg.tierIcon;
             }
+
+            imgIcon.sprite = ModuleManager.GearAtlas.LoadSprite(_vm.ItemType, _vm.Tier);
         }
     }
 }

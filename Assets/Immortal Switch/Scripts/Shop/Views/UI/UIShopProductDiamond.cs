@@ -4,6 +4,7 @@ using Immortal_Switch.Scripts.Localization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using ModuleManager = Immortal_Switch.Scripts.Modules.ModuleManager;
 
 namespace Immortal_Switch.Scripts.Shop.Views.UI
 {
@@ -85,7 +86,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             _product = product;
             _packId = packId;
 
-            var icon = ShopManager.Instance.Atlas.LoadIcon(iconId);
+            var icon = ModuleManager.ShopAtlas.LoadIcon(iconId);
 
             if (icon != null)
             {

@@ -21,5 +21,15 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         /// event newbie 7
         /// </summary>
         public const int EVENT_NEWBIE_7 = 1004;
+
+        /// <summary>
+        /// event dice
+        /// </summary>
+        public const int EVENT_DICE = 1005;
+
+        /// <summary>
+        /// event fishing
+        /// </summary>
+        public const int EVENT_FISHING = 1006;
     }
 }

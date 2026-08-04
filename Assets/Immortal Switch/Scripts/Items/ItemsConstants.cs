@@ -1,9 +1,9 @@
 namespace Immortal_Switch.Scripts.Items
 {
     /// <summary>
-    /// Định nghĩa các loại item/equipment trong game.
+    /// Định nghĩa các loại gear trong game.
     /// </summary>
-    public static class ItemsTypeConstants
+    public static class GearTypeConstants
     {
         /// <summary>
         /// Vũ khí.
@@ -41,9 +41,9 @@ namespace Immortal_Switch.Scripts.Items
         public const string RING = "Ring";
 
         /// <summary>
-        /// Dây chuyền.
+        /// Thắt lưng.
         /// </summary>
-        public const string NECKLACE = "Necklace";
+        public const string GIRDLE = "Girdle";
 
         /// <summary>
         /// Thánh vật / cổ vật.

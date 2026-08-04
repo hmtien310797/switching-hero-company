@@ -20,6 +20,11 @@ namespace Game.Configs.Generated
         public string eventKey;
 
         /// <summary>
+        /// CSV Column: event_icon
+        /// </summary>
+        public string eventIcon;
+
+        /// <summary>
         /// CSV Column: name_vi
         /// </summary>
         public string nameVi;

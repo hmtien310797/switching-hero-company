@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.DungeonSystem;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Pvp.Battle;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
@@ -50,7 +51,6 @@ namespace Battle
         public event Action<DungeonEndResponse> DungeonEndReported;
 
         private bool transitionInProgress;
-
         private void OnEnable()
         {
             if (dungeonBattleController != null)

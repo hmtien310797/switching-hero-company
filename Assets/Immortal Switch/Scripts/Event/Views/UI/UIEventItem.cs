@@ -1,4 +1,5 @@
 using System;
+using Immortal_Switch.Scripts.Localization;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
@@ -31,13 +32,13 @@ namespace Immortal_Switch.Scripts.Event.Views.UI
             _onClick?.Invoke(_eventId);
         }
 
-        public void Bind([CanBeNull] Sprite sprEvent, string title, int eventId, Action<int> onClick)
+        public void Bind([CanBeNull] Sprite sprEvent, string titleKey, int eventId, Action<int> onClick)
         {
             _onClick = onClick;
             _eventId = eventId;
 
             imgEvent.sprite = sprEvent;
-            txtTitle.text = title;
+            txtTitle.text = LocalizationManager.GetText(titleKey);
         }
     }
 }

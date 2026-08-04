@@ -42,19 +42,6 @@ namespace Immortal_Switch.Scripts.Shared
         {
             // Chỉ load label game_database đúng một lần.
             await LoadGameDatabaseAsync();
-
-            // Chỉ gọi sau khi ItemDb đã được bind.
-            if (ItemDb != null)
-            {
-                await ItemDb.InitializeAsync();
-            }
-            else
-            {
-                Debug.LogError(
-                    "[DatabaseManager] ItemDb chưa được load."
-                );
-            }
-
             await InitEventAsync();
 
             await UniTask.WhenAll(
@@ -457,6 +444,5 @@ namespace Immortal_Switch.Scripts.Shared
         }
 
 #endregion
-
     }
 }

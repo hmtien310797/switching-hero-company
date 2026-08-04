@@ -8,6 +8,7 @@ namespace Immortal_Switch.Scripts.PowerUpSystem
         // PowerUp source ids
         public const string GrowthSystem = "POWERUP:GROWTH";
         public const string EquipmentSystem = "POWERUP:EQUIPMENT";
+        public const string Transmutation = "POWERUP:TRANSMUTATION";
         public const string PetSystem = "POWERUP:PET";
         public const string ResearchSystem = "POWERUP:RESEARCH";
         public const string RelicSystem = "POWERUP:RELIC";

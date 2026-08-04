@@ -1,10 +1,13 @@
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Event.EventDice;
+using Immortal_Switch.Scripts.Event.EventFishing;
 using Immortal_Switch.Scripts.Event.EventLogin;
 using Immortal_Switch.Scripts.Event.EventWheel;
 using Immortal_Switch.Scripts.Event.Views.UI;
+using Immortal_Switch.Scripts.Modules;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.UI;
@@ -28,7 +31,7 @@ namespace Immortal_Switch.Scripts.Event.Views
         private UIEventItem eventPrefab;
 
         // --- Private Fields ---
-        private List<UIEventItem> _activities = new();
+        private SimpleUIPool<UIEventItem> _pool;
 
         public override void OnShow(object args)
         {
@@ -41,24 +44,18 @@ namespace Immortal_Switch.Scripts.Event.Views
 
         private void RefreshItems(List<DynamicHeroesGlobalSpecificationsConfigEventRow> activities)
         {
+            _pool ??= new SimpleUIPool<UIEventItem>(eventPrefab, eventContainer);
+
             for (int i = 0; i < activities.Count; i++)
             {
                 var activity = activities[i];
-                var display = DatabaseManager.Instance.EventDisplayDb.entries.FirstOrDefault(v => v.eventId == activity.eventId);
+                var icon = ModuleManager.EventAtlas.LoadIcon(activity.eventIcon);
+                var clone = _pool.Get(i);
 
-                if (_activities.Count > i)
-                {
-                    var clone = _activities[i];
-                    clone.gameObject.SetActive(true);
-                    clone.Bind(display?.banner, activity.nameVi, activity.eventId, OnClickEvent);
-                }
-                else
-                {
-                    var clone = Instantiate(eventPrefab, eventContainer);
-                    clone.Bind(display?.banner, activity.nameVi, activity.eventId, OnClickEvent);
-                    _activities.Add(clone);
-                }
+                clone.Bind(icon, activity.eventKey, activity.eventId, OnClickEvent);
             }
+
+            _pool.ReleaseFrom(activities.Count);
         }
 
         private void OnClickEvent(int eventId)
@@ -74,6 +71,14 @@ namespace Immortal_Switch.Scripts.Event.Views
                 case EventIdConstants.EVENT_NEWBIE_7:
                 case EventIdConstants.EVENT_NEWBIE_30:
                     UIManager.Instance.OpenPopupAsync<EventLoginView>(new EventLoginArgs(eventId)).Forget();
+                    break;
+
+                case EventIdConstants.EVENT_DICE:
+                    UIManager.Instance.OpenPopupAsync<EventDiceView>().Forget();
+                    break;
+
+                case EventIdConstants.EVENT_FISHING:
+                    UIManager.Instance.OpenPopupAsync<EventFishingView>().Forget();
                     break;
             }
         }

@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Event.EventWheel;
 using Immortal_Switch.Scripts.Shop.Views;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
@@ -27,6 +28,15 @@ namespace Immortal_Switch.Scripts.Shared.UI
 
         private void OnClickJump()
         {
+            var eventWheelView = UIManager.Instance.Get<EventWheelView>();
+
+            if (eventWheelView != null &&
+                eventWheelView.IsRolling)
+            {
+                UIManager.Instance.ShowToast("Vòng quay đang xoay");
+                return;
+            }
+
             UIManager.Instance.OpenPopupAsync<ShopView>(new ShopArgs(jumpTab)).Forget();
         }
     }

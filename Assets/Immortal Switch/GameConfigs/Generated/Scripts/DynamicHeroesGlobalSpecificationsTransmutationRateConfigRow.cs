@@ -27,12 +27,12 @@ namespace Game.Configs.Generated
         /// <summary>
         /// CSV Column: D
         /// </summary>
-        public int d;
+        public float d;
 
         /// <summary>
         /// CSV Column: C
         /// </summary>
-        public int c;
+        public float c;
 
         /// <summary>
         /// CSV Column: B

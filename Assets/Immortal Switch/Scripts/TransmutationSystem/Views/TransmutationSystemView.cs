@@ -96,16 +96,16 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
             _equipments = new Dictionary<string, UITransmutationEquipment>
             {
-                { ItemsTypeConstants.WEAPON, slotWeapon },
-                { ItemsTypeConstants.GLOVES, slotGloves },
-                { ItemsTypeConstants.SHIELD, slotShield },
-                { ItemsTypeConstants.HELMET, slotHelmet },
-                { ItemsTypeConstants.ARMOR, slotArmor },
-                { ItemsTypeConstants.BOOTS, slotBoots },
-                { ItemsTypeConstants.RING, slotRing },
-                { ItemsTypeConstants.NECKLACE, slotNecklace },
-                { ItemsTypeConstants.RELIC, slotRelic },
-                { ItemsTypeConstants.PENDANT, slotPendant },
+                { GearTypeConstants.WEAPON, slotWeapon },
+                { GearTypeConstants.GLOVES, slotGloves },
+                { GearTypeConstants.SHIELD, slotShield },
+                { GearTypeConstants.HELMET, slotHelmet },
+                { GearTypeConstants.ARMOR, slotArmor },
+                { GearTypeConstants.BOOTS, slotBoots },
+                { GearTypeConstants.RING, slotRing },
+                { GearTypeConstants.GIRDLE, slotNecklace },
+                { GearTypeConstants.RELIC, slotRelic },
+                { GearTypeConstants.PENDANT, slotPendant },
             };
         }
 
@@ -140,7 +140,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
         private void OnTransmutationEquipChanged(PlayerEquipItem arg1, PlayerEquipItem arg2)
         {
-            RebuildEquipment(arg2);
+            RebuildGear(arg2);
         }
 
         private void OnTransmutationSettingChanged(TransmutationSystemAutoSettingData arg)
@@ -224,7 +224,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
 
             foreach (var equip in equips)
             {
-                RebuildEquipment(equip);
+                RebuildGear(equip);
             }
         }
 
@@ -260,8 +260,14 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views
             }
         }
 
-        private void RebuildEquipment(PlayerEquipItem equip)
+        private void RebuildGear(PlayerEquipItem equip)
         {
+            // Có thể nhận null khi OnEquipChanged được fire dạng bulk-resync
+            // (SyncFromServerAsync truyền null,null) — bỏ qua, slot sẽ được rebuild
+            // qua InitializeEquipment() ở OnEnable.
+            if (equip == null)
+                return;
+
             if (_equipments.TryGetValue(equip.ItemType, out var equipment))
             {
                 var vm = TransmutationSystemManager.Instance.GetEquip(equip.ItemType);

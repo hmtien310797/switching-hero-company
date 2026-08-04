@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Pvp.Battle;
 using Immortal_Switch.Scripts.UI;
 using Sirenix.OdinInspector;
 using Unity.Cinemachine;
@@ -11,12 +13,15 @@ using UnityEngine;
 public class GameCameraController : Singleton<GameCameraController>
 {
     [SerializeField] private CinemachineCamera followHeroCamera;
+    [SerializeField] private CinemachineCamera followPvPHeroesCamera;
     [SerializeField] private CinemachineCamera followBossCamera;
     [SerializeField] private Camera renderHeroCamera;
     [SerializeField] private CinemachineBasicMultiChannelPerlin followHeroCameraNoise;
     [SerializeField] private float amplitude = 1f;
     [SerializeField] private float frequency = 1f;
     [SerializeField] private float duration = 0.2f;
+
+    [SerializeField] private Transform nullPoint;
 
     [Header("POV per Screen")] [SerializeField]
     private float horizontalPlayerPov;
@@ -27,6 +32,12 @@ public class GameCameraController : Singleton<GameCameraController>
 
     [Header("Hero Camera Zoom Settings")] [SerializeField]
     private CinemachineFollow cineMachineHeroFollow;
+    
+    [Header("Hero PVP Camera Zoom Settings")] [SerializeField]
+    private CinemachineFollow cineMachinePvpHeroesFollow;
+    
+    [Header("PvP hero vs hero camera")] [SerializeField]
+    private CinemachineTargetGroup cineMachineTargetGroup;
 
     [SerializeField] private CinemachineRotationComposer cineMachineHeroRotation;
     [SerializeField] private float zoomSpeed = 1.5f;
@@ -46,11 +57,17 @@ public class GameCameraController : Singleton<GameCameraController>
     private int inactivePriority = 10;
     private CancellationTokenSource shakeCts;
     private Tween shakeTween;
+    private CameraTarget nullPointTarget;
 
     private void Start()
     {
         ScreenOrientationTracker.Instance.OnOrientationChanged += SetCameraFieldOfView;
         SetCameraFieldOfView(ScreenOrientationTracker.Instance.CurrentMode);
+        nullPointTarget = new CameraTarget
+        {
+            TrackingTarget = nullPoint,
+            LookAtTarget = nullPoint
+        };
         followHeroCameraNoise.enabled = true;
         followHeroCameraNoise.AmplitudeGain = 0f;
         followHeroCameraNoise.FrequencyGain = frequency;
@@ -70,11 +87,13 @@ public class GameCameraController : Singleton<GameCameraController>
                 followHeroCamera.Lens.FieldOfView = horizontalPlayerPov;
                 followBossCamera.Lens.FieldOfView = horizontalPlayerPov;
                 renderHeroCamera.fieldOfView = horizontalSceneryPov;
+                followPvPHeroesCamera.Lens.FieldOfView = horizontalSceneryPov;
                 break;
             case ScreenOrientationTracker.ScreenViewMode.Portrait:
                 followHeroCamera.Lens.FieldOfView = verticalPlayerPov;
                 followBossCamera.Lens.FieldOfView = verticalPlayerPov;
                 renderHeroCamera.fieldOfView = verticalSceneryPov;
+                followPvPHeroesCamera.Lens.FieldOfView = verticalSceneryPov;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -83,6 +102,10 @@ public class GameCameraController : Singleton<GameCameraController>
 
     public void SetFollowHero(Transform target)
     {
+        if (PvpRealBattleController.Instance.IsRunning)
+        {
+            return;
+        }
         CameraTarget newCameraTarget = new CameraTarget
         {
             TrackingTarget = target,
@@ -90,18 +113,21 @@ public class GameCameraController : Singleton<GameCameraController>
         };
 
         followHeroCamera.Target = newCameraTarget;
+        FollowLastHeroTarget();
     }
 
     public void FollowLastHeroTarget()
     {
         followHeroCamera.Priority = activePriority;
         followBossCamera.Priority = inactivePriority;
+        followPvPHeroesCamera.Priority = inactivePriority;
     }
 
     public void FollowBoss()
     {
         followBossCamera.Priority = activePriority;
         followHeroCamera.Priority = inactivePriority;
+        followPvPHeroesCamera.Priority = inactivePriority;
     }
 
     [Button]
@@ -174,6 +200,23 @@ public class GameCameraController : Singleton<GameCameraController>
             .SetEase(Ease.OutQuad)
             .AsyncWaitForCompletion()
             .AsUniTask();
+    }
+
+    public void ResetCamera()
+    {
+        followHeroCamera.Priority = activePriority;
+        followBossCamera.Priority = inactivePriority;
+        followPvPHeroesCamera.Priority = inactivePriority;
+        followHeroCamera.Target = nullPointTarget;
+    }
+
+    public void SetFollowPvpHero(List<CinemachineTargetGroup.Target> allTargets)
+    {
+        followHeroCamera.Priority = inactivePriority;
+        followBossCamera.Priority = inactivePriority;
+        followPvPHeroesCamera.Priority = activePriority;
+        cineMachineTargetGroup.Targets.Clear();
+        cineMachineTargetGroup.Targets.AddRange(allTargets);
     }
 
     [Button]
