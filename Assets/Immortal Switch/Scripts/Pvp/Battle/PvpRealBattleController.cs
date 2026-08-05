@@ -8,11 +8,13 @@ using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Pvp;
+using Immortal_Switch.Scripts.Pvp.DevTools;
 using Immortal_Switch.Scripts.Pvp.Interfaces;
 using Immortal_Switch.Scripts.Pvp.Models;
 using Immortal_Switch.Scripts.Pvp.Snapshot;
 using Immortal_Switch.Scripts.Pvp.Views;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.StatSystem;
 using Immortal_Switch.Scripts.UI;
 using NUnit.Framework;
@@ -300,8 +302,13 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             // bridges non-fatal for enemy ids, then overwritten here).
             if (teamCtrl == null)
             {
-                // Defender (AI, fake data) - override base stats from snapshot FinalStats.
-                ApplySnapshotStats(hero, heroSnap.FinalStats);
+                // Defender (AI, fake data) - base = progression node; weapon = modifier riêng có sourceId
+                // (để StatsController liệt kê nguồn như attacker). Bỏ qua growth/transmutation/powerup.
+                ApplySnapshotBaseAndWeapon(hero, heroSnap);
+
+                // Áp skill loadout từ config + prewarm runtime assets (skill object/đạn) cho defender
+                // VÀO TRƯỚC khi trận bắt đầu (Init đã prewarm skill của player, không phải skill config).
+                await ApplySnapshotSkills(hero, heroSnap.Skills);
                 hero.BindDeathEvent();
             }
             // Attacker (player) - KEEP Init stats (PowerUp + progression + equipment + growth +
@@ -314,62 +321,95 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             team.AddHero(hero);
         }
 
-        private static void ApplySnapshotStats(HeroActor hero, RuntimeStatSnapshot stats)
+        /// <summary>
+        /// Áp stat cho defender: base = progression node + HeroDataSO (không weapon), weapon = StatModifier
+        /// riêng có sourceId (WeaponRuntimeIds) — để StatsController liệt kê nguồn giống attacker. Bỏ qua
+        /// growth/transmutation/powerup (config test chỉ có tier/star/skill/equipment).
+        /// </summary>
+        private static void ApplySnapshotBaseAndWeapon(HeroActor hero, HeroBattleSnapshot heroSnap)
         {
-            if (hero == null || hero.Stats == null) return;
+            if (hero?.Stats == null || heroSnap == null) return;
 
-            if (stats == null)
+            var heroData = DatabaseManager.Instance?.GetHeroDataById(heroSnap.HeroId);
+            if (heroData == null)
             {
                 hero.HealthBarController?.ResetHealth();
                 return;
             }
 
+            // Base stats (progression node + HeroDataSO), không weapon.
+            var baseStats = DefenderTestStatsBuilder.BuildBaseStats(
+                new DefenderSlotConfig { HeroId = heroSnap.HeroId, Tier = heroSnap.Tier, Star = heroSnap.Star },
+                heroData);
+
             var bs = new BaseStat
             {
-                Health = stats.Get(StatType.MaxHp),
-                Attack = stats.Get(StatType.Atk),
-                Defense = stats.Get(StatType.Def),
-                AttackRange = stats.Get(StatType.AttackRange),
-                AttackSpeed = stats.Get(StatType.AttackSpeed),
-                CritChance = stats.Get(StatType.CritChance),
-                CritDamage = stats.Get(StatType.CritDamage),
-                Accuracy = stats.Get(StatType.Accuracy),
-                MoveSpeed = stats.Get(StatType.MoveSpeed)
+                Health = baseStats.Get(StatType.MaxHp),
+                Attack = baseStats.Get(StatType.Atk),
+                Defense = baseStats.Get(StatType.Def),
+                AttackRange = baseStats.Get(StatType.AttackRange),
+                AttackSpeed = baseStats.Get(StatType.AttackSpeed),
+                CritChance = baseStats.Get(StatType.CritChance),
+                CritDamage = baseStats.Get(StatType.CritDamage),
+                Accuracy = baseStats.Get(StatType.Accuracy),
+                MoveSpeed = 0f
             };
             hero.Stats.Initialize(bs);   // recreate modules; HP = MaxHp.
 
-            // Extra stats not in BaseStat (Penetration, LifeSteal, ShieldPower, CooldownReduction, ...).
+            // Weapon modifiers riêng (có sourceId) → hiện breakdown nguồn như attacker.
             var sm = hero.Stats.StatModule;
-            if (stats.Values != null)
+            if (heroSnap.Equipment != null)
             {
-                foreach (var kv in stats.Values)
-                {
-                    switch (kv.Key)
-                    {
-                        case StatType.MaxHp:
-                        case StatType.Atk:
-                        case StatType.Def:
-                        case StatType.AttackRange:
-                        case StatType.AttackSpeed:
-                        case StatType.CritChance:
-                        case StatType.CritDamage:
-                        case StatType.Accuracy:
-                        case StatType.MoveSpeed:
-                            continue;
-                        default:
-                            sm.SetBaseStat(kv.Key, kv.Value);
-                            break;
-                    }
-                }
+                var mods = DefenderTestStatsBuilder.BuildWeaponModifiers(heroSnap.HeroId, heroSnap.Equipment);
+                for (int i = 0; i < mods.Count; i++)
+                    sm.AddModifier(mods[i]);
             }
 
             // Ensure MoveSpeed > 0 để hero di chuyển được (MoveTowards fallback khi teamController null).
-            // Hero prefab thường KHÔNG set MoveSpeed base stat (PvE dùng HeroTeamController.TeamMoveSpeed)
-            // → snapshot MoveSpeed = 0 → hero đứng im, không tới tầm → không đánh.
             if (sm.GetFinalStat(StatType.MoveSpeed) < 5f)
                 sm.SetBaseStat(StatType.MoveSpeed, 5f);
 
             hero.HealthBarController?.ResetHealth();
+
+            // [DEBUG] stat thực tế sau apply (so với FinalStats config).
+            Debug.Log($"[PvP][DefenderTest] applied hero={hero.GetHeroId()} " +
+                $"Atk={sm.GetFinalStat(StatType.Atk):0} " +
+                $"MaxHp={sm.GetFinalStat(StatType.MaxHp):0} " +
+                $"Def={sm.GetFinalStat(StatType.Def):0}");
+        }
+
+        /// <summary>
+        /// Áp loadout skill cho defender từ snapshot (giả lập một user khác). Resolve SkillId → SkillDataSO,
+        /// chỉ lấy class skill (ultimate/passive hero-bound không đổi), rồi set + inject level provider
+        /// trả level đã config (clamp MaxLevel). Sau khi set, prewarm runtime assets (skill object/đạn các
+        /// class skill) để chúng được pool trước khi trận bắt đầu. Nếu snapshot không mang skill thì giữ
+        /// nguyên mặc định (không prewarm lại).
+        /// </summary>
+        private static async UniTask ApplySnapshotSkills(HeroActor hero, SkillProgressionSnapshot skills)
+        {
+            if (hero?.HeroSkillController == null || skills?.Equipped == null) return;
+            if (DatabaseManager.Instance == null) return;
+
+            var resolved = new List<SkillDataSO>();
+            var seen = new HashSet<int>();
+            for (int i = 0; i < skills.Equipped.Count && resolved.Count < HeroSkillController.ClassSkillSlotCount; i++)
+            {
+                var slot = skills.Equipped[i];
+                if (slot == null || slot.SkillId <= 0) continue;
+                if (!seen.Add(slot.SkillId)) continue;
+
+                var data = DatabaseManager.Instance.GetSkillDataById(slot.SkillId);
+                if (data == null || data.OwnerType != SkillOwnerType.ClassSkill) continue;
+                resolved.Add(data);
+            }
+
+            if (resolved.Count == 0) return;
+            hero.HeroSkillController.SetClassSkills(resolved);
+            hero.HeroSkillController.SetSkillLevelProvider(new DefenderSkillLevelProvider(skills));
+
+            // Prewarm skill object + đạn của các class skill vừa config (idempotent) để không bị
+            // spawn-on-demand khi bước vào trận.
+            await hero.HeroSkillController.InitializeUltimateSkillDataAndClassSkillData();
         }
 
         // ── Hostile registration + death ─────────────────────────────────────────────
@@ -445,6 +485,9 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
                 var h = team.Actors[i];
                 if (h == null) continue;
                 try { h.OnDead -= OnHeroDead; } catch { }
+                // Despawn skill object + đạn (ultimate + class skills) của hero — giống PvE
+                // (BattleHeroSessionController.DespawnAllHeroes). Tránh pool skill rơi rớt sau trận.
+                try { h.HeroSkillController?.DespawnAllInstanceOfUltimateSkillAndClassSkill(); } catch { }
                 try { AddressableSpawnService.ReleaseInstance(h); } catch { }
             }
         }

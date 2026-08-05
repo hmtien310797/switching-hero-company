@@ -31,5 +31,8 @@ namespace Immortal_Switch.Scripts.Pvp
         public IFormationBuffGachaService Gacha { get; internal set; }
         public IFormationBuffProgressionService Progression { get; internal set; }
         public IPvPHistoryService History { get; internal set; }
+
+        // ── Leaderboard (rankings PvP Main) ──
+        public IPvPLeaderboardService Leaderboard { get; internal set; }
     }
 }

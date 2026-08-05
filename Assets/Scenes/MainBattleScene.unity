@@ -1059,8 +1059,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DontDestroyOnLoadEnabled: 0
   enableLog: 1
-  attackerSpawnCenter: {x: 5, y: 0, z: 12}
-  defenderSpawnCenter: {x: -5, y: 0, z: 12}
+  attackerSpawnCenter: {x: 5, y: 0, z: -0.5}
+  defenderSpawnCenter: {x: -5, y: 0, z: -0.5}
   heroSpacing: 1.5
   endBattleDelay: 3
 --- !u!1 &1026343336
@@ -1478,6 +1478,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: f474fe4478caae442ad90b9f82dc2cef, type: 2}
   defaultPoolParent: {fileID: 1322294840}
+  hidePosition: {x: 0, y: -10000, z: 0}
 --- !u!4 &1322294840
 Transform:
   m_ObjectHideFlags: 0

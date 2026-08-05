@@ -57,6 +57,9 @@ namespace Immortal_Switch.Scripts.Pvp
             var progression = new LocalFormationBuffProgressionService(_repository, catalog, profile);
             var history = new LocalPvpHistoryService(_repository);
 
+            // Leaderboard (mock 50 record — server chưa làm; thay sau qua IPvPLeaderboardService).
+            var leaderboard = new LocalPvPLeaderboardService(profile);
+
             _facade = new PvPFacade(_repository)
             {
                 BuffCatalog = catalog,
@@ -67,7 +70,8 @@ namespace Immortal_Switch.Scripts.Pvp
                 BattleResult = battleResult,
                 Gacha = gacha,
                 Progression = progression,
-                History = history
+                History = history,
+                Leaderboard = leaderboard
             };
 
             if (enableLog)

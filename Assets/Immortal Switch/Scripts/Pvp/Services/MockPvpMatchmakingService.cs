@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Pvp.Interfaces;
 using Immortal_Switch.Scripts.Pvp.Mock;
 using Immortal_Switch.Scripts.Pvp.Models;
+using Immortal_Switch.Scripts.Pvp.DevTools;
 using Immortal_Switch.Scripts.Pvp.Repositories;
 using Immortal_Switch.Scripts.Pvp.Snapshot;
 using Newtonsoft.Json;
@@ -59,7 +60,12 @@ namespace Immortal_Switch.Scripts.Pvp.Services
             var playerTeam = BuildPlayerTeamSnapshot(formation);
 
             // 5. Build opponent team snapshot từ mock profile (deserialize ProgressionJson).
-            var opponentTeam = BuildOpponentTeamSnapshot(opponentSave);
+            //    Nếu Defender Hero Test config đang enabled thì dùng config để build defender (giả lập
+            //    một user khác có tier/star/skill/equipment cụ thể) thay vì mock opponent random.
+            var defenderConfig = DefenderHeroTestConfigSO.LoadOrCreate();
+            TeamBattleSnapshot opponentTeam = defenderConfig != null && defenderConfig.Enabled
+                ? BuildOpponentFromConfig(defenderConfig)
+                : BuildOpponentTeamSnapshot(opponentSave);
 
             // 6. Create BattleId + RandomSeed + immutable snapshot (DOCX §10).
             var battleId = PvpBattleIdFactory.Create();
@@ -166,6 +172,16 @@ namespace Immortal_Switch.Scripts.Pvp.Services
                 FormationBuffs = mock.FormationBuffs ?? new List<FormationBuffSnapshot>()
             };
             return HeroBattleSnapshotBuilder.Build(ctx);
+        }
+
+        /// <summary>Build defender team từ Defender Hero Test config (giả lập tier/star/skill/equipment).</summary>
+        private static TeamBattleSnapshot BuildOpponentFromConfig(DefenderHeroTestConfigSO config)
+        {
+            var front = DefenderTestStatsBuilder.BuildHeroSnapshot(config.Front, FormationSlot.Front);
+            var back = DefenderTestStatsBuilder.BuildHeroSnapshot(config.Back, FormationSlot.Back);
+
+            long power = PvpTeamPowerEstimator.EstimateTeam(front?.FinalStats, back?.FinalStats);
+            return new TeamBattleSnapshot { FrontHero = front, BackHero = back, TeamPower = power };
         }
     }
 }

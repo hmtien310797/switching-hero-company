@@ -16,6 +16,10 @@ namespace Immortal_Switch.Scripts.Pooling
         [SerializeField] private AddressablePoolConfigSO config;
         [SerializeField] private Transform defaultPoolParent;
 
+        /// <summary>Vị trí đặt container pool (cha của mọi instance inactive). Đặt xa gốc toạ độ để
+        /// các instance được warmup trong ~1 frame (trước khi SetActive(false)) không flash tại 0:0.</summary>
+        [SerializeField] private Vector3 hidePosition = new Vector3(0f, -10000f, 0f);
+
         private readonly Dictionary<string, AddressablePool> pools = new();
         private readonly Dictionary<string, Transform> parents = new();
         private readonly Dictionary<string, int> activeCounts = new();
@@ -97,6 +101,11 @@ namespace Immortal_Switch.Scripts.Pooling
             try
             {
                 pool = new AddressablePool(key);
+
+                // Dời container pool ra xa gốc toạ độ: Warmup trong Addler instantiate instance ACTIVE
+                // ở local (0,0,0) → world = vị trí parent trong ~1 frame trước khi SetActive(false).
+                // Nếu parent nằm tại 0:0 thì các skill object sẽ nhấp nháy ở gốc khi vừa vào game.
+                pool.Parent.transform.position = hidePosition;
 
                 pools.Add(key, pool);
                 parents.Add(

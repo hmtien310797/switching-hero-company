@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Pvp;
 using Immortal_Switch.Scripts.Pvp.Models;
+using Immortal_Switch.Scripts.Pvp.Views.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -12,12 +13,20 @@ using UnityEngine.UI;
 namespace Immortal_Switch.Scripts.Pvp.Views
 {
     /// <summary>
-    /// Screen 01 — PvP Main (Markdown §01, wireframe 01). Hiển thị season/rank/ticket/token,
-    /// formation summary + các nút điều hướng. LOCAL/MOCK dev badge (DOCX §37).
+    /// Screen 01 — PvP Main (Markdown §01, wireframe 01). Hiển thị season/rank/ticket/token, formation
+    /// summary + các nút điều hướng + LEADERBOARD (top1/2/3 podium + 50-rank RecyclableScrollRect +
+    /// my rank + weekly-reset countdown). LOCAL/MOCK dev badge (DOCX §37).
     ///
     /// PREFAB (Addressable address = "PvpMainView", UILayer.Main, PageExclusive):
-    ///   TMP_Text: txtDevBadge, txtSeason, txtRank, txtTickets, txtTokens, txtFrontHero, txtBackHero
-    ///   Button:   btnFindMatch, btnFormation, btnBuffs, btnRankSeason, btnHistory, btnClose
+    ///   TMP_Text: txtDevBadge, txtSeason, txtRank, txtTickets, txtTokens, txtFrontHero, txtBackHero,
+    ///             txtWeeklyReset
+    ///   PvpLeaderboardTop: top1, top2, top3
+    ///   PvpLeaderboardRecyclableView: rankRecyclableView (chứa RSR + item prefab PvpLeaderboardRankItem)
+    ///   PvpLeaderboardRankItem: myRank (row cố định)
+    ///   Button: btnFindMatch, btnFormation, btnBuffs, btnRankSeason, btnHistory, btnClose
+    ///
+    /// DATA: leaderboard từ <see cref="IPvPLeaderboardService"/> (Phase-1 = LocalPvPLeaderboardService
+    /// mock 50 record — server chưa làm). TODO server: thay impl service.
     /// </summary>
     public class PvpMainView : UIView
     {
@@ -36,6 +45,18 @@ namespace Immortal_Switch.Scripts.Pvp.Views
         [SerializeField] private Button btnHistory;
         [SerializeField] private Button btnClose;
 
+        // ── Leaderboard ───────────────────────────────────────────────────────────
+        [Header("Leaderboard")]
+        [SerializeField] private TMP_Text txtWeeklyReset;
+        [SerializeField] private PvpLeaderboardTop top1;
+        [SerializeField] private PvpLeaderboardTop top2;
+        [SerializeField] private PvpLeaderboardTop top3;
+        [SerializeField] private PvpLeaderboardRecyclableView rankRecyclableView;
+        [SerializeField] private PvpLeaderboardRankItem myRank;
+
+        private PvpLeaderboardResponseModel _leaderboard;
+        private long _weeklyResetAtUtc;
+
         private void Awake()
         {
             if (btnFindMatch != null) btnFindMatch.onClick.AddListener(() => OnFindMatchAsync().Forget());
@@ -50,6 +71,14 @@ namespace Immortal_Switch.Scripts.Pvp.Views
         {
             if (txtDevBadge != null) txtDevBadge.text = "LOCAL MOCK";
             Refresh();
+            LoadLeaderboardAsync().Forget();
+        }
+
+        private void Update()
+        {
+            if (!gameObject.activeInHierarchy || txtWeeklyReset == null || _weeklyResetAtUtc <= 0) return;
+            long remain = _weeklyResetAtUtc - DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            txtWeeklyReset.text = "Weekly reset: " + FormatCountdown(remain);
         }
 
         private void Refresh()
@@ -72,6 +101,56 @@ namespace Immortal_Switch.Scripts.Pvp.Views
                 if (txtFrontHero != null) txtFrontHero.text = "FRONT\n" + PvpHeroNameResolver.Get(formation.FrontHeroId);
                 if (txtBackHero != null) txtBackHero.text = "BACK\n" + PvpHeroNameResolver.Get(formation.BackHeroId);
             }
+        }
+
+        private async UniTaskVoid LoadLeaderboardAsync()
+        {
+            var facade = PvpManager.Instance?.Facade;
+            if (facade?.Leaderboard == null) return;
+
+            try
+            {
+                _leaderboard = await facade.Leaderboard.GetLeaderboardAsync(CancellationToken.None);
+                RenderLeaderboard(_leaderboard);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[PvP] LoadLeaderboard failed: {e.Message}");
+                Toast("Không thể tải bảng xếp hạng.");
+            }
+        }
+
+        private void RenderLeaderboard(PvpLeaderboardResponseModel data)
+        {
+            if (data == null) return;
+
+            _weeklyResetAtUtc = data.WeeklyResetAtUtc;
+            if (txtWeeklyReset != null)
+                txtWeeklyReset.text = "Weekly reset: " + FormatCountdown(data.WeeklyResetAtUtc - data.ServerTimeUtc);
+
+            if (top1 != null) { top1.gameObject.SetActive(data.Top1 != null); if (data.Top1 != null) top1.Bind(data.Top1); }
+            if (top2 != null) { top2.gameObject.SetActive(data.Top2 != null); if (data.Top2 != null) top2.Bind(data.Top2); }
+            if (top3 != null) { top3.gameObject.SetActive(data.Top3 != null); if (data.Top3 != null) top3.Bind(data.Top3); }
+
+            if (rankRecyclableView != null && data.Rankings != null)
+                rankRecyclableView.Bind(data.Rankings.Count, i => data.Rankings[i]);
+
+            if (myRank != null)
+            {
+                bool hasMyRank = data.MyRank != null && data.MyRank.IsRanked;
+                myRank.gameObject.SetActive(hasMyRank);
+                if (hasMyRank) myRank.Bind(data.MyRank);
+            }
+        }
+
+        private static string FormatCountdown(long seconds)
+        {
+            if (seconds < 0) seconds = 0;
+            long d = seconds / 86400;
+            long h = (seconds % 86400) / 3600;
+            long m = (seconds % 3600) / 60;
+            long s = seconds % 60;
+            return $"{d}d {h:D2}:{m:D2}:{s:D2}";
         }
 
         private async UniTaskVoid OnFindMatchAsync()

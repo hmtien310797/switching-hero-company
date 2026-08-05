@@ -416,6 +416,12 @@ namespace Immortal_Switch.Scripts.Skill
             SkillsChanged?.Invoke(this);
         }
 
+        public void SetSkillLevelProvider(ISkillLevelProvider provider)
+        {
+            if (provider != null)
+                this.levelProvider = provider;
+        }
+
         public void SetClassSkills(List<SkillDataSO> classSkills)
         {
             this.classSkills = classSkills ?? new List<SkillDataSO>();

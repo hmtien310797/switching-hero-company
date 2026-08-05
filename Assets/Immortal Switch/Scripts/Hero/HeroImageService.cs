@@ -462,6 +462,39 @@ namespace Immortal_Switch.Scripts.Addressable
             return sprite;
         }
         
+        public static Sprite GetHeroTierBackground(string rarity)
+        {
+            string rarityKey = $"background_{rarity.ToLower()}";
+            
+            if (SpriteCache.TryGetValue(rarityKey, out Sprite cachedSprite))
+                return cachedSprite;
+
+            if (heroAtlas == null)
+            {
+                Debug.LogError(
+                    "[HeroImageService] Hero atlas has not been initialized. " +
+                    "Call InitializeAsync() or GetHeroIconAsync() first."
+                );
+
+                return null;
+            }
+
+            Sprite sprite = heroAtlas.GetSprite(rarityKey);
+
+            if (sprite == null)
+            {
+                Debug.LogError(
+                    $"[HeroImageService] Hero sprite was not found. " +
+                    $"Atlas={HeroAtlasKey}, SpriteName={rarityKey}"
+                );
+
+                return null;
+            }
+
+            SpriteCache.Add(rarityKey, sprite);
+            return sprite;
+        }
+        
         public static void Release()
         {
             if (heroAtlas == null)
