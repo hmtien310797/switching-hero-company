@@ -28,7 +28,11 @@ namespace Immortal_Switch.Scripts.Pvp.Models
         //    data; keep their config separate for later server replacement") ──
         public const int VictoryRankGain = 25;
         public const int DefeatRankLoss = 18;
-        public const long VictoryArenaToken = 120;
-        public const long DefeatArenaToken = 20;
+        public const long VictoryArenaToken = 120;   // thắng → +A token
+        public const long DefeatArenaToken = 20;     // thua/surrender → +B token
+        public const long DrawArenaToken = 50;       // hoà (hết giờ, sống bằng nhau) → +C token (TODO server)
+
+        // ── Match entry (Phase-1 local) ──
+        public const int MatchTicketCost = 1;        // phí vào trận (x pvp_arena_ticket) (TODO server)
     }
 }

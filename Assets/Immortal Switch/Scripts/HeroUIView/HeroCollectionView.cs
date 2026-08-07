@@ -79,16 +79,14 @@ namespace Immortal_Switch.Scripts.HeroUIView
             RefreshAll();
         }
         
-        private UniTask OnClickTutorial(string arg1, int arg2)
+        private async UniTask OnClickTutorial(string arg1, int arg2)
         {
             switch (arg2)
             {
                 case 24:
-                    OnClickHeroItem(spawnedItems[0]);
+                    await OnClickHeroItemAsync(spawnedItems[0]);
                     break;
             }
-
-            return UniTask.CompletedTask;
         }
 
         private RectTransform OnResolveTarget(string arg1, int arg2)
@@ -123,8 +121,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         public override async UniTask PlayShowAsync(object args)
         {
             await RefreshFromServerAsync();
-
-            base.PlayShowAsync(args).Forget();
+            await base.PlayShowAsync(args);
         }
 
         /// <summary>
@@ -402,6 +399,11 @@ namespace Immortal_Switch.Scripts.HeroUIView
         
         private void OnClickHeroItem(HeroCollectionItemUI item)
         {
+            OnClickHeroItemAsync(item).Forget();
+        }
+
+        private async UniTask OnClickHeroItemAsync(HeroCollectionItemUI item)
+        {
             if (item == null || item.Data == null)
                 return;
 
@@ -415,7 +417,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             currentSelectedItem.SetSelected(true);
             currentSelectedItem.SetReadyHighlight(false);
 
-            OpenHeroInfo(item.Data.HeroId).Forget();
+            await OpenHeroInfo(item.Data.HeroId);
         }
 
         private async UniTask OpenHeroInfo(int heroId)

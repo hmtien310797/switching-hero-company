@@ -20,6 +20,7 @@ namespace Immortal_Switch.Scripts.Pvp.Views
         [Header("Item Size")]
         [SerializeField] private bool isItemSizeKnown = true;
         [SerializeField] private float itemSize = 130f;
+        [SerializeField] private PvpRankInfoSo pvpRankInfo;
 
         private Func<int, PvpLeaderboardEntryModel> _onResolveItem;
 
@@ -27,6 +28,19 @@ namespace Immortal_Switch.Scripts.Pvp.Views
         {
             ItemsCount = itemCount;
             _onResolveItem = onResolveItem;
+
+            // Defensive: nếu prefab chưa wire đủ (rsr hoặc rankPrefab null) thì bỏ qua, không throw
+            // (tránh sập luôn top3/countdown/myRank). Log rõ để biết thiếu gì.
+            if (rsr == null)
+            {
+                Debug.LogWarning("[PvP] PvpLeaderboardRecyclableView: rsr chưa assign — bỏ qua list rankings.");
+                return;
+            }
+            if (rankPrefab == null)
+            {
+                Debug.LogWarning("[PvP] PvpLeaderboardRecyclableView: rankPrefab chưa assign — bỏ qua list rankings.");
+                return;
+            }
 
             if (!rsr.IsInitialized)
                 rsr.Initialize(this);
@@ -50,7 +64,7 @@ namespace Immortal_Switch.Scripts.Pvp.Views
             if (item is not PvpLeaderboardRankItem ui) return;
             var data = _onResolveItem?.Invoke(itemIndex);
             if (data != null)
-                ui.Bind(data);
+                ui.Bind(data, pvpRankInfo);
         }
 
         public void ItemCreated(int itemIndex, IItem item, GameObject itemGo) { }

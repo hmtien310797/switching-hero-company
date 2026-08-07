@@ -25,7 +25,9 @@ namespace Immortal_Switch.Scripts.Event.EventDice.UI
         [SerializeField]
         private TextMeshProUGUI txtTarget;
 
+        // --- Private Fields ---
         private Action<int> _onClaimMilestone;
+
         private int _milestoneId;
 
         private void Awake()

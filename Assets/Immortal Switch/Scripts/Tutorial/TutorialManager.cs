@@ -53,7 +53,10 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         protected override void OnSingletonAwake()
         {
-            UserDataCache.Instance.OnExpChanged += RefreshUnlock;
+            if (UserDataCache.Instance != null)
+            {
+                UserDataCache.Instance.OnExpChanged += RefreshUnlock;
+            }
 
             Storage = new TutorialStorage();
             Service = new TutorialService(Storage);
@@ -65,7 +68,11 @@ namespace Immortal_Switch.Scripts.Tutorial
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            UserDataCache.Instance.OnExpChanged -= RefreshUnlock;
+
+            if (UserDataCache.Instance != null)
+            {
+                UserDataCache.Instance.OnExpChanged -= RefreshUnlock;
+            }
         }
 
         private void RefreshUnlock()
@@ -75,13 +82,16 @@ namespace Immortal_Switch.Scripts.Tutorial
 
             foreach (var row in featureUnlocks)
             {
-                if (row.tutorialStepId > 0)
+                if (row.tutorialStepId > 0 &&
+                    !IsComplete(row.tutorialStepId) &&
+                    !pendingGuideIds.Contains(row.tutorialStepId))
                 {
                     pendingGuideIds.Add(row.tutorialStepId);
                 }
             }
 
             pendingGuideIds.Sort((a, b) => a - b);
+            _pendingTutorialGuideIds.Clear();
 
             for (int i = 1; i < pendingGuideIds.Count; i++)
             {
@@ -101,6 +111,7 @@ namespace Immortal_Switch.Scripts.Tutorial
                 _pendingTutorialGuideIds.Remove(_currentPendingGuideId);
             }
 
+            Debug.Log($"ClearTutorial: {_guideId}");
             _rows.Clear();
 
             _currentStep = 0;
@@ -203,6 +214,7 @@ namespace Immortal_Switch.Scripts.Tutorial
             ClearTutorial();
 
             _guideId = guideId;
+            Debug.Log($"StartTutorial: {guideId}");
             var tutorials = DatabaseManager.Instance.TutorialDb.GetTutorials(guideId);
 
             _rows.AddRange(tutorials);
@@ -215,6 +227,7 @@ namespace Immortal_Switch.Scripts.Tutorial
                 _rows.Count < _currentStep)
             {
                 ClearTutorial();
+                CheckPendingGuideId();
                 return;
             }
 
@@ -262,7 +275,8 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         public async UniTask FireOnClick()
         {
-            if (_rows.Count < _currentStep)
+            if (_rows.Count < 1 ||
+                _rows.Count < _currentStep)
             {
                 Debug.LogError($"[Tutorial] current step: {_currentStep} must smaller rows: {_rows.Count}");
                 return;
@@ -273,7 +287,7 @@ namespace Immortal_Switch.Scripts.Tutorial
 
             if (OnClick != null)
             {
-                await OnClick.Invoke(step.tutorialId, step.stepId);
+                await InvokeClickHandlersAsync(step.tutorialId, step.stepId);
             }
 
             if (step.nextStepId == 0)
@@ -302,11 +316,46 @@ namespace Immortal_Switch.Scripts.Tutorial
             }
         }
 
+        /// <summary>
+        /// Gọi và chờ toàn bộ subscriber xử lý click hoàn tất.
+        /// Multicast delegate chỉ trả task của subscriber cuối nếu gọi Invoke trực tiếp,
+        /// khiến tutorial đổi step trong khi animation của subscriber trước vẫn đang chạy.
+        /// </summary>
+        private async UniTask InvokeClickHandlersAsync(string tutorialId, int stepId)
+        {
+            var handlers = OnClick?.GetInvocationList();
+
+            if (handlers == null ||
+                handlers.Length == 0)
+            {
+                return;
+            }
+
+            var tasks = new List<UniTask>(handlers.Length);
+
+            foreach (var handler in handlers)
+            {
+                if (handler is Func<string, int, UniTask> clickHandler)
+                {
+                    tasks.Add(clickHandler.Invoke(tutorialId, stepId));
+                }
+            }
+
+            if (tasks.Count > 0)
+            {
+                await UniTask.WhenAll(tasks);
+            }
+        }
+
         private void CompleteCurrentGuide()
         {
             Service.Complete(_guideId);
             ClearTutorial();
+            CheckPendingGuideId();
+        }
 
+        private void CheckPendingGuideId()
+        {
             if (_pendingTutorialGuideIds.Count > 0)
             {
                 _currentPendingGuideId = _pendingTutorialGuideIds[0];

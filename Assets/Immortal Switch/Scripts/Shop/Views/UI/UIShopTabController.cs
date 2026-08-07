@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shop.Layouts;
 using Immortal_Switch.Scripts.UI;
@@ -115,6 +116,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         private void ShowHighlight(UIShopTabItem parent)
         {
+            _rtShopTabHighlight.DOKill();
             shopTabHighlight.BindTitle(parent.Title);
             _rtShopTabHighlight.SetParent(parent.transform);
             _rtShopTabHighlight.SetAsLastSibling();
@@ -122,8 +124,8 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             // set position
             var newAnchoredPos = _orgShopTabHighlightAnchoredPos;
             newAnchoredPos.y = 0;
-            _rtShopTabHighlight.anchoredPosition = newAnchoredPos;
-
+            _rtShopTabHighlight.anchoredPosition = new Vector2(-100f, newAnchoredPos.y);
+            _rtShopTabHighlight.DOAnchorPosX(-80f, 0.35f);
             shopTabHighlight.gameObject.SetActive(true);
         }
 

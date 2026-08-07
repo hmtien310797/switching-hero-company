@@ -25,12 +25,18 @@ namespace Immortal_Switch.Scripts.Shared.UI
 
         private void Awake()
         {
-            UserDataCache.Instance.OnExpChanged += RefreshView;
+            if (UserDataCache.Instance != null)
+            {
+                UserDataCache.Instance.OnExpChanged += RefreshView;
+            }
         }
 
         private void OnDestroy()
         {
-            UserDataCache.Instance.OnExpChanged -= RefreshView;
+            if (UserDataCache.Instance != null)
+            {
+                UserDataCache.Instance.OnExpChanged -= RefreshView;
+            }
         }
 
         private void OnEnable()

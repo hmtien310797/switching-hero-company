@@ -5,6 +5,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Android 13+ (API 33) requires this declared AND requested at runtime (Permission.
+         RequestUserPermission) — Firebase Messaging does not request it automatically. Without
+         this line the runtime request silently fails even if the app calls it. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application android:usesCleartextTraffic="true">
         <activity

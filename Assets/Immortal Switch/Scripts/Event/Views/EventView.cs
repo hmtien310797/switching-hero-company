@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Event.EventBingo;
 using Immortal_Switch.Scripts.Event.EventDice;
 using Immortal_Switch.Scripts.Event.EventFishing;
 using Immortal_Switch.Scripts.Event.EventLogin;
@@ -79,6 +80,10 @@ namespace Immortal_Switch.Scripts.Event.Views
 
                 case EventIdConstants.EVENT_FISHING:
                     UIManager.Instance.OpenPopupAsync<EventFishingView>().Forget();
+                    break;
+
+                case EventIdConstants.EVENT_BINGO:
+                    UIManager.Instance.OpenPopupAsync<EventBingoView>().Forget();
                     break;
             }
         }

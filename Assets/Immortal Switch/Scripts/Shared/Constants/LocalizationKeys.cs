@@ -249,6 +249,7 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         public const string UI_WEEKLY_SUMMON100_DECS = "ui_WEEKLY_SUMMON100_decs";
         public const string UI_WEEKLY_SUMMON100_TITLE = "ui_WEEKLY_SUMMON100_title";
         public const string UI_ACCOUNT = "ui_account";
+        public const string UI_AFK_TITLE = "ui_afk_title";
         public const string UI_ANOTHER = "ui_another";
         public const string UI_ANOTHER_INFO = "ui_another_info";
         public const string UI_AUTO = "ui_auto";
@@ -269,6 +270,8 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         public const string UI_CHARACTER_NAME = "ui_character_name";
         public const string UI_CLAIM = "ui_claim";
         public const string UI_CLAIM_ALL = "ui_claim_all";
+        public const string UI_CLAIM_REWARDS = "ui_claim_rewards";
+        public const string UI_CLAIM_X2 = "ui_claim_x2";
         public const string UI_CONFIRM = "ui_confirm";
         public const string UI_CONTENT_CONTAINS_PROHIBITED_WORDS = "ui_content_contains_prohibited_words";
         public const string UI_DECS_DUNGEON = "ui_decs_dungeon";
@@ -599,6 +602,7 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         public const string UI_SUMMON_SKILL = "ui_summon_skill";
         public const string UI_SUPPORT = "ui_support";
         public const string UI_TERM = "ui_term";
+        public const string UI_TIME_BATTLE = "ui_time_battle";
         public const string UI_TO_DO = "ui_to_do";
         public const string UI_TOTAL = "ui_total";
         public const string UI_ULTIMATE_AMELIA_NAME = "ui_ultimate_Amelia_name";

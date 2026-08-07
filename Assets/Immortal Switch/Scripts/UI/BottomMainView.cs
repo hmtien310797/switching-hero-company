@@ -54,13 +54,13 @@ namespace Immortal_Switch.Scripts.UI
         private void Awake()
         {
             if (ButtonGrowth != null)
-                ButtonGrowth.AddListener(OnClickBtnGrowth);
+                ButtonGrowth.AddListener(() => OnClickBtnGrowth().Forget());
 
             if (ButtonEquip != null)
-                ButtonEquip.AddListener(OnClickBtnEquip);
+                ButtonEquip.AddListener(() => OnClickBtnEquip().Forget());
 
-            ButtonShop.AddListener(OnClickBtnShop);
-            ButtonHero.AddListener(OnClickBtnHero);
+            ButtonShop.AddListener(() => OnClickBtnShop().Forget());
+            ButtonHero.AddListener(() => OnClickBtnHero().Forget());
             ButtonMission.AddListener(() => OnToggleMain<MissionSystemView>(ButtonMission).Forget());
             ButtonGem.onClick.AddListener(() => OnToggleMain<TransmutationSystemView>(null, false).Forget());
             ButtonDungeon.AddListener(() => OnToggleMain<DungeonMainView>(ButtonDungeon).Forget());
@@ -69,24 +69,24 @@ namespace Immortal_Switch.Scripts.UI
                 ButtonClose.onClick.AddListener(OnClickClose);
         }
 
-        private void OnClickBtnEquip()
+        private async UniTask OnClickBtnEquip()
         {
-            OnToggleMain<EquipView>(ButtonEquip).Forget();
+            await OnToggleMain<EquipView>(ButtonEquip);
         }
 
-        private void OnClickBtnShop()
+        private async UniTask OnClickBtnShop()
         {
-            OnToggleMain<SummonHubView>(ButtonShop).Forget();
+            await OnToggleMain<SummonHubView>(ButtonShop);
         }
 
-        private void OnClickBtnHero()
+        private async UniTask OnClickBtnHero()
         {
-            OnToggleMain<HeroCollectionView>(ButtonHero).Forget();
+            await OnToggleMain<HeroCollectionView>(ButtonHero);
         }
 
-        private void OnClickBtnGrowth()
+        private async UniTask OnClickBtnGrowth()
         {
-            OnToggleMain<GrowthView>(ButtonGrowth).Forget();
+            await OnToggleMain<GrowthView>(ButtonGrowth);
         }
 
         private void Start()
@@ -172,11 +172,11 @@ namespace Immortal_Switch.Scripts.UI
             {
                 case 16:
                 case 36:
-                    OnClickBtnShop();
+                    await OnClickBtnShop();
                     break;
 
                 case 22:
-                    OnClickBtnHero();
+                    await OnClickBtnHero();
                     break;
 
                 case 28:
@@ -188,7 +188,7 @@ namespace Immortal_Switch.Scripts.UI
                     break;
 
                 case 42:
-                    OnClickBtnEquip();
+                    await OnClickBtnEquip();
                     break;
             }
         }

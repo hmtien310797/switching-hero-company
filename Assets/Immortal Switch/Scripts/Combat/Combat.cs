@@ -9,12 +9,6 @@ namespace Immortal_Switch.Scripts.Combat
             ICombatUnit defender,
             float skillCoefficient = 0)
         {
-            DamageResult fakeResult = new DamageResult
-            {
-                Damage = 1f
-            };
-            return fakeResult;
-            
             DamageResult result = new DamageResult();
 
             float baseAtk = attacker.Stats.StatModule.GetFinalStat(StatType.Atk);

@@ -35,15 +35,30 @@ public class NakamaClient : MonoBehaviour
     /// chủ động thay vì đợi socket timeout (có thể mất nhiều giây/phút tuỳ heartbeat).</summary>
     private const float NetworkWatchdogIntervalSec = 5f;
 
+    /// <summary>Mất mạng thường chỉ chập chờn tạm thời (đổi wifi/4G, vào thang máy...) — chờ
+    /// tối đa ngần này trước khi thật sự force-logout, thay vì bứt người chơi về LoginScene
+    /// ngay lần đầu phát hiện mất mạng.</summary>
+    private const float NetworkLossGraceSec = 30f;
+    private const float NetworkLossPollIntervalSec = 2f;
+
     private const string NoNetworkReason = "Mất kết nối mạng. Vui lòng kiểm tra kết nối Internet và đăng nhập lại.";
+    private const string NetworkTroubleToastMessage = "Mạng của bạn đang có vấn đề. Đang thử kết nối lại...";
+
+    /// <summary>Phải khớp ADMIN_NOTIFICATION_CODE_MAINTENANCE trong nakama/src/handler/admin.js
+    /// (rpcAdminBroadcastMaintenance) — dùng để lọc đúng loại notification cần hiện toast,
+    /// phòng khi sau này có thêm code khác cho notification loại khác (mail, GM gift...).</summary>
+    private const int MaintenanceNotificationCode = 100;
+    private const float MaintenanceToastDurationSec = 5f;
+
+    /// <summary>Resources path loaded when <see cref="activeConfig"/> isn't assigned in the
+    /// Inspector — covers the singleton's AddComponent fallback path (see Instance getter)
+    /// where no serialized scene data exists at all.</summary>
+    private const string DefaultServerConfigResourcePath = "ServerConfig/Dev";
 
     [Header("Server Config")]
-    [SerializeField] private string scheme = "http";
-    //[SerializeField] private string host = "171.244.44.71"; // dev env
-    [SerializeField] private string host = "192.168.8.82"; // local env
-    [SerializeField] private int port = 7350;
-    [SerializeField] private string serverKey = "switchinghero-server-key";
-    [SerializeField] private string httpKey = "switchinghero-http-key";
+    [Tooltip("Drag the environment's NakamaServerConfig asset here (Dev/Staging/Prod under " +
+             "Assets/Resources/ServerConfig). Leave empty to fall back to Dev.")]
+    [SerializeField] private NakamaServerConfig activeConfig;
 
     private static NakamaClient _instance;
 
@@ -79,6 +94,7 @@ public class NakamaClient : MonoBehaviour
     private bool _forceLogoutHandled;
     private bool _forceLogoutPopupShown;
     private bool _intentionalSocketClose;
+    private bool _networkGraceActive;
 
     private void Awake()
     {
@@ -91,7 +107,15 @@ public class NakamaClient : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(gameObject);
 
-        Client = new Client(scheme, host, port, serverKey)
+        if (activeConfig == null)
+        {
+            activeConfig = Resources.Load<NakamaServerConfig>(DefaultServerConfigResourcePath);
+            if (activeConfig == null)
+                throw new InvalidOperationException(
+                    $"[NakamaClient] No server config assigned and Resources/{DefaultServerConfigResourcePath} is missing.");
+        }
+
+        Client = new Client(activeConfig.Scheme, activeConfig.Host, activeConfig.Port, activeConfig.ServerKey)
         {
 #if UNITY_EDITOR
             Logger = new UnityLogger()
@@ -105,10 +129,12 @@ public class NakamaClient : MonoBehaviour
             Debug.Log($"[NakamaClient] Socket closed: {reason}");
             var wasIntentional = _intentionalSocketClose;
             _intentionalSocketClose = false;
-            if (!wasIntentional)
-                RequestForceLogout(BuildUnintentionalDisconnectReason());
+            if (wasIntentional) return;
+
+            HandleUnintentionalSocketCloseAsync().Forget();
         };
         Socket.ReceivedError += ex => Debug.LogError($"[NakamaClient] Socket error: {ex.Message}");
+        Socket.ReceivedNotification += HandleReceivedNotification;
 
         _ = TryRestoreSessionAsync();
         StartCoroutine(SessionWatchdogRoutine());
@@ -127,6 +153,54 @@ public class NakamaClient : MonoBehaviour
             : "Mất kết nối với server — có thể tài khoản đã đăng nhập ở thiết bị khác.";
     }
 
+    /// <summary>Socket.Closed (như mọi sự kiện Socket.* khác) bắn từ thread nền của Nakama SDK
+    /// (WebSocketStdlibAdapter.ReceiveLoop), không phải main thread — StartCoroutine/UI bên
+    /// trong RequestForceLogout(WithNetworkGrace) đều là API Unity, phải nhảy về main thread
+    /// trước khi gọi, nếu không sẽ ném UnityException giống HandleReceivedNotificationAsync.</summary>
+    private async UniTaskVoid HandleUnintentionalSocketCloseAsync()
+    {
+        await UniTask.SwitchToMainThread();
+
+        var disconnectReason = BuildUnintentionalDisconnectReason();
+        if (disconnectReason == NoNetworkReason)
+            RequestForceLogoutWithNetworkGrace(disconnectReason);
+        else
+            RequestForceLogout(disconnectReason);
+    }
+
+    /// <summary>Nhận notification realtime từ server (Socket.ReceivedNotification) — hiện tại
+    /// chỉ xử lý code=MaintenanceNotificationCode (admin/broadcast_maintenance), bỏ qua mọi
+    /// code khác. Notification loại này gửi persistent:false nên chỉ tới máy đang mở socket,
+    /// không cần ack/xoá gì thêm phía client.</summary>
+    private void HandleReceivedNotification(IApiNotification notification)
+    {
+        HandleReceivedNotificationAsync(notification).Forget();
+    }
+
+    /// <summary>Socket.ReceivedNotification bắn từ thread nền của Nakama SDK — parse JSON không
+    /// đụng API Unity nên làm trước, chỉ nhảy về main thread ngay trước ShowToast (UIManager.
+    /// ShowToast dùng Object.Instantiate, bắt buộc main thread, ném UnityException nếu gọi từ
+    /// thread nền — đây chính là lỗi gốc trước khi sửa).</summary>
+    private async UniTaskVoid HandleReceivedNotificationAsync(IApiNotification notification)
+    {
+        if (notification.Code != MaintenanceNotificationCode) return;
+
+        var message = notification.Content;
+        try
+        {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(notification.Content);
+            if (data != null && data.TryGetValue("message", out var m) && !string.IsNullOrEmpty(m))
+                message = m;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"[NakamaClient] Failed to parse maintenance notification content: {ex.Message}");
+        }
+
+        await UniTask.SwitchToMainThread();
+        UIManager.Instance?.ShowToast(message, MaintenanceToastDurationSec);
+    }
+
     /// <summary>Chủ động phát hiện mất mạng trong khi đang đăng nhập/kết nối, thay vì chỉ chờ
     /// Socket.Closed (có thể đến trễ vài giây/phút tuỳ heartbeat timeout của Nakama SDK).</summary>
     private IEnumerator NetworkWatchdogRoutine()
@@ -138,8 +212,46 @@ public class NakamaClient : MonoBehaviour
             if (Session == null || !IsSocketConnected) continue;
             if (Application.internetReachability != NetworkReachability.NotReachable) continue;
 
-            RequestForceLogout(NoNetworkReason);
+            RequestForceLogoutWithNetworkGrace(NoNetworkReason);
         }
+    }
+
+    /// <summary>Điểm gọi chung cho mọi nguyên nhân force-logout do MẤT MẠNG (khác 401 / bị đăng
+    /// nhập thiết bị khác — 2 trường hợp đó không thể tự hồi phục nên vẫn force-logout ngay qua
+    /// RequestForceLogout). Hiện toast báo người chơi biết, rồi chờ tối đa NetworkLossGraceSec
+    /// xem internetReachability có hồi phục không trước khi thật sự đăng xuất. Guard bằng
+    /// _networkGraceActive vì Socket.Closed, NetworkWatchdogRoutine và CallRpcAsync đều có thể
+    /// cùng phát hiện mất mạng gần như đồng thời — chỉ cần 1 grace period chạy.</summary>
+    private void RequestForceLogoutWithNetworkGrace(string reason)
+    {
+        if (_forceLogoutHandled || _forceLogoutPopupShown || _networkGraceActive) return;
+
+        _networkGraceActive = true;
+        UIManager.Instance?.ShowToast(NetworkTroubleToastMessage, NetworkLossGraceSec);
+        StartCoroutine(NetworkLossGraceRoutine(reason));
+    }
+
+    private IEnumerator NetworkLossGraceRoutine(string reason)
+    {
+        var wait = new WaitForSeconds(NetworkLossPollIntervalSec);
+        var elapsed = 0f;
+
+        while (elapsed < NetworkLossGraceSec)
+        {
+            yield return wait;
+            elapsed += NetworkLossPollIntervalSec;
+
+            if (Application.internetReachability != NetworkReachability.NotReachable)
+            {
+                // Mạng đã có lại trong lúc chờ — không force logout, để watchdog/RPC kế tiếp
+                // tự phục hồi bình thường.
+                _networkGraceActive = false;
+                yield break;
+            }
+        }
+
+        _networkGraceActive = false;
+        RequestForceLogout(reason);
     }
 
     /// <summary>
@@ -232,6 +344,16 @@ public class NakamaClient : MonoBehaviour
 
         Debug.LogWarning($"[NakamaClient] Force logout: {reason}");
         await CleanupGameplayStateIfAny();
+
+        try
+        {
+            await DisconnectSocketAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"[NakamaClient] DisconnectSocketAsync failed during force logout: {ex.Message}");
+        }
+
         ClearSession();
         if (!alreadyNotified)
             LastForceLogoutReason = reason;
@@ -412,7 +534,7 @@ public class NakamaClient : MonoBehaviour
             Username = username,
             Password = password
         });
-        var result = await Client.RpcAsync(httpKey, "auth/register", payload);
+        var result = await Client.RpcAsync(activeConfig.HttpKey, "auth/register", payload);
         return JsonConvert.DeserializeObject<RegisterResponse>(result.Payload);
     }
 
@@ -491,7 +613,7 @@ public class NakamaClient : MonoBehaviour
             Debug.LogWarning($"[NakamaClient] RPC '{id}' failed without a server response (likely no network): {e.Message}");
 
             if (!suppressForceLogoutOnNetworkError)
-                RequestForceLogout(NoNetworkReason);
+                RequestForceLogoutWithNetworkGrace(NoNetworkReason);
 
             throw;
         }
@@ -598,6 +720,15 @@ public class NakamaClient : MonoBehaviour
     {
         var response = await CallRpcAsync("account/claim_link_reward", "{}");
         return JsonConvert.DeserializeObject<AccountClaimLinkRewardResponse>(response.Payload);
+    }
+
+    /// <summary>Đăng ký/refresh FCM device token qua RPC player/register_fcm_token — xem
+    /// FcmManager (Assets/Immortal Switch/Scripts/Core/FcmManager.cs) cho luồng gọi đầy đủ.</summary>
+    public async Task<FcmTokenResponse> RegisterFcmTokenAsync(string token, string platform)
+    {
+        var payload = JsonUtility.ToJson(new FcmTokenRequest { token = token, platform = platform });
+        var response = await CallRpcAsync("player/register_fcm_token", payload);
+        return JsonUtility.FromJson<FcmTokenResponse>(response.Payload);
     }
 
     // ── Summon Execute ────────────────────────────────────────────────────────
@@ -1131,6 +1262,70 @@ public class NakamaClient : MonoBehaviour
         var payload  = JsonConvert.SerializeObject(request);
         var response = await CallRpcAsync("eventfishing/shop_buy", payload);
         return JsonConvert.DeserializeObject<EventFishingShopBuyResponse>(response.Payload);
+    }
+
+    // ── Event Bingo ────────────────────────────────────────────────────────────
+    // Xem handler/event_bingo.js. Server là nguồn sự thật duy nhất (thay cho
+    // EventBingoManager/Service/Storage ES3 cục bộ trước đây — xem EventBingoManager).
+
+    /// <summary>Snapshot đầy đủ: board 5x5 theo pool_id hiện tại, 12 rương line, mốc điểm,
+    /// progress. Gọi khi mở EventBingoView và sau mỗi draw/claim thành công để đồng bộ lại.</summary>
+    public async Task<EventBingoStateResponse> EventBingoStateAsync()
+    {
+        var response = await CallRpcAsync("eventbingo/state", "{}");
+        return JsonConvert.DeserializeObject<EventBingoStateResponse>(response.Payload);
+    }
+
+    /// <summary>Server random 1 ô chưa mở trên board hiện tại và cấp thưởng ô đó ngay — client
+    /// không tự random, chỉ chạy animation lật ô theo TrackIndex trả về.</summary>
+    public async Task<EventBingoDrawResponse> EventBingoDrawAsync()
+    {
+        var response = await CallRpcAsync("eventbingo/draw", "{}");
+        return JsonConvert.DeserializeObject<EventBingoDrawResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng 1 rương line đã mở khóa. Nếu đây là rương cuối cùng của round, server
+    /// tự sang round mới (progress +100, pool mới) trong cùng lượt gọi — xem RoundCompleted.</summary>
+    public async Task<EventBingoClaimLineResponse> EventBingoClaimLineAsync(EventBingoClaimLineRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await CallRpcAsync("eventbingo/claim_line", payload);
+        return JsonConvert.DeserializeObject<EventBingoClaimLineResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng 1 mốc điểm đã đủ điều kiện (current_progress &gt;= points_required).</summary>
+    public async Task<EventBingoClaimMilestoneResponse> EventBingoClaimMilestoneAsync(EventBingoClaimMilestoneRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await CallRpcAsync("eventbingo/claim_milestone", payload);
+        return JsonConvert.DeserializeObject<EventBingoClaimMilestoneResponse>(response.Payload);
+    }
+
+    // ── Mail ─────────────────────────────────────────────────────────────────
+    // Xem handler/mail.js. Server là nguồn sự thật duy nhất cho thư và phần thưởng.
+
+    /// <summary>Toàn bộ thư (personal + global, đã merge/sort mới nhất trước) cho player hiện tại.
+    /// Gọi khi mở MailView và sau mỗi claim/claim_all thành công để đồng bộ lại.</summary>
+    public async Task<MailListResponse> MailListAsync()
+    {
+        var response = await CallRpcAsync("mail/list", "{}");
+        return JsonConvert.DeserializeObject<MailListResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận thưởng 1 thư. Idempotent — thư đã nhận trả về success với rewards rỗng thay
+    /// vì lỗi, nên client có thể retry an toàn nếu response bị rớt mạng.</summary>
+    public async Task<MailClaimResponse> MailClaimAsync(MailClaimRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await CallRpcAsync("mail/claim", payload);
+        return JsonConvert.DeserializeObject<MailClaimResponse>(response.Payload);
+    }
+
+    /// <summary>Nhận toàn bộ thư chưa nhận trong 1 lượt gọi.</summary>
+    public async Task<MailClaimAllResponse> MailClaimAllAsync()
+    {
+        var response = await CallRpcAsync("mail/claim_all", "{}");
+        return JsonConvert.DeserializeObject<MailClaimAllResponse>(response.Payload);
     }
 
     // ── Battle ────────────────────────────────────────────────────────────────

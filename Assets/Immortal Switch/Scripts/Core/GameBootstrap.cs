@@ -61,6 +61,23 @@ namespace Immortal_Switch.Scripts.Core
                     await NakamaClient.Instance.AuthenticateDeviceAsync();
                 }
 
+                // Socket realtime — trước đây không nơi nào gọi ConnectSocketAsync(), nên game
+                // chạy hoàn toàn qua HTTP RPC và Nakama Console luôn báo Sessions(CCU)/Presences/
+                // Parties = 0 dù server có traffic thật. Không hard-fail bootstrap nếu việc này
+                // lỗi (mạng chập chờn) — RPC qua HTTP vẫn hoạt động bình thường không cần socket.
+                try
+                {
+                    await NakamaClient.Instance.ConnectSocketAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[Bootstrap] Socket connect failed, falling back to HTTP RPC only: {ex.Message}");
+                }
+
+                // FCM token registration (push nhắc AFK ≥ 12h) — không chặn bootstrap, tự bắt lỗi
+                // bên trong (permission bị từ chối / Firebase init lỗi đều không nên chặn vào game).
+                FcmManager.Instance.InitializeAsync().Forget();
+
                 progress.CompleteStep("Authenticated");
 
                 // 2

@@ -28,16 +28,8 @@ namespace Immortal_Switch.Scripts.Pvp.Views
     /// DATA: leaderboard từ <see cref="IPvPLeaderboardService"/> (Phase-1 = LocalPvPLeaderboardService
     /// mock 50 record — server chưa làm). TODO server: thay impl service.
     /// </summary>
-    public class PvpMainView : UIView
+    public class PvpMainView : BouncePopupUIView
     {
-        [SerializeField] private TMP_Text txtDevBadge;
-        [SerializeField] private TMP_Text txtSeason;
-        [SerializeField] private TMP_Text txtRank;
-        [SerializeField] private TMP_Text txtTickets;
-        [SerializeField] private TMP_Text txtTokens;
-        [SerializeField] private TMP_Text txtFrontHero;
-        [SerializeField] private TMP_Text txtBackHero;
-
         [SerializeField] private Button btnFindMatch;
         [SerializeField] private Button btnFormation;
         [SerializeField] private Button btnBuffs;
@@ -53,6 +45,8 @@ namespace Immortal_Switch.Scripts.Pvp.Views
         [SerializeField] private PvpLeaderboardTop top3;
         [SerializeField] private PvpLeaderboardRecyclableView rankRecyclableView;
         [SerializeField] private PvpLeaderboardRankItem myRank;
+        
+        [SerializeField] private PvpRankInfoSo pvpRankInfo;
 
         private PvpLeaderboardResponseModel _leaderboard;
         private long _weeklyResetAtUtc;
@@ -60,16 +54,13 @@ namespace Immortal_Switch.Scripts.Pvp.Views
         private void Awake()
         {
             if (btnFindMatch != null) btnFindMatch.onClick.AddListener(() => OnFindMatchAsync().Forget());
-            if (btnFormation != null) btnFormation.onClick.AddListener(() => OpenAsync<PvpFormationSetupView>());
-            if (btnBuffs != null) btnBuffs.onClick.AddListener(() => OpenAsync<PvpBuffInventoryView>());
-            if (btnRankSeason != null) btnRankSeason.onClick.AddListener(() => OpenAsync<PvpRankSeasonView>());
-            if (btnHistory != null) btnHistory.onClick.AddListener(() => OpenAsync<PvpHistoryView>());
+            if (btnHistory != null) btnHistory.onClick.AddListener(OpenAsync<PvpHistoryView>);
             if (btnClose != null) btnClose.onClick.AddListener(() => UIManager.Instance.Close<PvpMainView>());
+            if (btnRankSeason != null) btnRankSeason.onClick.AddListener(OpenAsync<PvpRewardView>);
         }
 
         public override void OnShow(object args)
         {
-            if (txtDevBadge != null) txtDevBadge.text = "LOCAL MOCK";
             Refresh();
             LoadLeaderboardAsync().Forget();
         }
@@ -87,20 +78,7 @@ namespace Immortal_Switch.Scripts.Pvp.Views
             if (facade == null) return;
 
             var profile = facade.Profile?.GetCurrent();
-            if (profile != null)
-            {
-                if (txtSeason != null) txtSeason.text = profile.SeasonId;
-                if (txtRank != null) txtRank.text = $"{profile.RankTier} • {profile.RankPoint} pts";
-                if (txtTickets != null) txtTickets.text = $"{profile.ArenaTicket}/{PvpDefaults.MaxTicketsCap}";
-                if (txtTokens != null) txtTokens.text = $"{profile.ArenaToken}";
-            }
-
             var formation = facade.Formation?.LoadFormation();
-            if (formation != null)
-            {
-                if (txtFrontHero != null) txtFrontHero.text = "FRONT\n" + PvpHeroNameResolver.Get(formation.FrontHeroId);
-                if (txtBackHero != null) txtBackHero.text = "BACK\n" + PvpHeroNameResolver.Get(formation.BackHeroId);
-            }
         }
 
         private async UniTaskVoid LoadLeaderboardAsync()
@@ -128,9 +106,9 @@ namespace Immortal_Switch.Scripts.Pvp.Views
             if (txtWeeklyReset != null)
                 txtWeeklyReset.text = "Weekly reset: " + FormatCountdown(data.WeeklyResetAtUtc - data.ServerTimeUtc);
 
-            if (top1 != null) { top1.gameObject.SetActive(data.Top1 != null); if (data.Top1 != null) top1.Bind(data.Top1); }
-            if (top2 != null) { top2.gameObject.SetActive(data.Top2 != null); if (data.Top2 != null) top2.Bind(data.Top2); }
-            if (top3 != null) { top3.gameObject.SetActive(data.Top3 != null); if (data.Top3 != null) top3.Bind(data.Top3); }
+            if (top1 != null) { top1.gameObject.SetActive(data.Top1 != null); if (data.Top1 != null) top1.Bind(data.Top1, pvpRankInfo); }
+            if (top2 != null) { top2.gameObject.SetActive(data.Top2 != null); if (data.Top2 != null) top2.Bind(data.Top2, pvpRankInfo); }
+            if (top3 != null) { top3.gameObject.SetActive(data.Top3 != null); if (data.Top3 != null) top3.Bind(data.Top3, pvpRankInfo); }
 
             if (rankRecyclableView != null && data.Rankings != null)
                 rankRecyclableView.Bind(data.Rankings.Count, i => data.Rankings[i]);
@@ -139,7 +117,7 @@ namespace Immortal_Switch.Scripts.Pvp.Views
             {
                 bool hasMyRank = data.MyRank != null && data.MyRank.IsRanked;
                 myRank.gameObject.SetActive(hasMyRank);
-                if (hasMyRank) myRank.Bind(data.MyRank);
+                if (hasMyRank) myRank.Bind(data.MyRank, pvpRankInfo);
             }
         }
 
@@ -178,16 +156,20 @@ namespace Immortal_Switch.Scripts.Pvp.Views
             }
 
             // Show matching overlay, run FindMatchAsync (creates BattleId + PendingBattle), then preview.
-            UIManager.Instance.OpenPopupAsync<PvpMatchingView>().Forget();
+            //UIManager.Instance.OpenPopupAsync<PvpMatchingView>().Forget();
             try
             {
+                //find match from server
                 var snapshot = await facade.Matchmaking.FindMatchAsync(CancellationToken.None);
-                UIManager.Instance.Close<PvpMatchingView>();
-                UIManager.Instance.OpenPopupAsync<PvpBattlePreviewView>(snapshot).Forget();
+                //UIManager.Instance.Close<PvpMatchingView>();
+                //UIManager.Instance.OpenPopupAsync<PvpBattlePreviewView>(snapshot).Forget();
+                //run local battle, snapshot will be get from server to make preview info for ui
+                PvpQuickBattle.StartAsync().Forget();
+                UIManager.Instance.Close<PvpMainView>();
             }
             catch (Exception e)
             {
-                UIManager.Instance.Close<PvpMatchingView>();
+                //UIManager.Instance.Close<PvpMatchingView>();
                 Toast($"Match failed: {e.Message}");
             }
         }

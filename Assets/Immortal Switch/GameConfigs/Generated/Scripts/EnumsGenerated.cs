@@ -65,8 +65,10 @@ namespace Game.Configs.Generated
         point_event_gacha = 57,
         point_gacha = 58,
         point_event_newbie = 59,
-        bingo_dice = 60,
+        dice_point = 60,
         fishing_food = 61,
+        pvp_arena_ticket = 62,
+        pvp_arena_token = 63,
     }
     // </auto-generated:item_config:ECurrencyType>
 

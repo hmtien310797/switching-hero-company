@@ -31,6 +31,7 @@ namespace Immortal_Switch.Scripts.Shared.UI
         public void Bind(Action<bool> onChanged, bool defaultValue = false)
         {
             _onChanged = onChanged;
+
             SetDefaultEnabled(defaultValue);
         }
 

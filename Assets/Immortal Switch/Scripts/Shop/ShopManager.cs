@@ -152,7 +152,8 @@ namespace Immortal_Switch.Scripts.Shop
         /// <summary>Ngày hiện tại tính từ lúc mua (1-based), 1 nếu chưa mua hoặc đã hết hạn, tác dụng để hiển thị phần quà ngày.</summary>
         public int GetMonthlyPassCurrentDay(int packId)
         {
-            return MonthlyPassState?.Passes?.Find(p => p.Id == packId)?.CurrentDay ?? 1;
+            var currentDay = MonthlyPassState?.Passes?.Find(p => p.Id == packId)?.CurrentDay ?? 0;
+            return currentDay < 1 ? 1 : currentDay;
         }
 
         public bool IsMonthlyPassDayClaimed(int packId, int day)

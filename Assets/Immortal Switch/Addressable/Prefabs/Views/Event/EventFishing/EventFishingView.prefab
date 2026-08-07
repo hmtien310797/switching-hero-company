@@ -714,6 +714,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cde94e634f6a44e7bd5152ffb0c5fd06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skeletonAngler: {fileID: 7286317588184701564}
   btnFish: {fileID: 3696290793357049322}
   txtQuantity: {fileID: 172504975383195160}
 --- !u!1 &2686024107236729682
@@ -936,7 +937,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4732883676600325981}
   - component: {fileID: 8039643635902803397}
-  - component: {fileID: 5407131171689553956}
+  - component: {fileID: 7286317588184701564}
   m_Layer: 5
   m_Name: angler
   m_TagString: Untagged
@@ -953,16 +954,16 @@ RectTransform:
   m_GameObject: {fileID: 3590404138292078900}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1657025226513370967}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -248, y: -138}
-  m_SizeDelta: {x: 225, y: 284}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -248, y: -244}
+  m_SizeDelta: {x: 702.5676, y: 950.8992}
+  m_Pivot: {x: 0.2731997, y: 0.39260185}
 --- !u!222 &8039643635902803397
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -971,7 +972,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3590404138292078900}
   m_CullTransparentMesh: 1
---- !u!114 &5407131171689553956
+--- !u!114 &7286317588184701564
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -980,10 +981,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3590404138292078900}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: d85b887af7e6c3f45a2e2d2920d641bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: b66cf7a186d13054989b33a5c90044e4, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -991,16 +992,49 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c073d9ba1cfb11c4693982f35096733a, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 1
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  skeletonDataAsset: {fileID: 11400000, guid: 8cfa8fa4e43869c4f8df68fd635fa289, type: 2}
+  additiveMaterial: {fileID: 0}
+  multiplyMaterial: {fileID: 0}
+  screenMaterial: {fileID: 0}
+  m_SkeletonColor: {r: 1, g: 1, b: 1, a: 1}
+  initialSkinName: 
+  initialFlipX: 0
+  initialFlipY: 0
+  startingAnimation: idle
+  startingLoop: 1
+  timeScale: 1
+  freeze: 0
+  layoutScaleMode: 0
+  referenceSize: {x: 702.5676, y: 950.8992}
+  pivotOffset: {x: 0, y: 0}
+  referenceScale: 1
+  layoutScale: 1
+  rectTransformSize: {x: 225, y: 284}
+  editReferenceRect: 0
+  updateWhenInvisible: 3
+  allowMultipleCanvasRenderers: 0
+  canvasRenderers: []
+  separatorSlotNames: []
+  enableSeparatorSlots: 0
+  separatorParts: []
+  updateSeparatorPartLocation: 1
+  updateSeparatorPartScale: 0
+  disableMeshAssignmentOnOverride: 1
+  physicsPositionInheritanceFactor: {x: 1, y: 1}
+  physicsRotationInheritanceFactor: 1
+  physicsMovementRelativeTo: {fileID: 0}
+  meshGenerator:
+    settings:
+      useClipping: 1
+      zSpacing: 0
+      tintBlack: 0
+      canvasGroupCompatible: 0
+      pmaVertexColors: 1
+      addNormals: 0
+      calculateTangents: 0
+      immutableTriangles: 0
+  updateTiming: 1
+  unscaledTime: 1
 --- !u!1 &4015825766071664779
 GameObject:
   m_ObjectHideFlags: 0
@@ -2320,6 +2354,10 @@ PrefabInstance:
       propertyPath: currencyType
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 7433643910664316478, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: eCurrencyType
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8481808067183193493, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -2348,7 +2386,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2753184407010358003, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Name
-      value: currency_gold
+      value: currency_fishing_food
       objectReference: {fileID: 0}
     - target: {fileID: 3782611220763204165, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Pivot.x
@@ -2445,6 +2483,10 @@ PrefabInstance:
     - target: {fileID: 4504664956874266011, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 14.200012
+      objectReference: {fileID: 0}
+    - target: {fileID: 7433643910664316478, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
+      propertyPath: eCurrencyType
+      value: 61
       objectReference: {fileID: 0}
     - target: {fileID: 8481808067183193493, guid: 6aae7a51978815941bc8f2ae87817e0b, type: 3}
       propertyPath: m_Sprite

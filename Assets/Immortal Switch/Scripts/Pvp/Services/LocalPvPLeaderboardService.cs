@@ -106,7 +106,7 @@ namespace Immortal_Switch.Scripts.Pvp.Services
 
         private static List<PvpLeaderboardHeroModel> BuildHeroes(System.Random rng)
         {
-            int[] heroIds = { 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010 };
+            int[] heroIds = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13 };
             string[] heroTier = { "Common", "UnCommon", "Rare", "Epic", "Legendary", "Mythic" };
             return new List<PvpLeaderboardHeroModel>(2)
             {
@@ -136,12 +136,12 @@ namespace Immortal_Switch.Scripts.Pvp.Services
 
         private static string TierIdByRank(int rank)
         {
-            if (rank <= 3) return "legend";
-            if (rank <= 10) return "master";
-            if (rank <= 20) return "diamond";
-            if (rank <= 30) return "platinum";
-            if (rank <= 40) return "gold";
-            return "silver";
+            if (rank <= 3) return "diamond";
+            if (rank <= 10) return "diamond";
+            if (rank <= 20) return "platinum";
+            if (rank <= 30) return "gold";
+            if (rank <= 40) return "silver";
+            return "bronze";
         }
 
         private static string TierIdToString(PvpRankTier tier)

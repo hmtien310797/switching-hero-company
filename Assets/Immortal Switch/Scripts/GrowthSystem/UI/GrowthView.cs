@@ -56,8 +56,7 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         public override async UniTask PlayShowAsync(object args)
         {
             await RefreshFromServerAsync();
-
-            base.PlayShowAsync(args).Forget();
+            await base.PlayShowAsync(args);
         }
 
         /// <summary>

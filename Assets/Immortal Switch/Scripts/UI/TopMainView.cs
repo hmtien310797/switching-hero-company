@@ -19,7 +19,9 @@ using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Leaderboard.Views;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Mail.Views;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
+using Immortal_Switch.Scripts.Pvp.Views;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
@@ -60,6 +62,9 @@ namespace Immortal_Switch.Scripts.UI
         private Button btnEvent;
 
         [SerializeField]
+        private Button btnMail;
+
+        [SerializeField]
         private Button btnEventLeHoiBangLong;
 
         [SerializeField]
@@ -70,6 +75,9 @@ namespace Immortal_Switch.Scripts.UI
 
         [SerializeField]
         private Button btnDiamondInfo;
+        
+        [SerializeField]
+        private Button btnPvp;
 
         [SerializeField]
         CurrencyView currencyView;
@@ -242,9 +250,11 @@ namespace Immortal_Switch.Scripts.UI
             TutorialManager.Instance.OnClick += OnClickTutorial;
             Instance = this;
 
+            btnMail.onClick.AddListener(OnClickMail);
             btnLeaderboard.onClick.AddListener(OnClickLeaderboard);
             btnDiamondInfo.onClick.AddListener(OnClickDiamondInfo);
             btnGoldInfo.onClick.AddListener(OnClickGoldInfo);
+            btnPvp.onClick.AddListener(OnClickPvp);
 
             btnEventLeHoiBangLong.onClick.AddListener(OnClickEventLeHoiBangLong);
             btnEvent.onClick.AddListener(OnClickEvent);
@@ -264,6 +274,11 @@ namespace Immortal_Switch.Scripts.UI
             UserDataCache.Instance.OnExpChanged += RefreshPlayerInfo;
         }
 
+        private void OnClickMail()
+        {
+            UIManager.Instance.TogglePopupAsync<MailView>().Forget();
+        }
+
         //for demo
         private void OnOrientationChanged(ScreenOrientationTracker.ScreenViewMode mode)
         {
@@ -275,6 +290,7 @@ namespace Immortal_Switch.Scripts.UI
 
                     switchPanel.anchoredPosition =
                         new Vector2(switchPanel.anchoredPosition.x, 136f);
+
                     // bottomPanel.anchoredPosition =
                     //     new Vector2(bottomPanel.anchoredPosition.x, -100f);
                     rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
@@ -288,10 +304,11 @@ namespace Immortal_Switch.Scripts.UI
 
                     switchPanel.anchoredPosition =
                         new Vector2(switchPanel.anchoredPosition.x, 273f);
+
                     //bottomPanel.anchoredPosition =
-                        //new Vector2(bottomPanel.anchoredPosition.x, -15f);*/
+                    //new Vector2(bottomPanel.anchoredPosition.x, -15f);*/
                     rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
-                    rightSideLayoutGroup.constraintCount = 5;
+                    rightSideLayoutGroup.constraintCount = 7;
                     /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-33f, -118.7f);*/
                     break;
             }
@@ -325,6 +342,11 @@ namespace Immortal_Switch.Scripts.UI
         private void OnClickEvent()
         {
             UIManager.Instance.TogglePopupAsync<EventView>().Forget();
+        }
+        
+        private void OnClickPvp()
+        {
+            UIManager.Instance.TogglePopupAsync<PvpMainView>().Forget();
         }
 
         private void OnClickEventLeHoiBangLong()
@@ -560,7 +582,8 @@ namespace Immortal_Switch.Scripts.UI
             StageRuntimeData stageRuntimeData = PvEBattleController.Instance.GetStageRuntimeData();
             float waited = 0f;
 
-            while (stageRuntimeData == null && waited < waitTimeoutSeconds)
+            while (stageRuntimeData == null &&
+                   waited < waitTimeoutSeconds)
             {
                 await UniTask.Yield();
                 waited += Time.unscaledDeltaTime;
@@ -754,6 +777,7 @@ namespace Immortal_Switch.Scripts.UI
                 switchMainSubHeroButton.onClick.RemoveListener(OnSwitchMainSubHeroButtonClicked);
             }
 
+            btnMail.onClick.RemoveListener(OnClickMail);
             btnLeaderboard.onClick.RemoveListener(OnClickLeaderboard);
             btnDiamondInfo.onClick.RemoveListener(OnClickDiamondInfo);
             btnGoldInfo.onClick.RemoveListener(OnClickGoldInfo);
@@ -926,7 +950,9 @@ namespace Immortal_Switch.Scripts.UI
 
             for (int i = 0; i < 2; i++)
             {
-                if (iconHeroImage[i] != null && heroIconAnchors[i] != null && heroIconAnimationRoot != null)
+                if (iconHeroImage[i] != null &&
+                    heroIconAnchors[i] != null &&
+                    heroIconAnimationRoot != null)
                 {
                     RectTransform iconRect = iconHeroImage[i].rectTransform;
                     iconRect.SetParent(heroIconAnchors[i].transform, true);
@@ -934,7 +960,9 @@ namespace Immortal_Switch.Scripts.UI
                     iconRect.localScale = Vector3.one;
                 }
 
-                if (iconHeroClassImage[i] != null && heroClassIconAnchors[i] != null && heroIconAnimationRoot != null)
+                if (iconHeroClassImage[i] != null &&
+                    heroClassIconAnchors[i] != null &&
+                    heroIconAnimationRoot != null)
                 {
                     RectTransform classRect = iconHeroClassImage[i].rectTransform;
                     classRect.SetParent(heroClassIconAnchors[i].transform, true);

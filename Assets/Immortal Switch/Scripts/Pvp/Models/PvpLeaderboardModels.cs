@@ -32,10 +32,11 @@ namespace Immortal_Switch.Scripts.Pvp.Models
         [JsonProperty("playerId")] public string PlayerId;
         [JsonProperty("nickname")] public string Nickname;
         [JsonProperty("rank")] public int Rank;
-        [JsonProperty("rankPoints")] public int RankPoints;
         [JsonProperty("formationPower")] public string FormationPower;
+        //bronze, silver, gold, ruby, diamond,....
         [JsonProperty("rankTierId")] public string RankTierId;
         [JsonProperty("rankTierLevel")] public int RankTierLevel;
+        [JsonProperty("rankPoints")] public int RankPoints;
         [JsonProperty("isRanked")] public bool IsRanked;
 
         [JsonProperty("formationHeroes")] public List<PvpLeaderboardHeroModel> FormationHeroes = new();

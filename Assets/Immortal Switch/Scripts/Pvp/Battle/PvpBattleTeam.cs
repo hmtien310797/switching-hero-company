@@ -36,6 +36,18 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             }
         }
 
+        /// <summary>Số hero còn sống — dùng cho tie-break khi hết giờ (thắng/thua/hoà theo sống bằng nhau).</summary>
+        public int AliveCount
+        {
+            get
+            {
+                int n = 0;
+                for (int i = 0; i < Actors.Count; i++)
+                    if (Actors[i] != null && !Actors[i].IsDead) n++;
+                return n;
+            }
+        }
+
         public void Clear()
         {
             Registry.Clear();

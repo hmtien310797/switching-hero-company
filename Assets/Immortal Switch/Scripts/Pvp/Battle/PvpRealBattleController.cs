@@ -55,6 +55,7 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
         private float _endDelayTimer;
         private PvPBattleResult _pendingOutcome;
         [SerializeField] private float endBattleDelay = 2f;
+        [SerializeField] private float battleTimeLimitSeconds = 60f; // TODO server: server config
 
         public bool IsRunning => _running && !_ended;
 
@@ -94,6 +95,9 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             {
                 // Clear PvE chapter stage (creep/boss + live hero). Snapshot đã build từ live hero stats
                 // trong matchmaking (trước RunAsync), nên despawn live hero bây giờ không mất dữ liệu attacker.
+                // Giấu UI thường (top bar) như khi vào dungeon + chạy countdown battle timer.
+                // TODO server: battleTimeLimitSeconds có thể lấy từ server config.
+                GameEventManager.Trigger(GameEvents.OnPlayDungeon, true);
                 await Transitioner.Instance.TransitionOutWithoutChangingScene(token);
                 PvpStageTransition.ClearPveStage();
                 GameCameraController.Instance.ResetCamera();
@@ -138,6 +142,10 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
                 // sớm ở đầu RunAsync → Update check AllDead khi team rỗng (count==0 → true) → EndBattle
                 // ngay TRƯỚC khi hero spawn xong → battle kết thúc sớm, hero đứng im.)
                 _running = true;
+                
+                if (GameStatView.Instance != null)
+                    GameStatView.Instance.battleTimerController.InitTimer(
+                        battleTimeLimitSeconds, OnBattleTimeout, _cts?.Token ?? CancellationToken.None);
 
                 if (enableLog)
                 {
@@ -149,7 +157,9 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
 
                 // Open Battle HUD (screen 07) nếu openUi. No-UI flow: bỏ qua HUD, quan sát qua OnBattleEnded.
                 if (_openUi)
-                    UIManager.Instance?.OpenPopupAsync<PvpBattleHudView>(snapshot).Forget();
+                {
+                    //UIManager.Instance?.OpenPopupAsync<PvpBattleHudView>(snapshot).Forget();
+                }
             }
             catch (Exception e)
             {
@@ -159,6 +169,28 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
                 _ended = true;
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Hết giờ chiến đấu: quyết định kết quả theo số hero còn sống (thắng/thua/hoà), chờ
+        /// <see cref="endBattleDelay"/> rồi EndBattle → trở về chapter bình thường.
+        /// </summary>
+        private void OnBattleTimeout()
+        {
+            if (!_running || _ended) return;
+            if (_attacker == null || _defender == null) return;
+
+            int aAlive = _attacker.AliveCount;
+            int bAlive = _defender.AliveCount;
+            _pendingOutcome = aAlive > bAlive ? PvPBattleResult.Victory
+                : aAlive < bAlive ? PvPBattleResult.Defeat
+                : PvPBattleResult.Draw;
+            _ending = true;
+            _endDelayTimer = endBattleDelay;
+
+            // Dừng mọi skill object còn sống của cả 2 team.
+            StopAllTeamSkills(_attacker);
+            StopAllTeamSkills(_defender);
         }
 
         /// <summary>Force-end now with current alive/dead state (HUD RESOLVE).</summary>
@@ -212,6 +244,11 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
                 : (bDead ? PvPBattleResult.Victory : PvPBattleResult.Defeat);
             _ending = true;
             _endDelayTimer = endBattleDelay;
+
+            // Dừng mọi skill object còn sống của cả 2 team để không gây damage cho hero còn sống
+            // trong khoảng delay trước khi EndBattle dọn dẹp.
+            StopAllTeamSkills(_attacker);
+            StopAllTeamSkills(_defender);
         }
 
         private static void LogTeamStates(PvpBattleTeam team, string label)
@@ -252,8 +289,8 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             OnBattleEnded?.Invoke(request);
             if (_openUi)
             {
-                UIManager.Instance?.Close<PvpBattleHudView>();
-                UIManager.Instance.OpenPopupAsync<PvpBattleResultView>(request).Forget();
+                // UIManager.Instance?.Close<PvpBattleHudView>();
+                // UIManager.Instance.OpenPopupAsync<PvpBattleResultView>(request).Forget();
             }
             GameEventManager.Trigger(GameEvents.ON_PVP_BATTLE_END);
             BattleFlowController.Instance.PlayNormalChapter().Forget();
@@ -421,6 +458,21 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
                 into.Registry.RegisterHostile(from.Actors[i]);
         }
 
+        /// <summary>
+        /// Dừng mọi skill object còn sống (ultimate + class skill) của team để chúng không gây damage
+        /// cho hero còn sống sau khi trận đã kết thúc. Gọi ngay khi xác định kết quả (trước delay).
+        /// </summary>
+        private static void StopAllTeamSkills(PvpBattleTeam team)
+        {
+            if (team == null || team.Actors == null) return;
+            for (int i = 0; i < team.Actors.Count; i++)
+            {
+                var h = team.Actors[i];
+                if (h == null) continue;
+                try { h.HeroSkillController?.DespawnAllInstanceOfUltimateSkillAndClassSkill(); } catch { }
+            }
+        }
+
         private void OnHeroDead(HeroActor dead)
         {
             if (dead == null || _heroTeam == null) return;
@@ -468,6 +520,10 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
 
         private void Cleanup()
         {
+            // Ẩn countdown battle timer khi kết thúc/cleanup.
+            if (GameStatView.Instance != null)
+                GameStatView.Instance.battleTimerController.HideTimer();
+
             DespawnTeam(_attacker);
             DespawnTeam(_defender);
             _attacker?.Clear();

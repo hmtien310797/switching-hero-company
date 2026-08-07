@@ -31,5 +31,10 @@ namespace Immortal_Switch.Scripts.Shared.Constants
         /// event fishing
         /// </summary>
         public const int EVENT_FISHING = 1006;
+
+        /// <summary>
+        /// event bingo
+        /// </summary>
+        public const int EVENT_BINGO = 1007;
     }
 }

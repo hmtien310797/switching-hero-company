@@ -12,23 +12,24 @@ namespace Immortal_Switch.Scripts.Pvp.Views.UI
     /// </summary>
     public class PvpLeaderboardTop : MonoBehaviour
     {
+        [SerializeField] private Image imageRank;
         [SerializeField] private TextMeshProUGUI txtPlayerName;
         [SerializeField] private TextMeshProUGUI txtPower;
-        [SerializeField] private TextMeshProUGUI txtTier;
+        [SerializeField] private TextMeshProUGUI txtRank;
         [SerializeField] private TextMeshProUGUI txtHeroes; // optional "heroId*:star/tier, ..."
         [SerializeField] private StarHeroDisplay[] starHeroDisplays;
         [SerializeField] private Image[] heroImages;
         [SerializeField] private Image[] heroTierImages;
 
-        public void Bind(PvpLeaderboardEntryModel e)
+        public void Bind(PvpLeaderboardEntryModel e, PvpRankInfoSo pvpRankInfoSo)
         {
             if (e == null) return;
-
+            imageRank.sprite = pvpRankInfoSo.GetIconAtRank(e.Rank);
             if (txtPlayerName != null) txtPlayerName.text = e.Nickname;
             if (txtPower != null) txtPower.text = e.FormationPower;
-            if (txtTier != null) txtTier.text = e.RankTierId;
+            if (txtRank != null) txtRank.text = e.Rank.ToString();
 
-            if (txtHeroes != null && e.FormationHeroes != null && e.FormationHeroes.Count > 0)
+            if (e.FormationHeroes != null && e.FormationHeroes.Count > 0)
             {
                 var sb = new System.Text.StringBuilder();
                 for (int i = 0; i < e.FormationHeroes.Count; i++)
@@ -40,7 +41,6 @@ namespace Immortal_Switch.Scripts.Pvp.Views.UI
                     heroImages[i].sprite = HeroImageService.GetHeroIcon(h.HeroId);
                     heroTierImages[i].sprite = HeroImageService.GetHeroTierBackground(h.Tier);
                 }
-                txtHeroes.text = sb.ToString();
             }
         }
     }
