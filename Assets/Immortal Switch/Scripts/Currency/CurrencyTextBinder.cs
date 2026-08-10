@@ -1,10 +1,12 @@
-using System;
 using Battle;
+using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +27,10 @@ namespace Immortal_Switch.Scripts.Currency
         [SerializeField]
         private Image currencyImage;
 
+        [SerializeField]
+        private Button btnInfo;
+
+        // --- Private Fields ---
         private RewardSyncService rewardSyncService;
 
         private void Start()
@@ -46,7 +52,27 @@ namespace Immortal_Switch.Scripts.Currency
                 rewardSyncService.OnOnlineIdlePreviewChanged += Refresh;
             }
 
+            if (btnInfo != null)
+            {
+                btnInfo.onClick.AddListener(OnClickItemInfo);
+            }
+
             Refresh();
+        }
+
+        private void OnClickItemInfo()
+        {
+            var itemId = (int)eCurrencyType;
+
+            if (itemId > 0)
+            {
+                UIManager.Instance
+                    .OpenPopupAsync<PopupItemInfoView>(new PopupItemInfoArgs
+                    {
+                        ItemId = itemId,
+                    })
+                    .Forget();
+            }
         }
 
         private void OnEnable()
@@ -72,6 +98,11 @@ namespace Immortal_Switch.Scripts.Currency
             if (rewardSyncService != null)
             {
                 rewardSyncService.OnOnlineIdlePreviewChanged -= Refresh;
+            }
+
+            if (btnInfo != null)
+            {
+                btnInfo.onClick.RemoveListener(OnClickItemInfo);
             }
         }
 

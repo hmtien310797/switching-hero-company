@@ -51,12 +51,14 @@ namespace Immortal_Switch.Scripts.UI
 
     public abstract class UIView : MonoBehaviour
     {
-        [Header("UI View")] public UILayer Layer = UILayer.Main;
+        [Header("UI View")]
+        public UILayer Layer = UILayer.Main;
 
         [Header("Main Layer Mode (only used if Layer==Main)")]
         public MainLayerMode MainMode = MainLayerMode.PageExclusive;
 
-        [Header("Popup Settings")] public bool CloseOnBackdrop = false;
+        [Header("Popup Settings")]
+        public bool CloseOnBackdrop = false;
 
         [Header("Lifetime")]
         [Tooltip("If true: Close will hide (SetActive(false)) and keep instance+handle for fast reopen.")]
@@ -86,16 +88,25 @@ namespace Immortal_Switch.Scripts.UI
 
     public sealed class UIManager : Singleton<UIManager>
     {
-        [Header("Backdrop Prefab (normal prefab, not Addressables)")] [SerializeField]
+        [Header("Backdrop Prefab (normal prefab, not Addressables)")]
+        [SerializeField]
         private GameObject backdropPrefab;
 
-        [SerializeField] private GameObject tapeAnimator;
+        [SerializeField]
+        private GameObject tapeAnimator;
 
-        [SerializeField] private CanvasScaler canvasScaler;
-        [SerializeField] private Canvas canvas;
-        [SerializeField] private GameObject loadingScene;
+        [SerializeField]
+        private CanvasScaler canvasScaler;
 
-        [Header("Toast")] [SerializeField] private ToastMessageView toastMessagePrefab;
+        [SerializeField]
+        private Canvas canvas;
+
+        [SerializeField]
+        private GameObject loadingScene;
+
+        [Header("Toast")]
+        [SerializeField]
+        private ToastMessageView toastMessagePrefab;
 
         private ToastMessageView _toastMessageInstance;
 
@@ -137,10 +148,7 @@ namespace Immortal_Switch.Scripts.UI
             ScreenOrientationTracker.Instance.OnOrientationChanged += OnOrientationChanged;
             CreateLayerRootsFromEnum();
             InitLayerLists();
-            SceneManager.sceneLoaded += (arg0, mode) =>
-            {
-                canvas.worldCamera = Camera.main;
-            };
+            SceneManager.sceneLoaded += (arg0, mode) => { canvas.worldCamera = Camera.main; };
             PreloadAsync<PopupRewardView>().Forget();
             PreloadAsync<LoadingView>().Forget();
             PreloadAsync<PopupConfirmView>().Forget();
@@ -149,7 +157,11 @@ namespace Immortal_Switch.Scripts.UI
 
         protected override void OnDestroy()
         {
-            ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
+            if (ScreenOrientationTracker.Instance != null)
+            {
+                ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
+            }
+
             base.OnDestroy();
         }
 
@@ -171,6 +183,7 @@ namespace Immortal_Switch.Scripts.UI
                 canvasScaler.referenceResolution = new Vector2(
                     Mathf.Max(refRes.x, refRes.y),
                     Mathf.Min(refRes.x, refRes.y));
+
                 canvasScaler.matchWidthOrHeight = 1f;
             }
             else
@@ -178,6 +191,7 @@ namespace Immortal_Switch.Scripts.UI
                 canvasScaler.referenceResolution = new Vector2(
                     Mathf.Min(refRes.x, refRes.y),
                     Mathf.Max(refRes.x, refRes.y));
+
                 canvasScaler.matchWidthOrHeight = 0f;
             }
         }
@@ -202,6 +216,7 @@ namespace Immortal_Switch.Scripts.UI
                 }
 
                 var toastRoot = GetLayerRoot(UILayer.Toast);
+
                 if (toastRoot == null)
                 {
                     Debug.LogError("[UIManager] UILayer.Toast root was not found.");
@@ -225,7 +240,8 @@ namespace Immortal_Switch.Scripts.UI
 
             foreach (var cachedEntry in _cachedEntries.Values)
             {
-                if (cachedEntry != null && added.Add(cachedEntry))
+                if (cachedEntry != null &&
+                    added.Add(cachedEntry))
                 {
                     entries.Add(cachedEntry);
                 }
@@ -234,13 +250,16 @@ namespace Immortal_Switch.Scripts.UI
             foreach (var layerPair in _entriesByLayer)
             {
                 var layerEntries = layerPair.Value;
+
                 if (layerEntries == null)
                     continue;
 
                 for (int i = 0; i < layerEntries.Count; i++)
                 {
                     var entry = layerEntries[i];
-                    if (entry != null && added.Add(entry))
+
+                    if (entry != null &&
+                        added.Add(entry))
                     {
                         entries.Add(entry);
                     }
@@ -315,7 +334,7 @@ namespace Immortal_Switch.Scripts.UI
             }
         }
 
-        #region Layer Roots
+#region Layer Roots
 
         private void CreateLayerRootsFromEnum()
         {
@@ -337,13 +356,15 @@ namespace Immortal_Switch.Scripts.UI
         private void InitLayerLists()
         {
             _entriesByLayer.Clear();
+
             foreach (UILayer layer in Enum.GetValues(typeof(UILayer)))
                 _entriesByLayer[layer] = new List<Entry>();
         }
 
         private RectTransform GetLayerRoot(UILayer layer)
         {
-            if (_layerRoots.TryGetValue(layer, out var rt) && rt != null)
+            if (_layerRoots.TryGetValue(layer, out var rt) &&
+                rt != null)
                 return rt;
 
             Debug.LogError($"[UI] Missing layer root for {layer}");
@@ -361,19 +382,24 @@ namespace Immortal_Switch.Scripts.UI
             rt.localRotation = Quaternion.identity;
         }
 
-        #endregion
+#endregion
 
-        #region Public Queries
+#region Public Queries
 
         public bool IsAnyMainVisible()
         {
-            if (_activeMainPage != null && !_activeMainPage.closed && _activeMainPage.view != null &&
+            if (_activeMainPage != null &&
+                !_activeMainPage.closed &&
+                _activeMainPage.view != null &&
                 _activeMainPage.view.gameObject.activeSelf)
                 return true;
 
             foreach (var e in _mainStack)
             {
-                if (e != null && !e.closed && e.view != null && e.view.gameObject.activeSelf)
+                if (e != null &&
+                    !e.closed &&
+                    e.view != null &&
+                    e.view.gameObject.activeSelf)
                     return true;
             }
 
@@ -383,14 +409,19 @@ namespace Immortal_Switch.Scripts.UI
         public bool IsOpen<T>() where T : UIView
         {
             // main page
-            if (_activeMainPage != null && !_activeMainPage.closed && _activeMainPage.view is T &&
+            if (_activeMainPage != null &&
+                !_activeMainPage.closed &&
+                _activeMainPage.view is T &&
                 _activeMainPage.view.gameObject.activeSelf)
                 return true;
 
             // main stack
             foreach (var e in _mainStack)
             {
-                if (e != null && !e.closed && e.view is T && e.view.gameObject.activeSelf)
+                if (e != null &&
+                    !e.closed &&
+                    e.view is T &&
+                    e.view.gameObject.activeSelf)
                     return true;
             }
 
@@ -398,29 +429,42 @@ namespace Immortal_Switch.Scripts.UI
             foreach (var kv in _entriesByLayer)
             {
                 var list = kv.Value;
+
                 for (int i = 0; i < list.Count; i++)
                 {
                     var e = list[i];
-                    if (e == null || e.closed || e.view == null) continue;
-                    if (e.view is T && e.view.gameObject.activeSelf) return true;
+
+                    if (e == null ||
+                        e.closed ||
+                        e.view == null)
+                        continue;
+
+                    if (e.view is T &&
+                        e.view.gameObject.activeSelf)
+                        return true;
                 }
             }
 
             return false;
         }
-        
+
         [CanBeNull]
         public T Get<T>() where T : UIView
         {
             // main page
-            if (_activeMainPage != null && !_activeMainPage.closed && _activeMainPage.view is T view &&
+            if (_activeMainPage != null &&
+                !_activeMainPage.closed &&
+                _activeMainPage.view is T view &&
                 _activeMainPage.view.gameObject.activeSelf)
                 return view;
 
             // main stack
             foreach (var e in _mainStack)
             {
-                if (e != null && !e.closed && e.view is T view1 && e.view.gameObject.activeSelf)
+                if (e != null &&
+                    !e.closed &&
+                    e.view is T view1 &&
+                    e.view.gameObject.activeSelf)
                     return view1;
             }
 
@@ -428,20 +472,28 @@ namespace Immortal_Switch.Scripts.UI
             foreach (var kv in _entriesByLayer)
             {
                 var list = kv.Value;
+
                 for (int i = 0; i < list.Count; i++)
                 {
                     var e = list[i];
-                    if (e == null || e.closed || e.view == null) continue;
-                    if (e.view is T view2 && e.view.gameObject.activeSelf) return view2;
+
+                    if (e == null ||
+                        e.closed ||
+                        e.view == null)
+                        continue;
+
+                    if (e.view is T view2 &&
+                        e.view.gameObject.activeSelf)
+                        return view2;
                 }
             }
 
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region Public API
+#region Public API
 
         public async UniTask<bool> TogglePopupAsync<T>(object args = null, bool withBackdrop = true) where T : UIView
         {
@@ -588,16 +640,23 @@ namespace Immortal_Switch.Scripts.UI
         {
             {
                 var buffer = new List<Entry>();
+
                 while (_mainStack.Count > 0)
                 {
                     var top = _mainStack.Pop();
-                    if (top == null || top.closed) continue;
+
+                    if (top == null ||
+                        top.closed)
+                        continue;
 
                     if (top.view is T)
                     {
                         CloseEntryAsync(top).Forget();
+
                         // restore skipped
-                        for (int i = buffer.Count - 1; i >= 0; i--) _mainStack.Push(buffer[i]);
+                        for (int i = buffer.Count - 1; i >= 0; i--)
+                            _mainStack.Push(buffer[i]);
+
                         RefreshMainBackdrop();
                         return;
                     }
@@ -606,11 +665,14 @@ namespace Immortal_Switch.Scripts.UI
                 }
 
                 // restore all
-                for (int i = buffer.Count - 1; i >= 0; i--) _mainStack.Push(buffer[i]);
+                for (int i = buffer.Count - 1; i >= 0; i--)
+                    _mainStack.Push(buffer[i]);
             }
 
             // 2) active main page
-            if (_activeMainPage != null && !_activeMainPage.closed && _activeMainPage.view is T)
+            if (_activeMainPage != null &&
+                !_activeMainPage.closed &&
+                _activeMainPage.view is T)
             {
                 CloseEntryAsync(_activeMainPage).Forget();
                 _activeMainPage = null;
@@ -621,7 +683,10 @@ namespace Immortal_Switch.Scripts.UI
             // 3) global popup stack (non-main)
             foreach (var e in _globalPopupStack)
             {
-                if (e == null || e.closed) continue;
+                if (e == null ||
+                    e.closed)
+                    continue;
+
                 if (e.view is T)
                 {
                     _entriesByLayer[e.layer].Remove(e);
@@ -642,7 +707,10 @@ namespace Immortal_Switch.Scripts.UI
             while (_mainStack.Count > 0)
             {
                 var top = _mainStack.Pop();
-                if (top == null || top.closed) continue;
+
+                if (top == null ||
+                    top.closed)
+                    continue;
 
                 CloseEntryAsync(top).Forget();
                 RefreshMainBackdrop();
@@ -650,7 +718,8 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             // then close page
-            if (_activeMainPage != null && !_activeMainPage.closed)
+            if (_activeMainPage != null &&
+                !_activeMainPage.closed)
             {
                 var page = _activeMainPage;
                 _activeMainPage = null;
@@ -667,7 +736,10 @@ namespace Immortal_Switch.Scripts.UI
             while (_globalPopupStack.Count > 0)
             {
                 var e = _globalPopupStack.Pop();
-                if (e == null || e.closed) continue;
+
+                if (e == null ||
+                    e.closed)
+                    continue;
 
                 _entriesByLayer[e.layer].Remove(e);
                 CloseEntryAsync(e).Forget();
@@ -681,9 +753,9 @@ namespace Immortal_Switch.Scripts.UI
             PvpQuickBattle.StartAsync();
         }
 
-        #endregion
+#endregion
 
-        #region Open
+#region Open
 
         public async UniTask<T> OpenPopupAsync<T>(object args = null, bool withBackdrop = true) where T : UIView
         {
@@ -699,7 +771,9 @@ namespace Immortal_Switch.Scripts.UI
             try
             {
                 // 1) reuse cached
-                if (_cachedEntries.TryGetValue(key, out var cached) && cached != null && cached.view != null)
+                if (_cachedEntries.TryGetValue(key, out var cached) &&
+                    cached != null &&
+                    cached.view != null)
                 {
                     await ShowEntryAsync(cached, args, withBackdrop);
                     tcs.TrySetResult(cached.view);
@@ -718,6 +792,7 @@ namespace Immortal_Switch.Scripts.UI
 
                 var prefab = handle.Result;
                 var prefabView = prefab.GetComponent<UIView>();
+
                 if (prefabView == null)
                 {
                     Addressables.Release(handle);
@@ -727,6 +802,7 @@ namespace Immortal_Switch.Scripts.UI
 
                 var layer = prefabView.Layer;
                 var parent = GetLayerRoot(layer);
+
                 if (parent == null)
                 {
                     Addressables.Release(handle);
@@ -737,6 +813,7 @@ namespace Immortal_Switch.Scripts.UI
                 Debug.Log("OpenPopupAsync: " + prefab.name);
                 var go = Instantiate(prefab, parent, false);
                 var typed = go.GetComponent<T>();
+
                 if (typed == null)
                 {
                     Destroy(go);
@@ -760,6 +837,7 @@ namespace Immortal_Switch.Scripts.UI
                 {
                     // enforce caching on main
                     entry.cacheOnClose = typed.CacheOnClose;
+
                     //typed.CacheOnClose = true;
 
                     await HandleMainOpenAsync(entry, args, withBackdrop);
@@ -772,6 +850,7 @@ namespace Immortal_Switch.Scripts.UI
                 }
 
                 go.SetActive(true);
+
                 // NORMAL popup logic (non-main)
                 if (withBackdrop)
                     CreatePerEntryBackdrop(entry);
@@ -801,10 +880,13 @@ namespace Immortal_Switch.Scripts.UI
 
         private async UniTask ShowEntryAsync(Entry entry, object args, bool withBackdrop)
         {
-            if (entry == null || entry.view == null) return;
+            if (entry == null ||
+                entry.view == null)
+                return;
 
             // already visible
-            if (!entry.closed && entry.view.gameObject.activeSelf)
+            if (!entry.closed &&
+                entry.view.gameObject.activeSelf)
                 return;
 
             entry.closed = false;
@@ -831,16 +913,19 @@ namespace Immortal_Switch.Scripts.UI
                 _cachedEntries[entry.key] = entry;
         }
 
-        #endregion
+#endregion
 
-        #region Main Layer Core (Page + Stack + Shared Backdrop)
+#region Main Layer Core (Page + Stack + Shared Backdrop)
 
         private void EnsureMainBackdrop()
         {
-            if (backdropPrefab == null) return;
+            if (backdropPrefab == null)
+                return;
 
             var mainRoot = GetLayerRoot(UILayer.Main);
-            if (mainRoot == null) return;
+
+            if (mainRoot == null)
+                return;
 
             if (_mainSharedBackdrop == null)
             {
@@ -848,13 +933,17 @@ namespace Immortal_Switch.Scripts.UI
 
                 // optional: click backdrop closes top main (like X)
                 var btn = _mainSharedBackdrop.GetComponent<Button>();
+
                 if (btn != null)
                 {
                     btn.onClick.RemoveAllListeners();
+
                     btn.onClick.AddListener(() =>
                     {
                         var top = PeekTopMainView();
-                        if (top != null && top.CloseOnBackdrop)
+
+                        if (top != null &&
+                            top.CloseOnBackdrop)
                             CloseTopMain();
                     });
                 }
@@ -865,7 +954,9 @@ namespace Immortal_Switch.Scripts.UI
 
         private void RefreshMainBackdrop()
         {
-            if (_mainSharedBackdrop == null) return;
+            if (_mainSharedBackdrop == null)
+                return;
+
             _mainSharedBackdrop.SetActive(IsAnyMainVisible());
         }
 
@@ -874,11 +965,18 @@ namespace Immortal_Switch.Scripts.UI
             // stack top first
             foreach (var e in _mainStack)
             {
-                if (e == null || e.closed || e.view == null) continue;
-                if (e.view.gameObject.activeSelf) return e.view;
+                if (e == null ||
+                    e.closed ||
+                    e.view == null)
+                    continue;
+
+                if (e.view.gameObject.activeSelf)
+                    return e.view;
             }
 
-            if (_activeMainPage != null && !_activeMainPage.closed && _activeMainPage.view != null &&
+            if (_activeMainPage != null &&
+                !_activeMainPage.closed &&
+                _activeMainPage.view != null &&
                 _activeMainPage.view.gameObject.activeSelf)
                 return _activeMainPage.view;
 
@@ -890,7 +988,10 @@ namespace Immortal_Switch.Scripts.UI
             while (_mainStack.Count > 0)
             {
                 var e = _mainStack.Pop();
-                if (e == null || e.closed) continue;
+
+                if (e == null ||
+                    e.closed)
+                    continue;
 
                 await CloseEntryAsync(e);
             }
@@ -913,7 +1014,9 @@ namespace Immortal_Switch.Scripts.UI
                 await CloseAllMainStackAsync();
 
                 // close current page (if different)
-                if (_activeMainPage != null && !_activeMainPage.closed && _activeMainPage != entry)
+                if (_activeMainPage != null &&
+                    !_activeMainPage.closed &&
+                    _activeMainPage != entry)
                     await CloseEntryAsync(_activeMainPage);
 
                 _activeMainPage = entry;
@@ -922,6 +1025,7 @@ namespace Immortal_Switch.Scripts.UI
                 if (withBackdrop)
                     if (_mainSharedBackdrop != null)
                         _mainSharedBackdrop.transform.SetAsLastSibling();
+
                 entry.view.transform.SetAsLastSibling();
             }
             else // Stackable
@@ -929,9 +1033,12 @@ namespace Immortal_Switch.Scripts.UI
                 _mainStack.Push(entry);
 
                 // order: backdrop -> page -> stackable
-                if (_mainSharedBackdrop != null) _mainSharedBackdrop.transform.SetAsLastSibling();
+                if (_mainSharedBackdrop != null)
+                    _mainSharedBackdrop.transform.SetAsLastSibling();
 
-                if (_activeMainPage != null && !_activeMainPage.closed && _activeMainPage.view != null &&
+                if (_activeMainPage != null &&
+                    !_activeMainPage.closed &&
+                    _activeMainPage.view != null &&
                     _activeMainPage.view.gameObject.activeSelf)
                     _activeMainPage.view.transform.SetAsLastSibling();
 
@@ -946,13 +1053,14 @@ namespace Immortal_Switch.Scripts.UI
             }
         }
 
-        #endregion
+#endregion
 
-        #region Backdrop (non-main per entry)
+#region Backdrop (non-main per entry)
 
         private void CreatePerEntryBackdrop(Entry entry)
         {
-            if (backdropPrefab == null) return;
+            if (backdropPrefab == null)
+                return;
 
             // avoid duplicate
             if (entry.backdropInstance != null)
@@ -965,13 +1073,17 @@ namespace Immortal_Switch.Scripts.UI
             entry.backdropInstance = Instantiate(backdropPrefab, parent, false);
             entry.backdropInstance.transform.SetAsFirstSibling();
             var btn = entry.backdropInstance.GetComponent<Button>();
+
             if (btn != null)
             {
                 btn.onClick.RemoveAllListeners();
+
                 btn.onClick.AddListener(() =>
                 {
                     var top = PeekTopPopupView();
-                    if (top != null && top.CloseOnBackdrop)
+
+                    if (top != null &&
+                        top.CloseOnBackdrop)
                         CloseTopPopup();
                 });
             }
@@ -981,20 +1093,27 @@ namespace Immortal_Switch.Scripts.UI
         {
             foreach (var e in _globalPopupStack)
             {
-                if (e == null || e.closed || e.view == null) continue;
-                if (e.view.gameObject.activeSelf) return e.view;
+                if (e == null ||
+                    e.closed ||
+                    e.view == null)
+                    continue;
+
+                if (e.view.gameObject.activeSelf)
+                    return e.view;
             }
 
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region Close / Cleanup
+#region Close / Cleanup
 
         private async UniTask CloseEntryAsync(Entry entry)
         {
-            if (entry == null || entry.closed) return;
+            if (entry == null ||
+                entry.closed)
+                return;
 
             entry.closed = true;
 
@@ -1017,7 +1136,9 @@ namespace Immortal_Switch.Scripts.UI
             if (entry.layer == UILayer.Main)
             {
                 // remove main references if needed
-                if (_activeMainPage == entry) _activeMainPage = null;
+                if (_activeMainPage == entry)
+                    _activeMainPage = null;
+
                 // (stack entries are popped by CloseTopMain / CloseAllMainStackAsync)
                 //RefreshMainBackdrop();
                 return;
@@ -1031,13 +1152,14 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             // release addressables handle if not caching
-            if (!entry.cacheOnClose && entry.handle.IsValid())
+            if (!entry.cacheOnClose &&
+                entry.handle.IsValid())
                 Addressables.Release(entry.handle);
         }
 
-        #endregion
+#endregion
 
-        #region Main Scene Init
+#region Main Scene Init
 
         // Put BottomMainView on SubMain, TopMainView on OverMain (NOT Main)
         private async UniTask InitMainScene()
@@ -1046,6 +1168,6 @@ namespace Immortal_Switch.Scripts.UI
             await OpenPopupAsync<TopMainView>(withBackdrop: false);
         }
 
-        #endregion
+#endregion
     }
 }

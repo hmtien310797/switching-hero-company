@@ -86,6 +86,11 @@ namespace Immortal_Switch.Scripts.Shared.UI
             }
         }
 
+        public void SetInteractable(bool value)
+        {
+            btn.interactable = value;
+        }
+
         public virtual void SetStatus(ETabPresetStatus status)
         {
             // trang thai cu bo qua
@@ -145,7 +150,7 @@ namespace Immortal_Switch.Scripts.Shared.UI
 
             if (!keepInteractableOnHover)
             {
-                btn.interactable = _status == ETabPresetStatus.Normal;
+                SetInteractable(_status == ETabPresetStatus.Normal);
             }
         }
     }

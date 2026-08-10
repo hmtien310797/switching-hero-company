@@ -47,14 +47,14 @@ namespace Immortal_Switch.Scripts.Pvp.Services
                 throw new InvalidOperationException($"Cannot find match — invalid formation: {validation}");
 
             var profile = _profile.GetCurrent();
-            if (profile == null || profile.ArenaTicket < PvpDefaults.MatchTicketCost)
+            if (profile == null || profile.ArenaTicket <= 0)
                 throw new InvalidOperationException("No Arena tickets.");
 
             // 2. Select mock opponent (generate if list empty — DOCX §30/§7 reconciliation).
             var opponentSave = SelectOrGenerateOpponent(profile.RankPoint);
 
             // 3. Consume ticket (DOCX §31 — "Consume one local ticket"). Sau BattleId tạo, rời = defeat.
-            _profile.ConsumeTicket(PvpDefaults.MatchTicketCost);
+            _profile.ConsumeTicket(1);
 
             // 4. Build player team snapshot từ in-battle HeroActors + formation buff loadout.
             var playerTeam = BuildPlayerTeamSnapshot(formation);

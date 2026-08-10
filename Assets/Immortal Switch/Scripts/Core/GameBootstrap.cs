@@ -229,7 +229,7 @@ namespace Immortal_Switch.Scripts.Core
                 await UIManager.Instance.InitializeAsync();
                 progress.CompleteStep("UI initialized");
                 
-                await UniTask.WhenAll(HeroImageService.InitializeAsync(), SkillImageService.InitializeAsync(), ItemTierVisualImageService.InitializeAsync(),
+                await UniTask.WhenAll(HeroImageService.InitializeAsync(), SkillImageService.InitializeAsync(),
                     CreepBossImageService.InitializeAsync());
 
                 // 16

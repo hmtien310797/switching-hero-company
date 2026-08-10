@@ -101,8 +101,11 @@ namespace Immortal_Switch.Scripts.UI
 
         private void OnDestroy()
         {
-            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
-            TutorialManager.Instance.OnClick -= OnClickTutorial;
+            if (TutorialManager.Instance != null)
+            {
+                TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+                TutorialManager.Instance.OnClick -= OnClickTutorial;
+            }
 
             GameEventManager.Unsubscribe(GameEvents.OnToggleMainView, RefreshCloseAndGem);
             GameEventManager.Unsubscribe<string>(GameEvents.ON_NAVIGATION_REQUESTED, OnNavigationRequested);

@@ -13,23 +13,34 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
 {
     public class GrowthUpgradePanelView : MonoBehaviour
     {
-        [Header("Progress")] [SerializeField] private TextMeshProUGUI txtProgress;
-        [SerializeField] private Image imgSlider;
+        [Header("Progress")]
+        [SerializeField]
+        private TextMeshProUGUI txtProgress;
 
-        [SerializeField] private TMP_Text goldText;
-        [SerializeField] private GrowthUpgradeAmountSelector amountSelector;
+        [SerializeField]
+        private Image imgSlider;
 
-        [SerializeField] private Transform contentRoot;
-        [SerializeField] private StatTierView prefab;
+        [SerializeField]
+        private TMP_Text goldText;
 
-        
+        [SerializeField]
+        private GrowthUpgradeAmountSelector amountSelector;
+
+        [SerializeField]
+        private Transform contentRoot;
+
+        [SerializeField]
+        private StatTierView prefab;
 
         private readonly List<StatTierView> views = new();
 
         private void OnDestroy()
         {
-            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
-            TutorialManager.Instance.OnClick -= OnClickTutorial;
+            if (TutorialManager.Instance != null)
+            {
+                TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+                TutorialManager.Instance.OnClick -= OnClickTutorial;
+            }
         }
 
         private UniTask OnClickTutorial(string arg1, int arg2)
@@ -69,10 +80,10 @@ namespace Immortal_Switch.Scripts.GrowthSystem.UI
         {
             TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
             TutorialManager.Instance.OnClick -= OnClickTutorial;
-            
+
             TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
             TutorialManager.Instance.OnClick += OnClickTutorial;
-            
+
             goldText.text = gold.ToString();
 
             amountSelector.Initialize(selectedAmount, onAmountChanged);

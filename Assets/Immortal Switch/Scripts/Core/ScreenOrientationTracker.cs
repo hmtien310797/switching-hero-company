@@ -10,8 +10,13 @@ namespace Immortal_Switch.Scripts.UI
         public enum ScreenViewMode
         {
             Portrait,
-            Landscape
+            Landscape,
+            None = -1,
         }
+
+        [Header("Forced lock screen")]
+        [SerializeField]
+        private ScreenViewMode forcedOrientation = ScreenViewMode.None;
 
         [Header("Debug")]
         [SerializeField]
@@ -32,6 +37,18 @@ namespace Immortal_Switch.Scripts.UI
         {
             base.Awake();
             ForceRefresh();
+
+            if (forcedOrientation != ScreenViewMode.None)
+            {
+                Screen.orientation = forcedOrientation switch
+                {
+                    ScreenViewMode.Portrait => ScreenOrientation.Portrait,
+                    ScreenViewMode.Landscape => ScreenOrientation.LandscapeLeft,
+                    _ => ScreenOrientation.AutoRotation,
+                };
+
+                IsOrientationLocked = true;
+            }
         }
 
         private void Update()
@@ -55,8 +72,9 @@ namespace Immortal_Switch.Scripts.UI
 
         private bool HasScreenSizeChanged()
         {
-            return lastScreenSize.x != Screen.width ||
-                   lastScreenSize.y != Screen.height;
+            return (lastScreenSize.x != Screen.width ||
+                    lastScreenSize.y != Screen.height) &&
+                   forcedOrientation == ScreenViewMode.None;
         }
 
         private void CheckOrientationChanged()
@@ -79,9 +97,14 @@ namespace Immortal_Switch.Scripts.UI
 
         private ScreenViewMode GetCurrentMode()
         {
-            return Screen.height >= Screen.width
-                ? ScreenViewMode.Portrait
-                : ScreenViewMode.Landscape;
+            if (forcedOrientation == ScreenViewMode.None)
+            {
+                return Screen.height >= Screen.width
+                    ? ScreenViewMode.Portrait
+                    : ScreenViewMode.Landscape;
+            }
+
+            return forcedOrientation;
         }
 
         /// <summary>
@@ -89,9 +112,12 @@ namespace Immortal_Switch.Scripts.UI
         /// </summary>
         public void LockCurrentOrientation()
         {
-            LockedOrientation = GetCurrentScreenOrientation();
-            Screen.orientation = LockedOrientation;
-            IsOrientationLocked = true;
+            if (forcedOrientation == ScreenViewMode.None)
+            {
+                LockedOrientation = GetCurrentScreenOrientation();
+                Screen.orientation = LockedOrientation;
+                IsOrientationLocked = true;
+            }
         }
 
         /// <summary>
@@ -99,8 +125,11 @@ namespace Immortal_Switch.Scripts.UI
         /// </summary>
         public void UnlockOrientation()
         {
-            Screen.orientation = ScreenOrientation.AutoRotation;
-            IsOrientationLocked = false;
+            if (forcedOrientation == ScreenViewMode.None)
+            {
+                Screen.orientation = ScreenOrientation.AutoRotation;
+                IsOrientationLocked = false;
+            }
         }
 
         private ScreenOrientation GetCurrentScreenOrientation()
@@ -133,7 +162,7 @@ namespace Immortal_Switch.Scripts.UI
 
         public override UniTask InitializeAsync()
         {
-            throw new NotImplementedException();
+            return UniTask.CompletedTask;
         }
     }
 }

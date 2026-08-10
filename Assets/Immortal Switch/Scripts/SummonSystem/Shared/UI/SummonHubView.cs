@@ -14,15 +14,23 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 {
     public class SummonHubView : AnimatedUIView
     {
-        [Header("Panels")] [SerializeField] private List<BaseSummonPanelView> panels;
-        [SerializeField] private List<GameObject> currencyViews;
+        [Header("Panels")]
+        [SerializeField]
+        private List<BaseSummonPanelView> panels;
 
-        [Header("Default")] [SerializeField] private SummonCategory defaultCategory = SummonCategory.Hero;
+        [SerializeField]
+        private List<GameObject> currencyViews;
 
-        [Header("Navigation")] [SerializeField]
+        [Header("Default")]
+        [SerializeField]
+        private SummonCategory defaultCategory = SummonCategory.Hero;
+
+        [Header("Navigation")]
+        [SerializeField]
         private SegmentedControlStatic segmentedControl;
 
-        [SerializeField] private bool useSliderHighlight = true;
+        [SerializeField]
+        private bool useSliderHighlight = true;
 
         private BaseSummonPanelView currentPanel;
         private bool firstShow = true;
@@ -49,8 +57,11 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
 
         private void OnDestroy()
         {
-            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
-            TutorialManager.Instance.OnClick -= OnClickTutorial;
+            if (TutorialManager.Instance != null)
+            {
+                TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+                TutorialManager.Instance.OnClick -= OnClickTutorial;
+            }
         }
 
         private UniTask OnClickTutorial(string arg1, int arg2)
@@ -116,7 +127,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
             {
                 SwitchTo(defaultCategory);
             }
-            
+
             firstShow = false;
             base.OnShow(args);
         }

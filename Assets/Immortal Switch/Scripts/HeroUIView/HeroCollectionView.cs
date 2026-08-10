@@ -59,8 +59,12 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void OnDestroy()
         {
-            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
-            TutorialManager.Instance.OnClick -= OnClickTutorial;
+            if (TutorialManager.Instance != null)
+            {
+                TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+                TutorialManager.Instance.OnClick -= OnClickTutorial;
+            }
+
             GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, OnActiveLineUpChanged);
         }
 

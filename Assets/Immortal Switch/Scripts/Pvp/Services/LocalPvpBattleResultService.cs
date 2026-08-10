@@ -107,8 +107,6 @@ namespace Immortal_Switch.Scripts.Pvp.Services
                 PvPBattleResult.Victory => (PvpDefaults.VictoryRankGain, PvpDefaults.VictoryArenaToken),
                 PvPBattleResult.Defeat => (-PvpDefaults.DefeatRankLoss, PvpDefaults.DefeatArenaToken),
                 PvPBattleResult.Surrender => (-PvpDefaults.DefeatRankLoss, PvpDefaults.DefeatArenaToken),
-                // Hoà (hết giờ, số hero còn sống bằng nhau) → +C arena_token, không đổi rank.
-                PvPBattleResult.Draw => (0, PvpDefaults.DrawArenaToken),
                 _ => (0, 0)
             };
         }

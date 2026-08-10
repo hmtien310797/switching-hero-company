@@ -5,8 +5,6 @@ using Battle;
 using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Game.Configs.Generated;
-using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.AFKReward.Views;
 using Immortal_Switch.Scripts.Bag.Views;
 using Immortal_Switch.Scripts.Core;
@@ -16,7 +14,6 @@ using Immortal_Switch.Scripts.GameSetting.Views;
 using Immortal_Switch.Scripts.UI.Skill;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items;
-using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Leaderboard.Views;
 using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.Mail.Views;
@@ -26,9 +23,8 @@ using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Helper;
-using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Shop.Views;
-using Immortal_Switch.Scripts.StageSelection;
+using Immortal_Switch.Scripts.TopMain.Views.UI;
 using Immortal_Switch.Scripts.Tutorial;
 using Sirenix.OdinInspector;
 using Spine.Unity;
@@ -47,10 +43,7 @@ namespace Immortal_Switch.Scripts.UI
         HeroSkillBarUI heroSkillBarUI;
 
         [SerializeField]
-        private Button switchMainSubHeroButton;
-
-        [SerializeField]
-        private Button moveButton;
+        private UISwitchHeroPanel switchHeroPanel;
 
         [SerializeField]
         private Button btnBag;
@@ -70,12 +63,6 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private Button btnLeaderboard;
 
-        [SerializeField]
-        private Button btnGoldInfo;
-
-        [SerializeField]
-        private Button btnDiamondInfo;
-        
         [SerializeField]
         private Button btnPvp;
 
@@ -151,9 +138,12 @@ namespace Immortal_Switch.Scripts.UI
         [SerializeField]
         private GameObject[] enableObjectsWhenPlayDungeon;
 
-        [Header("Hero Icon Switch Animation")]
+        /*[Header("Hero Icon Switch Animation")]
         [SerializeField]
-        private Image[] iconHeroImage;
+        private Image[] iconHero1Image;
+
+        [SerializeField]
+        private Image[] iconHero2Image;
 
         [SerializeField]
         private Image[] iconHeroClassImage;
@@ -171,7 +161,7 @@ namespace Immortal_Switch.Scripts.UI
         private float heroIconSwitchDuration = 0.25f;
 
         [SerializeField]
-        private Ease heroIconSwitchEase = Ease.OutCubic;
+        private Ease heroIconSwitchEase = Ease.OutCubic;*/
 
         [SerializeField]
         private Button buttonSetting;
@@ -192,9 +182,6 @@ namespace Immortal_Switch.Scripts.UI
 
         [SerializeField]
         private RectTransform switchPanel;
-
-        [SerializeField]
-        private GridLayoutGroup rightSideLayoutGroup;
 
         private readonly Tween[] heroIconTweens = new Tween[2];
         private bool isHeroIconSwapped;
@@ -252,8 +239,6 @@ namespace Immortal_Switch.Scripts.UI
 
             btnMail.onClick.AddListener(OnClickMail);
             btnLeaderboard.onClick.AddListener(OnClickLeaderboard);
-            btnDiamondInfo.onClick.AddListener(OnClickDiamondInfo);
-            btnGoldInfo.onClick.AddListener(OnClickGoldInfo);
             btnPvp.onClick.AddListener(OnClickPvp);
 
             btnEventLeHoiBangLong.onClick.AddListener(OnClickEventLeHoiBangLong);
@@ -261,7 +246,7 @@ namespace Immortal_Switch.Scripts.UI
             btnShop.onClick.AddListener(OnClickShop);
             btnBag.onClick.AddListener(OnClickBag);
             profileBtn.onClick.AddListener(OnClickProfile);
-            switchMainSubHeroButton.onClick.AddListener(OnSwitchMainSubHeroButtonClicked);
+            switchHeroPanel.Bind(OnClickSwitchHero);
 
             InitRoot();
             HideAbleObjects();
@@ -282,7 +267,7 @@ namespace Immortal_Switch.Scripts.UI
         //for demo
         private void OnOrientationChanged(ScreenOrientationTracker.ScreenViewMode mode)
         {
-            switch (mode)
+            /*switch (mode)
             {
                 case ScreenOrientationTracker.ScreenViewMode.Landscape:
                     gameStatView.anchoredPosition =
@@ -293,9 +278,9 @@ namespace Immortal_Switch.Scripts.UI
 
                     // bottomPanel.anchoredPosition =
                     //     new Vector2(bottomPanel.anchoredPosition.x, -100f);
-                    rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
-                    rightSideLayoutGroup.constraintCount = 4;
-                    /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-83f, -115f);*/
+                    //rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+                    //rightSideLayoutGroup.constraintCount = 4;
+                    /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-83f, -115f);#1#
                     break;
 
                 case ScreenOrientationTracker.ScreenViewMode.Portrait:
@@ -306,12 +291,12 @@ namespace Immortal_Switch.Scripts.UI
                         new Vector2(switchPanel.anchoredPosition.x, 273f);
 
                     //bottomPanel.anchoredPosition =
-                    //new Vector2(bottomPanel.anchoredPosition.x, -15f);*/
-                    rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
-                    rightSideLayoutGroup.constraintCount = 7;
-                    /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-33f, -118.7f);*/
+                    //new Vector2(bottomPanel.anchoredPosition.x, -15f);#1#
+                    //rightSideLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+                    //rightSideLayoutGroup.constraintCount = 5;
+                    /*rightSideLayoutGroup.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-33f, -118.7f);#1#
                     break;
-            }
+            }*/
         }
 
         private void OnClickLeaderboard()
@@ -319,31 +304,11 @@ namespace Immortal_Switch.Scripts.UI
             UIManager.Instance.TogglePopupAsync<LeaderboardView>().Forget();
         }
 
-        private void OnClickDiamondInfo()
-        {
-            ShowItemInfo((int)ECurrencyType.diamond);
-        }
-
-        private void OnClickGoldInfo()
-        {
-            ShowItemInfo((int)ECurrencyType.gold);
-        }
-
-        private void ShowItemInfo(int itemId)
-        {
-            UIManager.Instance
-                .OpenPopupAsync<PopupItemInfoView>(new PopupItemInfoArgs
-                {
-                    ItemId = itemId,
-                })
-                .Forget();
-        }
-
         private void OnClickEvent()
         {
             UIManager.Instance.TogglePopupAsync<EventView>().Forget();
         }
-        
+
         private void OnClickPvp()
         {
             UIManager.Instance.TogglePopupAsync<PvpMainView>().Forget();
@@ -376,6 +341,7 @@ namespace Immortal_Switch.Scripts.UI
             if (remainSeconds <= 0d)
             {
                 eventBLEndTime = null;
+
                 txtTimeCountDownBL.gameObject.SetActive(false);
                 btnEventLeHoiBangLong.gameObject.SetActive(false);
                 return;
@@ -438,7 +404,7 @@ namespace Immortal_Switch.Scripts.UI
             }
 
             TimeSpan span = TimeSpan.FromSeconds(afkAccumulatedSeconds);
-            txtAfkClaimTimer.text = $"{(int)span.TotalHours:00}:{span.Minutes:00}:{span.Seconds:00}";
+            txtAfkClaimTimer.text = $"Afk\n{(int)span.TotalHours:00}:{span.Minutes:00}:{span.Seconds:00}";
         }
 
         // Kéo elapsed_seconds thật từ afk/preview để seed bộ đếm cục bộ — tránh vừa vào game
@@ -480,11 +446,11 @@ namespace Immortal_Switch.Scripts.UI
                 case 6:
                     //dong het cac ui main view
                     UIManager.Instance.CloseTopMain();
-                    OnSwitchMainSubHeroButtonClicked();
+                    OnClickSwitchHero();
                     break;
 
                 case 7:
-                    OnSwitchMainSubHeroButtonClicked();
+                    OnClickSwitchHero();
                     break;
 
                 case 8:
@@ -502,7 +468,7 @@ namespace Immortal_Switch.Scripts.UI
                 // step 6
                 case 6:
                 case 7:
-                    return switchMainSubHeroButton.transform as RectTransform;
+                    return switchHeroPanel.BtnSwitch;
 
                 case 8:
                     return autoClassSkillButton.transform as RectTransform;
@@ -723,37 +689,37 @@ namespace Immortal_Switch.Scripts.UI
             RefreshAfkClaimAvailabilityAsync().Forget();
             SetHeroTeamController(HeroTeamController.Instance);
 
-            moveButton.onClick.AddListener(() =>
-            {
-                UIManager.Instance.TogglePopupAsync<StageSelectionView>(new StageSelectionOpenArgs
-                    {
-                        CurrentStage = PvEBattleController.Instance.CurrentStage,
-                        HighestUnlockedStage = PvEBattleController.Instance.HighestUnlockedStage
-                    })
-                    .Forget();
-            });
-
             buttonSetting.onClick.AddListener(() => { UIManager.Instance.TogglePopupAsync<SettingView>().Forget(); });
 
             GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
             GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
             GameEventManager.Subscribe(GameEvents.OnWaveStart, OnStageStart);
-            GameEventManager.Subscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
             GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
             BattleHeroSessionController.Instance.HeroDied += OnHeroDied;
         }
 
         private void OnDestroy()
         {
-            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
-            TutorialManager.Instance.OnClick -= OnClickTutorial;
+            if (TutorialManager.Instance != null)
+            {
+                TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+                TutorialManager.Instance.OnClick -= OnClickTutorial;
+            }
+
             GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageEnd);
             GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLost);
             GameEventManager.Unsubscribe(GameEvents.OnWaveStart, OnStageStart);
-            GameEventManager.Unsubscribe(GameEvents.OnActiveLineupChanged, SetHeroImage);
             GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayDungeon);
-            ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
-            UserDataCache.Instance.OnExpChanged -= RefreshPlayerInfo;
+
+            if (ScreenOrientationTracker.Instance != null)
+            {
+                ScreenOrientationTracker.Instance.OnOrientationChanged -= OnOrientationChanged;
+            }
+
+            if (UserDataCache.Instance != null)
+            {
+                UserDataCache.Instance.OnExpChanged -= RefreshPlayerInfo;
+            }
 
             for (int i = 0; i < heroIconTweens.Length; i++)
             {
@@ -772,15 +738,8 @@ namespace Immortal_Switch.Scripts.UI
                 Instance = null;
             }
 
-            if (switchMainSubHeroButton != null)
-            {
-                switchMainSubHeroButton.onClick.RemoveListener(OnSwitchMainSubHeroButtonClicked);
-            }
-
             btnMail.onClick.RemoveListener(OnClickMail);
             btnLeaderboard.onClick.RemoveListener(OnClickLeaderboard);
-            btnDiamondInfo.onClick.RemoveListener(OnClickDiamondInfo);
-            btnGoldInfo.onClick.RemoveListener(OnClickGoldInfo);
         }
 
         public void SetHeroSkeletonAnimationGraphic(HeroDataSO heroData)
@@ -816,7 +775,7 @@ namespace Immortal_Switch.Scripts.UI
             skeletonGraphic.AnimationState.SetAnimation(0, "animation", false);
         }
 
-        private void SetHeroImage()
+        /*private void SetHeroImage()
         {
             for (int i = 0; i < UserDataCache.Instance.inBattleHeroes.Length; i++)
             {
@@ -828,12 +787,23 @@ namespace Immortal_Switch.Scripts.UI
                 }
 
                 HeroDataSO heroDataSo = currentHero.HeroData;
-                iconHeroImage[i].sprite = HeroImageService.GetHeroIcon(heroDataSo);
+                var icHero = HeroImageService.GetHeroIcon(heroDataSo);
+
+                foreach (var t in iconHero1Image)
+                {
+                    t.sprite = icHero;
+                }
+
+                foreach (var t in iconHero2Image)
+                {
+                    t.sprite = icHero;
+                }
+
                 iconHeroClassImage[i].sprite = HeroImageService.GetHeroClassIcon(heroDataSo);
             }
-        }
+        }*/
 
-        private void OnSwitchMainSubHeroButtonClicked()
+        private void OnClickSwitchHero()
         {
             // Chuyển Hero gameplay ngay lập tức.
             // Animation icon hoàn toàn không block logic này.
@@ -842,7 +812,7 @@ namespace Immortal_Switch.Scripts.UI
 
             SetHeroSkeletonAnimationGraphic(currentSelectedHeroData);
 
-            SwitchHeroIconVisual();
+            //SwitchHeroIconVisual();
         }
 
         private void OnPlayDungeon(bool result)
@@ -858,7 +828,7 @@ namespace Immortal_Switch.Scripts.UI
                 return;
             }
 
-            switchMainSubHeroButton.interactable = true;
+            switchHeroPanel.SetInteractable(true);
             heroDeadCount = 0;
 
             for (int i = 0; i < enableObjectsWhenPlayDungeon.Length; i++)
@@ -879,13 +849,13 @@ namespace Immortal_Switch.Scripts.UI
 
             if (actor.IsChosen)
             {
-                OnSwitchMainSubHeroButtonClicked();
+                OnClickSwitchHero();
             }
 
-            switchMainSubHeroButton.interactable = false;
+            switchHeroPanel.SetInteractable(false);
         }
 
-        private void SwitchHeroIconVisual()
+        /*private void SwitchHeroIconVisual()
         {
             if (!CanSwitchHeroIcon())
             {
@@ -897,8 +867,8 @@ namespace Immortal_Switch.Scripts.UI
 
             int currentVersion = heroIconSwitchVersion;
 
-            RectTransform iconHero1 = iconHeroImage[0].rectTransform;
-            RectTransform iconHero2 = iconHeroImage[1].rectTransform;
+            RectTransform iconHero1 = iconHero1Image[0].rectTransform;
+            RectTransform iconHero2 = iconHero2Image[1].rectTransform;
 
             RectTransform iconHeroClass1 = iconHeroClassImage[0].rectTransform;
             RectTransform iconHeroClass2 = iconHeroClassImage[1].rectTransform;
@@ -930,7 +900,7 @@ namespace Immortal_Switch.Scripts.UI
                 iconRect: iconHero2, iconHeroClass2,
                 targetAnchor: hero2TargetAnchor, hero2ClassTargetAnchor,
                 switchVersion: currentVersion);
-        }
+        }*/
 
         /// <summary>
         /// Reset vị trí iconHeroImage[] + iconHeroClassImage[] về home anchor (như mới vào game).
@@ -939,7 +909,7 @@ namespace Immortal_Switch.Scripts.UI
         /// </summary>
         public void ResetHeroIconPositions()
         {
-            for (int i = 0; i < heroIconTweens.Length; i++)
+            /*for (int i = 0; i < heroIconTweens.Length; i++)
             {
                 heroIconTweens[i]?.Kill(false);
                 heroIconTweens[i] = null;
@@ -950,11 +920,11 @@ namespace Immortal_Switch.Scripts.UI
 
             for (int i = 0; i < 2; i++)
             {
-                if (iconHeroImage[i] != null &&
+                if (iconHero1Image[i] != null &&
                     heroIconAnchors[i] != null &&
                     heroIconAnimationRoot != null)
                 {
-                    RectTransform iconRect = iconHeroImage[i].rectTransform;
+                    RectTransform iconRect = iconHero1Image[i].rectTransform;
                     iconRect.SetParent(heroIconAnchors[i].transform, true);
                     iconRect.anchoredPosition = Vector3.zero;
                     iconRect.localScale = Vector3.one;
@@ -969,10 +939,10 @@ namespace Immortal_Switch.Scripts.UI
                     classRect.anchoredPosition = Vector3.zero;
                     classRect.localScale = Vector3.one;
                 }
-            }
+            }*/
         }
 
-        private void MoveHeroIcon(
+        /*private void MoveHeroIcon(
             int iconIndex,
             RectTransform iconRect,
             RectTransform iconClassRect,
@@ -1049,7 +1019,7 @@ namespace Immortal_Switch.Scripts.UI
                 });
 
             heroIconTweens[iconIndex] = sequence;
-        }
+        }*/
 
         private static Vector3 ConvertWorldScaleToLocalScale(
             Transform parent,
@@ -1087,17 +1057,19 @@ namespace Immortal_Switch.Scripts.UI
             iconRect.localScale = Vector3.one;
         }
 
-        private bool CanSwitchHeroIcon()
+        /*private bool CanSwitchHeroIcon()
         {
-            return iconHeroImage != null &&
-                   iconHeroImage.Length >= 2 &&
-                   iconHeroImage[0] != null &&
-                   iconHeroImage[1] != null &&
+            return iconHero1Image != null &&
+                   iconHero2Image != null &&
+                   iconHero1Image.Length >= 1 &&
+                   iconHero2Image.Length >= 1 &&
+                   iconHero1Image[0] != null &&
+                   iconHero2Image[1] != null &&
                    heroIconAnchors != null &&
                    heroIconAnchors.Length >= 2 &&
                    heroIconAnchors[0] != null &&
                    heroIconAnchors[1] != null;
-        }
+        }*/
 
         private static float SafeDivide(float value, float divisor)
         {
@@ -1161,7 +1133,7 @@ namespace Immortal_Switch.Scripts.UI
                 hideAbleObjects[i].SetActive(true);
             }
 
-            switchMainSubHeroButton.interactable = true;
+            switchHeroPanel.SetInteractable(true);
             heroDeadCount = 0;
         }
     }

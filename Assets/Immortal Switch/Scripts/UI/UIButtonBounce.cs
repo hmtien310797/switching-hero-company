@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,14 +7,32 @@ public class UIButtonBounce : MonoBehaviour,
     IPointerDownHandler,
     IPointerUpHandler
 {
-    [SerializeField] private RectTransform target;
-    [SerializeField] private float pressedScale = 0.9f;
-    [SerializeField] private float bounceScale = 1.1f;
-    [SerializeField] private float pressDuration = 0.08f;
-    [SerializeField] private float bounceDuration = 0.15f;
-    [SerializeField] private float normalScale = 1f;
+    [SerializeField]
+    private RectTransform target;
+
+    [SerializeField]
+    private float pressedScale = 0.9f;
+
+    [SerializeField]
+    private float bounceScale = 1.1f;
+
+    [SerializeField]
+    private float pressDuration = 0.08f;
+
+    [SerializeField]
+    private float bounceDuration = 0.15f;
+
+    [SerializeField]
+    private float normalScale = 1f;
 
     private Tween scaleTween;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        normalScale = transform.localScale.x;
+    }
+#endif
 
     private void Awake()
     {

@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.Modules.Atlas.Implementations;
 using Immortal_Switch.Scripts.Modules.Power.Services;
 using Immortal_Switch.Scripts.Modules.Power.Services.Interfaces;
 using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.UI;
 
 namespace Immortal_Switch.Scripts.Modules
 {
@@ -17,6 +18,7 @@ namespace Immortal_Switch.Scripts.Modules
         public static GearAtlasService GearAtlas { get; private set; }
         public static AtlasServiceBase EventAtlas { get; private set; }
         public static AtlasServiceBase CurrencyAtlas { get; private set; }
+        public static ItemTierVisualImageService ItemTierVisualAtlas { get; private set; }
 
         public override async UniTask InitializeAsync()
         {
@@ -29,12 +31,18 @@ namespace Immortal_Switch.Scripts.Modules
             EventAtlas = AtlasServiceModule.Register(SpriteAtlasConstants.EVENT);
             CurrencyAtlas = AtlasServiceModule.Register(SpriteAtlasConstants.CURRENCY);
 
+            ItemTierVisualAtlas = AtlasServiceModule.Register(
+                SpriteAtlasConstants.ITEM_TIER_VISUAL,
+                atlasKey => new ItemTierVisualImageService(atlasKey)
+            );
+
             var atlases = new List<AtlasServiceBase>
             {
                 ShopAtlas,
                 GearAtlas,
                 EventAtlas,
                 CurrencyAtlas,
+                ItemTierVisualAtlas,
             };
 
             await UniTask.WhenAll(atlases.Select(v => v.InitializeAsync()));

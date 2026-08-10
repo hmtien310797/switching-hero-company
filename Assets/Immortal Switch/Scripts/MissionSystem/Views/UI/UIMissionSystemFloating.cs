@@ -14,10 +14,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
     {
         [Header("Reward panel")]
         [SerializeField]
-        private TextMeshProUGUI txtRewardQuantity;
-
-        [SerializeField]
-        private UIItemSlot rewardSlot;
+        private UIRewardQuantity rewardQuantity;
 
         [Header("Mission info")]
         [SerializeField]
@@ -28,6 +25,21 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         [SerializeField]
         private TextMeshProUGUI txtProgress;
+
+        [SerializeField]
+        private GameObject goEarnStatus;
+
+        [SerializeField]
+        private Color colorTitleNormal;
+
+        [SerializeField]
+        private Color colorTitleCompleted;
+
+        [SerializeField]
+        private Color colorProgressNormal;
+
+        [SerializeField]
+        private Color colorProgressCompleted;
 
         [Header("Button claim")]
         [SerializeField]
@@ -40,7 +52,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
         {
             TutorialManager.Instance.OnResolveTarget += OnResolveTarget;
             TutorialManager.Instance.OnClick += OnClickTutorial;
-            MissionSystemManager.Instance.OnChangeProgress += OnMissionSystemChangeProgress;
+            MissionSystemManager.Instance.OnChangeProgress += OnMissionChangeProgress;
             btnClaim.onClick.AddListener(OnClaim);
         }
 
@@ -51,9 +63,17 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void OnDestroy()
         {
-            TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
-            TutorialManager.Instance.OnClick -= OnClickTutorial;
-            MissionSystemManager.Instance.OnChangeProgress -= OnMissionSystemChangeProgress;
+            if (TutorialManager.Instance != null)
+            {
+                TutorialManager.Instance.OnResolveTarget -= OnResolveTarget;
+                TutorialManager.Instance.OnClick -= OnClickTutorial;
+            }
+
+            if (MissionSystemManager.Instance != null)
+            {
+                MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
+            }
+
             btnClaim.onClick.RemoveListener(OnClaim);
         }
 
@@ -85,7 +105,7 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             }
         }
 
-        private void OnMissionSystemChangeProgress(string arg1, int arg2, string arg3)
+        private void OnMissionChangeProgress(string arg1, int arg2, string arg3)
         {
             if (arg1 == MissionTypes.MAIN)
             {
@@ -94,9 +114,11 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
                 if (cfg != null)
                 {
                     _cfg = cfg;
+
                     txtTitle.text = LocalizationManager.GetText(cfg.title);
                     txtDescription.text = LocalizationManager.GetText(cfg.description);
                     txtProgress.text = $"( {arg2} / {cfg.target:F0} )";
+
                     RefreshVisual(cfg);
                 }
             }
@@ -104,17 +126,30 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void RefreshVisual(DynamicHeroesGlobalSpecificationsMissionConfigRow cfg)
         {
-            var isCompleted = MissionSystemManager.Instance.IsCompleted(cfg);
-            btnClaim.interactable = isCompleted;
-
             var rewards = DatabaseManager.Instance.GetRewards(cfg.rewards);
+            var isCompleted = MissionSystemManager.Instance.IsCompleted(cfg);
+
+            if (isCompleted)
+            {
+                goEarnStatus.SetActive(true);
+
+                btnClaim.interactable = true;
+                txtTitle.color = colorTitleCompleted;
+                txtProgress.color = colorProgressCompleted;
+            }
+            else
+            {
+                goEarnStatus.SetActive(false);
+
+                btnClaim.interactable = false;
+                txtTitle.color = colorTitleNormal;
+                txtProgress.color = colorProgressNormal;
+            }
 
             if (rewards.Count > 0)
             {
                 var reward = rewards[0];
-
-                rewardSlot.Bind(reward.ItemIcon, reward.TierInfo.border, reward.TierInfo.background, reward.TierInfo.tierIcon);
-                txtRewardQuantity.SetText(reward.Quantity.ToInputString());
+                rewardQuantity.Bind(reward.ItemId, reward.Quantity);
             }
         }
 
