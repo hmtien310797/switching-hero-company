@@ -10,6 +10,9 @@ public class UIButtonBounce : MonoBehaviour,
     [SerializeField]
     private RectTransform target;
 
+    [SerializeField] 
+    private bool useEditorValidate = true;
+
     [SerializeField]
     private float pressedScale = 0.9f;
 
@@ -30,6 +33,10 @@ public class UIButtonBounce : MonoBehaviour,
 #if UNITY_EDITOR
     private void OnValidate()
     {
+        if (!useEditorValidate)
+        {
+            return;
+        }
         normalScale = transform.localScale.x;
     }
 #endif

@@ -38,10 +38,10 @@ namespace Battle
         public BattleFlowState State { get; private set; } = BattleFlowState.None;
         public CancellationTokenSource stageFlowCancellationTokenSource;
         public CancellationTokenSource endStageSessionCancellationTokenSource;
+
         public bool IsDungeonLocked =>
             State == BattleFlowState.EnteringDungeon ||
-            State == BattleFlowState.DungeonRunning ||
-            State == BattleFlowState.ReturningToChapter;
+            State == BattleFlowState.DungeonRunning;
 
         /// <summary>
         /// Fires after every dungeon/end call (Success = true hoặc false) — hook cho UI hiển thị
@@ -244,6 +244,7 @@ namespace Battle
             try
             {
                 // fire event clear dungeon, ko tính thắng thua.
+                GameEventManager.Trigger(GameEvents.OnPlayDungeon, false);
                 GameEventManager.Trigger(GameEvents.ON_DUNGEON_CLEAR);
                 GameStatView.Instance.ExitDungeonGamePlay();
                 CreateDungeonBattleCancellationToken();
@@ -262,7 +263,6 @@ namespace Battle
 
                 await chapterBattleController.ResumeAfterDungeonAsync();
                 Transitioner.Instance.TransitionInWithoutChangingScene();
-                GameEventManager.Trigger(GameEvents.OnPlayDungeon, false);
                 State = BattleFlowState.ChapterRunning;
             }
             catch (Exception exception)

@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace Immortal_Switch.Scripts.HeroUIView
 {
-    public class HeroCollectionView : UIView
+    public class HeroCollectionView : AnimatedUIView
     {
         [Header("References")] [SerializeField]
         private HeroProgressionDatabaseSO heroDatabase;

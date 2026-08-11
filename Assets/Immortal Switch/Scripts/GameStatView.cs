@@ -155,13 +155,14 @@ public class GameStatView : MonoBehaviour
         currentDeadMonsterQuantityText.text =
             string.Format(DeadMonsterQuantityKey, deadCount, stageDataResolverSo.MaxCreepsPerStage);
 
-        OnDefenseDungeonDataChange((float)deadCount / stageDataResolverSo.MaxCreepsPerStage);
+        //OnDefenseDungeonDataChange((float)deadCount / stageDataResolverSo.MaxCreepsPerStage);
         RefreshGameProgressionState(deadCount == stageDataResolverSo.MaxCreepsPerStage && !playCompletedStage);
     }
 
     private void OnKillAllDungeonInit(DungeonKillAllDto data)
     {
         currentChapterStageNameText.text = $"{data.DungeonName} {string.Format(NormalChapterStageDataKey, data.Stage)}";
+        progressionPreset.SetStatus(ETabPresetStatus.Normal);
         /*currentChapterStageDataText.text = string.Format(NormalChapterStageDataKey, data.Stage);
 
         currentChapterStageEnemyCountText.text =
@@ -251,7 +252,6 @@ public class GameStatView : MonoBehaviour
 
         buttonBoss.SetStatus(ETabPresetStatus.Disabled);
         buttonMap.SetStatus(ETabPresetStatus.Disabled);
-
         btnGiveUp.gameObject.SetActive(false);
     }
 
@@ -262,11 +262,17 @@ public class GameStatView : MonoBehaviour
 
         btnGiveUp.gameObject.SetActive(false);
         buttonMap.SetStatus(ETabPresetStatus.Disabled);
+        progressionPreset.SetStatus(ETabPresetStatus.Normal);
+        currentChapterStageNameText.text = string.Empty;
         battleTimerController.HideTimer();
     }
 
     private void RefreshGameProgressionState(bool canMoveBoss)
     {
+        if (BattleFlowController.Instance.IsDungeonLocked)
+        {
+            return;
+        }
         if (canMoveBoss)
         {
             buttonMap.SetStatus(ETabPresetStatus.Selected);
