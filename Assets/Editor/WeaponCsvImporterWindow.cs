@@ -15,10 +15,11 @@ using Immortal_Switch.Scripts.StatSystem;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Editor.ExcelConfigTool.Services;
 
 namespace Immortal_Switch.Scripts.Equipment.Editor
 {
-    public class WeaponCsvImporterWindow : EditorWindow
+    public class WeaponCsvImporterWindow : EditorWindow, IGameDataSyncStep
     {
         // Mỗi URL trỏ tới một sheet/tab khác nhau bằng gid.
         private const string StandardWeaponCsvUrl =
@@ -36,61 +37,25 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
         private const string WeaponLimitBreakConfigCsvUrl =
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=368806139&single=true&output=csv";
 
-        private string databaseAssetPath = "Assets/Data/Equipment/WeaponDatabase.asset";
-        private string standardWeaponFolder = "Assets/Data/Equipment/StandardWeapons";
-        private string exclusiveWeaponFolder = "Assets/Data/Equipment/ExclusiveWeapons";
-        private string levelConfigFolder = "Assets/Data/Equipment/LevelConfigs";
-        private string limitBreakConfigFolder = "Assets/Data/Equipment/LimitBreakConfigs";
-
-        private const string PrefKeyDatabaseAssetPath = "WeaponCsvImporter.DatabaseAssetPath";
-        private const string PrefKeyStandardFolder = "WeaponCsvImporter.StandardFolder";
-        private const string PrefKeyExclusiveFolder = "WeaponCsvImporter.ExclusiveFolder";
-        private const string PrefKeyLevelConfigFolder = "WeaponCsvImporter.LevelConfigFolder";
-        private const string PrefKeyLimitBreakConfigFolder = "WeaponCsvImporter.LimitBreakConfigFolder";
-
+        private const string databaseAssetPath = "Assets/Immortal Switch/Addressable/Equipment/WeaponDatabase.asset";
+        private const string standardWeaponFolder = "Assets/Immortal Switch/Addressable/Equipment/StandardWeapon";
+        private const string exclusiveWeaponFolder = "Assets/Immortal Switch/Addressable/Equipment/ExclusiveWeapon";
+        private const string levelConfigFolder = "Assets/Immortal Switch/Addressable/Equipment/LevelConfig";
+        private const string limitBreakConfigFolder = "Assets/Immortal Switch/Addressable/Equipment/LimitBreak";
+        
         private bool isImporting;
         private string importStatus;
 
-        private void OnEnable()
+        // ---- Batch API (GameDataSyncCoordinator) ----
+        public bool IsRunning => isImporting;
+        public bool LastImportFailed { get; private set; }
+        private bool suppressDialogs;
+
+        public void RunForBatch()
         {
-            LoadPrefs();
-        }
-
-        private void LoadPrefs()
-        {
-            databaseAssetPath = EditorPrefs.GetString(
-                PrefKeyDatabaseAssetPath,
-                "Assets/Data/Equipment/WeaponDatabase.asset"
-            );
-
-            standardWeaponFolder = EditorPrefs.GetString(
-                PrefKeyStandardFolder,
-                "Assets/Data/Equipment/StandardWeapons"
-            );
-
-            exclusiveWeaponFolder = EditorPrefs.GetString(
-                PrefKeyExclusiveFolder,
-                "Assets/Data/Equipment/ExclusiveWeapons"
-            );
-
-            levelConfigFolder = EditorPrefs.GetString(
-                PrefKeyLevelConfigFolder,
-                "Assets/Data/Equipment/LevelConfigs"
-            );
-
-            limitBreakConfigFolder = EditorPrefs.GetString(
-                PrefKeyLimitBreakConfigFolder,
-                "Assets/Data/Equipment/LimitBreakConfigs"
-            );
-        }
-
-        private void SavePrefs()
-        {
-            EditorPrefs.SetString(PrefKeyDatabaseAssetPath, databaseAssetPath ?? string.Empty);
-            EditorPrefs.SetString(PrefKeyStandardFolder, standardWeaponFolder ?? string.Empty);
-            EditorPrefs.SetString(PrefKeyExclusiveFolder, exclusiveWeaponFolder ?? string.Empty);
-            EditorPrefs.SetString(PrefKeyLevelConfigFolder, levelConfigFolder ?? string.Empty);
-            EditorPrefs.SetString(PrefKeyLimitBreakConfigFolder, limitBreakConfigFolder ?? string.Empty);
+            LastImportFailed = false;
+            suppressDialogs = true;
+            ImportAllAsync();
         }
 
         [MenuItem("Tools/Equipment/Weapon CSV Importer")]
@@ -122,17 +87,6 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
             EditorGUILayout.Space();
             GUILayout.Label("Output", EditorStyles.boldLabel);
-
-            databaseAssetPath = EditorGUILayout.TextField("Database Asset", databaseAssetPath);
-            standardWeaponFolder = EditorGUILayout.TextField("Standard Folder", standardWeaponFolder);
-            exclusiveWeaponFolder = EditorGUILayout.TextField("Exclusive Folder", exclusiveWeaponFolder);
-            levelConfigFolder = EditorGUILayout.TextField("Level Config Folder", levelConfigFolder);
-            limitBreakConfigFolder = EditorGUILayout.TextField("Limit Break Config Folder", limitBreakConfigFolder);
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                SavePrefs();
-            }
 
             EditorGUILayout.Space();
 
@@ -168,8 +122,6 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
             try
             {
-                SavePrefs();
-
                 EnsureFolder(standardWeaponFolder);
                 EnsureFolder(exclusiveWeaponFolder);
                 EnsureFolder(levelConfigFolder);
@@ -255,23 +207,30 @@ namespace Immortal_Switch.Scripts.Equipment.Editor
 
                 importStatus = "Import Google Sheet hoàn tất.";
 
-                EditorUtility.DisplayDialog(
-                    "Success",
-                    "Import weapon data từ Google Sheet hoàn tất.",
-                    "OK"
-                );
+                if (!suppressDialogs)
+                {
+                    EditorUtility.DisplayDialog(
+                        "Success",
+                        "Import weapon data từ Google Sheet hoàn tất.",
+                        "OK"
+                    );
+                }
             }
             catch (Exception ex)
             {
+                LastImportFailed = true;
                 importStatus = $"Import thất bại: {ex.Message}";
 
                 Debug.LogException(ex);
 
-                EditorUtility.DisplayDialog(
-                    "Import Failed",
-                    ex.Message,
-                    "OK"
-                );
+                if (!suppressDialogs)
+                {
+                    EditorUtility.DisplayDialog(
+                        "Import Failed",
+                        ex.Message,
+                        "OK"
+                    );
+                }
             }
             finally
             {

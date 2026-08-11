@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Editor.ExcelConfigTool.Services;
 
 namespace Immortal_Switch.Scripts.Hero.Editor
 {
-    public class HeroProgressionGoogleSheetImporterWindow : EditorWindow
+    public class HeroProgressionGoogleSheetImporterWindow : EditorWindow, IGameDataSyncStep
     {
 
         private const string googleSheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=642786794&single=true&output=csv";
@@ -22,6 +23,17 @@ namespace Immortal_Switch.Scripts.Hero.Editor
         private bool isImporting;
         private Vector2 scrollPosition;
         private string lastResult = string.Empty;
+
+        // ---- Batch API (GameDataSyncCoordinator) ----
+        public bool IsRunning => isImporting;
+        public bool LastImportFailed { get; private set; }
+
+        public void RunForBatch()
+        {
+            LastImportFailed = false;
+            ImportAsync();
+        }
+        // ---------------------------------------------
 
         [MenuItem("Tools/Game Data/Hero Progression Importer")]
         public static void OpenWindow()
@@ -120,10 +132,16 @@ namespace Immortal_Switch.Scripts.Hero.Editor
                 string csvText = await DownloadTextAsync(csvUrl);
                 ImportReport report = ImportCsv(csvText);
 
+                if (report.ErrorCount > 0)
+                {
+                    LastImportFailed = true;
+                }
+
                 ShowResult(report.BuildMessage(), report.ErrorCount > 0);
             }
             catch (Exception exception)
             {
+                LastImportFailed = true;
                 Debug.LogException(exception);
                 ShowResult($"Import failed:\n{exception.Message}", true);
             }

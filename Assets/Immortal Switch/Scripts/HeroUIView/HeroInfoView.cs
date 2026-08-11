@@ -62,9 +62,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
         [SerializeField] private Image[] skillImage;
         [SerializeField] private GameObject[] stars;
         
-        private const string HERO_SPRITE_ATLAS_KEY = "hero_sprite_atlas";
         private int _currentHeroIdx;
-        private SpriteAtlas _heroSpriteAlas;
         private HeroCollectionItemViewData heroCollectionItemViewData;
         public int heroId { get; private set; }
         private HeroStatSnapshot heroStatSnapshot;
@@ -80,11 +78,6 @@ namespace Immortal_Switch.Scripts.HeroUIView
         
         public override async UniTask PlayShowAsync(object args)
         {
-            if (_heroSpriteAlas == null)
-            {
-                _heroSpriteAlas = await AddressableSpriteAtlasService.AcquireAtlasAsync(HERO_SPRITE_ATLAS_KEY);
-            }
-
             base.PlayShowAsync(args).Forget();
         }
 
@@ -112,7 +105,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
         private void OnClickFormation()
         {
-            UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>(_heroSpriteAlas).Forget();
+            UIManager.Instance.TogglePopupAsync<HeroSwitchPopupView>().Forget();
         }
 
         private void OnClickNext()
@@ -232,6 +225,10 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
                 // update lại mesh UI
                 heroSkeletonGraphic.LateUpdate();
+                foreach (var physics in heroSkeletonGraphic.Skeleton.PhysicsConstraints)
+                {
+                    physics.Mix = 0f;
+                }
             }
 
             var element = heroUiDb.GetElement(hero.Element);

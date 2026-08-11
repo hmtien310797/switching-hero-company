@@ -1034,7 +1034,7 @@ namespace Battle
         {
             result = BattleResult.Victory;
             SetState(BattleState.Ended);
-
+            GameEventManager.Trigger(GameEvents.OnStageSessionChange);
             if (currentBoss != null)
             {
                 targetRegistry.UnregisterHostile(currentBoss);
@@ -1114,7 +1114,6 @@ namespace Battle
             // vẫn chạy như cũ qua CacheStageSpawnData trong InitStage, không thuộc phạm vi RPC này.
             NextStageCallback(cancellationToken).Forget();
             cancellationToken.ThrowIfCancellationRequested();
-            GameEventManager.Trigger(GameEvents.OnStageSessionChange);
         }
 
         private void OnStageFailed()
@@ -1129,7 +1128,7 @@ namespace Battle
             result = BattleResult.Defeat;
             losingStage = true;
             DespawnCreepAndBoss();
-
+            GameEventManager.Trigger(GameEvents.OnStageSessionChange);
             // Defeat khi đang replay stage cũ (không phải frontier) — không cần báo server, không
             // ảnh hưởng progression dù có gọi hay không, bỏ qua để tránh gọi RPC vô nghĩa.
             if (CurrentStage == serverFrontierStage)
@@ -1147,7 +1146,6 @@ namespace Battle
 
             cancellationToken.ThrowIfCancellationRequested();
             PlayCurrentStage(cancellationToken,1).Forget();
-            GameEventManager.Trigger(GameEvents.OnStageSessionChange);
         }
 
         private void SetState(BattleState newState)

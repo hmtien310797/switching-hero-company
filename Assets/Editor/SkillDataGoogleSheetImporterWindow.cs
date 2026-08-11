@@ -10,8 +10,9 @@ using Immortal_Switch.Scripts.Skill;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Editor.ExcelConfigTool.Services;
 
-public class SkillDataGoogleSheetImporterWindow : EditorWindow
+public class SkillDataGoogleSheetImporterWindow : EditorWindow, IGameDataSyncStep
 {
     private const string SkillIdentityGoogleSheetUrl =
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=1104382280&single=true&output=csv";
@@ -27,6 +28,17 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
     private Vector2 scrollPosition;
     private UnityWebRequest activeRequest;
     private bool isDownloading;
+
+    // ---- Batch API (GameDataSyncCoordinator) ----
+    public bool IsRunning => isDownloading;
+    public bool LastImportFailed { get; private set; }
+
+    public void RunForBatch()
+    {
+        LastImportFailed = false;
+        DownloadValidateAndImportAll();
+    }
+    // ---------------------------------------------
 
     [MenuItem("Tools/Game Data/Import Skill Data From Google Sheet")]
     private static void OpenWindow()
@@ -159,6 +171,7 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                         }
                         catch (Exception exception)
                         {
+                            LastImportFailed = true;
                             Debug.LogError(
                                 "[Skill Data Sheet] Import thất bại.\n" +
                                 exception);
@@ -168,9 +181,9 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                             FinishDownloadProcess();
                         }
                     },
-                    FinishDownloadProcess);
+                    FailAndFinish);
             },
-            FinishDownloadProcess);
+            FailAndFinish);
     }
 
     private void DownloadCsv(
@@ -268,6 +281,12 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
         isDownloading = false;
         DisposeActiveRequest();
         Repaint();
+    }
+
+    private void FailAndFinish()
+    {
+        LastImportFailed = true;
+        FinishDownloadProcess();
     }
 
     private void DisposeActiveRequest()
@@ -495,11 +514,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
                 skillData.SkillKey,
                 rowData.SkillKey,
                 StringComparison.Ordinal) ||
-            !string.Equals(
-                skillData.IconSkillKey,
-                rowData.IconSkillKey,
-                StringComparison.Ordinal) ||
-            skillData.OwnerType != SkillOwnerType.ClassSkill ||
             skillData.SkillTier != rowData.SkillTier;
 
         if (!changed)
@@ -507,7 +521,6 @@ public class SkillDataGoogleSheetImporterWindow : EditorWindow
 
         skillData.SkillId = rowData.SkillId;
         skillData.SkillKey = rowData.SkillKey;
-        skillData.IconSkillKey = rowData.IconSkillKey;
         skillData.OwnerType = SkillOwnerType.ClassSkill;
         skillData.SkillTier = rowData.SkillTier;
 

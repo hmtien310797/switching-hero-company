@@ -42,7 +42,6 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         // --- Private Fields ---
         private Action<string, int> _onClickBuy;
-        private Action<int, EShopTab> _onClickClaim;
 
         private List<UIShopProductItem> _instantPools = new();
         private List<UIShopProductItem> _dailyPools = new();
@@ -83,10 +82,10 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
         private void OnClickBuy()
         {
+            // Đã mua thì nút chỉ còn là trạng thái hiển thị (xem RefreshStatus) — thưởng ngày giờ
+            // gửi thẳng qua mailbox, không còn thao tác nhận thủ công ở đây nữa.
             if (_isBought)
             {
-                _onClickClaim?.Invoke(_iap.iD, EShopTab.MonthlyPass);
-                RefreshStatus();
                 return;
             }
 
@@ -109,7 +108,6 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
         public void Bind(DynamicHeroesGlobalSpecificationsProductIdRow product,
             DynamicHeroesGlobalSpecificationsPackIapRow iap,
             Action<string, int> onClickBuy,
-            Action<int, EShopTab> onClickClaim,
             IReadOnlyList<ItemRewardData> rewardMonthly,
             IReadOnlyList<ItemRewardData> rewardDaily,
             IReadOnlyList<ItemRewardData> rewardInstant
@@ -118,7 +116,6 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             _product = product;
             _iap = iap;
             _onClickBuy = onClickBuy;
-            _onClickClaim = onClickClaim;
             txtBonus.text = $"Giá trị <size=30>{iap.bonus}</size>";
 
             RefreshStatus();
@@ -163,12 +160,12 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
 
             if (_isBought)
             {
-                var isClaimed = ShopManager.Instance.IsMonthlyPassDayClaimed(_iap.iD, currentDay);
-                var canClaim = currentDay >= 1 && currentDay <= 30 && !isClaimed;
-
-                txtPrice.text = canClaim ? "Nhận" : "Đã nhận";
+                // Thưởng mỗi ngày giờ tự động gửi vào mailbox (server: rpcPlayerMe →
+                // sendMonthlyPassDailyRewardsIfNeeded) — không còn thao tác nhận thủ công, nút chỉ
+                // hiển thị trạng thái.
+                txtPrice.text = "Đã kích hoạt";
                 txtDay.text = $"Ngày {currentDay}/30";
-                btnBuy.interactable = canClaim;
+                btnBuy.interactable = false;
             }
             else
             {

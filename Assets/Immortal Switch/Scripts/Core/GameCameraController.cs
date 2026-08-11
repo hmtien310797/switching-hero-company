@@ -79,6 +79,11 @@ public class GameCameraController : Singleton<GameCameraController>
         ScreenOrientationTracker.Instance.OnOrientationChanged -= SetCameraFieldOfView;
     }
 
+    public void TriggerHeroCamera(bool value)
+    {
+        renderHeroCamera.gameObject.SetActive(value);
+    }
+
     private void SetCameraFieldOfView(ScreenOrientationTracker.ScreenViewMode mode)
     {
         switch (mode)

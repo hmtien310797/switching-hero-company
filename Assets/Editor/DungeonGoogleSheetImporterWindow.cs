@@ -9,10 +9,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using Editor.ExcelConfigTool.Services;
 
 namespace Battle.Dungeon.Editor
 {
-    public sealed class DungeonGoogleSheetImporterWindow : EditorWindow
+    public sealed class DungeonGoogleSheetImporterWindow : EditorWindow, IGameDataSyncStep
     {
         // Điền URL CSV thật trực tiếp tại đây.
         private const string DungeonDefinitionCsvUrl =
@@ -28,6 +29,44 @@ namespace Battle.Dungeon.Editor
 
         [SerializeField] private DungeonDatabaseSO targetDatabase;
         private bool isImporting;
+
+        // ---- Batch API (GameDataSyncCoordinator) ----
+        public bool IsRunning => isImporting;
+        public bool LastImportFailed { get; private set; }
+        private bool suppressDialogs;
+
+        public void RunForBatch()
+        {
+            LastImportFailed = false;
+            suppressDialogs = true;
+
+            targetDatabase = FindFirstDungeonDatabase();
+
+            if (targetDatabase == null)
+            {
+                Debug.LogError(
+                    "[GameDataSync] Không tìm thấy DungeonDatabaseSO trong Assets. " +
+                    "Bỏ qua bước Dungeon.");
+                LastImportFailed = true;
+                return;
+            }
+
+            ImportAllAsync();
+        }
+
+        private static DungeonDatabaseSO FindFirstDungeonDatabase()
+        {
+            string[] guids = AssetDatabase.FindAssets("t:DungeonDatabaseSO");
+
+            if (guids == null || guids.Length == 0)
+            {
+                return null;
+            }
+
+            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            return AssetDatabase.LoadAssetAtPath<DungeonDatabaseSO>(path);
+        }
+        // ---------------------------------------------
 
         [MenuItem("Tools/Game Data/Dungeun Data Importer")]
         private static void OpenWindow()
@@ -135,24 +174,31 @@ namespace Battle.Dungeon.Editor
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
 
-                EditorUtility.DisplayDialog(
-                    "Dungeon Importer",
-                    "Import thành công.\n\n" +
-                    $"Definitions: {definitions.Count}\n" +
-                    $"Stage formulas: {stageFormulaRows.Count}\n" +
-                    $"Damage thresholds: {damageThresholdRows.Count}",
-                    "OK"
-                );
+                if (!suppressDialogs)
+                {
+                    EditorUtility.DisplayDialog(
+                        "Dungeon Importer",
+                        "Import thành công.\n\n" +
+                        $"Definitions: {definitions.Count}\n" +
+                        $"Stage formulas: {stageFormulaRows.Count}\n" +
+                        $"Damage thresholds: {damageThresholdRows.Count}",
+                        "OK"
+                    );
+                }
             }
             catch (Exception exception)
             {
+                LastImportFailed = true;
                 Debug.LogException(exception);
 
-                EditorUtility.DisplayDialog(
-                    "Dungeon Importer Error",
-                    exception.Message,
-                    "OK"
-                );
+                if (!suppressDialogs)
+                {
+                    EditorUtility.DisplayDialog(
+                        "Dungeon Importer Error",
+                        exception.Message,
+                        "OK"
+                    );
+                }
             }
             finally
             {

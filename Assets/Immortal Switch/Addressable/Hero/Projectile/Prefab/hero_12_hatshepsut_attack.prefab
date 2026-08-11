@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3297803092827021833}
   - component: {fileID: 959059736959254149}
   - component: {fileID: 194614590179569495}
+  - component: {fileID: 8441297273092002802}
   m_Layer: 11
   m_Name: hero_12_hatshepsut_attack
   m_TagString: Untagged
@@ -4953,7 +4954,7 @@ TrailRenderer:
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.5249904
+    widthMultiplier: 0.75
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -5035,6 +5036,18 @@ MonoBehaviour:
   speed: 30
   hitDistance: 0.15
   lifeTime: 3
+--- !u!114 &8441297273092002802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4661716183660938567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a04dc37457424f019c2410f4bc35be76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6318185419548616511
 GameObject:
   m_ObjectHideFlags: 0
@@ -5322,8 +5335,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.08
-      minScalar: 0.03
+      scalar: 0.1
+      minScalar: 0.5
       maxCurve:
         serializedVersion: 2
         m_Curve:

@@ -28,6 +28,18 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
         [SerializeField]
         private UIEventLeHoiBangLongLayoutController layoutVertical;
 
+        [SerializeField] 
+        private Transform verticalLayoutTransform;
+        
+        [SerializeField] 
+        private Transform horizontalLayoutTransform;
+        
+        [SerializeField] 
+        private Vector2 verticalLayoutSize;
+        
+        [SerializeField] 
+        private Vector2 horizontalLayoutSize;
+
         [SerializeField]
         private EventLeHoiBangLongTopLayout topLayout;
 
@@ -43,10 +55,6 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
         [Tooltip("RawImage nằm trong horizontal_layout. Code sẽ gán RenderTexture.")]
         [SerializeField]
         private RawImage mascotRawImageHorizontal;
-
-        [Tooltip("RawImage nằm trong vertical_layout. Code sẽ gán RenderTexture.")]
-        [SerializeField]
-        private RawImage mascotRawImageVertical;
 
         [Tooltip("Cạnh dài của RenderTexture (pixel). Cao hơn = nét hơn, tốn GPU hơn. Nền 1024+ cho background full-screen.")]
         [SerializeField]
@@ -138,15 +146,17 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
         public override async UniTask PlayShowAsync(object args)
         {
             EnsureMascot();
-            RefreshMascotFraming();
+            RefreshMascotFraming(ScreenOrientationTracker.Instance.CurrentMode);
             PlayMascotAnimation();
             await base.PlayShowAsync(args);
+            GameCameraController.Instance.TriggerHeroCamera(false);
         }
 
         public override async UniTask PlayHideAsync()
         {
             // Dừng + ẩn spine/camera khi đóng để tiết kiệm CPU (không render RT khi view ẩn).
             StopMascot();
+            GameCameraController.Instance.TriggerHeroCamera(true);
             await base.PlayHideAsync();
         }
 
@@ -158,14 +168,14 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
                     layoutHorizontal.gameObject.SetActive(false);
                     layoutVertical.gameObject.SetActive(true);
                     topLayout.SetEnableHelp(false);
-                    RefreshMascotFraming(); // RT aspect 9:16 + re-frame
+                    RefreshMascotFraming(obj); 
                     break;
 
                 case ScreenOrientationTracker.ScreenViewMode.Landscape:
                     layoutHorizontal.gameObject.SetActive(true);
                     layoutVertical.gameObject.SetActive(false);
                     topLayout.SetEnableHelp(true);
-                    RefreshMascotFraming(); // RT aspect 16:9 + re-frame
+                    RefreshMascotFraming(obj); 
                     break;
 
                 default:
@@ -234,14 +244,25 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
         }
 
         // RT aspect khớp RawImage active; Cover/Contain framing. Gọi mỗi lần show + khi xoay orientation.
-        private void RefreshMascotFraming()
+        private void RefreshMascotFraming(ScreenOrientationTracker.ScreenViewMode screenViewMode)
         {
             if (!_mascotSetup || _skeletonAnim == null || _mascotCam == null) return;
+            
+            if (mascotRawImageHorizontal == null) return;
+            switch (screenViewMode)
+            {
+                case ScreenOrientationTracker.ScreenViewMode.Landscape:
+                    mascotRawImageHorizontal.transform.SetParent(horizontalLayoutTransform);
+                    mascotRawImageHorizontal.rectTransform.sizeDelta = horizontalLayoutSize;
+                    break;
+                case ScreenOrientationTracker.ScreenViewMode.Portrait:
+                    mascotRawImageHorizontal.transform.SetParent(verticalLayoutTransform);
+                    mascotRawImageHorizontal.rectTransform.sizeDelta = verticalLayoutSize;
+                    break;
+            }
+            mascotRawImageHorizontal.transform.SetSiblingIndex(1);
 
-            RawImage activeRaw = GetActiveMascotRawImage();
-            if (activeRaw == null) return;
-
-            Rect r = activeRaw.rectTransform.rect;
+            Rect r = mascotRawImageHorizontal.rectTransform.rect;
             float aspect = (r.height > 0f) ? r.width / r.height : 1f;
             if (aspect <= 0f || float.IsNaN(aspect)) aspect = 1f;
 
@@ -275,7 +296,6 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
                 _rtAspect = aspect;
 
                 AssignRawImage(mascotRawImageHorizontal);
-                AssignRawImage(mascotRawImageVertical);
                 _mascotCam.targetTexture = _rt;
                 _mascotCam.aspect = aspect;
             }
@@ -295,15 +315,6 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong
             _mascotCam.transform.position = center + new Vector3(0f, 0f, -10f);
             _mascotCam.transform.LookAt(center, Vector3.up);
             _mascotCam.enabled = true;
-        }
-
-        private RawImage GetActiveMascotRawImage()
-        {
-            if (mascotRawImageVertical != null && mascotRawImageVertical.gameObject.activeInHierarchy)
-                return mascotRawImageVertical;
-            if (mascotRawImageHorizontal != null && mascotRawImageHorizontal.gameObject.activeInHierarchy)
-                return mascotRawImageHorizontal;
-            return null;
         }
 
         private void AssignRawImage(RawImage rawImage)

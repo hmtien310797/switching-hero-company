@@ -10,8 +10,9 @@ using Immortal_Switch.Scripts.Boss;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Editor.ExcelConfigTool.Services;
 
-public class BossDataCsvImporterWindow : EditorWindow
+public class BossDataCsvImporterWindow : EditorWindow, IGameDataSyncStep
 {
     /*
      * Google Sheet CSV URL:
@@ -34,6 +35,19 @@ public class BossDataCsvImporterWindow : EditorWindow
     private Vector2 logScrollPosition;
 
     private readonly List<string> importLogs = new();
+
+    // ---- Batch API (GameDataSyncCoordinator) ----
+    public bool IsRunning => isImporting;
+    public bool LastImportFailed { get; private set; }
+    private bool suppressDialogs;
+
+    public void RunForBatch()
+    {
+        LastImportFailed = false;
+        suppressDialogs = true;
+        DownloadAndImport();
+    }
+    // ---------------------------------------------
 
     [MenuItem("Tools/Game Data/Boss Data Importer")]
     private static void OpenWindow()
@@ -170,6 +184,7 @@ public class BossDataCsvImporterWindow : EditorWindow
         }
         catch (Exception exception)
         {
+            LastImportFailed = true;
             AddLog($"Import failed: {exception.Message}");
             Debug.LogException(exception);
         }
@@ -343,14 +358,17 @@ public class BossDataCsvImporterWindow : EditorWindow
             $"Skipped: {skippedCount}, " +
             $"Failed: {failedCount}");
 
-        EditorUtility.DisplayDialog(
-            "Boss Data Importer",
-            $"Import hoàn tất.\n\n" +
-            $"Created: {createdCount}\n" +
-            $"Updated: {updatedCount}\n" +
-            $"Skipped: {skippedCount}\n" +
-            $"Failed: {failedCount}",
-            "OK");
+        if (!suppressDialogs)
+        {
+            EditorUtility.DisplayDialog(
+                "Boss Data Importer",
+                $"Import hoàn tất.\n\n" +
+                $"Created: {createdCount}\n" +
+                $"Updated: {updatedCount}\n" +
+                $"Skipped: {skippedCount}\n" +
+                $"Failed: {failedCount}",
+                "OK");
+        }
     }
 
     private static BossCsvRow ParseRow(

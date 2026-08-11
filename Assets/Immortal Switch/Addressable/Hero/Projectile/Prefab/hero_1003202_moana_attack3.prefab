@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5696138192282603697}
   - component: {fileID: 3113857424157821907}
   - component: {fileID: 6946385455583904840}
+  - component: {fileID: 1227199331973984177}
   m_Layer: 7
   m_Name: hero_1003202_moana_attack3
   m_TagString: Untagged
@@ -291,7 +292,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.8
+      scalar: 1.2
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -5098,6 +5099,18 @@ MonoBehaviour:
   speed: 30
   hitDistance: 0.15
   lifeTime: 10
+--- !u!114 &1227199331973984177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 284666549664911678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a04dc37457424f019c2410f4bc35be76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8277253763746661094
 GameObject:
   m_ObjectHideFlags: 0
@@ -5385,8 +5398,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.5
-      minScalar: 0.2
+      scalar: 0.4
+      minScalar: 0.6
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -10227,7 +10240,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.4
+      scalar: 0.6
       minScalar: 1
       maxCurve:
         serializedVersion: 2

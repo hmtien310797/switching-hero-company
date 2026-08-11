@@ -10,6 +10,7 @@ namespace Immortal_Switch.Scripts.Shared.UI
         Normal = 0,
         Selected = 1,
         Lock = 2,
+        Disabled = 3
     }
 
     [RequireComponent(typeof(Button))]
@@ -104,21 +105,28 @@ namespace Immortal_Switch.Scripts.Shared.UI
             switch (status)
             {
                 case ETabPresetStatus.Normal:
+                    gameObject.SetActive(true);
                     RefreshNormal(true);
                     RefreshSelected(false);
                     RefreshVisual();
                     break;
 
                 case ETabPresetStatus.Selected:
+                    gameObject.SetActive(true);
                     RefreshNormal(false);
                     RefreshSelected(true);
                     RefreshVisual();
                     break;
 
                 case ETabPresetStatus.Lock:
+                    gameObject.SetActive(true);
                     RefreshNormal(false);
                     RefreshSelected(false);
                     RefreshVisual();
+                    break;
+                
+                case ETabPresetStatus.Disabled:
+                    gameObject.SetActive(false);
                     break;
             }
         }

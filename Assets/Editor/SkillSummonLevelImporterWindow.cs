@@ -7,10 +7,11 @@ using Immortal_Switch.Scripts.Skill;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Editor.ExcelConfigTool.Services;
 
 namespace Immortal_Switch.Editor.GameData
 {
-    public sealed class SkillSummonLevelImporterWindow : EditorWindow
+    public sealed class SkillSummonLevelImporterWindow : EditorWindow, IGameDataSyncStep
     {
         private const string MenuPath = "Tools/Game Data/Skill Summon Level Importer";
 
@@ -27,6 +28,17 @@ namespace Immortal_Switch.Editor.GameData
         private string downloadedCsvText;
         private UnityWebRequest downloadRequest;
         private bool isDownloading;
+
+        // ---- Batch API (GameDataSyncCoordinator) ----
+        public bool IsRunning => isDownloading;
+        public bool LastImportFailed { get; private set; }
+
+        public void RunForBatch()
+        {
+            LastImportFailed = false;
+            DownloadGoogleSheetAndApply();
+        }
+        // ---------------------------------------------
 
         [MenuItem(MenuPath)]
         private static void Open()
@@ -118,6 +130,7 @@ namespace Immortal_Switch.Editor.GameData
             }
             catch (Exception ex)
             {
+                LastImportFailed = true;
                 Debug.LogException(ex);
                 message = $"Import failed: {ex.Message}";
             }
@@ -205,6 +218,7 @@ namespace Immortal_Switch.Editor.GameData
             }
             catch (Exception ex)
             {
+                LastImportFailed = true;
                 Debug.LogException(ex);
                 message = $"Import failed: {ex.Message}";
             }

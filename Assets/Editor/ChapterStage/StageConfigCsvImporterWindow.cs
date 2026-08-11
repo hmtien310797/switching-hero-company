@@ -13,8 +13,9 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Level.Stage;
 using UnityEditor;
 using UnityEngine;
+using Editor.ExcelConfigTool.Services;
 
-public class StageConfigCsvImporterWindow : EditorWindow
+public class StageConfigCsvImporterWindow : EditorWindow, IGameDataSyncStep
 {
     [Header("CSV TextAssets")] [SerializeField]
     private TextAsset chaptersCsv;
@@ -38,6 +39,18 @@ public class StageConfigCsvImporterWindow : EditorWindow
 
     [Header("Output Folder")] [SerializeField]
     private string outputFolder = "Assets/_Project/Generated/StageConfig";
+
+    // ---- Batch API (GameDataSyncCoordinator) ----
+    // ImportAll() là đồng bộ (chặn main thread) nên IsRunning luôn false:
+    // sau khi RunForBatch trả về nghĩa là bước đã xong.
+    public bool IsRunning => false;
+    public bool LastImportFailed { get; private set; }
+
+    public void RunForBatch()
+    {
+        LastImportFailed = !ImportAll();
+    }
+    // ---------------------------------------------
 
     [MenuItem("Tools/Game Data/Stage Chapter Config")]
     private static void Open()
@@ -150,7 +163,7 @@ public class StageConfigCsvImporterWindow : EditorWindow
         }
     }
 
-    private void ImportAll()
+    private bool ImportAll()
     {
         EnsureFolder(outputFolder);
 
@@ -175,7 +188,7 @@ public class StageConfigCsvImporterWindow : EditorWindow
             StageScalingRuleSO scalingRule = null;
             if (!string.IsNullOrWhiteSpace(stageScalingRulesText))
                 scalingRule = ImportStageScalingRules(stageScalingRulesText);
-            
+
             ElementRuleSO elementRule = null;
             if (!string.IsNullOrWhiteSpace(elementRulesText))
                 elementRule = ImportElementRules(elementRulesText);
@@ -183,7 +196,7 @@ public class StageConfigCsvImporterWindow : EditorWindow
             EditorUtility.SetDirty(chapterConfig);
             EditorUtility.SetDirty(enemyPatternRule);
             EditorUtility.SetDirty(bossPatternRule);
-            
+
             if (elementRule != null)
                 EditorUtility.SetDirty(elementRule);
 
@@ -197,10 +210,12 @@ public class StageConfigCsvImporterWindow : EditorWindow
             AssetDatabase.Refresh();
 
             Debug.Log("[StageConfigImporter] Import completed.");
+            return true;
         }
         catch (Exception e)
         {
             Debug.LogError($"[StageConfigImporter] Import failed:\n{e}");
+            return false;
         }
     }
 

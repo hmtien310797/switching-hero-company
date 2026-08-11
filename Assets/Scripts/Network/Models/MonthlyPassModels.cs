@@ -7,6 +7,9 @@ using Newtonsoft.Json;
 // pack_monthly.csv) — MonthlyPassDayDto chỉ cần is_claimed để biết trạng thái nút, không lặp
 // lại item_id/quantity từ server (giống RechargeMilestoneDto).
 
+// is_claimed nay có nghĩa "đã gửi thưởng vào mailbox chưa" — thưởng ngày không còn claim thủ
+// công (xem handler/monthly_pass.js sendMonthlyPassDailyRewardsIfNeeded), field giữ nguyên tên
+// vì vẫn đúng bản chất (ngày đó đã được server phát thưởng hay chưa).
 [Serializable]
 public class MonthlyPassDayDto
 {
@@ -34,22 +37,5 @@ public class MonthlyPassStateResponse
     [JsonProperty("passes")] public List<MonthlyPassDto> Passes;
 }
 
-// ── monthlypass/claim ────────────────────────────────────────────────────────
-
-[Serializable]
-public class MonthlyPassClaimRequest
-{
-    [JsonProperty("pack_id")] public int PackId;
-}
-
-/// <summary>Response từ monthlypass/claim. Day là ngày server vừa cộng thưởng (tự tính từ
-/// purchased_at, không nhận day từ client) — dùng để tra reward hiển thị qua
-/// DatabaseManager.GetPackMonthly(packId, Day).</summary>
-[Serializable]
-public class MonthlyPassClaimResponse
-{
-    [JsonProperty("pack_id")]  public int             PackId;
-    [JsonProperty("day")]      public int             Day;
-    [JsonProperty("rewards")]  public List<RewardDto> Rewards;
-    [JsonProperty("balances")] public List<RewardDto> Balances;
-}
+// Thưởng ngày không còn RPC/claim riêng — server gửi thẳng qua mailbox (mail/list, mail/claim)
+// mỗi lần login, xem nakama/src/handler/monthly_pass.js sendMonthlyPassDailyRewardsIfNeeded.

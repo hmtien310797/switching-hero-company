@@ -11,8 +11,9 @@ using Immortal_Switch.Scripts.Hero;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Editor.ExcelConfigTool.Services;
 
-public class HeroDataCsvImporterWindow : EditorWindow
+public class HeroDataCsvImporterWindow : EditorWindow, IGameDataSyncStep
 {
     /*
      * Link Google Sheet dạng CSV:
@@ -35,6 +36,19 @@ public class HeroDataCsvImporterWindow : EditorWindow
     private Vector2 logScrollPosition;
 
     private readonly List<string> importLogs = new();
+
+    // ---- Batch API (GameDataSyncCoordinator) ----
+    public bool IsRunning => isImporting;
+    public bool LastImportFailed { get; private set; }
+    private bool suppressDialogs;
+
+    public void RunForBatch()
+    {
+        LastImportFailed = false;
+        suppressDialogs = true;
+        DownloadAndImport();
+    }
+    // ---------------------------------------------
 
     [MenuItem("Tools/Game Data/Hero Data Importer")]
     private static void OpenWindow()
@@ -171,6 +185,7 @@ public class HeroDataCsvImporterWindow : EditorWindow
         }
         catch (Exception exception)
         {
+            LastImportFailed = true;
             AddLog($"Import failed: {exception.Message}");
             Debug.LogException(exception);
         }
@@ -344,14 +359,17 @@ public class HeroDataCsvImporterWindow : EditorWindow
             $"Skipped: {skippedCount}, " +
             $"Failed: {failedCount}");
 
-        EditorUtility.DisplayDialog(
-            "Hero Data Importer",
-            $"Import hoàn tất.\n\n" +
-            $"Created: {createdCount}\n" +
-            $"Updated: {updatedCount}\n" +
-            $"Skipped: {skippedCount}\n" +
-            $"Failed: {failedCount}",
-            "OK");
+        if (!suppressDialogs)
+        {
+            EditorUtility.DisplayDialog(
+                "Hero Data Importer",
+                $"Import hoàn tất.\n\n" +
+                $"Created: {createdCount}\n" +
+                $"Updated: {updatedCount}\n" +
+                $"Skipped: {skippedCount}\n" +
+                $"Failed: {failedCount}",
+                "OK");
+        }
     }
 
     private static HeroCsvRow ParseRow(
@@ -561,12 +579,6 @@ public class HeroDataCsvImporterWindow : EditorWindow
         {
             throw new FormatException(
                 $"accuracy không được nhỏ hơn 0. Hero ID: {row.Id}");
-        }
-
-        if (row.SummonWeight < 1)
-        {
-            throw new FormatException(
-                $"summon_weight phải lớn hơn hoặc bằng 1. Hero ID: {row.Id}");
         }
     }
 

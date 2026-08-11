@@ -156,9 +156,8 @@ namespace Immortal_Switch.Scripts.Shop.Views
                     ClaimGloryPass(shopPackId);
                     break;
 
-                case EShopTab.MonthlyPass:
-                    ClaimMonthlyPass(shopPackId);
-                    break;
+                // MonthlyPass không còn claim thủ công — thưởng ngày gửi thẳng qua mailbox, xem
+                // handler/monthly_pass.js sendMonthlyPassDailyRewardsIfNeeded.
             }
         }
 
@@ -180,45 +179,6 @@ namespace Immortal_Switch.Scripts.Shop.Views
             }
 
             ClaimGloryPassAsync(shopPackId).Forget();
-        }
-
-        private void ClaimMonthlyPass(int packId)
-        {
-            if (!ShopManager.Instance.IsMonthlyPassPurchased(packId))
-            {
-                return;
-            }
-
-            var currentDay = ShopManager.Instance.GetMonthlyPassCurrentDay(packId);
-
-            if (currentDay <= 0 ||
-                ShopManager.Instance.IsMonthlyPassDayClaimed(packId, currentDay))
-            {
-                return;
-            }
-
-            ClaimMonthlyPassAsync(packId).Forget();
-        }
-
-        /// <summary>Gọi monthlypass/claim — server tự suy ngày từ purchased_at (nguồn sự thật, có
-        /// thể lệch với bộ đếm cache dùng để hiện nút) rồi cộng thưởng thật; sau khi thành công,
-        /// sync lại monthlypass/state để current_day/claimed trong ShopManager luôn khớp server.</summary>
-        private async UniTaskVoid ClaimMonthlyPassAsync(int packId)
-        {
-            try
-            {
-                var response = await NakamaClient.Instance.MonthlyPassClaimAsync(packId);
-
-                await ShopManager.Instance.SyncMonthlyPassStateAsync();
-                CurrencyManager.Instance?.ApplyServerBalances(response.Balances);
-                PopupRewardService.Show(DatabaseManager.Instance.GetPackMonthly(packId, response.Day));
-
-                Debug.Log($"[ShopView] MonthlyPass claimed: pack={packId} day={response.Day}");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[ShopView] Claim MonthlyPass thất bại -> pack={packId}: {ex.Message}");
-            }
         }
 
         /// <summary>Gọi recharge/claim — server tự kiểm tra lại số lượt tích nạp trong tháng hiện tại

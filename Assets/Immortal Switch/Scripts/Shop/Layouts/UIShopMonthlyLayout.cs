@@ -16,6 +16,10 @@ namespace Immortal_Switch.Scripts.Shop.Layouts
         [SerializeField]
         private UIShopMonthlyPass premiumPass;
 
+        // onClickClaim vẫn nhận vào để khớp chữ ký chung với UIShopGloryPassLayout (gọi đồng loạt
+        // từ UIShopTabController) — Monthly Pass không còn claim thủ công nữa (thưởng ngày gửi
+        // thẳng qua mailbox, xem handler/monthly_pass.js sendMonthlyPassDailyRewardsIfNeeded)
+        // nên không forward xuống UIShopMonthlyPass.
         public void Bind(List<ShopSpecialRuntimeData> rows, Action<string, int> onClickBuy, Action<int, EShopTab> onClickClaim)
         {
             ShopSpecialRuntimeData normal = null;
@@ -43,17 +47,16 @@ namespace Immortal_Switch.Scripts.Shop.Layouts
 
             if (normal != null)
             {
-                BindPass(normalPass, normal, onClickBuy, onClickClaim);
+                BindPass(normalPass, normal, onClickBuy);
             }
 
             if (premium != null)
             {
-                BindPass(premiumPass, premium, onClickBuy, onClickClaim);
+                BindPass(premiumPass, premium, onClickBuy);
             }
         }
 
-        private void BindPass(UIShopMonthlyPass view, ShopSpecialRuntimeData data,
-            Action<string, int> onClickBuy, Action<int, EShopTab> onClickClaim)
+        private void BindPass(UIShopMonthlyPass view, ShopSpecialRuntimeData data, Action<string, int> onClickBuy)
         {
             var packId = data.Pack.iD;
             var rewardCurrentDay = ShopManager.Instance.GetMonthlyPassCurrentDay(packId);
@@ -62,7 +65,7 @@ namespace Immortal_Switch.Scripts.Shop.Layouts
             var rewardInstant = DatabaseManager.Instance.GetShopSpecialRewards(packId);
 
             view.Bind(data.Product, data.Pack,
-                onClickBuy, onClickClaim,
+                onClickBuy,
                 rewardMonthly, rewardDaily, rewardInstant
             );
         }

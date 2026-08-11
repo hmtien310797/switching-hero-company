@@ -68,6 +68,7 @@ public class GameStatView : MonoBehaviour
     // --- Private Fields ---
     private float _killProgressWidth;
     private float _killProgressFxWidth;
+    private bool playCompletedStage;
 
     private StageDataResolverSO stageDataResolverSo;
 
@@ -87,11 +88,10 @@ public class GameStatView : MonoBehaviour
 
         GameEventManager.Subscribe<bool>(GameEvents.OnPlayDungeon, OnPlayingDungeon);
         GameEventManager.Subscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
-        GameEventManager.Subscribe(GameEvents.OnWaveStart, OnInitNewStage);
         GameEventManager.Subscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
         GameEventManager.Subscribe(GameEvents.OnStageLost, OnStageLost);
         GameEventManager.Subscribe(GameEvents.OnInitNewStage, (Action<bool, bool, StageRuntimeData>)OnInitNewStage);
-
+        GameEventManager.Subscribe(GameEvents.OnStageSessionChange, OnStageSessionChanged);
         GameEventManager.Subscribe<DungeonKillAllDto>(GameEvents.OnKillAllDungeonInit, OnKillAllDungeonInit);
         GameEventManager.Subscribe(GameEvents.OnKillAllDungeonEnemyCountChanged, (Action<int, int>)OnDungeonEnemyKill);
 
@@ -104,11 +104,10 @@ public class GameStatView : MonoBehaviour
     {
         GameEventManager.Unsubscribe<bool>(GameEvents.OnPlayDungeon, OnPlayingDungeon);
         GameEventManager.Unsubscribe<int>(GameEvents.OnEnemyDead, OnEnemyDead);
-        GameEventManager.Unsubscribe(GameEvents.OnWaveStart, OnInitNewStage);
         GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageCleared);
         GameEventManager.Unsubscribe(GameEvents.OnStageLost, OnStageLost);
         GameEventManager.Unsubscribe(GameEvents.OnInitNewStage, (Action<bool, bool, StageRuntimeData>)OnInitNewStage);
-
+        GameEventManager.Unsubscribe(GameEvents.OnStageSessionChange, OnStageSessionChanged);
         GameEventManager.Unsubscribe<DungeonKillAllDto>(GameEvents.OnKillAllDungeonInit, OnKillAllDungeonInit);
         GameEventManager.Unsubscribe(GameEvents.OnKillAllDungeonEnemyCountChanged, (Action<int, int>)OnDungeonEnemyKill);
 
@@ -116,14 +115,26 @@ public class GameStatView : MonoBehaviour
         GameEventManager.Unsubscribe<float>(GameEvents.OnDefenseDungeonDataChanged, OnDefenseDungeonDataChange);
     }
 
+    private void OnStageSessionChanged()
+    {
+        btnGiveUp.gameObject.SetActive(false);
+        buttonBoss.SetStatus(ETabPresetStatus.Disabled);
+        buttonMap.SetStatus(ETabPresetStatus.Disabled);
+    }
+
     private void OnClickRetreat()
     {
         BattleFlowController.Instance.SurrenderBattle();
         battleTimerController.HideTimer();
+        btnGiveUp.gameObject.SetActive(false);
     }
 
     private void OnClickBoss(int _)
     {
+        if (playCompletedStage)
+        {
+            return;
+        }
         buttonBoss.gameObject.SetActive(false);
         PvEBattleController.Instance.SpawnBossDirectly();
     }
@@ -145,7 +156,7 @@ public class GameStatView : MonoBehaviour
             string.Format(DeadMonsterQuantityKey, deadCount, stageDataResolverSo.MaxCreepsPerStage);
 
         OnDefenseDungeonDataChange((float)deadCount / stageDataResolverSo.MaxCreepsPerStage);
-        RefreshGameProgressionState(deadCount == stageDataResolverSo.MaxCreepsPerStage);
+        RefreshGameProgressionState(deadCount == stageDataResolverSo.MaxCreepsPerStage && !playCompletedStage);
     }
 
     private void OnKillAllDungeonInit(DungeonKillAllDto data)
@@ -189,73 +200,47 @@ public class GameStatView : MonoBehaviour
 
     private void OnInitNewStage()
     {
-        //buttonMap.gameObject.SetActive(true);
         monsterKill.gameObject.SetActive(true);
         battleTimerController.HideTimer();
-        SetActiveBossProgression(false);
-
-        //buttonGiveUp.gameObject.SetActive(false);
-        /*currentChapterStageEnemyCountText.text = string.Empty;*/
+        btnGiveUp.gameObject.SetActive(false);
     }
 
     private void OnStageCleared(int _)
     {
-        SetActiveBossProgression(false);
-
-        //buttonBoss.SetInteractable(false);
-
-        //buttonBoss.interactable = false;
+        btnGiveUp.gameObject.SetActive(false);
         battleTimerController.HideTimer();
-
-        //buttonGiveUp.gameObject.SetActive(false);
     }
 
     private void OnStageLost()
     {
-        //buttonBoss.interactable = true;
-        //buttonBoss.SetInteractable(true);
         battleTimerController.HideTimer();
-        SetActiveBossProgression(false);
-
-        //buttonGiveUp.gameObject.SetActive(false);
+        btnGiveUp.gameObject.SetActive(false);
     }
 
     private void OnInitNewStage(bool playCompletedStage, bool isLosingStage, StageRuntimeData stageRuntimeData)
     {
+        OnInitNewStage();
         currentChapterStageNameText.text =
             $"{string.Format(NormalChapterStageNameKey, stageRuntimeData.ChapterIndex + 1, stageRuntimeData.ChapterName)} {string.Format(NormalChapterStageDataKey, stageRuntimeData.GlobalStage)}";
 
         /*currentChapterStageDataText.text = string.Format(NormalChapterStageDataKey, stageRuntimeData.GlobalStage);*/
-        buttonBoss.gameObject.SetActive(!playCompletedStage);
-
-        // Trước đây buttonBoss.interactable chỉ được mở qua sự kiện OnStageLost (lúc hero chết
-        // thật trong session) — không đủ cho case resume sau khi đóng/mở lại app với
-        // isLosingStage = true do server báo stage_creeps_cleared (không có OnStageLost nào
-        // xảy ra). Set trực tiếp ở đây theo đúng nguồn dữ liệu (isLosingStage) cho cả 2 case.
+        this.playCompletedStage = playCompletedStage;
         RefreshGameProgressionState(isLosingStage && !playCompletedStage);
-
-        //buttonBoss.interactable = isLosingStage && !playCompletedStage;
-        //shinyBossButton.gameObject.SetActive(isLosingStage && !playCompletedStage);
-        //buttonGiveUp.gameObject.SetActive(false);
-        SetActiveBossProgression(false);
+        btnGiveUp.gameObject.SetActive(false);
     }
 
     public async UniTask InitTimer(float dur, float delay, Action Act, CancellationToken cancellationToken)
     {
-        buttonMap.gameObject.SetActive(false);
+        buttonMap.SetStatus(ETabPresetStatus.Disabled);
+        buttonBoss.SetStatus(ETabPresetStatus.Disabled);
         monsterKill.gameObject.SetActive(false);
-
-        //buttonGiveUp.interactable = true;
-        buttonBoss.gameObject.SetActive(false);
-
+        
         if (delay >= 0)
         {
             await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: cancellationToken);
         }
-
-        SetActiveBossProgression(true);
-
-        //buttonGiveUp.gameObject.SetActive(true);
+        
+        btnGiveUp.gameObject.SetActive(true);
         battleTimerController.InitTimer(dur, Act, cancellationToken);
     }
 
@@ -264,64 +249,37 @@ public class GameStatView : MonoBehaviour
         if (!result)
             return;
 
-        buttonBoss.gameObject.SetActive(false);
-        buttonMap.gameObject.SetActive(false);
+        buttonBoss.SetStatus(ETabPresetStatus.Disabled);
+        buttonMap.SetStatus(ETabPresetStatus.Disabled);
 
-        //buttonGiveUp.gameObject.SetActive(false);
-        SetActiveBossProgression(false);
+        btnGiveUp.gameObject.SetActive(false);
     }
 
     public void ExitDungeonGamePlay()
     {
-        SetActiveBossProgression(false);
+        btnGiveUp.gameObject.SetActive(false);
         buttonBoss.gameObject.SetActive(false);
 
-        //buttonGiveUp.gameObject.SetActive(false);
-        //buttonMap.gameObject.SetActive(false);
+        btnGiveUp.gameObject.SetActive(false);
+        buttonMap.SetStatus(ETabPresetStatus.Disabled);
         battleTimerController.HideTimer();
-    }
-
-    private void SetActiveBossProgression(bool active)
-    {
-        if (active)
-        {
-            foreach (var o in bossStateObjects)
-            {
-                o.SetActive(true);
-            }
-
-            btnGiveUp.gameObject.SetActive(true);
-        }
-        else
-        {
-            foreach (var o in bossStateObjects)
-            {
-                o.SetActive(false);
-            }
-
-            btnGiveUp.gameObject.SetActive(false);
-        }
     }
 
     private void RefreshGameProgressionState(bool canMoveBoss)
     {
         if (canMoveBoss)
         {
-            buttonBoss.gameObject.SetActive(true);
-            //buttonMap.gameObject.SetActive(true);
-
             buttonMap.SetStatus(ETabPresetStatus.Selected);
             buttonBoss.SetStatus(ETabPresetStatus.Selected);
+            buttonBoss.SetInteractable(true);
             monsterKill.SetStatus(ETabPresetStatus.Selected);
             progressionPreset.SetStatus(ETabPresetStatus.Selected);
         }
         else
         {
-            buttonBoss.gameObject.SetActive(false);
-            //buttonMap.gameObject.SetActive(true);
-
             buttonMap.SetStatus(ETabPresetStatus.Normal);
             buttonBoss.SetStatus(ETabPresetStatus.Normal);
+            buttonBoss.SetInteractable(false);
             monsterKill.SetStatus(ETabPresetStatus.Normal);
             progressionPreset.SetStatus(ETabPresetStatus.Normal);
         }

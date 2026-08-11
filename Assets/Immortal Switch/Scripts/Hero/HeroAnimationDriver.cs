@@ -61,6 +61,11 @@ namespace Immortal_Switch.Scripts.Hero
 
             skeletonAnimation.AnimationState.Event += OnSpineEvent;
             skeletonAnimation.AnimationState.Complete += OnSpineComplete;
+            foreach (var physics in skeletonAnimation.Skeleton.PhysicsConstraints)
+            {
+                physics.Mix = 0f;
+            }
+            
         }
 
         #if UNITY_EDITOR

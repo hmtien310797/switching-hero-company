@@ -286,14 +286,17 @@ namespace Immortal_Switch.Scripts.Skill
 
             if (handle == null)
             {
-                Debug.LogError(
+                // Pool đã bị dispose trước (vd battle kết thúc → DespawnAndDisposePool dispose pool
+                // trong khi object active này chưa kịp despawn, rồi bị force-despawn bởi token cancel).
+                // Không còn pool để trả về → hủy object thay vì log error + SetActive(false) rò rỉ.
+                Debug.LogWarning(
                     $"[{nameof(SkillRuntimeObject)}] " +
-                    $"Missing AddressablePoolHandle. Object={name}",
+                    $"Despawned without pool handle (pool disposed). Object={name}",
                     this
                 );
-                
+
                 ClearRuntimeState();
-                gameObject.SetActive(false);
+                Destroy(gameObject);
                 return;
             }
 

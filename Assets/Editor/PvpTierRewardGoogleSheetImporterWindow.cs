@@ -8,6 +8,7 @@ using Immortal_Switch.Scripts.Pvp.Data;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Editor.ExcelConfigTool.Services;
 
 namespace Immortal_Switch.Scripts.Pvp.Editor
 {
@@ -18,7 +19,7 @@ namespace Immortal_Switch.Scripts.Pvp.Editor
     /// Clone pattern của HeroProgressionGoogleSheetImporterWindow.
     /// <para>Columns: tier_id, tier_name, tier_level, tier_required_point, tier_reward.</para>
     /// </summary>
-    public class PvpTierRewardGoogleSheetImporterWindow : EditorWindow
+    public class PvpTierRewardGoogleSheetImporterWindow : EditorWindow, IGameDataSyncStep
     {
         private const string GoogleSheetUrl =
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq5Rq5h3ZiaDfG8U6-Q3hytEOHs3DqRgBETG7qcE2LjQZAhwR971MjEZqgc6wmsb_1Ey1mPK9-R13S/pub?gid=63311490&single=true&output=csv";
@@ -28,6 +29,17 @@ namespace Immortal_Switch.Scripts.Pvp.Editor
         private bool isImporting;
         private Vector2 scrollPosition;
         private string lastResult = string.Empty;
+
+        // ---- Batch API (GameDataSyncCoordinator) ----
+        public bool IsRunning => isImporting;
+        public bool LastImportFailed { get; private set; }
+
+        public void RunForBatch()
+        {
+            LastImportFailed = false;
+            ImportAsync();
+        }
+        // ---------------------------------------------
 
         [MenuItem("Tools/Game Data/PvP Tier Reward Importer")]
         public static void OpenWindow()
@@ -86,9 +98,16 @@ namespace Immortal_Switch.Scripts.Pvp.Editor
             {
                 string csvText = await DownloadTextAsync(GoogleSheetUrl);
                 lastResult = ImportCsv(csvText);
+
+                if (string.IsNullOrEmpty(lastResult) ||
+                    lastResult.StartsWith("IMPORT FAILED", StringComparison.Ordinal))
+                {
+                    LastImportFailed = true;
+                }
             }
             catch (Exception exception)
             {
+                LastImportFailed = true;
                 Debug.LogException(exception);
                 lastResult = $"Import failed:\n{exception.Message}";
             }

@@ -39,6 +39,54 @@ namespace Editor.ExcelConfigTool.Windows
             GetWindow<ExcelConfigToolWindow>("Excel Config Tool");
         }
 
+        [MenuItem("Tools/Game Data/Sync All Game Data + Excel")]
+        private static void SyncAllGameDataFromMenu()
+        {
+            var window = GetWindow<ExcelConfigToolWindow>("Excel Config Tool");
+            window.StartAllGameDataSync();
+        }
+
+        private void StartAllGameDataSync()
+        {
+            if (_isRunning || GameDataSyncCoordinator.IsRunning)
+            {
+                return;
+            }
+
+            if (!EditorUtility.DisplayDialog(
+                    "Game Data Sync",
+                    "Chạy toàn bộ importer Game Data rồi sync Excel Config?\n\n" +
+                    "Batch sẽ dừng lại ngay nếu có bước thất bại.",
+                    "Sync",
+                    "Hủy"))
+            {
+                return;
+            }
+
+            GameDataSyncCoordinator.Start(onFinished: success =>
+            {
+                if (success)
+                {
+                    // Excel Config sync chạy cuối cùng: nó có thể regenerate scripts
+                    // và trigger domain reload, nên coordinator không chờ nó.
+                    RunExcelSync();
+                }
+                else
+                {
+                    EditorUtility.DisplayDialog(
+                        "Game Data Sync",
+                        "Batch đã dừng lại do lỗi. Xem Console để biết chi tiết.",
+                        "OK"
+                    );
+                }
+            });
+        }
+
+        private void RunExcelSync()
+        {
+            SyncAll();
+        }
+
         private void OnEnable()
         {
             _service = new ExcelConfigToolService();
@@ -100,6 +148,21 @@ namespace Editor.ExcelConfigTool.Windows
             DrawFolderPicker("Output Asset Folder", ref _outputAssetFolder);
 
             EditorGUILayout.Space(12);
+
+            if (GameDataSyncCoordinator.IsRunning)
+            {
+                EditorGUILayout.HelpBox(
+                    $"Game Data Sync: {GameDataSyncCoordinator.CurrentStep}",
+                    MessageType.Info
+                );
+            }
+
+            GUI.enabled = !_isRunning && !GameDataSyncCoordinator.IsRunning;
+
+            if (GUILayout.Button("Sync All Game Data + Excel Config", GUILayout.Height(40)))
+            {
+                StartAllGameDataSync();
+            }
 
             GUI.enabled = !_isRunning && _entries.Any(e => !string.IsNullOrWhiteSpace(e.url));
 

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Currency;
-using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Leaderboard.Views.UI;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
@@ -62,25 +60,20 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
         private void Awake()
         {
             btnClose.onClick.AddListener(OnClickClose);
-            btnClaim.onClick.AddListener(OnClickClaim);
-        }
-
-        private void OnClickClaim()
-        {
-            ClaimSeasonRewardAsync().Forget();
+            // Thưởng cuối mùa giờ gửi thẳng qua mailbox (không cần chờ/claim ở đây nữa) — xem
+            // handler/leaderboard.js sendSeasonRewardMailIfNeeded. Ẩn hẳn nút, không còn RPC nào gọi tới nó.
+            btnClaim.gameObject.SetActive(false);
         }
 
         private void OnDestroy()
         {
             btnClose.onClick.RemoveListener(OnClickClose);
-            btnClaim.onClick.RemoveListener(OnClickClaim);
         }
 
         public override void OnShow(object args)
         {
             base.OnShow(args);
             RefreshAsync().Forget();
-            CheckSeasonRewardAsync().Forget();
         }
 
         private void OnClickClose()
@@ -185,68 +178,5 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
             txtSeasonEndCountdown.text = $"Hoàn tất xếp hạng trong {remaining.Days:00}d{remaining.Hours:00}h";
         }
 
-        // ── Season-end reward (claim trực tiếp qua btnClaim trong my_rank_view, chưa có mailbox UI) ──
-
-        // Gọi mỗi lần mở màn — chỉ quyết định có hiện btnClaim hay không (server là nguồn sự thật,
-        // không cache rewards ở đây vì ClaimLeaderboardSeasonRewardAsync tự đọc lại từ server).
-        private async UniTask CheckSeasonRewardAsync()
-        {
-            btnClaim.gameObject.SetActive(false);
-            btnClaim.interactable = true; // reset phòng lần trước bị disable dở do claim lỗi
-
-            LeaderboardSeasonRewardStateResponse state;
-            try
-            {
-                state = await NakamaClient.Instance.GetLeaderboardSeasonRewardStateAsync();
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[LeaderboardView] season_reward/state failed: {e.Message}");
-                return;
-            }
-
-            btnClaim.gameObject.SetActive(state != null && state.HasReward);
-        }
-
-        private async UniTask ClaimSeasonRewardAsync()
-        {
-            btnClaim.interactable = false;
-
-            LeaderboardSeasonRewardClaimResponse response;
-            try
-            {
-                response = await NakamaClient.Instance.ClaimLeaderboardSeasonRewardAsync();
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[LeaderboardView] season_reward/claim failed: {e.Message}");
-                UIManager.Instance.ShowToast("Không thể nhận thưởng, thử lại sau.");
-                btnClaim.interactable = true;
-                return;
-            }
-
-            if (response == null || !response.Success)
-            {
-                UIManager.Instance.ShowToast("Phần thưởng không còn khả dụng.");
-                btnClaim.gameObject.SetActive(false);
-                return;
-            }
-
-            if (response.UpdatedResources != null)
-            {
-                CurrencyManager.Instance?.ApplyServerBalances(
-                    response.UpdatedResources.Gold,
-                    response.UpdatedResources.Diamonds,
-                    response.UpdatedResources.Energy,
-                    response.UpdatedResources.Items);
-            }
-
-            var rewards = (response.Rewards ?? new List<LeaderboardSeasonRewardItemDto>())
-                .Select(r => new ItemRewardData(r.ItemKey, BigNumber.FromDouble(r.Amount)))
-                .ToList();
-            PopupRewardService.Show(rewards);
-
-            btnClaim.gameObject.SetActive(false);
-        }
     }
 }

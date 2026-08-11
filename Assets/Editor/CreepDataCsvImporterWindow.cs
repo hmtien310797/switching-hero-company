@@ -9,8 +9,9 @@ using Immortal_Switch.Scripts;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Editor.ExcelConfigTool.Services;
 
-public class CreepDataCsvImporterWindow : EditorWindow
+public class CreepDataCsvImporterWindow : EditorWindow, IGameDataSyncStep
 {
     /*
      * Link Google Sheet CSV.
@@ -34,6 +35,19 @@ public class CreepDataCsvImporterWindow : EditorWindow
     private Vector2 logScrollPosition;
 
     private readonly List<string> importLogs = new();
+
+    // ---- Batch API (GameDataSyncCoordinator) ----
+    public bool IsRunning => isImporting;
+    public bool LastImportFailed { get; private set; }
+    private bool suppressDialogs;
+
+    public void RunForBatch()
+    {
+        LastImportFailed = false;
+        suppressDialogs = true;
+        DownloadAndImport();
+    }
+    // ---------------------------------------------
 
     [MenuItem("Tools/Game Data/Creep Data Importer")]
     private static void OpenWindow()
@@ -169,6 +183,7 @@ public class CreepDataCsvImporterWindow : EditorWindow
         }
         catch (Exception exception)
         {
+            LastImportFailed = true;
             AddLog($"Import failed: {exception.Message}");
             Debug.LogException(exception);
         }
@@ -334,14 +349,17 @@ public class CreepDataCsvImporterWindow : EditorWindow
             $"Skipped: {skippedCount}, " +
             $"Failed: {failedCount}");
 
-        EditorUtility.DisplayDialog(
-            "Creep Data Importer",
-            $"Import hoàn tất.\n\n" +
-            $"Created: {createdCount}\n" +
-            $"Updated: {updatedCount}\n" +
-            $"Skipped: {skippedCount}\n" +
-            $"Failed: {failedCount}",
-            "OK");
+        if (!suppressDialogs)
+        {
+            EditorUtility.DisplayDialog(
+                "Creep Data Importer",
+                $"Import hoàn tất.\n\n" +
+                $"Created: {createdCount}\n" +
+                $"Updated: {updatedCount}\n" +
+                $"Skipped: {skippedCount}\n" +
+                $"Failed: {failedCount}",
+                "OK");
+        }
     }
 
     private static CreepCsvRow ParseRow(

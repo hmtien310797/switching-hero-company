@@ -975,24 +975,16 @@ public class NakamaClient : MonoBehaviour
 
     // ── Monthly Pass ──────────────────────────────────────────────────────────
     // Xem handler/monthly_pass.js — pack_iap các row pack_type="subscription" (Monthly Pass tab).
-    // Mua vẫn đi qua IapPackPurchaseAsync (pack_iap); 2 RPC này chỉ phụ trách trạng thái/nhận
-    // thưởng ngày (server tự tính ngày từ purchased_at, client không tự đếm ngày cục bộ nữa).
+    // Mua vẫn đi qua IapPackPurchaseAsync (pack_iap). Thưởng ngày không còn claim thủ công —
+    // server tự gửi thẳng qua mailbox mỗi lần login (sendMonthlyPassDailyRewardsIfNeeded), RPC
+    // này chỉ còn phục vụ hiển thị trạng thái mua/tiến độ.
 
-    /// <summary>Trạng thái mua/nhận thưởng của mọi Monthly Pass — nguồn sự thật, gọi khi login và
+    /// <summary>Trạng thái mua/tiến độ của mọi Monthly Pass — nguồn sự thật, gọi khi login và
     /// mỗi lần mở màn Shop/MonthlyPass (xem ShopManager.SyncMonthlyPassStateAsync).</summary>
     public async Task<MonthlyPassStateResponse> MonthlyPassStateAsync()
     {
         var response = await CallRpcAsync("monthlypass/state", "{}");
         return JsonConvert.DeserializeObject<MonthlyPassStateResponse>(response.Payload);
-    }
-
-    /// <summary>Nhận thưởng ngày hiện tại của 1 Monthly Pass đã mua. Server tự suy ngày từ
-    /// purchased_at và throw nếu chưa mua/đã hết hạn/ngày đó đã nhận rồi.</summary>
-    public async Task<MonthlyPassClaimResponse> MonthlyPassClaimAsync(int packId)
-    {
-        var payload  = JsonConvert.SerializeObject(new MonthlyPassClaimRequest { PackId = packId });
-        var response = await CallRpcAsync("monthlypass/claim", payload);
-        return JsonConvert.DeserializeObject<MonthlyPassClaimResponse>(response.Payload);
     }
 
     // ── Event config windows (all events) ────────────────────────────────────
@@ -1355,9 +1347,9 @@ public class NakamaClient : MonoBehaviour
 
     // ── Leaderboard ───────────────────────────────────────────────────────────
     // Xem handler/leaderboard.js — bảng xếp hạng theo highest_stage_cleared, dùng leaderboard
-    // built-in của Nakama. season_end_at (từ GetLeaderboardStageTopAsync) và thưởng cuối mùa
-    // (GetLeaderboardSeasonRewardStateAsync/ClaimLeaderboardSeasonRewardAsync) đọc từ
-    // game_config_leaderboard*.xlsx.
+    // built-in của Nakama. season_end_at (từ GetLeaderboardStageTopAsync) đọc từ
+    // game_config_leaderboard*.xlsx. Thưởng cuối mùa không còn claim riêng ở đây nữa — server gửi
+    // thẳng qua mailbox (mail/list, mail/claim) ngay khi mùa khóa, xem sendSeasonRewardMailIfNeeded.
 
     /// <summary>Top bảng xếp hạng stage (mặc định 100 người đầu). cursor để phân trang tiếp — truyền lại next_cursor của lần gọi trước.</summary>
     public async Task<LeaderboardStageTopResponse> GetLeaderboardStageTopAsync(int limit = 100, string cursor = null)
@@ -1373,20 +1365,6 @@ public class NakamaClient : MonoBehaviour
         var payload  = JsonConvert.SerializeObject(new { limit });
         var response = await CallRpcAsync("leaderboard/stage/around_me", payload);
         return JsonConvert.DeserializeObject<LeaderboardStageAroundMeResponse>(response.Payload);
-    }
-
-    /// <summary>Gọi khi mở màn Leaderboard — có thưởng mùa trước chưa nhận (has_reward=true) thì hiện banner/claim. Qua expire_at thì server tự cộng vào bag ở lần player/me kế tiếp, không mất thưởng.</summary>
-    public async Task<LeaderboardSeasonRewardStateResponse> GetLeaderboardSeasonRewardStateAsync()
-    {
-        var response = await CallRpcAsync("leaderboard/season_reward/state", "{}");
-        return JsonConvert.DeserializeObject<LeaderboardSeasonRewardStateResponse>(response.Payload);
-    }
-
-    /// <summary>Nhận thưởng mùa trước (nếu còn trong hạn) — cộng thẳng vào bag, trả updated_resources để áp qua CurrencyManager.</summary>
-    public async Task<LeaderboardSeasonRewardClaimResponse> ClaimLeaderboardSeasonRewardAsync()
-    {
-        var response = await CallRpcAsync("leaderboard/season_reward/claim", "{}");
-        return JsonConvert.DeserializeObject<LeaderboardSeasonRewardClaimResponse>(response.Payload);
     }
 
     // ── Dungeon ───────────────────────────────────────────────────────────────
