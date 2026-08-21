@@ -4,7 +4,9 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Leaderboard.Views.UI;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -60,6 +62,7 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
         private void Awake()
         {
             btnClose.onClick.AddListener(OnClickClose);
+
             // Thưởng cuối mùa giờ gửi thẳng qua mailbox (không cần chờ/claim ở đây nữa) — xem
             // handler/leaderboard.js sendSeasonRewardMailIfNeeded. Ẩn hẳn nút, không còn RPC nào gọi tới nó.
             btnClaim.gameObject.SetActive(false);
@@ -175,8 +178,11 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views
             if (remaining < TimeSpan.Zero)
                 remaining = TimeSpan.Zero;
 
-            txtSeasonEndCountdown.text = $"Hoàn tất xếp hạng trong {remaining.Days:00}d{remaining.Hours:00}h";
+            txtSeasonEndCountdown.text = LocalizationManager.GetText(
+                LocalizationKeys.UI_RANKING_END,
+                $"{remaining.Days:00}",
+                $"{remaining.Hours:00}"
+            );
         }
-
     }
 }

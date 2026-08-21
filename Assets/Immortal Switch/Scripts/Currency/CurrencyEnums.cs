@@ -69,6 +69,8 @@ namespace Immortal_Switch.Scripts.Currency
         weapon_ore,
         weapon_gem,
         weapon_essence,
+        pvp_arena_ticket,
+        pvp_arena_token,
 
         // Appended at the end (not inserted mid-list) — CurrencyEntry.CurrencyType is persisted via
         // ES3 by underlying int value, so inserting earlier would shift every later member's saved

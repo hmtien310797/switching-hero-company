@@ -1,9 +1,9 @@
 using System;
 using Cysharp.Threading.Tasks;
-using Firebase;
-using Firebase.Messaging;
 using UnityEngine;
 #if UNITY_ANDROID
+using Firebase;
+using Firebase.Messaging;
 using UnityEngine.Android;
 #endif
 
@@ -31,7 +31,9 @@ namespace Immortal_Switch.Scripts.Core
             if (_initialized) return;
             _initialized = true;
 
+#if UNITY_ANDROID
             RequestNotificationPermissionIfNeeded();
+
 
             DependencyStatus dependencyStatus;
             try
@@ -63,12 +65,15 @@ namespace Immortal_Switch.Scripts.Core
             {
                 Debug.LogWarning($"[FcmManager] GetTokenAsync failed: {ex.Message}");
             }
+#endif
         }
 
+#if UNITY_ANDROID
         private void OnTokenReceived(object sender, TokenReceivedEventArgs e)
         {
             SendTokenToServerAsync(e.Token).Forget();
         }
+#endif
 
         /// <summary>Firebase callbacks/Tasks (CheckAndFixDependenciesAsync, GetTokenAsync,
         /// TokenReceived) can all complete/fire off the main thread — SwitchToMainThread before

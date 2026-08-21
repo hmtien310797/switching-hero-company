@@ -4,13 +4,7 @@ FirebaseMessaging iOS and Android Dependencies.
 -->
 
 <dependencies>
-  <remoteSwiftPackage url="https://github.com/firebase/firebase-ios-sdk.git" version="12.16.0">
-    <swiftPackage name="FirebaseMessaging" replacesPod="Firebase/Messaging"/>
-  </remoteSwiftPackage>
-  <iosPods>
-    <iosPod name="Firebase/Messaging" version="12.16.0" minTargetSdk="15.0">
-    </iosPod>
-  </iosPods>
+  <!-- iOS not used (Firebase is Android-only for this app) -->
   <androidPackages>
     <androidPackage spec="com.google.firebase:firebase-messaging:25.1.1">
     </androidPackage>

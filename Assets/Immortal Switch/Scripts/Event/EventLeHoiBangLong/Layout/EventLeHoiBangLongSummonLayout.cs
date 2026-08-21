@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Controller;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Popup;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.Shared.Views;
@@ -108,7 +109,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private string OnCountdown(long days, long hours, long minutes, long seconds)
         {
-            return $"Kết thúc sau: {days:00} ngày {hours:00}:{minutes:00}:{seconds:00}";
+            return LocalizationManager.GetText(LocalizationKeys.UI_END_TIME, days, hours, minutes, seconds);
         }
 
         private void OnClickClaimAccumulated()
@@ -176,10 +177,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
                 displayMilestone.Reward?.ItemId ?? 0
             );
 
-            txtDropRate.text =
-                "Tăng tỷ lệ nhận <color=#ff56ed><i><size=55>Băng Long</size></i></color>!\n" +
-                $"Mỗi <color=#ffd200><i><size=55><b>{remainAccumulated}</b></size></i></color> lượt chắc chắn nhận\n" +
-                "<color=#ff56ed><i><size=55>Legend</size></i></color> trở lên";
+            txtDropRate.text = LocalizationManager.GetText(LocalizationKeys.UI_EVENT_BL_SUMMON_NOTE, remainAccumulated);
         }
     }
 }

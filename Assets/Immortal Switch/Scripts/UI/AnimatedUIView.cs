@@ -3,20 +3,11 @@ using UnityEngine;
 
 namespace Immortal_Switch.Scripts.UI
 {
-    public abstract class AnimatedUIView : UIView
+    public abstract class AnimatedUIView : BouncePopupUIView
     {
         [Header("Animation")]
-        [SerializeField] protected RectTransform animatedRoot; // root panel cần bay
-        [SerializeField] protected float showDuration = 0.25f;
-        [SerializeField] protected float hideDuration = 0.20f;
-
-        [Tooltip("Vị trí bắt đầu khi mở = anchoredPosition + offset")]
         [SerializeField] protected Vector2 showFromOffset = new Vector2(0, 900);
-
-        [Tooltip("Vị trí kết thúc khi đóng = anchoredPosition + offset")]
         [SerializeField] protected Vector2 hideToOffset = new Vector2(0, 900);
-
-        [SerializeField] protected bool fade = true;
         [SerializeField] protected float fromAlpha = 0f;
         [SerializeField] protected float toAlpha = 1f;
 

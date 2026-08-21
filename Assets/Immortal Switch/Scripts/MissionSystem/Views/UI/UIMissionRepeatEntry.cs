@@ -60,8 +60,11 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
 
         private void OnDestroy()
         {
-            MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
-            MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
+            if (MissionSystemManager.Instance != null)
+            {
+                MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
+                MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
+            }
 
             btnClaim.onClick.RemoveListener(OnClickClaim);
             btnChallenge.onClick.RemoveListener(OnClickChallenge);

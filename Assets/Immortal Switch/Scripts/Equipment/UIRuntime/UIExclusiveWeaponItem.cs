@@ -1,6 +1,8 @@
 ﻿using System;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.UI;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 
 namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 {
@@ -22,7 +24,7 @@ namespace Immortal_Switch.Scripts.Equipment.UIRuntime
 
             BindCommon(
                 vm.Icon,
-                $"Lv.{vm.Level}",
+                LocalizationManager.GetText(LocalizationKeys.UI_LV, vm.Level),
                 shardText,
                 vm.ShardProgressNormalized,
                 vm.MaxShard > 0,

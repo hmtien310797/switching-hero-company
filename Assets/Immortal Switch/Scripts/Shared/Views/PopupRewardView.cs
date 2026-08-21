@@ -6,6 +6,8 @@ using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -37,7 +39,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
         public Action OnClose { get; set; }
     }
 
-    public class PopupRewardView : AnimatedUIView
+    public class PopupRewardView : BouncePopupUIView
     {
         [SerializeField]
         private RectTransform rewardContainer;
@@ -91,7 +93,14 @@ namespace Immortal_Switch.Scripts.Shared.Views
                     break;
             }
             
-            StartCountdown(3);
+            // Ẩn tất cả reward để chờ animate tuần tự
+            for (int i = 0; i < _rewards.Count; i++)
+            {
+                if (_rewards[i] != null && _rewards[i].gameObject.activeSelf)
+                {
+                    _rewards[i].transform.localScale = Vector3.zero;
+                }
+            }
         }
 
         private void HideAllRewards()
@@ -100,6 +109,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
             {
                 if (_rewards[i] != null)
                 {
+                    _rewards[i].transform.DOKill();
                     _rewards[i].gameObject.SetActive(false);
                 }
             }
@@ -108,6 +118,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
         public override void OnHide()
         {
             KillCountdown();
+            KillRewardAnimations();
 
             var callback = _args?.OnClose;
             _args = null;
@@ -115,6 +126,33 @@ namespace Immortal_Switch.Scripts.Shared.Views
             base.OnHide();
 
             callback?.Invoke();
+        }
+
+        public override async UniTask PlayShowAsync(object args)
+        {
+            await base.PlayShowAsync(args);
+
+            if (_args != null)
+            {
+                await PlayRewardAnimationsAsync();
+                StartCountdown(3);
+            }
+        }
+
+        private async UniTask PlayRewardAnimationsAsync()
+        {
+            for (int i = 0; i < _rewards.Count; i++)
+            {
+                if (_rewards[i] != null && _rewards[i].gameObject.activeSelf)
+                {
+                    var rt = _rewards[i].transform;
+                    var reward = _rewards[i];
+                    rt.DOScale(1f, 0.35f)
+                        .SetEase(Ease.OutBack);
+                    reward.PlayAppearEffect();
+                    await UniTask.Delay(120, DelayType.UnscaledDeltaTime);
+                }
+            }
         }
 
         private void RefreshRewards(List<ItemData> rewards)
@@ -472,7 +510,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
         {
             if (remainingText != null)
             {
-                remainingText.text = $"Pop up will close in {value}.";
+                remainingText.text = LocalizationManager.GetText(LocalizationKeys.UI_POPUP_CLOSES, value);
             }
         }
 
@@ -480,6 +518,17 @@ namespace Immortal_Switch.Scripts.Shared.Views
         {
             countdownTween?.Kill();
             countdownTween = null;
+        }
+
+        private void KillRewardAnimations()
+        {
+            for (int i = 0; i < _rewards.Count; i++)
+            {
+                if (_rewards[i] != null)
+                {
+                    _rewards[i].transform.DOKill();
+                }
+            }
         }
 
         private void HidePopupRewardView()
@@ -491,6 +540,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
         private void OnDestroy()
         {
             KillCountdown();
+            KillRewardAnimations();
         }
     }
 

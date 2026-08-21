@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 
@@ -89,7 +91,11 @@ namespace Immortal_Switch.Scripts.Leaderboard.Views.UI
             var minutes = totalSeconds / 60L;
             var seconds = totalSeconds % 60L;
 
-            txtRefreshCountdown.text = $"Cập nhật bảng xếp hạng vào {minutes:00}m{seconds:00}s";
+            txtRefreshCountdown.text = LocalizationManager.GetText(
+                LocalizationKeys.UI_RANKING_UPDATE,
+                $"{minutes:00}",
+                $"{seconds:00}"
+            );
 
             if (totalSeconds > 0L)
             {

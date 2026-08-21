@@ -16,6 +16,7 @@ using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.Leaderboard.Views;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Mail.Views;
 using Immortal_Switch.Scripts.PlayerSystem.Views;
 using Immortal_Switch.Scripts.Pvp.Views;
@@ -1092,7 +1093,7 @@ namespace Immortal_Switch.Scripts.UI
         public void RefreshPlayerInfo()
         {
             var playerLevelInfo = DatabaseManager.Instance.GetLevelByTotalExp(UserDataCache.Instance.Exp);
-            txtPlayerLevel.text = $"Lv.{playerLevelInfo.level:00}";
+            txtPlayerLevel.text = LocalizationManager.GetText(LocalizationKeys.UI_LV, playerLevelInfo.level);
             imgPlayerProgress.fillAmount = playerLevelInfo.progress;
         }
 

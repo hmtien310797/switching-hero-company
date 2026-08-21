@@ -439,6 +439,15 @@ namespace Immortal_Switch.Scripts.Sound
             PlaySfx(soundId, volumeMultiplier, pitch);
         }
 
+        /// <summary>
+        /// Play một AudioClip đã được load sẵn (vd voice của hero) qua pool AudioSource SFX.
+        /// Luôn no-op nếu clip null hoặc SFX đang bị mute/suppress; không cache, không chịu trách nhiệm release.
+        /// </summary>
+        public void PlayAudioClip(AudioClip clip, float volumeMultiplier = 1f, float pitch = 1f)
+        {
+            PlaySfxClip(clip, volumeMultiplier, pitch);
+        }
+
         public void PlaySfxThrottled(
             SoundId soundId,
             float cooldown,

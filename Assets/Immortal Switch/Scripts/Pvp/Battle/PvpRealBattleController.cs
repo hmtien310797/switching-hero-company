@@ -6,7 +6,9 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.GrowthSystem;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Pvp;
 using Immortal_Switch.Scripts.Pvp.DevTools;
 using Immortal_Switch.Scripts.Pvp.Interfaces;
@@ -305,11 +307,11 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             Vector3 frontPos = center + Vector3.left * heroSpacing;
             Vector3 backPos = center + Vector3.right * heroSpacing;
             HeroTeamController teamCtrl = isAttacker ? HeroTeamController.Instance : null;
-            await SpawnHeroAsync(team, teamSnap.FrontHero, frontPos, teamCtrl);
-            await SpawnHeroAsync(team, teamSnap.BackHero, backPos, teamCtrl);
+            await SpawnHeroAsync(team, teamSnap.FrontHero, frontPos, teamCtrl, teamSnap);
+            await SpawnHeroAsync(team, teamSnap.BackHero, backPos, teamCtrl, teamSnap);
         }
 
-        private async UniTask SpawnHeroAsync(PvpBattleTeam team, HeroBattleSnapshot heroSnap, Vector3 pos, HeroTeamController teamCtrl)
+        private async UniTask SpawnHeroAsync(PvpBattleTeam team, HeroBattleSnapshot heroSnap, Vector3 pos, HeroTeamController teamCtrl, TeamBattleSnapshot teamSnap)
         {
             if (heroSnap == null || heroSnap.HeroId <= 0) return;
 
@@ -340,8 +342,14 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
             if (teamCtrl == null)
             {
                 // Defender (AI, fake data) - base = progression node; weapon = modifier riêng có sourceId
-                // (để StatsController liệt kê nguồn như attacker). Bỏ qua growth/transmutation/powerup.
+                // (để StatsController liệt kê nguồn như attacker).
                 ApplySnapshotBaseAndWeapon(hero, heroSnap);
+
+                // Growth/Transmutation của đối thủ THẬT (server ghép qua findRealOpponent — null với
+                // mock/dev-tool opponent, xem TeamBattleSnapshot.OpponentGrowth doc). Phải áp SAU
+                // ApplySnapshotBaseAndWeapon vì method đó gọi Stats.Initialize() (recreate StatModule
+                // từ đầu, sẽ xoá mọi modifier thêm trước đó).
+                ApplyOpponentGrowthAndTransmutation(hero, teamSnap?.OpponentGrowth, teamSnap?.OpponentTransmutationModifiers);
 
                 // Áp skill loadout từ config + prewarm runtime assets (skill object/đạn) cho defender
                 // VÀO TRƯỚC khi trận bắt đầu (Init đã prewarm skill của player, không phải skill config).
@@ -360,8 +368,9 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
 
         /// <summary>
         /// Áp stat cho defender: base = progression node + HeroDataSO (không weapon), weapon = StatModifier
-        /// riêng có sourceId (WeaponRuntimeIds) — để StatsController liệt kê nguồn giống attacker. Bỏ qua
-        /// growth/transmutation/powerup (config test chỉ có tier/star/skill/equipment).
+        /// riêng có sourceId (WeaponRuntimeIds) — để StatsController liệt kê nguồn giống attacker.
+        /// Growth/Transmutation KHÔNG nằm ở đây (config test/DefenderSlotConfig không có field đó) —
+        /// caller (SpawnHeroAsync) áp riêng ngay sau qua <see cref="ApplyOpponentGrowthAndTransmutation"/>.
         /// </summary>
         private static void ApplySnapshotBaseAndWeapon(HeroActor hero, HeroBattleSnapshot heroSnap)
         {
@@ -413,6 +422,44 @@ namespace Immortal_Switch.Scripts.Pvp.Battle
                 $"Atk={sm.GetFinalStat(StatType.Atk):0} " +
                 $"MaxHp={sm.GetFinalStat(StatType.MaxHp):0} " +
                 $"Def={sm.GetFinalStat(StatType.Def):0}");
+        }
+
+        /// <summary>
+        /// Áp bonus Growth + Transmutation của đối thủ THẬT lên StatModule của defender — cùng cách
+        /// <c>PowerUpManager.ApplyToOne</c>/<c>ApplyTransmutationTo</c> áp cho người chơi sống (chỉ
+        /// khác nguồn data: <paramref name="opponentGrowth"/> là snapshot server gửi thay vì
+        /// GrowthManager.SaveData cục bộ). Trước bản fix này, defender (kể cả đối thủ thật server
+        /// ghép được) luôn yếu hơn hẳn so với chính họ khi tự vào trận với tư cách attacker, vì
+        /// DefenderTestStatsBuilder/ApplySnapshotBaseAndWeapon chỉ tính tier/star+weapon, không đụng
+        /// 2 hệ thống đầu tư dài hạn này — xem TeamBattleSnapshot.OpponentGrowth doc.
+        /// </summary>
+        private static void ApplyOpponentGrowthAndTransmutation(HeroActor hero,
+            GrowthSaveData opponentGrowth, List<StatModifier> opponentTransmutationModifiers)
+        {
+            if (hero?.Stats?.StatModule == null) return;
+            var sm = hero.Stats.StatModule;
+
+            if (opponentGrowth != null && DatabaseManager.Instance?.GrowthDatabase != null)
+            {
+                // PowerUpSystemService/GrowthSystemService không gắn với 1 người chơi cụ thể nào —
+                // chỉ cần (database, saveData) bất kỳ, nên dùng thẳng cho đối thủ mà không cần
+                // GrowthManager singleton (vốn chỉ giữ save data của CHÍNH người chơi).
+                var growthService = new GrowthSystemService(DatabaseManager.Instance.GrowthDatabase, opponentGrowth);
+                var powerUps = new PowerUpSystemService();
+                powerUps.RegisterSource(growthService);
+                powerUps.RebuildAndApply(sm);
+            }
+
+            if (opponentTransmutationModifiers != null)
+            {
+                for (int i = 0; i < opponentTransmutationModifiers.Count; i++)
+                {
+                    var mod = opponentTransmutationModifiers[i];
+                    if (mod == null) continue;
+                    sm.AddModifier(new StatModifier(mod.StatType, mod.Operation, mod.Value,
+                        StatSourceIds.Transmutation, mod.IsUnique));
+                }
+            }
         }
 
         /// <summary>

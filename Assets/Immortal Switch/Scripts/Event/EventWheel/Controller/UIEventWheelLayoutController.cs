@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventWheel.Layout;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
@@ -60,7 +61,7 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Controller
 
         private string OnCountdown(long days, long hours, long minutes, long seconds)
         {
-            return $"{days:00} ngày {hours:00} giờ {minutes:00} phút";
+            return LocalizationManager.GetText(LocalizationKeys.UI_TIME, days, hours, minutes);
         }
 
         private void BindTabs()

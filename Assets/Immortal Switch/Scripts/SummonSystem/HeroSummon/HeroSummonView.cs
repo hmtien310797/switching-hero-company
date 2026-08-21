@@ -5,7 +5,9 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
@@ -160,7 +162,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.HeroSummon
             int currentLevel = HeroSummonManager.Instance.GetCurrentSummonLevel();
 
             if (summonLevelText != null)
-                summonLevelText.text = $"Lv.{currentLevel}";
+                summonLevelText.text = LocalizationManager.GetText(LocalizationKeys.UI_LV, currentLevel);
 
             int currentProgress = HeroSummonManager.Instance.Service.GetCurrentLevelProgressRoll();
             int currentRequired = HeroSummonManager.Instance.Service.GetCurrentLevelRequiredRoll();

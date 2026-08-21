@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -74,7 +76,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
 
             goOverlayClaimed.SetActive(isClaimed);
 
-            txtDay.text = $"Ngày {row.day}";
+            txtDay.text = LocalizationManager.GetText(LocalizationKeys.UI_DAY_NEW, row.day);
             btnClaim.interactable = row.day <= currentDay && !isClaimed;
             imgBg.sprite = row.day == 7 ? sprBgSpecial : sprBgNormal;
 

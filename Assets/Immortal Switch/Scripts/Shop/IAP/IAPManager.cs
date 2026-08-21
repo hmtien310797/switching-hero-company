@@ -8,10 +8,10 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventWheel;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Loading.Views;
+using Immortal_Switch.Scripts.Modules.Analytics;
+using Immortal_Switch.Scripts.Modules.Cache.Analytics;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
-using Immortal_Switch.Scripts.Shop.Views;
-using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using UnityEngine.Purchasing;
 
@@ -98,14 +98,14 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
                 foreach (var product in products)
                 {
-                    string storeProductId = GetStoreProductId(product);
+                    var storeProductId = GetStoreProductId(product);
 
                     if (string.IsNullOrEmpty(storeProductId))
                     {
                         continue;
                     }
 
-                    ProductType type = product.subscribe == 1 ? ProductType.Subscription : ProductType.Consumable;
+                    var type = product.subscribe == 1 ? ProductType.Subscription : ProductType.Consumable;
                     builder.AddProduct(storeProductId, type);
                 }
 
@@ -115,7 +115,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                 // Một số thiết bị (không có Google Play/App Store, sandbox lỗi...) không bao giờ gọi
                 // OnInitialized lẫn OnInitializeFailed — nếu await thẳng _initTcs.Task, bootstrap sẽ
                 // treo vĩnh viễn ở đây. Timeout để đảm bảo flow game luôn tiếp tục được.
-                (bool hasResult, bool success) = await UniTask.WhenAny(
+                (var hasResult, var success) = await UniTask.WhenAny(
                     _initTcs.Task, UniTask.Delay(TimeSpan.FromSeconds(InitTimeoutSeconds)));
 
                 if (!hasResult)
@@ -162,10 +162,10 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                 onComplete?.Invoke(false, "IAP chưa khởi tạo xong.");
                 return;
             }
-            
+
             LoadingService.Show(true);
-            
-            Product product = _storeController.products.WithID(storeProductId);
+
+            var product = _storeController.products.WithID(storeProductId);
 
             if (product == null ||
                 !product.availableToPurchase)
@@ -195,7 +195,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                 return;
             }
 
-            Product product = _storeController.products.WithID(storeProductId);
+            var product = _storeController.products.WithID(storeProductId);
 
             if (product == null ||
                 !product.availableToPurchase)
@@ -261,7 +261,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                 return;
             }
 
-            Product product = _storeController.products.WithID(storeProductId);
+            var product = _storeController.products.WithID(storeProductId);
 
             if (product == null ||
                 !product.availableToPurchase)
@@ -301,24 +301,24 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
         private async UniTaskVoid ValidateAndConfirmAsync(Product product)
         {
-            string storeProductId = product.definition.id;
+            var storeProductId = product.definition.id;
 
-            _pendingCallbacks.TryGetValue(storeProductId, out Action<bool, string> callback);
+            _pendingCallbacks.TryGetValue(storeProductId, out var callback);
             _pendingCallbacks.Remove(storeProductId);
 
-            _pendingPackIds.TryGetValue(storeProductId, out int packId);
+            _pendingPackIds.TryGetValue(storeProductId, out var packId);
             _pendingPackIds.Remove(storeProductId);
 
-            _pendingIsBundle.TryGetValue(storeProductId, out bool isBundle);
+            _pendingIsBundle.TryGetValue(storeProductId, out var isBundle);
             _pendingIsBundle.Remove(storeProductId);
 
-            _pendingIsEventPass.TryGetValue(storeProductId, out bool isEventPass);
+            _pendingIsEventPass.TryGetValue(storeProductId, out var isEventPass);
             _pendingIsEventPass.Remove(storeProductId);
 
             _pendingEventRewards.TryGetValue(storeProductId, out var eventRewards);
             _pendingEventRewards.Remove(storeProductId);
 
-            string payload = ExtractReceiptPayload(product.receipt);
+            var payload = ExtractReceiptPayload(product.receipt);
 
             if (string.IsNullOrEmpty(payload))
             {
@@ -357,6 +357,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
 
                     Debug.Log($"[IAPManager] Event pass purchase validated & confirmed -> product={storeProductId}");
                     callback?.Invoke(true, null);
+                    HandlePurchaseTracking(storeProductId);
                     OnPurchased?.Invoke(0);
                 }
                 else if (isBundle)
@@ -381,6 +382,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                         $"[IAPManager] Pack purchase validated & confirmed -> product={storeProductId} pack={packId} count={response.PurchaseCount}/{response.Limit}");
 
                     callback?.Invoke(true, null);
+                    HandlePurchaseTracking(storeProductId);
                     OnPurchased?.Invoke(packId);
                 }
                 else
@@ -411,6 +413,7 @@ namespace Immortal_Switch.Scripts.Shop.IAP
                         $"[IAPManager] Purchase validated & confirmed -> product={storeProductId} pack={packId} gems={response.GemsGranted} firstBuy={response.IsFirstBuy}");
 
                     callback?.Invoke(true, null);
+                    HandlePurchaseTracking(storeProductId);
                     OnPurchased?.Invoke(packId);
                 }
             }
@@ -424,6 +427,48 @@ namespace Immortal_Switch.Scripts.Shop.IAP
             finally
             {
                 LoadingService.Hide();
+            }
+        }
+
+        /// <summary>
+        /// Gửi event purchase lên AppsFlyer sau khi server xác thực thành công: af_purchase cho mọi
+        /// lần mua; af_purchase_first / af_purchase_first_1u chỉ gửi đúng 1 lần cho mỗi tài khoản
+        /// (cờ lưu theo userId — xem AppsflyerService). "Gói 1$" = product non-subscribe có giá
+        /// ~1 USD (bảng product_id: pack 1$ = 0.99, subscribe = 0).
+        /// </summary>
+        private void HandlePurchaseTracking(string storeProductId)
+        {
+            var productRow = DatabaseManager.Instance.GetAllProducts()
+                .FirstOrDefault(p =>
+                    string.Equals(p.googleID, storeProductId, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(p.appleID, storeProductId, StringComparison.OrdinalIgnoreCase)
+                );
+
+            var userId = NakamaClient.Instance?.Session?.UserId;
+
+            if (productRow == null)
+            {
+                AppsflyerService.TrackingPurchase(storeProductId, 0f);
+                return;
+            }
+
+            AppsflyerService.TrackingPurchase(productRow);
+
+            if (!string.IsNullOrEmpty(userId) &&
+                !AnalyticsTrackingCache.Instance.HasPurchasedAny(userId))
+            {
+                AnalyticsTrackingCache.Instance.MarkPurchasedAny(userId);
+                AppsflyerService.TrackingPurchaseFirst(productRow);
+            }
+
+            var isOneUsdPack = productRow.price is > 0 and <= 1f && productRow.subscribe == 0;
+
+            if (isOneUsdPack &&
+                !string.IsNullOrEmpty(userId) &&
+                !AnalyticsTrackingCache.Instance.HasPurchasedOneUsd(userId))
+            {
+                AnalyticsTrackingCache.Instance.MarkPurchasedOneUsd(userId);
+                AppsflyerService.TrackingPurchaseFirst1u(productRow);
             }
         }
 
@@ -478,10 +523,10 @@ namespace Immortal_Switch.Scripts.Shop.IAP
         {
             LoadingService.Hide();
 
-            string storeProductId = product?.definition.id;
+            var storeProductId = product?.definition.id;
 
             if (storeProductId != null &&
-                _pendingCallbacks.TryGetValue(storeProductId, out Action<bool, string> callback))
+                _pendingCallbacks.TryGetValue(storeProductId, out var callback))
             {
                 _pendingCallbacks.Remove(storeProductId);
                 _pendingPackIds.Remove(storeProductId);

@@ -17,6 +17,7 @@ using Immortal_Switch.Scripts.Level.Stage;
 using Immortal_Switch.Scripts.Reward;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
+using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Immortal_Switch.Scripts.StatSystem;
@@ -1108,12 +1109,34 @@ namespace Battle
                 Debug.LogWarning($"[PvE] battle/end rejected ({response.Error}) — resyncing progression.");
                 await ResyncProgressionFromServerAsync();
             }
+            else if (response != null && response.Error == "CHEAT_DETECTED")
+            {
+                // Server's plausibility check (lineup vs boss stats) rejected this Victory — no
+                // reward/progression was persisted server-side. Cancel the result and retry the
+                // same stage instead of falling through to NextStageCallback below (which would
+                // otherwise silently advance the stage despite the rejection).
+                Debug.LogWarning("[PvE] battle/end rejected (CHEAT_DETECTED).");
+                UIManager.Instance.ShowToast(DescribeBattleEndError(response.Error));
+                await ResyncProgressionFromServerAsync();
+                PlayCurrentStage(cancellationToken, 1f).Forget();
+                GameEventManager.Trigger(GameEvents.OnStageSessionChange);
+                return;
+            }
 
             // KHÔNG còn gọi rewardSyncService?.ClaimClearStageReward(stageRuntimeData) ở đây nữa —
             // reward stage-clear giờ lấy từ response battle/end. SetCurrentStageData (Online Idle)
             // vẫn chạy như cũ qua CacheStageSpawnData trong InitStage, không thuộc phạm vi RPC này.
             NextStageCallback(cancellationToken).Forget();
             cancellationToken.ThrowIfCancellationRequested();
+        }
+
+        private static string DescribeBattleEndError(string error)
+        {
+            switch (error)
+            {
+                case "CHEAT_DETECTED": return "Phát hiện gian lận — kết quả trận đấu đã bị huỷ.";
+                default: return "Có lỗi xảy ra, vui lòng thử lại.";
+            }
         }
 
         private void OnStageFailed()

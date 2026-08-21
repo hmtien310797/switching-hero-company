@@ -34,5 +34,8 @@ namespace Immortal_Switch.Scripts.Pvp
 
         // ── Leaderboard (rankings PvP Main) ──
         public IPvPLeaderboardService Leaderboard { get; internal set; }
+
+        // ── Shop (PvP Shop) ──
+        public IPvPShopService Shop { get; internal set; }
     }
 }

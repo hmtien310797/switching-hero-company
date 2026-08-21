@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Modules.Analytics;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Tutorial.Interfaces;
@@ -213,8 +214,15 @@ namespace Immortal_Switch.Scripts.Tutorial
         {
             ClearTutorial();
 
+            if (guideId == TutorialGuideIds.NEW_USER_GUIDE)
+            {
+                AppsflyerService.TrackingCompleteRegistration(UserDataCache.Instance.AccountType);
+            }
+
+            AppsflyerService.TrackingTutorialBegin(guideId);
+
             _guideId = guideId;
-            Debug.Log($"StartTutorial: {guideId}");
+
             var tutorials = DatabaseManager.Instance.TutorialDb.GetTutorials(guideId);
 
             _rows.AddRange(tutorials);
@@ -349,6 +357,11 @@ namespace Immortal_Switch.Scripts.Tutorial
 
         private void CompleteCurrentGuide()
         {
+            if (_guideId == TutorialGuideIds.END_GUIDE)
+            {
+                AppsflyerService.TrackingTutorialCompletion(_guideId);
+            }
+
             Service.Complete(_guideId);
             ClearTutorial();
             CheckPendingGuideId();

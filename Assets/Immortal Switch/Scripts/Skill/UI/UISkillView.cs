@@ -5,7 +5,9 @@ using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Helper;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -506,7 +508,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 if (detailShardFill != null) detailShardFill.fillAmount = 0f;
 
                 if (equipButton != null) equipButton.interactable = false;
-                if (equipButtonText != null) equipButtonText.text = "Trang bị";
+                if (equipButtonText != null) equipButtonText.text = LocalizationManager.GetText(LocalizationKeys.UI_EQUIP_GEAR);
                 return;
             }
 
@@ -523,7 +525,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                     frameImg.sprite = tierInfo.border;
             }
 
-            if (detailLevelText != null) detailLevelText.text = $"Cấp.{state.Level}";
+            if (detailLevelText != null) detailLevelText.text = LocalizationManager.GetText(LocalizationKeys.UI_LV, state.Level);
             if (detailNameText != null) detailNameText.text = skillData.GetLocalizedSkillName();
             //if (detailTypeText != null) detailTypeText.text = $"{skillData.CastType} kỹ năng";
             if (detailDescText != null) detailDescText.text = skillData.BuildDescription(state.Level);
@@ -535,12 +537,12 @@ namespace Immortal_Switch.Scripts.Skill.UI
             if (!state.IsOwned)
             {
                 if (equipButton != null) equipButton.interactable = false;
-                if (equipButtonText != null) equipButtonText.text = "Trang bị";
+                if (equipButtonText != null) equipButtonText.text = LocalizationManager.GetText(LocalizationKeys.UI_EQUIP_GEAR);
                 return;
             }
 
             if (equipButton != null) equipButton.interactable = hero != null;
-            if (equipButtonText != null) equipButtonText.text = state.IsEquipped ? "Tháo trang bị" : "Trang bị";
+            if (equipButtonText != null) equipButtonText.text = state.IsEquipped ? LocalizationManager.GetText(LocalizationKeys.UI_UNEQUIP_GEAR) : LocalizationManager.GetText(LocalizationKeys.UI_EQUIP_GEAR);
         }
 
         private void OnClickEquipOrUnequip()
@@ -598,7 +600,7 @@ namespace Immortal_Switch.Scripts.Skill.UI
                 replacePendingSkillIcon.sprite = SkillImageService.GetSkillIcon(pendingReplaceSkill);
 
             if (replaceInstructionText != null)
-                replaceInstructionText.text = "Vui lòng chọn ô để trang bị.";
+                replaceInstructionText.text = LocalizationManager.GetText(LocalizationKeys.UI_SELECT_A_SLOT);
 
             for (int i = 0; i < replaceSlotViews.Length; i++)
             {

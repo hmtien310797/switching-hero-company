@@ -4,6 +4,8 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Event.EventLogin.Layout;
 using Immortal_Switch.Scripts.Event.EventLogin.UI;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using TMPro;
 using UnityEngine;
@@ -85,8 +87,10 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.Controller
             _currentDay = state.Progress.CurrentDay;
             _totalDay = state.Progress.TotalDay;
 
-            txtTitle.text = $"Sự Kiện Tân Thủ {_totalDay} Ngày";
-            txtCountdown.text = $"Thời gian sự kiện: <color=#75ce80>{(_totalDay - _currentDay):00} ngày</color>";
+            txtTitle.text = LocalizationManager.GetText(LocalizationKeys.UI_NEWBIE_DAY, _totalDay);
+
+            txtCountdown.text =
+                LocalizationManager.GetText(LocalizationKeys.UI_EVENT_DURATION, $"{(_totalDay - _currentDay):00}");
 
             OnChangeDay(_currentDay);
             progressPanel.Bind(state.Milestones, state.Progress.Points, OnClaimAllMilestones, OnClaimMilestone);

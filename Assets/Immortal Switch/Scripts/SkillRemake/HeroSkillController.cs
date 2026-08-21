@@ -573,7 +573,9 @@ namespace Immortal_Switch.Scripts.Skill
             PlayPassiveTriggerAnimation(
                 skillToActivate,
                 level);
-            
+
+            owner.PlayPassiveVoice();
+
             PlayPassiveAura(passiveConfig);
             ClearPassiveAuraAfter(passiveConfig.BuffDuration).Forget();
 

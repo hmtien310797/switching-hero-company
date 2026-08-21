@@ -4,7 +4,9 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Modules.Navigation;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -101,7 +103,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
 
             txtTitle.text = row.titleVi;
             txtDay.text = row.sortOrder.ToString();
-            txtProgress.text = $"Tiến độ: {currentValue}/{row.target}";
+            txtProgress.text = LocalizationManager.GetText(LocalizationKeys.UI_PROGRESS, currentValue, row.target);
             imgFill.fillAmount = row.target <= 0 ? 0f : currentValue / (row.target * 1f);
 
             if (isClaimed)
@@ -115,7 +117,10 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
             {
                 _hasCanJump = currentValue < row.target;
                 _hasCanClaim = !_hasCanJump;
-                txtClaim.text = _hasCanClaim ? "Nhận ngay" : "Đến";
+
+                txtClaim.text = _hasCanClaim
+                    ? LocalizationManager.GetText(LocalizationKeys.UI_CLAIM_NOW_STORE)
+                    : LocalizationManager.GetText(LocalizationKeys.UI_GO);
 
                 btnClaim.gameObject.SetActive(true);
             }

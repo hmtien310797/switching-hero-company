@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Profile.Models;
 using Immortal_Switch.Scripts.StatSystem;
 using JetBrains.Annotations;
@@ -39,7 +40,7 @@ namespace Immortal_Switch.Scripts.TransmutationSystem.Views.UI
 
         public void Bind(PlayerEquipViewData showEquip, [CanBeNull] PlayerEquipViewData oldEquip, bool isUsed)
         {
-            txtTitle.SetText(showEquip.Title);
+            txtTitle.SetText(LocalizationManager.GetText(showEquip.Title));
             goUsedLayout.SetActive(isUsed);
             selectedEquip.Bind(showEquip, showEquip.Level);
 

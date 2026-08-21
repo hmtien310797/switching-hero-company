@@ -155,7 +155,7 @@ public class GameStatView : MonoBehaviour
         currentDeadMonsterQuantityText.text =
             string.Format(DeadMonsterQuantityKey, deadCount, stageDataResolverSo.MaxCreepsPerStage);
 
-        //OnDefenseDungeonDataChange((float)deadCount / stageDataResolverSo.MaxCreepsPerStage);
+        OnDefenseDungeonDataChange((float)deadCount / stageDataResolverSo.MaxCreepsPerStage);
         RefreshGameProgressionState(deadCount == stageDataResolverSo.MaxCreepsPerStage && !playCompletedStage);
     }
 

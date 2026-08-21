@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shop.IAP;
 using TMPro;
 using UnityEngine;
@@ -116,7 +118,7 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             _product = product;
             _iap = iap;
             _onClickBuy = onClickBuy;
-            txtBonus.text = $"Giá trị <size=30>{iap.bonus}</size>";
+            txtBonus.text = LocalizationManager.GetText(LocalizationKeys.UI_VALUE, iap.bonus);
 
             RefreshStatus();
             RefreshRewards(rewardInstantContainer, _instantPools, rewardInstant);
@@ -163,15 +165,15 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 // Thưởng mỗi ngày giờ tự động gửi vào mailbox (server: rpcPlayerMe →
                 // sendMonthlyPassDailyRewardsIfNeeded) — không còn thao tác nhận thủ công, nút chỉ
                 // hiển thị trạng thái.
-                txtPrice.text = "Đã kích hoạt";
-                txtDay.text = $"Ngày {currentDay}/30";
+                txtPrice.text = LocalizationManager.GetText(LocalizationKeys.UI_ACTIVATED);
+                txtDay.text = LocalizationManager.GetText(LocalizationKeys.UI_30_DAY_CHECK, currentDay);
                 btnBuy.interactable = false;
             }
             else
             {
                 txtPrice.text = price;
                 btnBuy.interactable = true;
-                txtDay.text = "Mua ngay";
+                txtDay.text = LocalizationManager.GetText(LocalizationKeys.UI_BUY_NOW_STORE);
             }
         }
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,7 +43,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
             _times = times;
             _onClickSummon = onClickSummon;
 
-            txtTitle.text = $"Triệu Hồi X{times}";
+            txtTitle.text = LocalizationManager.GetText(LocalizationKeys.UI_SUMMON_X, times);
             txtCount.text = $"{times}";
         }
     }

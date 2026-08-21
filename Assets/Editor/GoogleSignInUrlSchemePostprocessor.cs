@@ -29,23 +29,31 @@ namespace SwitchingHero.Editor
                 return;
             }
 
-            // Unity copies the plist onto disk under Libraries/Plugins/iOS (same
-            // as the GoogleSignIn .h/.mm files), but unlike recognized native
-            // plugin types it does NOT add it to the Xcode "Copy Bundle
-            // Resources" build phase, so it never lands inside the .app and
-            // pathForResource:ofType: returns nil at runtime. Add it explicitly.
-            const string relativePlistPath = "Libraries/Plugins/iOS/GoogleService-Info.plist";
+            // Unity recognizes any Assets file named exactly "GoogleService-Info.plist"
+            // and auto-copies it to the *root* of the generated Xcode project, adding
+            // it to the Copy Bundle Resources phase for Firebase out of the box. Match
+            // that same root path here: only step in if that didn't happen (older/other
+            // Unity versions), otherwise adding our own reference on top of Unity's
+            // duplicates the copy command and Xcode's new build system rejects it as
+            // "Multiple commands produce".
+            const string relativePlistPath = "GoogleService-Info.plist";
             var copiedPlistPath = Path.Combine(report.summary.outputPath, relativePlistPath);
-            Directory.CreateDirectory(Path.GetDirectoryName(copiedPlistPath));
-            File.Copy(sourcePlistPath, copiedPlistPath, true);
+            if (!File.Exists(copiedPlistPath))
+            {
+                File.Copy(sourcePlistPath, copiedPlistPath, true);
+            }
 
             var projectPath = PBXProject.GetPBXProjectPath(report.summary.outputPath);
             var pbxProject = new PBXProject();
             pbxProject.ReadFromString(File.ReadAllText(projectPath));
             var targetGuid = pbxProject.GetUnityMainTargetGuid();
-            var fileGuid = pbxProject.AddFile(relativePlistPath, relativePlistPath, PBXSourceTree.Source);
-            pbxProject.AddFileToBuild(targetGuid, fileGuid);
-            pbxProject.WriteToFile(projectPath);
+
+            if (!pbxProject.ContainsFileByRealPath(relativePlistPath))
+            {
+                var fileGuid = pbxProject.AddFile(relativePlistPath, relativePlistPath, PBXSourceTree.Source);
+                pbxProject.AddFileToBuild(targetGuid, fileGuid);
+                pbxProject.WriteToFile(projectPath);
+            }
 
             var sourcePlist = new PlistDocument();
             sourcePlist.ReadFromFile(sourcePlistPath);

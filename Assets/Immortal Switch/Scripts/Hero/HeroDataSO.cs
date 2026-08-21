@@ -33,6 +33,11 @@ namespace Immortal_Switch.Scripts.Hero
         public string HeroAddressKey;
         public SkeletonDataAsset Spine;
         public string HeroIconKey;
+
+        [Header("Voice")]
+        public string ThirdHitVoiceKey;
+        public string UltimateVoiceKey;
+        public string PassiveVoiceKey;
     }
 
     public enum HeroClass

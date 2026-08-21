@@ -1,6 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
@@ -112,11 +113,15 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.UI
             switch (limitType)
             {
                 case EEventWheelShopLimitType.Account:
-                    txtLimitType.text = $"Tài khoản {limitCurrentValue}/{limitTargetValue}";
+                    txtLimitType.text =
+                        LocalizationManager.GetText(LocalizationKeys.UI_ACCOUNT_CHECK, limitCurrentValue, limitTargetValue);
+
                     break;
 
                 case EEventWheelShopLimitType.Daily:
-                    txtLimitType.text = $"Ngày {limitCurrentValue}/{limitTargetValue}";
+                    txtLimitType.text =
+                        LocalizationManager.GetText(LocalizationKeys.UI_DAY_CHECK, limitCurrentValue, limitTargetValue);
+
                     break;
             }
         }

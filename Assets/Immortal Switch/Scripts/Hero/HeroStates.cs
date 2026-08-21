@@ -151,6 +151,10 @@ public class HeroAttackState : HeroStateBase
         currentAttackAnim = owner.Anim.GetAttackAnimationName(comboIndex);
         duration = owner.Anim.PlayAttack(comboIndex);
 
+        // Đòn thứ 3 trong chuỗi combo → phát voice riêng.
+        if (comboIndex == 2)
+            owner.PlayThirdHitVoice();
+
         timer = 0f;
         hasHit = false;
 

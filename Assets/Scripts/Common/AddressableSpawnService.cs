@@ -304,6 +304,16 @@ namespace Immortal_Switch.Scripts.Common
             return LoadAssetAsync<AudioClip>(finalKey);
         }
 
+        /// <summary>
+        /// Load AudioClip theo đúng addressable address (không tự dựng path như LoadAudioClipAsync).
+        /// Dùng cho các clip không nằm trong thư mục `.../SoundData/SFX/*.wav` (vd voice của hero là .ogg).
+        /// Clip trả về phải được release bằng ReleaseAudioClip(clip).
+        /// </summary>
+        public static UniTask<AudioClip> LoadAudioClipByAddressAsync(string address)
+        {
+            return LoadAssetAsync<AudioClip>(address);
+        }
+
         public static void ReleaseAudioClip(AudioClip audioClip)
         {
             ReleaseAsset(audioClip);

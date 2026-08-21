@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Skill;
 
 namespace Immortal_Switch.Scripts.HeroUIView
@@ -35,7 +36,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (_skillData == null)
                 return;
 
-            skillNameAndLevel.text = $"{_skillData.GetLocalizedSkillName()} Lv.{_currentLevel}";
+            skillNameAndLevel.text = $"{_skillData.GetLocalizedSkillName()} {LocalizationManager.GetText(LocalizationKeys.UI_LV, _currentLevel)}";
             skillDescription.text = _skillData.GetDisplayDescription(_currentLevel);
         }
 

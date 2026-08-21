@@ -8,7 +8,9 @@ using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Equipment.Models;
 using Immortal_Switch.Scripts.Equipment.UIRuntime;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.StatSystem;
 using UnityEngine;
 
@@ -16,13 +18,16 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 {
     public class WeaponViewDataProvider : MonoBehaviour
     {
-        [Header("Scene Hero Runtime")] [SerializeField]
+        [Header("Scene Hero Runtime")]
+        [SerializeField]
         private List<HeroActor> deployedHeroes = new();
-        
+
         [Header("Visual Config")]
-        [SerializeField] private CurrencyVisualConfigSO currencyVisualConfig;
+        [SerializeField]
+        private CurrencyVisualConfigSO currencyVisualConfig;
 
         private WeaponDatabaseSO _weaponDatabaseSo;
+
         public void SetDeployedHeroes(List<HeroActor> heroes)
         {
             deployedHeroes = heroes ?? new List<HeroActor>();
@@ -37,13 +42,16 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             int focusedHeroId = 0)
         {
             int resolvedSelectedWeaponId = selectedWeaponId;
+
             if (resolvedSelectedWeaponId <= 0)
             {
-                if(_weaponDatabaseSo == null)
+                if (_weaponDatabaseSo == null)
                     _weaponDatabaseSo = DatabaseManager.Instance.GetWeaponDatabase();
-                
+
                 var standardWeaponDefinitionSos = _weaponDatabaseSo.GetStandardsByClass(selectedClass);
-                if (standardWeaponDefinitionSos != null && standardWeaponDefinitionSos.Count > 0)
+
+                if (standardWeaponDefinitionSos != null &&
+                    standardWeaponDefinitionSos.Count > 0)
                     resolvedSelectedWeaponId = standardWeaponDefinitionSos[0].WeaponId;
             }
 
@@ -58,6 +66,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 {
                     continue;
                 }
+
                 vm.ClassTabs.Add(new WeaponClassTabViewModel
                 {
                     HeroClass = heroClass,
@@ -70,6 +79,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return vm;
 
             var standards = _weaponDatabaseSo.GetStandardsByClass(selectedClass);
+
             for (int i = 0; i < standards.Count; i++)
             {
                 var def = standards[i];
@@ -98,7 +108,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                     CanLimitBreak = CanLimitBreakStandard(def.WeaponId)
                 });
             }
-            
+
             if (resolvedSelectedWeaponId > 0)
                 vm.SelectedDetail = BuildStandardDetail(resolvedSelectedWeaponId, focusedHeroId);
 
@@ -112,14 +122,17 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 HeroId = heroId
             };
 
-            if (WeaponManager.Instance == null || _weaponDatabaseSo == null)
+            if (WeaponManager.Instance == null ||
+                _weaponDatabaseSo == null)
                 return vm;
 
             var hero = DatabaseManager.Instance != null ? DatabaseManager.Instance.GetHeroDataById(heroId) : null;
+
             if (hero != null)
                 vm.HeroName = hero.Name;
 
             var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
+
             if (def == null)
                 return vm;
 
@@ -143,6 +156,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 ShardProgressNormalized = 0f,
                 CurrentStar = state.CurrentStar,
                 MaxStar = def.MaxStar,
+
                 // Exclusive equip/upgrade/limit-break chưa có RPC server hỗ trợ (thiếu master data
                 // hero→exclusive weapon) — tắt cứng cho tới khi BE bổ sung, xem
                 // Docs/be-weapon-equip-upgrade-rpc-spec.md mục 7.
@@ -158,11 +172,13 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         public WeaponDetailViewModel BuildStandardDetail(int weaponId, int focusedHeroId = 0)
         {
             var def = _weaponDatabaseSo.GetStandard(weaponId);
+
             if (def == null)
                 return null;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateStandardState(weaponId);
             bool isEquippedByFocusedHero = IsFocusedHeroEquippingStandard(focusedHeroId, def.WeaponId);
+
             var vm = new WeaponDetailViewModel
             {
                 ActiveSource = WeaponEquipSource.Standard,
@@ -207,12 +223,14 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         public WeaponDetailViewModel BuildExclusiveDetail(int heroId)
         {
             var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
+
             if (def == null)
                 return null;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
             var equip = WeaponManager.Instance.Inventory.GetOrCreateHeroEquip(heroId);
             bool isEquippedByFocusedHero = IsFocusedHeroEquippingExclusive(heroId, def.ExclusiveWeaponId);
+
             var vm = new WeaponDetailViewModel
             {
                 ActiveSource = WeaponEquipSource.Exclusive,
@@ -231,7 +249,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 CurrentMaxLevel = GetCurrentMaxLevelForExclusive(heroId),
                 IsUnlocked = state.IsUnlocked,
                 IsEquipped = isEquippedByFocusedHero,
-                
+
                 // Exclusive equip/upgrade chưa có RPC server hỗ trợ — tắt cứng, xem
                 // Docs/be-weapon-equip-upgrade-rpc-spec.md mục 7.
                 ShowEquip = false,
@@ -252,21 +270,25 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             vm.UpgradePanel = BuildExclusiveUpgradePanel(def, state, heroId);
             return vm;
         }
-        
+
         public WeaponFusionPopupViewModel BuildFusionPopup(int weaponId)
         {
             if (WeaponManager.Instance == null)
                 return null;
 
             var def = _weaponDatabaseSo.GetStandard(weaponId);
+
             if (def == null)
                 return null;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateStandardState(weaponId);
-            if (state == null || !state.IsUnlocked)
+
+            if (state == null ||
+                !state.IsUnlocked)
                 return null;
 
             var currencyType = WeaponCurrencyHelper.GetClassStoneCurrency(def.ExclusivePoolClass);
+
             BigNumber currentCurrency = CurrencyLedgerService.Instance != null
                 ? CurrencyLedgerService.Instance.GetDisplayBalance(currencyType)
                 : 0;
@@ -336,6 +358,7 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             panel.ShowLevelUp = !isAtCurrentCap;
             panel.ShowLevelUpAll = !isAtCurrentCap;
             panel.CanLevelUp = CanLevelUpStandard(def.WeaponId);
+
             panel.CanLevelUpAll = CalculateLevelUpAllCostStandard(def, state) > 0 &&
                                   CurrencyLedgerService.Instance != null &&
                                   CurrencyLedgerService.Instance.HasEnoughDisplayBalance(
@@ -352,9 +375,11 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             panel.BreakThroughCost = nextBreakEntry != null ? nextBreakEntry.BreakThroughStoneCost : 0;
             panel.LimitBreakSuccessRate = nextBreakEntry != null ? nextBreakEntry.SuccessRate : 0f;
             panel.NextBreakRequiredLevel = nextBreakEntry != null ? nextBreakEntry.RequiredLevel : 0;
+
             panel.NextMaxLevel = def.LimitBreakConfig != null
                 ? def.LimitBreakConfig.GetMaxLevel(state.LimitBreakStage + 1)
                 : currentMaxLevel;
+
             panel.ShardProgressNormalized = def.FuseShardRequired > 0
                 ? Mathf.Clamp01((float)state.CurrentShard / def.FuseShardRequired)
                 : 0f;
@@ -363,7 +388,6 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             return panel;
         }
-
 
         private WeaponUpgradePanelViewModel BuildExclusiveUpgradePanel(
             ExclusiveWeaponDefinitionSO def,
@@ -410,9 +434,11 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             panel.BreakThroughCost = nextBreakEntry != null ? nextBreakEntry.BreakThroughStoneCost : 0;
             panel.LimitBreakSuccessRate = nextBreakEntry != null ? nextBreakEntry.SuccessRate : 0f;
             panel.NextBreakRequiredLevel = nextBreakEntry != null ? nextBreakEntry.RequiredLevel : 0;
+
             panel.NextMaxLevel = def.LimitBreakConfig != null
                 ? def.LimitBreakConfig.GetMaxLevel(state.LimitBreakStage + 1)
                 : currentMaxLevel;
+
             panel.CurrentShard = state.CurrentShard;
             panel.MaxShard = 0;
             panel.ShardProgressNormalized = 0f;
@@ -421,13 +447,15 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
             return panel;
         }
-        
+
         private List<WeaponUpgradeStatPreviewViewModel> BuildStandardUpgradeStatPreview(
             StandardWeaponDefinitionSO def,
             StandardWeaponState state)
         {
             var result = new List<WeaponUpgradeStatPreviewViewModel>();
-            if (def == null || def.EquipStats == null)
+
+            if (def == null ||
+                def.EquipStats == null)
                 return result;
 
             for (int i = 0; i < def.EquipStats.Length; i++)
@@ -452,7 +480,9 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             ExclusiveWeaponState state)
         {
             var result = new List<WeaponUpgradeStatPreviewViewModel>();
-            if (def == null || def.EquipStats == null)
+
+            if (def == null ||
+                def.EquipStats == null)
                 return result;
 
             for (int i = 0; i < def.EquipStats.Length; i++)
@@ -483,12 +513,14 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         private List<WeaponStatLineViewModel> BuildStatLines(WeaponStatBlock[] stats, int level)
         {
             var result = new List<WeaponStatLineViewModel>();
+
             if (stats == null)
                 return result;
 
             for (int i = 0; i < stats.Length; i++)
             {
                 var item = stats[i];
+
                 result.Add(new WeaponStatLineViewModel
                 {
                     StatType = item.StatType,
@@ -504,13 +536,17 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         private bool HasDeployedHeroUsingStandard(HeroClass heroClass)
         {
-            if (deployedHeroes == null || deployedHeroes.Count == 0 || WeaponManager.Instance == null)
+            if (deployedHeroes == null ||
+                deployedHeroes.Count == 0 ||
+                WeaponManager.Instance == null)
                 return false;
 
             bool hasHero = false;
+
             for (int i = 0; i < deployedHeroes.Count; i++)
             {
                 var hero = deployedHeroes[i];
+
                 if (hero == null)
                     continue;
 
@@ -521,8 +557,10 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
                 hasHero = true;
                 var source = WeaponManager.Instance.Inventory.ResolveActiveSource(hero.GetHeroId());
+
                 if (source == WeaponEquipSource.Exclusive)
                     return false;
+
                 break;
             }
 
@@ -535,18 +573,22 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             var def = _weaponDatabaseSo.GetStandard(weaponId);
+
             if (def == null)
                 return false;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateStandardState(weaponId);
+
             if (!state.IsUnlocked)
                 return false;
 
             int currentMax = GetCurrentMaxLevelForStandard(weaponId);
+
             if (state.Level >= currentMax)
                 return false;
 
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(state.Level + 1) : 0;
+
             return CurrencyLedgerService.Instance != null &&
                    cost > 0 &&
                    CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.weapon_ore, cost);
@@ -558,18 +600,22 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
+
             if (def == null)
                 return false;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
+
             if (!state.IsUnlocked)
                 return false;
 
             int currentMax = GetCurrentMaxLevelForExclusive(heroId);
+
             if (state.Level >= currentMax)
                 return false;
 
             int cost = def.LevelConfig != null ? def.LevelConfig.GetCost(state.Level + 1) : 0;
+
             return CurrencyLedgerService.Instance != null &&
                    cost > 0 &&
                    CurrencyLedgerService.Instance.HasEnoughDisplayBalance(CurrencyType.weapon_ore, cost);
@@ -581,14 +627,18 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             var def = _weaponDatabaseSo.GetStandard(weaponId);
-            if (def == null || def.LimitBreakConfig == null)
+
+            if (def == null ||
+                def.LimitBreakConfig == null)
                 return false;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateStandardState(weaponId);
+
             if (!state.IsUnlocked)
                 return false;
 
             var entry = def.LimitBreakConfig.GetEntryByStage(state.LimitBreakStage + 1);
+
             if (entry == null)
                 return false;
 
@@ -604,14 +654,18 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
-            if (def == null || def.LimitBreakConfig == null)
+
+            if (def == null ||
+                def.LimitBreakConfig == null)
                 return false;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
+
             if (!state.IsUnlocked)
                 return false;
 
             var entry = def.LimitBreakConfig.GetEntryByStage(state.LimitBreakStage + 1);
+
             if (entry == null)
                 return false;
 
@@ -627,10 +681,12 @@ namespace Immortal_Switch.Scripts.Equipment.UI
                 return false;
 
             var def = _weaponDatabaseSo.GetStandard(weaponId);
+
             if (def == null)
                 return false;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateStandardState(weaponId);
+
             if (!state.IsUnlocked)
                 return false;
 
@@ -640,7 +696,9 @@ namespace Immortal_Switch.Scripts.Equipment.UI
             if (def.FuseMode == WeaponFuseMode.ToRandomExclusive)
             {
                 var currencyType = WeaponCurrencyHelper.GetClassStoneCurrency(def.ExclusivePoolClass);
-                if (def.ExclusiveClassStoneCost > 0 && CurrencyManager.Instance != null)
+
+                if (def.ExclusiveClassStoneCost > 0 &&
+                    CurrencyManager.Instance != null)
                 {
                     return CurrencyLedgerService.Instance.HasEnoughDisplayBalance(currencyType, def.ExclusiveClassStoneCost);
                 }
@@ -652,7 +710,9 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         private int GetCurrentMaxLevelForStandard(int weaponId)
         {
             var def = _weaponDatabaseSo.GetStandard(weaponId);
-            if (def == null || def.LimitBreakConfig == null)
+
+            if (def == null ||
+                def.LimitBreakConfig == null)
                 return 25;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateStandardState(weaponId);
@@ -662,7 +722,9 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         private int GetCurrentMaxLevelForExclusive(int heroId)
         {
             var def = _weaponDatabaseSo.GetExclusiveByHeroId(heroId);
-            if (def == null || def.LimitBreakConfig == null)
+
+            if (def == null ||
+                def.LimitBreakConfig == null)
                 return 25;
 
             var state = WeaponManager.Instance.Inventory.GetOrCreateExclusiveState(def.ExclusiveWeaponId, heroId);
@@ -671,7 +733,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         private int CalculateLevelUpAllCostStandard(StandardWeaponDefinitionSO def, StandardWeaponState state)
         {
-            if (def == null || def.LevelConfig == null)
+            if (def == null ||
+                def.LevelConfig == null)
                 return 0;
 
             int maxLevel = GetCurrentMaxLevelForStandard(def.WeaponId);
@@ -688,7 +751,8 @@ namespace Immortal_Switch.Scripts.Equipment.UI
         private int CalculateLevelUpAllCostExclusive(ExclusiveWeaponDefinitionSO def, ExclusiveWeaponState state,
             int heroId)
         {
-            if (def == null || def.LevelConfig == null)
+            if (def == null ||
+                def.LevelConfig == null)
                 return 0;
 
             int maxLevel = GetCurrentMaxLevelForExclusive(heroId);
@@ -704,16 +768,19 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         private bool HasAnyDeployedHeroOfClass(HeroClass heroClass)
         {
-            if (deployedHeroes == null || deployedHeroes.Count == 0)
+            if (deployedHeroes == null ||
+                deployedHeroes.Count == 0)
                 return false;
 
             for (int i = 0; i < deployedHeroes.Count; i++)
             {
                 var hero = deployedHeroes[i];
+
                 if (hero == null)
                     continue;
 
-                if (hero.HeroClass == heroClass && hero.gameObject.activeInHierarchy)
+                if (hero.HeroClass == heroClass &&
+                    hero.gameObject.activeInHierarchy)
                     return true;
             }
 
@@ -731,33 +798,38 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         private string GetStatDisplayName(StatType statType)
         {
-            switch (statType)
+            var key = statType switch
             {
-                case StatType.Atk: return "Tăng Công";
-                case StatType.MaxHp: return "Tăng HP";
-                case StatType.Def: return "Tăng Phòng thủ";
-                case StatType.CritChance: return "Tăng Tỷ lệ Chí mạng";
-                case StatType.CritDamage: return "Tăng Sát thương Chí mạng";
-                case StatType.AttackSpeed: return "Tăng Tốc độ Đánh";
-                case StatType.Accuracy: return "Tăng Chính xác";
-                default: return statType.ToString();
-            }
+                StatType.Atk => LocalizationKeys.UI_INC_ATK,
+                StatType.MaxHp => LocalizationKeys.UI_INC_HP,
+                StatType.Def => LocalizationKeys.UI_INC_DEF,
+                StatType.CritChance => LocalizationKeys.UI_INC_CRIT_RATE,
+                StatType.CritDamage => LocalizationKeys.UI_INC_CRIT_DMG,
+                StatType.AttackSpeed => LocalizationKeys.UI_INC_ATK_SPD,
+                StatType.Accuracy => LocalizationKeys.UI_INC_ACC,
+                _ => string.Empty,
+            };
+
+            return string.IsNullOrWhiteSpace(key) ? statType.ToString() : LocalizationManager.GetText(key);
         }
 
         private string GetStatDisplayValue(ModifierOp op, float value)
         {
             if (op == ModifierOp.Multiply)
                 return $"{value * 100f:0.##}%";
-            
+
             return value.ToString("0.##");
         }
-        
+
         private bool IsFocusedHeroEquippingStandard(int heroId, int weaponId)
         {
-            if (WeaponManager.Instance == null || heroId <= 0 || weaponId <= 0)
+            if (WeaponManager.Instance == null ||
+                heroId <= 0 ||
+                weaponId <= 0)
                 return false;
 
             var equip = WeaponManager.Instance.Inventory.GetOrCreateHeroEquip(heroId);
+
             if (equip == null)
                 return false;
 
@@ -767,10 +839,13 @@ namespace Immortal_Switch.Scripts.Equipment.UI
 
         private bool IsFocusedHeroEquippingExclusive(int heroId, int exclusiveWeaponId)
         {
-            if (WeaponManager.Instance == null || heroId <= 0 || exclusiveWeaponId <= 0)
+            if (WeaponManager.Instance == null ||
+                heroId <= 0 ||
+                exclusiveWeaponId <= 0)
                 return false;
 
             var equip = WeaponManager.Instance.Inventory.GetOrCreateHeroEquip(heroId);
+
             if (equip == null)
                 return false;
 

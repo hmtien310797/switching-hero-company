@@ -25,12 +25,13 @@ namespace Immortal_Switch.Scripts.Pvp.Views
     ///   PvpLeaderboardRankItem: myRank (row cố định)
     ///   Button: btnFindMatch, btnFormation, btnBuffs, btnRankSeason, btnHistory, btnClose
     ///
-    /// DATA: leaderboard từ <see cref="IPvPLeaderboardService"/> (Phase-1 = LocalPvPLeaderboardService
-    /// mock 50 record — server chưa làm). TODO server: thay impl service.
+    /// DATA: leaderboard từ <see cref="IPvPLeaderboardService"/> (server-backed —
+    /// ServerPvPLeaderboardService, xem class header đó cho field còn thiếu so với contract cũ).
     /// </summary>
     public class PvpMainView : BouncePopupUIView
     {
         [SerializeField] private Button btnFindMatch;
+        [SerializeField] private Button btnShop;
         [SerializeField] private Button btnFormation;
         [SerializeField] private Button btnBuffs;
         [SerializeField] private Button btnRankSeason;
@@ -57,6 +58,7 @@ namespace Immortal_Switch.Scripts.Pvp.Views
             if (btnHistory != null) btnHistory.onClick.AddListener(OpenAsync<PvpHistoryView>);
             if (btnClose != null) btnClose.onClick.AddListener(() => UIManager.Instance.Close<PvpMainView>());
             if (btnRankSeason != null) btnRankSeason.onClick.AddListener(OpenAsync<PvpRewardView>);
+            if (btnShop != null) btnShop.onClick.AddListener(OpenAsync<PvpShopUiView>);
         }
 
         public override void OnShow(object args)

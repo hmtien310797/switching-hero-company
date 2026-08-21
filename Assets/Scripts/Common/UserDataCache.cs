@@ -51,6 +51,15 @@ namespace Common
         /// <summary>Account đã link bất kỳ social provider nào — quyết định hiển thị gg_linked/gg_no_link trong SettingView.</summary>
         public bool IsSocialLinked => GoogleLinked || AppleLinked;
 
+        /// <summary>"guest" | "google" | "apple" | "web" — set bởi GameBootstrap từ player/me
+        /// (server-authoritative, xem nakama/src/handler/player.js rpcPlayerMe). "web" = tài khoản
+        /// username/password (auth/register).</summary>
+        public string AccountType { get; set; }
+
+        /// <summary>Account chưa link Google/Apple và chưa phải tài khoản username/password —
+        /// mất máy/xoá app là mất account vĩnh viễn. Dùng để hiện cảnh báo/nhắc link trong Settings.</summary>
+        public bool IsGuestAccount => AccountType == "guest";
+
         /// <summary>exp của player — set bởi GameBootstrap từ player/me.</summary>
         public long Exp { get; set; }
 

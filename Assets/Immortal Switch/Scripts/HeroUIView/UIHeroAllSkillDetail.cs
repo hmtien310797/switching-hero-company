@@ -1,5 +1,6 @@
 ﻿using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Skill;
 using TMPro;
 using UnityEngine;
@@ -63,7 +64,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
             }
 
             skillNameTmpText.text = _skillData.GetLocalizedSkillName();
-            skillLevelTmpText.text = $"Lv.{_level}";
+            skillLevelTmpText.text = LocalizationManager.GetText(LocalizationKeys.UI_LV, _level);
         }
 
         private void OnEnable()

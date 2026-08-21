@@ -513,11 +513,13 @@ public class SettingManager : Singleton<SettingManager>
             {
                 await NakamaClient.Instance.LinkGoogleAsync(token);
                 UserDataCache.Instance.GoogleLinked = true;
+                UserDataCache.Instance.AccountType = "google";
             }
             else
             {
                 await NakamaClient.Instance.LinkAppleAsync(token);
                 UserDataCache.Instance.AppleLinked = true;
+                UserDataCache.Instance.AccountType = "apple";
             }
 
             UIManager.Instance.ShowToast($"Liên kết {provider} thành công.");

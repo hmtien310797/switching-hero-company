@@ -1,6 +1,8 @@
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.HeroSummon;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
@@ -63,7 +65,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
 
             if (rollCountText != null)
-                rollCountText.text = $"{option.RollCount} lần";
+                rollCountText.text = LocalizationManager.GetText(LocalizationKeys.UI_TIME_COUNT, option.RollCount);
 
             BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.summon_ticket_hero);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
@@ -89,7 +91,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
 
             if (rollCountText != null)
-                rollCountText.text = $"{option.RollCount} lần";
+                rollCountText.text = LocalizationManager.GetText(LocalizationKeys.UI_TIME_COUNT, option.RollCount);
 
             BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.summon_ticket_weapon);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);
@@ -115,7 +117,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.Shared.UI
                 return;
 
             if (rollCountText != null)
-                rollCountText.text = $"{option.RollCount} lần";
+                rollCountText.text = LocalizationManager.GetText(LocalizationKeys.UI_TIME_COUNT, option.RollCount);
 
             BigNumber ticket = CurrencyManager.Instance.Get(CurrencyType.summon_ticket_skill);
             BigNumber gem    = CurrencyManager.Instance.Get(CurrencyType.diamond);

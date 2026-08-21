@@ -66,8 +66,11 @@ namespace Immortal_Switch.Scripts.MissionSystem.Views.UI
             StopRefreshLoop();
             btnClaimAll.onClick.RemoveListener(OnClickClaimAll);
 
-            MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
-            MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
+            if (MissionSystemManager.Instance != null)
+            {
+                MissionSystemManager.Instance.OnMissionClaimed -= OnMissionClaimed;
+                MissionSystemManager.Instance.OnChangeProgress -= OnMissionChangeProgress;
+            }
         }
 
         private void StartRefreshLoop()

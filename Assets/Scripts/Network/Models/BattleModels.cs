@@ -56,7 +56,7 @@ public class BattleEndRequest
 public class BattleEndResponse
 {
     [JsonProperty("success")] public bool   Success;
-    /// <summary>"INVALID_STAGE" | "STAGE_MISMATCH"</summary>
+    /// <summary>"INVALID_STAGE" | "STAGE_MISMATCH" | "CHEAT_DETECTED"</summary>
     [JsonProperty("error")]   public string Error;
 
     /// <summary>"Victory" | "Defeat"</summary>

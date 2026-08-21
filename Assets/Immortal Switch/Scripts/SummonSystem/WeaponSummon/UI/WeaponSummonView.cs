@@ -5,7 +5,9 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Equipment.Core;
 using Immortal_Switch.Scripts.Equipment.Definitions;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Data;
@@ -207,7 +209,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             int currentLevel = WeaponSummonManager.Instance.GetCurrentSummonLevel();
 
             if (summonLevelText != null)
-                summonLevelText.text = $"Lv.{currentLevel}";
+                summonLevelText.text = LocalizationManager.GetText(LocalizationKeys.UI_LV, currentLevel);
 
             int currentProgress = WeaponSummonManager.Instance.Service.GetCurrentLevelProgressRoll();
             int currentRequired = WeaponSummonManager.Instance.Service.GetCurrentLevelRequiredRoll();

@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
@@ -118,6 +119,9 @@ namespace Immortal_Switch.Scripts.AFKReward.Views
 
         private void OnClickClaimX2()
         {
+            UIManager.Instance.ShowToast(LocalizationManager.GetText("ui_coming_soon"));
+            return;
+            //chưa gắn ad nên chưa tạm thời show comming soon
             if (AFKRewardManager.Instance.RecordClaimX2())
             {
                 CancelAutoClaim();

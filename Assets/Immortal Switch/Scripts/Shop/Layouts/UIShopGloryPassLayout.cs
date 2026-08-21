@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shop.Views;
 using Immortal_Switch.Scripts.Shop.Views.UI;
 using TMPro;
@@ -93,7 +95,12 @@ namespace Immortal_Switch.Scripts.Shop.Layouts
             var now = DateTime.UtcNow;
             var endOfMonth = new DateTime(now.Year, now.Month, 1).AddMonths(1);
             var remaining = endOfMonth - now;
-            txtTime.text = $"Còn: {((int)remaining.TotalDays):00} ngày {remaining.Hours:00} giờ";
+
+            txtTime.text = LocalizationManager.GetText(
+                LocalizationKeys.UI_LEFT,
+                $"{((int)remaining.TotalDays):00}",
+                $"{remaining.Hours:00}"
+            );
         }
 
         private void OnShopDataChanged()

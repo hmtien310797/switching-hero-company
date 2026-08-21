@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Currency;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.Skill;
 using Immortal_Switch.Scripts.SummonSystem.Shared.Base;
@@ -169,7 +171,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.SkillSummon
             int currentLevel = SkillSummonManager.Instance.GetCurrentSummonLevel();
 
             if (summonLevelText != null)
-                summonLevelText.text = $"Lv.{currentLevel}";
+                summonLevelText.text = LocalizationManager.GetText(LocalizationKeys.UI_LV, currentLevel);
 
             int currentProgress = SkillSummonManager.Instance.Service.GetCurrentLevelProgressRoll();
             int currentRequired = SkillSummonManager.Instance.Service.GetCurrentLevelRequiredRoll();

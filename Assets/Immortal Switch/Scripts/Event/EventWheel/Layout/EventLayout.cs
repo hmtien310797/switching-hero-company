@@ -7,6 +7,8 @@ using Immortal_Switch.Scripts.Currency;
 using Immortal_Switch.Scripts.Event.EventWheel.Controller;
 using Immortal_Switch.Scripts.Event.EventWheel.UI;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
 using Nakama;
@@ -119,11 +121,11 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         {
             if (IsRolling)
             {
-                UIManager.Instance.ShowToast("Vòng quay đang xoay");
+                UIManager.Instance.ShowToast(LocalizationManager.GetText(LocalizationKeys.UI_WHEEL_IS_SPIN));
                 return;
             }
 
-            txtTitle.text = "Vòng Cơ Bản";
+            txtTitle.text = LocalizationManager.GetText(LocalizationKeys.UI_BASIC_WHEEL);
 
             RefreshBind(EEventCategory.Normal);
             SetSelected(EEventCategory.Normal);
@@ -133,11 +135,11 @@ namespace Immortal_Switch.Scripts.Event.EventWheel.Layout
         {
             if (IsRolling)
             {
-                UIManager.Instance.ShowToast("Vòng quay đang xoay");
+                UIManager.Instance.ShowToast(LocalizationManager.GetText(LocalizationKeys.UI_WHEEL_IS_SPIN));
                 return;
             }
 
-            txtTitle.text = "Vòng Cao Cấp";
+            txtTitle.text = LocalizationManager.GetText(LocalizationKeys.UI_ADVANCED_WHEEL);
 
             RefreshBind(EEventCategory.Premium);
             SetSelected(EEventCategory.Premium);

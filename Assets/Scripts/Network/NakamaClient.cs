@@ -520,9 +520,6 @@ public class NakamaClient : MonoBehaviour
 
     // ── Auth/Register + Login ──────────────────────────────────────────────────
 
-    private static string ToInternalEmail(string username)
-        => username.ToLower() + "@sh.game";
-
     /// <summary>
     /// Đăng ký tài khoản mới qua RPC auth/register.
     /// Gọi một lần duy nhất — sau đó dùng LoginAsync để đăng nhập.
@@ -539,7 +536,10 @@ public class NakamaClient : MonoBehaviour
     }
 
     /// <summary>
-    /// Đăng nhập bằng username + password theo quy ước email nội bộ username@sh.game.
+    /// Đăng nhập bằng username + password tài khoản native đã đăng ký qua auth/register.
+    /// Email nội bộ được suy ra theo đúng quy ước của server (xem toEmail() trong
+    /// nakama/src/handler/auth.js: username.ToLower() + "@sh.game") — không có RPC login
+    /// nào cả, AuthenticateEmailAsync là bước duy nhất thực sự cấp session.
     /// </summary>
     public async Task<ISession> LoginAsync(string username, string password)
     {
@@ -552,6 +552,11 @@ public class NakamaClient : MonoBehaviour
         SaveSession(Session);
         Debug.Log($"[NakamaClient] Login success. UserId={Session.UserId}");
         return Session;
+    }
+
+    private static string ToInternalEmail(string username)
+    {
+        return username.ToLowerInvariant() + "@sh.game";
     }
 
     /// <summary>
@@ -1365,6 +1370,49 @@ public class NakamaClient : MonoBehaviour
         var payload  = JsonConvert.SerializeObject(new { limit });
         var response = await CallRpcAsync("leaderboard/stage/around_me", payload);
         return JsonConvert.DeserializeObject<LeaderboardStageAroundMeResponse>(response.Payload);
+    }
+
+    // ── PvP ──────────────────────────────────────────────────────────────────
+    // Xem handler/pvp.js. Phase 1: server sở hữu rank/tier/vé/arena_token + check hợp lý
+    // (ratio-based, chưa phải replay đầy đủ trận đấu) — đối thủ hiển thị/chiến đấu vẫn do client
+    // tự sinh (MockPvpOpponentGenerator), xem ServerPvPMatchmakingService.
+
+    /// <summary>Rank/tier/vé/arena_token/lịch sử hiện tại — gọi khi mở PvP Main để đồng bộ.</summary>
+    public async Task<PvpStateResponse> PvpStateAsync()
+    {
+        var response = await CallRpcAsync("pvp/state");
+        return JsonConvert.DeserializeObject<PvpStateResponse>(response.Payload);
+    }
+
+    /// <summary>Trừ 1 vé, xin battle_id + random_seed server-authoritative cho trận PvP sắp đánh.</summary>
+    public async Task<PvpMatchmakingResponse> PvpMatchmakingAsync()
+    {
+        var response = await CallRpcAsync("pvp/matchmaking", "{}");
+        return JsonConvert.DeserializeObject<PvpMatchmakingResponse>(response.Payload);
+    }
+
+    /// <summary>Báo kết quả 1 trận PvP. Server tính rank/token/tier reward — client không tự cộng trước khi có response.</summary>
+    public async Task<PvpBattleEndResponse> PvpBattleEndAsync(PvpBattleEndRequest request)
+    {
+        var payload  = JsonConvert.SerializeObject(request);
+        var response = await CallRpcAsync("pvp/battle/end", payload);
+        return JsonConvert.DeserializeObject<PvpBattleEndResponse>(response.Payload);
+    }
+
+    /// <summary>Top bảng xếp hạng PvP theo rank_points.</summary>
+    public async Task<PvpLeaderboardTopResponse> PvpLeaderboardTopAsync(int limit = 50, string cursor = null)
+    {
+        var payload  = JsonConvert.SerializeObject(new { limit, cursor });
+        var response = await CallRpcAsync("pvp/leaderboard/top", payload);
+        return JsonConvert.DeserializeObject<PvpLeaderboardTopResponse>(response.Payload);
+    }
+
+    /// <summary>Các record PvP xếp hạng gần với chính người chơi hiện tại.</summary>
+    public async Task<PvpLeaderboardAroundMeResponse> PvpLeaderboardAroundMeAsync(int limit = 20)
+    {
+        var payload  = JsonConvert.SerializeObject(new { limit });
+        var response = await CallRpcAsync("pvp/leaderboard/around_me", payload);
+        return JsonConvert.DeserializeObject<PvpLeaderboardAroundMeResponse>(response.Payload);
     }
 
     // ── Dungeon ───────────────────────────────────────────────────────────────

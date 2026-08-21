@@ -35,5 +35,10 @@ namespace Immortal_Switch.Scripts.Tutorial
         /// huong dan dau game cho new user
         /// </summary>
         public const int NEW_USER_GUIDE = 1;
+
+        /// <summary>
+        /// tutorial ket thuc huong dan
+        /// </summary>
+        public const int END_GUIDE = 28;
     }
 }

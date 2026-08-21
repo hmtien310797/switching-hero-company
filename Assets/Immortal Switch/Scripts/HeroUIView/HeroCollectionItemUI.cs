@@ -1,4 +1,6 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,36 +9,73 @@ namespace Immortal_Switch.Scripts.HeroUIView
 {
     public class HeroCollectionItemUI : MonoBehaviour
     {
-        [Header("Icons")] [SerializeField] private Image portraitIcon;
-        [SerializeField] private Image shardIcon;
-        [SerializeField] private Image rarityIcon;
-        [SerializeField] private Image elementIcon;
-        [SerializeField] private Image heroClassIcon;
-        [SerializeField] private Image bgImg;
-        [SerializeField] private Image frameImg;
+        [Header("Icons")]
+        [SerializeField]
+        private Image portraitIcon;
 
-        [Header("Texts")] [SerializeField] private TMP_Text progressText;
-        [SerializeField] private TMP_Text txtSlot;
+        [SerializeField]
+        private Image shardIcon;
 
-        [Header("Progress")] [SerializeField] private Image progressFill;
+        [SerializeField]
+        private Image rarityIcon;
 
-        [Header("States")] [SerializeField] private GameObject acquiredGroup;
-        [SerializeField] private GameObject notAcquiredGroup;
-        [SerializeField] private GameObject grayscaleOverlay;
-        [SerializeField] private GameObject goSlotPanel;
+        [SerializeField]
+        private Image elementIcon;
 
-        [Tooltip("Viền chọn tĩnh")] [SerializeField]
+        [SerializeField]
+        private Image heroClassIcon;
+
+        [SerializeField]
+        private Image bgImg;
+
+        [SerializeField]
+        private Image frameImg;
+
+        [Header("Texts")]
+        [SerializeField]
+        private TMP_Text progressText;
+
+        [SerializeField]
+        private TMP_Text txtSlot;
+
+        [Header("Progress")]
+        [SerializeField]
+        private Image progressFill;
+
+        [Header("States")]
+        [SerializeField]
+        private GameObject acquiredGroup;
+
+        [SerializeField]
+        private GameObject notAcquiredGroup;
+
+        [SerializeField]
+        private GameObject grayscaleOverlay;
+
+        [SerializeField]
+        private GameObject goSlotPanel;
+
+        [Tooltip("Viền chọn tĩnh")]
+        [SerializeField]
         private GameObject selectedObject;
 
-        [Tooltip("Glow sáng nhẹ / pulse khi đã chọn đủ source + target")] [SerializeField]
+        [Tooltip("Glow sáng nhẹ / pulse khi đã chọn đủ source + target")]
+        [SerializeField]
         private GameObject readyHighlightObject;
 
-        [Header("Interaction")] [SerializeField]
+        [Header("Interaction")]
+        [SerializeField]
         private Button button;
 
-        [Header("Star")] [SerializeField] private Transform starRoot;
-        [SerializeField] private GameObject starPrefab;
-        [SerializeField] private GameObject emptyStarPrefab;
+        [Header("Star")]
+        [SerializeField]
+        private Transform starRoot;
+
+        [SerializeField]
+        private GameObject starPrefab;
+
+        [SerializeField]
+        private GameObject emptyStarPrefab;
 
         private HeroCollectionItemViewData currentData;
         private Action<HeroCollectionItemUI> onClick;
@@ -121,7 +160,7 @@ namespace Immortal_Switch.Scripts.HeroUIView
 
                 if (data.IsInLineup)
                 {
-                    txtSlot.text = $"Slot {data.LineupIdx + 1}";
+                    txtSlot.text = LocalizationManager.GetText(LocalizationKeys.UI_SLOT, $"{data.LineupIdx + 1}");
                 }
             }
 

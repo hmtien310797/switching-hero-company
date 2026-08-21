@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Event.EventLogin.UI;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -65,7 +67,7 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.Layout
             var maxValue = milestones.LastOrDefault()?.PointsRequired ?? 1;
 
             imgFill.fillAmount = currentPoint / (maxValue * 1f);
-            txtCurrentPoint.text = $"Điểm Nhiệm Vụ\nHôm Nay:\n{currentPoint:00}";
+            txtCurrentPoint.text = LocalizationManager.GetText(LocalizationKeys.UI_QUEST_POINT, $"{currentPoint:00}");
 
             btnClaim.interactable = milestones.Any(m => !m.IsClaimed && currentPoint >= m.PointsRequired);
             RefreshMilestones(milestones, currentPoint);

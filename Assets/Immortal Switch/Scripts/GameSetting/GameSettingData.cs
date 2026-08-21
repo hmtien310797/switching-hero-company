@@ -26,7 +26,7 @@ public class GameSettingData
     public bool BattleMusicEnabled = true;
     
     public bool EventNotiEnabled = true;
-    public string LangCode = ValueConstants.DEFAULT_LANGUAGE;
+    public string LangCode;
 
     public int GraphicIdx = 0;
     public int QualityIdx = 0;

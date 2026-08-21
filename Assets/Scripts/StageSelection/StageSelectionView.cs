@@ -4,6 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Immortal_Switch.Scripts.Level.Stage;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.UI;
 
 namespace Immortal_Switch.Scripts.StageSelection
@@ -145,7 +147,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             BindChapterHeader(data);
 
             if (selectedStageText != null)
-                selectedStageText.text = $"Stage {data.GlobalStage}";
+                selectedStageText.text = LocalizationManager.GetText(LocalizationKeys.UI_STAGE_COUNT, data.GlobalStage);
 
             if (baseRewardListView != null)
                 baseRewardListView.Bind(data.BaseRewards);

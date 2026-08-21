@@ -6,7 +6,9 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
 using Immortal_Switch.Scripts.Event.Views.UI;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using Immortal_Switch.Scripts.Shared.Views;
 using UnityEngine;
@@ -66,7 +68,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
 
         private string OnCountdown(long days, long hours, long minutes, long seconds)
         {
-            return $"Kết thúc sau: {days:00} ngày {hours:00}:{minutes:00}:{seconds:00}";
+            return LocalizationManager.GetText(LocalizationKeys.UI_END_TIME, days, hours, minutes, seconds);
         }
 
         private void RefreshEventPointRewards(IList<int> rows)

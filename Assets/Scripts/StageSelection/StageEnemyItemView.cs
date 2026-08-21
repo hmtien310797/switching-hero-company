@@ -1,4 +1,6 @@
 ﻿using System;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +30,7 @@ namespace Immortal_Switch.Scripts.StageSelection
             }
 
             if (txtBoss != null && isBoss)
-                txtBoss.text = "Trùm";
+                txtBoss.text = LocalizationManager.GetText(LocalizationKeys.UI_BOSS);
         }
     }
 }

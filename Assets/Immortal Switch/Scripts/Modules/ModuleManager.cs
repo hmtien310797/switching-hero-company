@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Modules.Analytics;
 using Immortal_Switch.Scripts.Modules.Atlas;
 using Immortal_Switch.Scripts.Modules.Atlas.Implementations;
+using Immortal_Switch.Scripts.Modules.Cache.Analytics;
 using Immortal_Switch.Scripts.Modules.Power.Services;
 using Immortal_Switch.Scripts.Modules.Power.Services.Interfaces;
 using Immortal_Switch.Scripts.Shared.Constants;
@@ -22,6 +24,13 @@ namespace Immortal_Switch.Scripts.Modules
 
         public override async UniTask InitializeAsync()
         {
+            // Nạp cache tracking theo tài khoản — phải trước LoginDayService.Initialize (bước 5
+            // của bootstrap) vì OnLoginNewDay sẽ gọi RegisterLogin/level tracking đọc cache này.
+            AnalyticsTrackingCache.Instance.Init();
+
+            // Subscribe event vòng đời cho analytics (OnLoginNewDay, OnAppResumed) + gửi af_login.
+            AppsflyerService.Init();
+
             GearAtlas = AtlasServiceModule.Register(
                 SpriteAtlasConstants.GEAR,
                 atlasKey => new GearAtlasService(atlasKey)

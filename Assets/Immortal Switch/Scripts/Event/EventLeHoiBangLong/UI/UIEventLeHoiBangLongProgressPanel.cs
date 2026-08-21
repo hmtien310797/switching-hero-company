@@ -2,6 +2,7 @@
 using DG.Tweening;
 using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using TMPro;
 using UnityEngine;
@@ -66,10 +67,11 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
 
             var item = DatabaseManager.Instance.ItemDb.FindItem(rewardId);
 
-            txtNote.text = $"Mỗi lần triệu hồi nhận 1 điểm. Đủ {targetPoint} điểm nhận " +
+            txtNote.text = $"{LocalizationManager.GetText(LocalizationKeys.UI_GAIN_1_POINT)} " +
                            $"{LocalizationManager.GetText(item?.itemName)}";
 
             txtProgress.text = $"{Math.Min(summonPoint, targetPoint)}/{targetPoint}";
+
             imgFill.fillAmount = targetPoint > 0
                 ? Mathf.Clamp01(summonPoint / (float)targetPoint)
                 : 0f;

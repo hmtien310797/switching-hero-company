@@ -17,6 +17,7 @@ namespace Immortal_Switch.Scripts.Pvp.Repositories
         public const string PendingBuffRoll = "pvp_pending_buff_roll";
         public const string BuffRollHistory = "pvp_buff_roll_history";
         public const string ProcessedTransactions = "pvp_processed_transactions";
+        public const string ShopPurchases = "pvp_shop_purchases";
 
         /// <summary>
         /// Schema version hiện hành cho MỌI data group. Bump giá trị này + thêm nhánh migrate
@@ -29,7 +30,7 @@ namespace Immortal_Switch.Scripts.Pvp.Repositories
         {
             PlayerData, Formation, OwnedBuffs, MockOpponents, BattleHistory,
             PendingBattle, BuffGachaState, PendingBuffRoll, BuffRollHistory,
-            ProcessedTransactions
+            ProcessedTransactions, ShopPurchases
         };
     }
 }

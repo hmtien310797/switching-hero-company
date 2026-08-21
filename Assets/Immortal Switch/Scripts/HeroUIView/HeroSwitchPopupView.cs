@@ -4,7 +4,9 @@ using Common;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -218,13 +220,13 @@ namespace Immortal_Switch.Scripts.HeroUIView
             if (instructionText != null)
             {
                 if (selectedSourceHeroId <= 0 && selectedTargetHeroId <= 0)
-                    instructionText.text = "Vui lòng chọn Anh hùng";
+                    instructionText.text = LocalizationManager.GetText(LocalizationKeys.UI_PLS_SELECT_HERO);
                 else if (selectedSourceHeroId <= 0)
-                    instructionText.text = "Vui lòng chọn Anh hùng để thay ra";
+                    instructionText.text = LocalizationManager.GetText(LocalizationKeys.UI_PLS_SELECT_HERO_TO_SWAP_OUT);
                 else if (selectedTargetHeroId <= 0)
-                    instructionText.text = "Vui lòng chọn Anh hùng để thay vào";
+                    instructionText.text = LocalizationManager.GetText(LocalizationKeys.UI_PLS_SELECT_HERO_TO_SWAP_IN);
                 else
-                    instructionText.text = "Sẵn sàng thay đổi";
+                    instructionText.text = LocalizationManager.GetText(LocalizationKeys.UI_READY_TO_SWAP);
             }
             
             if (selectedSourceHeroId <= 0)

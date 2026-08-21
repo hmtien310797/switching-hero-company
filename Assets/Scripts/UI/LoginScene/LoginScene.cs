@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using AppsFlyerSDK;
 using Google;
 using AppleAuth;
 using AppleAuth.Enums;
@@ -449,6 +451,18 @@ public class LoginScene : MonoBehaviour
         selectAccount.ShowLogin();
     }
 
+    /// <summary>Bắn af_login kèm af_registration_method = loại tài khoản (guest/google/apple/web)
+    /// cho AppsFlyer — cùng giá trị account_type mà server tính trong player/me (xem
+    /// nakama/src/handler/player.js rpcPlayerMe), để dashboard AppsFlyer phân loại đúng theo
+    /// kênh đăng nhập thật sự vừa dùng.</summary>
+    private static void LogAppsFlyerLogin(string accountType)
+    {
+        AppsFlyer.sendEvent(AFInAppEvents.LOGIN, new Dictionary<string, string>
+        {
+            { AFInAppEvents.REGSITRATION_METHOD, accountType }
+        });
+    }
+
     private async UniTask DoLogin(string username, string password)
     {
         try
@@ -465,6 +479,7 @@ public class LoginScene : MonoBehaviour
             return;
         }
 
+        LogAppsFlyerLogin("web");
         selectAccount.SaveLoginInfo();
         await SceneManager.LoadSceneAsync("MainBattleScene");
         await RunBootstrapAsync();
@@ -497,6 +512,7 @@ public class LoginScene : MonoBehaviour
             return;
         }
 
+        LogAppsFlyerLogin("web");
         await SceneManager.LoadSceneAsync("MainBattleScene");
         await RunBootstrapAsync();
     }
@@ -523,6 +539,7 @@ public class LoginScene : MonoBehaviour
         }
 
         Debug.Log($"[LoginScene] Guest login success. UserId={NakamaClient.Instance.Session.UserId}");
+        LogAppsFlyerLogin("guest");
         await SceneManager.LoadSceneAsync("MainBattleScene");
         await RunBootstrapAsync();
     }
@@ -567,6 +584,7 @@ public class LoginScene : MonoBehaviour
         }
 
         Debug.Log($"[LoginScene] Google Nakama auth success. UserId={NakamaClient.Instance.Session.UserId}");
+        LogAppsFlyerLogin("google");
         await SceneManager.LoadSceneAsync("MainBattleScene");
         await RunBootstrapAsync();
     }
@@ -619,6 +637,7 @@ public class LoginScene : MonoBehaviour
         }
 
         Debug.Log($"[LoginScene] Apple Nakama auth success. UserId={NakamaClient.Instance.Session.UserId}");
+        LogAppsFlyerLogin("apple");
         await SceneManager.LoadSceneAsync("MainBattleScene");
         await RunBootstrapAsync();
     }

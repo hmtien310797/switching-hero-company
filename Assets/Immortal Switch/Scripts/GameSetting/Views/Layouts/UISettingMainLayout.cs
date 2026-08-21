@@ -2,7 +2,9 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.GameSetting.Views.UI;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Shared;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Helper;
 using Immortal_Switch.Scripts.Shared.Views;
 using Immortal_Switch.Scripts.UI;
@@ -169,7 +171,7 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
                 var isSelected = SettingManager.Instance.CurrentSetting.LangCode == entry.langCode;
                 var clone = _pools.Get(index);
 
-                clone.Bind(entry.nameNative, entry.langCode, OnChangeLanguage);
+                clone.Bind(entry.name, entry.langCode, OnChangeLanguage);
                 clone.SetSelected(isSelected);
             }
 
@@ -260,9 +262,9 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
         {
             UIManager.Instance
                 .OpenPopupAsync<PopupConfirmView>(new PopupConfirmArgs(
-                    "Xoá tài khoản",
-                    "Hành động này sẽ xoá vĩnh viễn tài khoản và toàn bộ dữ liệu.\nBạn có chắc chắn muốn tiếp tục?",
-                    () => SettingManager.Instance.DeleteAccount(),
+                    LocalizationManager.GetText(LocalizationKeys.UI_DELETE_ACCOUNT),
+                    LocalizationManager.GetText(LocalizationKeys.UI_DELETE_ACCOUNT_DESC),
+                    SettingManager.Instance.DeleteAccount,
                     showToggleDoNotShowAgain: false
                 ))
                 .Forget();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Bag.Views.UI;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Shared.UI;
@@ -25,14 +26,14 @@ namespace Immortal_Switch.Scripts.Mail.Views.UI
         private RectTransform rewardContainer;
 
         [SerializeField]
-        private UIRewardQuantity rewardPrefab;
+        private UIBagItem rewardPrefab;
 
         [SerializeField]
         [Range(0f, float.MaxValue)]
         private float rewardScale = 0.75f;
 
         // --- Private Fields ---
-        private SimpleUIPool<UIRewardQuantity> _pool;
+        private SimpleUIPool<UIBagItem> _pool;
         private Action<string> _onClickClaim;
 
         private string _mailId;
@@ -75,7 +76,7 @@ namespace Immortal_Switch.Scripts.Mail.Views.UI
 
         private void RefreshRewards(List<ItemData> rewards)
         {
-            _pool ??= new SimpleUIPool<UIRewardQuantity>(rewardPrefab, rewardContainer);
+            _pool ??= new SimpleUIPool<UIBagItem>(rewardPrefab, rewardContainer);
 
             for (int i = 0; i < rewards.Count; i++)
             {

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using TMPro;
 using UnityEngine;
@@ -65,7 +67,7 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
         {
             if (!isClaimedFree)
             {
-                txtClaim.text = "Nhận ngay";
+                txtClaim.text = LocalizationManager.GetText(LocalizationKeys.UI_CLAIM_NOW_STORE);
                 btnClaim.interactable = true;
             }
             else if (!isBonusPurchased)
@@ -75,16 +77,16 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI
             }
             else if (!isClaimedPack)
             {
-                txtClaim.text = "Nhận ngay";
+                txtClaim.text = LocalizationManager.GetText(LocalizationKeys.UI_CLAIM_NOW_STORE);
                 btnClaim.interactable = true;
             }
             else
             {
-                txtClaim.text = "Đã nhận";
+                txtClaim.text = LocalizationManager.GetText(LocalizationKeys.UI_CLAIMED);
                 btnClaim.interactable = false;
             }
 
-            txtTitle.text = $"Ngày {currentDay}";
+            txtTitle.text = LocalizationManager.GetText(LocalizationKeys.UI_DAY_NEW, currentDay);
 
             _currentDay = currentDay;
             _onClickClaim = onClickClaim;

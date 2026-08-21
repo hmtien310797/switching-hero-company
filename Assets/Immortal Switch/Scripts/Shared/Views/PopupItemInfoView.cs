@@ -1,5 +1,6 @@
 using Immortal_Switch.Scripts.Items;
 using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -68,7 +69,7 @@ namespace Immortal_Switch.Scripts.Shared.Views
                 imgIcon.sprite = itemIcon;
                 txtTitle.text = LocalizationManager.GetText(item.itemName);
                 txtDesc.text = LocalizationManager.GetText(item.desc);
-                txtQuantity.text = $"Số lượng: {itemQuantity.ToInputString()}";
+                txtQuantity.text = LocalizationManager.GetText(LocalizationKeys.UI_QUANTITY, itemQuantity.ToInputString());
             }
         }
     }

@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0ce15e7b0f70b148983b8a08fef76eb, type: 3}
+  m_Name: BuildToolSettings
+  m_EditorClassIdentifier: 
+  outputPath: Builds/Android/
+  groupRemoting:
+  - groupName: Projectile
+    remote: 1
+  - groupName: HeroSpine
+    remote: 1
+  - groupName: HeroPrefab
+    remote: 1
+  - groupName: BossData
+    remote: 1
+  - groupName: Localization-Locales
+    remote: 0
+  - groupName: UI
+    remote: 1
+  - groupName: Localization-String-Tables-English (en)
+    remote: 1
+  - groupName: BossPrefab
+    remote: 1
+  - groupName: GameDataBase
+    remote: 1
+  - groupName: HeroData
+    remote: 1
+  - groupName: Localization-String-Tables-Vietnamese (vi)
+    remote: 1
+  - groupName: Skill
+    remote: 1
+  - groupName: Localization-String-Tables-Chinese (Simplified) (zh-Hans)
+    remote: 1
+  - groupName: SharedAssets
+    remote: 0
+  - groupName: Duplicate Asset Isolation
+    remote: 1
+  - groupName: Localization-Assets-Shared
+    remote: 0
+  - groupName: CreepData
+    remote: 1
+  - groupName: Map
+    remote: 1
+  - groupName: CreepPrefab
+    remote: 1
+  - groupName: SFX
+    remote: 1
+  - groupName: SkillData
+    remote: 1
+  - groupName: ui_atlas
+    remote: 1
+  - groupName: Localization-String-Tables-Chinese (Traditional) (zh-Hant)
+    remote: 1
+  - groupName: Content Update
+    remote: 1

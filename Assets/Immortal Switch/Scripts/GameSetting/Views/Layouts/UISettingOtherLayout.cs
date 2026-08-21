@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using TMPro;
 using UnityEngine;
@@ -49,7 +51,7 @@ namespace Immortal_Switch.Scripts.GameSetting.Views.Layouts
             for (int i = 0; i < _offscreenTime.Count; i++)
             {
                 var time = _offscreenTime[i];
-                txtOffscreenTimes[i].text = time > 0 ? $"{time}M" : "Tắt";
+                txtOffscreenTimes[i].text = time > 0 ? $"{time}M" : LocalizationManager.GetText(LocalizationKeys.UI_OFF);
             }
         }
 

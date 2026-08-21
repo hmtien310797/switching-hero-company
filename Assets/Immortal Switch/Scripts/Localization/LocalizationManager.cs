@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
-using Immortal_Switch.Scripts.Shared.Constants;
+using Immortal_Switch.Scripts.Skill;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
@@ -17,6 +19,16 @@ namespace Immortal_Switch.Scripts.Localization
     /// </summary>
     public class LocalizationManager : Singleton<LocalizationManager>
     {
+        [ValueDropdown("@GetAllLangCodes()")]
+        [SerializeField]
+        private string defaultLangCode = "en";
+
+        private List<string> GetAllLangCodes()
+        {
+            var locales = LocalizationSettings.AvailableLocales?.Locales;
+            return locales == null ? new List<string>() : locales.Select(v => v.Identifier.Code).ToList();
+        }
+
         /// <summary>
         /// Fire khi ngôn ngữ thay đổi runtime. Các component LocalizeText / LocalizeImage
         /// subscribe event này để tự động cập nhật.
@@ -41,7 +53,7 @@ namespace Immortal_Switch.Scripts.Localization
             get
             {
                 var locale = LocalizationSettings.SelectedLocale;
-                return locale != null ? locale.Identifier.Code : ValueConstants.DEFAULT_LANGUAGE;
+                return locale != null ? locale.Identifier.Code : defaultLangCode;
             }
         }
 
@@ -196,6 +208,13 @@ namespace Immortal_Switch.Scripts.Localization
             }
 
             var savedLang = SettingManager.Instance.CurrentSetting.LangCode;
+
+            if (string.IsNullOrWhiteSpace(savedLang))
+            {
+                savedLang = defaultLangCode;
+                SettingManager.Instance.SetLangCode(savedLang);
+            }
+
             var locale = LocalizationSettings.AvailableLocales.GetLocale(savedLang);
 
             if (locale != null &&
@@ -350,7 +369,8 @@ namespace Immortal_Switch.Scripts.Localization
             var operation = LocalizationSettings.StringDatabase
                 .GetTableEntryAsync(TABLE_NAME, key);
 
-            if (!operation.IsDone || operation.Result.Entry == null)
+            if (!operation.IsDone ||
+                operation.Result.Entry == null)
                 return false;
 
             localizedValue = operation.Result.Entry.Value;

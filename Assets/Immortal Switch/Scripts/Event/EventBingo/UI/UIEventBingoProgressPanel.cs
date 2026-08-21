@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 
@@ -33,7 +35,7 @@ namespace Immortal_Switch.Scripts.Event.EventBingo.UI
         {
             _onClaimMilestone = onClaimMilestone;
 
-            txtProgress.text = $"Điểm hiện tại:\n{currentProgress}";
+            txtProgress.text = LocalizationManager.GetText(LocalizationKeys.UI_CURRENT_POINT, currentProgress);
 
             RefreshMilestones(milestones, currentProgress, claimedMilestoneIds);
         }

@@ -6,6 +6,7 @@ using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.Modules;
+using Immortal_Switch.Scripts.Shared.Constants;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -102,10 +103,15 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             IReadOnlyList<ItemData> rewards
         )
         {
-            txtPrice.text = Mathf.Approximately(price, 0f) ? "Free" : price.ToString(CultureInfo.InvariantCulture);
+            txtPrice.text = Mathf.Approximately(price, 0f)
+                ? LocalizationManager.GetText(LocalizationKeys.UI_FREE)
+                : price.ToString(CultureInfo.InvariantCulture);
+
             txtTitle.text = LocalizationManager.GetText(titleKey);
             txtLimit.text = $"{currentValue:00}/{limit:00}";
-            txtCountdown.text = $"Sale time: {endTime.Day:00}d {endTime.Hour:00}h";
+
+            txtCountdown.text =
+                LocalizationManager.GetText(LocalizationKeys.UI_SALE_TIME, $"{endTime.Day:00}", $"{endTime.Hour:00}");
 
             _onClickBuy = onClickBuy;
             _product = product;

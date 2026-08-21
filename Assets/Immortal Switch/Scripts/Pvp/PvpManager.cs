@@ -10,7 +10,8 @@ namespace Immortal_Switch.Scripts.Pvp
     /// <summary>
     /// Singleton facade root cho PvP. Sở hữu <see cref="IPvPRepository"/> + <see cref="PvPFacade"/>.
     /// <see cref="InitializeAsync"/> load repository, chạy first-run bootstrap, dựng facade.
-    /// Được gọi từ <see cref="GameBootstrap"/> (DOCX §38). Phase-1 toàn bộ local — không đụng server.
+    /// Được gọi từ <see cref="GameBootstrap"/> (DOCX §38). Phase 2: rank/tier/vé/token/battle result/
+    /// leaderboard server-authoritative (xem handler/pvp.js) — formation/buff-gacha/history vẫn local.
     /// </summary>
     public class PvpManager : Singleton<PvpManager>
     {
@@ -38,27 +39,37 @@ namespace Immortal_Switch.Scripts.Pvp
             _repository = new Es3PvPRepository();
             PvpBootstrap.Run(_repository);
 
-            // M2 services (catalog + formation + buff inventory + profile). Inject repository.
+            // M2 services (catalog + formation + buff inventory). Formation/buff inventory vẫn local
+            // (chưa có RPC server cho formation buff — xem ServerPvPMatchmakingService header).
             var catalog = new LocalFormationBuffCatalogService();
             var formation = new LocalPvpFormationService(_repository, catalog);
             var buffInventory = new LocalPvpBuffInventoryService(_repository, catalog);
-            var profile = new LocalPvPProfileService(_repository);
+
+            // Profile: rank/tier/vé/arena_token giờ do server sở hữu (pvp/state) — thay
+            // LocalPvPProfileService (ES3) bằng ServerPvPProfileService (xem handler/pvp.js).
+            var profile = new ServerPvPProfileService();
             await profile.LoadAsync(System.Threading.CancellationToken.None);
 
-            // M4 matchmaking (mock local — DOCX §31).
-            var matchmaking = new MockPvpMatchmakingService(_repository, formation, profile, buffInventory);
+            // M4 matchmaking — ticket/BattleId/RandomSeed server-authoritative (pvp/matchmaking),
+            // đối thủ hiển thị/chiến đấu vẫn client tự sinh (xem ServerPvPMatchmakingService header).
+            var matchmaking = new ServerPvPMatchmakingService(_repository, formation, profile, buffInventory);
 
-            // M5 battle result + battle controller (seeded simulation — DOCX §38).
-            var battleResult = new LocalPvpBattleResultService(_repository, profile);
+            // M5 battle result (pvp/battle/end, server tính rank/token/tier reward) + battle
+            // controller (seeded simulation — không đổi, vẫn chạy client-side).
+            var battleResult = new ServerPvpBattleResultService(_repository, profile);
             _battleController = new HeroVsHeroBattleController(battleResult, catalog);
 
-            // M7 gacha / progression / history (DOCX §22, §38).
+            // M7 gacha / progression / history — vẫn local (chưa có RPC server, ngoài phạm vi đợt này).
             var gacha = new LocalFormationBuffGachaService(_repository, catalog, profile);
             var progression = new LocalFormationBuffProgressionService(_repository, catalog, profile);
             var history = new LocalPvpHistoryService(_repository);
 
-            // Leaderboard (mock 50 record — server chưa làm; thay sau qua IPvPLeaderboardService).
-            var leaderboard = new LocalPvPLeaderboardService(profile);
+            // Leaderboard server-backed (pvp/leaderboard/top + around_me) — xem
+            // ServerPvPLeaderboardService header cho field còn thiếu so với contract cũ.
+            var leaderboard = new ServerPvPLeaderboardService(profile);
+
+            // PvP Shop (mock local — server chưa làm; thay sau qua IPvPShopService).
+            var shop = new LocalPvPShopService(_repository);
 
             _facade = new PvPFacade(_repository)
             {
@@ -71,11 +82,12 @@ namespace Immortal_Switch.Scripts.Pvp
                 Gacha = gacha,
                 Progression = progression,
                 History = history,
-                Leaderboard = leaderboard
+                Leaderboard = leaderboard,
+                Shop = shop
             };
 
             if (enableLog)
-                Debug.Log("[PvP] PvpManager initialized (local Phase-1).");
+                Debug.Log("[PvP] PvpManager initialized (server-backed rank/vé/battle/leaderboard).");
 
             await UniTask.CompletedTask;
         }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Common;
 using Immortal_Switch.Scripts.GameSetting.Views.Layouts;
-using Immortal_Switch.Scripts.Shared;
 using Immortal_Switch.Scripts.UI;
 using UnityEngine;
 

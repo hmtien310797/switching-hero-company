@@ -4,6 +4,8 @@ using Cysharp.Threading.Tasks;
 using Game.Configs.Generated;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Event.EventLeHoiBangLong.UI;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.Views;
 using TMPro;
 using UnityEngine;
@@ -151,7 +153,9 @@ namespace Immortal_Switch.Scripts.Event.EventLeHoiBangLong.Layout
             var maxValue = _milestones.LastOrDefault()?.pointsRequired ?? 1;
 
             imgFill.fillAmount = maxValue <= 0 ? 0f : currentPoint / (maxValue * 1f);
-            txtCurrentPoint.text = $"Điểm hiện tại {currentPoint:N0}";
+
+            txtCurrentPoint.text =
+                LocalizationManager.GetText(LocalizationKeys.UI_EVENT_BL_MISSION_MY_POINT, $"{currentPoint:N0}");
 
             btnClaim.interactable = _milestones.Any(milestone =>
                 currentPoint >= milestone.pointsRequired &&

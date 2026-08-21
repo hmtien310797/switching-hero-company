@@ -25,14 +25,9 @@ namespace Game.Configs.Generated
         public string nameNative;
 
         /// <summary>
-        /// CSV Column: name_vi
+        /// CSV Column: name
         /// </summary>
-        public string nameVi;
-
-        /// <summary>
-        /// CSV Column: name_en
-        /// </summary>
-        public string nameEn;
+        public string name;
 
         /// <summary>
         /// CSV Column: enabled

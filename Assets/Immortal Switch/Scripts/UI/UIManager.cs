@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Items.Models;
 using Immortal_Switch.Scripts.Loading.Views;
 using Immortal_Switch.Scripts.Pvp;
 using Immortal_Switch.Scripts.Shared.Views;
@@ -1166,6 +1167,42 @@ namespace Immortal_Switch.Scripts.UI
         {
             tapeAnimator.transform.parent = GetLayerRoot(UILayer.Main);
             await OpenPopupAsync<TopMainView>(withBackdrop: false);
+        }
+
+#endregion
+
+#region Debug
+
+        [Button("Show 6 Test Rewards (Normal)")]
+        public void DebugShowTestRewards()
+        {
+            var rewards = new List<ItemData>
+            {
+                new ItemData("gold", 9999),
+                new ItemData("diamond", 888),
+                new ItemData("crystal", 777),
+                new ItemData("summon_ticket", 66),
+                new ItemData("energy", 5555),
+                new ItemData("arena_token", 5),
+            };
+
+            PopupRewardService.Show(rewards, withBackdrop: true);
+        }
+
+        [Button("Show 6 Test Rewards (Hero)")]
+        public void DebugShowTestHeroRewards()
+        {
+            var rewards = new List<HeroItemData>
+            {
+                new HeroItemData(1, 1),
+                new HeroItemData(2, 1),
+                new HeroItemData(3, 1),
+                new HeroItemData(4, 1),
+                new HeroItemData(5, 1),
+                new HeroItemData(6, 1),
+            };
+
+            PopupRewardService.ShowHeroItemReward(rewards, withBackdrop: true);
         }
 
 #endregion

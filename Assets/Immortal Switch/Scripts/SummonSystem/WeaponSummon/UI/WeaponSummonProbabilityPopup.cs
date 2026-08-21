@@ -3,6 +3,8 @@ using System.Linq;
 using Immortal_Switch.Scripts.Addressable;
 using Immortal_Switch.Scripts.Hero;
 using Immortal_Switch.Scripts.Items.ScriptableObjects;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.UI;
 using TMPro;
 using UnityEngine;
@@ -151,7 +153,7 @@ namespace Immortal_Switch.Scripts.SummonSystem.WeaponSummon.UI
             var levelData = cachedLevels[currentIndex];
 
             if (summonLevelText != null)
-                summonLevelText.text = $"Lv.{levelData.SummonLevel}";
+                summonLevelText.text = LocalizationManager.GetText(LocalizationKeys.UI_LV, levelData.SummonLevel);
 
             gradeDRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.D) , levelData.GradeDRate);
             gradeCRow?.Bind(ItemTierVisualImageService.GetItemTierIcon(EItemTier.C), levelData.GradeCRate);

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Immortal_Switch.Scripts.Items.Models;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -101,12 +103,12 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
                 if (_canClaim)
                 {
                     btnClaim.image.sprite = sprClaimBtn;
-                    txtClaim.text = "Nhận";
+                    txtClaim.text = LocalizationManager.GetText(LocalizationKeys.UI_CLAIM_PACK);
                 }
                 else
                 {
                     btnClaim.image.sprite = sprUnclaimedBtn;
-                    txtClaim.text = "Nạp";
+                    txtClaim.text = LocalizationManager.GetText(LocalizationKeys.UI_RECHARGE);
                 }
 
                 goClaimed.SetActive(false);

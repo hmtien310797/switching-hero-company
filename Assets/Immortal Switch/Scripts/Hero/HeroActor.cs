@@ -4,9 +4,11 @@ using Common;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts;
 using Immortal_Switch.Scripts.Combat;
+using Immortal_Switch.Scripts.Common;
 using Immortal_Switch.Scripts.Core;
 using Immortal_Switch.Scripts.Equipment.Runtime;
 using Immortal_Switch.Scripts.Hero;
+using Immortal_Switch.Scripts.Localization;
 using Immortal_Switch.Scripts.PowerUpSystem;
 using Immortal_Switch.Scripts.Pooling;
 using Immortal_Switch.Scripts.Skill;
@@ -81,6 +83,12 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     private HeroDataSO heroData;
     private int attackComboIndex;
     private float nextTargetSearchTime;
+
+    [Header("Voice")]
+    private AudioClip thirdHitVoiceClip;
+    private AudioClip ultimateVoiceClip;
+    private AudioClip passiveVoiceClip;
+
     public event Action<HeroActor> OnDead;
 
     public HeroDataSO HeroData => heroData;
@@ -160,6 +168,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
     private void OnDestroy()
     {
+        ReleaseVoice();
         DespawnAndDisposeProjectilePool();
         GameEventManager.Unsubscribe<bool>(GameEvents.OnBossSpawnAnimationComplete, OnBossSpawnAnimationComplete);
         GameEventManager.Unsubscribe<int>(GameEvents.OnStageCleared, OnStageClearEvent);
@@ -213,6 +222,8 @@ public class HeroActor : MonoBehaviour, ICombatUnit
 
         if (!string.IsNullOrEmpty(projectileAddressKey))
             AddressablePoolService.Instance.CreatePoolAsync(projectileAddressKey, 10).Forget();
+
+        await LoadVoiceAsync();
     }
 
     public void SetChosen(bool chosen)
@@ -524,6 +535,79 @@ public class HeroActor : MonoBehaviour, ICombatUnit
     }
 
     // =========================================================
+    // Voice (3rd hit / ultimate / passive)
+    // =========================================================
+
+    private static string GetVoiceFolder()
+    {
+        string code = LocalizationManager.Instance?.CurrentLangCode?.ToLowerInvariant();
+        return code == "vi" ? "vietnamese" : "english";
+    }
+
+    private static string BuildVoiceAddress(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            return null;
+
+        return $"CharacterVoice/{GetVoiceFolder()}/{key}";
+    }
+
+    private async UniTask LoadVoiceAsync()
+    {
+        // Phòng trường hợp Init được gọi lại trên cùng instance đã có clip cũ.
+        ReleaseVoice();
+
+        if (heroData == null)
+            return;
+
+        string thirdAddress = BuildVoiceAddress(heroData.ThirdHitVoiceKey);
+        string ultimateAddress = BuildVoiceAddress(heroData.UltimateVoiceKey);
+        string passiveAddress = BuildVoiceAddress(heroData.PassiveVoiceKey);
+
+        if (!string.IsNullOrWhiteSpace(thirdAddress))
+            thirdHitVoiceClip = await AddressableSpawnService.LoadAudioClipByAddressAsync(thirdAddress);
+        if (!string.IsNullOrWhiteSpace(ultimateAddress))
+            ultimateVoiceClip = await AddressableSpawnService.LoadAudioClipByAddressAsync(ultimateAddress);
+        if (!string.IsNullOrWhiteSpace(passiveAddress))
+            passiveVoiceClip = await AddressableSpawnService.LoadAudioClipByAddressAsync(passiveAddress);
+    }
+
+    /// <summary>Unload các clip voice đã load (gọi khi hero bị despawn / thay bằng hero khác).</summary>
+    public void ReleaseVoice()
+    {
+        if (thirdHitVoiceClip != null)
+        {
+            AddressableSpawnService.ReleaseAudioClip(thirdHitVoiceClip);
+            thirdHitVoiceClip = null;
+        }
+        if (ultimateVoiceClip != null)
+        {
+            AddressableSpawnService.ReleaseAudioClip(ultimateVoiceClip);
+            ultimateVoiceClip = null;
+        }
+        if (passiveVoiceClip != null)
+        {
+            AddressableSpawnService.ReleaseAudioClip(passiveVoiceClip);
+            passiveVoiceClip = null;
+        }
+    }
+
+    public void PlayThirdHitVoice()
+    {
+        SoundManager.Instance.PlayAudioClip(thirdHitVoiceClip);
+    }
+
+    public void PlayUltimateVoice()
+    {
+        SoundManager.Instance.PlayAudioClip(ultimateVoiceClip);
+    }
+
+    public void PlayPassiveVoice()
+    {
+        SoundManager.Instance.PlayAudioClip(passiveVoiceClip);
+    }
+
+    // =========================================================
     // Damage / Heal
     // =========================================================
 
@@ -605,6 +689,7 @@ public class HeroActor : MonoBehaviour, ICombatUnit
         ResetAttackCombo();
         if (isCastingUltimate)
         {
+            PlayUltimateVoice();
             stateMachine.ChangeState(HeroStateId.Ultimate);
             return;
         }

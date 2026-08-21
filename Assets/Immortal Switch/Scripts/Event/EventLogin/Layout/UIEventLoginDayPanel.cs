@@ -1,6 +1,8 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Immortal_Switch.Scripts.Core;
+using Immortal_Switch.Scripts.Localization;
+using Immortal_Switch.Scripts.Shared.Constants;
 using Immortal_Switch.Scripts.Shared.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -109,7 +111,7 @@ namespace Immortal_Switch.Scripts.Event.EventLogin.Layout
                 var day = i + 1;
                 var clone = _pools.Get(i);
 
-                clone.Bind(i, $"Ngày {day}", OnClickDay);
+                clone.Bind(i, LocalizationManager.GetText(LocalizationKeys.UI_DAY_NEW, day), OnClickDay);
 
                 if (day > currentDay)
                 {

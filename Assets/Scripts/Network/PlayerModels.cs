@@ -12,6 +12,9 @@ public class PlayerMeResponse
     // Xem NakamaClient.LinkGoogleAsync/LinkAppleAsync + nakama/src/handler/account.js.
     [JsonProperty("google_linked")]  public bool              google_linked;
     [JsonProperty("apple_linked")]   public bool              apple_linked;
+    // "guest" | "google" | "apple" | "web" (BD/auth-register username+password) — xem
+    // nakama/src/handler/player.js rpcPlayerMe.
+    [JsonProperty("account_type")]   public string            account_type;
     [JsonProperty("level")]          public int               level;
     [JsonProperty("exp")]            public int               exp;
     [JsonProperty("gems")]   public int gems;

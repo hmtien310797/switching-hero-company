@@ -131,13 +131,13 @@ namespace Immortal_Switch.Scripts.Shop.Views.UI
             var remaining = ShopManager.Instance.GetRemaining(_iap.iD, _iap.limit);
             var purchased = ShopManager.Instance.GetPurchasedCount(_iap.iD);
 
-            txtLimit.text = $"Giới Hạn ({purchased}/{_iap.limit})";
+            txtLimit.text = LocalizationManager.GetText(LocalizationKeys.UI_LIMIT, purchased, _iap.limit);
             btnBuy.interactable = remaining > 0;
         }
 
         private void RefreshBonus()
         {
-            txtBonus.text = $"Giá trị <size=30>{_iap.bonus}</size>";
+            txtBonus.text = LocalizationManager.GetText(LocalizationKeys.UI_VALUE, _iap.bonus);
         }
 
         private void RefreshRewards(IReadOnlyList<ItemRewardData> rewards)
